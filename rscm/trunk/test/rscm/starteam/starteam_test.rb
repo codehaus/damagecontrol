@@ -8,11 +8,15 @@ module RSCM
 #    include GenericSCMTests
 
     def create_scm(repository_root_dir, path)
-      StarTeam.new("a_user_name", "a_password", "a_server_name", "49201", "a_project_name", "a_view_name", "a_folder_name")
+      StarTeam.new(ENV["STARTEAM_USER"], ENV["STARTEAM_PASS"], "192.168.254.21", 49201, "NGST Application", "NGST Application", "java")
     end
 
     def test_changesets
-      changesets = create_scm(nil, nil).changesets(nil, Time.new, Time.new)
+      from = Time.new - 2 * 3600 * 24
+      to = Time.new - 1 * 3600 * 24
+      puts "Getting changesets for #{from} - #{to}"
+    
+      changesets = create_scm(nil, nil).changesets(nil, from, to)
       assert_equal(1, changesets.length)
       assert_equal(Time.utc(2004, 11, 30, 04, 52, 24), changesets[0][0].time)
       assert_equal(Time.utc(2004, 11, 30, 04, 53, 23), changesets[0][1].time)

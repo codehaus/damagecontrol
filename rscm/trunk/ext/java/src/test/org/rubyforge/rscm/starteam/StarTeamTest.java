@@ -2,7 +2,6 @@ package org.rubyforge.rscm.starteam;
 
 import junit.framework.TestCase;
 import org.rubyforge.rscm.RSCM;
-import org.rubyforge.rscm.TestScm;
 import org.rubyforge.rscm.YamlDumpable;
 
 import java.io.IOException;
@@ -19,12 +18,12 @@ public class StarTeamTest extends TestCase {
     private String serverPort = "49201";
     private String projectName = "NGST Application";
     private String viewName = "NGST Application";
-    private String folderName = "/bundles";
+    private String folderName = "data";
     private RSCM starTeam;
 
     protected void setUp() throws Exception {
         starTeam = new StarTeam(userName, password, serverName, serverPort, projectName, viewName, folderName);
-        starTeam = new TestScm(null, null);
+//        starTeam = new TestScm(null, null);
     }
 
     public void testShouldConvertChangesToYaml() throws IOException {
@@ -39,6 +38,7 @@ public class StarTeamTest extends TestCase {
         String expected = "--- \n- eenie/meenie/minee/mo\n- catch/a/redneck/by\n- the/toe\n";
         StringWriter yaml = new StringWriter();
         files.dumpYaml(yaml);
+        System.out.println(yaml);
         assertEquals(expected, yaml.toString());
     }
 }

@@ -18,13 +18,13 @@ import org.apache.tools.ant.DefaultLogger;
 import org.apache.tools.ant.Project;
 import org.apache.tools.ant.Target;
 import org.apache.tools.ant.Task;
-import org.apache.tools.ant.BuildException;
 import org.apache.tools.ant.taskdefs.optional.starteam.StarTeamCheckout;
 import org.apache.tools.ant.taskdefs.optional.starteam.StarTeamTask;
 import org.rubyforge.rscm.Change;
 import org.rubyforge.rscm.ChangeSets;
 import org.rubyforge.rscm.RSCM;
 import org.rubyforge.rscm.YamlDumpable;
+import org.rubyforge.rscm.YamlList;
 
 import java.text.DateFormat;
 import java.text.ParseException;
@@ -32,12 +32,10 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Iterator;
-import java.util.List;
 import java.util.Locale;
 import java.util.Map;
-import java.util.ArrayList;
-import java.util.regex.Pattern;
 import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 /**
  * Java helper for the RSCM implementation of StarTeam. This class has borrowed a lot of code from
@@ -64,7 +62,7 @@ public class StarTeam implements RSCM {
     private final String url;
 
     private Pattern checkingOutPattern;
-    private Map starTeamFileToFileSystemFiles = new HashMap();
+    private Map checkedOutStarTeamFileToFileSystemFiles = new HashMap();
 
     public StarTeam(String userName, String password, String serverName, String serverPort, String projectName, String viewName, String folderName) {
         this.userName = userName;
@@ -76,13 +74,12 @@ public class StarTeam implements RSCM {
         this.folderName = folderName;
 
         this.url = userName + ":" + password + "@" + serverName + ":" + Integer.parseInt(serverPort) + "/" + projectName + "/" + viewName;
-
         // compute regexp to match the checked out files.
-        String checkingOutPatternSpec = "Checking out: " + viewName + ".";
-        if(folderName != null) {
-            checkingOutPatternSpec += folderName + ".";
+        String checkingOutPatternSpec = "Checking out: " + viewName;
+        if(folderName != null && !folderName.equals("")) {
+            checkingOutPatternSpec += "." + folderName;
         }
-        checkingOutPatternSpec += "(.*) \\-\\-> (.*)";
+        checkingOutPatternSpec += ".(.*) \\-\\-> (.*)";
         checkingOutPattern = Pattern.compile(checkingOutPatternSpec, Pattern.DOTALL);
     }
 
@@ -172,7 +169,7 @@ public class StarTeam implements RSCM {
 
     public YamlDumpable checkout(String dir, String toIdentifier) {
         StarTeamCheckout checkout = new StarTeamCheckout();
-        final List checkedOutFiles = new ArrayList();
+        final YamlList checkedOutFiles = new YamlList();
         BuildListener buildListener = new BuildListener() {
             public void buildStarted(BuildEvent event) {
             }
@@ -202,7 +199,8 @@ public class StarTeam implements RSCM {
                         // we have to stick it on the path, because it is only when we get a
                         // removing processed that the file exists on disk, and we can check
                         // whether the file is a dir or a file.
-                        starTeamFileToFileSystemFiles.put(fileSystemPath, starTeamPath);
+                        checkedOutStarTeamFileToFileSystemFiles.put(fileSystemPath, starTeamPath);
+                    } else {
                     }
                 } else if (event.getPriority() == 4) {
                     Matcher removingProcessedMatcher = removingProcessesPattern.matcher(message.trim());
@@ -210,11 +208,10 @@ public class StarTeam implements RSCM {
                         String fileSystemPath = removingProcessedMatcher.group(1);
                         java.io.File file = new java.io.File(fileSystemPath);
                         if (file.isFile()) {
-                            String starTeamPath = (String) starTeamFileToFileSystemFiles.remove(fileSystemPath);
-                            if(starTeamPath == null) {
-                                throw new BuildException("No starteam path for " + fileSystemPath);
+                            String starTeamPath = (String) checkedOutStarTeamFileToFileSystemFiles.remove(fileSystemPath);
+                            if(starTeamPath != null) {
+                                checkedOutFiles.add(starTeamPath);
                             }
-                            checkedOutFiles.add(starTeamPath);
                         }
                     }
                 }
@@ -227,7 +224,7 @@ public class StarTeam implements RSCM {
 
         checkout.setRootLocalFolder(dir);
         checkout.execute();
-        return null;
+        return checkedOutFiles;
     }
 
     /**

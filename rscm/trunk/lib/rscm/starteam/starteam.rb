@@ -29,6 +29,7 @@ module RSCM
       clazz = "org.rubyforge.rscm.starteam.StarTeam"
       ctor_args = "#{user_name};#{password};#{server_name};#{server_port};#{project_name};#{view_name};#{folder_name}"
 
+#     Uncomment if you're not Aslak - to run against a bogus java class.
       clazz = "org.rubyforge.rscm.TestScm"
       ctor_args = "hubba;bubba"
 
@@ -36,7 +37,8 @@ module RSCM
 
       rscm_jar = File.expand_path(File.dirname(__FILE__) + "../../../../ext/rscm.jar")
       starteam_jars = Dir["#{ENV['RSCM_STARTEAM']}/Lib/*jar"].join(File::PATH_SEPARATOR)
-      classpath = "#{rscm_jar}#{File::PATH_SEPARATOR}#{starteam_jars}"
+      ant_jars = Dir["#{ENV['ANT_HOME']}/lib/*jar"].join(File::PATH_SEPARATOR)
+      classpath = "#{rscm_jar}#{File::PATH_SEPARATOR}#{ant_jars}#{File::PATH_SEPARATOR}#{starteam_jars}"
 
       @cmd = "java -Djava.library.path=\"#{ENV['RSCM_STARTEAM']}#{File::SEPARATOR}Lib\" -classpath \"#{classpath}\" org.rubyforge.rscm.Main"
     end
@@ -63,6 +65,8 @@ module RSCM
       tf.puts(command)
       tf.close      
       IO.popen("#{@cmd} #{tf.path}") do |io|
+#        io = io.read
+#        puts io
         YAML::load(io)
       end
     end
