@@ -9,7 +9,7 @@
 build = build_history_repository.lookup(project_name, request.query["timestamp"])
 %>
 
-<h1 class="pane"><img src="images/timestampstatus?project_name=<%= project_name %>&timestamp=<%= request.query['timestamp'] %>"/> <%= build_description(build) %></h1>
+<h1 class="pane"><img src="/public/images/timestampstatus?project_name=<%= project_name %>&timestamp=<%= request.query['timestamp'] %>"/> <%= build_description(build) %></h1>
 
 
 <table class="main-table">

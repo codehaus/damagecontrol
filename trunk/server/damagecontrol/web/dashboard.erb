@@ -23,7 +23,7 @@
 			end_row = i == project_count || i % cells_per_row == (cells_per_row - 1)
 			href = "project?project_name=#{project}"
 	
-			image = "images/lastcompletedstatus?project_name=#{project}"
+			image = "/public/images/lastcompletedstatus?project_name=#{project}"
 			last_successful_build = build_history_repository.last_successful_build(project)
 			label = ""
 			label = " (##{last_successful_build.label})" if(last_successful_build)
@@ -47,16 +47,16 @@
 		<% if false then %>
 		<tr>
 			<td>
-			<img src="images/red-pulse-32.gif" />&nbsp;<a href="project">project1</a>
+			<img src="/public/images/red-pulse-32.gif" />&nbsp;<a href="project">project1</a>
 			</td>
 			<td>
-			<img src="images/red-32.gif" />&nbsp;<a href="project">project1</a>
+			<img src="/public/images/red-32.gif" />&nbsp;<a href="project">project1</a>
 			</td>
 			<td>
-			<img src="images/green-pulse-32.gif" />&nbsp;<a href="project">project1</a>
+			<img src="/public/images/green-pulse-32.gif" />&nbsp;<a href="project">project1</a>
 			</td>
 			<td>
-			<img src="images/green-32.gif" />&nbsp;<a href="project">project1</a>
+			<img src="/public/images/green-32.gif" />&nbsp;<a href="project">project1</a>
 			</td>
 		</tr>
 		<% end %>
