@@ -61,6 +61,7 @@ module DamageControl
     end
   end
 
+  # event to picked up by BuildScheduler, which will only build if force_build || !changesets_or_last_commit_time.nil?
   class CheckedOutEvent
     attr_reader :project_name
     attr_reader :changesets_or_last_commit_time

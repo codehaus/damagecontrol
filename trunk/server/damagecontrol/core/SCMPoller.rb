@@ -38,7 +38,7 @@ module DamageControl
         now = Time.at(time)
         if should_poll?(project_name, now)
           @poll_times[project_name] = now
-          @channel.publish_message(DoCheckoutEvent.new(project_name, true))
+          @channel.publish_message(DoCheckoutEvent.new(project_name, false))
         end
       end
     end

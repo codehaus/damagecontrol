@@ -23,9 +23,7 @@ module DamageControl
 
     def on_message(event)
       if event.is_a?(DoCheckoutEvent)
-puts "CM: < DO CHECKOUT #{event.project_name}"
         checked_out_event = CheckedOutEvent.new(event.project_name, checkout(event.project_name), event.force_build)
-puts "CM: > CHECKED OUT #{checked_out_event.project_name}"
         @hub.publish_message(checked_out_event)
       end
     end

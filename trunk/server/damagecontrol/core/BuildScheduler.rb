@@ -32,14 +32,23 @@ module DamageControl
   
     def on_message(event)
       if event.is_a?(CheckedOutEvent)
-puts "BC: < CHECKED OUT #{event.project_name}"
-        build = @project_config_repository.create_build(event.project_name)
-        if(event.changesets_or_last_commit_time.is_a?(ChangeSets))
-          build.changesets = event.changesets_or_last_commit_time
-        end
+        # We only want to build if this is a forced build or if there are changes
+        if(event.force_build || !event.changesets_or_last_commit_time.nil?)
+          build = @project_config_repository.create_build(event.project_name)
+          if(event.changesets_or_last_commit_time.is_a?(ChangeSets))
+            build.changesets = event.changesets_or_last_commit_time
+          end
 
-        build.status = Build::QUEUED
-        schedule_build(build)
+          build.status = Build::QUEUED
+          if(!event.changesets_or_last_commit_time.nil?)
+            logger.info("Scheduling build for #{event.project_name} as there were changes.")
+          else
+            logger.info("Scheduling build for #{event.project_name} as it was forced.")
+          end
+          schedule_build(build)
+        else
+          logger.info("Not scheduling build for #{event.project_name} as there were no changes and the build isn't forced.")
+        end
       end
       if event.is_a?(BuildCompleteEvent)
         try_to_execute_builds
