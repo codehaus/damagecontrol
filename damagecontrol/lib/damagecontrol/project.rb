@@ -10,6 +10,7 @@ require 'damagecontrol/tracker'
 require 'damagecontrol/visitor/yaml_persister'
 require 'damagecontrol/visitor/diff_persister'
 require 'damagecontrol/visitor/rss_writer'
+require 'damagecontrol/publisher/base'
 
 module DamageControl
   # Represents a project with associated SCM, Tracker and SCMWeb
@@ -218,7 +219,7 @@ module DamageControl
 
     # Returns the Build for the given +changeset_identifier+ and +build_time+
     def build(changeset_identifier, build_time)
-      Build.new(name, changeset_identifier, build_time)
+      Build.new(name, changeset_identifier, build_time, "FIXME")
     end
 
     # Returns the latest build.

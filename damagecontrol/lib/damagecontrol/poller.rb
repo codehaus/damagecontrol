@@ -40,7 +40,6 @@ module DamageControl
     
     # Runs +poll+ in a separate thread.
     def start
-      add_all_projects
       @t = Thread.new do
         while(true)
           poll
