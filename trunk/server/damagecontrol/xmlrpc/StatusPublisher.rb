@@ -52,14 +52,15 @@ module XMLRPC
     def clean_for_marshal(o)
       case o
       when Build
-        o.scm = nil
+        build = o.dup
+        build.scm = nil
         # HACK OF DEATH:
         # some xmlrpc implementations get very confused by an empty struct
         # so we'll patch it by adding a pointless property in it
         # (did that take me like one day to figure out?!)
         # -- Jon Tirsen
-        o.config["apa"]="banan" if o.config.empty?
-        o
+        build.config["apa"]="banan" if o.config.empty?
+        build
       when Enumerable
         o.collect {|s| clean_for_marshal(s)}
       else
