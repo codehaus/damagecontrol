@@ -23,6 +23,7 @@ class End2EndTest < Test::Unit::TestCase
 	
 	def setup
 		@basedir = "../.."
+		Dir.mkdir("#{@basedir}/target")
 		@tempdir = File.expand_path("#{@basedir}/target/temp_e2e_#{Time.new.to_i}")
 		mkdirs(@tempdir)
 		Dir.chdir(@tempdir)
