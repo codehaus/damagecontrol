@@ -1,0 +1,88 @@
+<table nowrap="nowrap" class="pane" nowrap="nowrap">
+
+  <tr>
+    <td class="pane-header">
+      <%= header_text %>
+    </td>
+  </tr>
+  
+<%
+  if builds.empty?
+%>
+
+  <tr class="pane">
+    <td class="pane">
+      <%= empty_text %>
+    </td>
+  </tr>
+  
+<% else %>
+
+  <%
+    builds = builds.reverse
+    builds_to_display = builds[0..max_number_of_builds]
+    builds_to_option_box = builds[max_number_of_builds..-1]
+    i = -1
+    builds_to_display.each do |build|
+      i = i + 1
+      color = if build.successful? then "green" else "red" end
+      color = "grey" if !build.completed?
+      image = "images/#{color}-16.gif"
+      prefix = ""
+      prefix = "#{build.project_name} " if prefix_with_project_name
+  %>
+  <tr class="build-row">
+    <td nowrap="nowrap">
+      <img width="16" height="16" src="<%= image %>" />&nbsp;
+    <% if selected_build == build then%><span class="highlighted-build"><% end %>
+      <a class="tip" href="<%= base_url %><%= build_url(build) %>">
+        <% if selected_build == build then %><b><% end %>
+        
+        <%= prefix %><%= build_description(build) %>
+        
+        <% if selected_build == build then %></b><% end %>
+        <span>
+          <% if(build.changesets.length == 0) %>
+            <i><%= no_changes_in_this_build %></i>
+          <% else %>
+            <% build.changesets.each do |changeset| %>
+              (by <%= changeset.developer %> <%= changeset.time_difference %> ago) <br/>
+              <i><%= changeset.message %></i><br/>
+              <% changeset.each do |change| %>
+                <%= change.path %><br/>
+              <% end %>
+            <% end %>
+          <% end %>
+        </span>
+      </a>
+    <% if selected_build == build then%></span><% end %>
+    </td>
+  </tr>
+  
+  <% end %>
+
+  <% if builds_to_option_box && !builds_to_option_box.empty? %>
+    <tr class="build-row">
+      <td class="build-cell-even">
+        <form method="get" action="<%= base_url %>">
+          <input type="hidden" name="project_name" value="<%= project_name %>" />
+          <select name="timestamp" onchange="submit()">
+          
+          <%
+            builds_to_option_box.each do |build|
+            prefix = ""
+            prefix = "#{build.project_name} " if prefix_with_project_name
+          %>
+            <option value="<%= build.timestamp_as_s %>"><%= prefix %><%= build_description(build) %></option>      
+          <% end %>
+          
+          </select>
+        </form>
+      </td>
+    </tr>
+  <% end %>  
+
+<% end %>
+
+</table>
+

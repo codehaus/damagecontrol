@@ -1,0 +1,39 @@
+<!-- the config file used by xmlconfig.rb -->
+<log4r_config>
+  <pre_config>
+    <global level="DEBUG"/>
+    <!-- rootdir is the root directory of the server, defined at runtime -->
+    <!-- logdir is also defined at runtime and is usually #{logdir}/log -->
+    <parameter name="logfile" value="#{logdir}/damagecontrol.log"/>
+  </pre_config>
+
+  <!-- outputters -->
+  
+  <outputter name="file" type="RollingFileOutputter" level="INFO">
+    <filename>#{logfile}</filename>
+    <!-- 24 hours in seconds -->
+    <maxtime>86400</maxtime>
+  </outputter>
+  <outputter name="stdout" type="StdoutOutputter" level="INFO"/>
+  <outputter name="stderr" type="StderrOutputter" level="ERROR"/>
+  <outputter name="email" type="EmailOutputter" level="ERROR">
+    <server>beaver.codehaus.org</server>
+    <port>25</port>
+    <domain>builds.codehaus.org</domain>
+    <from>damagecontrol@builds.codehaus.org</from>
+    <to>tirsen@codehaus.org</to>
+    <subject>DamageControl Error</subject>
+    <immediate_at>FATAL,ERROR</immediate_at>
+  </outputter>
+  
+  <!-- loggers -->
+  
+  <logger name="DamageControl">
+    <level>INFO</level>
+    <outputter>file</outputter>
+    <outputter>stdout</outputter>
+    <outputter>stderr</outputter>
+    <outputter>email</outputter>
+  </logger>
+  
+</log4r_config> 

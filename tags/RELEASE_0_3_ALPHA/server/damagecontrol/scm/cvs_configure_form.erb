@@ -1,0 +1,76 @@
+<img src="http://www.wincvs.org/cvs.png"/>
+<table width="100%">
+  <tr>
+    <td class="setting-name">CVSROOT</td>
+    <td width="75%"><input class="setting-input" name="cvsroot" id="cvsroot" onKeyUp="distributeCvsrootFields()" type="text" value="<%=  cvsroot %>"></td>
+  </tr>
+  <tr>
+    <td>Protocol</td>
+    <td>
+      <select class="setting-input" id="cvsprotocol" onchange="updateCvsRootField()">
+        <option value=""></option>
+        <option value="ext" selected>Secure shell (:ext:)</option>
+        <option value="pserver">Password server (:pserver:)</option>
+        <option value="local">Locally mounted folder (:local:)</option>
+      </select>
+    </td>
+  </tr>
+  <tr>
+    <td>User name</td>
+    <td><input class="setting-input" id="cvsuser" onKeyUp="updateCvsRootField()" type="text"></td>
+  </tr>
+  <tr>
+    <td>Password</td>
+    <td><input class="setting-input" name="cvspassword" id="cvspassword" value="<%= cvspassword %>" type="password"></td>
+  </tr>
+  <tr>
+    <td>&nbsp;</td>
+    <td class="setting-description">
+      <b>Warning!</b> Password will be shown in cleartext in configuration files.
+    </td>
+  </tr>
+  <tr>
+    <td>Server</td>
+    <td><input class="setting-input" id="cvsserver" onKeyUp="updateCvsRootField()" type="text"></td>
+  </tr>
+  <tr>
+    <td>Port</td>
+    <td><input class="setting-input" id="cvsport" onKeyUp="updateCvsRootField()" type="text"></td>
+  </tr>
+  <tr>
+    <td>Repository directory</td>
+    <td><input class="setting-input" id="cvsrepodir" onKeyUp="updateCvsRootField()" type="text"></td>
+  </tr>
+  <tr>
+    <td>&nbsp;</td>
+    <td class="setting-description">
+      <b>For CVS NT users:</b> Please ensure that there are no backslashes for the path to the repository as the Cygwin build of the CVS client which 
+      DamageControl by default uses does not recognize that as a valid path spec (no Unix builds of the CVS client recognizes 
+      backslashes).
+    </td>
+  </tr>
+  <tr>
+    <td>Module</td>
+    <td><input class="setting-input" name="cvsmodule" id="cvsmodule" type="text" value="<%= cvsmodule %>"></td>
+  </tr>
+  <tr>
+    <td>Branch</td>
+    <td><input class="setting-input" name="cvsbranch" id="cvsbranch" type="text" value="<%= cvsbranch %>"></td>
+  </tr>
+  <tr>
+    <td>&nbsp;</td>
+    <td class="setting-description">
+      Note that you can't use trigged build if you are using DC to build multiple branches for the same project,
+      use polled builds instead.
+    </td>
+  </tr>
+  <tr>
+    <td class="setting-name">RSH client</td>
+    <td><input class="setting-input" name="rsh_client" id="cvs_web_url" type="text" value="<%= rsh_client %>"></td>
+  </tr>
+  <tr>
+    <td>&nbsp;</td>
+    <td class="setting-description">For example <tt>ssh</tt> or <tt>plink.exe</tt></td>
+  </tr>
+</table>
+

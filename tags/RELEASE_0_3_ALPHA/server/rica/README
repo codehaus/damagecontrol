@@ -1,0 +1,64 @@
+=====================================================================
+      Rica -- Ruby Internet relay Chat Agents (based on RFC1459)
+
+                                     NISHI Takao <zophos@koka-in.org>
+                             Time-stamp: <2001/11/11 17:10:13 zophos>
+=====================================================================
+
+What's Rica?
+------------
+    Rica is RFC1459 matched irc clients class library for Ruby
+    1.6.x.
+
+
+Features
+--------
+    * Multiple server connection supported
+    * Event driven classes
+    * Easy to create user agents
+    * 100% pure Ruby :)
+
+
+Requirement
+-----------
+    * Ruby 1.6.x
+    * Socket, Thread, Observer, Singleton, Delegate and Kconv
+      libraries (Ruby archive consits all of those liblaries.)
+    * jcode and curses liblaries required for ricaco.rb
+    * ruby/gtk liblaries required for erica.rb
+    * A little bit of your energy
+
+
+Download and more information
+-----------------------------
+    You can get latest version of Rica from;
+      http://www.koka-in.org/%7Ezophos/lib/rica/
+
+    There are more information at
+      http://www.koka-in.org/%7Ezophos/SideA/lsnt/rica.html
+
+
+Files
+-----
+    README  ................... This file
+    COPYING ................... Artistic Copyright
+    CHANGES ................... Change log
+    rica.rb ................... Rica main modules
+    rica-example.rb ........... Rica Example Code
+    ctptresponder.rb .......... Rica ctcp auto responding module
+    logholder.rb .............. Rica logging modules
+    connectiondiag.rb ......... Rica connection diagnostic module
+    ricaco.rb ................. Rica sample application (based on Cursor)
+    erica.rb .................. Rica sample application (based on GTK)
+    erica.txt ................. erica manual (in Japanese)
+    classes_and_methods.txt ... Rica's classes and method list
+    event.lst ................. Rica's event list
+    rica_classes.png .......... Rica's message flow diagram
+    rica_uml.png .............. Rica's classes relationship diagram
+
+Copying
+-------
+    RICA is copyrighted free software by NISHI Takao
+    <zophos@koka-in.org>.
+    You can redistribute it and/or modify it under either the terms of
+    the Artistic.

@@ -1,0 +1,19 @@
+<table class="pane">
+  <tr><td class="pane-header" colspan="2">
+    Build Executor Status
+  </td></tr>
+  <tr>
+    <th class="pane"></th>
+    <th class="pane">Status</th>
+  </tr>
+  <%
+    i = 0
+    build_executors.each do |build_executor|
+      i += 1
+  %>
+  <tr>
+    <td class="pane">#<%= i %></td>
+    <td class="pane"><%= build_executor.status_message %></td>
+  </tr>
+  <% end %>
+</table>
