@@ -48,18 +48,18 @@ module Pebbles
     
     include RiteMesh
     
-    def service(req, res)
-      super(req, res)
+    def service(request, response)
+      super(request, response)
 
       # http://lab.artlung.com/other/anti-cache/
-      if(req["auto_refresh"] != "true")
+      if(request.query["auto_refresh"] != "true")
         # we _do_ want the browser to cache when auto_refresh is enabled, to avoid flickering of images
         response["CacheControl"] = "no-cache"
         response["Pragma"] = "no-cache"
         response["Expires"] = "-1"
       end
       
-      action = req.query['action'] || "default_action"
+      action = request.query['action'] || "default_action"
       
       begin
         raise "no such action: #{action}" unless actions.index(action)
