@@ -30,7 +30,7 @@ else
 EOF
     
     def test_can_parse_SIMPLE_LOG_ENTRIES
-      parser = SVNLogEntryParser.new("damagecontrolled", "damagecontrolled")
+      parser = SubversionLogEntryParser.new("damagecontrolled", "damagecontrolled")
       can_parse_simple_log_entry(parser, SIMPLE_LOG_ENTRY)
       can_parse_simple_log_entry(parser, SIMPLE_LOG_ENTRY_WITH_BACKSLASHES)
     end
@@ -53,7 +53,7 @@ EOF
 
     def test_parses_entire_log_into_changesets
       File.open(File.dirname(__FILE__) + "/svn-proxytoys.log") do |io|
-        parser = SVNLogParser.new(io, "trunk/proxytoys", nil)
+        parser = SubversionLogParser.new(io, "trunk/proxytoys", nil)
 
         changesets = parser.parse_changesets
         
@@ -88,7 +88,7 @@ EOF
 
     def test_parses_entire_log_into_changesets
       File.open(File.dirname(__FILE__) + "/svn-cargo.log") do |io|
-        parser = SVNLogParser.new(io, "trunk/proxytoys", nil)
+        parser = SubversionLogParser.new(io, "trunk/proxytoys", nil)
         changesets = parser.parse_changesets
         assert_equal(16, changesets.length)
       end
@@ -103,7 +103,7 @@ nothing
 EOF
 
     def test_should_retrieve_head_revision
-      parser = SVNLogParser.new(StringIO.new(SVN_R_LOG_HEAD_DATA), "blah", nil)
+      parser = SubversionLogParser.new(StringIO.new(SVN_R_LOG_HEAD_DATA), "blah", nil)
       changesets = parser.parse_changesets
       assert_equal(48, changesets[0].revision)
     end
