@@ -111,10 +111,6 @@ module DamageControl
       params[:RootDir] || "#{damagecontrol_home}/work"
     end
     
-    def checkoutdir
-      "#{rootdir}/checkout"
-    end
-    
     def logdir
       "#{rootdir}/log"
     end
@@ -229,10 +225,6 @@ module DamageControl
     
     def webdir
       "#{damagecontrol_home}/server/damagecontrol/web"
-    end
-    
-    def checkoutdir
-      "#{rootdir}/checkout"
     end
     
     def init_build_scheduler

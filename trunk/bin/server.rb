@@ -28,12 +28,10 @@ def server.init_custom_components
   # you can initialize custom or non-standard components below (examples provided)
   
   #require 'damagecontrol/publisher/IRCPublisher'
-  #require 'damagecontrol/template/ShortTextTemplate'
-  #component(:irc_publisher, IRCPublisher.new(hub, "irc.codehaus.org", '#damagecontrol', ShortTextTemplate.new))
+  #component(:irc_publisher, IRCPublisher.new(hub, self, "some.irc.server", '#somechannel', "short_text_build_result_with_link.erb"))
   
   #require 'damagecontrol/publisher/EmailPublisher'
-  #require 'damagecontrol/template/HTMLTemplate'
-  #component(:email_publisher, EmailPublisher.new(hub, ShortTextTemplate.new, HTMLTemplate.new, "dcontrol@builds.codehaus.org"))
+  #component(:email_publisher, EmailPublisher.new(hub, self, "short_text_build_result.erb", "short_html_build_result.erb", "dcontrol@builds.codehaus.org"))
   
 end
 
