@@ -30,12 +30,14 @@ module XMLRPC
 
     def request(project_name)
       begin
-        changesets_or_last_commit_time = @checkout_manager.checkout(project_name)
         build = @project_configuration_repository.create_build(project_name)
+        build.status = Build::CHECKING_OUT
+        @channel.publish_message(BuildRequestEvent.new(build))
+
+        changesets_or_last_commit_time = @checkout_manager.checkout(project_name)
         if(changesets_or_last_commit_time.is_a?(ChangeSets))
           build.changesets = changesets_or_last_commit_time
         end
-        @channel.publish_message(BuildRequestEvent.new(build))
         
 <<-EOF
 Monitor build results at:
