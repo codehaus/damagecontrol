@@ -48,10 +48,12 @@
 		<% end %>
 	</table>
 	
+	<% if private? then %>
 	Tasks:
 	<ul>
 	<li><a href="project?action=configure">New Project</a></li>
 	</ul>
+	<% end %>
 
 </body>
 </html>

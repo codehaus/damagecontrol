@@ -107,26 +107,40 @@ module DamageControl
         :RequestHandler => HostVerifyingHandler.new(host_verifier)
       ))
       
+      init_public_web
+      init_private_web
+    end
+    
+    def init_public_web
       public_xmlrpc_servlet = ::XMLRPC::WEBrickServlet.new
       DamageControl::XMLRPC::StatusPublisher.new(public_xmlrpc_servlet, build_history_repository)
       DamageControl::XMLRPC::ConnectionTester.new(public_xmlrpc_servlet)
       # For public unauthenticated XML-RPC connections like getting status
       httpd.mount("/public/xmlrpc", public_xmlrpc_servlet)
       
+      httpd.mount("/public/dashboard", DashboardServlet.new(build_history_repository, project_config_repository, :public))
+      httpd.mount("/public/project", ProjectServlet.new(build_history_repository, nil, nil, :public))
+      
+      httpd.mount("/public/images", WEBrick::HTTPServlet::FileHandler, "#{webdir}/images")
+      httpd.mount("/public/css", WEBrick::HTTPServlet::FileHandler, "#{webdir}/css")
+    end
+    
+    def init_private_web
       private_xmlrpc_servlet = ::XMLRPC::WEBrickServlet.new
       DamageControl::XMLRPC::ServerControl.new(private_xmlrpc_servlet)
       component(:trigger, DamageControl::XMLRPC::Trigger.new(private_xmlrpc_servlet, @hub, project_config_repository))
       # For private authenticated and encrypted (with eg an Apache proxy) XML-RPC connections like triggering a build
       httpd.mount("/private/xmlrpc", private_xmlrpc_servlet)
 
-      httpd.mount("/private/dashboard", DashboardServlet.new(build_history_repository, project_config_repository))
-      httpd.mount("/private/project", ProjectServlet.new(build_history_repository, project_config_repository, trigger))
+      httpd.mount("/private/dashboard", DashboardServlet.new(build_history_repository, project_config_repository, :private))
+      httpd.mount("/private/project", ProjectServlet.new(build_history_repository, project_config_repository, trigger, :private))
       
-      webdir = "#{damagecontrol_home}/server/damagecontrol/web"
-      httpd.mount("/public/images", WEBrick::HTTPServlet::FileHandler, "#{webdir}/images")
       httpd.mount("/private/images", WEBrick::HTTPServlet::FileHandler, "#{webdir}/images")
-      httpd.mount("/public/css", WEBrick::HTTPServlet::FileHandler, "#{webdir}/css")
       httpd.mount("/private/css", WEBrick::HTTPServlet::FileHandler, "#{webdir}/css")
+    end
+    
+    def webdir
+      "#{damagecontrol_home}/server/damagecontrol/web"
     end
     
     def checkoutdir
