@@ -84,10 +84,10 @@ module DamageControl
       changesets = scm.checkout(checkout_dir, before_change, nil) { |line| puts line }
       assert(1, changesets.length)
       
-      build_xml = changesets[0][0]
-      assert(before_change < build_xml.time, "'{before_change}' should be < '#{build_xml.time}'")
-      assert(build_xml.time < after_change)
-      assert_equal("build.xml", build_xml.path)
+      assert(before_change < changesets[0].time)
+      assert(changesets[0].time < after_change)
+
+      assert_equal("build.xml", changesets[0][0].path)
       assert_equal("src/java/com/thoughtworks/damagecontrolled/Thingy.java", changesets[0][1].path)
 
       changesets = scm.checkout(checkout_dir, before_change, nil)

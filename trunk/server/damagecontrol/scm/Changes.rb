@@ -124,7 +124,7 @@ EOF
       change.revision = revision if revision
       change.developer = developer if developer
       change.message = message if message
-      change.time = time if time
+#      change.time = time if time
     end
 
     def [] (change)
