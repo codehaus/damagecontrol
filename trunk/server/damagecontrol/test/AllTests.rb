@@ -45,3 +45,4 @@ require 'damagecontrol/test/IntegrationTests'
 
 require 'pebbles/RiteMeshTest'
 require 'pebbles/TimeUtilsTest'
+require 'pebbles/MatchableTest'
