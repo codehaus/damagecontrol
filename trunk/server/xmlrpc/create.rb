@@ -3,7 +3,7 @@
 # 
 # Copyright (C) 2001, 2002 by Michael Neumann (neumann@s-direktnet.de)
 #
-# $Id: create.rb,v 1.1 2004/05/17 14:41:24 tirsen Exp $
+# $Id: create.rb,v 1.2 2004/07/29 00:22:32 tirsen Exp $
 #
 
 require "date"
@@ -261,7 +261,7 @@ module XMLRPC
             if ok
               return conv2value(pa)
             else 
-              raise "Wrong type!"
+              raise "Wrong type #{param}!"
             end
           end
 	end
