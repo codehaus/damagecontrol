@@ -15,6 +15,7 @@ module DamageControl
       
       if message.is_a? BuildProgressEvent
         log_file(message.build).puts(message.output)
+        log_file(message.build).flush
       end
 
       if message.is_a? BuildCompleteEvent
