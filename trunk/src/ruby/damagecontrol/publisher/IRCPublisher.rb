@@ -19,29 +19,44 @@ module DamageControl
   
     def initialize(channel, server, irc_channel, template)
       super(channel)
-      @irc = IRCConnection.new()
+      @irc = IRCConnection.new
       @server = server
       @irc_channel = irc_channel
       @template = template
       @handle = 'dcontrol'
     end
+    
+    def start
+      super
+      ensure_in_channel
+    end
+    
+    def wait_until
+      while !yield
+        sleep 1
+      end
+    end
+    
+    def ensure_in_channel
+      if !@irc.connected?
+        logger.info("connecting to #{server}")
+        @irc.connect(server, handle)
+        wait_until { @irc.connected? }
+      end
+      
+      if @irc.connected? && !@irc.in_channel?
+        logger.info("join channel #{@server_channel}")
+        @irc.join_channel(@irc_channel)
+        wait_until { @irc.in_channel? }
+      end
+    end
   
     def process_message(message)
       if message.is_a?(BuildCompleteEvent)
-        if @irc.connected? && @irc.in_channel?
-          content = @template.generate(message.build)
-          logger.info("sending irc message #{content}")
-          @irc.send_message_to_channel(content)
-        else
-          if !@irc.connected?
-            logger.info("connecting to #{server}")
-            @irc.connect(server, handle)
-          elsif !@irc.in_channel?
-            logger.info("join channel #{@server_channel}")
-            @irc.join_channel(@irc_channel)
-          end
-          raise "not in channel yet"
-        end
+        ensure_in_channel
+        content = @template.generate(message.build)
+        logger.info("sending irc message #{content}")
+        @irc.send_message_to_channel(content)
       end
     end
   end
