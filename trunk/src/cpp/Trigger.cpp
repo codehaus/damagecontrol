@@ -37,7 +37,7 @@
 //
 // authors: emerson clarke, aslak hellesoy
 
-#include "trigger.h"
+#include "Trigger.h"
 
 bool Trigger::Active=false;
 
