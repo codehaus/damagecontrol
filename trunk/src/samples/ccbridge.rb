@@ -3,20 +3,20 @@ $VERBOSE = nil
 handle = 'ant'
 server = 'zebedee'
 channel = "#build"
-#logdir = 'D:\cruise\cruiselogs'
-logdir = '.'
+logdir = 'D:\cruise\cruiselogs'
 
 $damagecontrol_home = '../..'
 $:<<"#{$damagecontrol_home}/src/ruby"
 
 require 'damagecontrol/cruisecontrol/CruiseControlLogPoller'
+require 'damagecontrol/template/ShortTextTemplate'
 require 'damagecontrol/publisher/IRCPublisher'
 
 include DamageControl
 
 hub = Hub.new
 CruiseControlLogPoller.new(hub, logdir).start
-irc = IRCPublisher.new(hub, server, channel)
+irc = IRCPublisher.new(hub, server, channel, ShortTextTemplate.new)
 irc.handle = handle
 irc.start
 
