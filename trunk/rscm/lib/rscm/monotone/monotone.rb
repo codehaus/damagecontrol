@@ -24,6 +24,10 @@ module RSCM
       end
     end
 
+    def transactional?
+      true
+    end
+
     def import(dir, message)
       dir = File.expand_path(dir)
 

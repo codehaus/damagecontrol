@@ -62,7 +62,7 @@ module RSCM
     module_function :project_dir
 
     def basedir
-      @@basedir ||= ENV["RSCM_BASE"] || File.expand_path(File.dirname(__FILE__) + "/../../target/work")
+      @@basedir ||= ENV['RSCM_BASE'] || "#{ENV['HOME']}/.rscm" || "#{ENV['HOMEDIR']}/.rscm"
     end
     module_function :basedir
 

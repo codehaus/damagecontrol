@@ -105,6 +105,7 @@ function enableOrDisableCvsFields() {
 }
 
 var scm_password_tip = "<div class='tp1'><b>Warning!</b> Password will be shown in cleartext in configuration files.</div>";
+var cvs_protocol_tip = "<div class='tp1'>If you specify :local: DamageControl can create the repository for you after you save (unless the repository already exists).</div>";
 // not displayed yet - not appropriate for rscm...
 var cvs_mod_tip  = "<div class='tp1'>Note that you can't use trigged build if you are using DC to build multiple branches for the same project, use polling instead.</div>";
 
@@ -119,7 +120,7 @@ var cvs_mod_tip  = "<div class='tp1'>Note that you can't use trigged build if yo
 <% if(@edit) %>
   <tr>
     <td>Protocol</td>
-    <td>&nbsp;</td>
+    <td><%= tip(:txt => 'cvs_protocol_tip') %></td>
     <td>
       <select class="setting-input" id="cvsprotocol" onchange="updateCvsRootField()">
         <option value=""></option>
@@ -127,13 +128,6 @@ var cvs_mod_tip  = "<div class='tp1'>Note that you can't use trigged build if yo
         <option value="pserver">Password server (:pserver:)</option>
         <option value="local">Locally mounted folder (:local:)</option>
       </select>
-    </td>
-  </tr>
-  <tr>
-    <td>&nbsp;</td>
-    <td>&nbsp;</td>
-    <td class="setting-description">
-      If you specify :local: DamageControl can create the repository for you after you save (unless the repository already exists).
     </td>
   </tr>
   <tr>
