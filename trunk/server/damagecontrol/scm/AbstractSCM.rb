@@ -1,11 +1,13 @@
 require 'damagecontrol/util/Logging'
 require 'damagecontrol/util/FileUtils'
 require 'damagecontrol/scm/Changes'
+require 'xmlrpc/utils'
 
 module DamageControl
   class AbstractSCM
     include FileUtils
     include Logging
+    include XMLRPC::Marshallable
     
   public
 
