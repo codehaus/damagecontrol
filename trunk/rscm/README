@@ -104,7 +104,8 @@ acceptance test suite for RSCM. By doing this you'll actually follow a TDD
 approach for your new Mooky class - except that the tests are already written
 for you!
 
-IMPORTANT NOTE: If your SCM doesn't provide an easy way to create new local repositories (such as with StarTeam) you're probably better off writing the tests from scratch and not
+IMPORTANT NOTE: If your SCM doesn't provide an easy way to create new local repositories 
+(such as with StarTeam) you're probably better off writing the tests from scratch and not
 include GenericSCMTests. Instead, just make sure you have an SCM repository set up somewhere
 and write tests to work against that repository. This way you won't be able to pass the
 generic acceptance test suite, and other people (like the RSCM dev team) will probably
@@ -119,11 +120,11 @@ They're just files).
 
 Let's implement the Mooky class. Take a look at.
 
-  lib/rscm/mooky/mooky.rb
+  lib/rscm/scm/mooky.rb
 
 Try running Mooky's test:
 
-  rake test TEST=test/rscm/mooky/mooky_test.rb
+  rake test TEST=test/rscm/scm/mooky_test.rb
   
 Whoops - we got some failures! It failed because our checkout method returned 
 nothing (nil). Let'see if we can get the a little further by implementing this
@@ -150,7 +151,7 @@ should also yield each file name as the execution proceeds).
 Once your checkout command works okay, the test will get you a little further. Just keep
 on going until all tests pass.
 
-NOTE: If the SCM doesn't have a command line utility or a 3rd party Ruby API, but instead
+NOTE: If the SCM doesn't have a command line utility (unlikely) or a 3rd party Ruby API, but instead
 provides libraries (perhaps in C), then you should consider writing a Ruby C extension
 instead.
 
@@ -158,25 +159,9 @@ If the SCM has a Java interface, you can take the same approach as for StarTeam.
 Java classes for ChangeSets that allow easy interaction between Ruby and Java over YAML. 
 You can reuse these classes for other Java based SCMs (if there are any, I don't know).
 
-== Writing the web interface (DamageControl only)
+== Web interface (DamageControl only)
 
-If you're contributing a new SCM it would be nice if you took the time to implement a web interface
-that can be used to embed it into DamageControl.
-
-In trunk/damagecontrol, start by creating +app/views/project/_mooky.rhtml+. 
-
-Create a table with 2 columns and a row for each +attr_accessor+ in the Mooky class, preferrably
-with some explanatory text for the users so they know how to fill it in. See how the tooltips
-are used in some of the existing implementations.
-
-You also need a javascript section at the top
-with a function called +mooky_init()+. This will be called when the page is loaded. If you don't
-have plans to do anything fancy here, just leave it blank.
-
-=== Wiring it all up
-
-Just edit +lib/rscm.rb+ and +require+ your new scm class. Now you should see it coming up
-on the Source Control tab in the web interface.
+DamageControl automatically detects new SCM classes in RSCM and generates a default web interface.
 
 = Building RSCM
 This section is for developers who are new to ruby development and do not already know how to build and install Ruby gems.
