@@ -41,7 +41,11 @@ module DamageControl
 
       @filesystem.makedirs(project_base_dir)
       @filesystem.chdir(project_base_dir)
- 
+
+      # set up some environment variables the build can use
+      ENV["DAMAGECONTROL_CHANGES"] = 
+        current_build.modification_set.collect{|m| "\"#{m.path}\"" }.join(" ") unless current_build.modification_set.nil?
+        
       IO.foreach("|#{current_build.build_command_line} 2>&1") do |line|
         report_progress(line)
       end

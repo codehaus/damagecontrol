@@ -71,7 +71,10 @@ module DamageControl
     def changes(spec, checkoutdirectory, time_before, time_after)
       with_working_directory(checkoutdirectory) do
         cvs_with_io(changes_command(time_before, time_after)) do |io|
-          CVSLogParser.new.parse_log(io)
+          parser = CVSLogParser.new
+          parser.cvspath = path(spec)
+          parser.cvsmodule = mod(spec)
+          parser.parse_log(io)
         end
       end
     end
@@ -289,11 +292,21 @@ module DamageControl
       
       entries[1..entries.length].each do |entry|
         modification = parse_modification(entry)
-        modification.path = file
+        modification.path = make_relative_to_module(file)
         modifications<<modification
       end
       
       modifications
+    end
+    
+    attr_accessor :cvspath
+    attr_accessor :cvsmodule
+    
+    def make_relative_to_module(file)
+      return file if cvspath.nil? || cvsmodule.nil?
+      # clean away windows backslashes
+      cvspath.gsub!(/\\/, "/")
+      file.gsub(/\\/, "/").gsub(/^#{cvspath}\/#{cvsmodule}\//, "")
     end
     
     def parse_modification(modification_entry)

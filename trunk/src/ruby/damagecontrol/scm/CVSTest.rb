@@ -48,7 +48,7 @@ module DamageControl
       changes = @cvs.changes(spec, testcheckout, time_before, time_after)
       assert_equal(1, changes.length)
       mod = changes[0]
-      assert(mod.path =~ /build\.xml/)
+      assert_equal("build.xml", mod.path)
       assert_equal("changed something\n", mod.message)
     end
     
@@ -238,6 +238,14 @@ module DamageControl
       assert_equal("2003/11/09 17:53:37", modification.time)
       assert_equal("tirsen", modification.developer)
       assert_equal("Quiet period is configurable for each project\n", modification.message)
+    end
+    
+    def test_removes_cvsroot_and_module_from_paths_when_specified
+      @parser.cvspath = "/cvsroot/damagecontrol"
+      @parser.cvsmodule = "damagecontrol"
+      modifications = @parser.parse_modifications(LOG_ENTRY)
+      assert_equal("src/ruby/damagecontrol/BuildExecutorTest.rb", modifications[0].path)
+      assert_equal("linux/windows galore\n", modifications[2].message)
     end
     
     def test_can_split_entries_separated_by_line_of_dashes
