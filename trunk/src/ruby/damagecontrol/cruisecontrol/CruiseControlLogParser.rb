@@ -11,8 +11,8 @@ module DamageControl
         parser = REXML::PullParser.new(io)
         parse_top_level(parser, build_result)
       end
-        
-      return build_result
+
+      nil        
     end
     
   private
