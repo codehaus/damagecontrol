@@ -402,6 +402,92 @@ ProxyPassReverse /private http://localhost:4712/private</programlisting>
           </step>
         </procedure>
       </section>
+
+      <section>
+        <title>Other Server Parameters</title>
+
+        <highlights>
+          <para>This section covers additional parameters that can be used to
+          configure the DamageControl server. In most cases DamageControl will
+          try to use reasonable defaults, but sometimes it may be useful to
+          modify some of these parameters by hand.</para>
+        </highlights>
+
+        <variablelist>
+          <varlistentry>
+            <term><parameter>RootDir</parameter></term>
+
+            <listitem>
+              <para>Directory where DamageControl should check out the sources
+              and build the projects.</para>
+            </listitem>
+          </varlistentry>
+
+          <varlistentry>
+            <term><parameter>AllowIPs</parameter></term>
+
+            <listitem>
+              <para>An array of IP-addresses of host that are permitted to
+              access the server. If this parameter is left empty, all hosts
+              can access the server.</para>
+            </listitem>
+          </varlistentry>
+
+          <varlistentry>
+            <term><parameter>HttpPort</parameter></term>
+
+            <listitem>
+              <para>Port where the DamageControl <abbrev>HTTP</abbrev> server
+              is listening.</para>
+            </listitem>
+          </varlistentry>
+
+          <varlistentry>
+            <term><parameter>HttpPort</parameter></term>
+
+            <listitem>
+              <para>Port where the DamageControl <abbrev>HTTPS</abbrev> server
+              is listening.</para>
+            </listitem>
+          </varlistentry>
+
+          <varlistentry>
+            <term><parameter>TrigXmlrpcUrl</parameter></term>
+
+            <listitem>
+              <para>Default <abbrev>URL</abbrev> to be called by installed
+              triggers.</para>
+            </listitem>
+          </varlistentry>
+
+          <varlistentry>
+            <term><parameter>ExternalWebUrl</parameter></term>
+
+            <listitem>
+              <para><abbrev>URL</abbrev> of the DamageControl server. This is
+              the root of public and private views to the server.</para>
+            </listitem>
+          </varlistentry>
+
+          <varlistentry>
+            <term><parameter>PublicWebUrl</parameter></term>
+
+            <listitem>
+              <para><abbrev>URL</abbrev> of the DamageControl server. This is
+              the root of public view to the server.</para>
+            </listitem>
+          </varlistentry>
+
+          <varlistentry>
+            <term><parameter>PollingInterval</parameter></term>
+
+            <listitem>
+              <para>Interval (in seconds) to poll <abbrev>SCM</abbrev>s that
+              do not support triggers.</para>
+            </listitem>
+          </varlistentry>
+        </variablelist>
+      </section>
     </section>
 
     <section>
@@ -847,13 +933,13 @@ component(:email_publisher, EmailPublisher.new(hub, build_history_repository,
           </step>
 
           <step>
-            <para>Add the parameter ExternalWebUrl, which points to the public
-            root of the DamageControl installation.</para>
+            <para>Add the parameter <parameter>ExternalWebUrl</parameter>,
+            which points to the root of the DamageControl installation.</para>
 
             <programlisting role="ruby">server = DamageControlServer.new(
   :RootDir =&gt; ENV["DAMAGECONTROL_WORK"],
   :HttpPort =&gt; 4712,
-  :ExternalWebUrl =&gt; "http://my-machine/damagecontrol/public"
+  :ExternalWebUrl =&gt; "http://my-machine/damagecontrol/"
   :PollingInterval =&gt; 60 # specified in seconds
   # to allow access only from localhost then uncomment line below 
   # (when running behind an Apache proxy for example)
@@ -2908,6 +2994,19 @@ end</programlisting>
     </glossentry>
 
     <glossentry>
+      <glossterm>Hypertext Transport Protocol</glossterm>
+
+      <abbrev>HTTP</abbrev>
+
+      <glossdef>
+        <para>The protocol used to access resources in the World Wide
+        Web.</para>
+
+        <glossseealso>Secure Hypertext Transport Protocol</glossseealso>
+      </glossdef>
+    </glossentry>
+
+    <glossentry>
       <glossterm>Internet Relay Chat</glossterm>
 
       <abbrev>IRC</abbrev>
@@ -2936,6 +3035,17 @@ end</programlisting>
       <glossdef>
         <para>An XML-format to aggregate the news headlines of a
         website.</para>
+      </glossdef>
+    </glossentry>
+
+    <glossentry>
+      <glossterm>Secure Hypertext Transport Protocol</glossterm>
+
+      <abbrev>HTTPS</abbrev>
+
+      <glossdef>
+        <para>A secure extension of the <glossterm>Hypertext Transport
+        Protocol</glossterm> that enables encrypted communication.</para>
       </glossdef>
     </glossentry>
 
