@@ -3,6 +3,8 @@
     <th>&nbsp;</th>
     <th>Project</th>
     <th>Last Success</th>
+    <th>Last Duration</th>
+    <th>Current Duration</th>
     <th>&nbsp;</th>
 </tr>
 
@@ -13,14 +15,21 @@ projects.each do |project|
   
   image = "images/lastcompletedstatus?project_name=#{project}"
   last_successful_build = build_history_repository.last_successful_build(project)
+  last_completed_build = build_history_repository.last_completed_build(project)
+  current_build = build_history_repository.current_build(project)
+  current_build = nil if current_build.completed?
   label = ""
   label = " (##{last_successful_build.label})" if(last_successful_build)
-  ago = (last_successful_build ? last_successful_build.time_since_for_humans : "Never built")
+  ago = if last_successful_build then last_successful_build.time_since_for_humans else "Never built" end
+  last_duration = if last_completed_build then last_completed_build.duration_for_humans else "Never built" end
+  current_duration = if current_build then current_build.duration_for_humans else "No ongoing build" end
 %>
 <tr>
     <td><img width="32" height="32" src="<%= image %>" /></td>
     <td><a href="<%= href %>"><%= project %><%= label %></a></td>
     <td><%= ago %></td>
+    <td><%= last_duration %></td>
+    <td><%= current_duration %></td>
     <% if private? %>
     <td align="center" style="border-left: 1px solid #bbb; color: #bbb;"> <a href="configure?project_name=<%=project%>&action=configur
 e" title="Configure <%=project%>"><img src="icons/wrench.png" width="24" height="24"/></a>

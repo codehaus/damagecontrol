@@ -85,14 +85,28 @@ module DamageControl
     end
 
     def time_since_for_humans
-      "#{Time.new.utc.difference_as_text(timestamp_as_time)} ago"
+      "#{Time.now.utc.difference_as_text(timestamp_as_time)} ago"
+    end
+    
+    def duration_for_humans
+      return "Not started yet" if start_time.nil?
+      # protects against historical data in the Codehaus history, it used to be an integer but is now a time object
+      return "Unknown" unless start_time.is_a?(Time)
+      return Time.now.utc.difference_as_text(start_time) if end_time.nil?
+      end_time.difference_as_text(start_time)
     end
 
     def Build.format_timestamp(time)
-      if time.is_a?(Numeric) then format_timestamp(Time.at(time).utc)
-      elsif time.is_a?(Time) then time.utc.strftime("%Y%m%d%H%M%S")
-      elsif time.is_a?(String) then time
-      else raise "can't format as timestamp #{time}" end
+      case time
+        when Numeric
+          format_timestamp(Time.at(time).utc)
+        when Time
+          time.utc.strftime("%Y%m%d%H%M%S")
+        when String
+          time
+        else
+          raise "can't format as timestamp #{time}"
+      end
     end
     
     def Build.timestamp_to_time(timestamp_as_string)
