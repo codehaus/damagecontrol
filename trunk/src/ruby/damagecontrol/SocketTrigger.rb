@@ -56,7 +56,7 @@ module DamageControl
               payload = session.gets
               do_accept(payload)
               session.print("DamageControl got your message\r\n")
-              session.print("http://damagecontrol.codehaus.org/")
+              session.print("http://damagecontrol.codehaus.org/\r\n")
             ensure
               session.close
             end
