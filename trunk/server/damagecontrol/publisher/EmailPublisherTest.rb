@@ -4,7 +4,6 @@ require 'damagecontrol/core/BuildEvents'
 require 'damagecontrol/core/Build'
 require 'damagecontrol/core/Hub'
 require 'damagecontrol/publisher/EmailPublisher'
-require 'damagecontrol/template/ShortTextTemplate'
 require 'ftools'
 
 module DamageControl
@@ -34,7 +33,7 @@ module DamageControl
       build.timestamp = Time.utc(1971,2,28,23,45,0,0)
 
       @email_publisher.process_message(BuildCompleteEvent.new(build))
-      assert_equal("[cheese] BUILD FAILED: http://moradi.com/public/project?action=build_details&project_name=cheese&timestamp=19710228234500|<a href=\"http://moradi.com/public/project?project_name=cheese\">[cheese] BUILD FAILED</a>|noreply@somewhere.foo|somelist@someproject.bar", @email_publisher.mail_content)
+      assert_equal("[cheese] BUILD FAILED|<a href=\"http://moradi.com/public/project?action=build_details&project_name=cheese&timestamp=19710228234500\">[cheese] BUILD FAILED</a>|noreply@somewhere.foo|somelist@someproject.bar", @email_publisher.mail_content)
     end
     
     def test_nothing_is_sent_unless_build_complete_event
