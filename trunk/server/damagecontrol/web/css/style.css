@@ -1,3 +1,9 @@
+body {
+  margin: 0;
+  padding: 0;
+  background: white;
+}
+
 body, table, form, input, td, th, p, textarea, select
 {
   font-family: Verdana, Helvetica, sans serif;
@@ -16,40 +22,53 @@ td {
 #top-panel {
   padding-bottom: 3pt;
   margin-bottom: 3pt;
+  background: #6c0;
 }
 
 #left-top-nav {
   text-align: left;
-  border-top: 1px solid #7f7f7f;
-  border-bottom: 1px solid #7f7f7f;
-  padding-bottom: 5px;
+  border-top: 1px solid #090;
+  border-bottom: 1px solid #090;
+  background: #090;
+  padding: 4px;
+  color: white;
+}
+
+#left-top-nav a, #right-top-nav a {
+  color: white;
 }
 
 #right-top-nav {
   text-align: right;
-  border-top: 1px solid #7f7f7f;
-  border-bottom: 1px solid #7f7f7f;
-  padding-bottom: 5px;
+  border-top: 1px solid #090;
+  border-bottom: 1px solid #090;
+  background: #090;
+  padding: 4px;
 }
 
 #main-panel {
-  width: 70%;
-  padding-left: 5px;
+  padding: 10px;
 }
 
 #side-panel {
-  padding-right: 1em;
-  width: 30%;
-  border-right: 1px solid #7f7f7f;
+  padding: 4px;
+  width: 220px;
+  border-right: 1px solid #090;
+  background: #eed;
 }
 
 #footer {
   text-align: center;
   font-size: 8pt;
   margin-top: 10em;
-  width: 100%;
   padding: 10px;
+  background-image: @url("http://redback.york.atlassian.com:4712/private/images/footer_grad.gif");
+  border-top: 1px solid #090;
 }
+
+#tasks {
+  padding: 4px;
+} 
 
 a.link {
   text-decoration: underline;
@@ -86,6 +105,10 @@ a.tip:hover span {
   text-align: left
 }
 
+#top-nav .a {
+  color: white;
+}
+
 img {
   vertical-align: middle;
   border: 0;
@@ -97,23 +120,23 @@ table.tab {
 
 td.selected_tab {
   vertical-align: middle;
-  border: 1px #7f7f7f solid;
+  border: 1px #090 solid;
   background: #ffffff;
 }
 
 td.tab_filler {
   background: #ffffff;
-  border-bottom: 1px #7f7f7f solid;
+  border-bottom: 1px #090 solid;
 }
 
 td.tab {
   vertical-align: middle;
-  border: 1px #7f7f7f solid;
+  border: 1px #090 solid;
   background: #f0f0f0;
 }
 
-div.dashboard {
-  display: inline;
+.dashboard td {
+  padding: 4px 4px 4px 4px;
 }
 
 pre.console {
@@ -127,10 +150,13 @@ pre.console {
 .config_cell {
   width: 160px;
 }
+.build-row {
+  padding: 3px 4px 3px 4px;
+}
 
 .task-header {
   display: block;
-  border-bottom: 1px #7f7f7f solid;
+  border-bottom: 1px #090 solid;
   font-weight: bold;
   font-size: 12pt;
 }
@@ -143,44 +169,102 @@ table.dashboard {
 }
 
 .pane  {
-  margin-top: 0.5em;
+  margin-top: 4px;
+}
+.pane td {
+  padding: 4px 4px 3px 4px;
 }
 
 table.pane {
   width: 100%;
   background-color: #ffffff;
   border-collapse: collapse;
-  border: 1px #7f7f7f solid;
-  border-bottom: 2px #7f7f7f solid;
-  border-right: 2px #7f7f7f solid;
+  border: 1px #bbb solid;
 }
 
 td.pane {
-  border: 1px #7f7f7f solid;
+  border: 1px #bbb solid;
   background-color: #ffffff;
+  padding: 3px 4px 3px 4px;
 }
 
 td.pane-header {
-  border: 1px #7f7f7f solid;
+  border: 1px #bbb solid;
   background-color: #f0f0f0;
   font-weight: bold;
 }
 
 th.pane {
-  border: 1px #7f7f7f solid;
+  border: 1px #bbb solid;
   font-weight: bold;
 }
 
 #projectstatus th {
   font-weight: bold;
-  background-color: #bbbbbb;
+  background-color: #f0f0f0;
+  padding: 3px 4px 3px 4px;
 }
 
 #projectstatus tr {
-  border: 1px solid #7f7f7f;
+  border: 1px solid #bbb;
+  padding: 3px 4px 3px 4px;
 }
+
 #projectstatus td {
   padding: 2px 4px 2px 4px;
   vertical-align: middle;
+  padding: 3px 4px 3px 4px;
 }
 
+.smallfont {
+  font-size: 9px;
+}
+
+   #foldertab {
+   padding: 3px 0;
+   margin-left: 0;
+   border-bottom: 1px solid #090;
+   font: bold 12px Verdana, sans-serif;
+   }
+
+   #foldertab li {
+   list-style: none;
+   margin: 0;
+   display: inline;
+   }
+
+   #foldertab li a {
+   padding: 3px 0.5em;
+   margin-left: 3px;
+   border: 1px solid #090;
+   border-bottom: none;
+   background: #090;
+   text-decoration: none;
+   }
+
+   #foldertab li a:link { color: white; }
+   #foldertab li a:visited { color: white; }
+
+   #foldertab li a:hover {
+   color: white;
+   background: #6c0;
+   border-color: #6c0;
+   }
+
+  #foldertab li a#current {
+  background: white;
+  border-bottom: 1px solid white;
+  color: black;
+  }
+
+.highlighted-build {
+  border: 1px solid #ddc;
+  background: #ffe;
+  padding: 3px;
+  margin-left: -4px;
+}
+.changeset-message {
+  border: 1px solid #ccb;
+  background: #eed;
+  padding: 4px;
+}
