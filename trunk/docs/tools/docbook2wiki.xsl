@@ -108,6 +108,184 @@
 {panel}</xsl:text>
 	</xsl:template>
 	
+	<xsl:template match="example|informalexample">
+		<xsl:text>{panel</xsl:text><xsl:call-template name="make.exampletitle"/><xsl:text>}
+</xsl:text>
+		<xsl:apply-templates/>
+		<xsl:text>
+{panel}
+</xsl:text>
+	</xsl:template>
+	
+	<xsl:template match="screen">
+		<xsl:text>
+{code}
+</xsl:text>
+		<xsl:apply-templates mode="noformat"/>
+		<xsl:text>
+{code}
+</xsl:text>
+	</xsl:template>
+	
+	<xsl:template match="programlisting">
+		<xsl:text>
+{code</xsl:text>
+<xsl:text>}</xsl:text><xsl:if test="@role!=''"><xsl:text>:</xsl:text><xsl:value-of select="@role" /></xsl:if><xsl:text>
+</xsl:text>
+	<xsl:value-of select="."/>
+	<xsl:text>
+{code}
+</xsl:text>
+	</xsl:template>
+	
+	<xsl:template match="programlisting//*|screen//*">
+		<xsl:apply-templates/>
+	</xsl:template>
+	
+	<xsl:template name="make.exampletitle">
+		<xsl:text>:borderStyle=dashed|borderColor=#ccc|bgColor=#ddffdd</xsl:text>
+		<xsl:if test="title">
+			<xsl:text>|title=</xsl:text><xsl:value-of select="title"/><xsl:text>|titleBGColor=#ccffcc</xsl:text>
+		</xsl:if>
+	</xsl:template>
+	
+	<xsl:template match="procedure">
+		<xsl:apply-templates />
+	</xsl:template>
+	
+	<xsl:template match="procedure/title">
+		<xsl:text>*</xsl:text><xsl:value-of select="."/><xsl:text>*
+</xsl:text>
+	</xsl:template>
+	
+	<xsl:template match="ulink">
+		<xsl:text>[</xsl:text><xsl:value-of select="."/><xsl:text>|</xsl:text><xsl:value-of select="@url"/><xsl:text>]</xsl:text>
+	</xsl:template>
+	
+	<xsl:template match="glossary">
+		<xsl:text>*Glossary*
+</xsl:text>
+		<xsl:apply-templates/>
+	</xsl:template>
+	
+	<xsl:template match="glossentry">
+		<xsl:text>
+{panel:title=</xsl:text><xsl:value-of select="glossterm"/><xsl:text>|borderStyle=solid|borderColor=#ccc|titleBGColor=#cccccc|bgColor=#ccccff}
+</xsl:text>
+			<xsl:apply-templates />
+<xsl:text>
+{panel}
+		</xsl:text>
+	</xsl:template>
+	
+	<xsl:template match="email">
+		<xsl:text>[mailto</xsl:text><xsl:apply-templates select="text()"/><xsl:text>]</xsl:text>
+	</xsl:template>
+	
+	<xsl:template match="row">
+		<xsl:text>
+</xsl:text><xsl:apply-templates />
+	</xsl:template>
+	
+	<xsl:template match="thead|tbody|tgroup|informaltable"/>
+	
+	<xsl:template match="qandaset">
+		<xsl:apply-templates />
+	</xsl:template>
+	
+	
+	<xsl:template match="qandaentry">
+		<xsl:text>
+{panel:title=</xsl:text><xsl:value-of select="question"/><xsl:text>|borderStyle=solid|borderColor=#ccc|titleBGColor=#cccccc|bgColor=#ccffff}
+</xsl:text>
+			<xsl:apply-templates select="anwser"/>
+<xsl:text>
+{panel}
+		</xsl:text>
+	</xsl:template>
+	
+	<xsl:template match="variablelist">
+		<xsl:apply-templates />
+	</xsl:template>
+	
+	<xsl:template match="varlistentry">
+		<xsl:text>
+{panel:title=</xsl:text><xsl:value-of select="term"/><xsl:text>|borderStyle=solid|borderColor=#ccc|titleBGColor=#cccccc|bgColor=#ffccff}
+</xsl:text>
+			<xsl:apply-templates select="listitem"/>
+<xsl:text>
+{panel}
+		</xsl:text>
+	</xsl:template>
+	
+	
+	<xsl:template match="sidebar">
+		<xsl:text>
+{panel:title=Sidebar </xsl:text><xsl:value-of select="title"/><xsl:text>|borderStyle=solid|borderColor=#ccc|titleBGColor=#cccccc|bgColor=#ffffcc}
+</xsl:text>
+			<xsl:apply-templates select="listitem"/>
+<xsl:text>
+{panel}
+		</xsl:text>
+	</xsl:template>
+	
+	<xsl:template match="varlistentry/listitem">
+		<xsl:apply-templates />
+	</xsl:template>
+	
+	<xsl:template match="callout">
+		<xsl:text> - </xsl:text> <xsl:apply-templates select="text()"/><xsl:text> (</xsl:text><xsl:value-of select="@arearefs"/><xsl:text>)
+</xsl:text>
+	</xsl:template>
+	
+	
+	
+	<xsl:template match="entry">
+		<xsl:text>|</xsl:text><xsl:apply-templates select="text()"/>
+	</xsl:template>
+	
+	<xsl:template match="entry[position()=last()]">
+		<xsl:text>|</xsl:text><xsl:apply-templates select="text()"/><xsl:text>|</xsl:text>
+	</xsl:template>
+	
+	<xsl:template match="thead/entry">
+		<xsl:text>||</xsl:text><xsl:apply-templates select="text()"/>
+	</xsl:template>
+	
+	<xsl:template match="thead/entry[position()=last()]">
+		<xsl:text>||</xsl:text><xsl:apply-templates select="text()"/><xsl:text>||</xsl:text>
+	</xsl:template>
+	
+	<xsl:template match="glossentry/glossterm"/>
+	
+	<xsl:template match="glossentry/glossdef">
+		<xsl:apply-templates />
+	</xsl:template>
+	
+	<xsl:template match="areaspec" />
+	
+	<xsl:template match="phrase" />
+	
+	<xsl:template match="footnote">
+		<xsl:text>^(</xsl:text><xsl:apply-templates select="text()"/><xsl:text>)^</xsl:text>
+	</xsl:template>
+	
+	<xsl:template match="acronym|abbrev|guilabel|guibutton">
+		<xsl:text>*</xsl:text><xsl:apply-templates select="text()"/><xsl:text>*</xsl:text>
+	</xsl:template>
+	
+	<xsl:template match="emphasis|replaceable">
+		<xsl:text>_</xsl:text><xsl:apply-templates select="text()"/><xsl:text>_</xsl:text>
+	</xsl:template>
+	
+	<xsl:template match="filename|envar|classname|literal|varname|methodname|command">
+		<xsl:text>{{</xsl:text><xsl:apply-templates select="text()"/><xsl:text>}}</xsl:text>
+	</xsl:template>
+	
+	<xsl:template match="step">
+		<xsl:text></xsl:text>
+	</xsl:template>
+	
 	<xsl:template name="make.paneltitle">
 		<!--
 		<xsl:choose>
@@ -253,4 +431,17 @@
 		<xsl:text>
 </xsl:text>
 	</xsl:template>
+	
+	<xsl:template match="figure">
+		<xsl:message>TODO: Add Figures</xsl:message>
+	</xsl:template>
+	
+	<xsl:template match="programlistingco">
+		<xsl:apply-templates select="programlisting" />
+	</xsl:template>
+	
+	<xsl:template match="calloutlist">
+		<xsl:apply-templates />
+	</xsl:template>
+	
 </xsl:stylesheet>

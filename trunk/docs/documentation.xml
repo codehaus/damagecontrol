@@ -2,9 +2,8 @@
 <!DOCTYPE book PUBLIC "-//OASIS//DTD DocBook XML V4.2//EN"
 "http://www.oasis-open.org/docbook/xml/4.2/docbookx.dtd">
 <book>
-  <title>DamageControl</title>
-
   <bookinfo>
+		<title>DamageControl</title>
     <date>11/09/2004</date>
 
     <authorgroup>
