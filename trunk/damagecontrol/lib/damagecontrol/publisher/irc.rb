@@ -1,6 +1,4 @@
-require 'rscm/annotations'
-require 'damagecontrol/project'
-require 'rscm/annotations'
+require 'damagecontrol/publisher/base'
 
 module DamageControl
   module Publisher
@@ -18,7 +16,7 @@ module DamageControl
     
       def initialize
         @server = "irc.codehaus.org"
-        @channel = "#damagecontrol"
+        @channel = "#xxxxxx"
         @nick = "dcontrol"
       end
 

@@ -19,6 +19,7 @@ module DamageControl
     attr_accessor :name
     attr_accessor :description
     attr_accessor :home_page
+    attr_accessor :start_time
 
     attr_accessor :scm
     attr_accessor :tracker
@@ -57,12 +58,19 @@ module DamageControl
       end
     end
     
-    def initialize(name=nil)
+    def start_time=(t)
+      t = Time.parse_ymdHMS(t) if t.is_a? String
+      @start_time = t
+    end
+    
+    def initialize(name="")
       @name = name
       @publishers = Publisher::Base.classes.collect{|cls| cls.new}
       @scm = nil
       @tracker = Tracker::Null.new
       @scm_web = SCMWeb::Null.new
+      # Default start time is 2 weeks ago
+      @start_time = Time.now.utc - (3600*24*14)
     end
     
     # Tells all publishers to publish a build
@@ -106,9 +114,9 @@ module DamageControl
     end
 
     # Polls SCM for new changesets and yields them to the given block.
-    def poll(from_if_first_poll=Time.epoch)
+    def poll
       start = Time.now
-      from = next_changeset_identifier || from_if_first_poll
+      from = next_changeset_identifier || @start_time
       
       Log.info "Getting changesets for #{name} from #{from} (retrieved from #{checkout_dir})"
       changesets = @scm.changesets(checkout_dir, from)
