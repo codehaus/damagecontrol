@@ -30,6 +30,7 @@ module RSCM
       # post 0.17, this can be "cd dir && cmd add ."
 
       files = Dir["#{dir}/*"]
+## refactor this to a private method to_relative, reuse near line 96
       relative_paths_to_add = files.collect{|p| p[dir.length+1..-1]}
 
       with_working_dir(dir) do
@@ -60,6 +61,8 @@ module RSCM
       end
     end
 
+## move this to abstract_scm called checkout_without_stdout, make this call to
+## that function
     def checkout(checkout_dir)
       checkout_dir = PathConverter.filepath_to_nativepath(checkout_dir, false)
       mkdir_p(checkout_dir)

@@ -88,6 +88,35 @@ module RSCM
     #
     def checkout(checkout_dir, to_identifier=Time.infinity) # :yield: file
       ["not/implemented/in", __FILE__, "do/it/now"]
+      before = Dir["#{checkout_dir}/**/*"]
+puts "BEFORE:"
+puts before.join("\n")
+puts
+    end
+  
+    # Checks out or updates to +checkout_dir+, where the SCM does not report
+    # checked out files to stdout.
+    #
+    def checkout_without_stdout(checkout_dir)
+      after = Dir["#{checkout_dir}/**/*"]
+puts "AFTER:"
+puts after.join("\n")
+puts
+      # ignore monotone administrative files
+      added = (after - before).delete_if{|path| path =~ /MT/}
+puts "ADDED TOTAL:"
+puts added.join("\n")
+puts
+      added_file_paths = added.find_all do |path|
+        File.file?(path)
+      end
+puts "ADDED FILES:"
+puts added_file_paths.join("\n")
+puts
+      added_file_paths.each do |path|
+        yield path
+      end
+      return added_file_paths
     end
     
     # Returns a ChangeSets object for the period specified by +from_identifier+
