@@ -66,7 +66,7 @@ module DamageControl
           "scm" => create_default_scm
         },
         build.config)
-      assert_equal("http://localhost/public/project?action=build_details&project_name=newproject&timestamp=20040615120000", build.url)
+      assert_equal("http://localhost/public/project?project_name=newproject&timestamp=20040615120000", build.url)
     end
     
     def test_next_build_number
