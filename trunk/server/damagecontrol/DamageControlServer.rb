@@ -100,10 +100,12 @@ module DamageControl
             build.dc_start_time = build.dc_creation_time
           end
           
-          if build.end_time && build.start_time
-            build.duration = build.end_time - build.start_time 
-          else
-            build.duration = 1
+          if(!build.duration)
+            if build.end_time && build.start_time
+              build.duration = build.end_time - build.start_time 
+            else
+              build.duration = 1
+            end
           end
           
           # remove old
@@ -166,9 +168,9 @@ module DamageControl
       url = params[:ExternalWebUrl] || "http://#{get_ip}:#{http_port}/"
       ensure_trailing_slash(url)
     end
-		
+    
     def trig_xmlrpc_url
-			params[:TrigXmlrpcUrl] || "#{web_url}private/xmlrpc"
+      params[:TrigXmlrpcUrl] || "#{web_url}private/xmlrpc"
     end
     
     def public_web_url
