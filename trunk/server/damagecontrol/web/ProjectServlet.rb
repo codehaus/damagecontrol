@@ -41,7 +41,7 @@ module DamageControl
       render("configure.erb", binding)
     end
     
-    KEYS = ["build_command_line", "project_name", "unix_groups", "scm_type", "cvsroot", "cvsmodule", "cvspassword", "svnurl"]
+    KEYS = ["build_command_line", "project_name", "unix_groups", "trigger", "scm_type", "cvsroot", "cvsmodule", "cvspassword", "svnurl"]
     
     def store_configuration
       assert_private
@@ -56,10 +56,12 @@ module DamageControl
 
       @project_config_repository.modify_project_config(project_name, project_config)
       
-      # Now install the trigger
+      # Uninstall the old trigger (if any)
       scm = @scm_factory.get_scm(project_config, @project_directories.checkout_dir(project_name))
       scm.uninstall_trigger(project_name) if scm.trigger_installed?(project_name)
-      scm.install_trigger(project_name, @nudge_xmlrpc_url)
+      
+      # Install the trigger if trigger=xmlrpc
+      scm.install_trigger(project_name, @nudge_xmlrpc_url) if project_config["trigger"] == "xmlrpc"
       
       dashboard_redirect
     end
