@@ -85,7 +85,8 @@ module RSCM
         path_from_root = $1
         change.status = Change::MOVED
       elsif(line =~ /^   ([M|A|D|R]) (.+)$/)
-        status, path_from_root = line.split
+        status = $1
+        path_from_root = $2
         change.status = STATES[status]
       else
         raise "could not parse change line: '#{line}'"
