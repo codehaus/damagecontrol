@@ -12,11 +12,12 @@ module DamageControl
   class EmailPublisherTest < Test::Unit::TestCase
   
     def setup
-      @template = Mock.new
-      @email_publisher = EmailPublisher.new(Hub.new, @template, "noreply@somewhere.foo")
+      @subject_template = Mock.new
+      @body_template = Mock.new
+      @email_publisher = EmailPublisher.new(Hub.new, @subject_template, @body_template, "noreply@somewhere.foo")
 
-      def @email_publisher.sendmail(content, from, to)
-        @mail_content = "#{content} #{from} #{to}"
+      def @email_publisher.sendmail(subject, body, from, to)
+        @mail_content = "#{subject} #{body} #{from} #{to}"
       end
       
       def @email_publisher.mail_content
@@ -27,15 +28,20 @@ module DamageControl
     def test_email_is_sent_upon_build_complete_event    
       build = Build.new("project_name", {"nag_email" => "somelist@someproject.bar"})
 
-      @template.__return(:file_type, "email")
-      @template.__next(:generate) { |build2|
-        "some content"
+      @body_template.__return(:file_type, "email")
+      @body_template.__next(:generate) { |build2|
+        "some_body"
+      }
+      @subject_template.__return(:file_type, "email")
+      @subject_template.__next(:generate) { |build2|
+        "some_subject"
       }
       
       @email_publisher.process_message(BuildCompleteEvent.new(build))
-      assert_equal("some content noreply@somewhere.foo somelist@someproject.bar", @email_publisher.mail_content)
+      assert_equal("some_subject some_body noreply@somewhere.foo somelist@someproject.bar", @email_publisher.mail_content)
 
-      @template.__verify
+      @subject_template.__verify
+      @body_template.__verify
     end
     
     def test_nothing_is_sent_unless_build_complete_event
