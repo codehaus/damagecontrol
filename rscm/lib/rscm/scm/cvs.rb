@@ -300,7 +300,7 @@ module RSCM
   
     def command_line(cmd, password=nil, simulate=false)
       cvs_options = simulate ? "-n" : ""
-      "cvs \"-d#{root_with_password(password)}\" #{cvs_options} -q #{cmd}"
+      "cvs -f \"-d#{root_with_password(password)}\" #{cvs_options} -q #{cmd}"
     end
 
     def create_root_cvs
