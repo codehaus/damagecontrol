@@ -191,3 +191,19 @@ on the Source Control tab in the web interface.
 * SCM classes should have a no-arg constructor and be serialisable with YAML
 * SCM classes should be inexpensive to instantiate (should not access SCM in constructor)
 
+= Building
+This section is for developers who are new to ruby development and do not already know how to build and install gems.
+
+You need to install rubygems http://rubygems.rubyforge.org/ 
+Afterwards you need to install rake and rails
+
+gem install rake
+gem install rails
+
+Now change to the RSCM root directory and type
+
+rake
+
+This will create a gem for RSCM. To install this gem, you have to change to the pgk directory and type
+
+sudo gem install rscm
