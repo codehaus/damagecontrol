@@ -207,6 +207,8 @@ on the Source Control tab in the web interface.
 
 * SCM classes should have a no-arg constructor and be serialisable with YAML
 * SCM classes should be inexpensive to instantiate (should not access SCM in constructor)
+* Instead of adding a lot of utility methods to the core objects, use visitors. This makes
+  it possible to add lots of useful plugins to operate on the basic datastructures (scm/changesets)
 
 = Building RSCM
 This section is for developers who are new to ruby development and do not already know how to build and install Ruby gems.

@@ -60,11 +60,6 @@ module RSCM
       end
     end
 
-    # Administrative files that should be ignored when counting files.
-    def ignore_paths
-      return [/MT/, /\.mt-attrs/]
-    end
-
     def commit(checkout_dir, message)
 
     end
@@ -81,6 +76,11 @@ module RSCM
           yield line if block_given?
         end
       end
+    end
+
+    # Administrative files that should be ignored when counting files.
+    def ignore_paths
+      return [/MT/, /\.mt-attrs/]
     end
 
   private

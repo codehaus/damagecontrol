@@ -33,7 +33,13 @@ module RSCM
   #
   class AbstractSCM
     include FileUtils
-    
+
+# TODO: Make changesets yield changesets as they are determined, to avoid
+# having to load them all into memory before the method exits. Careful not to
+# use yielded changesets to do another scm hit - like get diffs. Some SCMs
+# might dead lock on this. Implement a guard for that.
+# TODO: Add some visitor support here too?
+
   public
   
     # Whether the physical SCM represented by this instance exists.
@@ -96,8 +102,10 @@ module RSCM
       checkout_silent(checkout_dir)
 
       after = Dir["#{checkout_dir}/**/*"]
-      # ignore monotone administrative files
-      added = (after - before).delete_if{|path| path =~ /MT/}
+      added = (after - before)
+      ignore_paths.each do |regex|
+        added.delete_if{|path| path =~ regex}
+      end
       added_file_paths = added.find_all do |path|
         File.file?(path)
       end
