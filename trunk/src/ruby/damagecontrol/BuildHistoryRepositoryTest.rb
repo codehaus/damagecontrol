@@ -11,25 +11,25 @@ module DamageControl
 
   class BuildHistoryRepositoryTest < AbstractBuildHistoryTest
   
-  	def test_can_get_last_succesful_build_of_a_project
-  	  assert_equal(nil, @bhp.last_succesful_build("project_name"))
+    def test_can_get_last_succesful_build_of_a_project
+      assert_equal(nil, @bhp.last_succesful_build("project_name"))
 
-  	  build1 = Build.new("project_name")
-  	  build1.timestamp = Time.utc(2004, 04, 02, 12, 00, 00)
-  	  build1.status = Build::SUCCESSFUL
-  	  build2 = Build.new("project_name")
-  	  build2.timestamp = Time.utc(2004, 04, 02, 13, 00, 00) # one hour later
-  	  build2.status = Build::SUCCESSFUL
-  	  failed_build = Build.new("project_name")
-  	  failed_build.timestamp = Time.utc(2004, 04, 02, 14, 00, 00) # one hour later
-  	  failed_build.status = Build::FAILED
-  	  @bhp.register(build2)
-  	  @bhp.register(build1)
-  	  @bhp.register(failed_build)
-  	  assert_equal([build1, build2, failed_build], @bhp.build_history("project_name"))
-  	  
-  	  assert_equal(build2, @bhp.last_succesful_build("project_name"))
-  	end
+      build1 = Build.new("project_name")
+      build1.timestamp = Time.utc(2004, 04, 02, 12, 00, 00)
+      build1.status = Build::SUCCESSFUL
+      build2 = Build.new("project_name")
+      build2.timestamp = Time.utc(2004, 04, 02, 13, 00, 00) # one hour later
+      build2.status = Build::SUCCESSFUL
+      failed_build = Build.new("project_name")
+      failed_build.timestamp = Time.utc(2004, 04, 02, 14, 00, 00) # one hour later
+      failed_build.status = Build::FAILED
+      @bhp.register(build2)
+      @bhp.register(build1)
+      @bhp.register(failed_build)
+      assert_equal([build1, build2, failed_build], @bhp.build_history("project_name"))
+      
+      assert_equal(build2, @bhp.last_succesful_build("project_name"))
+    end
     
     # Not really a unit test, more a YAML experiment
     def test_build_can_be_saved_as_yaml
@@ -147,8 +147,57 @@ pear:
       assert_equal(Hash.new, @bhp.get_build_list_map("4"))
     end
 
-    def TODO_test_register_build_saves_as_yaml_and_filters_out_old_builds_so_the_file_doesnt_grow_too_big
+    def test_should_be_able_to_group_builds_per_week_month_and_day
+      week_zero_one = Build.new("test")
+      week_zero_one.timestamp = Time.utc(2004, 01, 01, 12, 00, 00)
+
+      week_zero_two = Build.new("test")
+      week_zero_two.timestamp = Time.utc(2004, 01, 04, 12, 00, 00)
+
+      week_one_one = Build.new("test")
+      week_one_one.timestamp = Time.utc(2004, 01, 05, 12, 00, 00)
+
+      week_one_two = Build.new("test")
+      week_one_two.timestamp = Time.utc(2004, 01, 11, 12, 00, 00)
+
+      week_two_one = Build.new("test")
+      week_two_one.timestamp = Time.utc(2004, 01, 12, 12, 00, 00)
+      
+      week_eight_one = Build.new("test")
+      week_eight_one.timestamp = Time.utc(2004, 02, 28, 12, 00, 00)
+      
+      week_eight_two = Build.new("test")
+      week_eight_two.timestamp = Time.utc(2004, 02, 28, 13, 00, 00)
+      
+      @bhp.register(week_zero_one)
+      @bhp.register(week_zero_two)
+      @bhp.register(week_one_one)
+      @bhp.register(week_one_two)
+      @bhp.register(week_two_one)
+      @bhp.register(week_eight_one)
+      @bhp.register(week_eight_two)
+      
+      week_builds = @bhp.group_by_period("test", :week)
+
+      builds_per_week_zero = week_builds[Time.utc(2003, 12, 29)]
+      assert_equal([week_zero_one, week_zero_two], builds_per_week_zero)
+      builds_per_week_one = week_builds[Time.utc(2004, 01, 05)]
+      assert_equal([week_one_one, week_one_two], builds_per_week_one)
+      builds_per_week_two = week_builds[Time.utc(2004, 01, 12)]
+      assert_equal([week_two_one], builds_per_week_two)
+      builds_per_week_two = week_builds[Time.utc(2004, 01, 12)]
+      assert_equal([week_two_one], builds_per_week_two)
+      builds_per_week_eight = week_builds[Time.utc(2004, 02, 23)]
+      assert_equal([week_eight_one, week_eight_two], builds_per_week_eight)
+
+      day_builds = @bhp.group_by_period("test", :day)
+      builds_per_aslaks_birthday = day_builds[Time.utc(2004, 02, 28)]
+      assert_equal([week_eight_one, week_eight_two], builds_per_aslaks_birthday)
+
+      month_builds = @bhp.group_by_period("test", :month)
+      builds_per_january = month_builds[Time.utc(2004, 01, 01)]
+      assert_equal([week_zero_one, week_zero_two, week_one_one, week_one_two, week_two_one], builds_per_january)
     end
-    
+
   end
 end

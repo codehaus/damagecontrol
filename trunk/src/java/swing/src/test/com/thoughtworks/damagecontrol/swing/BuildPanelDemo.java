@@ -16,7 +16,7 @@ import java.util.Map;
 
 /**
  * @author Aslak Helles&oslash;y
- * @version $Revision: 1.6 $
+ * @version $Revision: 1.7 $
  */
 public class BuildPanelDemo {
     private static BuildListener bl;
@@ -31,6 +31,7 @@ public class BuildPanelDemo {
         f.getContentPane().add(buildPanel.getPanel());
         f.pack();
         f.show();
+
     }
 
     private static BuildPoller createDemoPoller() {

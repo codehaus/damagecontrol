@@ -1,6 +1,7 @@
 require 'damagecontrol/Build'
 require 'damagecontrol/AsyncComponent'
 require 'damagecontrol/BuildEvents'
+require 'damagecontrol/pebbles/TimeUtils'
 
 # Captures and persists build history
 # Instances of this class can also be reached
@@ -82,10 +83,30 @@ module DamageControl
     def build_history(project_name)
       return [] unless @builds.has_key?(project_name)
       @builds[project_name]
-   	end
+    end
 
     def get_project_names()
       @builds.keys
+    end
+
+    # Returns a map of time -> [build]
+    # The time represents a time period of a day, week or month
+    # date_field should be :day, :week or :month
+    def group_by_period(project_name, interval)
+      build_periods = {}
+      build_list = get_build_list_map(project_name)[project_name]
+      build_list.each do |build|
+        timestamp = build.timestamp_as_time
+        period_number, period_start_date = timestamp.get_period_info(interval)
+        builds_during_that_period = build_periods[period_start_date]
+        if(builds_during_that_period.nil?)
+          builds_during_that_period = []
+          build_periods[period_start_date] = builds_during_that_period
+        end
+
+        builds_during_that_period << build
+      end
+      build_periods
     end
 
   end
