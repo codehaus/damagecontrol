@@ -1,0 +1,8 @@
+./gplot/MANIFEST
+./gplot/README
+./gplot/ChangeLog.txt
+./gplot/gpl.txt
+./gplot/Gnuplot.rb
+./gplot/array_demo.rb
+./gplot/func_demo.rb
+./gplot/matrix_demo.rb

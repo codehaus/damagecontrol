@@ -1,0 +1,68 @@
+<html>
+<head>
+<link rel="stylesheet" href="css/style.css" type="text/css">
+<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+
+<% if auto_refresh? %>
+  <meta http-equiv="Refresh" content="<%= auto_refresh_rate %>">
+<% end %>
+
+<title><%= title %> - <%= html_quote(DamageControl::VERSION_TEXT) %></title>
+</head>
+
+<body>
+
+<div id="top-panel">
+<a href="http://damagecontrol.codehaus.org/"><img class="logo" src="images/damagecontrol-logo.png"/></a>
+</div>
+
+<div id="top-nav">
+	<div id="left-top-nav">
+	<%= breadcrumbs %>
+	</div>
+	<div id="right-top-nav">
+    <% if auto_refresh? %>
+      <a href="<%= auto_refresh_url_prefix %>auto_refresh=false">Turn auto refresh off</a>
+    <% else %>
+      <a href="<%= auto_refresh_url_prefix %>auto_refresh=true">Turn auto refresh on</a>
+    <% end %>
+	</div>
+</div>
+
+<div id="main-panel">
+<%= body %>
+</div>
+
+<%
+tasks = self.tasks
+if(tasks && tasks.length > 0)
+%>
+  <div id="tasks">  
+    <% tasks.each do |task| %>
+      <div class="task"><%= task %></div>
+    <% end %>  
+  </div>
+<% end %>
+
+<%
+navigation = self.navigation
+if(navigation)
+%>
+  <div id="navigation">  
+    <%= navigation %>
+  </div>
+<% end %>
+
+<% 
+# I just can't get the footer to layout properly :-( --jon 
+if false then
+%>
+<div id="footer">
+This stuff displays best in a Mozilla based browser. Try <a href="http://www.mozilla.org/products/firefox/">Firefox</a>.
+<br>
+<%= html_quote(DamageControl::VERSION_TEXT) %>
+</div>
+<% end %>
+
+</body>
+</html>

@@ -1,0 +1,73 @@
+<html>
+<head>
+<title><%= project_name %> Configuration</title>
+<link type="text/css" rel="stylesheet" href="css/style.css">
+</head>
+<body onLoad="executeOnLoad()">
+<script><!--
+
+function executeOnLoad() {  
+  <% scm_configurators.each do |scm_configurator| %>
+    <%= scm_configurator.javascript_on_load %>
+  <% end %>
+}
+
+initialScm = "<%= project_config['scm_type'] %>"
+oldScmDiv = null
+function showScm(scm) {
+  if(!oldScmDiv) {
+    oldScmDiv = document.getElementById(initialScm)
+  }
+  if(oldScmDiv) {
+    oldScmDiv.style.display = 'none'
+  }
+  newScmDiv = document.getElementById(scm)
+  newScmDiv.style.display = 'block'
+  oldScmDiv = newScmDiv
+}
+
+<% scm_configurators.each do |scm_configurator| %>
+  <%= scm_configurator.javascript_declarations %>
+<% end %>
+
+// --></script>
+
+<form>
+<table>
+<tr>
+  <td class="config_cell">Project name</td>
+  <td><input class="scm_info" name="project_name" type="text" value="<%= project_name %>"/></td>
+</tr>
+<tr>
+  <td>Build command</td>
+  <td><input class="scm_info" name="build_command_line" type="text" value="<%= project_config['build_command_line'] %>"/></td>
+</tr>
+<tr>
+</tr>
+<tr>
+  <td>Nag email</td>
+  <td><input class="scm_info" name="nag_email" id="nag_email" type="text" value="<%= project_config['nag_email'] %>"/></td>
+</tr>
+<tr>
+  <td>Source control</td>
+  <td>
+    <% scm_configurators.each do |scm_configurator| %>
+      <input id="<%= scm_configurator.scm_id %>radio" type="radio" value="<%= scm_configurator.scm_id %>" name="scm_type" onClick="javascript:showScm('<%= scm_configurator.scm_id %>')"<%if(scm_configurator.selected?)%>checked="true"<%end%>/> <%= scm_configurator.scm_display_name %>
+    <% end %>
+  </td>
+</tr>
+</table>
+
+  <% scm_configurators.each do |scm_configurator| %>
+    <div id="<%= scm_configurator.scm_id %>" style="<% if(scm_configurator.selected?)%>display:block<%else%>display:none<%end%>">
+      <%= scm_configurator.config_form %>
+    </div>
+  <% end %>
+
+  <input name="action" type="hidden" value="<%= action %>" />
+  <input type="submit" value="Save"/>
+  
+</form>
+  
+</body>
+</html>
