@@ -3,7 +3,7 @@ require 'damagecontrol/Project'
 require 'damagecontrol/BuildRequestEvent'
 require 'damagecontrol/BuildProgressEvent'
 require 'damagecontrol/BuildCompleteEvent'
-require 'damagecontrol/FakeClock'
+require 'damagecontrol/Clock'
 
 module DamageControl
 

@@ -1,8 +1,9 @@
 module DamageControl
+
 	module FileUtils
 		def mkdirs(dirs)
 			dir = ""
-			dirs.split(/\\|\//).each{|entry|
+			dirs.split("\\").each{|entry|
 				dir += entry
 				Dir.mkdir(dir) unless FileTest::exists?(dir)
 				dir += "/"

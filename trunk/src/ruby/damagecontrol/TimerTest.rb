@@ -1,6 +1,6 @@
 require 'test/unit'
 require 'damagecontrol/Timer'
-require 'damagecontrol/FakeClock'
+require 'damagecontrol/Clock'
 require 'damagecontrol/Hub'
 
 module DamageControl
