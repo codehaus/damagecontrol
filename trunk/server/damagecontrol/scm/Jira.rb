@@ -19,7 +19,7 @@ module DamageControl
     def highlight(message)
       url = ensure_trailing_slash(jira_url)
       if(url)
-	message.gsub(/(?:^|\s)+([A-Z]+-[0-9]+)/, "<a href=\"#{url}browse/\\1\">\\1</a>")
+        message.gsub(/(?:^|\s)?([A-Z]+-[0-9]+)/, " <a href=\"#{url}browse/\\1\">\\1</a>").gsub(/(\n)/, "<br/>")
       else
         message
       end
