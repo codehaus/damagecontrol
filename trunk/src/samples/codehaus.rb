@@ -13,7 +13,7 @@ require 'damagecontrol/publisher/FilePublisher'
  
 include DamageControl 
  
-buildRoot = File.expand_path("/www/damagecontrol.codehaus.org/builds") 
+buildRoot = File.expand_path("/www/damagecontrol.codehaus.org") 
  
 hub = Hub.new 
 BuildExecutor.new(hub, "#{buildRoot}/builds").start 
