@@ -331,6 +331,9 @@ class End2EndTest < Test::Unit::TestCase
     File.mkpath(basedir)
   end
   
+  def test_dummy
+  end
+  
   def Xtest_damagecontrol_works_with_cvs
     @project_name = "CVS_TestingProject"
 
