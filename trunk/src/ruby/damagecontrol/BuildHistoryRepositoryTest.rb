@@ -31,6 +31,21 @@ module DamageControl
       assert_equal(build2, @bhp.last_succesful_build("project_name"))
     end
     
+    def test_build_history_is_sorted_according_to_timestamp
+  	  build1 = Build.new("project_name")
+  	  build1.timestamp = Time.utc(2004, 04, 02, 12, 00, 00)
+  	  build2 = Build.new("project_name")
+  	  build2.timestamp = Time.utc(2004, 04, 02, 13, 00, 00) # one hour later
+  	  build3 = Build.new("project_name")
+  	  build3.timestamp = Time.utc(2004, 04, 02, 14, 00, 00) # one hour later
+      
+      @bhp.register(build3)
+      @bhp.register(build1)
+      @bhp.register(build2)
+      
+  	  assert_equal([build1, build2, build3], @bhp.build_history("project_name"))
+    end
+    
     # Not really a unit test, more a YAML experiment
     def test_build_can_be_saved_as_yaml
       builds = [@apple1, @pear1, @apple1]
