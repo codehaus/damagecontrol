@@ -1,3 +1,5 @@
+$:<<'../../lib'
+
 require 'test/unit'
 require 'ftools'
 require 'damagecontrol/Build'
