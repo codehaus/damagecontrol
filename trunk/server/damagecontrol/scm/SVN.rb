@@ -103,11 +103,17 @@ module DamageControl
     def install_trigger(trigger_command, damagecontrol_install_dir, &proc)
       post_commit_exists = File.exists?(post_commit_file)
       mode = post_commit_exists ? File::APPEND|File::WRONLY : File::CREAT|File::WRONLY
-      File.open(post_commit_file, mode) do |file|
-        file.puts("#!/bin/sh") unless post_commit_exists 
-        file.puts("#{trigger_command}\n" )
+      begin
+        File.open(post_commit_file, mode) do |file|
+          file.puts("#!/bin/sh") unless post_commit_exists 
+          file.puts("#{trigger_command}\n" )
+        end
+        system("chmod g+x #{post_commit_file}")
+      rescue
+        raise "Didn't have persmissions to write to #{post_commit_file}. " +
+        "Try to manually add the following line:\n\n#{trigger_line}\n\n" +
+        "Finally make it executable with chmod g+x #{post_commit_file}"
       end
-      system("chmod g+x #{post_commit_file}")
     end
     
     def uninstall_trigger(trigger_command, trigger_files_checkout_dir)
