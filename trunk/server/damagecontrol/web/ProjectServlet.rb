@@ -66,6 +66,10 @@ module DamageControl
       raise "not privileged" if @type != :private
     end
   
+    def private?
+      @type == :private
+    end
+    
     def project_name
       request.query['project_name']
     end

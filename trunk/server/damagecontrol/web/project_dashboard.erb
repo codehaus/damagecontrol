@@ -7,10 +7,12 @@
 <tr><td>Current build status</td><td><%= current_status %></td></tr>
 </table>
 
+<% if private? then %>
 Tasks:
 <ul>
 <li><a href="?project_name=<%= project_name %>&action=configure">Configure</a></li>
 <li><a href="?project_name=<%= project_name %>&action=trig_build">Trig build now</a></li>
 </ul>
+<% end %>
 
 </body></html>
