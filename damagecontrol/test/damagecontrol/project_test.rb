@@ -140,5 +140,29 @@ module DamageControl
       end
     end
     
+    def test_should_tell_each_publisher_to_publish_build
+      p = Project.new("mooky")
+      
+      publisher_1 = new_mock
+      publisher_1.__expect(:publish) do |build|
+        assert_equal("build", build)
+      end
+      p.publishers << publisher_1
+      
+      publisher_2 = new_mock
+      publisher_2.__expect(:publish) do |build|
+        assert_equal("build", build)
+      end
+      p.publishers << publisher_2
+
+      p.publish("build")
+    end
+
+    def test_should_have_all_publisher_classes_available
+      publisher_class_names = Project.publisher_classes.collect{ |cls| cls.name }
+      assert_equal(1, publisher_class_names.length)
+      
+      assert(publisher_class_names.index("DamageControl::Publisher::Email"))
+    end
   end
 end

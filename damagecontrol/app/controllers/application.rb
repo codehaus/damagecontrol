@@ -6,11 +6,6 @@ require 'damagecontrol/build'
 require 'damagecontrol/tracker'
 require 'damagecontrol/scm_web'
 
-# TODO - do this only when needed. It's slow!
-# Start Drb - this is how we communicate with the daemon.
-#DRb.start_service()
-#Rscm = DRbObject.new(nil, 'druby://localhost:9000')
-
 class ApplicationController < ActionController::Base
 
   layout 'rscm'

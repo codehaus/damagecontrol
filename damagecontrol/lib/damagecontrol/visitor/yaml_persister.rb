@@ -45,7 +45,9 @@ module DamageControl
           first = 0 if first < 0
 
           identifiers[first..last].each do |identifier|
-            changesets.add(YAML::load_file("#{@changesets_dir}/#{identifier.to_s}/changeset.yaml"))
+            changeset_yaml = "#{@changesets_dir}/#{identifier.to_s}/changeset.yaml"
+            Log.info "Loading changesets from #{changeset_yaml}"
+            changesets.add(YAML::load_file(changeset_yaml))
           end
         end
         changesets

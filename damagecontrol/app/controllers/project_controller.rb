@@ -1,3 +1,4 @@
+require 'drb'
 require 'rscm'
 require 'damagecontrol/project'
 require 'damagecontrol/directories'
@@ -93,7 +94,9 @@ class ProjectController < ApplicationController
     project.tracker = instantiate_from_params("tracker")
     
     begin
-      Rscm.save_project(project)
+      DRb.start_service()
+      rscm = DRbObject.new(nil, 'druby://localhost:9000')
+      rscm.save_project(project)
     rescue => e
       $stderr.puts(e.backtrace.join("\n"))
       return render_text("Couldn't connect to RSCM server. Please make sure it's running.<br>" + e.message)

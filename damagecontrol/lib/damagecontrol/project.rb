@@ -1,6 +1,7 @@
 require 'fileutils'
 require 'yaml'
 require 'rscm'
+require 'action_controller/support/class_inheritable_attributes'
 require 'damagecontrol/build'
 require 'damagecontrol/directories'
 require 'damagecontrol/diff_parser'
@@ -27,6 +28,10 @@ module DamageControl
     attr_accessor :quiet_period
 
     attr_accessor :build_command
+    attr_accessor :publishers
+
+    @@available_publisher_classes = []
+    cattr_reader :available_publisher_classes
 
     # Loads the project with the given +name+.
     def Project.load(name)
@@ -43,12 +48,28 @@ module DamageControl
         Project.load(name)
       end
     end
-  
+    
+    # Available publisher classes
+    def Project.publisher_classes
+      if(@@available_publisher_classes.length == 0)
+        Dir[File.dirname(__FILE__) + "/publisher/*.rb"].each do |publisher_source|
+          Kernel.load(File.expand_path(publisher_source))
+        end
+      end
+      @@available_publisher_classes
+    end
+
     def initialize(name=nil)
       @name = name
+      @publishers = []
       @scm = nil
       @tracker = Tracker::Null.new
       @scm_web = SCMWeb::Null.new
+    end
+    
+    # Tells all publishers to publish a build
+    def publish(build)
+      @publishers.each do |publisher| publisher.publish(build) end
     end
     
     # Saves the state of this project to persistent store (YAML)

@@ -30,7 +30,7 @@
   <% if(!@select_changeset_identifiers.empty?) %>
     <tr class="build-row">
       <td class="build-cell-even">
-        <form method="get" action="<%= url_for(:action => "changesets", :id => @project.name) %>">
+        <form method="get" action="<%= url_for(:action => "changeset", :id => @project.name) %>">
           <input type="hidden" name="project_name" value="<%= "bar" %>" />
           <select name="changeset" onchange="submit()">
           
