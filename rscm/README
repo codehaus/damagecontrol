@@ -104,8 +104,7 @@ acceptance test suite for RSCM. By doing this you'll actually follow a TDD
 approach for your new Mooky class - except that the tests are already written
 for you!
 
-IMPORTANT NOTE: If your SCM doesn't provide an easy way to create new local repositories
-- such as with StarTeam - you're probably better off writing the tests from scratch and not
+IMPORTANT NOTE: If your SCM doesn't provide an easy way to create new local repositories (such as with StarTeam) you're probably better off writing the tests from scratch and not
 include GenericSCMTests. Instead, just make sure you have an SCM repository set up somewhere
 and write tests to work against that repository. This way you won't be able to pass the
 generic acceptance test suite, and other people (like the RSCM dev team) will probably

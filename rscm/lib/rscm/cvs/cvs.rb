@@ -7,15 +7,22 @@ module RSCM
 
   # RSCM implementation for CVS.
   #
-  # You need the cvs executable on the PATH in order for it to work.
+  # You need a cvs executable on the PATH in order for it to work.
   #
   # NOTE: On Cygwin this has to be the win32 build of cvs and not the Cygwin one.
-  class CVS < AbstractSCM
+  class Cvs < AbstractSCM
 
   public
+    ann :description => "CVSROOT"
     attr_accessor :root
+
+    ann :description => "module"
     attr_accessor :mod
+
+    ann :description => "Branch"
     attr_accessor :branch
+
+    ann :description => "Password", :tip => "<b>Warning!</b> Password will be shown in cleartext in configuration files."
     attr_accessor :password
     
     def initialize(root=nil, mod=nil, branch=nil, password=nil)
@@ -91,11 +98,7 @@ module RSCM
 
     def changesets(checkout_dir, from_identifier, to_identifier=Time.infinity, files=nil)
       checkout(checkout_dir) unless uptodate?(checkout_dir, nil) # must checkout to get changesets
-      begin
-        parse_log(checkout_dir, new_changes_command(from_identifier, to_identifier, files))
-      rescue => e
-        parse_log(checkout_dir, old_changes_command(from_identifier, to_identifier, files))
-      end
+      parse_log(checkout_dir, changes_command(from_identifier, to_identifier, files))
     end
     
     def diff(checkout_dir, change)
@@ -105,7 +108,7 @@ module RSCM
           when /#{Change::DELETED}/; "#{revision_option(change.previous_revision)}"
           when /#{Change::ADDED}/; "#{revision_option(Time.epoch)} #{revision_option(change.revision)}"
         end
-        # IPORTANT! CVS NT has a bug in the -N diff option
+        # IMPORTANT! CVS NT has a bug in the -N diff option
         # http://www.cvsnt.org/pipermail/cvsnt-bugs/2004-November/000786.html
         cmd = command_line("diff -Nu #{opts} #{change.path}")
         safer_popen(cmd, "r", 1) do |io|
@@ -230,7 +233,7 @@ module RSCM
       changesets = nil
       with_working_dir(checkout_dir) do
         safer_popen(execed_command_line) do |stdout|
-          parser = CVSLogParser.new(stdout)
+          parser = CvsLogParser.new(stdout)
           parser.cvspath = path
           parser.cvsmodule = mod
           changesets = parser.parse_changesets
@@ -239,11 +242,10 @@ module RSCM
       changesets
     end
 
-    def new_changes_command(from_identifier, to_identifier, files)
+    def changes_command(from_identifier, to_identifier, files)
       # https://www.cvshome.org/docs/manual/cvs-1.11.17/cvs_16.html#SEC144
       # -N => Suppress the header if no revisions are selected.
-      # -S => Do not print the list of tags for this file.
-      "log #{branch_option} -N -S #{period_option(from_identifier, to_identifier)}"
+      "log #{branch_option} -N #{period_option(from_identifier, to_identifier)}"
     end
 
     def branch_specified?
@@ -262,11 +264,6 @@ module RSCM
       "checkout #{branch_option} -d #{target_dir} #{mod} #{revision_option(to_identifier)}"
     end
     
-    def old_changes_command(from_identifier, to_identifier, files)
-      # Many servers don't support the new -S option
-      "log #{branch_option} -N #{period_option(from_identifier, to_identifier)}"
-    end
-
     def hidden_password
       if(password && password != "")
         "********"
@@ -307,7 +304,7 @@ module RSCM
     end
 
     def create_root_cvs
-      CVS.new(self.root, "CVSROOT", nil, self.password)
+      Cvs.new(self.root, "CVSROOT", nil, self.password)
     end
 
     def revision_option(identifier)
@@ -353,11 +350,5 @@ module RSCM
         else ["local", nil, nil, root]
       end
     end
-  end
-
-  # Convenience factory method used in testing
-  def CVS.local(cvsroot_dir, mod)
-    cvsroot_dir = PathConverter.filepath_to_nativepath(cvsroot_dir, true)
-    CVS.new(":local:#{cvsroot_dir}", mod)
   end
 end

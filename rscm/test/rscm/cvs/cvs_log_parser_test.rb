@@ -5,12 +5,12 @@ require 'rscm/changes'
 require 'rscm/cvs/cvs_log_parser'
 
 module RSCM
-  class CVSLogParserTest < Test::Unit::TestCase
+  class CvsLogParserTest < Test::Unit::TestCase
   
     include FileUtils
     
     def setup
-      @parser = CVSLogParser.new(nil)
+      @parser = CvsLogParser.new(nil)
       @parser.cvspath = "/scm/damagecontrol"
       @parser.cvsmodule = "damagecontrol"
     end
@@ -20,12 +20,12 @@ module RSCM
     end
     
     def test_read_log_entry
-      assert_equal(nil, CVSLogParser.new(StringIO.new("")).next_log_entry)
+      assert_equal(nil, CvsLogParser.new(StringIO.new("")).next_log_entry)
     end
     
     def test_parses_entire_log_into_changesets
       File.open(File.dirname(__FILE__) + "/cvs-test.log") do |io|
-        @parser = CVSLogParser.new(io)
+        @parser = CvsLogParser.new(io)
         changesets = @parser.parse_changesets
         
         assert_equal(24, changesets.length)
@@ -37,7 +37,7 @@ module RSCM
     # http://jira.codehaus.org/browse/DC-312
     def test_jira_dc_312
       File.open(File.dirname(__FILE__) + "/cvs-dataforge.log") do |io|
-        @parser = CVSLogParser.new(io)
+        @parser = CvsLogParser.new(io)
         changesets = @parser.parse_changesets
         
         assert_equal(271, changesets.length)
@@ -110,7 +110,7 @@ EOF
     end
     
     def test_log_from_e2e_test
-      @parser = CVSLogParser.new(StringIO.new(LOG_FROM_E2E_TEST))
+      @parser = CvsLogParser.new(StringIO.new(LOG_FROM_E2E_TEST))
       changesets = @parser.parse_changesets
       assert_equal(2, changesets.length)
       assert_match(/foo/, changesets[1].message)
@@ -195,7 +195,7 @@ description:
 EOF
 
     def test_can_parse_LOG_FROM_05_07_2004_19_41
-      @parser = CVSLogParser.new(StringIO.new(LOG_FROM_05_07_2004_19_41))
+      @parser = CvsLogParser.new(StringIO.new(LOG_FROM_05_07_2004_19_41))
       assert_equal(11, @parser.split_entries(LOG_FROM_05_07_2004_19_41).size)
       assert_equal("server/damagecontrol/scm/CVS.rb", @parser.parse_path(@parser.split_entries(LOG_FROM_05_07_2004_19_41)[0]))
       changesets = @parser.parse_changesets
@@ -359,7 +359,7 @@ fixed broken url (NANO-8)
 EOF
 
     def test_can_parse_LOG_WITH_DELETIONS
-      @parser = CVSLogParser.new(StringIO.new(LOG_WITH_DELETIONS))
+      @parser = CvsLogParser.new(StringIO.new(LOG_WITH_DELETIONS))
       changesets = @parser.parse_changesets
       assert_equal(2, changesets.length)
 
@@ -415,7 +415,7 @@ description:
 EOF
 
     def test_can_parse_LOG_WITH_MISSING_ENTRIES
-      @parser = CVSLogParser.new(StringIO.new(LOG_WITH_MISSING_ENTRIES))
+      @parser = CvsLogParser.new(StringIO.new(LOG_WITH_MISSING_ENTRIES))
       changesets = @parser.parse_changesets
       assert_equal(0, changesets.length)
     end
@@ -461,7 +461,7 @@ installer!!!!!! it's getting close to release!!!
 EOF
 
     def test_can_distinguish_new_file_from_old_file
-      @parser = CVSLogParser.new(StringIO.new(LOG_WITH_NEW_AND_OLD_FILE))
+      @parser = CvsLogParser.new(StringIO.new(LOG_WITH_NEW_AND_OLD_FILE))
       changesets = @parser.parse_changesets
 
       assert_equal(Change::ADDED,    changesets[0][0].status)
@@ -566,7 +566,7 @@ Final changes for 2.1 release
 EOF
 
     def test_can_parse_logs_with_cvs_and_dashes_in_commit_message
-      @parser = CVSLogParser.new(StringIO.new(LOG_WITH_WEIRD_CVS_AND_MANY_DASHES))
+      @parser = CvsLogParser.new(StringIO.new(LOG_WITH_WEIRD_CVS_AND_MANY_DASHES))
       changesets = @parser.parse_changesets
       assert_equal(6, changesets.length)
     end

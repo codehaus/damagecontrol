@@ -3,10 +3,7 @@ require 'rscm/time_ext'
 
 module RSCM
 
-  # TODO: add a hook to get committers from a separate class - to support registered pairs
-  # We'll be able to do lots of cool analysis with visitors later -> graphs. mmmmm.
-
-  # A collection of changesets.
+  # A collection of ChangeSet.
   class ChangeSets
     include Enumerable
     include XMLRPC::Marshallable

@@ -109,27 +109,28 @@ else
 end
 
 task :publish do
- # publisher = Rake::CompositePublisher.new
-#  publisher.add Rake::RubyForgePublisher.new('rscm', 'aslak_hellesoy')
+  publisher = Rake::CompositePublisher.new
+  publisher.add Rake::RubyForgePublisher.new('rscm', 'aslak_hellesoy')
+  publisher.upload
 
   RUBYFORGE_GROUP_ID = 490
   RUBYFORGE_PACKAGE_ID = 552
   RUBYFORGE_RELEASE_NAME = "rakedrelease"
 
-  Rake::RubyForgeFilePublisher.new(
-    RUBYFORGE_GROUP_ID, 
-    "aslak_hellesoy", 
-    "README",
-    #"pkg/#{PKG_FILE_NAME}.gem", 
-    RUBYFORGE_PACKAGE_ID,
-    RUBYFORGE_RELEASE_NAME
-  ) do |p|
-    p.type_id = 8100
-    p.processor_id = 2000
-    p.preformatted = 1
-    p.release_name = "come on"
-    p.release_changes = "now"
-    p.release_date = Time.utc(2005, 2, 19, 23, 42, 0)
-  end
+#  Rake::RubyForgeFilePublisher.new(
+#    RUBYFORGE_GROUP_ID, 
+#    "aslak_hellesoy", 
+#    "README",
+#    #"pkg/#{PKG_FILE_NAME}.gem", 
+#    RUBYFORGE_PACKAGE_ID,
+#    RUBYFORGE_RELEASE_NAME
+#  ) do |p|
+#    p.type_id = 8100
+#    p.processor_id = 2000
+#    p.preformatted = 1
+#    p.release_name = "come on"
+#    p.release_changes = "now"
+#    p.release_date = Time.utc(2005, 2, 19, 23, 42, 0)
+#  end
 
 end

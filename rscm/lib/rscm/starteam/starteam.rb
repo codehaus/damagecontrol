@@ -19,9 +19,28 @@ module RSCM
   #
   class StarTeam < AbstractSCM
 
-    attr_accessor :user_name, :password, :server_name, :server_port, :project_name, :view_name, :folder_name
+    ann :description => "User name"
+    attr_accessor :user_name
 
-    def initialize(user_name=nil, password=nil, server_name=nil, server_port=nil, project_name=nil, view_name=nil, folder_name=nil)
+    ann :description => "Password"
+    attr_accessor :password
+
+    ann :description => "Server name"
+    attr_accessor :server_name
+
+    ann :description => "Server port"
+    attr_accessor :server_port
+
+    ann :description => "Project name"
+    attr_accessor :project_name
+
+    ann :description => "View name"
+    attr_accessor :view_name
+
+    ann :description => "Folder name"
+    attr_accessor :folder_name
+
+    def initialize(user_name="", password="", server_name="", server_port="", project_name="", view_name="", folder_name="")
       @user_name, @password, @server_name, @server_port, @project_name, @view_name, @folder_name = user_name, password, server_name, server_port, project_name, view_name, folder_name
     end
 

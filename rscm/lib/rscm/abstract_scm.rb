@@ -1,6 +1,7 @@
 require 'fileutils'
 require 'rscm/changes'
 require 'rscm/path_converter'
+require 'rscm/annotations'
 
 class String
   # Turns a String into a Time or an int
