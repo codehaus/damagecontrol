@@ -46,7 +46,7 @@ module DamageControl
                 payload = socket.gets(nil)
                 begin
                   do_accept(payload)
-                  socket.print("DamageControl server on #{@server.peeraddr[2]}/#{@server.peeraddr[3]} got message from #{client_hostname} / #{client_ip}\r\n")
+                  socket.print("DamageControl server on #{@server.addr[2]}/#{@server.addr[3]} got message from #{client_hostname} / #{client_ip}\r\n")
                   socket.print("http://damagecontrol.codehaus.org/\r\n")
                 rescue => e
                   socket.print("DamageControl exception:\n")
