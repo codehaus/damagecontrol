@@ -2,7 +2,6 @@
 
 $VERBOSE = nil
 
-
 class Project
   def initialize
     $damagecontrol_home = File::expand_path(".")
