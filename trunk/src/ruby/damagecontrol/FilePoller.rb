@@ -1,4 +1,3 @@
-
 require 'damagecontrol/Timer'
 require 'damagecontrol/FileUtils'
 
@@ -8,7 +7,6 @@ module DamageControl
 		attr_reader :dir_to_poll
 			
 		include TimerMixin
-		include FileUtils
 
 		def initialize(dir_to_poll)
 			@dir_to_poll = dir_to_poll

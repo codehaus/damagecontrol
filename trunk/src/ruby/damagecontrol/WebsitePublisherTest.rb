@@ -1,6 +1,7 @@
 require 'test/unit'
 require 'damagecontrol/WebsitePublisher'
 require 'damagecontrol/FileUtils'
+require 'ftools'
 
 module DamageControl
 
@@ -21,6 +22,11 @@ module DamageControl
 			}
 		end
 		
+		def teardown
+			rmdir("logs")
+			rmdir("out")
+		end
+
 		def foreach_log
 			3.times {|i|
 				log = "#{i}"
@@ -70,12 +76,7 @@ module DamageControl
 			}
 			return text
 		end
-		
-		def teardown
-			delete("logs")
-			delete("out")
-		end
-				
+			
 	end
 	
 end

@@ -1,13 +1,13 @@
-
 require 'test/unit'
 require 'damagecontrol/FilePoller'
 require 'damagecontrol/FileUtils'
+require 'ftools'
 
 module DamageControl
 	
 	class FilePollerTest < Test::Unit::TestCase
 		include FileUtils
-				
+		
 		class TestFilePoller < FilePoller
 			attr_reader :new_files
 			
@@ -22,30 +22,30 @@ module DamageControl
 		end
 
 		def setup
-			@dir = "FilePoller"
-			mkdirs(@dir)
+			@dir = target_file("FilePoller#{Time.now.to_i}")
+			File.mkpath(@dir)
 			@poller = TestFilePoller.new(@dir)
 		end
 
 		def teardown
-			delete(@dir)
+			rmdir(@dir)
 		end
 		
 		def test_doesnt_trig_on_empty_directory
-			@poller.tick(@poller.clock.current_time)
+			@poller.force_tick
 			assert_equal([], @poller.new_files)
 		end
 		
-		def test_checks_peridoically
+		def test_checks_periodically
 			@poller.clock = FakeClock.new
 			@poller.clock.change_time(4711)
-			@poller.tick(@poller.clock.current_time)
+			@poller.force_tick
 			assert_equal(4711 + 1000, @poller.next_tick)
 		end
 		
 		def test_new_file_calls_new_file
 			create_file("newfile")
-			@poller.tick(@poller.clock.current_time)
+			@poller.force_tick
 			assert_equal(["#{@dir}/newfile"], @poller.new_files)
 		end
 		

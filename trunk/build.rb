@@ -1,8 +1,5 @@
 $VERBOSE = nil
 
-$damagecontrol_home = File::expand_path(".")
-
-$:<<'src/ruby'
 #$:<<'lib'
 
 #require 'damagecontrol/FileUtils'
@@ -21,4 +18,38 @@ $:<<'src/ruby'
 #system("javac -classpath #{classpath} -d #{class_target} -sourcepath #{java_source} #{sources}")
 #system("jar cvf lib/damagecontrol.jar -C #{class_target} .")
 
-require 'AllTests'
+class Project
+	def initialize
+		$damagecontrol_home = File::expand_path(".")
+		
+		$:<<'src/ruby'
+	end
+
+	def unit_test
+		require 'AllTests'
+	end
+
+	def integration_test
+		require 'End2EndTest.rb'
+	end
+	
+	def all
+		unit_test
+		integration_test
+	end
+	
+	def default
+		all
+	end
+	
+	def run(args)
+		if args.nil?
+			default
+		else
+			args.each {|target| project.instance_eval(target) }
+		end
+	end
+end
+
+project = Project.new
+project.run($ARGV)

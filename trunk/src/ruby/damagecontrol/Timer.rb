@@ -37,11 +37,7 @@ module DamageControl
 		end
 		
 		def interval
-			if @interval
-				@interval
-			else
-				1000
-			end
+			@interval || 1000
 		end
 		
 		def stop

@@ -1,5 +1,6 @@
 require 'test/unit'
 require 'damagecontrol/LogWriter'
+require 'ftools'
 
 module DamageControl
 
@@ -17,10 +18,11 @@ module DamageControl
 		def teardown
 			begin
 				@writer.current_log.close
-				delete("tmp.log")
-				delete("logs")
 			rescue
 			end
+			
+			rmdir("tmp.log")
+			rmdir("logs")
 		end
 		
 		def test_log_writer_creates_new_log_on_build_request_and_closes_it_on_build_complete

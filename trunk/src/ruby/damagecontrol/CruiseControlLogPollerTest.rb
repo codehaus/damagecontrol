@@ -2,6 +2,7 @@ require 'test/unit'
 require 'damagecontrol/HubTestHelper'
 require 'damagecontrol/CruiseControlLogPoller'
 require 'rexml/document'
+require 'ftools'
 
 module DamageControl
 	class CruiseControlLogPollerTest < Test::Unit::TestCase
@@ -12,7 +13,7 @@ module DamageControl
 		
 		def setup
 			@dir = "test#{Time.new.to_i}"
-			mkdirs(@dir)
+			File.mkpath(@dir)
 			create_hub
 			@log_file = damagecontrol_file("testdata/log20030929145347.xml")
 			@ccpoller = CruiseControlLogPoller.new(@hub, @dir)
@@ -26,7 +27,7 @@ module DamageControl
 			@ccpoller.force_tick
 			assert_no_messages
 			
-			copy(@log_file, "#{@dir}/log.xml")
+			File.copy(@log_file, "#{@dir}/log.xml")
 			@ccpoller.force_tick
 			assert_message_types("DamageControl::BuildCompleteEvent")
 			assert_equal('dxbranch', messages_from_hub[0].build.project_name)
