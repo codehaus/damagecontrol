@@ -86,11 +86,38 @@ The build object will then be passed on to publishers that will publish
 the result of the build to various communication channels<br>
 <br>
 <h2>Publishers</h2>
+The publisher classes are responsible for delivering content to a
+destination. Currently DamageControl supports IRC and static files
+(HTML). RSS, Email, Jabber and Yahoo! Messenger(TM) is planned.<br>
+The content that a publisher will deliver is provided by templates.<br>
 <br>
+There is also a Java applet that can be used to monitor build progress.
+It is not technically speaking a publisher. It is a poller that polls
+for content (build output redirected to logfiles) on the DamageControl
+server. It is an excellent way to monitor a build at real-time.<br>
 <h2>Templates</h2>
-<h2><br>
+The templates aer responsible for generating content to be delivered by
+the publihers. Currently only HTML is supported. Planned templates are
+RSS (with link to HTML) and short text (with link to HTML) - intended
+for IRC, Jabber, Y! and email<br>
+<br>
+<h2>SCM<br>
 </h2>
-<h2>SCM</h2>
+The SCM classes are responsible for all interaction with the physical
+SCMs. They are not full blown Ruby wrappers for the SCM's native APIs,
+but include functionality that is required for DamageControl:<br>
+<ul>
+  <li>Installing DamageControl triggers (using nc - netcat) in
+repositories</li>
+  <li>Checking out latest code</li>
+  <li>Parsing URL-like strings that identifies a repository</li>
+  <li>Getting/guessing email addresses from users</li>
+</ul>
+<h2>SocketTrigger</h2>
+The SocketTrigger class is the main interaction point with
+DamageControl. It listens for connections on a socket. When it gets a
+connection, it parses a command and starts to build. The socket
+connections typically come from trigger scripts installed in the SCM.<br>
 <br>
 <h1>Glossary</h1>
 <h2>Build artifacts</h2>
@@ -106,6 +133,9 @@ the result of the build to various communication channels<br>
   <li>Documentation<br>
   </li>
 </ul>
-<br>
+<h2>SCM</h2>
+&nbsp;SCM stands for Source Control Management systems. Examples are
+CVS, Subverision (SVN), StarTeam, Perforce, Visual Source Safe (VSS)
+etc. Currently only CVS and SVN are supported.<br>
 </body>
 </html>
