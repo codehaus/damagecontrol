@@ -1,9 +1,12 @@
 require 'damagecontrol/FileSystem'
 require 'damagecontrol/scm/DefaultSCMRegistry'
+require 'damagecontrol/ant/ant'
 
 module DamageControl
 
   class BuildResult
+
+    include Ant
 
     # these should ideally be set before exceution
     # they are exposed as accessors only so they can be re-set from a cc log file
@@ -52,12 +55,19 @@ module DamageControl
   private
   
     def do_build
-      @filesystem.chdir("#{checkout_dir}/#{@build_path}")
-      IO.popen(build_command_line) do |output|
+      puts "Changing dir to #{absolute_build_path}"
+      @filesystem.chdir("#{absolute_build_path}")
+      cmdline = translate_command_to_ruby(build_command_line)
+      puts "Executing build command line #{cmdline}"
+      IO.popen(cmdline) do |output|
         output.each_line do |line|
           yield line
         end
       end
+    end
+    
+    def translate_command_to_ruby(build_command_line)
+      ant_commandline
     end
   end
 end

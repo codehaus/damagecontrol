@@ -16,7 +16,7 @@ module Ant
   # classpath   classpath for ant. if nil it will be calculated.
   # jikespath   path to jikes executable
   #
-  def commandline(
+  def ant_commandline(
     ant_args  = "", \
     vm_args   = ENV['ANT_OPTS'] , \
     ant_home  = ENV['ANT_HOME'] , \
@@ -73,6 +73,6 @@ end
 if($0 == __FILE__)
   include Ant
   ant_args = ARGV ? ARGV.join : ""
-  cmdline = commandline(ant_args)
+  cmdline = ant_commandline(ant_args)
   system(cmdline)
 end

@@ -71,11 +71,11 @@ module DamageControl
     def checkout(spec, directory, &proc)
       directory = File.expand_path(directory)
       File.makedirs(directory)
-      Dir.chdir(directory)
-
       if(checked_out?(directory, spec))
+        Dir.chdir("#{directory}/#{mod(spec)}")
         cvs(update_command(spec), &proc)
       else
+        Dir.chdir(directory)
         cvs(checkout_command(spec), &proc)
       end
     end

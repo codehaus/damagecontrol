@@ -2,9 +2,12 @@ require 'test/unit'
 require 'ftools'
 require 'socket'
 require 'damagecontrol/scm/CVS'
+require 'damagecontrol/FileUtils'
 
 module DamageControl
   class CVSTest < Test::Unit::TestCase
+    include FileUtils
+  
     def setup
       @cvs = CVS.new
     end
@@ -74,9 +77,9 @@ module DamageControl
       testrepo = File.expand_path("target/cvstestrepo")
       testcheckout = File.expand_path("target/cvstestcheckout")
       
-      project_name = "testproject"
-      spec = ":local:#{testrepo}:testmodule"
-      build_command = "echo dummybuild"
+      project_name = "DamageControlled"
+      spec = ":local:#{testrepo}:damagecontrolled"
+      build_command = "ant"
 
       expected = "#{project_name} #{spec.gsub('/','\\')} #{build_command} ."
       mock_server = start_mock_server(self, expected)
@@ -95,7 +98,7 @@ module DamageControl
         #puts output
       }
 
-      import_module(testcheckout, spec)      
+      import_damagecontrolled(testcheckout, spec)      
       
       # wait for max 2 secs. if mock server is still waiting, it's a failure
       mock_server.join(2)
@@ -111,15 +114,8 @@ module DamageControl
       system("cvs -d:local:#{dir} init")
     end
     
-    def import_module(testcheckout, spec)
-      module_dir = "#{testcheckout}/#{@cvs.mod(spec)}"
-
-      File.mkpath(module_dir)
-      File.open("#{module_dir}/afile.txt", "w") do |file|
-        file.puts "yo"
-      end      
-
-      Dir.chdir("#{testcheckout}")
+    def import_damagecontrolled(testcheckout, spec)
+      Dir.chdir("C:/scm/damagecontrol/testdata/damagecontrolled")
       system("cvs -d#{@cvs.cvsroot(spec)} -q import -m \"\" #{@cvs.mod(spec)} dc-vendor dc-release")
     end
 

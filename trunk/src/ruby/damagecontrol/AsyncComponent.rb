@@ -25,8 +25,9 @@ module DamageControl
         begin
           process_message(message)
           consume_message(message)
-        rescue
+        rescue => detail
           puts "error processing message #{message}: " + $!
+          print detail.backtrace.join("\n")
         end
       end
     end
