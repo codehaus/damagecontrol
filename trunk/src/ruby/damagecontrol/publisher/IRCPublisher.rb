@@ -14,11 +14,11 @@ module DamageControl
     attr_reader :channel
     attr_reader :server
   
-    def initialize(channel, server, channel, template)
+    def initialize(channel, server, irc_channel, template)
       super(channel)
       @irc = IRCConnection.new()
       @server = server
-      @channel = channel
+      @irc_channel = irc_channel
       @template = template
       @handle = 'dcontrol'
     end
@@ -30,7 +30,7 @@ module DamageControl
           @irc.send_message_to_channel(content)
         else
           @irc.connect(server, handle) unless @irc.connected?
-          @irc.join_channel(channel) if @irc.connected? && !@irc.in_channel?
+          @irc.join_channel(irc_channel) if @irc.connected? && !@irc.in_channel?
           raise "not in channel yet"
         end
       end
