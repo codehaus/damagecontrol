@@ -18,7 +18,7 @@ module DamageControl
     end
     
     def start
-      logger.info("starting poller #{self}")
+      logger.info("starting #{self}")
       super
     end
   

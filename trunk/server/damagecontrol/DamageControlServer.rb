@@ -51,6 +51,8 @@ require 'damagecontrol/web/ChangesReport'
 require 'damagecontrol/web/ErrorsReport'
 require 'damagecontrol/web/cruisecontrol/TestsReport'
 
+require 'damagecontrol/publisher/BuildHistoryStatsPublisher'
+
 # patch webrick so that it displays files it doesn't recognize as text
 module WEBrick
   module HTTPUtils
@@ -163,6 +165,7 @@ module DamageControl
       init_fixed_time_scheduler
       init_webserver
       init_custom_components
+      init_build_history_stats_publisher
     end
     
     def access_log
@@ -337,6 +340,10 @@ module DamageControl
     end
 
     def init_custom_components
+    end
+    
+    def init_build_history_stats_publisher
+      component(:build_history_stats_publisher, BuildHistoryStatsPublisher.new(hub, build_history_repository))
     end
     
     def log4r_config_file

@@ -123,6 +123,10 @@ module DamageControl
       "#{build_dir(project_name, dc_creation_time)}/log.xml"
     end
 
+    def project_dir(project_name)
+      "#{@basedir}/#{project_name}"
+    end
+
   private
   
     # writes rss to disk
@@ -141,10 +145,6 @@ module DamageControl
       File.open(rss_file(project_name), "w") do |io|
         io.puts(rss.to_s)
       end
-    end
-
-    def project_dir(project_name)
-      "#{@basedir}/#{project_name}"
     end
 
     def builds_dir(project_name)

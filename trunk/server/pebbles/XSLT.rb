@@ -1,7 +1,5 @@
 module DamageControl
   module XSLT
-    include FileUtils
-
     def xslt(xml, xsl, out)
       result = ""
       cmd = "xsltproc '#{xsl}' '#{xml}' > '#{out}'"
