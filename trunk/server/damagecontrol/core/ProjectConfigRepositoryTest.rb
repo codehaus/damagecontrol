@@ -1,6 +1,7 @@
 require 'test/unit'
 require 'damagecontrol/core/ProjectConfigRepository'
 require 'damagecontrol/scm/NoSCM'
+require 'damagecontrol/scm/NoTracker'
 
 module DamageControl
 
@@ -33,8 +34,9 @@ module DamageControl
       assert(@pcr.project_exists?("newproject"))
       assert_equal(
         {
+					"tracking" => create_default_tracker,
           "project_name" => "newproject",
-          "scm" => create_default_scm
+          "scm" => create_default_scm,
         },
         @pcr.project_config("newproject"))
     end
@@ -53,6 +55,10 @@ module DamageControl
     def create_default_scm
       NoSCM.new
     end
+		
+		def create_default_tracker
+			NoTracker.new
+		end
 
     def test_creates_build_with_proper_attributes_from_project_config
       @pcr.new_project("newproject")
