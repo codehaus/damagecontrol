@@ -76,8 +76,17 @@ module DamageControl
       params[:HttpsPort] || 4713
     end
     
-    def init_components                
+    def init_config_services
       component(:hub, Hub.new)
+      
+      component(:project_directories, ProjectDirectories.new(rootdir))
+      component(:project_config_repository, ProjectConfigRepository.new(project_directories))
+      component(:build_history_repository, BuildHistoryRepository.new(hub, "#{rootdir}/build_history.yaml"))
+    end
+    
+    def init_components
+      init_config_services
+      
       component(:log_writer, LogWriter.new(hub, logdir))
     
       component(:host_verifier, if allow_ips.nil? then OpenHostVerifier.new else HostVerifier.new(allow_ips) end)
@@ -87,12 +96,7 @@ module DamageControl
       public_xmlrpc_servlet = ::XMLRPC::WEBrickServlet.new
       private_xmlrpc_servlet = ::XMLRPC::WEBrickServlet.new
       
-      component(:project_directories, ProjectDirectories.new(rootdir))
-      component(:project_config_repository, ProjectConfigRepository.new(project_directories))
-      
       component(:trigger, DamageControl::XMLRPC::Trigger.new(private_xmlrpc_servlet, @hub, project_config_repository))
-    
-      component(:build_history_repository, BuildHistoryRepository.new(@hub, "#{rootdir}/build_history.yaml"))
       
       DamageControl::XMLRPC::StatusPublisher.new(public_xmlrpc_servlet, build_history_repository)
       DamageControl::XMLRPC::ServerControl.new(private_xmlrpc_servlet)

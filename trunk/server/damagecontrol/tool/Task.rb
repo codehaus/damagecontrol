@@ -96,9 +96,12 @@ end
 class ConfigTask < Task
   commandline_option :rootdir
   
+  attr_reader :server
+  
   def initialize
     super
-    init_config_services(rootdir)
+    @server = DamageControlServer.new(:RootDir => rootdir)
+    @server.init_config_services
   end
 end
 
