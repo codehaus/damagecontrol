@@ -57,8 +57,9 @@ module DamageControl
     end
     
     def test_checkout_command
+      root = to_os_path("/some/where")
       assert_equal(
-        "-d :pserver:anonymous@cvs.codehaus.org:/cvsroot/damagecontrol checkout -d /some/where damagecontrol", \
+        "-d :pserver:anonymous@cvs.codehaus.org:/cvsroot/damagecontrol checkout -d #{root} damagecontrol", \
         @cvs.checkout_command(":pserver:anonymous@cvs.codehaus.org:/cvsroot/damagecontrol:damagecontrol", "/some/where"))
     end
     

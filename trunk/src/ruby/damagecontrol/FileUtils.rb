@@ -15,6 +15,10 @@ module DamageControl
       windows? ? "\\" : "/"
     end
     
+    def to_os_path(path)
+      path.gsub('/', path_separator)
+    end
+    
     def rmdir(dir)
       if windows?
         system("rmdir /S /Q #{dir}")
