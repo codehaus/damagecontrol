@@ -229,7 +229,7 @@ logger.info("Got changesets from CVS checkout: #{changesets}")
         changesets = parser.parse_changesets
         logger.info("DONE Reading chengeset log from stdout")
       end
-      logger.info("OUTSIDE BLOCK")
+      logger.info("OUTSIDE changesets BLOCK")
       changesets
     end
     
@@ -250,6 +250,7 @@ logger.info("Got changesets from CVS checkout: #{changesets}")
         end
         logger.info("DONE Reading from stdout")
       end
+      logger.info("OUTSIDE cvs BLOCK")
     end
 
   protected

@@ -77,11 +77,13 @@ puts "Process done: #{pid} #{process_status}"
         # read the rest of the output
         raise ProcessError.new("Process failed:\n#{cmd}\nExit code: #{process_status}", process_status)
       end
+putd "RETURNING FROM EXEC"
       return process_status.exitstatus
     rescue Timeout::Error => e
       Process.kill("SIGHUP", pid)
       raise e
     ensure
+putd "CLOSING STREAMS"
       stdin_pipe[1].close unless stdin_pipe[1].closed?
       stdout_pipe[0].close unless stdout_pipe[0].closed?
       stderr_pipe[0].close unless stderr_pipe[0].closed?
