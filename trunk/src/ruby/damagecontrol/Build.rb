@@ -6,6 +6,7 @@ require 'damagecontrol/ant/ant'
 module DamageControl
 
   class Modification
+    attr_accessor :revision
     attr_accessor :developer
     attr_accessor :path
     attr_accessor :message

@@ -139,4 +139,84 @@ module DamageControl
       }
     end
   end
+
+
+  class CVSLogParserTest < Test::Unit::TestCase
+  
+    include FileUtils
+    
+    def setup
+      @parser = CVSLogParser.new
+    end
+    
+    def test_extracts_log_entries
+      def @parser.number_of_entries; @number_of_entries end
+      def @parser.parse_modifications(log_entry)
+        @number_of_entries = 0 unless defined?(@number_of_entries)
+        @number_of_entries+=1
+        []
+      end
+  
+      File.open("#{damagecontrol_home}/testdata/cvs-test.log") do |io|
+        @parser.parse_log(io)
+      end
+      assert_equal(220, @parser.number_of_entries)
+    end
+    
+    
+    def test_parse_modifications
+      modifications = @parser.parse_modifications(LOG_ENTRY)
+      assert_equal(4, modifications.length)
+      assert_equal("/cvsroot/damagecontrol/damagecontrol/src/ruby/damagecontrol/BuildExecutorTest.rb", modifications[0].path)
+    end
+    
+
+    def test_parse_modification
+      modification = @parser.parse_modification(MODIFICATION_ENTRY)
+      assert_equal("1.20", modification.revision)
+      assert_equal("2003/11/09 17:53:37", modification.time)
+      assert_equal("tirsen", modification.developer)
+    end
+
+    MODIFICATION_ENTRY = <<-EOF
+    revision 1.20
+    date: 2003/11/09 17:53:37;  author: tirsen;  state: Exp;  lines: +3 -4
+    Quiet period is configurable for each project
+    EOF
+    
+    LOG_ENTRY = <<-EOF
+    =============================================================================
+    
+    RCS file: /cvsroot/damagecontrol/damagecontrol/src/ruby/damagecontrol/BuildExecutorTest.rb,v
+    Working file: src/ruby/damagecontrol/BuildExecutorTest.rb
+    head: 1.20
+    branch:
+    locks: strict
+    access list:
+    symbolic names:
+    keyword substitution: kv
+    total revisions: 20;    selected revisions: 4
+    description:
+    ----------------------------
+    revision 1.20
+    date: 2003/11/09 17:53:37;  author: tirsen;  state: Exp;  lines: +3 -4
+    Quiet period is configurable for each project
+    ----------------------------
+    revision 1.19
+    date: 2003/11/09 17:04:18;  author: tirsen;  state: Exp;  lines: +32 -2
+    Quiet period implemented for BuildExecutor, but does not yet handle multiple projects (builds are not queued as before)
+    ----------------------------
+    revision 1.18
+    date: 2003/11/09 15:51:50;  author: rinkrank;  state: Exp;  lines: +1 -2
+    linux/windows galore
+    ----------------------------
+    revision 1.17
+    date: 2003/11/09 15:00:06;  author: rinkrank;  state: Exp;  lines: +6 -8
+    o YAML config (BuildBootstrapper)
+    o EmailPublisher
+    =============================================================================
+    EOF
+
+  end
+
 end

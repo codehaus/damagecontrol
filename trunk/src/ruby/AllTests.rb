@@ -1,6 +1,6 @@
 $:<<'../../lib'
 
-#require 'damagecontrol/scm/CVSTest'
+require 'damagecontrol/scm/CVSTest'
 require 'damagecontrol/scm/SVNTest'
 
 require 'damagecontrol/BuildTest'

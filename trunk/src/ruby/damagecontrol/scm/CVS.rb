@@ -157,5 +157,63 @@ module DamageControl
       end
     end
     
-  end   
+  end
+  
+  class CVSLogParser
+    def parse_log(io)
+      modifications = []
+      while(log_entry = read_log_entry(io))
+        modifications += parse_modifications(log_entry)
+      end
+      modifications
+    end
+    
+    def read_log_entry(io)
+      log_entry = ""
+      io.each_line do |line|
+        return log_entry if line=~/====*/
+        log_entry<<line
+      end
+      return nil
+    end
+    
+    def parse_modifications(log_entry)
+      file = nil
+      log_entry.each_line do |line|
+        if line =~ /RCS file: (.*),v/
+          file = $1
+        end
+        break if line=~/----*/
+      end
+      modifications = []
+      modification_entry = ""
+      log_entry.each_line do |line|
+        modification_entry<<line
+        if line=~/----*/
+          modification = parse_modification(modification_entry)
+          modification.path = file
+          modifications<<modification
+        end
+      end
+      modifications
+    end
+    
+    def parse_modification(modification_entry)
+      modification = Modification.new
+      modification.message = ""
+      modification_entry.each_line do |line|
+        if line=~/revision (.*)/
+          modification.revision = $1
+        elsif line=~/date: (.*);  author: (.*);  state: (.*);  lines: (.*)/
+          modification.time = $1
+          modification.developer = $2
+        else
+          modification.message<<line
+        end
+      end
+      modification
+    end
+    
+  end
+
 end
