@@ -28,6 +28,7 @@ REGISTRY = Needle::Registry.define do |b|
         project.publish(build)
       end
       # TODO: do this in a publisher that can be turned off if an other SCMWeb is used.
+      # Disable by default if other SCMWeb is specified.
       # This may take a while, so we do it after the build.
       b.persister.save_diffs(project, changesets)
     end
