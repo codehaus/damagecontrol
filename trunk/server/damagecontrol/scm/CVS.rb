@@ -2,6 +2,7 @@ require 'damagecontrol/scm/AbstractSCM'
 require 'damagecontrol/scm/CVSLogParser'
 require 'damagecontrol/scm/Changes'
 require 'ftools'
+require 'stringio'
 
 module DamageControl
 
@@ -59,18 +60,20 @@ module DamageControl
     
     def changes(from_time, to_time)
       all_changes = with_working_dir(working_dir) do
-        if block_given?
-          yield changes_command(from_time, to_time)
-          cvs_with_io(changes_command(from_time, to_time)) do |io|
-            io.each_line {|line| yield line}
+        command = changes_command(from_time, to_time)
+        log = ""
+        yield command if block_given?
+        cvs_with_io(command) do |io|
+          io.each_line do |line|
+            log << line
+            yield line if block_given?
           end
         end
-        cvs_with_io(changes_command(from_time, to_time)) do |io|
-          parser = CVSLogParser.new
-          parser.cvspath = path
-          parser.cvsmodule = mod
-          parser.parse_changes_from_log(io)
-        end
+        
+        parser = CVSLogParser.new
+        parser.cvspath = path
+        parser.cvsmodule = mod
+        parser.parse_changes_from_log(StringIO.new(log))
       end
       
       #changes_within_period = changes_within_period(all_changes, from_time, to_time)

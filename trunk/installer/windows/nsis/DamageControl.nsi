@@ -11,6 +11,8 @@
 ;General
 
   !define ROOTDIR "..\..\.."
+  !define DISTDIR "..\..\..\target\dist"
+  !define RUBY_HOME "C:\ruby"
   
   ; VERSION needs to be defined on the command line with /DVERSION=1.2.3 option
   
@@ -39,7 +41,7 @@
 ;Pages
 
   !insertmacro MUI_PAGE_WELCOME
-  !insertmacro MUI_PAGE_LICENSE "${ROOTDIR}\License.txt"
+  !insertmacro MUI_PAGE_LICENSE "${DISTDIR}\license.txt"
   !insertmacro MUI_PAGE_COMPONENTS
   !insertmacro MUI_PAGE_DIRECTORY
   
@@ -79,8 +81,8 @@ Section "DamageControl Server" SecServer
 
   SetOutPath "$INSTDIR" 
   
-  File /r "${ROOTDIR}\server"
-  File /r "${ROOTDIR}\bin"
+  File "${DISTDIR}\license.txt"
+  File /r "${DISTDIR}"
   
   ;Include a minimal ruby installation (to reduce the size of the installer)
 
@@ -129,7 +131,7 @@ Section "DamageControl Server" SecServer
     ;Create shortcuts
     CreateDirectory "$SMPROGRAMS\$STARTMENU_FOLDER"
     CreateShortCut "$SMPROGRAMS\$STARTMENU_FOLDER\Start Server.lnk" "$INSTDIR\bin\server.cmd"
-    CreateShortCut "$SMPROGRAMS\$STARTMENU_FOLDER\Stop Server.lnk" "$INSTDIR\bin\shutdownserver.cmd" "http://localhost:4712/private/xmlrpc"
+    CreateShortCut "$SMPROGRAMS\$STARTMENU_FOLDER\Stop Server.lnk" "$INSTDIR\bin\shutdownserver.cmd" "--url http://localhost:4712/private/xmlrpc"
     CreateShortCut "$SMPROGRAMS\$STARTMENU_FOLDER\Modify settings.lnk" "$WINDIR\notepad.exe" "$INSTDIR\bin\server.rb"
     CreateShortCut "$SMPROGRAMS\$STARTMENU_FOLDER\Dashboard.lnk" "http://localhost:4712/private/dashboard"
     CreateShortCut "$SMPROGRAMS\$STARTMENU_FOLDER\DamageControl Website.lnk" "http://damagecontrol.codehaus.org"

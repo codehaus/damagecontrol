@@ -18,6 +18,7 @@ module DamageControl
       changes = []
       while(log_entry = read_log_entry(io))
         @log<<log_entry
+        @log<<""
         begin
           changes += parse_changes(log_entry)
         rescue Exception => e

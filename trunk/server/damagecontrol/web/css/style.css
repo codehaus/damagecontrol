@@ -19,6 +19,10 @@ img {
   border: 0;
 }
 
+div.dashboard {
+  display: inline;
+}
+
 .scm_info {
   width: 480px;
 }
@@ -51,7 +55,7 @@ img {
 }
 
 .task-panel {
-  float: right;
+  float: left;
   width: 200px;
   margin-right: -1px;
   padding: 3px;
@@ -61,8 +65,8 @@ img {
 }
 
 .main-panel {
-  float: left;
-  clear: left;
+  float: right;
+  clear: right;
 }
 
 .task-header {

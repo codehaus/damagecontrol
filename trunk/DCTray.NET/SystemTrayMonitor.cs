@@ -430,6 +430,11 @@ namespace ThoughtWorks.DamageControl.DCTray
 
 		private void mnuSettings_Click(object sender, System.EventArgs e)
 		{
+			if ( settingsForm == null ) 
+			{
+				// this happens if the user is trying to bring up the settings form before the monitor has been initialized properly
+				return;
+			}
 			settingsForm.Launch();
 		}
 
