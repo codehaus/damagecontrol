@@ -3,7 +3,8 @@
 "http://www.oasis-open.org/docbook/xml/4.2/docbookx.dtd">
 <book>
   <bookinfo>
-		<title>DamageControl</title>
+    <title>DamageControl</title>
+
     <date>11/09/2004</date>
 
     <authorgroup>
@@ -1116,24 +1117,24 @@ end</programlisting>
 
               <procedure>
                 <step>
-                  <para> Create a new project named
+                  <para>Create a new project named
                   <quote>myproject-deploy</quote> (for example).</para>
                 </step>
 
                 <step>
-                  <para> Configure <quote>myproject-deploy</quote> to be a
+                  <para>Configure <quote>myproject-deploy</quote> to be a
                   child build of <quote>myproject</quote> (so it gets
                   triggered at each commit).</para>
                 </step>
 
                 <step>
-                  <para> Configure <quote>myproject-deploy</quote> so it has
-                  no <abbrev>SCM</abbrev> and that the build command line
-                  looks something like:</para>
+                  <para>Configure <quote>myproject-deploy</quote> so it has no
+                  <abbrev>SCM</abbrev> and that the build command line looks
+                  something like:</para>
 
                   <screen>cd /<replaceable>var/damagecontrol/myproject/checkout/myproject</replaceable> &amp;&amp; <replaceable>deploy</replaceable></screen>
 
-                  <para> Where
+                  <para>Where
                   <replaceable>/var/damagecontrol/project/checkout/myproject</replaceable>
                   is the full path to the checkout directory of the parent
                   project <quote>myproject</quote> and
@@ -1157,7 +1158,7 @@ end</programlisting>
               execute it.</para>
 
               <formalpara>
-                <title> Why would I want to pin a build?</title>
+                <title>Why would I want to pin a build?</title>
 
                 <para>Well there's a number of ways this would be useful, but
                 for example in our scenario we have 8 or 9 functional test
@@ -1173,7 +1174,7 @@ end</programlisting>
               </formalpara>
 
               <formalpara>
-                <title> So how do I pin a build?</title>
+                <title>So how do I pin a build?</title>
 
                 <para>It's not documented anywhere (hence why I'm writing this
                 <acronym>FAQ</acronym>) but it really is quite simple. To pin
@@ -1193,7 +1194,7 @@ end</programlisting>
               executors.</para>
 
               <formalpara>
-                <title> Why can not I pin a build through the web UI?</title>
+                <title>Why can not I pin a build through the web UI?</title>
 
                 <para>This feature hasn't been implemented yet, but it is
                 scheduled (see <ulink
@@ -1316,6 +1317,20 @@ end</programlisting>
             </tbody>
           </tgroup>
         </informaltable>
+      </section>
+
+      <section>
+        <title>Testing</title>
+
+        <para>You should provide a test case for all new code you write. If
+        you would like to run a single test suite, change to the DamageControl
+        root directory and execute following command.</para>
+
+        <screen><prompt># </prompt><userinput>ruby -Iserver <replaceable>server/damagecontrol/scm/CVSTest.rb</replaceable></userinput>
+<computeroutput>…
+Finished in 22.017786 seconds.
+
+8 tests, 29 assertions, 0 failures, 0 errors</computeroutput></screen>
       </section>
 
       <section>
@@ -2188,7 +2203,7 @@ end</programlisting>
 
         <refentry>
           <refnamediv>
-            <refname> <methodname>create</methodname></refname>
+            <refname><methodname>create</methodname></refname>
 
             <refpurpose>Creates a new repository</refpurpose>
           </refnamediv>
@@ -2210,7 +2225,7 @@ end</programlisting>
           <refsection>
             <title>Description</title>
 
-            <para> This method should call the mooky command line that will
+            <para>This method should call the mooky command line that will
             create a new repository. Details about where it should be created
             should be passed to the constructor.</para>
           </refsection>
@@ -2223,7 +2238,7 @@ end</programlisting>
                 <term><parameter>&amp;line_proc</parameter></term>
 
                 <listitem>
-                  <para> A block that should receive lines from the
+                  <para>A block that should receive lines from the
                   command(s)'s standard output.</para>
                 </listitem>
               </varlistentry>
@@ -2259,7 +2274,7 @@ end</programlisting>
           <refsection>
             <title>Description</title>
 
-            <para> This method should call the mooky command line that will
+            <para>This method should call the mooky command line that will
             recursively import files into the repository.</para>
           </refsection>
 
@@ -2323,7 +2338,7 @@ end</programlisting>
           <refsection>
             <title>Description</title>
 
-            <para> This method should call the mooky command line that will
+            <para>This method should call the mooky command line that will
             check out previously imported sources to a working folder.</para>
           </refsection>
 
@@ -2424,7 +2439,7 @@ end</programlisting>
           <refsection>
             <title>Description</title>
 
-            <para> Commits (checks in) all files that have been locally
+            <para>Commits (checks in) all files that have been locally
             modified.</para>
           </refsection>
 
@@ -2501,8 +2516,8 @@ end</programlisting>
           <refsection>
             <title>Description</title>
 
-            <para> This method should install the trigger command in such a
-            way that it is executed when a commit to the SCM occurs.</para>
+            <para>This method should install the trigger command in such a way
+            that it is executed when a commit to the SCM occurs.</para>
           </refsection>
 
           <refsection>
@@ -2569,7 +2584,7 @@ end</programlisting>
           <refsection>
             <title>Description</title>
 
-            <para> This method should return true if the trigger_command is
+            <para>This method should return true if the trigger_command is
             installed, otherwise false.</para>
           </refsection>
 
@@ -2644,8 +2659,8 @@ end</programlisting>
           <refsection>
             <title>Description</title>
 
-            <para> This method should install the trigger command in such a
-            way that it no longer executed when a commit to the
+            <para>This method should install the trigger command in such a way
+            that it no longer executed when a commit to the
             <abbrev>SCM</abbrev> occurs.</para>
           </refsection>
 
@@ -2734,17 +2749,17 @@ end</programlisting>
 
           <itemizedlist>
             <listitem>
-              <para> What are the command line commands for executing
+              <para>What are the command line commands for executing
               checkouts, updates and getting (history) logs?</para>
             </listitem>
 
             <listitem>
-              <para> What does the output of the log command typically look
+              <para>What does the output of the log command typically look
               like?</para>
             </listitem>
           </itemizedlist>
 
-          <para> Please contact us on
+          <para>Please contact us on
           <email>dev@damagecontrol.codehaus.org</email> for further
           information.</para>
         </note>
@@ -2794,11 +2809,11 @@ NameError: undefined local variable or method `num' for \
               <quote><literal>-I.</literal></quote> if you are in that
               directory) when starting the test-suite or the server.</para>
 
-              <para>So instead of: </para>
+              <para>So instead of:</para>
 
               <screen><prompt># </prompt><userinput>ruby damagecontrol/AllTests.rb # will not work!</userinput></screen>
 
-              <para> then do:</para>
+              <para>then do:</para>
 
               <screen><prompt># </prompt><userinput>ruby -I. damagecontrol/AllTests.rb</userinput></screen>
             </answer>
@@ -2887,7 +2902,7 @@ end</programlisting>
       <abbrev>GNOME</abbrev>
 
       <glossdef>
-        <para> A project to build a complete, user-friendly desktop based
+        <para>A project to build a complete, user-friendly desktop based
         entirely on free software.</para>
       </glossdef>
     </glossentry>
@@ -2967,7 +2982,7 @@ end</programlisting>
     </glossentry>
 
     <glossentry>
-      <glossterm> Universal Time Coordinated</glossterm>
+      <glossterm>Universal Time Coordinated</glossterm>
 
       <abbrev>UTC</abbrev>
 
