@@ -5,7 +5,7 @@ $VERBOSE = nil
 class Object
   def system(*args)
     result = super(*args)
-    raise "#{args} failed" if !result
+    raise "#{args} failed" if ($? != 0)
   end
 end
 
@@ -16,8 +16,7 @@ class Project
   
   def execute_ruby(test, safe_level=0)
     Dir.chdir("#{$damagecontrol_home}/server")
-    system("ruby -I. -T#{safe_level} #{test}") || fail
-    fail if ($? != 0)
+    system("ruby -I. -T#{safe_level} #{test}")
   end
 
   def fail(message = $?.to_s)
@@ -42,26 +41,15 @@ class Project
   end
   
   def version
-    "0.2-prerelease"
+    load 'server/damagecontrol/Version.rb'
+    DamageControl::VERSION
   end
   
   def installer
     fail("put a ruby distribution in #{File.expand_path('ruby')}") if !File.exists?("ruby")
     fail("NSIS needs to be installed, download from http://nsis.sf.net (or not installed to default place: #{makensis_exe})") if !File.exists?(makensis_exe)
     
-    write_file("server/damagecontrol/Version.rb", %{
-      module DamageControl
-        PRODUCT_NAME = "DamageControl"
-        VERSION = "#{version}"
-        
-        VERSION_TEXT = "\#{PRODUCT_NAME} version \#{VERSION}"
-      end
-    })
     system("#{makensis_exe} /DVERSION=#{version} installer/windows/nsis/DamageControl.nsi")
-  end
-  
-  def username
-    "tirsen"
   end
   
   def username
