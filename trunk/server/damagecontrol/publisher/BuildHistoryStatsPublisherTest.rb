@@ -28,7 +28,7 @@ module DamageControl
       end
 
       xp = BuildHistoryStatsPublisher.new(
-        new_mock.__expect(:add_consumer),
+        new_mock.__expect(:add_consumer).__expect(:put) {|m| assert(m.is_a?(StatProducedEvent))},
         build_history_repository
       )
       
