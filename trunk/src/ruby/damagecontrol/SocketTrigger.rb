@@ -4,6 +4,7 @@ require 'damagecontrol/BuildEvents'
 require 'damagecontrol/Build'
 require 'damagecontrol/BuildBootstrapper'
 require 'damagecontrol/FileUtils'
+require 'damagecontrol/Logging'
 
 module DamageControl
 
@@ -28,6 +29,7 @@ module DamageControl
   class SocketTrigger
   
     include FileUtils
+    include Logging
 
     attr_accessor :port
     attr_accessor :host_verifier
@@ -88,7 +90,7 @@ module DamageControl
       Thread.new {
         begin
           @server = TCPServer.new(port)
-          puts "Starting SocketTrigger listening on port #{port}"
+          logger.info "#{self} listening on port #{port}"
           $stdout.flush
           
           while (socket = @server.accept)

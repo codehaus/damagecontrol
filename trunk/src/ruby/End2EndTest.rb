@@ -8,11 +8,39 @@ require 'damagecontrol/Hub'
 require 'damagecontrol/FileUtils'
 require 'damagecontrol/scm/SCM'
 
+require 'damagecontrol/Logging'
+
 include DamageControl
 
+# turn off debug logging
+Logging.quiet
+
 class End2EndTest < Test::Unit::TestCase
-	
-	include FileUtils
+
+  def test_builds_on_cvs_add
+    create_cvs_repository
+    create_cvsmodule("e2eproject")
+    
+    install_damagecontrol_into_cvs(execute_script_commandline("build"))
+    start_damagecontrol
+    
+    add_and_commit_file
+    
+    wait_less_time_than_default_quiet_period
+    assert_not_built_yet
+    
+    wait_for_build_to_complete
+    assert_build_success
+  end
+  
+  def add_and_commit_file
+    # add build.bat file and commit it (will trigger build)
+    checkout_cvs_project("e2eproject")
+    create_file("e2eproject/#{script_file('build')}", 'echo "Hello world from DamageControl" > buildresult.txt')
+    add_file_to_cvs_project("e2eproject", script_file("build"))
+  end
+  
+  include FileUtils
         
   def initialize(someparam)
       super(someparam)
@@ -164,8 +192,12 @@ class End2EndTest < Test::Unit::TestCase
 		rmdir(project)
 	end
 
+  def wait_less_time_than_default_quiet_period
+    sleep BuildScheduler::DEFAULT_QUIET_PERIOD - 1
+  end
+
   def wait_for_build_to_complete
-    sleep 5
+    sleep BuildScheduler::DEFAULT_QUIET_PERIOD # we already waited almost all the quiet period, so this should be more than enough
   end
 
   def verify_output_of_svn_build
@@ -188,19 +220,15 @@ class End2EndTest < Test::Unit::TestCase
     end
   end
   
-  def test_builds_on_cvs_add
-    create_cvs_repository
-    create_cvsmodule("e2eproject")
-    install_damagecontrol_into_cvs(execute_script_commandline("build"))
-    
-    start_damagecontrol
-    
-    # add build.bat file and commit it (will trigger build)
-    checkout_cvs_project("e2eproject")
-    create_file("e2eproject/#{script_file('build')}", 'echo "Hello world from DamageControl" > buildresult.txt')
-    add_file_to_cvs_project("e2eproject", script_file("build"))
-    
-    wait_for_build_to_complete
+  def build_result
+    "#{buildsdir}/e2eproject/buildresult.txt"
+  end
+  
+  def assert_not_built_yet
+    assert(!File.exists?(build_result), "build executed before quiet period elapsed")
+  end
+  
+  def assert_build_success
     expected_content =
             if windows?
               '"Hello world from DamageControl" '
@@ -208,7 +236,7 @@ class End2EndTest < Test::Unit::TestCase
               'Hello world from DamageControl'
             end
     assert_file_content(expected_content,
-			"#{buildsdir}/e2eproject/buildresult.txt", 
+			build_result,
 			"build not executed")
   end
   

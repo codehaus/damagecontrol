@@ -1,6 +1,7 @@
 require 'damagecontrol/scm/SCM'
 require 'damagecontrol/FileUtils'
 require 'damagecontrol/BuildBootstrapper'
+require 'damagecontrol/Logging'
 require 'ftools'
 
 module DamageControl
@@ -16,6 +17,7 @@ module DamageControl
   class CVS < SCM
   
     include FileUtils
+    include Logging
   
     def handles_spec?(scm_spec)
       parse_spec(scm_spec)
@@ -144,7 +146,6 @@ module DamageControl
       # install trigger command
       File.open("#{directory}/loginfo", File::WRONLY | File::APPEND) do |file|
         conf_file = conf_script(scm_spec, BuildBootstrapper.conf_file(project_name))
-        puts "conf_file = #{conf_file}"
         trigger_command = BuildBootstrapper.trigger_command(project_name, conf_file, nc_command(scm_spec), dc_host, dc_port)
         file.puts("#{mod(scm_spec)} #{trigger_command}")
       end
@@ -195,12 +196,12 @@ module DamageControl
   
     def cvs(cmd, &proc)
       cmd = "cvs -q #{cmd} 2>&1"
-      puts "executing #{cmd}"
+      logger.debug "executing #{cmd}"
       io = IO.foreach("|#{cmd}") do |progress|
-        if block_given? then yield progress else puts progress end
+        if block_given? then yield progress else logger.debug(progress) end
       end
       raise SCMError.new("#{cmd} failed with code #{$?.to_s}") if $? != 0
-      puts "executed #{cmd}"
+      logger.debug "executed #{cmd}"
     end
     
   end
