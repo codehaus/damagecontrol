@@ -9,6 +9,10 @@ module DamageControl
       @build_history_repository = build_history_repository
     end
     
+    def name
+      build_executor.name
+    end
+    
     def status_message
       build_executor.status_message
     end

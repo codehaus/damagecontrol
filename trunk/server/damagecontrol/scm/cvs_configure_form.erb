@@ -54,6 +54,17 @@
     <td><input class="setting-input" name="cvsmodule" id="cvsmodule" type="text" value="<%= cvsmodule %>"></td>
   </tr>
   <tr>
+    <td>Branch</td>
+    <td><input class="setting-input" name="cvsbranch" id="cvsbranch" type="text" value="<%= cvsbranch %>"></td>
+  </tr>
+  <tr>
+    <td>&nbsp;</td>
+    <td class="setting-description">
+      Note that you can't use trigged build if you are using DC to build multiple branches for the same project,
+      use polled builds instead.
+    </td>
+  </tr>
+  <tr>
     <td class="setting-name">RSH client</td>
     <td><input class="setting-input" name="rsh_client" id="cvs_web_url" type="text" value="<%= rsh_client %>"></td>
   </tr>

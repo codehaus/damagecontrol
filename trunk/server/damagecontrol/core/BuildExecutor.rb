@@ -18,6 +18,7 @@ module DamageControl
     
     attr_reader :current_build
     attr_reader :builds_dir
+    attr_reader :name
     
     attr_accessor :last_build_request
 
@@ -139,7 +140,7 @@ module DamageControl
     
     # overload to specify more clever scheduling mechanism, like some executors are reserved for some builds etc
     def can_execute?(build)
-      !busy? && executor_selector(build) =~ (@name)
+      !busy? && executor_selector(build) =~ (name)
     end
     
     def busy?

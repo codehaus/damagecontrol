@@ -11,6 +11,7 @@ module DamageControl
     include FileUtils
 
   public
+    attr_accessor :cvsbranch
     attr_accessor :cvsroot
     attr_accessor :cvspassword
     attr_accessor :cvsmodule
@@ -174,20 +175,28 @@ module DamageControl
       # https://www.cvshome.org/docs/manual/cvs-1.11.17/cvs_16.html#SEC144
       # -N => Suppress the header if no revisions are selected.
       # -S => Do not print the list of tags for this file.
-      "log -N -S -d\"#{cvsdate(from_time)}<=#{cvsdate(to_time)}\""
+      "log #{branch_option} -N -S -d\"#{cvsdate(from_time)}<=#{cvsdate(to_time)}\""
+    end
+    
+    def branch_specified?
+      cvsbranch && cvsbranch.strip != ""
     end
 
+    def branch_option
+      if branch_specified? then "-r#{cvsbranch}" else "" end
+    end
+    
     def old_changes_command(from_time, to_time)
       # Many servers don't support the new -S option
-      "log -N -d\"#{cvsdate(from_time)}<=#{cvsdate(to_time)}\""
+      "log #{branch_option} -N -d\"#{cvsdate(from_time)}<=#{cvsdate(to_time)}\""
     end
     
     def update_command(time)
-      "update #{time_option(time)} -d -P"
+      "update #{branch_option} #{time_option(time)} -d -P"
     end
     
     def checkout_command(time)
-      "checkout #{time_option(time)} #{cvsmodule}"
+      "checkout #{branch_option} #{time_option(time)} #{cvsmodule}"
     end
     
     def cvs_cmd_with_password(cmd, password)

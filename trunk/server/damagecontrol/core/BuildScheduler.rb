@@ -51,11 +51,16 @@ module DamageControl
     def project_building?(project_name)
       @executors.find {|e| e.building_project?(project_name) }
     end
+    
+    def kill_named_executor(executor_name)
+      executor = executors.find{|e| e.name == executor_name}
+      executor.kill_build_process
+    end
 
   private
     
     def find_available_executor(build)
-      @executors.find {|e| e.can_execute?(build) }
+      executors.find {|e| e.can_execute?(build) }
     end
 
     # try to execute build, taking quiet period and available suitable executors into consideration

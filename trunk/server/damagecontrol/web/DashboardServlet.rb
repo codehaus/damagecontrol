@@ -15,8 +15,8 @@ module DamageControl
     
     def kill_executor
       assert_private
-      executor_index = request.query["executor"].to_i
-      build_scheduler.executors[executor_index].kill_build_process
+      executor_name = request.query["executor"]
+      build_scheduler.kill_named_executor(executor_name)
       action_redirect(:dashboard)
     end
     

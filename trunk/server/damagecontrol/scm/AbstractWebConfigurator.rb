@@ -24,8 +24,9 @@ module DamageControl
       # request.each do |key, value| won't work - it takes too much.
       project_config['scm'] = scm_class.new
       configuration_keys.each do |key|
-        if (request.query[key])
-          project_config['scm'].send("#{key}=", request.query[key].to_s)
+        value = request.query[key].to_s.strip
+        if (value && value != "")
+          project_config['scm'].send("#{key}=", value)
         else
           project_config['scm'].send("#{key}=", nil)
         end
