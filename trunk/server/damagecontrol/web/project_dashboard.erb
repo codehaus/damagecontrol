@@ -29,6 +29,7 @@
   builds = build_history_repository.build_history(project_name).reverse
   builds.each do |build|
     color = if build.successful? then "green" else "red" end
+    color = "grey" if !build.completed?
     image = "images/#{color}-16.gif"
 %>
   <tr class="dashboard">
