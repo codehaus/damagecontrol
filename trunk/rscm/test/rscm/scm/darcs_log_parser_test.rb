@@ -58,10 +58,10 @@ EOF
 
     def test_should_parse_CHANGESET_to_changeset
       parser = DarcsLogParser.new
-      changeset = parser.parse_changeset(StringIO.new(CHANGESET))
+      changeset = parser.parse_changeset(StringIO.new(CHANGESET), {})
 
       assert_equal("imported\nsources", changeset.message)
-      assert_equal('', changeset.revision)
+      assert_equal('20050327203534-4d520-baeeafb062e7f0d72ce740e1e1f5e6a203321ab4.gz', changeset.revision)
       assert_equal("tester@test.net", changeset.developer)
       assert_equal(Time.utc(2005,3,27,20,35,34), changeset.time)
       assert_equal(4, changeset.length)
