@@ -9,7 +9,7 @@ module DamageControl
     attr_accessor :tracker_id
 
     def name
-      "Sourceforge.net"
+      "SourceForge.net"
     end
     
     def url

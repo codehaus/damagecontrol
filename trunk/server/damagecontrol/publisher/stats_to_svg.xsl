@@ -5,7 +5,15 @@
                 >
 
 <!-- 
-http://www.biglist.com/lists/xsl-list/archives/200302/msg00504.html 
+Some nice graphs we can use for inspiration:
+
+http://aeditor.rubyforge.org/graphs.html
+http://www.jbrowse.com/text/rws.shtml
+http://leo.cuckoo.org/projects/SVG-TT-Graph/examples/
+http://ploticus.sourceforge.net/
+
+Here is some arithmetic!
+http://cvs.apache.org/viewcvs.cgi/xml-batik/contrib/charts/
 -->
 <xsl:template match="stats">
   <svg>

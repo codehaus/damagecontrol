@@ -1,21 +1,21 @@
 require 'damagecontrol/scm/AbstractTrackingConfigurator'
-require 'damagecontrol/scm/SourceForgeTracker'
+require 'damagecontrol/scm/RubyForgeTracker'
 
 module DamageControl
-  class SourceForgeTrackerWebConfigurator < AbstractTrackingConfigurator
+  class RubyForgeTrackerWebConfigurator < AbstractTrackingConfigurator
   
   public
   
     def tracking_class
-      SourceForgeTracker
+      RubyForgeTracker
     end
     
     def tracking_display_name
-      "SourceForge.net"
+      "RubyForge.net"
     end
     
     def config_form_template
-      "sourceforge_configure_form.erb"
+      "rubyforge_configure_form.erb"
     end
     
   protected

@@ -41,6 +41,7 @@ require 'damagecontrol/scm/NoSCMWebConfigurator'
 
 require 'damagecontrol/scm/JiraWebConfigurator'
 require 'damagecontrol/scm/ScarabWebConfigurator'
+require 'damagecontrol/scm/RubyForgeTrackerWebConfigurator'
 require 'damagecontrol/scm/SourceForgeTrackerWebConfigurator'
 require 'damagecontrol/scm/NoTrackerWebConfigurator'
 require 'damagecontrol/scm/BugzillaWebConfigurator'
@@ -300,6 +301,7 @@ module DamageControl
         DamageControl::NoTrackerWebConfigurator,
         DamageControl::JiraWebConfigurator,
         DamageControl::ScarabWebConfigurator,
+        DamageControl::RubyForgeTrackerWebConfigurator,
         DamageControl::SourceForgeTrackerWebConfigurator,
         DamageControl::BugzillaWebConfigurator
       ]
