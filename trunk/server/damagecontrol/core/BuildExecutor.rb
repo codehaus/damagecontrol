@@ -61,7 +61,6 @@ module DamageControl
     def execute
       current_build.status = Build::BUILDING
 
-      working_dir = if current_scm.nil? then project_base_dir else checkout_dir end
       # set up some environment variables the build can use
       environment = { "DAMAGECONTROL_BUILD_LABEL" => current_build.potential_label.to_s }
       unless current_build.changesets.nil?
@@ -71,7 +70,7 @@ module DamageControl
       report_progress(current_build.build_command_line)
       begin
         @build_process = Pebbles::Process.new
-        @build_process.working_dir = working_dir
+        @build_process.working_dir = checkout_dir
         @build_process.environment = environment
         @build_process.execute(current_build.build_command_line) do |stdin, stdout, stderr|
           threads = []
@@ -120,10 +119,6 @@ module DamageControl
  
     def checkout?
       !current_scm.nil?
-    end
-    
-    def project_base_dir
-      current_build.scm.working_dir
     end
     
     def scheduled_build

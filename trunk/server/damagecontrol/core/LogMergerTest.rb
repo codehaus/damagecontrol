@@ -8,6 +8,7 @@ require 'damagecontrol/scm/NoSCM'
 module DamageControl  
   class LogMergerTest < Test::Unit::TestCase
     include FileUtils
+    include MockIt
     
     def test_copies_away_logs_on_build_complete
       hub = MockIt::Mock.new
@@ -23,14 +24,15 @@ module DamageControl
       })
       
       build.xml_log_file = "#{basedir}/project/log/#{build_timestamp}.xml"
-      build.scm = NoSCM.new
-      build.scm.checkout_dir = "#{basedir}/checkout"
       
       mkdir_p("#{basedir}/checkout/target/test-reports")
       touch("#{basedir}/checkout/target/test-reports/TEST-com.thoughtworks.Test.xml")
       touch("#{basedir}/checkout/ant-log.xml")
       
-      lm = LogMerger.new(hub)
+      lm = LogMerger.new(
+        hub,
+        new_mock.__expect(:checkout_dir) { "#{basedir}/checkout" }
+      )
       lm.put(BuildCompleteEvent.new(build))
       
       assert(File.exists?(build.xml_log_file))

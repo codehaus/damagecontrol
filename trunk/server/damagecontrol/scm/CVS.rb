@@ -31,7 +31,7 @@ module DamageControl
       begin
         parse_log(checkout_dir, new_changes_command(from_time, to_time), &proc)
       rescue Pebbles::ProcessFailedException => e
-        parse_log(old_changes_command(from_time, to_time), &proc)
+        parse_log(checkout_dir, old_changes_command(from_time, to_time), &proc)
       end
     end
     
