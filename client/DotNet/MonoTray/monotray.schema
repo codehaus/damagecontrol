@@ -1,0 +1,158 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<gconfschemafile>
+	<schemalist>
+		<schema>
+			<key>/schemas/apps/damagecontrol/monotray/notification_messages</key>
+			<applyto>/schemas/apps/damagecontrol/monotray/notification_messages</applyto>
+			<owner>monotray</owner>
+			<type>bool</type>
+	<!--
+  <cstype class="Sample.Alignment">enum</cstype>
+	-->
+			<locale name="C">
+				<short>Show Graphical notification messages</short>
+				<long>Wether graphical notification messages should be displayed after a build</long>
+				<default>true</default>
+			</locale>
+		
+		</schema>
+		<schema>
+			<key>/schemas/apps/damagecontrol/monotray/play_when_successful</key>
+			<applyto>/schemas/apps/damagecontrol/monotray/play_when_successful</applyto>
+			<owner>monotray</owner>
+			<type>bool</type>
+			<locale name="C">
+				<short>Play a sound on first successful build</short>
+				<long>Should a sound be played when a project is built sucessfully for the first time or a project has been repaired</long>
+				<default>false</default>
+			</locale>
+		
+		</schema>
+		<schema>
+			<key>/schemas/apps/damagecontrol/monotray/play_when_still_successful</key>
+			<applyto>/schemas/apps/damagecontrol/monotray/play_when_still_successful</applyto>
+			<owner>monotray</owner>
+			<type>bool</type>
+			<locale name="C">
+				<short>Play a sound on every successful build</short>
+				<long>Should a sound be played when a project is built sucessfully for the first time or a project has been repaired</long>
+				<default>false</default>
+			</locale>
+		
+		</schema>
+		<schema>
+			<key>/schemas/apps/damagecontrol/monotray/play_when_failing</key>
+			<applyto>/schemas/apps/damagecontrol/monotray/play_when_failing</applyto>
+			<owner>monotray</owner>
+			<type>bool</type>
+			<locale name="C">
+				<short>Play a sound on first failing build</short>
+				<long>Should a sound be played when a project is built sucessfully for the first time or a project has been repaired</long>
+				<default>false</default>
+			</locale>
+		
+		</schema>
+		<schema>
+			<key>/schemas/apps/damagecontrol/monotray/play_when_still_failing</key>
+			<applyto>/schemas/apps/damagecontrol/monotray/play_when_still_failing</applyto>
+			<owner>monotray</owner>
+			<type>bool</type>
+			<locale name="C">
+				<short>Play a sound on every failing build</short>
+				<long>Should a sound be played when a project is built sucessfully for the first time or a project has been repaired</long>
+				<default>false</default>
+			</locale>
+		
+		</schema>
+		
+		<schema>
+			<key>/schemas/apps/damagecontrol/monotray/successful_sound</key>
+			<applyto>/schemas/apps/damagecontrol/monotray/successful_sound</applyto>
+			<owner>monotray</owner>
+			<type>string</type>
+			<locale name="C">
+				<short>Sound to Play</short>
+				<long>Should a sound be played when a project is built sucessfully for the first time or a project has been repaired</long>
+				<default></default>
+			</locale>
+		
+		</schema>
+		
+		<schema>
+			<key>/schemas/apps/damagecontrol/monotray/still_successful_sound</key>
+			<applyto>/schemas/apps/damagecontrol/monotray/still_successful_sound</applyto>
+			<owner>monotray</owner>
+			<type>string</type>
+			<locale name="C">
+				<short>Sound to Play</short>
+				<long>Should a sound be played when a project is built sucessfully for the first time or a project has been repaired</long>
+				<default></default>
+			</locale>
+		
+		</schema>
+		
+		<schema>
+			<key>/schemas/apps/damagecontrol/monotray/failing_sound</key>
+			<applyto>/schemas/apps/damagecontrol/monotray/failing_sound</applyto>
+			<owner>monotray</owner>
+			<type>string</type>
+			<locale name="C">
+				<short>Sound to Play</short>
+				<long>Should a sound be played whengc a project is built sucessfully for the first time or a project has been repaired</long>
+				<default></default>
+			</locale>
+		
+		</schema>
+		
+		<schema>
+			<key>/schemas/apps/damagecontrol/monotray/still_failing_sound</key>
+			<applyto>/schemas/apps/damagecontrol/monotray/still_failing_sound</applyto>
+			<owner>monotray</owner>
+			<type>string</type>
+			<locale name="C">
+				<short>Sound to Play</short>
+				<long>Should a sound be played when a project is built sucessfully for the first time or a project has been repaired</long>
+				<default></default>
+			</locale>
+		</schema>
+		
+		<schema>
+			<key>/schemas/apps/damagecontrol/monotray/projects</key>
+			<applyto>/schemas/apps/damagecontrol/monotray/projects</applyto>
+			<owner>monotray</owner>
+			<type>list</type>
+			<list_type>string</list_type>
+			<locale name="C">
+				<short>Sound to Play</short>
+				<long>Should a sound be played when a project is built sucessfully for the first time or a project has been repaired</long>
+				<default></default>
+			</locale>
+		</schema>
+	
+	<!--
+  <schema>
+   <key>/schemas/apps/gconfsharp/sample_app/text_color</key>
+   <applyto>/apps/gconfsharp/sample_app/text_color</applyto>
+   <owner>sample_app</owner>
+  <type>string</type>
+  <cstype>color</cstype>
+   <locale name="C">
+    <short>Text color</short>
+    <long>Text color</long>
+   </locale>
+   <default>#000000</default>
+  </schema>
+  <schema>
+   <key>/schemas/apps/gconfsharp/sample_app/enable_text_color</key>
+   <applyto>/apps/gconfsharp/sample_app/enable_text_color</applyto>
+   <owner>sample_app</owner>
+   <type>bool</type>
+   <locale name="C">
+    <short>Show colored text</short>
+    <long>Show colored text</long>
+   </locale>
+   
+  </schema>
+	-->
+	</schemalist>
+</gconfschemafile>  
