@@ -35,7 +35,7 @@
 // via some of the multiple publishing channels provided by
 // damagecontrol.
 //
-// authors: emerson clarke, aslak hellesoy
+// authors: emerson clarke, aslak hellesoy, trygvis, dan north
 
 #include "Trigger.h"
 
@@ -133,7 +133,7 @@ void Trigger::Process()
 
 		if (send(sock,buffer,strlen(buffer),0) != -1)
 		{
-			// TODO: read line by line and verify that the HTTP response code is 200.
+			// Read line by line and verify that the HTTP response code is 200.
 			// (It will be 200 for both cases below, and something else in case of an XML-RPC error).
 			// When we get to the payload (after an empty line), extract the message
 			// from the XML (which can be expected to be on one single line). The XML will
