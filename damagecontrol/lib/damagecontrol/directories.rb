@@ -92,7 +92,7 @@ module DamageControl
     module_function :changesets_dir
 
     def changesets_rss_file(project_name)
-      "#{changesets_dir(project_name)}/changesets.rss"
+      "#{changesets_dir(project_name)}/changesets.xml"
     end
     module_function :changesets_rss_file
 
