@@ -24,6 +24,7 @@ REGISTRY = Needle::Registry.define do |b|
           'DAMAGECONTROL_BUILD_LABEL' => changeset.identifier.to_s # For others
         }
         build.execute(project.build_command, env)
+        project.publish(build)
       end
     end
   end

@@ -1,5 +1,6 @@
 require 'rscm/path_converter'
 require 'damagecontrol/directories'
+require 'damagecontrol/project'
 
 module DamageControl
   # Represents build-related data organised in the following file structure:
@@ -31,6 +32,16 @@ module DamageControl
     # Our unique id within the changeset
     def identifier
       time.ymdHMS
+    end
+
+    # Our associated project
+    def project
+      Project.load(@project_name)
+    end
+    
+    # Our associated changeset
+    def changeset
+      project.changeset(@changeset_identifier)
     end
     
     # Executes +command+ with the environment variables +env+ and persists the command for future reference.
