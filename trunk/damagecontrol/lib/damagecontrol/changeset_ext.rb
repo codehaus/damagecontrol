@@ -35,18 +35,23 @@ module RSCM
       yield build
     end
 
-    # Returns an array of existing Build s.
+    # Returns an array of existing (archived) Build s.
     def builds
       builds_glob = "#{dir}/builds/*"
       Log.debug "Builds Glob: #{builds_glob}"
       Dir[builds_glob].collect do |dir|
         # The dir's basename will always be a Time
         time = Time.parse_ymdHMS(File.basename(dir))
-        DamageControl::Build.load(self, time)
+        build(time)
       end
     end
+    
+    # Returns a specific existing (archived) Build for +time+
+    def build(time)
+      DamageControl::Build.load(self, time)
+    end
 
-    # Returns the latest build.
+    # Returns the latest Build.
     def latest_build
       builds[-1]
     end
