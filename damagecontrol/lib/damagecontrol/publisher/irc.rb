@@ -3,7 +3,7 @@ require 'damagecontrol/publisher/base'
 module DamageControl
   module Publisher
     class Irc < Base
-      register self
+      #register self
     
       ann :description => "IRC server"
       attr_reader :server

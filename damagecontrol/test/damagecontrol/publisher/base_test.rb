@@ -6,16 +6,16 @@ module DamageControl
     class BaseTest < Test::Unit::TestCase
       def test_should_load_all_scm_classes
         expected = [
-          AmbientOrb,
-          BuildDuration,
+          #AmbientOrb,
+          #BuildDuration,
           Email,
-          Execute,
+          #Execute,
           Growl,
-          Irc,
-          Jabber,
-          X10Cm11A,
-          X10Cm17A,
-          Yahoo
+          #Irc,
+          Jabber
+          #X10Cm11A,
+          #X10Cm17A,
+          #Yahoo
         ]
         assert_equal(
           expected.collect{|c| c.name},

@@ -4,7 +4,7 @@ require 'damagecontrol/publisher/base'
 module DamageControl
   module Publisher
     class X10Cm11A < Base
-      register self
+      #register self
     
       def name
         "X10-CM11A"

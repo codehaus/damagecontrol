@@ -18,8 +18,7 @@ module DamageControl
       end    
 
       def publish(build)
-        hosts = @hosts.split(%r{,\s*})
-        hosts.each do |host|
+        @hosts.split(%r{,\s*}).each do |host|
           begin
             g = ::Growl.new("localhost", "DamageControl", ["DamageControl Notification"])
             g.notify("DamageControl Notification", "#{build.project.name}", "Build #{build.status_message}", 0, true)
