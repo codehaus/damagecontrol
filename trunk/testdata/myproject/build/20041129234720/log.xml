@@ -1,0 +1,78 @@
+<?xml version='1.0'?>
+<damagecontrol>
+<testsuite name="com.thoughtworks.damagecontrolled.ThingyTestCase" tests="1" failures="0" errors="0" time="0.02">
+  <properties>
+    <property name="java.runtime.name" value="Java(TM) 2 Runtime Environment, Standard Edition"></property>
+    <property name="sun.boot.library.path" value="C:\j2sdk1.4.2_04\jre\bin"></property>
+    <property name="java.vm.version" value="1.4.2_04-b05"></property>
+    <property name="ant.library.dir" value="c:/apache-ant-1.6.2/lib"></property>
+    <property name="ant.version" value="Apache Ant version 1.6.2 compiled on July 16 2004"></property>
+    <property name="ant.java.version" value="1.4"></property>
+    <property name="java.vm.vendor" value="Sun Microsystems Inc."></property>
+    <property name="java.vendor.url" value="http://java.sun.com/"></property>
+    <property name="path.separator" value=";"></property>
+    <property name="java.vm.name" value="Java HotSpot(TM) Client VM"></property>
+    <property name="file.encoding.pkg" value="sun.io"></property>
+    <property name="user.country" value="GB"></property>
+    <property name="sun.os.patch.level" value="Service Pack 2"></property>
+    <property name="libdir" value="target/lib"></property>
+    <property name="java.vm.specification.name" value="Java Virtual Machine Specification"></property>
+    <property name="user.dir" value="C:\Documents and Settings\ahelleso\.damagecontrol\javatest\checkout"></property>
+    <property name="final.name" value="damagecontrolled-1.0"></property>
+    <property name="java.runtime.version" value="1.4.2_04-b05"></property>
+    <property name="java.awt.graphicsenv" value="sun.awt.Win32GraphicsEnvironment"></property>
+    <property name="basedir" value="."></property>
+    <property name="java.endorsed.dirs" value="C:\j2sdk1.4.2_04\jre\lib\endorsed"></property>
+    <property name="os.arch" value="x86"></property>
+    <property name="ant.file.damagecontrolled" value="C:\Documents and Settings\ahelleso\.damagecontrol\javatest\checkout\build.xml"></property>
+    <property name="java.io.tmpdir" value="c:\DOCUME~1\ahelleso\LOCALS~1\Temp\"></property>
+    <property name="line.separator" value="
+"></property>
+    <property name="java.vm.specification.vendor" value="Sun Microsystems Inc."></property>
+    <property name="classesdir" value="target/classes"></property>
+    <property name="user.variant" value=""></property>
+    <property name="os.name" value="Windows XP"></property>
+    <property name="ant.home" value="c:/apache-ant-1.6.2"></property>
+    <property name="testclassesdir" value="target/test-classes"></property>
+    <property name="sun.java2d.fontpath" value=""></property>
+    <property name="ant.project.name" value="damagecontrolled"></property>
+    <property name="cygwin.user.home" value="c:/"></property>
+    <property name="java.library.path" value="C:\j2sdk1.4.2_04\jre\bin;.;C:\WINDOWS\system32;C:\WINDOWS;C:\cygwin\usr\local\bin;C:\cygwin\bin;C:\cygwin\bin;C:\cygwin\usr\X11R6\bin;c:\ruby\bin;c:\WINDOWS\system32;c:\WINDOWS;c:\WINDOWS\System32\Wbem;c:\Program Files\ATI Technologies\ATI Control Panel;c:\Program Files\Common Files\Adaptec Shared\System;c:\Program Files\Executive Software\DiskeeperWorkstation\;c:\Program Files\TortoiseCVS;c:\maven\bin;c:\putty;c:\Program Files\Common Files\GTK\2.0\bin;c:\PROGRA~1\ATT\Graphviz\bin;c:\PROGRA~1\ATT\Graphviz\bin\tools;c:\Subversion\bin;c:\Program Files\TortoiseCVS;c:\Program Files\Perforce;c:\Python23;&quot;C;C:\cygwin\Program Files\Mozilla Firefox&quot;;c:\apache-ant-1.6.2\bin"></property>
+    <property name="testreportdir" value="target/test-reports"></property>
+    <property name="java.class.version" value="48.0"></property>
+    <property name="java.specification.name" value="Java Platform API Specification"></property>
+    <property name="java.util.prefs.PreferencesFactory" value="java.util.prefs.WindowsPreferencesFactory"></property>
+    <property name="os.version" value="5.1"></property>
+    <property name="distdir" value="dist"></property>
+    <property name="ant.file" value="c:\Documents and Settings\ahelleso\.damagecontrol\javatest\checkout\build.xml"></property>
+    <property name="user.home" value="C:\Documents and Settings\ahelleso"></property>
+    <property name="user.timezone" value=""></property>
+    <property name="java.awt.printerjob" value="sun.awt.windows.WPrinterJob"></property>
+    <property name="file.encoding" value="Cp1252"></property>
+    <property name="java.specification.version" value="1.4"></property>
+    <property name="javadocdir" value="dist/docs/api"></property>
+    <property name="java.class.path" value="C:\Documents and Settings\ahelleso\.damagecontrol\javatest\checkout\target\test-classes;C:\Documents and Settings\ahelleso\.damagecontrol\javatest\checkout\target\classes;C:\apache-ant-1.6.2\lib\junit-3.8.1.jar;C:\apache-ant-1.6.2\lib\ant-launcher.jar;C:\apache-ant-1.6.2\lib\ant.jar;C:\apache-ant-1.6.2\lib\ant-junit.jar"></property>
+    <property name="user.name" value="ahelleso"></property>
+    <property name="java.vm.specification.version" value="1.0"></property>
+    <property name="java.home" value="C:\j2sdk1.4.2_04\jre"></property>
+    <property name="sun.arch.data.model" value="32"></property>
+    <property name="user.language" value="en"></property>
+    <property name="java.specification.vendor" value="Sun Microsystems Inc."></property>
+    <property name="awt.toolkit" value="sun.awt.windows.WToolkit"></property>
+    <property name="java.vm.info" value="mixed mode"></property>
+    <property name="java.version" value="1.4.2_04"></property>
+    <property name="java.ext.dirs" value="C:\j2sdk1.4.2_04\jre\lib\ext"></property>
+    <property name="sun.boot.class.path" value="C:\j2sdk1.4.2_04\jre\lib\rt.jar;C:\j2sdk1.4.2_04\jre\lib\i18n.jar;C:\j2sdk1.4.2_04\jre\lib\sunrsasign.jar;C:\j2sdk1.4.2_04\jre\lib\jsse.jar;C:\j2sdk1.4.2_04\jre\lib\jce.jar;C:\j2sdk1.4.2_04\jre\lib\charsets.jar;C:\j2sdk1.4.2_04\jre\classes"></property>
+    <property name="java.vendor" value="Sun Microsystems Inc."></property>
+    <property name="file.separator" value="\"></property>
+    <property name="java.vendor.url.bug" value="http://java.sun.com/cgi-bin/bugreport.cgi"></property>
+    <property name="sun.io.unicode.encoding" value="UnicodeLittle"></property>
+    <property name="sun.cpu.endian" value="little"></property>
+    <property name="defaulttargetdir" value="target"></property>
+    <property name="sun.cpu.isalist" value="pentium i486 i386"></property>
+  </properties>
+  <testcase name="testBeerIsGuinness" classname="com.thoughtworks.damagecontrolled.ThingyTestCase" time="0.0"></testcase>
+  <system-out><![CDATA[]]></system-out>
+  <system-err><![CDATA[]]></system-err>
+</testsuite>
+</damagecontrol>

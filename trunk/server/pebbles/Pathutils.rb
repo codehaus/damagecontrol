@@ -23,7 +23,7 @@ module Pebbles
 
     def nativepath_to_filepath(path)
       if(CYGWIN)
-        cygpath = IO.popen("cygpath #{path}").read.chomp
+        cygpath = IO.popen("cygpath '#{path}'").read.chomp
       else
         path
       end

@@ -8,18 +8,26 @@ module DamageControl
     include XSLT
   
     def available?
-      super && File.exists?(@build_history_repository.xml_log_file(selected_build.project_name, selected_build.dc_creation_time))
+      super && File.exists?(xml_log_file)
     end
     
     def content
-      xslt(stylesheet_file(stylesheet), selected_build.xml_log_file, "#{selected_build.xml_log_file}.html")
-      File.new("#{selected_build.xml_log_file}.html").read
+puts xml_log_file
+puts xml_log_file
+puts xml_log_file
+puts xml_log_file
+      xslt(xml_log_file, stylesheet_file(stylesheet), "#{xml_log_file}.html")
+      File.new("#{xml_log_file}.html").read
     end
     
   protected
 
     def stylesheet
       raise "you have to implement #{stylesheet}"
+    end
+    
+    def xml_log_file
+      @build_history_repository.xml_log_file(selected_build.project_name, selected_build.dc_creation_time)
     end
 
   private

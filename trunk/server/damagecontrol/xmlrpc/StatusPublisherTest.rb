@@ -72,9 +72,6 @@ module XMLRPC
       @bhp.register(@pear1)
       @bhp.register(@apple2)
 
-      @mutex = Mutex.new
-      @resource = ConditionVariable.new
-
       @httpserver = WEBrick::HTTPServer.new(:Port => 4719)
       Thread.new { @httpserver.start }
     end

@@ -1,0 +1,27 @@
+cvs '-d:local:C:\\javatest' update  -d -P -A -C
+U build.xml
+ant
+Buildfile: build.xml
+
+init:
+
+get-deps:
+
+compile:
+
+compile-tests:
+
+internal-test:
+    [junit] Running com.thoughtworks.damagecontrolled.ThingyTestCase
+    [junit] Tests run: 1, Failures: 0, Errors: 0, Time elapsed: 0.02 sec
+    [junit] Testsuite: com.thoughtworks.damagecontrolled.ThingyTestCase
+    [junit] Tests run: 1, Failures: 0, Errors: 0, Time elapsed: 0.02 sec
+
+    [junit] Testcase: testBeerIsGuinness took 0 sec
+
+test:
+
+jar:
+
+BUILD SUCCESSFUL
+Total time: 1 second

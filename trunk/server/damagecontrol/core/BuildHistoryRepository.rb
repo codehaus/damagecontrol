@@ -40,62 +40,62 @@ module DamageControl
     # TODO rename to dump (more aligned with YAML terminology - we're doing a similar thing)
     def register(build)
       @build_serializer.dump(build, build_dir(build.project_name, build.dc_creation_time))
-      
       write_rss(build.project_name)
     end
     
-    # returns a build object
-    def lookup(project_name, dc_creation_time, with_changesets=false)
-      @build_serializer.load(build_dir(project_name, dc_creation_time), with_changesets)
-    end    
-
-    def current_build(project_name)
-      build_dirs(project_name).reverse.each do |build_dir|
-        build = @build_serializer.load(build_dir)
-        return build unless build.status == Build::QUEUED
-      end
-      nil
-    end
-    
-    def last_completed_build(project_name)
-      build_dirs(project_name).reverse.each do |build_dir|
-        build = @build_serializer.load(build_dir)
-        return build if build.completed?
-      end
-      nil
-    end
-    
-    def last_successful_build(project_name)
-      build_dirs(project_name).reverse.each do |build_dir|
-        build = @build_serializer.load(build_dir)
-        return build if build.successful?
-      end
-      nil
-    end
-    
-    def history(project_name)
-      build_dirs(project_name).collect do |build_dir|
-        @build_serializer.load(build_dir)
-      end
-    end
-
     def project_names
       Dir["#{@basedir}/*"].collect do |filename|
         File.basename(filename)
       end.sort
     end
     
-    def next(build)
+    def history(project_name, with_changesets=false)
+      build_dirs(project_name).collect do |build_dir|
+        @build_serializer.load(build_dir, with_changesets)
+      end
+    end
+
+    def lookup(project_name, dc_creation_time, with_changesets=false)
+      @build_serializer.load(build_dir(project_name, dc_creation_time), with_changesets)
+    end    
+
+    def current_build(project_name, with_changesets=false)
+      build_dirs(project_name).reverse.each do |build_dir|
+        build = @build_serializer.load(build_dir, with_changesets)
+        return build unless build.status == Build::QUEUED
+      end
+      nil
+    end
+    
+    def last_completed_build(project_name, with_changesets=false)
+      build_dirs(project_name).reverse.each do |build_dir|
+        build = @build_serializer.load(build_dir, with_changesets)
+        return build if build.completed?
+      end
+      nil
+    end
+    
+    def last_successful_build(project_name, with_changesets=false)
+      build_dirs(project_name).reverse.each do |build_dir|
+        build = @build_serializer.load(build_dir, with_changesets)
+        return build if build.successful?
+      end
+      nil
+    end
+    
+    def next(build, with_changesets=false)
+      return nil unless build
       build_dirs(build.project_name).each do |build_dir|
-        b = @build_serializer.load(build_dir)
+        b = @build_serializer.load(build_dir, with_changesets)
         return b if b.dc_creation_time > build.dc_creation_time
       end
       nil
     end
 
-    def prev(build)
+    def prev(build, with_changesets=false)
+      return nil unless build
       build_dirs(build.project_name).reverse.each do |build_dir|
-        b = @build_serializer.load(build_dir)
+        b = @build_serializer.load(build_dir, with_changesets)
         return b if b.dc_creation_time < build.dc_creation_time
       end
       nil

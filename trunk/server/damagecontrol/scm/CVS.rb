@@ -56,11 +56,11 @@ module DamageControl
       cvs(dir, "import -m \"initial import\" #{modulename} VENDOR START")
     end
 
-    def checkout(checkout_dir, scm_time, &line_proc)
+    def checkout(checkout_dir, scm_to_time, &line_proc)
       checked_out_files = []
       if(checked_out?(checkout_dir))
         path_regex = /^[U|P] (.*)/
-        cvs(checkout_dir, update_command(scm_time)) do |line, err|
+        cvs(checkout_dir, update_command(scm_to_time)) do |line, err|
           if(line =~ path_regex)
             checked_out_files << $1
           end
@@ -73,7 +73,7 @@ module DamageControl
         target_dir = File.basename(checkout_dir)
         run_checkout_command_dir = File.dirname(checkout_dir)
         # -D is sticky, but subsequent updates will reset stickiness with -A
-        cvs(run_checkout_command_dir, checkout_command(scm_time, target_dir)) do |line, err|
+        cvs(run_checkout_command_dir, checkout_command(scm_to_time, target_dir)) do |line, err|
           if(line =~ path_regex)
             checked_out_files << $1
           end
@@ -217,13 +217,13 @@ module DamageControl
       if branch_specified? then "-r#{cvsbranch} " else "" end
     end
     
-    def update_command(scm_time)
+    def update_command(scm_to_time)
       # get a clean copy
-      "update #{branch_option}#{to_time_option(scm_time)} -d -P -A -C"
+      "update #{branch_option}#{to_time_option(scm_to_time)} -d -P -A -C"
     end
     
-    def checkout_command(scm_time, target_dir)
-      "checkout #{branch_option}#{to_time_option(scm_time)} -d #{target_dir} #{cvsmodule}"
+    def checkout_command(scm_to_time, target_dir)
+      "checkout #{branch_option}#{to_time_option(scm_to_time)} -d #{target_dir} #{cvsmodule}"
     end
     
     def environment

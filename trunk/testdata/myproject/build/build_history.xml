@@ -1,0 +1,68 @@
+<Array>
+      <DamageControl-Build>
+        <scm_commit_time>
+          <Time>2004-Nov-29 23:47:18</Time>
+        </scm_commit_time>
+        <changesets>
+          <DamageControl-ChangeSets>
+            <changesets>
+              <Array/>
+            </changesets>
+          </DamageControl-ChangeSets>
+        </changesets>
+        <duration>
+          <Fixnum>4</Fixnum>
+        </duration>
+        <status>
+          <String>SUCCESSFUL</String>
+        </status>
+        <label>
+          <String>2</String>
+        </label>
+        <dc_creation_time>
+          <Time>2004-Nov-29 23:47:20</Time>
+        </dc_creation_time>
+        <config>
+          <Hash/>
+        </config>
+        <dc_start_time>
+          <Time>2004-Nov-29 23:47:25</Time>
+        </dc_start_time>
+        <project_name>
+          <String>myproject</String>
+        </project_name>
+      </DamageControl-Build>
+      <DamageControl-Build>
+        <scm_commit_time>
+          <Time>2004-Nov-29 23:47:18</Time>
+        </scm_commit_time>
+        <changesets>
+          <DamageControl-ChangeSets>
+            <changesets>
+              <Array/>
+            </changesets>
+          </DamageControl-ChangeSets>
+        </changesets>
+        <duration>
+          <Fixnum>4</Fixnum>
+        </duration>
+        <status>
+          <String>SUCCESSFUL</String>
+        </status>
+        <label>
+          <String>2</String>
+        </label>
+        <dc_creation_time>
+          <Time>2004-Nov-29 23:47:20</Time>
+        </dc_creation_time>
+        <config>
+          <Hash/>
+        </config>
+        <dc_start_time>
+          <Time>2004-Nov-29 23:47:25</Time>
+        </dc_start_time>
+        <project_name>
+          <String>myproject</String>
+        </project_name>
+      </DamageControl-Build>
+    </Array>

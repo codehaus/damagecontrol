@@ -37,19 +37,19 @@ module DamageControl
       commit(checkout_dir, "#{message} #{relative_filename}", &line_proc)
     end
 
-    def checkout(checkout_dir, scm_time, &line_proc)
+    def checkout(checkout_dir, scm_to_time, &line_proc)
       mkdir_p(checkout_dir)
       checked_out_files = []
       path_regex = /^[A|D|U]\s*(.*)/
       if(checked_out?(checkout_dir))
-        svn(checkout_dir, update_command(scm_time)) do |line|
+        svn(checkout_dir, update_command(scm_to_time)) do |line|
           if(line =~ path_regex)
             checked_out_files << $1
           end
           line_proc.call(line) if block_given?
         end
       else
-        svn(checkout_dir, checkout_command(scm_time)) do |line|
+        svn(checkout_dir, checkout_command(scm_to_time)) do |line|
           if(line =~ path_regex)
             checked_out_files << $1
           end
@@ -228,12 +228,12 @@ module DamageControl
       File.exists?(rootentries)
     end
 
-    def checkout_command(scm_time)
-      "checkout #{revision_option(nil, scm_time)} #{svnurl} ."
+    def checkout_command(scm_to_time)
+      "checkout #{revision_option(nil, scm_to_time)} #{svnurl} ."
     end
 
-    def update_command(scm_time)
-      "update  #{revision_option(nil, scm_time)}"
+    def update_command(scm_to_time)
+      "update  #{revision_option(nil, scm_to_time)}"
     end
     
     def changes_command(scm_from_time, scm_to_time, files)

@@ -1,5 +1,6 @@
 require 'yaml'
 require 'fileutils'
+require 'damagecontrol/core/Build'
 
 module DamageControl
 

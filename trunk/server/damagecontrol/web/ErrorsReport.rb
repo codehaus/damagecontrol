@@ -19,7 +19,7 @@ module DamageControl
     end
     
     def content
-      "<pre class=\"console\">#{File.read(selected_build.error_log_file)}</pre>"
+      "<iframe border=\"0\" width=\"100%\" height=\"100%\" src=\"/public/root/#{project_name}/build/#{selected_build.dc_creation_time.ymdHMS}/stderr.log\" />"
     end
   end
 end

@@ -38,7 +38,10 @@ module DamageControl
       return if !checkout?
       
       current_build.status = Build::CHECKING_OUT
-      current_scm.checkout(checkout_dir, current_build.scm_commit_time) do |progress|
+      # we're not specifying scm_to_time since we don't know that time. we cannot safely
+      # assume that it is the same time as *now* on the machine where this process (DC)
+      # is running. therefore, specify nil and get the latest.
+      current_scm.checkout(checkout_dir, nil) do |progress|
         report_progress(progress)
       end
     end

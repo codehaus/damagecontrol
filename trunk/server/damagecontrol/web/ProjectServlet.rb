@@ -39,6 +39,12 @@ module DamageControl
       build_details_redirect
     end
     
+    def service(req, res)
+      # clear cached selected_build set in the selected_build method
+      Thread.current["selected_build"] = nil
+      super
+    end
+
   protected
   
     attr_reader :report_classes
@@ -197,7 +203,7 @@ module DamageControl
       if(result.nil?)
         if(request.query["dc_creation_time"])
           dc_creation_time = Time.parse_ymdHMS(request.query["dc_creation_time"].to_s)
-          result = build_history_repository.lookup(project_name, dc_creation_time)
+          result = build_history_repository.lookup(project_name, dc_creation_time, true)
         else
           result = last_build
         end

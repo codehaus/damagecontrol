@@ -399,7 +399,9 @@ module DamageControl
 end
 
 if __FILE__ == $0
+  require 'pebbles/Pathutils'
+  include Pebbles::Pathutils
   DamageControl::DamageControlServer.new({
-    :RootDir => ENV["DAMAGECONTROL_WORK"]
+    :RootDir => nativepath_to_filepath(ENV['DAMAGECONTROL_WORK'])
   }).start.wait_for_shutdown
 end
