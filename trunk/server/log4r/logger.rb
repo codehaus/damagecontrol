@@ -2,7 +2,7 @@
 #
 # == Other Info
 # 
-# Version:: $Id: logger.rb,v 1.1 2004/05/17 14:41:10 tirsen Exp $
+# Version:: $Id: logger.rb,v 1.2 2004/06/17 16:48:21 tirsen Exp $
 # Author:: Leon Torres <leon(at)ugcs.caltech.edu>
 
 require "log4r/outputter/outputter"

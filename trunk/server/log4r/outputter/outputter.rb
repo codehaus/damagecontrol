@@ -2,7 +2,7 @@
 #
 # == Other Info
 #
-# Version:: $Id: outputter.rb,v 1.1 2004/05/17 14:41:14 tirsen Exp $
+# Version:: $Id: outputter.rb,v 1.2 2004/06/17 16:48:21 tirsen Exp $
 # Author:: Leon Torres <leon@ugcs.caltech.edu>
 
 require "thread"

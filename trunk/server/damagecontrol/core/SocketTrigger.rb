@@ -77,7 +77,7 @@ module DamageControl
           socket.print("irc://irc.codehaus.org/damagecontrol/\r\n")
           process_payload(payload)
         rescue => e
-          print_error(e)
+          logger.error("Error processing socket payload: #{format_exception(e)}")
           socket.print("DamageControl exception:\n")
           socket.print(e.message)
           socket.print("DamageControl config:\n")
@@ -107,7 +107,7 @@ module DamageControl
             do_accept(socket)
           end
         rescue => e
-          print_error(e)
+          logger.error(format_exception(e))
           @error = e
         ensure
           puts "Stopped SocketTrigger listening on port #{port}"

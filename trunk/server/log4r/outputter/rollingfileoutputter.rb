@@ -1,6 +1,6 @@
 
 # :nodoc:
-# Version:: $Id: rollingfileoutputter.rb,v 1.1 2004/05/17 14:41:14 tirsen Exp $
+# Version:: $Id: rollingfileoutputter.rb,v 1.2 2004/06/17 16:48:21 tirsen Exp $
 
 require "log4r/outputter/fileoutputter"
 require "log4r/staticlogger"

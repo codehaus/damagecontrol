@@ -39,8 +39,7 @@ module DamageControl
   
     def startup_message
       message = "Starting #{DamageControl::VERSION_TEXT} at #{startup_time}, root directory = #{rootdir.inspect}, config = #{params.inspect}"
-      puts message
-      logger.info(message)
+      root_logger.info(message)
     end
     
     def component(name, instance)
@@ -75,10 +74,6 @@ module DamageControl
     
     def https_port
       params[:HttpsPort] || 4713
-    end
-    
-    def logging_level
-      Logging.quiet
     end
     
     def init_components                
@@ -136,11 +131,27 @@ module DamageControl
     
     def init_custom_components
     end
-      
+    
+    def log4r_config_file
+      "#{rootdir}/log4r.xml"
+    end
+    
+    def init_logging
+      if File.exists?(log4r_config_file)
+        Logging.init_logging(log4r_config_file, { 
+            'rootdir' => rootdir,
+            'logdir' => mkdir_p(logdir),
+            'damagecontrol_home' => damagecontrol_home
+        })
+      else
+        Logging.quiet
+      end
+    end
+    
     def start
-      startup_message
-      logging_level
+      init_logging
       
+      startup_message
       init_components
 
       at_exit { shutdown }
@@ -154,10 +165,6 @@ module DamageControl
 
     def wait_for_shutdown
       @threads.each {|thread| thread.join }
-    end
-    
-    def format_exception(e)
-      e.message + "\n\t" + e.backtrace.join("\n\t")
     end
     
     def shutdown
