@@ -37,19 +37,42 @@
     <th class="pane">&nbsp;</th>
   </tr>
   <%
-    i = -1
     build_executors.each do |build_executor|
-      i += 1
   %>
   <tr>
-    <td class="pane">#<%= i+1 %></td>
+    <!-- <td class="pane" <% if build_executor.percentage_left != 0 then %>rowspan="2"<% end %>> -->
+    <td class="pane" rowspan="2">
+      #<%= build_executor.index+1 %></td>
     <td class="pane" width="70%"><%= build_executor.status_message %></td>
-    <% if build_executor.build_process_executing? && private? then %>
-      <td class="pane"><a href="?action=kill_executor&executor=<%= i %>"><img width="24" height="24" src="icons/stop.png" /></a></td>
-    <% else %>
-      <td class="pane">&nbsp;</td>
-    <% end %>
+    <td class="pane">&nbsp;</td>
   </tr>
+    <tr>
+      <td class="pane">
+        <table width="100%" class="progress-bar">
+          <tr>
+            <td width="33" class="progress-bar-done">&nbsp;</td>
+            <td width="66" class="progress-bar-left">&nbsp;</td>
+          </tr>
+        </table>
+          &nbsp;
+      </td class="pane">
+    </tr>
+  <% if build_executor.percentage_left != 0 then %>
+    <tr>
+      <td class="pane">
+        <table class="progress-bar">
+          <tr>
+            <td width="<%= build_executor.percentage_done %>" class="progress-bar-done">&nbsp;</td>
+            <td width="<%= build_executor.percentage_left %>" class="progress-bar-left">&nbsp;</td>
+          </tr>
+        </table>
+          &nbsp;
+      </td class="pane">
+      <% if build_executor.build_process_executing? && private? then %>
+        <td class="pane"><a href="?action=kill_executor&executor=<%= build_executor.id %>"><img width="24" height="24" src="icons/stop.png" /></a></td>
+      <% end %>
+    </tr>
+    <% end %>
   <% end %>
 </table>
 </div>

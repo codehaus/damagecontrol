@@ -1,5 +1,6 @@
 require 'damagecontrol/web/AbstractAdminServlet'
 require 'damagecontrol/web/ProjectStatus'
+require 'damagecontrol/web/BuildExecutorStatus'
 
 module DamageControl  
   class DashboardServlet < AbstractAdminServlet
@@ -31,7 +32,11 @@ module DamageControl
     end
     
     def build_scheduler_status(build_scheduler)
-      build_executors = build_scheduler.executors
+      i = -1
+      build_executors = build_scheduler.executors.collect do |e|
+        i+=1
+        BuildExecutorStatus.new(i, e, build_history_repository)
+      end
       build_queue = build_scheduler.build_queue.sort {|b1, b2| b1.timestamp_as_time <=> b2.timestamp_as_time }
       erb("components/build_scheduler_status.erb", binding)
     end

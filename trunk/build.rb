@@ -101,13 +101,6 @@ class Project
     integration_test
   end
   
-  def makensis_executable
-    existing_file(params["makensis_executable"]) ||
-      existing_file("/cygdrive/c/Program Files/NSIS/makensis.exe") || 
-      existing_file("C:\\Program Files\\NSIS\\makensis.exe") ||
-      fail("NSIS needs to be installed, download from http://nsis.sf.net (you may need to add option -Dmakensis_executable=<path to makensis.exe>)")
-  end
-  
   def existing_file(file)
     if !file.nil? && File.exists?(file) then file else nil end
   end
@@ -187,16 +180,23 @@ class Project
     installer_nodeps
   end
   
+  def missing_installer_variable(name, description, path)
+    fail("Define the #{name} variable (with eg -D#{name}=#{path.inspect}) to point to a #{description}, it must be a Windows path and backslashes must be double")
+  end
+  
   def ruby_home
-    params["ruby_home"] || ENV["RUBY_HOME"] || fail("Define the RUBY_HOME variable to point to your ruby installation")
+    params["ruby_home"] || missing_installer_variable("ruby_home", "ruby installation (a Cygwin build)", "c:\\ruby")
   end
   
   def cvs_executable
-    params["cvs_executable"] || "#{ENV['CVS_HOME']}/cvs.exe" || fail("Define the cvs_executable variable to point to your CVS binary (eg. -Dcvs_executable=c:\bin\cvs.exe)")
+    params["cvs_executable"] || missing_installer_variable("cvs_executable", "CVS executable", "c:\\bin\\cvs.exe")
   end
   
-  def svn_executable
-    params["svn_executable"] || "#{ENV['SVN_HOME']}/svn.exe" || fail("Define the svn_executable variable to point to your Subversion client binary eg. -Dsvn_executable=c:\bin\svn.exe")
+  def makensis_executable
+    existing_file(params["makensis_executable"]) ||
+      existing_file("/cygdrive/c/Program Files/NSIS/makensis.exe") || 
+      existing_file("C:\\Program Files\\NSIS\\makensis.exe") ||
+      params["makensis_executable"] || missing_installer_variable("makensis_executable", "NSIS executable (NSIS can be downloaded from http://nsis.sf.net)", "c:\\Program Files\\NSIS\\makensis.exe")
   end
   
   def installer_nodeps
@@ -229,16 +229,20 @@ class Project
     system("rm -rf target") unless windows?
   end
   
-  def username
+  def user
     params["user"] || ENV["USERNAME"] || ENV["USER"]
   end
   
   def deploy_dest
-    "#{username}@beaver.codehaus.org:/home/projects/damagecontrol/dist/distributions"
+    "#{user}@beaver.codehaus.org:/home/projects/damagecontrol/dist/distributions"
   end
   
   def scp_executable
     if windows? then "pscp" else "scp" end
+  end
+  
+  def upload
+    upload_nodeps
   end
   
   def upload_nodeps

@@ -131,7 +131,7 @@ module DamageControl
     def status_message
       status = ""
       if busy? then
-        status = "Building #{scheduled_build.project_name}"
+        status = "Building #{scheduled_build.project_name}: #{scheduled_build.status}"
       else
         status = "Idle"
       end
@@ -146,6 +146,7 @@ module DamageControl
     end
     
     def determine_changeset
+      current_build.status = Build::DETERMINING_CHANGESETS
       if !current_build.changesets.empty?
         logger.info("does not determine changeset for #{current_build.project_name} because other component (such as SCMPoller) has already determined it")
         return

@@ -49,6 +49,7 @@ require 'damagecontrol/web/ProjectServletTest'
 require 'damagecontrol/web/ChangesReportTest'
 require 'damagecontrol/web/SearchServletTest'
 require 'damagecontrol/web/ProjectStatusTest'
+require 'damagecontrol/web/BuildExecutorStatusTest'
 
 require 'damagecontrol/test/IntegrationTests'
 

@@ -62,7 +62,7 @@ td {
   font-size: 8pt;
   margin-top: 10em;
   padding: 10px;
-  background-image: @url("http://redback.york.atlassian.com:4712/private/images/footer_grad.gif");
+  background-image: @url("images/footer_grad.gif");
   border-top: 1px solid #090;
 }
 
@@ -137,6 +137,7 @@ td.tab {
 
 table.progress-bar {
   border-collapse: collapse;
+  border: 1px solid #ddc;
 }
 
 td.progress-bar-done {
