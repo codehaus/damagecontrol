@@ -59,10 +59,21 @@ module DamageControl
       ChangeSets.new
     end
     
+    # It is recommended that this method first checks for checked_out?
+    # and does a checkout followed by return false. (See CVS and SVN)
+    # TODO: remove the need for this and add this logic to the
+    # BuildExecutor
+    # TODO: add a generic test that tests uptodate? on a repo that
+    # isn't checked out and verifies that it returns false rather
+    # than throwing an exception
     def uptodate?(checkout_dir, from_time, to_time, &proc)
       true
     end
     
+    def checked_out?(checkout_dir)
+      false
+    end
+
     def label(checkout_dir, &proc)
       nil
     end
