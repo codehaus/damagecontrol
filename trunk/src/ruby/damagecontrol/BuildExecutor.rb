@@ -72,18 +72,27 @@ module DamageControl
       !@scheduled_build_slot.empty?
     end
     
+    def build_started
+      current_build.start_time = Time.now.to_i
+      determine_changeset
+      @channel.publish_message(BuildStartedEvent.new(current_build))
+    end
+    
     def determine_changeset
+      # this won't work the first build, so I just skip it 
+      # the first time a project is built it will have a changeset of every file in the repository
+      # this is almost useless information and there's no point in spending lots of time trying to code around it
+      return unless File.exists?(project_base_dir)
+      
       begin
         last_successful_build = @build_history.last_succesful_build(current_build.project_name)
-        
-        # Assume last build was at the start of time. This way it will work for new projects too.
-        time_before = Build.timestamp_to_time(Build.format_timestamp(0))
-        if(!last_successful_build.nil?)
-          time_before = last_successful_build.timestamp_as_time
-        end
+        # we have no record of when the last succesful build was made, don't determine the changeset
+        # (might be a new project, see comment above)
+        return if last_successful_build.nil?
+        time_before = last_successful_build.timestamp_as_time
         
         time_after = current_build.timestamp_as_time
-                
+        
         current_build.modification_set = 
           @scm.changes(current_build.scm_spec, project_base_dir, time_before, time_after)
 
@@ -113,10 +122,8 @@ module DamageControl
     def process_next_scheduled_build
       next_scheduled_build
       begin
-        current_build.start_time = Time.now.to_i
-        @channel.publish_message(BuildStartedEvent.new(current_build))
+        build_started
         checkout if checkout?
-        determine_changeset
         execute
       rescue Exception => e
         message = e.message + e.backtrace.join("\n")

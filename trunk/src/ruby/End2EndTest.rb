@@ -2,6 +2,7 @@ $:<<'../../lib'
 
 require 'test/unit'
 require 'ftools'
+require 'fileutils'
 require 'damagecontrol/Build'
 require 'damagecontrol/SocketTrigger'
 require 'damagecontrol/BuildExecutor'
@@ -25,11 +26,15 @@ class IRCListener < IRCConnection
   
   def initialize
     super
-    @received_text = ""
+    reset_log
   end
 
   def on_recv_cmnd_privmsg(msg)
     @received_text += msg.args[0]
+  end
+  
+  def reset_log
+    @received_text = ""
   end
 end
 
@@ -45,7 +50,7 @@ class End2EndTest < Test::Unit::TestCase
     
     start_logging_irc_channel
     
-    add_and_commit_file
+    create_build_script_add_and_commit
     
     wait_less_time_than_default_quiet_period
     assert_not_built_yet
@@ -54,6 +59,14 @@ class End2EndTest < Test::Unit::TestCase
     assert_build_produced_correct_output
     assert_build_successful_on_irc_channel
     assert_log_output_written_out
+    
+    reset_irc_log
+    
+    change_build_script_to_failing_and_commit
+    wait_for_build_to_complete
+    assert_build_failed_and_changes_on_irc_channel
+
+    irc_listener.send_message_to_channel("Test successful. Thank you for your cooperation.")
   end
   
   attr_reader :irc_listener
@@ -77,19 +90,36 @@ class End2EndTest < Test::Unit::TestCase
     assert_equal(1, Dir["#{logdir}/e2eproject/*.log"].size)
   end
   
+  def reset_irc_log
+    irc_listener.reset_log
+  end
+  
   def assert_build_successful_on_irc_channel
-    assert(irc_listener.received_text =~ /BUILD SUCCESSFUL/)
+    assert_match(/e2eproject/, irc_listener.received_text)
+    assert_match(/BUILD SUCCESSFUL/, irc_listener.received_text)
+  end
+  
+  def assert_build_failed_and_changes_on_irc_channel
+    assert_match(/e2eproject/, irc_listener.received_text)
+    assert_match(/BUILD FAILED/, irc_listener.received_text)
+    assert_match(/jtirsen/, irc_listener.received_text)
     irc_listener.send_message_to_channel("Test successful. Thank you for your cooperation.")
   end
   
-  def add_and_commit_file
-    # add build.bat file and commit it (will trigger build)
-    checkout_cvs_project("e2eproject")
-    create_file("e2eproject/#{script_file('build')}", 'echo "Hello world from DamageControl" > buildresult.txt')
-    add_file_to_cvs_project("e2eproject", script_file("build"))
+  def change_build_script_to_failing_and_commit
+    create_file("#{basedir}/e2eproject/#{script_file('build')}", 'this_will_not_work')
+    commit("e2eproject")
   end
   
-  include FileUtils
+  def create_build_script_add_and_commit
+    # add build.bat file and commit it (will trigger build)
+    checkout_cvs_project("e2eproject")
+    create_file("#{basedir}/e2eproject/#{script_file('build')}", 'echo "Hello world from DamageControl" > buildresult.txt')
+    add_file_to_cvs_project("e2eproject", script_file("build"))
+    commit("e2eproject")
+  end
+  
+  include DamageControl::FileUtils
   
   attr_accessor :basedir
   
@@ -115,16 +145,15 @@ class End2EndTest < Test::Unit::TestCase
   end
   
   def Xteardown
-    Dir.chdir(basedir)
-    rmdir(@project)
-    rmdir(@cvsrootdir)
-    rmdir(@svn_repo_dir)
+    FileUtils.rm_rf("#{basedir}/#{@project}")
+    FileUtils.rm_rf("#{basedir}/#{@cvsrootdir}")
+    FileUtils.rm_rf("#{basedir}/#{@svn_repo_dir}")
   end
 
   def create_cvs_repository
     system("cvs -d#{@cvsroot} init")
   end
-
+    
   def builddir
     "#{basedir}/build"
   end
@@ -143,11 +172,21 @@ class End2EndTest < Test::Unit::TestCase
     }
   end
   
+  def with_working_dir(dir)
+    prev = Dir.pwd
+    begin
+      Dir.chdir(dir)
+      yield
+    ensure
+      Dir.chdir(prev)
+    end
+  end
+  
   def create_cvsmodule(project)
-    Dir.chdir(basedir)
-    File.mkpath(@project)
-    Dir.chdir(@project)
-    system("cvs -d#{@cvsroot} import -m 'message' #{project} VENDOR START")
+    File.mkpath("#{basedir}/#{@project}")
+    with_working_dir("#{basedir}/#{@project}") do
+      system("cvs -d#{@cvsroot} import -m 'message' #{project} VENDOR START")
+    end
   end
   
   def install_damagecontrol_into_cvs(build_command_line)
@@ -163,17 +202,25 @@ class End2EndTest < Test::Unit::TestCase
           nc_exe_location)
   end
   
-  
   def checkout_cvs_project(project)
-    Dir.chdir(basedir)
-    rmdir(project)
-    system("cvs -d#{@cvsroot} co #{project}")
+    FileUtils.rm_rf("#{basedir}/#{project}")
+    with_working_dir(basedir) do    
+      system("cvs -d#{@cvsroot} co #{project}")
+    end
+    assert(File.exists?("#{basedir}/#{project}"))
   end
   
   def add_file_to_cvs_project(project, file)
-    Dir.chdir("#{basedir}/#{project}")
-    system("cvs add #{file}")
-    system("cvs com -m 'comment'")
+    File.mkpath("#{basedir}/#{project}")
+    with_working_dir("#{basedir}/#{project}") do
+      system("cvs add #{file}")
+    end
+  end
+  
+  def commit(project)
+    with_working_dir("#{basedir}/#{project}") do
+      system("cvs com -m 'comment'")
+    end
   end
   
   def script_file(file)
@@ -209,8 +256,7 @@ class End2EndTest < Test::Unit::TestCase
   end
   
   def delete_checked_out_project(project)
-    Dir.chdir(basedir)
-    rmdir(project)
+    FileUtils.rm_rf("#{basedir}/#{project}")
   end
 
   def wait_less_time_than_default_quiet_period
@@ -218,7 +264,7 @@ class End2EndTest < Test::Unit::TestCase
   end
 
   def wait_for_build_to_complete
-    sleep BuildScheduler::DEFAULT_QUIET_PERIOD # we already waited almost all the quiet period, so this should be more than enough
+    sleep 30
   end
 
   def verify_output_of_svn_build
@@ -260,7 +306,23 @@ class End2EndTest < Test::Unit::TestCase
       build_result,
       "build not executed")
   end
-          
+  
+  def TODO_test_builds_on_svn_add
+      create_svn_repository
+      start_damagecontrol
+      install_and_activate_damagecontrol_for_svn
+      checkout_svn_repository
+      with_working_dir(@svn_wc_usage_dir) do
+        File.open("build.bat", "w") do |file|
+            file.puts('echo "Hello world from DamageControl" > buildresult.txt')
+        end
+        add_file_to_svn("build.bat")
+      end
+      
+      wait_for_build_to_complete
+      verify_output_of_svn_build
+  end
+        
   def create_svn_repository
     dsystem("svnadmin create #{@svn_repo_dir}")
   end
@@ -281,18 +343,13 @@ class End2EndTest < Test::Unit::TestCase
         
   def checkout_svn_repository
     File.mkpath(@svn_wc_checkout_dir)
-    Dir.chdir(@svn_wc_checkout_dir)
-    dsystem("svn checkout #{@svn_url}")
+    with_working_dir(@svn_wc_checkout_dir) do
+      system("svn checkout #{@svn_url}")
+    end
   end
         
   def add_file_to_svn(filename)
-    dsystem("svn add #{filename}")
-    dsystem("svn commit -m \"Adding test file to svn\" #{filename}")
-  end
-        
-  def dsystem(cmd)
-    puts "current dir: " + Dir.pwd()
-    puts "running command: #{cmd}"
-    system cmd
+    system("svn add #{filename}")
+    system("svn commit -m \"Adding test file to svn\" #{filename}")
   end
 end

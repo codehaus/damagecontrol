@@ -41,23 +41,25 @@ module DamageControl
     def test_sends_message_on_build_requested_and_started
       setup_irc_connected
       @irc_mock.__expect(:send_message_to_channel) {|message| 
-        assert(message=~/REQUESTED/)
-        assert(message=~/project/)
+        assert_match(/REQUESTED/, message)
+        assert_match(/project/, message)
       }
       @irc_mock.__expect(:send_message_to_channel) {|message| 
-        assert(message=~/STARTED/)
-        assert(message=~/project/)
+        assert_match(/jtirsen/, message)
+        assert_match(/STARTED/, message)
+        assert_match(/project/, message)
       }
       
       @publisher.send_message_on_build_request = true
       
-      evt = BuildRequestEvent.new(Build.new("project"))
-      @publisher.enq_message(evt)
-      evt = BuildStartedEvent.new(Build.new("project"))
-      @publisher.enq_message(evt)
+      build = Build.new("project")
+      mod = Modification.new
+      mod.developer = "jtirsen"
+      mod.path = "this/is/a/file.txt"
+      build.modification_set = [mod]
+      @publisher.enq_message(BuildRequestEvent.new(build))
+      @publisher.enq_message(BuildStartedEvent.new(build))
       @publisher.process_messages
-      
-      assert(@publisher.consumed_message?(evt))
     end
 
   end

@@ -64,7 +64,10 @@ module DamageControl
       end
       
       if message.is_a?(BuildStartedEvent)
-        @irc.send_message_to_channel("[#{message.build.project_name}] BUILD STARTED")
+        changes = ""
+        developers = message.build.modification_set.collect {|m| m.developer}.uniq.join(", ")
+        changes += " changes by: #{developers}" unless developers.empty?
+        @irc.send_message_to_channel("[#{message.build.project_name}] BUILD STARTED#{changes}")
       end
       
       if message.is_a?(BuildCompleteEvent)

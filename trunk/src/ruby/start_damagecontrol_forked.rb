@@ -31,4 +31,4 @@ irc_publisher = IRCPublisher.new(@hub, "irc.codehaus.org", '#dce2e', ShortTextTe
 irc_publisher.handle = "server"
 irc_publisher.start
 
-sleep 30
+sleep 60
