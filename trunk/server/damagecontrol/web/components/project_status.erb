@@ -18,7 +18,7 @@ projects.each do |project|
   ago = (last_successful_build ? last_successful_build.time_since_for_humans : "Never built")
 %>
 <tr>
-    <td><img width="24" height="24" src="<%= image %>" /></td>
+    <td><img width="32" height="32" src="<%= image %>" /></td>
     <td><a href="<%= href %>"><%= project %><%= label %></a></td>
     <td><%= ago %></td>
     <% if private? %>
