@@ -1,5 +1,6 @@
 require 'test/unit'
 require 'damagecontrol/BuildCompleteEvent'
+require 'damagecontrol/BuildProgressEvent'
 require 'damagecontrol/Project'
 
 module DamageControl
@@ -13,7 +14,14 @@ module DamageControl
 		def test_build_complete_event
 			project = Project.new("name")
 			do_test_equal {
-				BuildCompleteEvent.new(project, "test")
+				BuildCompleteEvent.new(project)
+			}
+		end
+		
+		def test_build_progress_event
+			project = Project.new("name")
+			do_test_equal {
+				BuildProgressEvent.new(project, "output")
 			}
 		end
 		

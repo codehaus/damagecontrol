@@ -1,11 +1,16 @@
 require 'test/unit'
 require 'damagecontrol/WebsitePublisher'
+require 'damagecontrol/FileUtils'
 
 module DamageControl
 
 	class WebsitePublisherTest < Test::Unit::TestCase
+	
+		include FileUtils
+		
 		def setup
-			@publisher = WebsitePublisher.new()
+			@hub = Hub.new
+			@publisher = WebsitePublisher.new(@hub)
 			@project = Project.new("Bob")
 			@project.logs_directory = "logs"
 			@project.website_directory = "out"
@@ -24,13 +29,13 @@ module DamageControl
 		end
 		
 		def test_creates_dir_and_index_file
-			@publisher.receive_message( BuildCompleteEvent.new( @project, @result ) )
+			@hub.publish_message( BuildCompleteEvent.new( @project ) )
 			assert(FileTest.exists?("out"), "directory should exist")
 			assert(FileTest.exists?("out/index.html"), "index file should exist")
 		end
 		
 		def test_writes_project_summary_and_lists_logs
-			@publisher.receive_message( BuildCompleteEvent.new( @project, @result ) )
+			@publisher.receive_message( BuildCompleteEvent.new( @project ) )
 			index_content = content(@project.website_file("index.html"))
 			assert_contain( @project.name, index_content )
 			foreach_log {|log|
@@ -41,7 +46,7 @@ module DamageControl
 		end
 		
 		def test_writes_content_of_logs
-			@publisher.receive_message( BuildCompleteEvent.new( @project, @result ) )
+			@publisher.receive_message( BuildCompleteEvent.new( @project ) )
 			foreach_log {|log|
 				assert( FileTest::exists?( @project.website_file("#{log}.html") ) )
 				published_content = content(@project.website_file(log + ".html"))
@@ -67,19 +72,10 @@ module DamageControl
 		end
 		
 		def teardown
-			delete_dir("logs")
-			delete_dir("out")
+			delete("logs")
+			delete("out")
 		end
-		
-		def delete_dir(dir)
-			if FileTest::exist?(dir)
-				Dir.foreach(dir) {|filename| 
-					File.delete(dir + "/" + filename) unless is_special_filename(filename) 
-				}
-				Dir.delete(dir)
-			end
-		end
-		
+				
 		def is_special_filename(filename)
 			filename == '.' || filename == '..'
 		end

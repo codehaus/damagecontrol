@@ -23,6 +23,7 @@ class Project
 	end
 
 	def log_file (filename)
+		Dir.mkdir( logs_directory ) unless File.exists?( logs_directory )
 		logs_directory + File::SEPARATOR + filename
 	end
 	
@@ -42,6 +43,13 @@ class Project
 			end
 		}
 	end
+	
+	def build
+		IO.popen(build_command_line) {|f|
+			yield(f)
+		}
+	end
+
 end
 
 class Log

@@ -4,16 +4,22 @@ require 'damagecontrol/BuildCompleteEvent'
 module DamageControl
 
 	class WebsitePublisher
-		def receive_message( event )
-			@project = event.project
-			@project.open_website_file("index.html") { |file|
-				file.print(main_page())
-			}
-			@project.foreach_log { |log|
-				@project.open_website_file("#{log.name}.html") { |file|
-					file.print(log_page(log))
+		def initialize (hub)
+			hub.add_subscriber(self)
+		end
+	
+		def receive_message (message)
+			if message.is_a? BuildCompleteEvent
+				@project = message.project
+				@project.open_website_file("index.html") { |file|
+					file.print(main_page())
 				}
-			}
+				@project.foreach_log { |log|
+					@project.open_website_file("#{log.name}.html") { |file|
+						file.print(log_page(log))
+					}
+				}
+			end
 		end
 		
 		def title

@@ -1,16 +1,15 @@
 module DamageControl
 
 	class BuildCompleteEvent
-		attr_reader :result
 		attr_reader :project
 
-		def initialize( project, result )
+		def initialize (project)
 			@project = project
-			@result = result
 		end
 		
 		def ==(event)
-			event.result == result && event.project == project
+			event.is_a?(BuildCompleteEvent) \
+				&& event.project == project
 		end
 	end
 
