@@ -15,6 +15,8 @@ DC_DIST_DIR = ENV['dist_dir'] || "#{DC_TARGET_DIR}/dist"
 
 RUBY_HOME = ENV['ruby_home']
 CVS_EXECUTABLE = ENV['cvs_executable']
+XSLTPROC_EXECUTABLE = ENV['xsltproc_executable'] || `which xsltproc`
+SAXON_EXECUTABLE = ENV['saxon_executable'] || `which saxon`
 
 def windows
   require 'rbconfig.rb'
@@ -230,6 +232,18 @@ task :installer_nodeps do
   raise "cvs_executable undefined" if CVS_EXECUTABLE.nil? or CVS_EXECUTABLE.empty?
 
   sh "#{makensis_executable} /DVERSION=#{DC_VERSION} /DSVN_BIN=xx /DCVS_EXECUTABLE=#{CVS_EXECUTABLE} /DRUBY_HOME=#{RUBY_HOME} installer/windows/nsis/DamageControl.nsi"
+end
+
+desc "Create HTML documentation for the website"
+task :html_docs do
+	raise "no XSLT processor found" if (XSLTPROC_EXECUTABLE.nil? or XSLTPROC_EXECUTABLE.empty?) and (SAXON_EXECUTABLE.nil? or SAXON_EXECUTABLE.empty?) 
+	helpdir = "./lib/damagecontrol/web/help"
+	mkdir_p helpdir
+	if  !(SAXON_EXECUTABLE.nil? and SAXON_EXECUTABLE.empty?) then
+		sh "#{SAXON_EXECUTABLE.chomp} ../docs/documentation.xml ../docs/xsl/dc-html.xsl base.dir=#{helpdir}"
+	else
+		sh "#{XSLTPROC_EXECUTABLE.chomp} ..docs/xsl/dc-html.xsl ../docs/documentation.xml --stringparam base.dir #{helpdir}"
+	end
 end
 
 desc "Upload Release from Local Build"
