@@ -102,7 +102,7 @@ module DamageControl
       change.path = make_relative(change.path)
       change.revision = @changeset.revision
       # http://jira.codehaus.org/browse/DC-204
-      change.previous_revision = "PREVIOUS_REVISION_UNKNOWN"
+      change.previous_revision = change.revision - 1;
       change
     end
 
