@@ -13,12 +13,12 @@ module RSCM
     end
     
     # Writes RSS for all registered projects
-    def write_rss
+    def poll
       @projects.each do |project|
         begin
-          project.write_rss
+          project.poll
         rescue => e
-          $stderr.puts "Error writing RSS for #{project.name}"
+          $stderr.puts "Error polling #{project.name}"
           $stderr.puts e.message
           $stderr.puts "  " + e.backtrace.join("  \n")
         end
@@ -29,7 +29,7 @@ module RSCM
     def start(sleeptime=60)
       @t = Thread.new do
         while(true)
-          write_rss
+          poll
           sleep(sleeptime)
         end
       end
@@ -43,7 +43,7 @@ module RSCM
     # Adds all projects with rss enabled
     def add_all_projects
       Project.find_all.each do |project|
-        add_project(project) if project.rss_enabled
+        add_project(project)
       end
     end
   end

@@ -16,17 +16,17 @@ module RSCM
 
     def test_should_tell_all_projects_to_write_rss
       p = new_mock
-      p.__expect(:write_rss)
+      p.__expect(:poll)
 
       s = RssService.new
       s.add_project(p)
-      s.write_rss
+      s.poll
     end
     
     def test_should_write_rss_in_a_loop
       p = new_mock
-      p.__expect(:write_rss)
-      p.__expect(:write_rss)
+      p.__expect(:poll)
+      p.__expect(:poll)
 
       s = RssService.new
       s.add_project(p)

@@ -1,4 +1,5 @@
 require 'fileutils'
+require 'tempdir'
 
 module RSCM
 
@@ -26,7 +27,7 @@ module RSCM
     # 17) Add and commit a file in CheckoutHere
     # 18) Verify that the changeset (since last changeset) for CheckoutHereToo contains only one file
     def test_basics
-      work_dir = new_temp_dir
+      work_dir = RSCM.new_temp_dir
       checkout_dir = "#{work_dir}/CheckoutHere"
       other_checkout_dir = "#{work_dir}/CheckoutHereToo"
       repository_dir = "#{work_dir}/repository"
@@ -115,7 +116,7 @@ module RSCM
     end
     
     def test_trigger
-      work_dir = new_temp_dir
+      work_dir = RSCM.new_temp_dir
       path = "OftenModified"
       checkout_dir = "#{work_dir}/#{path}/checkout"
       repository_dir = "#{work_dir}/repository"
@@ -133,20 +134,12 @@ module RSCM
     end
 
     def test_should_allow_creation_with_empty_constructor
-      scm = create_scm(new_temp_dir, ".")
+      scm = create_scm(RSCM.new_temp_dir, ".")
       scm2 = scm.class.new
       assert_same(scm.class, scm2.class)
     end
 
   private
-
-    def new_temp_dir
-      identifier = identifier.to_s
-      identifier.gsub!(/\(|:|\)/, '_')
-      dir = File.dirname(__FILE__) + "/../../target/temp_#{identifier}_#{Time.new.to_i}"
-      mkdir_p(dir)
-      dir
-    end
 
     def import_damagecontrolled(scm, import_copy_dir)
       mkdir_p(import_copy_dir)
@@ -186,7 +179,7 @@ module RSCM
     
   module LabelTest
     def test_label
-      work_dir = new_temp_dir
+      work_dir = RSCM.new_temp_dir
       checkout_dir = "#{work_dir}/LabelTest"
       repository_dir = "#{work_dir}/repository"
       scm = create_scm(repository_dir, "damagecontrolled")
@@ -214,7 +207,7 @@ module RSCM
 
   module ApplyLabelTest
     def test_apply_label
-      work_dir = new_temp_dir
+      work_dir = RSCM.new_temp_dir
       checkout_dir = "#{work_dir}/checkout"
       repository_dir = "#{work_dir}/repository"
       scm = create_scm(repository_dir, "damagecontrolled")

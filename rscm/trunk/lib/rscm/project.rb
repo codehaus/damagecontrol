@@ -43,7 +43,7 @@ module RSCM
         YAML::dump(self, io)
       end
       
-      RSS_SERVICE.add_project(self)
+      RSS_SERVICE.add_project(self) if RSS_SERVICE
 
     end
     
@@ -62,29 +62,49 @@ module RSCM
         end
       end
     end
-    
-    # Writes RSS for the last week to file. See +rss_file+
-    def write_rss
-      # approx 1 week back
-      from = Time.new - 3600*24*7
-      changesets = @scm.changesets(checkout_dir, from)
 
-      FileUtils.mkdir_p(File.dirname(rss_file))
-      File.open(rss_file, "w") do |io|
-        rss = changesets.to_rss(
-          "Changesets for #{name}", 
-          @home_page, # TODO point to web version of changeset
-          @description, 
+    # Polls SCM for new changesets and updates
+    # RSS and YAML files on disk. If this is the first poll (i.e. no changesets have
+    # been previously stored on disk), then changesets since +from_if_first_poll+
+    # will be retrieved.
+    def poll(from_if_first_poll=Time.epoch)
+      from = next_changeset_time || from_if_first_poll
+
+      changesets = @scm.changesets(checkout_dir, from)
+      if(!changesets.empty?)
+        changesets.save(changesets_dir)
+
+        # Now we need to update the RSS. The RSS spec says max 15 items in a channel,
+        # So we'll get upto the latest 15 changesets and RSS it..
+        # (http://www.chadfowler.com/ruby/rss/)
+        last_changesets = ChangeSets.load_upto(changesets_dir, 15)
+        title = "Changesets for #{@name}"
+        last_changesets.write_rss(
+          title,
+          changesets_rss_file,
+          "http://localhost:4712/", # TODO point to web version of changeset
+          @description || title, 
           @tracker || Tracker::Null.new, 
-          @scm_web || SCMWeb::Null.new
+          @scm_web || SCMWeb::Null.new        
         )
-        io.write(rss)
       end
     end
 
+    # Returns the time that should be used to get the next (unrecorded)
+    # changeset. This is the time of the latest recorded changeset +1. 
+    # This time is determined by looking at the directory names under 
+    # +changesets_dir+. If there are none, this method returns nil.
+    def next_changeset_time(d=changesets_dir)
+      changestet_dirs = Dir["#{d}/*"]
+      latest_dir = changestet_dirs.sort.reverse.find {|f| File.directory?(f)}
+      return nil unless latest_dir
+      latest = File.basename(latest_dir)
+      Time.parse_ymdHMS(latest) + 1
+    end
+    
     # Where RSS is written.
-    def rss_file
-      Directories.rss_file(name)
+    def changesets_rss_file
+      Directories.changesets_rss_file(name)
     end
     
     def checked_out?
@@ -103,8 +123,12 @@ module RSCM
       File.delete(checkout_dir)
     end
 
-    def rss_exists?
-      File.delete(rss_file)
+    def changesets_rss_exists?
+      File.exist?(changesets_rss_file)
+    end
+
+    def changesets_dir
+      Directories.changesets_dir(name)
     end
 
   private
@@ -112,5 +136,6 @@ module RSCM
     def project_config_file
       Directories.project_config_file(name)
     end
+
   end
 end

@@ -1,5 +1,6 @@
 require 'yaml'
 require 'test/unit'
+require 'tempdir'
 require 'rscm/changes'
 require 'rscm/tracker'
 require 'rscm/scm_web'
@@ -111,24 +112,41 @@ module RSCM
       assert_equal(Time.utc(2005), changeset.time)
     end
 
-    def test_rss
+    def test_should_write_file_on_write_rss
       changesets = ChangeSets.new
       changesets.add(@change1)
       changesets.add(@change2)
       changesets.add(@change3)
 
-      # TODO: we should compare this with an expected XML
-      # or perhaps better: use mocks to expect the correct methods to be called
-      # on the rss maker (pass it in as optional last arg)
-      puts changesets.to_rss(
-        "DamageControl Changesets", 
+      rss_file = "#{RSCM.new_temp_dir}/rss.xml"
+      assert(!File.exist?(rss_file))
+      changesets.write_rss(
+        "Mooky",
+        rss_file,
         "http://damagecontrol.codehaus.org/", 
         "This feed contains SCM changes for the DamageControl project", 
         Tracker::JIRA.new("http://jira.codehaus.org/", "DC"), 
         SCMWeb::ViewCVS.new("http://cvs.damagecontrol.codehaus.org/")
       )
+      assert(File.exist?(rss_file))
     end
 
+    def test_should_write_several_changesets_on_save_and_reload_them
+      changesets_dir = "#{RSCM.new_temp_dir}/save_load"
+
+      changesets = ChangeSets.new
+      changesets.add(@change1)
+      changesets.add(@change2)
+      changesets.add(@change3)
+      changesets.save(changesets_dir)
+      
+      all_reloaded = ChangeSets.load_upto(changesets_dir, 4)
+      assert_equal(changesets, all_reloaded)
+
+      some_reloaded = ChangeSets.load_upto(changesets_dir, 1)
+      assert_equal(1, some_reloaded.length)
+      assert_equal(@change3, some_reloaded[0][0])
+    end
   end
 
 end

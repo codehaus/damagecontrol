@@ -1,5 +1,7 @@
 require 'rss/maker'
 require 'xmlrpc/utils'
+require 'rscm/directories'
+require 'rscm/time_ext'
 
 module RSCM
 
@@ -91,6 +93,41 @@ module RSCM
       end
       time
     end
+
+    # Writes RSS for the changesets to file.
+    def write_rss(title, rss_file, link, description, message_linker, change_linker)
+      FileUtils.mkdir_p(File.dirname(rss_file))
+      File.open(rss_file, "w") do |io|
+        rss = to_rss(
+          title, 
+          link,
+          description, 
+          message_linker, 
+          change_linker
+        )
+        io.write(rss)
+      end
+    end
+
+    # Writes the changesets to several YAML files.
+    def save(changesets_dir)
+      self.each do |changeset|
+        changeset.save(changesets_dir)
+      end
+    end
+
+    # Loads +upto+ number of changesets from the +changesets+ dir. 
+    def ChangeSets.load_upto(changesets_dir, upto)
+      dirs = Dir["#{changesets_dir}/*"].find_all {|f| File.directory?(f) && File.exist?("#{f}/changesets.yaml")}
+      changesets = ChangeSets.new
+      start = [upto, dirs.length].min
+      dirs[-start..-1].each do |f|
+        changesets.add(YAML::load_file("#{f}/changesets.yaml"))
+      end
+      changesets
+    end
+
+  private
 
     def to_rss(title, link, description, message_linker, change_linker)
       raise "title" unless title
@@ -190,6 +227,14 @@ module RSCM
         result << " " << change.to_s << "\n"
       end
       result
+    end
+    
+    def save(changesets_dir)
+      changesets_file = "#{changesets_dir}/#{time.ymdHMS}/changesets.yaml"
+      FileUtils.mkdir_p(File.dirname(changesets_file))
+      File.open(changesets_file, "w") do |io|
+        YAML::dump(self, io)
+      end
     end
   end
 

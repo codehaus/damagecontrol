@@ -29,9 +29,9 @@ class ProjectController < ApplicationController
     render_action("view")
   end
   
-  def rss
+  def changesets_rss
     project = RSCM::Project.load(@params["id"])
-    send_file(project.rss_file)
+    send_file(project.changesets_rss_file)
   end
 
   def delete
@@ -124,10 +124,10 @@ protected
       }
     end
 
-    if(@project.rss_exists?)
+    if(@project.changesets_rss_exists?)
       @sidebar_links << {
         :controller => "project", 
-        :action     => "rss", 
+        :action     => "changesets_rss", 
         :id         => @project.name,
         :image      => "/images/rss.gif",
         :name       => "Changesets RSS"

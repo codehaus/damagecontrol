@@ -5,7 +5,7 @@ require 'xmlrpc/utils'
 class Time
   class << self
     def epoch
-      Time.at(0)
+      Time.at(0).utc
     end
 
     def infinity

@@ -26,10 +26,15 @@ module RSCM
     end
     module_function :checkout_list_file
 
-    def rss_file(project_name)
-      "#{project_dir(project_name)}/rss.xml"
+    def changesets_dir(project_name)
+      "#{project_dir(project_name)}/changesets"
     end
-    module_function :rss_file
+    module_function :changesets_dir
+
+    def changesets_rss_file(project_name)
+      "#{changesets_dir(project_name)}/rss.xml"
+    end
+    module_function :changesets_rss_file
 
     def trigger_checkout_dir(project_name)
       "#{project_dir(project_name)}/trigger_checkout"
