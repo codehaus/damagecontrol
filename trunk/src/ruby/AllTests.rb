@@ -27,8 +27,7 @@ require 'damagecontrol/publisher/EmailPublisherTest'
 require 'damagecontrol/publisher/BuildHistoryPublisherTest'
 require 'damagecontrol/publisher/XMLRPCStatusPublisherTest'
 require 'damagecontrol/publisher/JabberPublisherTest'
-# JIRA publisher disabled, Aslak doesn't like it ;-) --jon
-#require 'damagecontrol/publisher/JIRAPublisherTest'
+require 'damagecontrol/publisher/JIRAPublisherTest'
 
 require 'damagecontrol/template/HTMLTemplateTest'
 

@@ -28,10 +28,6 @@ module DamageControl
             jelly_script = create_jelly_script("Fix broken build", @template.generate(message.build), jira_project_key, assignee)
             puts "Posting JIRA issue"
             post_script(jelly_script)
-          else
-            puts "Not posting JIRA issue:"
-            puts " JIRA_USER='#{@jira_user}'"
-            puts " jira_project_key='#{jira_project_key}'"
           end
         end
       end

@@ -1,17 +1,19 @@
 $:<<'../../lib'
 
-require 'yaml'
-require 'test/unit' 
-require 'mockit' 
-require 'xmlrpc/server'
-require "xmlrpc/client"
-require "xmlrpc/config"
-require "xmlrpc/utils"
-require 'webrick'
+require 'damagecontrol/Hub'
 require 'damagecontrol/publisher/BuildHistoryPublisher'
-require 'cgi'
 
 module DamageControl
+
+  # add eq? methods to DamageControl::Build so we can compare builds
+  class Build
+    def ==(o)
+      project_name == o.project_name &&
+      successful == o.successful &&
+      config == o.config &&
+      timestamp == o.timestamp
+    end
+  end
 
   class AbstractBuildHistoryTest < Test::Unit::TestCase
     
@@ -30,7 +32,7 @@ module DamageControl
       @apple2.successful = false
       @apple2.timestamp = "20040316225948"
 
-      @bhp = BuildHistoryPublisher.new
+      @bhp = BuildHistoryPublisher.new(Hub.new)
       @bhp.register(@apple1)
       @bhp.register(@pear1)
       @bhp.register(@apple2)

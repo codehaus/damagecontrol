@@ -3,7 +3,6 @@ package com.thoughtworks.damagecontrol.swing;
 import com.thoughtworks.damagecontrol.buildmonitor.BuildConstants;
 import junit.framework.TestCase;
 
-import javax.swing.SwingUtilities;
 import javax.swing.table.DefaultTableModel;
 import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
@@ -14,58 +13,51 @@ import java.util.Vector;
 
 /**
  * @author Aslak Helles&oslash;y
- * @version $Revision: 1.2 $
+ * @version $Revision: 1.3 $
  */
 public class TableModelBuildListenerTestCase extends TestCase {
     public void testStatusIsReportedForBuildStarted() throws InvocationTargetException, InterruptedException {
 
         List appleList = new ArrayList();
-        Map three = new HashMap();
-        three.put(BuildConstants.PROJECT_NAME_FIELD, "apple");
-        three.put(BuildConstants.SUCCESSFUL_FIELD, Boolean.TRUE);
-        appleList.add(three);
+        Map apple1 = new HashMap();
+        apple1.put(BuildConstants.PROJECT_NAME_FIELD, "apple");
+        apple1.put(BuildConstants.SUCCESSFUL_FIELD, Boolean.TRUE);
+        appleList.add(apple1);
 
-        Map mice = new HashMap();
-        mice.put(BuildConstants.PROJECT_NAME_FIELD, "apple");
-        mice.put(BuildConstants.SUCCESSFUL_FIELD, Boolean.FALSE);
-        appleList.add(mice);
+        Map apple2 = new HashMap();
+        apple2.put(BuildConstants.PROJECT_NAME_FIELD, "apple");
+        apple2.put(BuildConstants.SUCCESSFUL_FIELD, Boolean.FALSE);
+        appleList.add(apple2);
 
         List pearList = new ArrayList();
-        Map blind = new HashMap();
-        blind.put(BuildConstants.PROJECT_NAME_FIELD, "pear");
-        blind.put(BuildConstants.SUCCESSFUL_FIELD, Boolean.TRUE);
-        pearList.add(blind);
+        Map pear1 = new HashMap();
+        pear1.put(BuildConstants.PROJECT_NAME_FIELD, "pear");
+        pear1.put(BuildConstants.SUCCESSFUL_FIELD, Boolean.TRUE);
+        pearList.add(pear1);
 
         TableModelBuildListener buildListener = new TableModelBuildListener();
         final DefaultTableModel tableModel = buildListener.getTableModel();
 
-        Map buildListMap = new HashMap();
+        final Map buildListMap = new HashMap();
         buildListMap.put("apple", appleList);
         buildListMap.put("pear", pearList);
 
         buildListener.update(buildListMap);
 
         final Vector expectedVector = new Vector();
+        Vector appleRow = new Vector();
+        Vector pearRow = new Vector();
+        appleRow.add("apple");
+        appleRow.add(new BuildSet(appleList));
+        pearRow.add("pear");
+        pearRow.add(new BuildSet(pearList));
+        expectedVector.add(pearRow);
+        expectedVector.add(appleRow);
 
-        Vector rowOne = new Vector();
-        rowOne.add("apple");
-        rowOne.add(Boolean.TRUE);
-        expectedVector.add(rowOne);
+        // Allow the swing thread to do its job
+        Thread.sleep(1000);
+        Vector dataVector = tableModel.getDataVector();
 
-        Vector rowTwo = new Vector();
-        rowTwo.add("pear");
-        rowTwo.add(Boolean.TRUE);
-        expectedVector.add(rowTwo);
-
-        Vector rowThree = new Vector();
-        rowThree.add("apple");
-        rowThree.add(Boolean.TRUE);
-        expectedVector.add(rowThree);
-
-        SwingUtilities.invokeAndWait(new Runnable() {
-            public void run() {
-                assertEquals(expectedVector, tableModel.getDataVector());
-            }
-        });
+        assertEquals(expectedVector, dataVector);
     }
 }

@@ -29,11 +29,14 @@ def start_simple_server(params = {})
 
   xmlrpc_servlet = XMLRPC::WEBrickServlet.new
   XMLRPCTrigger.new(xmlrpc_servlet, @hub)
-  XMLRPCStatusPublisher.new(xmlrpc_servlet, @hub)
+
+  bhp = BuildHistoryPublisher.new(@hub, "build_history.yaml")
+  XMLRPCStatusPublisher.new(xmlrpc_servlet, bhp)
 
   LogWriter.new(@hub, logsdir)
   
   scheduler = BuildScheduler.new(@hub)
+  # Only use one build executor (don't allow parallel builds)
   scheduler.add_executor(BuildExecutor.new(@hub, buildsdir))
   scheduler.start
 

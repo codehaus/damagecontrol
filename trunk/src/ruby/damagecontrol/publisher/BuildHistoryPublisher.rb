@@ -1,4 +1,6 @@
 require 'damagecontrol/Build'
+require 'damagecontrol/AsyncComponent'
+require 'damagecontrol/BuildEvents'
 
 # Captures and persists build history
 # Instances of this class can also be reached
@@ -7,13 +9,25 @@ require 'damagecontrol/Build'
 # Authors: Steven Meyfroidt, Aslak Hellesoy
 module DamageControl
 
-  class BuildHistoryPublisher
-    def initialize(file=nil)
-      if(file != nil)
-        @file = file
-        @builds = Hash.new
+  class BuildHistoryPublisher < AsyncComponent
+  
+    def initialize(channel, filename=nil)
+      super(channel)
+      if(filename != nil)
+        if(File.exist?(filename))
+          file = File.new(filename)
+          @builds = YAML::load(file.read)
+          file.close
+        end
+        @filename = filename
       else
         @builds = Hash.new
+      end
+    end
+
+    def process_message(message)
+      if message.is_a?(BuildEvent) && !message.is_a?(BuildProgressEvent)
+        register(message.build)
       end
     end
 
@@ -24,16 +38,39 @@ module DamageControl
         @builds[build.project_name]=build_array
       end
       build_array << build unless build_array.index(build)
-      YAML::dump(@builds, @file) unless @file == nil      
+      if(@filename != nil)
+        out = File.new(@filename, "w")
+        YAML::dump(@builds, out)
+        out.close
+      end
     end
     
-    # returns a map of array of build, project name as key. if project_name 
+    # Returns a map of array of build, project name as key. if project_name 
     # is nil then all the builds, otherwise only for the specified name
-    def get_build_list_map(project_name=nil)
+    # If number_of_builds is specified, each list will contain maximum
+    # that number of builds - from the end of the original list
+    def get_build_list_map(project_name=nil, number_of_builds=nil)
+      result_map = nil
       if(project_name != nil)
-        {project_name => @builds[project_name]}
+        if(@builds[project_name] != nil)
+          result_map = {project_name => @builds[project_name]}
+        else
+          return nil
+        end
       else
-        @builds
+        result_map = @builds
+      end
+      
+      if(number_of_builds != nil)
+        #filter out the end of each list
+        result = Hash.new
+        @builds.each_pair{ |project_name, build_list|
+          length = number_of_builds > build_list.length ? build_list.length : number_of_builds
+          result[project_name] = build_list[-length, length]
+        }
+        return result
+      else
+        return result_map
       end
     end
 

@@ -25,7 +25,7 @@ import java.util.Collections;
 //that goes against the ruby server
 /**
  * @author Aslak Helles&oslash;y
- * @version $Revision: 1.3 $
+ * @version $Revision: 1.4 $
  */
 public class MarqueeXmlRpcBuildMonitorTestCase extends TestCase {
     private IOException serverEx;
@@ -134,7 +134,7 @@ public class MarqueeXmlRpcBuildMonitorTestCase extends TestCase {
             }
         });
 
-        BuildPoller buildMonitor = new MarqueeXmlRpcBuildPoller(new URL("https://localhost:4315/"));
+        BuildPoller buildMonitor = new MarqueeXmlRpcBuildPoller(new URL("http://localhost:4315/"));
         buildMonitor.addBuildListener((BuildListener) mockBuildListener.proxy());
         buildMonitor.poll();
 

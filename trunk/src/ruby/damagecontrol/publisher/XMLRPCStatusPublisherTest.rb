@@ -5,6 +5,8 @@ require 'test/unit'
 require 'mockit' 
 require 'xmlrpc/server'
 require 'xmlrpc/parser'
+require 'webrick'
+require 'net/http'
 require 'damagecontrol/BuildScheduler'
 require 'damagecontrol/BuildExecutor'
 require 'damagecontrol/HubTestHelper'
@@ -13,16 +15,6 @@ require 'damagecontrol/publisher/BuildHistoryPublisher'
 require 'damagecontrol/publisher/AbstractBuildHistoryTest'
 
 module DamageControl
-
-  # add eq? methods to DamageControl::Build so we can compare builds
-  class Build
-    def ==(o)
-      project_name == o.project_name &&
-      successful == o.successful &&
-      config == o.config &&
-      timestamp == o.timestamp
-    end
-  end
   
   class XMLRPCStatusPublisherTest < AbstractBuildHistoryTest
     
