@@ -1,1 +1,0 @@
-java -classpath damagecontrol-1.0-alpha-1-SNAPSHOT.jar com.thoughtworks.damagecontrol.testserver.TestServer

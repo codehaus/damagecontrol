@@ -9,13 +9,13 @@ import java.lang.reflect.InvocationTargetException;
 
 /**
  * @author Aslak Helles&oslash;y
- * @version $Revision: 1.1 $
+ * @version $Revision: 1.2 $
  */
 public class DocumentUpdaterTestCase extends TestCase {
     public void testUpdateDocument() throws BadLocationException, InterruptedException, InvocationTargetException {
         Document document = new PlainDocument();
         DocumentUpdater documentUpdater = new DocumentUpdater(document);
-        documentUpdater.addText("Howdy");
-        assertEquals("Howdy", document.getText(0, document.getLength()));
+        documentUpdater.consume("I".toCharArray()[0]);
+        assertEquals("I", document.getText(0, document.getLength()));
     }
 }

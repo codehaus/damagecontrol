@@ -1,40 +1,32 @@
 package com.thoughtworks.damagecontrol.swing;
 
-import com.thoughtworks.damagecontrol.monitor.TextAdder;
-import com.thoughtworks.damagecontrol.monitor.BuildClient;
+import com.thoughtworks.damagecontrol.monitor.CharConsumer;
+import com.thoughtworks.damagecontrol.monitor.URLPumper;
 
 import javax.swing.*;
 import java.net.URL;
-import java.awt.*;
 import java.io.IOException;
 
 /**
  * @author Aslak Helles&oslash;y
- * @version $Revision: 1.2 $
+ * @version $Revision: 1.3 $
  */
 public class MonitorApplet extends JApplet {
 
-    private final GuiBuilder guiBuilder;
-
-    public MonitorApplet() throws HeadlessException {
-         guiBuilder = new GuiBuilder(getContentPane());
-    }
-
     public void init() {
         super.init();
+        GuiBuilder guiBuilder = new GuiBuilder(getContentPane());
+        CharConsumer textAdder = guiBuilder.buildPanel();
 
-        TextAdder textAdder = guiBuilder.buildPanel();
-
-        URL url = getCodeBase();
-        String host = url.getHost();
-        int port = Integer.parseInt(getParameter("port"));
-
-        BuildClient buildClient = new BuildClient(host, port, textAdder);
+        String indexPath = getParameter("indexPath");
         try {
-            buildClient.connect();
+            URL indexURL = new URL(getCodeBase(), indexPath);
+            URLPumper urlPumper= new URLPumper(indexURL, 1000, textAdder);
+            urlPumper.startPumping();
         } catch (IOException e) {
             e.printStackTrace();
+            getContentPane().removeAll();
+            getContentPane().add(new JTextField(e.getMessage()));
         }
-
     }
 }
