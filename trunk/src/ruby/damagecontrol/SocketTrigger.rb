@@ -3,6 +3,7 @@ require 'yaml'
 require 'damagecontrol/BuildEvents'
 require 'damagecontrol/Build'
 require 'damagecontrol/BuildBootstrapper'
+require 'damagecontrol/FileUtils'
 
 module DamageControl
 
@@ -15,6 +16,8 @@ module DamageControl
   #
   class SocketTrigger
   
+    include FileUtils
+
     attr_accessor :port
     
     def initialize(channel, port=4711, allowed_client_ips=["127.0.0.1"], allowed_client_hostnames=["localhost"])
@@ -53,7 +56,7 @@ module DamageControl
                 end
                 begin
                   do_accept(payload)
-                  socket.print("DamageControl server on #{@server.addr[2]}/#{@server.addr[3]} got message from #{client_hostname} / #{client_ip}\r\n")
+                  socket.print("DamageControl server on #{get_ip} got message from #{client_ip}\r\n")
                   socket.print("http://damagecontrol.codehaus.org/\r\n")
                 rescue => e
                   socket.print("DamageControl exception:\n")
@@ -78,6 +81,14 @@ module DamageControl
           puts "Stopped SocketTrigger listening on port #{port}"
         end
       }
+    end
+    
+    def get_ip
+      if(windows?)
+        ["(unknown)"]
+      else
+        [`/sbin/ifconfig eth0|grep inet|cut -d : -f 2|cut -d \  -f 1`.chomp ]
+      end
     end
     
     def allowed?(client_hostname, client_ip)
