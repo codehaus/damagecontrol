@@ -16,7 +16,7 @@ end
 def server.init_custom_components
   require 'damagecontrol/publisher/IRCPublisher'
   component(:irc_publisher, IRCPublisher.new(hub, self, "irc.codehaus.org", '#dce2e', "short_text_build_result.erb"))
-  irc_publisher.handle = "server2"
+  irc_publisher.handle = "server"
 end
 
 server.start.wait_for_shutdown

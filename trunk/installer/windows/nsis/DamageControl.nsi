@@ -11,7 +11,7 @@
 ;General
 
   !define ROOTDIR "..\..\.."
-  !define DISTDIR "..\..\..\target\dist"
+  !define DISTDIR "${ROOTDIR}\target\dist"
   
   ; VERSION needs to be defined on the command line with /DVERSION=1.2.3 option
   
@@ -81,7 +81,7 @@ Section "DamageControl Server" SecServer
   SetOutPath "$INSTDIR" 
   
   File "${DISTDIR}\license.txt"
-  File /r "${DISTDIR}"
+  File /r "${DISTDIR}\*"
   
   ;Include a minimal ruby installation (to reduce the size of the installer)
 
@@ -114,10 +114,8 @@ Section "DamageControl Server" SecServer
   File /r ${RUBY_HOME}\lib\ruby\1.8\webrick\httpservlet\*.rb
     
   ;Include CVS binaries
-;  SetOutPath $INSTDIR\cvs
-;  File /r ${CVS_HOME}\cvs.exe
-;  File /r ${CVS_HOME}\ext_protocol.dll
-;  File /r ${CVS_HOME}\pserver_protocol.dll
+  SetOutPath $INSTDIR\bin
+  File /r ${CVS_EXECUTABLE}
   
   ;Store installation folder
   WriteRegStr HKCU "Software\Modern UI Test" "" $INSTDIR

@@ -169,15 +169,21 @@ class Project
   end
   
   def cvs_executable
-    params["cvs_executable"] || "#{ENV['CVS_HOME']}/cvs.exe" || fail("Define the CVS_HOME variable to point to your CVS installation (can be TortoiseCVS)") 
+    params["cvs_executable"] || "#{ENV['CVS_HOME']}/cvs.exe" || fail("Define the cvs_executable variable to point to your CVS binary (eg. -Dcvs_executable=c:\bin\cvs.exe)")
+  end
+  
+  def svn_executable
+    params["svn_executable"] || "#{ENV['SVN_HOME']}/svn.exe" || fail("Define the svn_executable variable to point to your Subversion client binary eg. -Dsvn_executable=c:\bin\svn.exe") 
   end
   
   def installer_nodeps
-    # call these to verify they are defined before starting to build installer
+    # call these to verify they are defined before starting to build
     ruby_home
-    #cvs_executable
+    cvs_executable
+    #svn_executable
+
     fail("NSIS needs to be installed, download from http://nsis.sf.net (or not installed to default place: #{makensis_exe})") if !File.exists?(makensis_exe)
-    system("#{makensis_exe} /DVERSION=#{version} /DRUBY_HOME=#{ruby_home} installer/windows/nsis/DamageControl.nsi")
+    system("#{makensis_exe} /DVERSION=#{version} /DSVN_BIN= /DCVS_EXECUTABLE=#{cvs_executable} /DRUBY_HOME=#{ruby_home} installer/windows/nsis/DamageControl.nsi")
   end
   
   def archive
