@@ -4,19 +4,6 @@ require 'damagecontrol/Build'
 
 module DamageControl
 
-  class SocketRequestEvent
-    attr_reader :payload
-    
-    def initialize(payload)
-      @payload = payload
-    end
-    
-    def ==(other)
-      other.is_a?(SocketRequestEvent) && \
-        @payload == other.payload
-    end
-  end
-
   # This class listens for incoming connections. For each incoming
   # connection it will read one line of payload. The payload is parsed
   # into a Build object which is then wrapped in a BuildRequestEvent

@@ -10,11 +10,13 @@ require 'ftools'
 module DamageControl
 
   class FilePublisher < AsyncComponent
+  
+    attr_writer :filesystem
 
-    def initialize(channel, template, filesystem=FileSystem.new)
+    def initialize(channel, template)
       super(channel)
       @template = template
-      @filesystem = filesystem
+      @filesystem = FileSystem.new
     end
   
     def process_message(message)

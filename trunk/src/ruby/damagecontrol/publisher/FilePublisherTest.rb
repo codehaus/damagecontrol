@@ -5,7 +5,6 @@ require 'damagecontrol/Build'
 require 'damagecontrol/Hub'
 require 'damagecontrol/publisher/FilePublisher'
 require 'damagecontrol/template/MockTemplate'
-require 'damagecontrol/SocketTrigger'
 require 'ftools'
 
 module DamageControl
@@ -15,7 +14,8 @@ module DamageControl
     def setup
       @filesystem = Mock.new
       @template = Mock.new
-      @file_publisher = FilePublisher.new(Hub.new, @template, @filesystem)
+      @file_publisher = FilePublisher.new(Hub.new, @template)
+      @file_publisher.filesystem = @filesystem
     end
   
     def test_file_is_written_in_correct_location_upon_build_complete_event    
@@ -47,7 +47,7 @@ module DamageControl
     end
     
     def test_nothing_is_written_unless_build_complete_event
-      @file_publisher.process_message(SocketRequestEvent.new(nil))
+      @file_publisher.process_message("event")
       @template.__verify
       @filesystem.__verify
     end
