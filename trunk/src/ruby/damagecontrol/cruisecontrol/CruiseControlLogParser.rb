@@ -27,12 +27,21 @@ module DamageControl
   private
 
     def parse_top_level(parser, build)
-      while parser.has_next?
+      # these files can get might big, so we need to break fast as soon as we got the info we need
+      parsed_info = false
+      parsed_build = false
+      while parser.has_next? && !parsed_info || !parsed_build
         res = parser.pull
         handle_error(res)
                 
-        parse_info(parser, build) if res.start_element? and res[0] == 'info'
-        parse_build(res, parser, build) if res.start_element? and res[0] == 'build'
+        if res.start_element? and res[0] == 'info'
+	  parse_info(parser, build)
+	  parsed_info = true
+	end
+        if res.start_element? and res[0] == 'build'
+	  parse_build(res, parser, build)
+	  parsed_build = true
+	end
       end
     end
 
@@ -44,6 +53,7 @@ module DamageControl
         if res.start_element? and res[0] == 'property'
           build.label = res[1]['value'] if res[1]['name'] == 'label'
           build.timestamp = res[1]['value'] if res[1]['name'] == 'cctimestamp'
+          build.project_name = res[1]['value'] if res[1]['name'] == 'projectname'
         end
                 
         return if res.end_element? and res[0] == 'info'

@@ -145,7 +145,7 @@ the same class.
 require "xmlrpc/parser"
 require "xmlrpc/create"
 require "xmlrpc/config"
-require "xmlrpc/httpserver"
+#require "xmlrpc/httpserver"
 require "xmlrpc/utils"         # ParserWriterChooseMixin
 
 
@@ -833,6 +833,6 @@ end # module XMLRPC
 
 =begin
 = History
-    $Id: server.rb,v 1.1 2004/04/21 21:33:17 tirsen Exp $    
+    $Id: server.rb,v 1.2 2004/04/30 15:31:19 tirsen Exp $    
 =end
 

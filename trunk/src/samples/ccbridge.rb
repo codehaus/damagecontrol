@@ -1,28 +1,44 @@
-$VERBOSE = nil
+#!/usr/bin/env ruby
 
-handle = 'ant'
-server = 'zebedee'
-channel = "#build"
-logdir = 'D:\cruise\cruiselogs'
+irc_handle = 'rant'
+irc_server = '164.38.224.177'
+irc_channel = "#build"
+logdir = '/cruise/cruiselogs'
 
-$damagecontrol_home = '../..'
-$:<<"#{$damagecontrol_home}/src/ruby"
+$damagecontrol_home = File::expand_path('../..')
+$:.push("#{$damagecontrol_home}/src/ruby")
+$:.push("#{$damagecontrol_home}/lib")
 
-require 'damagecontrol/cruisecontrol/CruiseControlLogPoller'
+require 'simple'
+require 'damagecontrol/Hub'
+require 'damagecontrol/SocketTrigger'
+require 'damagecontrol/BuildExecutor'
+require 'damagecontrol/LogWriter'
+require 'damagecontrol/SelfUpgrader'
 require 'damagecontrol/template/ShortTextTemplate'
+require 'damagecontrol/template/HTMLTemplate'
 require 'damagecontrol/publisher/IRCPublisher'
+require 'damagecontrol/publisher/FilePublisher'
+require 'damagecontrol/publisher/GraphPublisher'
+require 'damagecontrol/publisher/EmailPublisher'
+require 'damagecontrol/publisher/JIRAPublisher'
+require 'damagecontrol/cruisecontrol/CruiseControlLogPoller'
+require 'damagecontrol/Logging'
 
 include DamageControl
 
-hub = Hub.new
-CruiseControlLogPoller.new(hub, logdir).start
-irc = IRCPublisher.new(hub, server, channel, ShortTextTemplate.new)
-irc.handle = handle
+Logging.quiet
+
+start_simple_server(
+  :RootDir => ".",
+  :SocketTriggerPort => 4711,
+  :HttpPort => 4712,
+  :HttpsPort => 4713)
+
+irc = IRCPublisher.new(@hub, irc_server, irc_channel, ShortTextTemplate.new)
+irc.handle = irc_handle
 irc.start
+CruiseControlLogPoller.new(@hub, logdir).start
 
-#set_trace_func proc { |event, file, line, id, binding, classname|
-#  printf "%8s %s:%-2d %10s %8s\n", event, file, line, id, classname
-#}
-
-# sleep until ctrl-c
-sleep
+# wait until ctrl-c
+@socket_trigger.join

@@ -16,7 +16,11 @@ module DamageControl
     
     def tick(time)
       foreach do |filename|
-        @file_handler.new_file(filename) if is_new_file(filename)
+      	begin
+          @file_handler.new_file(filename) if is_new_file(filename)
+	rescue
+	  puts "error processing #{filename}, ignoring"
+	end
       end
       discover_files
       schedule_next_tick
@@ -27,9 +31,9 @@ module DamageControl
     def is_new_file(filename)
       discovered = @discovered_files.index(filename)
       is_dir = @dir_to_poll == filename
-      is_par = @parent_dir == filename
+      is_parent = @parent_dir == filename
 
-      !discovered && !is_dir && !is_par
+      !discovered && !is_dir && !is_parent
     end
 
     def foreach

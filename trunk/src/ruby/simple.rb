@@ -4,7 +4,7 @@ require 'xmlrpc/server'
 require 'webrick'
  
 $damagecontrol_home = File::expand_path('../..') 
-$:<<"#{$damagecontrol_home}/src/ruby" 
+$:.push("#{$damagecontrol_home}/src/ruby")
 
 require 'damagecontrol/Hub'
 require 'damagecontrol/BuildExecutor'
@@ -16,6 +16,7 @@ require 'damagecontrol/xmlrpc/Trigger'
 require 'damagecontrol/BuildHistoryRepository'
 require 'damagecontrol/xmlrpc/StatusPublisher'
 require 'damagecontrol/xmlrpc/ConnectionTester'
+require 'damagecontrol/HostVerifier'
 
 include DamageControl 
 
@@ -23,7 +24,7 @@ Logging.quiet
 
 def start_simple_server(params = {})
   rootdir = params[:RootDir] || File.expand_path(".")
-  allow_ips = params[:AllowIPs] || ["127.0.0.1"]
+  allow_ips = params[:AllowIPs] || nil 
   port = params[:SocketTriggerPort] || 4711
   http_port = params[:HttpPort] || 4712
   https_port = params[:HttpsPort] || 4713
@@ -34,7 +35,7 @@ def start_simple_server(params = {})
   @hub = Hub.new
   LogWriter.new(@hub, logdir)
 
-  host_verifier = HostVerifier.new(allow_ips)
+  host_verifier = if allow_ips.nil? then OpenHostVerifier.new else HostVerifier.new(allow_ips) end
   @socket_trigger = SocketTrigger.new(@hub, port, host_verifier).start
 
   public_xmlrpc_servlet = XMLRPC::WEBrickServlet.new

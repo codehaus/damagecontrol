@@ -11,7 +11,7 @@ require 'damagecontrol/pebbles/TimeUtils'
 module DamageControl
 
   class BuildHistoryRepository < AsyncComponent
-  
+
     def initialize(channel, filename=nil)
       super(channel)
       @builds = Hash.new
@@ -25,13 +25,23 @@ module DamageControl
         @filename = expanded
       end
     end
+
+    # HACK OF DEATH:
+    # some xmlrpc implementations gets very confused by an empty struct
+    # so we'll patch it by adding a pointless property in it
+    # (did that take me like on day to figure out?!)
+    # -- Jon Tirsen
+    def patch_build(build)
+      build.config["apa"]="banan" unless build.nil?
+      build
+    end
     
     def current_build(project_name)
-      build_history(project_name).reverse[0]
+      patch_build(build_history(project_name).reverse[0])
     end
     
     def last_completed_build(project_name)
-      build_history(project_name).reverse.find {|build| build.is_completed?}
+      patch_build(build_history(project_name).reverse.find {|build| build.is_completed?})
     end
     
     def last_succesful_build(project_name)

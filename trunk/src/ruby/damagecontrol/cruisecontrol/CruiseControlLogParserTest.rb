@@ -10,7 +10,7 @@ module DamageControl
     def test_successful_build_data
       cc_log_file = "#{damagecontrol_home}/testdata/log20030929145347.xml"
       reader = CruiseControlLogParser.new
-      build = Build.new("dxbranch")
+      build = Build.new("")
       reader.parse(cc_log_file, build)
 
       assert_equal('dxbranch', build.project_name)
@@ -19,6 +19,6 @@ module DamageControl
       assert_equal(Build::FAILED, build.status)
       assert_equal("BUILD FAILED detected", build.error_message)
     end
-    
+
   end
 end

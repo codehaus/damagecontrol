@@ -7,7 +7,7 @@ require 'damagecontrol/BuildHistoryRepository'
 
 # Exposes a BuildHistoryRepository to XML-RPC
 # 
-# Authors: Steven Meyfroidt, Aslak Hellesoy
+# Authors: Steven Meyfroidt, Aslak Hellesoy, Jon Tirsen
 module DamageControl
 module XMLRPC  
 
@@ -20,8 +20,8 @@ module XMLRPC
       meth 'struct get_last_completed_build(string)', 'returns a map of array of build, project name as key.', 'last_completed_build'
     }
 
-    def initialize(xmlrpc_servlet, build_history_publisher)
-      xmlrpc_servlet.add_handler(INTERFACE, build_history_publisher)
+    def initialize(xmlrpc_servlet, build_history_repository)
+      xmlrpc_servlet.add_handler(INTERFACE, build_history_repository)
     end
   end
 
