@@ -1,41 +1,50 @@
 require 'damagecontrol/Timer'
-require 'damagecontrol/FileUtils'
 
 module DamageControl
 
-	class FilePoller
-		attr_reader :dir_to_poll
-			
-		include TimerMixin
+  class FilePoller
 
-		def initialize(dir_to_poll)
-			@dir_to_poll = dir_to_poll
-			determine_existing_files
-		end
-		
-		def tick(time)
-			Dir.foreach(dir_to_poll) do |filename|
-				new_file("#{dir_to_poll}/#{filename}") if is_new_file(filename)
-			end
-			determine_existing_files
-			schedule_next_tick
-		end
-		
-		def is_new_file(filename)
-			!@existing_files.index(filename)
-		end
-		
-		def determine_existing_files
-			@existing_files = []
-			Dir.foreach(dir_to_poll) do |filename|
-				@existing_files << filename
-			end
-		end
-		
-		def new_file(file)
-			puts "detected new file #{file}"
-		end
-		
-	end
-		
+    include TimerMixin
+
+    def initialize(dir_to_poll, file_handler)
+      @dir_to_poll = File.expand_path(dir_to_poll)
+      @parent_dir = File.dirname(@dir_to_poll)
+      @file_handler = file_handler
+
+      discover_files
+    end
+    
+    def tick(time)
+      foreach do |filename|
+        @file_handler.new_file(filename) if is_new_file(filename)
+      end
+      discover_files
+      schedule_next_tick
+    end
+    
+  private
+  
+    def is_new_file(filename)
+      discovered = @discovered_files.index(filename)
+      is_dir = @dir_to_poll == filename
+      is_par = @parent_dir == filename
+
+      !discovered && !is_dir && !is_par
+    end
+
+    def foreach
+      Dir.foreach(@dir_to_poll) do |filename|
+        yield File.expand_path("#{@dir_to_poll}/#{filename}")
+      end
+    end
+        
+    def discover_files
+      @discovered_files = []
+      foreach do |filename|
+        @discovered_files << filename
+      end
+    end
+
+  end
+
 end

@@ -17,5 +17,11 @@ module DamageControl
     def newFile(*args)
       File.new(*args)
     end
+    
+    def foreach(dir)
+      Dir.foreach(dir) { |file|
+        yield file
+      }
+    end
   end
 end

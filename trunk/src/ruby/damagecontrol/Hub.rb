@@ -12,7 +12,6 @@ module DamageControl
     end   
         
     def publish_message(message)
-      puts "publishing message #{message} at time #{clock.current_time}"
       @last_message=message
       @subscribers.each {|subscriber|
         subscriber.receive_message(message)

@@ -1,71 +1,69 @@
 require 'test/unit'
+require 'mock_with_returns'
+require 'ftools'
 require 'damagecontrol/FilePoller'
 require 'damagecontrol/FileUtils'
-require 'ftools'
 
 module DamageControl
-	
-	class FilePollerTest < Test::Unit::TestCase
-		include FileUtils
-		
-		class TestFilePoller < FilePoller
-			attr_reader :new_files
-			
-			def initialize(dir)
-				super(dir)
-				@new_files = []
-			end
-			
-			def new_file(file)
-				@new_files<<file
-			end
-		end
+  
+  class FilePollerTest < Test::Unit::TestCase
 
-		def setup
-			@dir = target_file("FilePoller#{Time.now.to_i}")
-			File.mkpath(@dir)
-			@poller = TestFilePoller.new(@dir)
-		end
+    include FileUtils
 
-		def teardown
-			rmdir(@dir)
-		end
-		
-		def test_doesnt_trig_on_empty_directory
-			@poller.force_tick
-			assert_equal([], @poller.new_files)
-		end
-		
-		def test_checks_periodically
-			@poller.clock = FakeClock.new
-			@poller.clock.change_time(4711)
-			@poller.force_tick
-			assert_equal(4711 + 1000, @poller.next_tick)
-		end
-		
-		def test_new_file_calls_new_file
-			create_file("newfile")
-			@poller.force_tick
-			assert_equal(["#{@dir}/newfile"], @poller.new_files)
-		end
-		
-		def create_file(filename)
-			File.open("#{@dir}/#{filename}", "w") do |file|
-				file.puts "bajs"
-			end
-		end
-		
-		def test_two_newfiles_calls_new_file_for_each
-			create_file("newfile1")
-			@poller.tick(@poller.clock.current_time)
-			assert_equal(["#{@dir}/newfile1"], @poller.new_files)
-			@poller.new_files.clear
-			assert_equal([], @poller.new_files)
+    def setup
+      @dir = File.expand_path("FilePoller#{Time.now.to_i}")
+      File.makedirs(@dir)
+      
+      @file_handler = Mock.new
+      @poller = FilePoller.new(@dir, @file_handler)
+    end
 
-			create_file("newfile2")
-			@poller.tick(@poller.clock.current_time)
-			assert_equal(["#{@dir}/newfile2"], @poller.new_files)
-		end
-	end
+    def teardown
+      puts "deleteing " + @dir
+      delete(@dir)
+    end
+    
+    def test_checks_periodically_and_doesnt_trig_on_empty_directory
+      @poller.clock = FakeClock.new
+      @poller.clock.change_time(4711)
+      @poller.force_tick
+      assert_equal(4711 + 1000, @poller.next_tick)
+      
+      @file_handler.__verify
+    end
+    
+    def test_new_file_calls_new_file
+      puts"test_new_file_calls_new_file"
+      @file_handler.__next(:new_file) { |file_name|
+        assert_equal("#{@dir}/newfile", file_name)
+      }
+    
+      create_file("newfile")
+      @poller.force_tick
+      @file_handler.__verify
+    end
+    
+    def test_two_newfiles_calls_new_file_for_each
+      @file_handler.__next(:new_file) { |file_name|
+        assert_equal("#{@dir}/newfile1", file_name)
+      }
+      @file_handler.__next(:new_file) { |file_name|
+        assert_equal("#{@dir}/newfile2", file_name)
+      }
 
+      create_file("newfile1")
+      create_file("newfile2")
+      @poller.force_tick
+      @file_handler.__verify
+    end
+
+  private
+
+    def create_file(filename)
+      File.open("#{@dir}/#{filename}", "w") do |file|
+        file.puts "bajs"
+      end
+    end
+    
+  end
 end
