@@ -23,7 +23,7 @@
       changeset.each do |change|
       %>
       <tr>
-        <td><img width="16" height="16" src="<%= file_icon(change) %>"/></td>
+        <td><%= file_icon(change).render %></td>
         <td><%= change.revision %></td>
         <td>
           <% if web_url_to_change(change) then %>

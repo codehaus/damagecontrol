@@ -4,6 +4,41 @@ require 'damagecontrol/scm/Changes'
 require 'pebbles/MVCServlet'
 
 module DamageControl
+  class Icon
+    def initialize(name, description)
+      @name = name
+      @description = description
+    end
+    
+    def url
+      "fileicons/#{@name}.png"
+    end
+    
+    def alt
+      @description
+    end
+    
+    def to_s
+      url
+    end
+    
+    def size
+      16
+    end
+    
+    def width
+      size
+    end
+    
+    def height
+      size
+    end
+    
+    def render
+      "<img width=\"#{width}\" height=\"#{height}\" src=\"#{url}\" title=\"#{alt}\" />"
+    end
+  end
+
   class ChangesReport < Report
     include Pebbles::HTMLQuoting
     include FileUtils
@@ -64,10 +99,10 @@ the working directory has been cleaned out, or because there has been no success
     end
     
     FILE_ICONS = {
-      Change::MODIFIED => "fileicons/document_edit.png",
-      Change::DELETED  => "fileicons/document_delete.png",
-      Change::ADDED    => "fileicons/document_new.png",
-      Change::MOVED    => "fileicons/document_exchange.png"
+      Change::MODIFIED => Icon.new("document_edit", "Edited - the file was changed in this changeset"),
+      Change::DELETED => Icon.new("document_delete", "Deleted - the file was removed in this changeset"),
+      Change::ADDED => Icon.new("document_new", "Added - the file was added in this changeset"),
+      Change::MOVED  => Icon.new("document_exchange", "Moved - the file was moved in this changeset")
     }
     
   end
