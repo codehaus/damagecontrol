@@ -2,7 +2,7 @@ require 'test/unit'
 require 'ftools'
 require 'damagecontrol/FileUtils'
 require 'damagecontrol/FilePoller'
-require 'damagecontrol/cruisecontrol/CruiseControlLogHandler'
+require 'damagecontrol/cruisecontrol/CruiseControlLogPoller'
 
 module DamageControl
   class CruiseControlLogPollerTest < Test::Unit::TestCase
@@ -15,9 +15,7 @@ module DamageControl
       create_hub
       @log_file = "#{damagecontrol_home}/testdata/log20030929145347.xml"
 
-      cchandler = CruiseControlLogHandler.new(hub)
-
-      @ccpoller = FilePoller.new(@dir, cchandler)
+      @ccpoller = CruiseControlLogPoller.new(hub, @dir)
     end
     
     def teardown

@@ -29,11 +29,13 @@ class Project
 	end
 
 	def unit_test
-		require 'AllTests'
+		Dir.chdir("#{$damagecontrol_home}/src/ruby")
+		system('ruby AllTests.rb')
 	end
 
 	def integration_test
-		require 'End2EndTest'
+		Dir.chdir("#{$damagecontrol_home}/src/ruby")
+		system('ruby End2EndTest.rb')
 	end
 	
 	def all

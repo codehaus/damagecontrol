@@ -25,6 +25,17 @@ module Ant
     classpath = ENV['CLASSPATH'], \
     jikespath = ENV['JIKESPATH'])
 
+    if( !ant_home )
+      raise "ANT_HOME *MUST* be set!"
+    end
+    
+    if( !java_home )
+      puts "\n\nWarning: JAVA_HOME environment variable is not set.\n", \
+        "If the build fails because sun.* classes could not be found\n", \
+        "you will need to set the JAVA_HOME environment variable\n", \
+        "to the installation directory of java\n"
+    end
+    
     current_dir = Dir.getwd
 
     if( !ant_home )
@@ -57,17 +68,6 @@ module Ant
     Dir.chdir(current_dir)
     "#{javacmd} -classpath #{classpath} -Dant.home=#{ant_home} #{vm_args} org.apache.tools.ant.Main #{ant_args}"
   end
-end
-
-if( !ENV['ANT_HOME'] )
-  raise "ANT_HOME *MUST* be set!"
-end
-
-if( !ENV['JAVA_HOME'] )
-  puts "\n\nWarning: JAVA_HOME environment variable is not set.\n", \
-    "If the build fails because sun.* classes could not be found\n", \
-    "you will need to set the JAVA_HOME environment variable\n", \
-    "to the installation directory of java\n"
 end
 
 if($0 == __FILE__)

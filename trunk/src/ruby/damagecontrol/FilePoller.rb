@@ -6,7 +6,7 @@ module DamageControl
 
     include TimerMixin
 
-    def initialize(dir_to_poll, file_handler)
+    def initialize(dir_to_poll, file_handler=self)
       @dir_to_poll = File.expand_path(dir_to_poll)
       @parent_dir = File.dirname(@dir_to_poll)
       @file_handler = file_handler

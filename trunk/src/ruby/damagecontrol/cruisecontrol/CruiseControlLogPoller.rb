@@ -7,8 +7,9 @@ require 'damagecontrol/cruisecontrol/CruiseControlLogParser'
 module DamageControl
 
   # File handler to used in conjuction with FilePoller
-  class CruiseControlLogHandler
-    def initialize(hub)
+  class CruiseControlLogPoller < FilePoller
+    def initialize(hub, dir_to_poll)
+      super(dir_to_poll)
       @hub = hub
       @ccparser = CruiseControlLogParser.new
     end
