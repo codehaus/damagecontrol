@@ -33,6 +33,7 @@ module DamageControl
     attr_accessor :url
     attr_accessor :log_file
     attr_accessor :xml_log_file
+    attr_accessor :archive_dir
 
     # the scm to use to talk to this builds source control system
     attr_accessor :scm
