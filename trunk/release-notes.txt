@@ -1,3 +1,23 @@
+Release 0.4-alpha (build #123) - 1 September 2004
+=================================================
+
+New features (the most significant ones):
+
+* Much better web interface for easier configuration
+* Subversion support
+* Build artifact archiving
+* Polling of SCM
+* Integration with ViewCVS and Fisheye (links to diffs)
+* JUnit report integration (for Java projects)
+* Trigger installation via the web interface
+* Automatic trigging of child builds
+* Automatic creation of new repositories on the server
+* Kill build support
+* Build progress bar in web interface
+* Show build queue
+
+For the full list of resolved issues (a total of 53!) see http://jira.codehaus.org/secure/BrowseProject.jspa?id=10260&report=changelog
+
 Release 0.3
 ===========
 
