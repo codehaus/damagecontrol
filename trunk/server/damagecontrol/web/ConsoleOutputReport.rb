@@ -19,6 +19,8 @@ module DamageControl
     end
     
     def content
+      # TODO: just point the iframe straight to the file. Example:
+      # http://builds.codehaus.org/damagecontrol/public/root/damagecontrol/build/20041129060728/stdout.log
       "<iframe border=\"0\" width=\"100%\" height=\"100%\" src=\"../log/#{project_name}?dc_creation_time=#{selected_build.dc_creation_time.ymdHMS}\" />"
     end
   end
