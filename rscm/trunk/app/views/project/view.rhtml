@@ -1,13 +1,22 @@
 <script><!--
 
+tabs = ["project_tab", "scm_tab", "tracker_tab"]
+
+function setTab(tab) {
+  stickyTab = tab
+  showElement(stickyTab, tabs)
+}
+
 function executeOnLoad() {
 <% @scms.each do |scm| %>
   <%= scm.short %>_init();
 <% end %>
+  tab = "<%= @params['tab'] || 'project_tab' %>"
+  setTab(tab)
 }
 
 function showElement(selected, elements) {
-  // hide all divs in the group
+  // hide all divs in the group unless selected
   for(element in elements) {
     id = elements[element]
     style = "none"
@@ -18,12 +27,11 @@ function showElement(selected, elements) {
   }
 }
 
-tabs = ["project_tab", "scm_tab", "tracker_tab"]
-
 scms = [
 <% @scms.each do |scm| %>
   "<%=scm.class.name %>",
 <% end %> "" ];
+scm_tip = "<div class='tp1'>If you don't find your SCM here, file a feature request in RSCM's JIRA</div>";
 
 trackers = [
 <% @trackers.each do |tracker| %>
@@ -32,11 +40,13 @@ trackers = [
 
 // -->
 </script>
-<%= link_to_image("rssbadge.gif", :action => "rss", :id => @project.name) %>
+
+<%= !@edit ? link_to("Edit", :action => "edit", :id => @params["id"]) : "" %>
+
 <ul id="foldertab">
-  <li><a href="javascript:showElement('project_tab', tabs)"><img src="/images/16x16/wrench.png"> General</a></li>
-  <li><a href="javascript:showElement('scm_tab', tabs)"><img src="/images/16x16/safe.png"> Source Control</a></li>
-  <li><a href="javascript:showElement('tracker_tab', tabs)"><img src="/images/16x16/scroll_information.png"> Issue Tracker</a></li>
+  <li><a href="javascript:setTab('project_tab')"><img src="/images/16x16/wrench.png"> General</a></li>
+  <li><a href="javascript:setTab('scm_tab')"><img src="/images/16x16/safe.png"> Source Control</a></li>
+  <li><a href="javascript:setTab('tracker_tab')"><img src="/images/16x16/scroll_information.png"> Issue Tracker</a></li>
 </ul>
 
 <form action="/project/save">
@@ -46,17 +56,15 @@ trackers = [
 </div>
 
 <div id="scm_tab" style="display:none">
+<%= @new_project.nil? ? link_to_image("rssbadge.gif", {:action => "rss", :id => @project.name}, :alt => "Changesets") : "" %>
 <table width="100%">
   <tr>
-    <td>Source control</td>
-    <td>
+    <td width="25%">Source Control</td>
+    <td class="config_cell"><%= tip(:txt => "scm_tip") %></td>
+    <td width="75%">
+      <select name="scm" class="setting-input" onchange="showElement(this.value, scms)">
       <% @scms.each do |scm| %>
-        <input 
-          type="radio" 
-          value="<%= scm.class.name %>" 
-          name="scm" 
-          onClick="javascript:showElement('<%= scm.class.name %>', scms)"<%if(scm.selected?)%>checked="true"<%end%>/> 
-        <%= scm.name %>
+        <option value="<%= scm.class.name %>" <%if(scm.selected?)%>selected<%end%>><%= scm.name %></option>
       <% end %>
     </td>
   </tr>
@@ -79,7 +87,7 @@ trackers = [
 </div>
 
 <div id="tracker_tab" style="display:none">
-Issue tracking. By specifying an issue tracker, issue numbers/ids in developers' SCM commit messages
+By specifying an issue tracker issue numbers/ids in developers' SCM commit messages
 will be detected and highlighted with external links to the particular issue. 
 This way people browsing changesets can easily navigate to related issues.
 <table width="100%">

@@ -10,8 +10,16 @@ Rscm = DRbObject.new(nil, 'druby://localhost:9000')
 class ApplicationController < ActionController::Base
 
   def initialize
+    @tab = "project_tab"
     @controller = self
-    @tasks = ["FOO", "BAR"]
+    @sidebar_links = [
+      {
+        :controller => "project", 
+        :action     => "new", 
+        :image      => "/images/24x24/box_new.png",
+        :name       => "New project"
+      }
+    ]
   end
   
   def breadcrumbs
@@ -35,6 +43,33 @@ module ActionView
           html_options.delete(:confirm)
         end
       end
+    end
+  end
+  
+  class Base
+    def text_or_input(input, options)
+      if(input)
+        options[:class] = "setting-input" unless options[:class]
+        tag("input", options)
+      elsif(options[:value] =~ /^http?:\/\//)
+        content_tag("a", options[:value], "href" => options[:value])
+      else
+        options[:value]
+      end
+    end
+    
+    # Creates an image with a tooltip that will show on mouseover.
+    #
+    # Options:
+    # * <tt>:txt</tt> - The text to put in the tooltip. Can be HTML.
+    # * <tt>:img</tt> - The image to display on the page. Defaults to '/images/16x16/about.png'
+    def tip(options)
+      tip = options.delete(:txt)
+      options[:src] = options.delete(:img) || "/images/16x16/about.png"
+      options[:onmouseover] = "Tooltip.show(event,#{tip})"
+      options[:onmouseout] = "Tooltip.hide()"
+
+      tag("img", options)
     end
   end
 end

@@ -2,7 +2,7 @@
 <table width="100%">
   <tr>
     <td class="setting-name">Bugzilla URL</td>
-    <td width="75%"><input class="setting-input" name="RSCM::Tracker::Bugzilla[url]" type="text" value="<%= bugzilla.url %>"></td>
+    <td width="75%"><%= text_or_input(@edit, :name => "RSCM::Tracker::Bugzilla[url]", :value => bugzilla.url) %></td>
   </tr>
   <tr>
     <td>&nbsp;</td>

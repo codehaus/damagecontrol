@@ -4,7 +4,7 @@
 <tr>
   <td class="setting-name">Project name</td>
   <td width="75%">
-    <input class="setting-input" name="RSCM::Project[name]" type="text" value="<%= project.name %>"/>
+    <%= text_or_input(@new_project, :name => "RSCM::Project[name]", :value => project.name) %>
   </td>
 </tr>
 <tr>
@@ -15,7 +15,7 @@
 </tr>
 <tr>
   <td>Project description</td>
-  <td><input class="setting-input" name="RSCM::Project[description]" type="text" value="<%= project.description %>"></td>
+  <td><%= text_or_input(@edit, :name => "RSCM::Project[description]", :value => project.description) %></td>
 </tr>
 <tr>
   <td>&nbsp;</td>
@@ -25,7 +25,7 @@
 </tr>
 <tr>
   <td>Project home page</td>
-  <td><input class="setting-input" name="RSCM::Project[home_page]" type="text" value="<%= project.home_page %>"></td>
+  <td><%= text_or_input(@edit, :name => "RSCM::Project[home_page]", :value => project.home_page) %></td>
 </tr>
 <tr>
   <td>Enable RSS generation</td>

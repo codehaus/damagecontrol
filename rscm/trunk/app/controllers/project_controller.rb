@@ -8,35 +8,24 @@ class ProjectController < ApplicationController
     @projects = RSCM::Project.find_all
   end
 
+  def new
+    @project = RSCM::Project.new
+    @scms = RSCM::SCMS.dup
+    @trackers = RSCM::TRACKERS.dup
+    @edit = true
+    @new_project = true
+    render_action("view")
+  end
+
   def view
-    project_name = @params["id"]
-    if(project_name)
-      @project = RSCM::Project.load(project_name)
+    @edit = false
+    load
+  end
 
-      scm = @project.scm
-      def scm.selected?
-        true
-      end
-
-      tracker = @project.tracker
-      def tracker.selected?
-        true
-      end
-
-      # Make a dupe of the scm/tracker lists and substitute with project's value
-      @scms = RSCM::SCMS.dup
-      @scms.each_index {|i| @scms[i] = @project.scm if @scms[i].class == @project.scm.class}
-
-      @trackers = RSCM::TRACKERS.dup
-      @trackers.each_index {|i| @trackers[i] = @project.tracker if @trackers[i].class == @project.tracker.class}
-    else
-      @project = RSCM::Project.new
-      @scms = RSCM::SCMS.dup
-      @trackers = RSCM::TRACKERS.dup
-    end    
-    
-    # TODO: loop through query params and override the selected?
-    # method for the one that has matching class name to the scm_name param
+  def edit
+    @edit = true
+    load
+    render_action("view")
   end
   
   def rss
@@ -61,6 +50,28 @@ class ProjectController < ApplicationController
   end
 
 private
+
+  def load
+    project_name = @params["id"]
+    @project = RSCM::Project.load(project_name)
+
+    scm = @project.scm
+    def scm.selected?
+      true
+    end
+
+    tracker = @project.tracker
+    def tracker.selected?
+      true
+    end
+
+    # Make a dupe of the scm/tracker lists and substitute with project's value
+    @scms = RSCM::SCMS.dup
+    @scms.each_index {|i| @scms[i] = @project.scm if @scms[i].class == @project.scm.class}
+
+    @trackers = RSCM::TRACKERS.dup
+    @trackers.each_index {|i| @trackers[i] = @project.tracker if @trackers[i].class == @project.tracker.class}
+  end
 
   # Instantiates an object from parameters
   def instantiate_from_params(param)

@@ -2,7 +2,7 @@
 <table width="100%">
   <tr>
     <td class="setting-name">Project ID</td>
-    <td width="75%"><input class="setting-input" name="RSCM::Tracker::SourceForge[group_id]" type="text" value="<%= sourceforge.group_id %>"></td>
+    <td width="75%"><%= text_or_input(@edit, :name => "RSCM::Tracker::SourceForge[group_id]", :value => sourceforge.group_id) %></td>
   </tr>
   <tr>
     <td>&nbsp;</td>
@@ -12,7 +12,7 @@
   </tr>
   <tr>
     <td class="setting-name">Tracker ID</td>
-    <td width="75%"><input class="setting-input" name="RSCM::Tracker::SourceForge[tracker_id]" maxlen="4" type="text" value="<%= sourceforge.tracker_id %>"></td>
+    <td width="75%"><%= text_or_input(@edit, :name => "RSCM::Tracker::SourceForge[tracker_id]", :value => sourceforge.tracker_id) %></td>
   </tr>
   <tr>
     <td>&nbsp;</td>

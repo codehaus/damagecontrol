@@ -8,10 +8,10 @@ function mooky_init() {
 <table width="100%">
   <tr>
     <td class="config_cell">Foo</td>
-    <td width="75%"><input class="setting-input" name="RSCM::Mooky[foo]" type="text" value="<%= mooky.foo %>"></td>
+    <td width="75%"><%= text_or_input(@edit, :name => "RSCM::Mooky[foo]", :value => mooky.foo) %></td>
   </tr>
   <tr>
     <td class="config_cell">Bar</td>
-    <td><input class="setting-input" name="RSCM::Mooky[bar]" type="text" value="<%= mooky.bar %>"></td>
+    <td width="75%"><%= text_or_input(@edit, :name => "RSCM::Mooky[bar]", :value => mooky.bar) %></td>
   </tr>
 </table>
