@@ -1,7 +1,7 @@
-require 'stringio'
 require 'parsedate'
 require 'pebbles/LineEditor'
 require 'pebbles/Pathutils'
+require 'pebbles/AsyncProcess'
 require 'damagecontrol/scm/AbstractSCM'
 require 'damagecontrol/scm/CVSLogParser'
 require 'damagecontrol/scm/Changes'
@@ -91,7 +91,7 @@ module DamageControl
     def changesets(checkout_dir, scm_from_time, scm_to_time, files, &line_proc)
       begin
         parse_log(checkout_dir, new_changes_command(scm_from_time, scm_to_time, files), &line_proc)
-      rescue Pebbles::ProcessFailedException => e
+      rescue ProcessError => e
         parse_log(checkout_dir, old_changes_command(scm_from_time, scm_to_time, files), &line_proc)
       end
     end
@@ -214,19 +214,19 @@ module DamageControl
       env
     end
     
-    def cvs(dir, cmd, &line_proc)
-      cmd(dir, cmd, &line_proc)
-    end
-
     def parse_log(checkout_dir, cmd, &proc)
-      execed_command_line = "cvs -d#{cvsroot_with_password(cvspassword)} #{cmd}"
-      cmd_with_io(checkout_dir, execed_command_line, environment) do |io|
+      changesets = nil
+
+      outproc = Proc.new { |io| 
         parser = CVSLogParser.new(io)
         parser.cvspath = path
         parser.cvsmodule = cvsmodule
         changesets = parser.parse_changesets
-      end
+      }
 
+      execed_command_line = "cvs -d#{cvsroot_with_password(cvspassword)} #{cmd}"      
+      Pebbles::AsyncProcess.new(checkout_dir, execed_command_line, nil, outproc, nil, environment, 60*10).waitfor
+      changesets
     end
     
     def cvs(dir, cmd)
@@ -238,12 +238,13 @@ module DamageControl
       end
 
       execed_command_line = "cvs -d#{cvsroot_with_password(cvspassword)} #{cmd}"
-
-      cmd_with_io(dir, execed_command_line, environment) do |io|
-        io.each_line do |progress|
-          if block_given? then yield progress else logger.debug(progress) end
-        end
-      end
+      outproc = Proc.new { 
+        |io| io.each_line { 
+          |progress|
+            if block_given? then yield progress else logger.debug(progress) end
+        }
+      }
+      Pebbles::AsyncProcess.new(dir, execed_command_line, nil, outproc, nil, environment, 60*10).waitfor
     end
 
   protected

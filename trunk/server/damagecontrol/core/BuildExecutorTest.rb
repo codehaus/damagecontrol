@@ -1,8 +1,6 @@
+require 'timeout'
 require 'test/unit'
 require 'pebbles/mockit'
-
-require 'fileutils'
-
 require 'damagecontrol/core/Build'
 require 'damagecontrol/core/BuildExecutor'
 require 'damagecontrol/core/BuildHistoryRepository'
@@ -44,7 +42,7 @@ module DamageControl
     end
      
     def test_can_kill_a_running_build 
-      # this blocks forever
+      # cat blocks forever
       @build.config["build_command_line"] = "cat"
       mock_hub = new_mock
       mock_hub.__expect(:put) {|message| assert(message.is_a?(BuildStartedEvent))}
@@ -121,10 +119,7 @@ module DamageControl
       assert_equal(Build::FAILED, @build.status)
     end
     
-    def test_checks_out_before_building      
-      checkoutdir = "#{@basedir}/damagecontrolled/checkout/damagecontrolled"
-      FileUtils.mkdir_p(checkoutdir)
-      last_build_time = Time.utc(2004, 04, 02, 12, 00, 00)
+    def test_reports_progress
       current_build_time = Time.utc(2004, 04, 02, 13, 00, 00)
       
       mock_scm = new_mock

@@ -1,7 +1,6 @@
 require 'fileutils'
 require 'ftools'
 require 'damagecontrol/util/Logging'
-require 'pebbles/Process'
 
 module FileUtils
 
@@ -82,23 +81,4 @@ module FileUtils
     end
   end
   
-  def cmd_with_io(dir, cmd, environment = {}, &proc)
-    begin
-      File.mkpath(dir)
-      p = Pebbles::Process.new
-      p.command_line = cmd
-      p.environment = environment
-      p.working_dir = dir
-      p.join_stdout_and_stderr = true
-      ret = p.execute do |stdout, stdin|
-        if proc.arity == 1 then proc.call(p.stdout) else proc.call(p.stdout, p.stdin) end
-      end
-      logger.debug("successfully executed #{cmd.inspect} in directory #{dir.inspect}")
-      ret
-    rescue NotImplementedError
-      puts "DamageControl only runs in Cygwin on Windows"
-      exit!
-    end
-  end
-
 end

@@ -84,9 +84,21 @@ module DamageControl
         history = build_history_repository.history(project_name)
         history.each do |build|
           # transform old to new
-          build.dc_start_time = build.start_time if build.start_time
-          build.duration = build.end_time - build.start_time if build.end_time && build.start_time
-          build.dc_creation_time = Time.parse_ymdHMS(build.timestamp) if build.timestamp
+          if build.timestamp
+            build.dc_creation_time = Time.parse_ymdHMS(build.timestamp)
+          end
+
+          if build.start_time
+            build.dc_start_time = build.start_time if build.start_time
+          else
+            build.dc_start_time = build.dc_creation_time
+          end
+          
+          if build.end_time && build.start_time
+            build.duration = build.end_time - build.start_time 
+          else
+            build.duration = nil
+          end
           
           # remove old
           build.start_time = nil

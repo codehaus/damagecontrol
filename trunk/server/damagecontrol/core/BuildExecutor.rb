@@ -104,17 +104,7 @@ module DamageControl
       end
       report_progress(build.build_command_line)
       begin
-        @build_process = Pebbles::Process.new
-        @build_process.working_dir = checkout_dir
-        @build_process.environment = environment
-        @was_killed = false
-        @build_process.execute(build.build_command_line) do |stdin, stdout, stderr|
-          threads = []
-          threads << Thread.new { stdout.each_line {|line| report_progress(line) } }
-          threads << Thread.new { stderr.each_line {|line| report_error(line) } }
-          threads.each{|t| t.join}
-        end
-        build.status = Build::SUCCESSFUL
+        external_process(build)
       rescue Exception => e
         logger.error("Build failed: #{format_exception(e)}")
         report_error(format_exception(e))
@@ -132,6 +122,35 @@ module DamageControl
         build.label = label
       end
 
+    end
+    
+    def external_process(build)
+      @was_killed = false
+
+      outproc = Proc.new { |io| 
+        io.each_line {|line| report_progress(line) }
+      }
+      errproc = Proc.new { |io| 
+        io.each_line {|line| report_progress(line) }
+      }
+
+      @build_process = Pebbles::AsyncProcess.new(checkout_dir, build.build_command_line, nil, outproc, errproc, nil, 60*30)
+      @build_process.waitfor
+      build.status = Build::SUCCESSFUL
+    end
+    
+    def external_process_old(build)
+      @build_process = Pebbles::Process.new
+      @build_process.working_dir = checkout_dir
+      @build_process.environment = environment
+      @was_killed = false
+      @build_process.execute(build.build_command_line) do |stdin, stdout, stderr|
+        threads = []
+        threads << Thread.new { stdout.each_line {|line| report_progress(line) } }
+        threads << Thread.new { stderr.each_line {|line| report_error(line) } }
+        threads.each{|t| t.join}
+      end
+      build.status = Build::SUCCESSFUL
     end
     
     def label(build)

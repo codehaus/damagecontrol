@@ -1,5 +1,6 @@
 require 'pebbles/Pathutils'
 require 'pebbles/LineEditor'
+require 'pebbles/AsyncProcess'
 require 'damagecontrol/scm/AbstractSCM'
 require 'damagecontrol/scm/SVNLogParser'
 require 'damagecontrol/util/FileUtils'
@@ -40,6 +41,7 @@ module DamageControl
     end
 
     def checkout(checkout_dir, scm_from_time, scm_to_time, &line_proc)
+      mkdir_p(checkout_dir)
       checked_out_files = []
       path_regex = /^[A|D|U]\s*(.*)/
       if(checked_out?(checkout_dir))
@@ -95,8 +97,9 @@ module DamageControl
       local?
     end
 
-    def create(&line_proc)
+    def create(&line_proc)      
       native_path = filepath_to_nativepath(svnrootdir, true)
+      mkdir_p(native_path)
       svnadmin(svnrootdir, "create #{native_path}", &line_proc)
     end
 
@@ -143,23 +146,40 @@ module DamageControl
     end
 
     def changesets(checkout_dir, scm_from_time, scm_to_time, files, &line_proc)
-      command = changes_command(scm_from_time, scm_to_time, files)
+      changesets = nil
+
+      outproc = Proc.new { |io| 
+        parser = SVNLogParser.new(io, svnpath)
+        changesets = parser.parse_changesets(scm_from_time, scm_to_time, &line_proc)
+      }
+
+      command = "svn #{changes_command(scm_from_time, scm_to_time, files)}"
       yield command if block_given?
 
-      cmd_with_io(checkout_dir, "svn #{command}") do |io|
-        parser = SVNLogParser.new(io, svnpath)
-        parser.parse_changesets(scm_from_time, scm_to_time, &line_proc)
-      end
+      Pebbles::AsyncProcess.new(checkout_dir, command, nil, outproc, nil, nil, 60*10).waitfor
+      changesets
     end
 
     def svn(dir, cmd, &line_proc)
       command_line = "svn #{cmd}"
-      cmd(dir, command_line, &line_proc)
+
+      outproc = Proc.new do |io| 
+        io.each_line do |progress|
+          if block_given? then yield progress else logger.debug(progress) end
+        end
+      end
+      Pebbles::AsyncProcess.new(dir, command_line, nil, outproc, nil, nil, 60*10).waitfor
     end
 
     def svnadmin(dir, cmd, &line_proc)
       command_line = "svnadmin #{cmd}"
-      cmd(dir, command_line, &line_proc)
+
+      outproc = Proc.new do |io| 
+        io.each_line do |progress|
+          if block_given? then yield progress else logger.debug(progress) end
+        end
+      end
+      Pebbles::AsyncProcess.new(dir, command_line, nil, outproc, nil, nil, 60*10).waitfor
     end
     
     def checked_out?(checkout_dir)

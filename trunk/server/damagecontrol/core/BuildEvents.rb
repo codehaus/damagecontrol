@@ -72,4 +72,13 @@ module DamageControl
     end
   end
 
+  class XMLProducedEvent
+    attr_reader :project_name
+    attr_reader :xml_file
+
+    def initialize(project_name, xml_file)
+      @project_name, @xml_file = project_name, xml_file
+    end
+  end
+
 end

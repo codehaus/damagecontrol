@@ -70,11 +70,6 @@ module DamageControl
         logger.info(line)
       end
 
-puts changesets_or_last_commit_time
-puts changesets_or_last_commit_time
-puts changesets_or_last_commit_time
-puts changesets_or_last_commit_time
-
       if(changesets_or_last_commit_time.is_a?(Time))
         logger.info("First checkout of #{project_name}. Last commit was at #{changesets_or_last_commit_time}")
         update_last_commit_time(project_name, changesets_or_last_commit_time, project_config)
