@@ -1,5 +1,4 @@
 require 'erb'
-require 'digest/md5'
 
 module Pebbles
 
@@ -13,7 +12,7 @@ module Pebbles
       result
     end
     
-    private
+  private
     
     def parse_tag(input, tag, binding, attributes)
       Thread.current['parse_tag_value'] = ""
