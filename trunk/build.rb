@@ -36,7 +36,7 @@ class Project
   end
 
   def fail
-    puts "BUILD FAILED"
+    puts "BUILD FAILED: #{$?.to_s}"
     exit(1)
   end
 

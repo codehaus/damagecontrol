@@ -40,8 +40,8 @@ module DamageControl
         handle_error(res)
                 
         if res.start_element? and res[0] == 'property'
-          build.label              = res[1]['value'] if res[1]['name'] == 'label'
-          build.timestamp          = res[1]['value'] if res[1]['name'] == 'cctimestamp'
+          build.label = res[1]['value'] if res[1]['name'] == 'label'
+          build.timestamp = res[1]['value'] if res[1]['name'] == 'cctimestamp'
         end
                 
         return if res.end_element? and res[0] == 'info'

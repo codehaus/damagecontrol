@@ -90,13 +90,14 @@ module DamageControl
     end
     
     def fetch_ip
-      result = if windows?
-        get_ip_from_ipconfig_exe_output(`ipconfig.exe`)
-      else
-        `/sbin/ifconfig eth0|grep inet|cut -d : -f 2|cut -d \  -f 1`.chomp
-      end
-      result = "(unknown)" unless $?
-      result
+"beaver.codehaus.org"
+#      result = if windows?
+#        get_ip_from_ipconfig_exe_output(`ipconfig.exe`)
+#      else
+#        `/sbin/ifconfig eth0|grep inet|cut -d : -f 2|cut -d \  -f 1`.chomp
+#      end
+#      result = "(unknown)" unless $?
+#      result
     end
     
     def get_ip_from_ipconfig_exe_output(ipconfig_output)

@@ -199,7 +199,7 @@ module DamageControl
       io = IO.foreach("|#{cmd}") do |progress|
         if block_given? then yield progress else puts progress end
       end
-      raise SCMError.new("#{cmd} failed") if $? != 0
+      raise SCMError.new("#{cmd} failed with code #{$?.to_s}") if $? != 0
       puts "executed #{cmd}"
     end
     
