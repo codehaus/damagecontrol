@@ -432,13 +432,87 @@ ProxyPassReverse /private http://localhost:4712/private</programlisting>
         </figure>
 
         <para>A new project is created by following the <guilabel>New
-        project</guilabel> hyperlink.</para>
+        project</guilabel> hyperlink. The following page allows you to enter
+        the project name, the build command and some other configuration
+        options.</para>
+
+        <figure>
+          <title>The configuration screen</title>
+
+          <screenshot>
+            <mediaobject>
+              <imageobject>
+                <imagedata fileref="images/project_name.png" />
+              </imageobject>
+            </mediaobject>
+          </screenshot>
+        </figure>
+
+        <para>After having entered all configuration options, you can click
+        the <guibutton>Save</guibutton> button and the new project is
+        created.</para>
+
+        <para>You can navigate to the project overview using the
+        <guilabel>Back to project</guilabel> hyperlink or the hyperlinked
+        project name in the navigation breadcrumbs. From this location, which
+        is generally available at
+        <literal>http://hostname:port/private/project/<replaceable>projectname</replaceable></literal>.
+        This page allows you to clone the project, which will create a project
+        with identical settings, but different name, to configure the project,
+        to trigger a new build, even if no changes have been made to the
+        codebase and to clean all working files.</para>
+
+        <para>On the public project page, which is available at
+        <literal>http://hostname:port/public/project/<replaceable>projectname</replaceable></literal>
+        you can just view the current build status, inspect the command line
+        output of the build or view unit test results. Aditionally it is
+        possible to view the working files and the history of occurred
+        builds.</para>
       </section>
 
       <section>
         <title>DamageControl and Build Tools</title>
 
-        <para>Following environment variables are passed to an external build
+        <para>DamageControl will support any build tool you need in your
+        project. All you need to do is to enter the relevant build command in
+        the field labeled <guilabel>Build command</guilabel>. If the command
+        returns an exit code of <literal>0</literal>, the build is successful,
+        if the build end with another status code, it was a failed
+        build.</para>
+
+        <sidebar>
+          <title>What if the build returns the wrong error code?</title>
+
+          <para>Some configurations of Ant under Microsoft Windows operating
+          systems return the wrong error code. To fix this behaviour, you will
+          have to modify the <filename>ant.bat</filename> that is executed
+          when calling <command>ant</command> to return the correct error
+          code. This is done by adding following code at the end of
+          <filename>ant.bat</filename>.</para>
+
+          <programlisting>exit %errorlevel%</programlisting>
+        </sidebar>
+
+        <para>Example commands to be run by DamageControl are:</para>
+
+        <screen>make all
+ant dist
+maven jar</screen>
+
+        <para>Some Windows setups may require, that you run ant in the native
+        shell and not in a possibly installed cywin shell. For this purpose,
+        you have to use a build command like this.</para>
+
+        <screen>cmd /C ant dist</screen>
+
+        <para>If your project root directory does not equal the project, you
+        want to run your builds in, you have to change to this directory
+        before. An appropiate build command would be as following.</para>
+
+        <screen>cd subdir &amp;&amp; make all</screen>
+
+        <para>If you need to build more complicated build scripts, you can use
+        following environment variables that are passed to an external build
         process. You can use these variables to create build artifacts which
         are specific to a certain build.</para>
 
@@ -466,13 +540,234 @@ ProxyPassReverse /private http://localhost:4712/private</programlisting>
       <section>
         <title>DamageControl and SCM Systems</title>
 
-        <para></para>
+        <para>DamageControl has an event-view to your project. This means,
+        rebuilds are triggered when a change to the codebase of your project
+        (an event) occurs. To make this triggering possible, your software
+        configuration management system must support triggers.</para>
+
+        <para>For SCM systems like CVS and Subversion, DamageControl can
+        install triggers automatically if it has local access to the
+        repository. To use a specific SCM, you will have to select the radio
+        box for this SCM and enter the required configuration
+        parameters.</para>
+
+        <para>If you have local access to the repository, there will be a new
+        action available at the private project webpage, which allows you to
+        create the repository and to install the triggers. If you are less
+        fortunate, you will have to install the triggers yourself, which is
+        described in the following sections.</para>
+
+        <section>
+          <title>Installing Triggers for CVS</title>
+
+          <para>To install the triggers for CVS you need to have DamageControl
+          installed at the CVS server. DamageControl does not need to be
+          running, as it will be used as client to trigger new builds via the
+          remote API.</para>
+
+          <para>To install the trigger follow these steps from a computer that
+          has access to the CVS repository.</para>
+
+          <procedure>
+            <step>
+              <para>Check out the <filename>CVSROOT</filename> of your
+              project</para>
+
+              <screen><prompt># </prompt><userinput>cvs -d<replaceable>&lt;cvsroot to your repository&gt;</replaceable> checkout CVSROOT</userinput></screen>
+
+              <para>There should be a newly created directory
+              <filename>CVSROOT</filename>.</para>
+            </step>
+
+            <step>
+              <para>Edit the file <filename>CVSROOT/loginfo</filename> and add
+              following line.</para>
+
+              <programlistingco>
+                <areaspec>
+                  <area coords="1 10" id="modulename" units="linecolumn" />
+
+                  <area coords="1 36" id="dcinstallation" units="linecolumn" />
+
+                  <area coords="1 57" id="cmd" os="windows" units="linecolumn" />
+
+                  <area coords="2 59" id="dcurl" units="linecolumn" />
+
+                  <area coords="3 29" id="projectname" units="linecolumn" />
+                </areaspec>
+
+                <programlisting><replaceable>modulename</replaceable> <replaceable>/path/to/dc/installation</replaceable>/bin/requestbuild<optional
+                    os="windows">.cmd</optional> \
+  --url http://<replaceable>your-damagecontrol-host:4712</replaceable>/private/xmlrpc \
+  --projectname <replaceable>projectname</replaceable></programlisting>
+              </programlistingco>
+
+              <calloutlist>
+                <callout arearefs="modulename">
+                  <para>The name of the module in the CVS repository</para>
+                </callout>
+
+                <callout arearefs="dcinstallation">
+                  <para>The path to your DamageControl installation</para>
+                </callout>
+
+                <callout arearefs="cmd" os="windows">
+                  <para>You will have to add the extension
+                  <filename>.cmd</filename>, you are using Microsoft
+                  Windows.</para>
+                </callout>
+
+                <callout arearefs="dcurl">
+                  <para>The URL of the actual build server. You specify the
+                  private XML-RPC address here. Please make sure that this URI
+                  is accessible from the SCM server without
+                  authentification.</para>
+                </callout>
+
+                <callout arearefs="projectname">
+                  <para>The projectname at the DamageControl server.</para>
+                </callout>
+              </calloutlist>
+            </step>
+
+            <step>
+              <para>Finally commit the changes to the CVS server.</para>
+
+              <screen><prompt># </prompt><userinput>cvs ci CVSROOT/loginfo -m "<replaceable>Installed DamageControl triggers</replaceable>"</userinput></screen>
+            </step>
+          </procedure>
+        </section>
+
+        <section>
+          <title>Installing hooks for Subversion</title>
+
+          <para>In order to install the hooks for Subversion you need to have
+          DamageControl installed at the Subversion server. DamageControl does
+          not need to be running, as it will be used as client to trigger new
+          builds via the remote API.</para>
+
+          <para>You will have to follow these steps from the server where your
+          Subversion repository is located.</para>
+
+          <procedure>
+            <step>
+              <para>Go to the hooks directory of your subversion
+              repository.</para>
+
+              <screen><prompt># </prompt><userinput>cd <replaceable>/var/svn/repos/projectname/hooks</replaceable></userinput></screen>
+            </step>
+
+            <step>
+              <para>If the file <filename>post-commit</filename> does not
+              exist, copy the template create a new file caled
+              <filename>post-commit</filename> with following contents.</para>
+
+              <programlisting>#! /bin/sh</programlisting>
+
+              <para>This is a shell script that will be executed after every
+              successful commit. This file does nothing, because the actual
+              contents will be added in the next step.</para>
+            </step>
+
+            <step>
+              <para>Add following lines to the file
+              <filename>post-commit</filename>.</para>
+
+              <programlistingco>
+                <areaspec>
+                  <area coords="1 25" id="svn.dcinstallation"
+                        units="linecolumn" />
+
+                  <area coords="1 46" id="svn.cmd" os="windows"
+                        units="linecolumn" />
+
+                  <area coords="2 59" id="svn.dcurl" units="linecolumn" />
+
+                  <area coords="3 29" id="svn.projectname" units="linecolumn" />
+                </areaspec>
+
+                <programlisting><replaceable>/path/to/dc/installation</replaceable>/bin/requestbuild<optional
+                    os="windows">.cmd</optional> \
+  --url http://<replaceable>your-damagecontrol-host:4712</replaceable>/private/xmlrpc \
+  --projectname <replaceable>projectname</replaceable></programlisting>
+
+                <calloutlist>
+                  <callout arearefs="svn.dcinstallation">
+                    <para>The path to your DamageControl installation</para>
+                  </callout>
+
+                  <callout arearefs="svn.cmd" os="windows">
+                    <para>You will have to add the extension
+                    <filename>.cmd</filename>, you are using Microsoft
+                    Windows.</para>
+                  </callout>
+
+                  <callout arearefs="svn.dcurl">
+                    <para>The URL of the actual build server. You specify the
+                    private XML-RPC address here. Please make sure that this
+                    URI is accessible from the SCM server without
+                    authentification.</para>
+                  </callout>
+
+                  <callout arearefs="svn.projectname">
+                    <para>The projectname at the DamageControl server.</para>
+                  </callout>
+                </calloutlist>
+              </programlistingco>
+            </step>
+          </procedure>
+        </section>
       </section>
 
       <section>
         <title>DamageControl and Issue Trackers</title>
 
-        <para></para>
+        <para>DamageControl has support for various issue trackers. In most
+        cases this support means that whenever a commit message refers to a
+        issue number in Jira, Bugzilla, Scarab or sourceforge.net issue
+        trackers, this issue number will be turned into a hyperlink to the
+        issue tracking system.</para>
+
+        <para>For the issue tracker Jira, there is an additional feature. A
+        Jira publisher allows to create Jira issues for each failed build. To
+        use this publisher, you will have to edit the server configuration
+        file.</para>
+
+        <procedure>
+          <step>
+            <para>Open your DamageControl server configuration file in a text
+            editor.</para>
+          </step>
+
+          <step>
+            <para>Find following line.</para>
+
+            <programlisting>def server.init_custom_components</programlisting>
+          </step>
+
+          <step>
+            <para>Add following code below this line.</para>
+
+            <programlisting>require 'damagecontrol/publisher/JIRAPublisher'
+component(:jira_publisher, 
+  JIRAPublisher.new(
+    hub, 
+   "short_text_build_result_with_link.erb", 
+   "<replaceable>jira.server</replaceable>", 
+   "<replaceable>username</replaceable>",
+   "<replaceable>password</replaceable>")</programlisting>
+
+            <para>Replace <literal>jira.server</literal> with the hostname of
+            your Jira installation and <literal>username</literal> and
+            <literal>password</literal> with the credentials of a user who has
+            privileges to create issues at the server.</para>
+          </step>
+        </procedure>
+
+        <para>If you omiss the parameters username and password, make sure to
+        have the environment variables <envar>JIRA_USER</envar> and
+        <envar>JIRA_PASSWORD</envar> set before you start the DamageControl
+        server.</para>
       </section>
     </section>
 
@@ -506,8 +801,8 @@ ProxyPassReverse /private http://localhost:4712/private</programlisting>
 component(:email_publisher, EmailPublisher.new(hub, build_history_repository,
   :SubjectTemplate =&gt; "short_text_build_result.erb", 
   :BodyTemplate =&gt; "short_html_build_result.erb",
-  :FromEmail =&gt; "damagecontrol@mydomain.com",
-  :MailServerHost =&gt; "localhost",
+  :FromEmail =&gt; "<replaceable>damagecontrol@mydomain.com</replaceable>",
+  :MailServerHost =&gt; "<replaceable>localhost</replaceable>",
   :MailServerPort =&gt; 25))</programlisting>
 
             <para>Replace <literal>damagecontrol@mydomain.com</literal> with
@@ -543,8 +838,8 @@ component(:email_publisher, EmailPublisher.new(hub, build_history_repository,
 component(:irc_publisher, 
   IRCPublisher.new(
     hub, 
-   "some.irc.server", 
-   '#somechannel', 
+   "<replaceable>some.irc.server</replaceable>", 
+   '#<replaceable>somechannel</replaceable>', 
    "short_text_build_result_with_link.erb"))</programlisting>
 
             <para>Replace <literal>some.irc.server</literal> with the hostname
@@ -557,19 +852,84 @@ component(:irc_publisher,
       <section>
         <title>RSS</title>
 
-        <para></para>
+        <para>DamageControl offers a convenient way to view the results of the
+        last builds of a project. If you use a RSS reader like <phrase
+        os="macosx">NetNewsWire,</phrase> <phrase
+        os="windows">RSSBandit,</phrase> <phrase os="linux">Straw</phrase> or
+        the LiveBookmarks fetaure of Mozilla Firefox, you should locate the
+        orange XML icon at the project page and subscribe to the linked
+        RSS-feed.</para>
+
+        <figure>
+          <title>The XML icon</title>
+
+          <screenshot>
+            <mediaobject>
+              <imageobject>
+                <imagedata fileref="images/xml_icon.png" />
+              </imageobject>
+            </mediaobject>
+          </screenshot>
+        </figure>
+
+        <para>Each time a build succeeds or fails, you will be notified
+        through your RSS reader.</para>
       </section>
 
       <section>
         <title>Windows System Tray</title>
 
-        <para></para>
+        <para>Another nice way to be notified is the Windows System Tray icon,
+        which can be installed for DamageControl. You can configure a number
+        of projects on different DamageControl servers and the tray icon will
+        notify you of successful or failed builds through popup ballons and
+        sounds.</para>
+
+        <figure>
+          <title>The Windows System Tray Icon</title>
+
+          <screenshot>
+            <mediaobject>
+              <imageobject>
+                <imagedata fileref="images/dctray_net.png" />
+              </imageobject>
+            </mediaobject>
+          </screenshot>
+        </figure>
+
+        <para>The installation of the Windows System Tray icon is done through
+        the installer package. After starting the tray icon, you should click
+        it with the right mouse button to enter the settings menu and
+        configure the projects to monitor.</para>
       </section>
 
       <section>
         <title>GNOME System Tray</title>
 
-        <para></para>
+        <para>There is also a System Tray Icon for the GNOME desktop, which
+        will show a red or green status light if depending on the build status
+        of your monitored projects. The GNOME System Tray Icon currently does
+        not support the display of notification messages nor the playing of
+        sound to notify the user of finished builds.</para>
+
+        <figure>
+          <title>The GNOME System Tray Icon</title>
+
+          <screenshot>
+            <mediaobject>
+              <imageobject>
+                <imagedata fileref="images/dctray_mono.png" />
+              </imageobject>
+            </mediaobject>
+          </screenshot>
+        </figure>
+
+        <para>To use this icon, you will need a Linux computer with following
+        software: Mono, Gtk# and the GNOME desktop. After unpacking the
+        DamageControl-MonoTray package, you can start the Tray Icon using
+        following command.</para>
+
+        <screen><prompt># </prompt><userinput>mono MonoTray.exe</userinput></screen>
       </section>
     </section>
   </chapter>
@@ -577,6 +937,10 @@ component(:irc_publisher,
   <chapter>
     <title>Developer Handbook</title>
 
-    <para></para>
+    <para>This chapter contains information for developers of DamageControl or
+    users of DamageControl who would like to extend the features offered by
+    DamageControl.</para>
+
+    <remark>TODO.</remark>
   </chapter>
 </book>
