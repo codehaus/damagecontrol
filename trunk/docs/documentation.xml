@@ -590,21 +590,21 @@ maven jar</screen>
 
               <programlistingco>
                 <areaspec>
-                  <area coords="1 10" id="modulename" units="linecolumn" />
+                  <area coords="1 11" id="modulename" units="linecolumn" />
 
                   <area coords="1 36" id="dcinstallation" units="linecolumn" />
 
-                  <area coords="1 57" id="cmd" os="windows" units="linecolumn" />
+                  <area coords="1 59" id="cmd" os="windows" units="linecolumn" />
 
                   <area coords="2 59" id="dcurl" units="linecolumn" />
 
-                  <area coords="3 29" id="projectname" units="linecolumn" />
+                  <area coords="3 28" id="projectname" units="linecolumn" />
                 </areaspec>
 
                 <programlisting><replaceable>modulename</replaceable> <replaceable>/path/to/dc/installation</replaceable>/bin/requestbuild<optional
                     os="windows">.cmd</optional> \
   --url http://<replaceable>your-damagecontrol-host:4712</replaceable>/private/xmlrpc \
-  --projectname <replaceable>projectname</replaceable></programlisting>
+  --projectname <replaceable>projectname       </replaceable></programlisting>
               </programlistingco>
 
               <calloutlist>
@@ -683,18 +683,18 @@ maven jar</screen>
                   <area coords="1 25" id="svn.dcinstallation"
                         units="linecolumn" />
 
-                  <area coords="1 46" id="svn.cmd" os="windows"
+                  <area coords="1 48" id="svn.cmd" os="windows"
                         units="linecolumn" />
 
                   <area coords="2 59" id="svn.dcurl" units="linecolumn" />
 
-                  <area coords="3 29" id="svn.projectname" units="linecolumn" />
+                  <area coords="3 28" id="svn.projectname" units="linecolumn" />
                 </areaspec>
 
                 <programlisting><replaceable>/path/to/dc/installation</replaceable>/bin/requestbuild<optional
                     os="windows">.cmd</optional> \
   --url http://<replaceable>your-damagecontrol-host:4712</replaceable>/private/xmlrpc \
-  --projectname <replaceable>projectname</replaceable></programlisting>
+  --projectname <replaceable>projectname        </replaceable></programlisting>
 
                 <calloutlist>
                   <callout arearefs="svn.dcinstallation">
@@ -813,6 +813,48 @@ component(:email_publisher, EmailPublisher.new(hub, build_history_repository,
             <para>Replace <literal>damagecontrol@mydomain.com</literal> with
             the desired sender address and <literal>localhost</literal> with
             the hostname of the mail server.</para>
+          </step>
+        </procedure>
+
+        <para>Under some circumstances, DamageControl will use the wrong
+        hostname in created EMails. This is most likely the case if you are
+        accessing DamageControl via an Apache proxy. To prevent DamageControl
+        from creating incorrect URLs in EMails and notification messages, you
+        have to edit the DamageControl server configuration.</para>
+
+        <procedure>
+          <step>
+            <para>Open your DamageControl server configuration file in a text
+            editor.</para>
+          </step>
+
+          <step>
+            <para>Find the section which configures the network server. This
+            section looks in the default configuration like this:</para>
+
+            <programlisting>server = DamageControlServer.new(
+  :RootDir =&gt; ENV["DAMAGECONTROL_WORK"],
+  :HttpPort =&gt; 4712,
+  :PollingInterval =&gt; 60 # specified in seconds
+  # to allow access only from localhost then uncomment line below 
+  # (when running behind an Apache proxy for example)
+  #:AllowIPs =&gt; [ "127.0.0.1" ],
+  )</programlisting>
+          </step>
+
+          <step>
+            <para>Add the parameter ExternalWebUrl, which points to the public
+            root of the DamageControl installation.</para>
+
+            <programlisting>server = DamageControlServer.new(
+  :RootDir =&gt; ENV["DAMAGECONTROL_WORK"],
+  :HttpPort =&gt; 4712,
+  :ExternalWebUrl =&gt; "http://my-machine/damagecontrol/public"
+  :PollingInterval =&gt; 60 # specified in seconds
+  # to allow access only from localhost then uncomment line below 
+  # (when running behind an Apache proxy for example)
+  #:AllowIPs =&gt; [ "127.0.0.1" ],
+  )</programlisting>
           </step>
         </procedure>
       </section>
