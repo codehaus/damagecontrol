@@ -24,7 +24,7 @@ module DamageControl
 
     end
     
-    def Xtest_exits_on_successful_damagecontrol
+    def XXtest_exits_on_successful_damagecontrol
       build = Build.new("damagecontrol")
       build.status = Build::SUCCESSFUL
       hub.publish_message(BuildCompleteEvent.new(build))
