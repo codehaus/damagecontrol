@@ -5,8 +5,8 @@ require_gem 'rscm'
 require 'damagecontrol/poller'
 require 'damagecontrol/standard_persister'
 
-# Wire up the whole app with Needle's nice block based DI framework.
-# I wonder - is BDI? (Block Dependency Injection)
+# Wire up the whole DamageControl app with Needle's nice block based DI framework.
+# I wonder - is BDI (Block Dependency Injection) a new flavour of DI?
 REGISTRY = Needle::Registry.define do |b|
   b.persister do
     DamageControl::StandardPersister.new
@@ -16,9 +16,10 @@ REGISTRY = Needle::Registry.define do |b|
     # Use a poller that persists the basic stuff
     DamageControl::Poller.new do |project, changesets|
       b.persister.save_changesets(project, changesets)
-      b.persister.save_diffs(project)
+      b.persister.save_diffs(project, changesets)
       b.persister.save_rss(project)
       # TODO: stick project+changesets pairs on the channel
+      project.checkout(changesets.latest.id)
     end
   end
 

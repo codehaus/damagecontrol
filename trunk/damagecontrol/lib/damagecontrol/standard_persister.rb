@@ -15,7 +15,7 @@ module DamageControl
     end
     
     # Get the diffs for each change and save them.
-    def save_diffs(project)
+    def save_diffs(project, changesets)
       Log.info "Getting diffs for #{project.name}"
       dp = DamageControl::Visitor::DiffPersister.new(project.scm, project.name)
       changesets.accept(dp)
