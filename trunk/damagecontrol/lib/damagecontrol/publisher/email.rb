@@ -1,5 +1,4 @@
 require 'rubygems'
-#require_gem 'actionmailer'
 require 'action_mailer'
 require 'damagecontrol/publisher/base'
 
@@ -22,8 +21,8 @@ module DamageControl
       
       def initialize
         @delivery_method = "sendmail"
-        @recipients = ["dev@XXXXX.codehaus.org"]
-        @from = "dcontrol@codehaus.org"
+        @recipients = ""
+        @from = "\"DamageControl\" <dcontrol@codehaus.org>"
         @active = false
       end
       
@@ -42,10 +41,11 @@ module DamageControl
       def email(build, email_publisher)
         Log.info("Sending email to #{email_publisher.recipients.inspect}")
         @delivery_method = email_publisher.delivery_method
-        @recipients = email_publisher.recipients
+        @recipients = email_publisher.recipients.split(%r{,\s*})
+
         @from = email_publisher.from
 
-        @subject = "#{build.project.name} build failed"
+        @subject = "#{build.project.name} Build #{build.status_message}"
         @sent_on = Time.new.utc
         @body["build"] = build
       end
