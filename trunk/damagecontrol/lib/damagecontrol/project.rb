@@ -87,7 +87,7 @@ module DamageControl
       
       Log.info "Getting changesets for #{name} from #{from} (retrieved from #{checkout_dir})"
       changesets = @scm.changesets(checkout_dir, from)
-      if(!@scm.transactional?)
+      if(!changesets.empty? && !@scm.transactional?)
         # We're dealing with a non-transactional SCM (like CVS/StarTeam/ClearCase,
         # unlike Subversion/Monotone). Sleep a little, get the changesets again.
         # When the changesets are not changing, we can consider the last commit done
@@ -97,7 +97,7 @@ module DamageControl
         commit_in_progress = true
         while(commit_in_progress)
           @quiet_period ||= 5
-          Log.info "Sleeping for #{@quiet_period} secs since #{name}'s SCM (#{@scm.name}) is not transactional."
+          Log.info "Sleeping for #{@quiet_period} seconds since #{name}'s SCM (#{@scm.name}) is not transactional."
           sleep @quiet_period
           next_changesets = @scm.changesets(checkout_dir, from)
           commit_in_progress = changesets != next_changesets

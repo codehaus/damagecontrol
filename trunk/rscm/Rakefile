@@ -4,8 +4,9 @@ require 'rake/testtask'
 require 'rake/rdoctask'
 require 'rake/packagetask'
 require 'rake/gempackagetask'
+require 'rake/contrib/compositepublisher'
+require 'rake/contrib/sshpublisher'
 require 'rake/contrib/rubyforgepublisher'
-require 'rscm'
 
 PKG_BUILD     = ENV['PKG_BUILD'] ? '.' + ENV['PKG_BUILD'] : ''
 PKG_NAME      = 'rscm'
@@ -14,6 +15,7 @@ PKG_FILE_NAME = "#{PKG_NAME}-#{PKG_VERSION}"
 
 desc "Default Task"
 task :default => [ :all ]
+task :all => [:ant, :gem]
 
 # Run the unit tests
 # To run a specific test: rake test TEST=path/to/test
@@ -30,7 +32,6 @@ Rake::TestTask.new { |t|
 }
 
 rd = Rake::RDocTask.new { |rdoc|
-  rdoc.rdoc_dir = 'doc'
   rdoc.title    = 'RSCM - Ruby Source Control Management API'
   rdoc.options << '--line-numbers' << '--inline-source'
   rdoc.rdoc_files.include('README')
@@ -51,8 +52,6 @@ task :ant do |t|
   end
 end
 
-task :all => [:ant, :gem]
-
 PKG_FILES = FileList[
   '[A-Z]*',
   'lib/**/*.rb', 
@@ -68,34 +67,21 @@ else
     
     #### Basic information.
 
-    s.name = 'rscm'
+    s.name    = PKG_NAME
     s.version = PKG_VERSION
     s.summary = "RSCM - Ruby Source Control Management"
     s.description = <<-EOF
       RSCM is a Ruby library for various Source Control Management (SCM) systems.
     EOF
 
-    #### Dependencies and requirements.
-
-    #s.add_dependency('log4r', '> 1.0.4')
-    #s.requirements << ""
-
     #### Which files are to be included in this gem?  Everything!  (Except CVS directories.)
 
     s.files = PKG_FILES.to_a
 
-    #### C code extensions.
-
-    #s.extensions << "ext/rmagic/extconf.rb"
-
     #### Load-time details: library and application (you will need one or both).
 
-    s.require_path = 'lib'                         # Use these for libraries.
+    s.require_path = 'lib'
     s.autorequire = 'rscm'
-
-    #s.bindir = "bin"                               # Use these for applications.
-    #s.executables = ["rscm"]
-    #s.default_executable = "rscm"
 
     #### Documentation and testing.
 
@@ -109,7 +95,7 @@ else
 
     s.author = "Aslak Hellesoy"
     s.email = "dev@damagecontrol.codehaus.org"
-    s.homepage = "http://damagecontrol.codehaus.org/rscm"
+    s.homepage = "http://rscm.rubyforge.org"
     s.rubyforge_project = "rscm"
   end
 
@@ -117,4 +103,16 @@ else
     pkg.need_zip = true
     pkg.need_tar = true
   end
+end
+
+task :publish => [:rdoc] do
+  publisher = Rake::CompositePublisher.new  
+  publisher.add Rake::RubyForgePublisher.new('rscm', 'aslak_hellesoy')  
+  #publisher.add Rake::SshFilePublisher.new(  
+  #  'umlcoop',  
+  #  'htdocs/software/rake',  
+  #  '.',  
+  #  'rake.blurb')
+
+  publisher.upload
 end
