@@ -98,6 +98,7 @@ protected
       @sidebar_links << {
         :controller => "scm", 
         :action     => "create", 
+        :id         => @project.name,
         :image      => "/images/24x24/safe_new.png",
         :name       => "Create #{@project.scm.name} repository"
       }

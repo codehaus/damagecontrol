@@ -123,13 +123,15 @@ module RSCM
       last_changeset_id = last_changeset_id.to_i
       ids = ChangeSets.ids(changesets_dir)
       last = ids.index(last_changeset_id)
-      raise "No occurrence of #{last_changeset_id.inspect} in #{ids.inspect}" unless last
-      first = last - prior + 1
-      first = 0 if first < 0
 
       changesets = ChangeSets.new
-      ids[first..last].each do |id|
-        changesets.add(YAML::load_file("#{changesets_dir}/#{id}/changeset.yaml"))
+      if(last)
+        first = last - prior + 1
+        first = 0 if first < 0
+
+        ids[first..last].each do |id|
+          changesets.add(YAML::load_file("#{changesets_dir}/#{id}/changeset.yaml"))
+        end
       end
       changesets
     end

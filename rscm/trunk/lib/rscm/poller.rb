@@ -7,16 +7,18 @@ module RSCM
       @projects = []
     end
 
-    # Adds a project to poll
+    # Adds a project to poll. If the project is already added it is replaced
+    # with then new one, otherwise appended to the end.
     def add_project(project)
-      @projects << project unless @projects.index(project)
+      index = @projects.index(project) || @projects.length
+      @projects[index] = project
     end
     
     # Polls all registered projects
     def poll
       @projects.each do |project|
         begin
-          project.poll
+          project.poll if project.scm_exists?
         rescue => e
           $stderr.puts "Error polling #{project.name}"
           $stderr.puts e.message

@@ -131,6 +131,10 @@ module RSCM
       File.exists?(project_config_file)
     end
 
+    def scm_exists?
+      scm.exists?
+    end
+
     def checkout_dir
       Directories.checkout_dir(name)
     end
@@ -161,6 +165,11 @@ module RSCM
     
     def delete
       File.delete(Directories.project_dir(name))
+    end
+    
+    def == (o)
+      return false unless o.is_a?(Project)
+      name == o.name
     end
 
   private

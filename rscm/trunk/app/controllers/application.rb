@@ -72,11 +72,11 @@ module ActionView
     end
     
     def text_or_select(input, options)
+      values = options.delete(:values)
       if(input)
         options[:class] = "setting-input" unless options[:class]
         
         option_tags = ""
-        values = options.delete(:values)
         values.each do |value|
           option_attrs = {:value => value.class.name}
           option_attrs[:selected] = "true" if value.selected?
@@ -85,7 +85,7 @@ module ActionView
         end
         content_tag("select", option_tags, options)
       else
-        "JALLA"
+        values.find {|v| v.selected?}.name
       end
     end
     

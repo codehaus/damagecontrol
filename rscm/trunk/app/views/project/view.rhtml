@@ -47,7 +47,9 @@ trackers = [
   <li><a href="javascript:setTab('trackers')"><img src="/images/16x16/scroll_information.png"> Issue Tracker</a></li>
 </ul>
 
+<% if(@edit) %>
 <form action="/project/save">
+<% end %>
 
 <div id="projects" style="display:block">
   <%= render_partial("project", @project) %>
@@ -61,6 +63,8 @@ trackers = [
   <%= render_partial("trackers", @trackers) %>
 </div>
 
+<% if(@edit) %>
   <input type="submit" value="Save"/>
   
 </form>
+<% end %>
