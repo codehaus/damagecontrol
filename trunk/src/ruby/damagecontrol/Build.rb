@@ -57,6 +57,10 @@ module DamageControl
       end_time - start_time
     end
     
+    def is_completed?
+      status == SUCCESSFUL || status == FAILED
+    end
+    
     def initialize(project_name = nil, config={})
       @project_name = project_name
       @config = config

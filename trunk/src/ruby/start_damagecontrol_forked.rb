@@ -1,7 +1,3 @@
-$:<<'../../lib'
-$:<<"../../src/ruby" 
-$:<<"src/ruby" 
-
 require 'simple' 
 require 'damagecontrol/Hub' 
 require 'damagecontrol/SocketTrigger' 

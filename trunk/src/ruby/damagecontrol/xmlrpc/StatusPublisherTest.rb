@@ -6,17 +6,19 @@ require 'mockit'
 require 'xmlrpc/server'
 require 'xmlrpc/parser'
 require 'webrick'
+require 'rexml/document'
 require 'net/http'
 require 'damagecontrol/BuildScheduler'
 require 'damagecontrol/BuildExecutor'
 require 'damagecontrol/HubTestHelper'
-require 'damagecontrol/publisher/XMLRPCStatusPublisher'
+require 'damagecontrol/xmlrpc/StatusPublisher'
 require 'damagecontrol/BuildHistoryRepository'
 require 'damagecontrol/AbstractBuildHistoryTest'
 
 module DamageControl
+module XMLRPC
   
-  class XMLRPCStatusPublisherTest < AbstractBuildHistoryTest
+  class StatusPublisherTest < AbstractBuildHistoryTest
     
     XMLRPC_CALL_DATA = <<-EOF
     <?xml version="1.0" encoding="ISO-8859-1"?>
@@ -36,8 +38,8 @@ module DamageControl
 
     # This is an acceptance test
     def test_xml_rpc_response_is_of_expected_format
-      xmlrpc_servlet = XMLRPC::WEBrickServlet.new
-      XMLRPCStatusPublisher.new(xmlrpc_servlet, @bhp)
+      xmlrpc_servlet = ::XMLRPC::WEBrickServlet.new
+      StatusPublisher.new(xmlrpc_servlet, @bhp)
 
       httpserver = WEBrick::HTTPServer.new(:Port => 4719)
       httpserver.mount("/test", xmlrpc_servlet)
@@ -54,7 +56,6 @@ module DamageControl
       h = Net::HTTP.new('localhost', 4719)
       resp, data = h.post2('/test', XMLRPC_CALL_DATA, header)
       
-      
       pref = {:ignore_whitespace_nodes=>:all}
       a = ""
       REXML::Document.new( data, pref ).write(a)
@@ -66,4 +67,6 @@ module DamageControl
       end
     end
   end
+  
+end
 end

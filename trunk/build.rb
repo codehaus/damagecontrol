@@ -13,7 +13,7 @@ class Project
   
   def run_test(test)
     Dir.chdir("#{$damagecontrol_home}/src/ruby")
-    system("ruby #{test}") || fail
+    system("ruby -I#{$damagecontrol_home}/lib #{test}") || fail
     fail if ($? != 0)
   end
 

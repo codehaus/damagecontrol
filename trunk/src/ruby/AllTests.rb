@@ -1,5 +1,3 @@
-$:<<'../../lib'
-
 require 'damagecontrol/Logging'
 DamageControl::Logging.silent
 
@@ -15,7 +13,7 @@ require 'damagecontrol/TimerTest'
 require 'damagecontrol/SlotTest'
 require 'damagecontrol/LogWriterTest'
 require 'damagecontrol/SocketTriggerTest'
-require 'damagecontrol/XMLRPCTriggerTest'
+require 'damagecontrol/xmlrpc/TriggerTest'
 require 'damagecontrol/SelfUpgraderTest'
 require 'damagecontrol/BuildExecutorTest'
 require 'damagecontrol/BuildSchedulerTest'
@@ -25,7 +23,7 @@ require 'damagecontrol/publisher/IRCPublisherTest'
 require 'damagecontrol/publisher/FilePublisherTest'
 require 'damagecontrol/publisher/EmailPublisherTest'
 require 'damagecontrol/BuildHistoryRepositoryTest'
-require 'damagecontrol/publisher/XMLRPCStatusPublisherTest'
+require 'damagecontrol/xmlrpc/StatusPublisherTest'
 require 'damagecontrol/publisher/JabberPublisherTest'
 require 'damagecontrol/publisher/JIRAPublisherTest'
 

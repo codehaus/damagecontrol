@@ -22,6 +22,11 @@ module DamageControl
       false
     end
     
+    def script_file(file)
+      return "#{file}.bat" if windows?
+      "#{file}.sh"
+    end
+  
     def path_separator
       windows? ? "\\" : "/"
     end

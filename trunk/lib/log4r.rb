@@ -3,7 +3,7 @@
 # == Other Info
 #
 # Author::      Leon Torres
-# Version::     $Id: log4r.rb,v 1.1 2004/03/31 19:02:48 tirsen Exp $
+# Version::     $Id: log4r.rb,v 1.2 2004/04/21 21:33:12 tirsen Exp $
 
 require "log4r/outputter/fileoutputter"
 require "log4r/outputter/consoleoutputters"

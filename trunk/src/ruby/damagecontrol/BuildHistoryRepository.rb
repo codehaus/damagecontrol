@@ -5,9 +5,9 @@ require 'damagecontrol/pebbles/TimeUtils'
 
 # Captures and persists build history
 # Instances of this class can also be reached
-# through XML-RPC - See XMLRPCStatusPublisher.rb
+# through XML-RPC - See xmlrpc/StatusPublisher.rb
 # 
-# Authors: Steven Meyfroidt, Aslak Hellesoy
+# Authors: Steven Meyfroidt, Aslak Hellesoy, Jon Tirsen
 module DamageControl
 
   class BuildHistoryRepository < AsyncComponent
@@ -24,6 +24,14 @@ module DamageControl
         end
         @filename = expanded
       end
+    end
+    
+    def current_build(project_name)
+      build_history(project_name).reverse[0]
+    end
+    
+    def last_completed_build(project_name)
+      build_history(project_name).reverse.find {|build| build.is_completed?}
     end
     
     def last_succesful_build(project_name)
