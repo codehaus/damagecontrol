@@ -14,6 +14,7 @@ Changed paths:
    M /damagecontrolled/src/java/com/thoughtworks/damagecontrolled/Thingy.java
 
 changed something
+else
 ------------------------------------------------------------------------
 EOF
 
@@ -24,6 +25,7 @@ Changed paths:
    M \\damagecontrolled\\src\\java\\com\\thoughtworks\\damagecontrolled\\Thingy.java
 
 changed something
+else
 ------------------------------------------------------------------------
 EOF
     
@@ -39,7 +41,7 @@ EOF
       assert_equal("2", changeset.revision)
       assert_equal("ahelleso", changeset.developer)
       assert_equal(Time.utc(2004,7,11,13,29,35), changeset.time)
-      assert_equal("changed something", changeset.message)
+      assert_equal("changed something\nelse", changeset.message)
 
       assert_equal(2, changeset.length)
       assert_equal("build.xml", changeset[0].path)
@@ -50,7 +52,7 @@ EOF
     end
 
     def test_parses_entire_log_into_changesets
-      File.open("#{damagecontrol_home}/testdata/proxytoys-svn.log") do |io|
+      File.open(File.dirname(__FILE__) + "/proxytoys-svn.log") do |io|
         parser = SVNLogParser.new(io, "trunk/proxytoys", nil)
 
         start_date = Time.utc(2004,02,13,19,02,44,0)

@@ -1,13 +1,15 @@
 require 'yaml'
 require 'test/unit'
 require 'rscm/changes'
+require 'rscm/tracker'
+require 'rscm/scm_web'
 
 module RSCM
   class ChangesTest < Test::Unit::TestCase
     
     def setup
-      @change1 = Change.new("path/one",   "jon",   "tjo bing",    "1.1", Time.utc(2004,7,5,12,0,2))
-      @change2 = Change.new("path/two",   "jon",   "tjo bing",    "1.2", Time.utc(2004,7,5,12,0,4))
+      @change1 = Change.new("path/one",   "jon",   "Fixed CATCH-22", "1.1", Time.utc(2004,7,5,12,0,2))
+      @change2 = Change.new("path/two",   "jon",   "Fixed CATCH-22", "1.2", Time.utc(2004,7,5,12,0,4))
       @change3 = Change.new("path/three", "jon",   "hipp hurra",  "1.3", Time.utc(2004,7,5,12,0,6))
       @change4 = Change.new("path/four",  "aslak", "hipp hurraX", "1.4", Time.utc(2004,7,5,12,0,8))
       @change5 = Change.new("path/five",  "aslak", "hipp hurra",  "1.5", Time.utc(2004,7,5,12,0,10))
@@ -74,17 +76,6 @@ module RSCM
       assert_same(@change4, hipp_hurraX_changeset[0])
     end
 
-    def test_to_rss_description
-      changesets = ChangeSets.new
-      @change1.status = Change::ADDED
-      changesets.add(@change1)
-      changesets.add(@change4)
-      description = changesets.to_rss_description
-      assert_equal("jon", description.get_text("p[1]/strong").value)
-      assert_equal("Added path/one", description.get_text("p[1]/ul/li").value)
-      assert_equal("aslak", description.get_text("p[2]/strong").value)      
-    end
-    
     def test_should_sort_by_time
       changesets = ChangeSets.new
       changesets.add(@change1)
@@ -117,6 +108,26 @@ module RSCM
       changeset << Change.new(nil, nil, nil, nil, Time.utc(2005))
       changeset << Change.new(nil, nil, nil, nil, Time.utc(2003))
       assert_equal(Time.utc(2005), changeset.time)
+    end
+
+    def test_rss
+      changesets = ChangeSets.new
+      changesets.add(@change1)
+      changesets.add(@change2)
+      changesets.add(@change3)
+
+      jira = Tracker::JIRA.new
+      jira.jira_url = "http://jira.codehaus.org/"
+
+      view_cvs = SCMWeb::ViewCVS.new
+      view_cvs.view_cvs_url = "http://cvs.damagecontrol.codehaus.org/"
+
+      puts changesets.to_rss(
+        "DamageControl Changesets", 
+        "http://damagecontrol.codehaus.org/", 
+        "This feed contains SCM changes for the DamageControl project", 
+        jira, 
+        view_cvs)
     end
 
   end

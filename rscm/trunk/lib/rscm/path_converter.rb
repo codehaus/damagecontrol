@@ -33,9 +33,19 @@ module RSCM
         path
       end
     end
+    
+    def ensure_trailing_slash(url)
+      return nil if url.nil?
+      if(url && url[-1..-1] != "/")
+        "#{url}/"
+      else
+        url
+      end
+    end
 
     module_function :filepath_to_nativepath
     module_function :filepath_to_nativeurl
     module_function :nativepath_to_filepath
+    module_function :ensure_trailing_slash
   end
 end

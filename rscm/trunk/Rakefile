@@ -31,5 +31,6 @@ Rake::RDocTask.new { |rdoc|
   rdoc.options << '--line-numbers --inline-source --main README'
   rdoc.rdoc_files.include('README')
   rdoc.rdoc_files.include('lib/**/*.rb')
+  rdoc.rdoc_files.include('docs/**/*.rd')
 }
 

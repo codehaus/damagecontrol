@@ -17,6 +17,10 @@ module RSCM
     attr_accessor :cvsbranch
     attr_accessor :cvspassword
     
+    def initialize(cvsroot, cvsmodule, cvsbranch=nil, cvspassword=nil)
+      @cvsroot, @cvsmodule, @cvsbranch, @cvspassword = cvsroot, cvsmodule, cvsbranch, cvspassword
+    end
+
     def name
       "CVS"
     end
@@ -30,17 +34,18 @@ module RSCM
       cvs(checkout_dir, "add #{relative_filename}")
     end
 
-    # The extra simulate parameter is not in accordance with the RSCM scm API,
+    # The extra simulate parameter is not in accordance with the AbstractSCM API,
     # but it's optional and is only being used from within this class (uptodate? method).
-    def checkout(checkout_dir, scm_to_time=nil, simulate=false, &line_proc)
+    def checkout(checkout_dir, to_identifier=nil, simulate=false)
       checked_out_files = []
       if(checked_out?(checkout_dir))
         path_regex = /^[U|P] (.*)/
-        cvs(checkout_dir, update_command(scm_to_time), simulate) do |line, err|
+        cvs(checkout_dir, update_command(to_identifier), simulate) do |line|
           if(line =~ path_regex)
-            checked_out_files << $1.chomp
+            path = $1.chomp
+            yield path if block_given?
+            checked_out_files << path
           end
-          line_proc.call(line) if block_given?
         end
       else
         prefix = File.basename(checkout_dir)
@@ -50,11 +55,12 @@ module RSCM
         target_dir = File.basename(checkout_dir)
         run_checkout_command_dir = File.dirname(checkout_dir)
         # -D is sticky, but subsequent updates will reset stickiness with -A
-        cvs(run_checkout_command_dir, checkout_command(scm_to_time, target_dir), simulate) do |line, err|
+        cvs(run_checkout_command_dir, checkout_command(to_identifier, target_dir), simulate) do |line|
           if(line =~ path_regex)
-            checked_out_files << $1.chomp
+            path = $1.chomp
+            yield path if block_given?
+            checked_out_files << path
           end
-          line_proc.call(line) if block_given?
         end
       end
       checked_out_files.sort!
@@ -78,19 +84,23 @@ module RSCM
       files.empty?
     end
 
-    def changesets(checkout_dir, scm_from_time, scm_to_time, files, &line_proc)
+    def changesets(checkout_dir, from_identifier, to_identifier=nil, files=nil)
       begin
-        parse_log(checkout_dir, new_changes_command(scm_from_time, scm_to_time, files), &line_proc)
+        parse_log(checkout_dir, new_changes_command(from_identifier, to_identifier, files))
       rescue => e
-        parse_log(checkout_dir, old_changes_command(scm_from_time, scm_to_time, files), &line_proc)
+        parse_log(checkout_dir, old_changes_command(from_identifier, to_identifier, files))
       end
     end
     
-    def install_trigger(trigger_command, trigger_files_checkout_dir, &line_proc)
+    def apply_label(checkout_dir, label)
+      cvs(checkout_dir, "tag -c #{label}")
+    end
+    
+    def install_trigger(trigger_command, trigger_files_checkout_dir)
       raise "cvsmodule can't be null or empty" if (cvsmodule.nil? || cvsmodule == "")
 
       cvsroot_cvs = create_cvsroot_cvs
-      cvsroot_cvs.checkout(trigger_files_checkout_dir, nil, &line_proc)
+      cvsroot_cvs.checkout(trigger_files_checkout_dir, nil)
       with_working_dir(trigger_files_checkout_dir) do
         trigger_line = "#{cvsmodule} #{trigger_command}\n"
         File.open("loginfo", File::WRONLY | File::APPEND) do |file|
@@ -105,13 +115,13 @@ module RSCM
       end
     end
     
-    def trigger_installed?(trigger_command, trigger_files_checkout_dir, &line_proc)
+    def trigger_installed?(trigger_command, trigger_files_checkout_dir)
       loginfo_line = "#{cvsmodule} #{trigger_command}"
       regex = Regexp.new(Regexp.escape(loginfo_line))
 
       cvsroot_cvs = create_cvsroot_cvs
       begin
-        cvsroot_cvs.checkout(trigger_files_checkout_dir, nil, &line_proc)
+        cvsroot_cvs.checkout(trigger_files_checkout_dir, nil)
         loginfo = File.join(trigger_files_checkout_dir, "loginfo")
         return false if !File.exist?(loginfo)
 
@@ -129,12 +139,12 @@ module RSCM
       end
     end
 
-    def uninstall_trigger(trigger_command, trigger_files_checkout_dir, &line_proc)
+    def uninstall_trigger(trigger_command, trigger_files_checkout_dir)
       loginfo_line = "#{cvsmodule} #{trigger_command}"
       regex = Regexp.new(Regexp.escape(loginfo_line))
 
       cvsroot_cvs = create_cvsroot_cvs
-      cvsroot_cvs.checkout(trigger_files_checkout_dir, nil, &line_proc)
+      cvsroot_cvs.checkout(trigger_files_checkout_dir, nil)
       loginfo_path = File.join(trigger_files_checkout_dir, "loginfo")
       File.comment_out(loginfo_path, regex, "# ")
       with_working_dir(trigger_files_checkout_dir) do
@@ -170,38 +180,25 @@ module RSCM
       end
     end
 
-  # NOT PART OF PUBLIC API. EXPOSED JUST TO MAKE TESTING EASIER
-  # SHOULD IDEALLY BE MOVED TO protected OR private.
-    
-    def new_changes_command(scm_from_time, scm_to_time, files)
-      # https://www.cvshome.org/docs/manual/cvs-1.11.17/cvs_16.html#SEC144
-      # -N => Suppress the header if no revisions are selected.
-      # -S => Do not print the list of tags for this file.
-      "log #{branch_option}-N -S #{period_option(scm_from_time, scm_to_time)}"
-    end
-    
-    def old_changes_command(scm_from_time, scm_to_time, files)
-      # Many servers don't support the new -S option
-      "log #{branch_option}-N #{period_option(scm_from_time, scm_to_time)}"
-    end
-    
-    def branch_specified?
-      cvsbranch && cvsbranch.strip != ""
+  private
+
+    def cvs(dir, cmd, simulate=false)
+      dir = File.expand_path(dir)
+
+      execed_command_line = command_line(cvspassword, cmd, simulate)
+      with_working_dir(dir) do
+        IO.popen(execed_command_line) do |stdout|
+          stdout.each_line do |progress|
+            yield progress if block_given?
+          end
+        end
+      end
     end
 
-    def branch_option
-      if branch_specified? then "-r#{cvsbranch} " else "" end
+    def checkout_command(to_identifier, target_dir)
+      "checkout #{to_option(to_identifier)} -d #{target_dir} #{cvsmodule}"
     end
-    
-    def update_command(scm_to_time)
-      # get a clean copy
-      "update #{branch_option}#{to_time_option(scm_to_time)} -d -P -A"
-    end
-    
-    def checkout_command(scm_to_time, target_dir)
-      "checkout #{branch_option}#{to_time_option(scm_to_time)} -d #{target_dir} #{cvsmodule}"
-    end
-    
+
     def parse_log(checkout_dir, cmd, &proc)
       logged_command_line = command_line(hidden_password, cmd)
       yield logged_command_line if block_given?
@@ -219,23 +216,30 @@ module RSCM
       changesets
     end
 
-    def cvs(dir, cmd, simulate=false)
-      dir = File.expand_path(dir)
-      logged_command_line = command_line(hidden_password, cmd, simulate)
-      if block_given?
-        yield logged_command_line
-      end
-      execed_command_line = command_line(cvspassword, cmd, simulate)
-      with_working_dir(dir) do
-        IO.popen(execed_command_line) do |stdout|
-          stdout.each_line do |progress|
-            yield progress if block_given?
-          end
-        end
-      end
+    def new_changes_command(from_identifier, to_identifier, files)
+      # https://www.cvshome.org/docs/manual/cvs-1.11.17/cvs_16.html#SEC144
+      # -N => Suppress the header if no revisions are selected.
+      # -S => Do not print the list of tags for this file.
+      "log #{branch_option} -N -S #{period_option(from_identifier, to_identifier)}"
     end
 
-  protected
+    def branch_specified?
+      cvsbranch && cvsbranch.strip != ""
+    end
+
+    def branch_option
+      branch_specified? ? "-r#{cvsbranch}" : ""
+    end
+
+    def update_command(to_identifier)
+      # get a clean copy
+      "update #{branch_option} #{to_option(to_identifier)} -d -P -A"
+    end
+
+    def old_changes_command(from_identifier, to_identifier, files)
+      # Many servers don't support the new -S option
+      "log #{branch_option} -N #{period_option(from_identifier, to_identifier)}"
+    end
 
     def hidden_password
       if(cvspassword && cvspassword != "")
@@ -245,11 +249,11 @@ module RSCM
       end
     end
   
-    def period_option(scm_from_time, scm_to_time)
-      if(scm_from_time.nil? && scm_to_time.nil?)
+    def period_option(from_identifier, to_identifier)
+      if(from_identifier.nil? && to_identifier.nil?)
         ""
       else
-        "-d\"#{cvsdate(scm_from_time)}<=#{cvsdate(scm_to_time)}\" " 
+        "-d\"#{cvsdate(from_identifier)}<=#{cvsdate(to_identifier)}\" " 
       end
     end
       
@@ -275,8 +279,6 @@ module RSCM
         result = cvsroot
       end
     end
-    
-  private
   
     def command_line(password, cmd, simulate=false)
       cvs_options = simulate ? "-n" : ""
@@ -291,8 +293,15 @@ module RSCM
       cvs
     end
 
-    def to_time_option(time)
-      if time.nil? then "" else "-D \"#{cvsdate(time)}\"" end
+    def to_option(to_identifier)
+      option = nil
+      if(to_identifier.is_a?(Time))
+        option = "-D \"#{cvsdate(to_identifier)}\""
+      elsif(to_identifier.is_a?(String))
+        option = "-r #{to_identifier}"
+      else
+        ""
+      end
     end
 
     def commit_command(message)

@@ -1,3 +1,5 @@
 require 'rscm/changes'
-require 'rscm/cvs'
-require 'rscm/svn'
+require 'rscm/tracker'
+require 'rscm/scm_web'
+require 'rscm/cvs/cvs'
+require 'rscm/svn/svn'

@@ -1,4 +1,4 @@
-require 'rexml/document'
+require 'rss/maker'
 
 module RSCM
 
@@ -36,9 +36,9 @@ module RSCM
       @changesets.empty?
     end
 
-    # adds a Change or a ChangeSet
-    # if the argument is a Change and no corresponding ChangeSet exist,
-    # then a new ChangeSet is created, added, and the Change is added to that ChangeSet -
+    # Adds a Change or a ChangeSet.
+    # If the argument is a Change and no corresponding ChangeSet exists,
+    # a new ChangeSet is created, added, and the Change is added to that ChangeSet -
     # and then finally the newly created ChangeSet is returned.
     # Otherwise nil is returned.
     def add(change_or_changeset)
@@ -49,9 +49,6 @@ module RSCM
         changeset = @changesets.find { |a_changeset| a_changeset.can_contain?(change_or_changeset) }
         if(changeset.nil?)
           changeset = ChangeSet.new
-          changeset.developer = change_or_changeset.developer
-          changeset.message = change_or_changeset.message
-          changeset.time = change_or_changeset.time
           @changesets << changeset
           changeset << change_or_changeset
           return changeset
@@ -65,13 +62,8 @@ module RSCM
       change_or_changesets.each { |change_or_changeset| self << (change_or_changeset) }
       self
     end
-    
-    def format(template, format_time=Time.new.utc)
-      result = ""
-      each { |changeset| result << changeset.format(template, format_time) << "\n" }
-      result
-    end
 
+    # The most recent time of all the ChangeSet s.
     def time
       time = nil
       changesets.each do |changeset|
@@ -80,10 +72,25 @@ module RSCM
       time
     end
 
-    def to_rss_description
-      div = REXML::Element.new("div")
-      each { |changeset| div.add(changeset.to_rss_description) }
-      div
+    def to_rss(title, link, description, message_linker, change_linker)
+      RSS::Maker.make("2.0") do |rss|
+        rss.channel.title = title
+        rss.channel.link = link
+        rss.channel.description = description
+
+        changesets.each do |changeset|
+          item = rss.items.new_item
+          
+          item.pubDate = changeset.time
+          item.title = changeset.message
+          item.link = change_linker.changeset_url(changeset, true)
+          item.description = message_linker.highlight(changeset.message).gsub(/\n/, "<br/>\n") << "<p/>\n"
+          changeset.each do |change|
+            item.description << change_linker.change_url(change, true) << "<br/>\n"
+          end
+        end
+        rss.to_rss
+      end
     end
 
   end
@@ -104,6 +111,8 @@ module RSCM
     def << (change)
       @changes << change
       self.time = change.time if self.time.nil? || self.time < change.time unless change.time.nil?
+      self.developer = change.developer if change.developer
+      self.message = change.message if change.message
     end
 
     def [] (change)
@@ -148,19 +157,9 @@ module RSCM
     def to_s
       result = "#{revision} | #{developer} | #{time} | #{message}\n"
       self.each do |change|
-        result << "  " << change.to_s << "\n"
+        result << " " << change.to_s << "\n"
       end
       result
-    end
-
-    def to_rss_description
-      p = REXML::Element.new("p")
-      p.add_element("strong").add_text(developer)
-      p.add_element("br")
-      p.add_text(message)
-      ul = p.add_element("ul")
-      each { |change| ul.add_element("li").add_text(change.to_rss_description) }
-      p
     end
   end
 
@@ -182,17 +181,16 @@ module RSCM
     # This is a UTC ruby time
     attr_accessor :time
     
-    def initialize(path="", developer="", message="", revision="", time=nil)
+    def initialize(path=nil, developer=nil, message=nil, revision=nil, time=nil)
       @path, @developer, @message, @revision, @time = path, developer, message, revision, time
     end
   
     def to_s
-      "#{path} | #{developer} | #{revision} | #{time}"
+      "#{path} | #{revision}"
     end
 
     def to_rss_description
-      status_text = if status.nil? then "" else status.capitalize + " " end
-      status_text + path
+      status_text = status.nil? ? path : "#{status.capitalize} #{path}"
     end
   
     def developer=(developer)

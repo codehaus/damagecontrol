@@ -5,6 +5,11 @@ require 'rscm/svn/svn_log_parser'
 
 module RSCM
 
+  # RSCM implementation for Subversion.
+  #
+  # NOTE: This class has been tested on Cygwin, Windows and Linux.
+  # On Cygwin/Windows - the win32 build of svn/svnadmin must be on the path,
+  # and *not* the cygwin binaries.
   class SVN < AbstractSCM
     include FileUtils
     include RSCM::PathConverter
@@ -12,6 +17,10 @@ module RSCM
     
     attr_accessor :svnurl
     attr_accessor :svnpath
+
+    def initialize(svnurl=nil, svnpath=nil)
+      @svnurl, @svnpath = svnurl, svnpath
+    end
 
     def name
       "Subversion"
@@ -141,7 +150,7 @@ module RSCM
       svn(dir, import_cmd, &line_proc)
     end
 
-    def changesets(checkout_dir, scm_from_time, scm_to_time, files, &line_proc)
+    def changesets(checkout_dir, scm_from_time, scm_to_time=nil, files=nil, &line_proc)
       checkout_dir = filepath_to_nativepath(checkout_dir, false)
       changesets = nil
       command = "svn #{changes_command(scm_from_time, scm_to_time, files)}"
@@ -174,7 +183,7 @@ module RSCM
         end
         system("chmod g+x #{post_commit_file}")
       rescue
-        raise "Didn't have persmissions to write to #{post_commit_file}. " +
+        raise "Didn't have permission to write to #{post_commit_file}. " +
               "Try to manually add the following line:\n\n#{trigger_command}\n\n" +
               "Finally make it executable with chmod g+x #{post_commit_file}\n\n"
       end

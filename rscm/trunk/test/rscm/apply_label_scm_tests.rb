@@ -1,7 +1,6 @@
 require 'fileutils'
 
 module RSCM
-
   module GenericSCMTests
     include FileUtils
 
@@ -51,7 +50,7 @@ module RSCM
       assert_equal(1, initial_changesets.length)
       initial_changeset = initial_changesets[0]
       assert_equal(4, initial_changeset.length)
-      assert_equal("imported\nsources", initial_changeset.message)
+      assert_equal("imported sources", initial_changeset.message)
       assert(scm.uptodate?(checkout_dir))
 
       # modify file and commit it
@@ -62,7 +61,7 @@ module RSCM
       assert(scm.uptodate?(other_checkout_dir))
       assert(scm.uptodate?(checkout_dir))
 
-      scm.commit(checkout_dir, "changed\nsomething") 
+      scm.commit(checkout_dir, "changed something") 
 
       # check that we now have one more change
       changesets = scm.changesets(checkout_dir, initial_changesets.time + 1) 
@@ -71,7 +70,7 @@ module RSCM
       changeset = changesets[0]
       assert_equal(2, changeset.length)
 
-      assert_equal("changed\nsomething", changeset.message)
+      assert_equal("changed something", changeset.message)
       # why is this nil when running as the dcontrol user on codehaus? --jon
       #assert_equal(username, changeset.developer)
       assert(changeset.developer)
@@ -122,6 +121,54 @@ module RSCM
         scm.uninstall_trigger(trigger_command, trigger_files_checkout_dir)
       end
     end
+    
+    def test_label
+      work_dir = new_temp_dir
+      checkout_dir = "#{work_dir}/LabelTest"
+      repository_dir = "#{work_dir}/repository"
+      scm = create_scm(repository_dir, "damagecontrolled")
+      scm.create
+
+      import_damagecontrolled(scm, "#{work_dir}/damagecontrolled")
+
+      scm.checkout(checkout_dir)
+
+      # Some SCMs don't support labels, so we just return
+      return if scm.label(checkout_dir).nil?
+
+      # TODO: introduce a Revision class which implements comparator methods
+      assert_equal(
+        "1",
+        scm.label(checkout_dir) 
+      )
+      change_file("#{checkout_dir}/build.xml")
+      scm.commit(checkout_dir, "changed something") 
+      scm.checkout(checkout_dir, nil) 
+      assert_equal(
+        "2",
+        scm.label(checkout_dir) 
+      )
+    end
+
+    def test_apply_label
+      work_dir = new_temp_dir
+      checkout_dir = "#{work_dir}/checkout"
+      repository_dir = "#{work_dir}/repository"
+      scm = create_scm(repository_dir, "damagecontrolled")
+      scm.create
+
+      import_damagecontrolled(scm, "#{work_dir}/damagecontrolled")
+      scm.checkout(checkout_dir)
+
+      add_or_edit_and_commit_file(scm, checkout_dir, "before.txt", "Before label")
+      scm.apply_label(checkout_dir, "MY_LABEL")
+      add_or_edit_and_commit_file(scm, checkout_dir, "after.txt", "After label")
+      scm.checkout(checkout_dir, "MY_LABEL")
+      assert(File.exist?("#{checkout_dir}/before.txt"))
+      assert(!File.exist?("#{checkout_dir}/after.txt"))
+    end
+
+  private
 
     def new_temp_dir
       identifier = identifier.to_s
@@ -138,7 +185,7 @@ module RSCM
       cp_r(path, File.dirname(import_copy_dir))
       todelete = Dir.glob("#{import_copy_dir}/**/.svn")
       rm_rf(todelete)
-      scm.import(import_copy_dir, "imported\nsources")
+      scm.import(import_copy_dir, "imported sources")
     end
     
     def change_file(file)
@@ -161,54 +208,6 @@ module RSCM
       message = existed ? "editing" : "adding"
 
       scm.commit(checkout_dir, "#{message} #{relative_filename}")
-    end
-  end
-    
-  module LabelTest
-    def test_label
-      work_dir = new_temp_dir
-      checkout_dir = "#{work_dir}/LabelTest"
-      repository_dir = "#{work_dir}/repository"
-      scm = create_scm(repository_dir, "damagecontrolled")
-      scm.create
-
-      import_damagecontrolled(scm, "#{work_dir}/damagecontrolled")
-
-      scm.checkout(checkout_dir)
-
-      # TODO: introduce a Revision class which implements comparator methods
-      assert_equal(
-        "1",
-        scm.label(checkout_dir) 
-      )
-      change_file("#{checkout_dir}/build.xml")
-      scm.commit(checkout_dir, "changed something") 
-      scm.checkout(checkout_dir, nil) 
-      assert_equal(
-        "2",
-        scm.label(checkout_dir) 
-      )
-    end
-  end
-
-
-  module ApplyLabelTest
-    def test_apply_label
-      work_dir = new_temp_dir
-      checkout_dir = "#{work_dir}/checkout"
-      repository_dir = "#{work_dir}/repository"
-      scm = create_scm(repository_dir, "damagecontrolled")
-      scm.create
-
-      import_damagecontrolled(scm, "#{work_dir}/damagecontrolled")
-      scm.checkout(checkout_dir)
-
-      add_or_edit_and_commit_file(scm, checkout_dir, "before.txt", "Before label")
-      scm.apply_label(checkout_dir, "MY_LABEL")
-      add_or_edit_and_commit_file(scm, checkout_dir, "after.txt", "After label")
-      scm.checkout(checkout_dir, "MY_LABEL")
-      assert(File.exist?("#{checkout_dir}/before.txt"))
-      assert(!File.exist?("#{checkout_dir}/after.txt"))
     end
 
   end

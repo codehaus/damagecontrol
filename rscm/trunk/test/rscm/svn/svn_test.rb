@@ -7,6 +7,7 @@ module RSCM
   class SVNTest < Test::Unit::TestCase
   
     include GenericSCMTests
+    include LabelTest
 
     def create_scm(repository_root_dir, path)
       svn = SVN.new

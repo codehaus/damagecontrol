@@ -1,13 +1,66 @@
-RSCM is a Ruby API for various Source Control Management systems.
-RSCM's API allows developers to administer and access SCMs through
-a simple object-oriented API.
+= RSCM - Ruby Source Control Management
+
+RSCM is a Ruby library for various SCM systems. RSCM provides an intuitive API
+which is described in AbstractSCM.
+
+RSCM is currently used inside DamageControl. Let us know if you use it for something else.
+
+RSCM also provides integration with issue traqcking systems and SCM web front-ends.
+
+== Supported SCMs
+
+* CVS
+* Subversion
+* P4 (in progress)
+
+== Issue trackers
+
+RSCM can recognise bug/issue numbers from a number of popular issue tracking systems.
+It can convert a simple textual SCM commit message and convert issue numbers to html
+links that can be displayed on web pages, emails and other systems.
+
+== SCM web front-ends
+
+RSCM can generate links to SCM web frontends such as Fisheye, Trac, ViewCVS and Chora.
+This way links to diffs can be easily created.
+
+== RSS 
+
+It is easy to make RSS feeds from RSCM's ChangeSets objects. RSCM provides an
+alternative to tools like CVSSpam and SVN::Notify that is portable across several
+SCMs.
+
+== YAML
+
+RSCM objects are easily serializable to YAML.
+
+== Changesets
+
+RSCM's ChangeSets support makes it possible to mimic atomic changesets for SCMs
+that don't aupport it natively (CVS, VSS).
+
+= Usage
+
+Here is an example of how to use RSCM to get a list of changes with Subversion:
+
+  require 'rscm'
+  
+  scm = RSCM::SVN.new
+  scm.svnurl = "svn://some.server/some/path/trunk"
+  scm.svnpath = "trunk"
+
+  scm.checkout("mycheckout")
+  changesets = scm.changesets("mycheckout", Time.utc(2004, 11, 10, 12, 34, 22))
+  changesets.each do |changeset|
+    puts changeset
+  end
 
 = Implementing support for a new SCM
 
 Let's write an RSCM implementation for the imaginary SCM called Mooky.
 Start by writing a test:
 
-  #link test/rscm/mooky/mooky_test.rb
+<<< test/rscm/mooky/mooky_test.rb
 
 By including GenericSCMTests your test will automatically include the
 acceptance test suite for RSCM. As you will see later, this will be of great
@@ -15,8 +68,8 @@ help when developing the Mooky class.
 
 Let's start implementing the Mooky class too:
 
-  link:README
-  #link lib/rscm/mooky/mooky.rb
+<<< Rakefile
+<<< lib/rscm/mooky/mooky.rb
 
 Try running this test:
 

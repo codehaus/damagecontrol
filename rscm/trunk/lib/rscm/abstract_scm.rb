@@ -2,97 +2,91 @@ require 'fileutils'
 require 'rscm/changes'
 require 'xmlrpc/utils'
 
-# WARNING - THIS DOCO IS CURRENTLY OUT OF DATE - PLEASE REFER TO THE README.
-# 
-# Base class for SCM (Source Control Management systems). In order to
-# add support for a new SCM (let's say it's called Snoopy):
-#
-# 1) Implement SnoopyTest that includes GenericSCMTests and implements create_scm
-#
-# 2) Implement Snoopy < RSCM::AbstractSCM.
-# Implement the following methods:
-# (The methods that take a line_proc should yield each output line from 
-# the underlying SCM command line (if appliccable))
-#
-# checkout(utc_time, &line_proc) -> Changesets
-# atomic? -> [true|false] (TODO: avoid quiet period for atomic SCMs)
-#
-# 3) Implement LocalSnoopy < Snoopy. This is to support proper compliance testing
-# as well as the possibility to create new repositories on the same machine as
-# where the DC server will be running.
-#
-# Implement the following methods:
-#
-# create(&line_proc) -> nil
-# import(dir, &line_proc) -> nil
-#
-# 4) (Optional) If the native SCM supports triggers, implement the following methods:
-# (In either Snoopy or LocalSnoopy depending on the native trigger installation mechanism)
-#
-# install_trigger(damagecontrol_install_dir, project_name, dc_xml_rpx_url) -> nil (throw ex on failure)
-# uninstall_trigger(project_name) -> nil (throw ex on failure)
-# trigger_installed?(project_name) -> [true|false]
-#
-# 5) implement snoopy_configure_form.erb
-#
-# 6) SnoopyWebConfigurator.rb
-# (TODO - a generic test for this)
-#
-# 7) (optional) snoopy_declarations.js
-#
-# 8) Add your configurator to DamageControlServer.scm_configurator_classes
-#
 module RSCM
+  # This class defines the RSCM API. The documentation of the various methods
+  # uses CVS' terminology.
+  #
+  # Some of the methods in this API use +from_identifier+ and +to_identifier+.
+  # These identifiers can be either a UTC Time (according to the SCM's clock)
+  # or a String representing a label (according to the SCM's label system).
+  #
+  # If +from_identifier+ or +to_identifier+ are +nil+ they respectively represent
+  # epoch or the infinite future.
+  #
+  # Most of the methods take a mandatory +checkout_dir+ - even if this may seem
+  # unnecessary. The reason is that some SCMs require a working copy to be checked
+  # out in order to perform certain operations. In order to develop portable code,
+  # you should always pass in a non +nil+ value for +checkout_dir+.
+  #
   class AbstractSCM
     include FileUtils
     
   public
   
-    def create(&line_proc)      
-    end
-
-    def import(dir, message, &line_proc)
-    end
-
-    def trigger_installed?(trigger_command, trigger_files_checkout_dir, &line_proc)
-    end
-
-    def install_trigger(trigger_command, damagecontrol_install_dir, &line_proc)
-    end
-
-    def uninstall_trigger(trigger_command, trigger_files_checkout_dir, &line_proc)
-    end
-
-    # Checks out a working copy.
+    # Creates a new repository. Throws an exception if the
+    # repository cannot be created.
     #
-    # checkout_dir: the local directory where the working copy will be checked out
-    # scm_to_time: optional parameter. specifies the latest timestamp (in UTC) of
-    # the files to check out. This timestamp should be according to the machine
-    # where the SCM is running.
-    #
-    # The block will receive the checked out file names one by one.
-    #
-    # returns an array of strings, each representing the relative path of a checked
-    # out file.
-    # 
-    # This method should not return or yield paths corresponding to
-    # directories - only files.
-    def checkout(checkout_dir, scm_to_time=nil, &file_proc)
+    def create      
     end
 
-    def uptodate?(checkout_dir)
-    end
-
+    # Whether a repository can be created.
+    #
     def can_create?
     end
 
+    # Recursively imports files from a directory
+    #
+    def import(dir, message)
+    end
+
     # The display name of this SCM
+    #
     def name
     end
 
-    def label(checkout_dir, &line_proc)
+    # Gets the label for the working copy currently checked out in +checkout_dir+.
+    #
+    def label(checkout_dir)
     end
     
+    # Checks out or updates contents from an SCM to +checkout_dir+ - a local working copy.
+    #
+    # The +to_identifier+ parameter may be optionally specified to obtain files up to a
+    # particular time or label. +time_label+ should either be a Time (in UTC - according to
+    # the clock on the SCM machine) or a String - reprsenting a label.
+    #
+    # This method will yield the relative file name of each checked out file, and also return
+    # them in an array. Only files, not directories, will be yielded/returned.
+    #
+    def checkout(checkout_dir, to_identifier=nil) # :yield: file
+    end
+    
+    # Returns a ChangeSets object for the period specified by +from_identifier+
+    # and +to_identifier+. See AbstractSCM for details about the parameters.
+    #
+    def changesets(checkout_dir, from_identifier, to_identifier=nil, files=nil)
+    end
+
+    # Whether the working copy in +checkout_dir+ is uptodate with the repository.
+    #
+    def uptodate?(checkout_dir)
+    end
+
+    # Whether the command denoted by +trigger_command+ is installed in the SCM.
+    #
+    def trigger_installed?(trigger_command, trigger_files_checkout_dir)
+    end
+
+    # Installs +trigger_command+ in the SCM.
+    #
+    def install_trigger(trigger_command, damagecontrol_install_dir)
+    end
+
+    # Uninstalls +trigger_command+ from the SCM.
+    #
+    def uninstall_trigger(trigger_command, trigger_files_checkout_dir)
+    end
+
     def ==(other_scm)
       return false if self.class != other_scm.class
       self.instance_variables.each do |var|
@@ -101,30 +95,7 @@ module RSCM
       true
     end
  
-    # Use this from checkout if it is a first checkout (and not "update" to use cvs terms)
-    def most_recent_timestamp(changesets)
-      most_recent = nil
-      changesets.each do |changeset|
-        if(changeset.time)
-          most_recent = changeset.time if most_recent.nil? || most_recent < changeset.time
-        else
-          logger.warn("No time for changeset:")
-          logger.warn(changeset)
-        end
-      end
-      most_recent
-    end
-
   protected
-
-    def cmd(dir, cmd, &line_proc)
-      if block_given? then yield "#{cmd}\n" else logger.debug("#{cmd}\n") end
-      cmd_with_io(dir, cmd) do |io|
-        io.each_line do |progress|
-          if block_given? then yield progress else logger.debug(progress) end
-        end
-      end
-    end
 
     def with_working_dir(dir)
       prev = Dir.pwd

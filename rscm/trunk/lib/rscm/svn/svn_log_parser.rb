@@ -20,6 +20,7 @@ module RSCM
       while(!@io.eof?)
         changeset = @changeset_parser.parse(@io, &line_proc)
         if(changeset)
+          # have to strip the last newline before -------
           after_required = start_date.nil? || start_date < changeset.time
           before_required = end_date.nil? || changeset.time <= end_date
           if(after_required && before_required)
@@ -39,6 +40,13 @@ module RSCM
       @checkout_dir = checkout_dir
     end
 
+    def parse(io, skip_line_parsing=false, &line_proc)
+      # We have to trim off the last newline - it's not meant to be part of the message
+      changeset = super
+      changeset.message = changeset.message[0..-2] if changeset
+      changeset
+    end
+
   protected
 
     def parse_line(line)
@@ -56,7 +64,7 @@ module RSCM
           @changeset << change unless File.directory?(fullpath)
         end
       elsif(@parse_state == :parse_message)
-        @changeset.message << line.chomp
+        @changeset.message << line
       end
     end
 
@@ -74,7 +82,6 @@ module RSCM
       @changeset = ChangeSet.new
       @changeset.message = ""
       revision, developer, time, the_rest = line.split("|")
-      # we don't want the r
       @changeset.revision = revision.strip[1..-1] unless revision.nil?
       @changeset.developer = developer.strip unless developer.nil?
       @changeset.time = parse_time(time.strip) unless time.nil?
@@ -83,7 +90,7 @@ module RSCM
     def parse_change(line)
       change = Change.new
       path_from_root = nil
-      if(line =~ /^   [M|A|D|R] [^\s]+ \(from (.*)\)/)
+      if(line =~ /^   [M|A|D|R] ([^\s]+) \(from (.*)\)/)
         path_from_root = $1
         change.status = Change::MOVED
       elsif(line =~ /^   ([M|A|D]) (.+)$/)
