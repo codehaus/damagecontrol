@@ -49,12 +49,13 @@
   <%
   previous_successful_build = build_history_repository.previous_successful_build(selected_build)
   previous_successful_build_link = "<a href=\"#{build_url(previous_successful_build)}\">(##{previous_successful_build.label})</a>" if previous_successful_build
+  this_build_link = "<a href=\"#{build_url(selected_build)}\">(##{selected_build.label})</a>"
   %>
 
   <table class="pane">
     <tr><td class="pane-header" colspan="3">
       <% if(previous_successful_build) %>
-        Changes since #{previous_successful_build_link}
+        Changes between this build <%= this_build_link %> and last successful build #{previous_successful_build_link}
       <% else %>
         Changes
       <% end %>
