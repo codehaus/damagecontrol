@@ -165,8 +165,8 @@ module DamageControl
       # to avoid hitting the filesystem too much to parse the build over and over.
       result = Thread.current["selected_build"]
       if(result.nil?)
-        dc_creation_time = Time.parse_ymdHMS(request.query["dc_creation_time"].to_s)
-        if dc_creation_time then
+        if(request.query["dc_creation_time"])
+          dc_creation_time = Time.parse_ymdHMS(request.query["dc_creation_time"].to_s)
           result = build_history_repository.lookup(project_name, dc_creation_time)
         else
           result = last_build

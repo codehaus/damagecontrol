@@ -17,7 +17,7 @@ module DamageControl
         response.status = WEBrick::HTTPStatus::NotModified.code
         response.body = ""
       else
-        response.body = build_history_repository.to_rss(project_name, @project_root_url + CGI.escape(project_name)).to_s
+        response.body = build_history_repository.to_rss(project_name).to_s
         response["ETag"] = current_etag
       end
     end
