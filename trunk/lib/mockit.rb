@@ -1,3 +1,5 @@
+require 'test/unit/assertions'
+
 module MockIt
   class Mock
     include Test::Unit::Assertions
@@ -23,11 +25,11 @@ module MockIt
       assert_all_expected_methods_called
     end
     
-    def method_missing(method, *args)
+    def method_missing(method, *args, &proc)
       if (is_setup_call(method)) then
-        handle_setup_call(method, *args)
+        handle_setup_call(method, *args, &proc)
       else
-        handle_expected_call(method, *args)
+        handle_expected_call(method, *args, &proc)
       end
     end
     
@@ -54,15 +56,15 @@ module MockIt
       not @setup_call_procs[method].nil?
     end
     
-    def handle_setup_call(method, *args)
-      @setup_call_procs[method].call(*args)
+    def handle_setup_call(method, *args, &proc)
+      @setup_call_procs[method].call(*args, &proc)
     end
     
-    def handle_expected_call(method, *args)
+    def handle_expected_call(method, *args, &proc)
       assert_equal(currently_expected_method, method, "got unexpected call")
       validation_proc = current_validation_proc
       next_call
-      validation_proc.call(*args)
+      validation_proc.call(*args, &proc)
     end
     
     def currently_expected_method

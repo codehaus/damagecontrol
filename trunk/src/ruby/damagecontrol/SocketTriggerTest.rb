@@ -1,4 +1,5 @@
 require 'test/unit'
+require 'mockit'
 
 require 'damagecontrol/SocketTrigger'
 require 'damagecontrol/Hub'
@@ -9,6 +10,24 @@ require 'damagecontrol/HubTestHelper'
 require 'socket'
 
 module DamageControl
+
+  class HostVerifierTest < Test::Unit::TestCase
+    def setup
+      @verifier = HostVerifier.new
+    end
+
+    def test_accepts_local_ip
+      assert(@verifier.allowed?("blah", "127.0.0.1"))
+    end
+
+    def test_accepts_local_host
+      assert(@verifier.allowed?("localhost", "128.0.0.1"))
+    end
+
+    def test_rejects_other
+      assert(!@verifier.allowed?("host.evil.com", "0.6.6.6"))
+    end    
+  end
 
   class SocketTriggerTest < Test::Unit::TestCase
     include FileUtils
@@ -22,10 +41,31 @@ module DamageControl
       @build_command_line = "echo damagecontrol rocks"
       @nag_email = "damagecontrol@codehaus.org"
     end
+
+    def test_prints_error_message_on_disallowed_host
+      socket = MockIt::Mock.new
+      socket.__setup(:peeraddr) { [nil, nil, "host.evil.com", "0.6.6.6"] }
+      socket.__expect(:print) {|message|
+        assert_match(message, /doesn't allow/)
+        assert_match(message, /host.evil.com/)
+        assert_match(message, /0.6.6.6/)
+      }
+      socket.__expect(:close) { }
+      verifier = MockIt::Mock.new
+      verifier.__expect(:allowed?) {|host, ip| 
+        assert_equal("host.evil.com", host)
+        assert_equal("0.6.6.6", ip)
+      }
+      @socket_trigger.host_verifier = verifier
+      @socket_trigger.do_accept(socket)
+      verifier.__verify
+      socket.__verify
+      assert_message_types_from_hub([])
+    end
     
     def test_fires_build_request_on_socket_accept
       
-      build = @socket_trigger.do_accept(BuildBootstrapper.build_spec(
+      build = @socket_trigger.process_payload(BuildBootstrapper.build_spec(
         @project_name, \
         @socket_triggercm_spec, \
         @build_command_line, \
@@ -39,18 +79,6 @@ module DamageControl
       
     end
 
-    def test_accepts_local_ip
-      assert(@socket_trigger.allowed?("blah", "127.0.0.1"))
-    end
-
-    def test_accepts_local_host
-      assert(@socket_trigger.allowed?("localhost", "128.0.0.1"))
-    end
-
-    def test_rejects_other
-      assert(!@socket_trigger.allowed?("blah", "128.0.0.1"))
-    end
-    
     IPCONFIG_EXE_OUTPUT = <<-EOF
 
 Windows IP Configuration

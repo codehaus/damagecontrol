@@ -83,7 +83,8 @@ class End2EndTest < Test::Unit::TestCase
 	
   def start_damagecontrol
     if(@@damagecontrol_started == false) then
-      load("#{damagecontrol_home}/src/samples/simple.rb")
+      $:<<"#{damagecontrol_home}/src/ruby"
+      require 'simple'
       start_simple_server(buildsdir, 4713)
       @@damagecontrol_started = true
     end

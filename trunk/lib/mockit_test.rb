@@ -13,7 +13,7 @@ module MockIt
         @mock.unmocked_call
       end
     end
-    
+
     def test_expected_call_works
       @mock.__expect(:expected_call)
       @mock.expected_call
@@ -40,6 +40,16 @@ module MockIt
       assert_raises(Test::Unit::AssertionFailedError) do
         @mock.expected_call("incorrect arg")
       end
+    end
+
+    def DOESNT_WORK_test_provided_block_can_validate_whether_block_was_given
+      @mock.__expect(:expect_call_with_block) { assert(block_given?) }
+      @mock.expect_call_with_block do end
+    end
+
+    def test_provided_block_can_validate_whether_block_was_not_given
+      @mock.__expect(:expect_call_without_block) { assert(!block_given?) }
+      @mock.expect_call_without_block
     end
 
     def test_provided_block_can_validate_several_arguments

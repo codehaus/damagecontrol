@@ -1,7 +1,6 @@
 #!/usr/bin/env ruby
 
-load('simple.rb')
-
+require 'simple' 
 require 'damagecontrol/Hub' 
 require 'damagecontrol/SocketTrigger' 
 require 'damagecontrol/BuildExecutor' 
