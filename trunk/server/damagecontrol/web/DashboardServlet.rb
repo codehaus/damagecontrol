@@ -16,12 +16,18 @@ module DamageControl
     end
     
     def sidepanes
-      return super unless private?
-      super +
+      result = super
+      result +=
         [
-          global_search_form,
-          task(:name => "New project", :url => "project?action=configure")
+          global_search_form
         ]
+      if private?
+        result +=
+          [
+            task(:name => "New project", :url => "project?action=configure")
+          ]
+      end
+      result
     end
   
     def default_action

@@ -75,6 +75,31 @@ date: 2003/11/09 17:53:37;  author: tirsen;  state: Exp;  lines: +3 -4
 Quiet period is configurable for each project
 EOF
 
+  LOG_ENTRY_WITH_DELETED_FILE = <<EOF
+RCS file: /scm/damagecontrol/damagecontrol/server/damagecontrol/Attic/codehaus.rb,v
+Working file: server/damagecontrol/codehaus.rb
+head: 1.23
+branch:
+locks: strict
+access list:
+keyword substitution: kv
+total revisions: 23;	selected revisions: 1
+description:
+----------------------------
+revision 1.23
+date: 2004/07/13 07:56:26;  author: tirsen;  state: dead;  lines: +0 -0
+remove username check (doesn't work on beaver)
+I do really want to see the url in irc, it's very, very convenient. thank you very much ;-)
+EOF
+
+    def test_can_parse_changes_with_deleted_file
+      changesets = ChangeSets.new
+      @parser.parse_changes(LOG_ENTRY_WITH_DELETED_FILE, changesets)
+      assert_equal(1, changesets.length)
+      assert_equal("server/damagecontrol/codehaus.rb", changesets[0][0].path)
+      assert_equal(Change::DELETED, changesets[0][0].status)
+    end
+    
     def test_log_from_e2e_test
       @parser = CVSLogParser.new(StringIO.new(LOG_FROM_E2E_TEST))
       changesets = @parser.parse_changesets
