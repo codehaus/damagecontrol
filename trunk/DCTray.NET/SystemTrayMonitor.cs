@@ -32,7 +32,6 @@ namespace ThoughtWorks.DamageControl.DCTray
 		SettingsForm settingsForm;
 		Settings settings;
 
-		Exception _agentException = null;
 		private System.Windows.Forms.MenuItem mnuForceBuild;
 		Exception _audioException = null;
 

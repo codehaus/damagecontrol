@@ -34,19 +34,22 @@ module DamageControl
       time_after = Time.now.utc
       
       # check that we now have one more change
-      changes = cvs.changes(time_before, time_after)
+      changesets = cvs.changesets(time_before, time_after)
 
-      assert_equal(1, changes.length)
-      mod = changes[0]
-      assert_equal("build.xml", mod.path)
-      assert_equal("changed something", mod.message)
+      assert_equal(1, changesets.length)
+      changeset = changesets[0]
+      assert_equal(1, changeset.length)
+
+      change = changeset[0]
+      assert_equal("build.xml", change.path)
+      assert_equal("changed something", change.message)
     end
     
-    def Xtest_can_build_a_cvs_rdiff_command_for_retrieving_the_changes_between_two_dates
+    def test_can_build_a_cvs_rdiff_command_for_retrieving_the_changes_between_two_dates
       time_before = Time.utc(2004,01,01,12,00,00) 
       time_after = Time.utc(2004,01,01,13,00,00)
-      cvs = CVS.new(":local:repo", "module", nil)
-      assert_equal("log -d\"2004-01-01 12:00:00 UTC<=2004-01-01 13:00:00 UTC\"",
+      cvs = CVS.new({"cvsroot" => ":local:repo", "cvsmodule" => "module", "working_dir_root" => "."})
+      assert_equal("log -N -S -d\"2004-01-01 12:00:00 UTC<=2004-01-01 13:00:00 UTC\"",
         cvs.changes_command(time_before, time_after))
     end
     

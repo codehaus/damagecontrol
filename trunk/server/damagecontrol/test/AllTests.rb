@@ -44,3 +44,4 @@ require 'damagecontrol/web/ConfigureProjectTest'
 require 'damagecontrol/test/IntegrationTests'
 
 require 'pebbles/RiteMeshTest'
+require 'pebbles/TimeUtilsTest'

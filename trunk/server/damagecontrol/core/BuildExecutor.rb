@@ -3,6 +3,7 @@ require 'damagecontrol/core/BuildEvents'
 require 'damagecontrol/core/AsyncComponent'
 require 'damagecontrol/util/Slot'
 require 'damagecontrol/scm/SCMFactory'
+require 'damagecontrol/scm/Changes'
 
 module DamageControl
   
@@ -59,7 +60,7 @@ module DamageControl
         # set up some environment variables the build can use
 
         ENV["DAMAGECONTROL_CHANGES"] = 
-          current_build.modification_set.collect{|m| "\"#{m.path}\"" }.join(" ") unless current_build.modification_set.nil?
+          current_build.changesets.format(CHANGESET_TEXT_FORMAT, Time.new.utc) unless current_build.changesets.nil?
 
         ENV["DAMAGECONTROL_BUILD_LABEL"] = current_build.potential_label.to_s
 
@@ -125,8 +126,13 @@ module DamageControl
         from_time = last_successful_build.timestamp_as_time        
         to_time = current_build.timestamp_as_time
         logger.info("determining change set for #{current_build.project_name}, from #{from_time} to #{to_time}")
-        current_build.modification_set = current_scm.changes(from_time, to_time) {|p| report_progress(p)}
-        logger.info("change set for #{current_build.project_name} is #{current_build.modification_set.inspect}")
+        changesets = current_scm.changesets(from_time, to_time) {|p| report_progress(p)}
+        if(changesets)
+          changesets.each do |changeset|
+            current_build.changesets << changeset 
+          end
+        end
+        logger.info("change set for #{current_build.project_name} is #{current_build.changesets.inspect}")
 
       rescue Exception => e
         logger.error "could not determine changeset: #{format_exception(e)}"

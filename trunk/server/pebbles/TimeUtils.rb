@@ -42,4 +42,35 @@ class Time
   def get_day_info
     return yday, Time.utc(utc.year, utc.month, utc.day)
   end
+
+  SECOND =   1
+  MINUTE =  60
+  HOUR   =  60 * MINUTE
+  DAY    =  24 * HOUR
+  WEEK   =   7 * DAY
+  MONTH  =  30 * DAY
+  YEAR   = 365 * DAY
+  YEARS  =   2 * YEAR
+
+  def difference_as_text(t)
+    raise "t must be a time" unless t.is_a?(Time)
+    diff = (self - t).to_i
+    case diff
+      when 0                   then "0 seconds"
+      when SECOND              then "#{diff/SECOND} second"
+      when SECOND+1..MINUTE-1  then "#{diff/SECOND} seconds"
+      when MINUTE..2*MINUTE-1  then "#{diff/MINUTE} minute"
+      when 2*MINUTE..HOUR-1    then "#{diff/MINUTE} minutes"
+      when HOUR..2*HOUR-1      then "#{diff/HOUR} hour"
+      when 2*HOUR..DAY-1       then "#{diff/HOUR} hours"
+      when DAY..2*DAY-1        then "#{diff/DAY} day"
+      when 2*DAY..WEEK-1       then "#{diff/DAY} days"
+      when WEEK..2*WEEK-1      then "#{diff/WEEK} week"
+      when 2*WEEK..MONTH-1     then "#{diff/WEEK} weeks"
+      when MONTH..2*MONTH-1    then "#{diff/MONTH} month"
+      when 2*MONTH..YEAR-1     then "#{diff/MONTH} months"
+      when YEAR..2*YEAR-1      then "#{diff/YEAR} year"
+      else                          "#{diff/YEAR} years"
+    end
+  end
 end

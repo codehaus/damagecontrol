@@ -115,9 +115,10 @@ Section "DamageControl Server" SecServer
   File /r ${RUBY_HOME}\lib\ruby\1.8\webrick\httpservlet\*.rb
     
   ;Include CVS binaries
-  SetOutPath $INSTDIR\cvs\bin
-  File /r ${CVS_HOME}\bin\cvs.exe
-  File /r ${CVS_HOME}\bin\*_protocol.dll
+;  SetOutPath $INSTDIR\cvs
+;  File /r ${CVS_HOME}\cvs.exe
+;  File /r ${CVS_HOME}\ext_protocol.dll
+;  File /r ${CVS_HOME}\pserver_protocol.dll
   
   ;Store installation folder
   WriteRegStr HKCU "Software\Modern UI Test" "" $INSTDIR

@@ -1,4 +1,5 @@
 require 'damagecontrol/core/BuildEvents'
+require 'damagecontrol/scm/Changes'
 require 'xmlrpc/utils'
 
 module DamageControl
@@ -21,7 +22,7 @@ module DamageControl
     attr_accessor :timestamp
     
     attr_accessor :config
-    attr_accessor :modification_set
+    attr_reader   :changesets
     attr_accessor :label
     attr_accessor :error_message
     attr_accessor :status
@@ -48,11 +49,11 @@ module DamageControl
       status == SUCCESSFUL
     end
     
-    def initialize(project_name = nil, timestamp = Time.now, config={})
+    def initialize(project_name = nil, timestamp = Time.new.utc, config={})
       @project_name = project_name
       @config = config
       @status = IDLE
-      @modification_set = []
+      @changesets = ChangeSets.new
       self.timestamp = timestamp
     end
     

@@ -1,9 +1,10 @@
 require 'erb'
 require 'rica/rica'
-require 'damagecontrol/util/Timer'
+require 'damagecontrol/scm/Changes'
 require 'damagecontrol/core/AsyncComponent'
 require 'damagecontrol/core/BuildEvents'
 require 'damagecontrol/util/Logging'
+require 'damagecontrol/util/Timer'
 
 module DamageControl
 
@@ -58,17 +59,6 @@ module DamageControl
         wait_until(10) { @irc.in_channel? }
       end
     end
-    
-    def format_changeset(changeset)
-      message_to_modifications = {}
-      changeset.each {|m| message_to_modifications[m.message + m.developer] = []}
-      changeset.each {|m| message_to_modifications[m.message + m.developer]<<m}
-      result = message_to_modifications.collect do |key, modifications|
-        files = modifications.collect{|m| m.path}.join(", ")
-        "\"#{modifications[0].message}\" by #{modifications[0].developer}: #{files}"
-      end
-      result.sort
-    end
   
     def process_message(message)
       ensure_in_channel
@@ -79,8 +69,9 @@ module DamageControl
       
       if message.is_a?(BuildStartedEvent)
         @irc.send_message_to_channel("[#{message.build.project_name}] BUILD STARTED")
-        format_changeset(message.build.modification_set).each do |change|
-          @irc.send_message_to_channel("[#{message.build.project_name}] #{change}")
+        message.build.changesets.each do |changeset|
+          formatted_changeset = changeset.format(CHANGESET_TEXT_FORMAT)
+          @irc.send_message_to_channel("[#{message.build.project_name}] #{formatted_changeset}")
         end
       end
       

@@ -8,23 +8,15 @@
                         <value>
                             <struct>
                                 <member>
-                                    <name>timestamp</name>
-                                    <value>
-                                        <string>20040316225946</string>
-                                    </value>
-                                </member>
-                                <member>
                                     <name>status</name>
                                     <value>
                                         <string>SUCCESSFUL</string>
                                     </value>
                                 </member>
                                 <member>
-                                    <name>modification_set</name>
+                                    <name>timestamp</name>
                                     <value>
-                                        <array>
-                                            <data/>
-                                        </array>
+                                        <string>20040316225946</string>
                                     </value>
                                 </member>
                                 <member>
@@ -35,6 +27,27 @@
                                                 <name>build_command_line</name>
                                                 <value>
                                                     <string>Apple1</string>
+                                                </value>
+                                            </member>
+                                        </struct>
+                                    </value>
+                                </member>
+                                <member>
+                                    <name>changesets</name>
+                                    <value>
+                                        <struct>
+                                            <member>
+                                                <name>changesets</name>
+                                                <value>
+                                                    <array>
+                                                        <data/>
+                                                    </array>
+                                                </value>
+                                            </member>
+                                            <member>
+                                                <name>___class___</name>
+                                                <value>
+                                                    <string>DamageControl::ChangeSets</string>
                                                 </value>
                                             </member>
                                         </struct>
@@ -57,23 +70,15 @@
                         <value>
                             <struct>
                                 <member>
-                                    <name>timestamp</name>
-                                    <value>
-                                        <string>20040316225948</string>
-                                    </value>
-                                </member>
-                                <member>
                                     <name>status</name>
                                     <value>
                                         <string>FAILED</string>
                                     </value>
                                 </member>
                                 <member>
-                                    <name>modification_set</name>
+                                    <name>timestamp</name>
                                     <value>
-                                        <array>
-                                            <data/>
-                                        </array>
+                                        <string>20040316225948</string>
                                     </value>
                                 </member>
                                 <member>
@@ -84,6 +89,127 @@
                                                 <name>build_command_line</name>
                                                 <value>
                                                     <string>Apple2</string>
+                                                </value>
+                                            </member>
+                                        </struct>
+                                    </value>
+                                </member>
+                                <member>
+                                    <name>changesets</name>
+                                    <value>
+                                        <struct>
+                                            <member>
+                                                <name>changesets</name>
+                                                <value>
+                                                    <array>
+                                                        <data>
+                                                            <value>
+                                                                <struct>
+                                                                    <member>
+                                                                        <name>changes</name>
+                                                                        <value>
+                                                                            <array>
+                                                                                <data>
+                                                                                    <value>
+                                                                                        <struct>
+                                                                                            <member>
+                                                                                                <name>message</name>
+                                                                                                <value>
+                                                                                                    <string>tjo bing</string>
+                                                                                                </value>
+                                                                                            </member>
+                                                                                            <member>
+                                                                                                <name>time</name>
+                                                                                                <value>
+                                                                                                    <dateTime.iso8601>20040705T12:00:02</dateTime.iso8601>
+                                                                                                </value>
+                                                                                            </member>
+                                                                                            <member>
+                                                                                                <name>revision</name>
+                                                                                                <value>
+                                                                                                    <string>1.1</string>
+                                                                                                </value>
+                                                                                            </member>
+                                                                                            <member>
+                                                                                                <name>path</name>
+                                                                                                <value>
+                                                                                                    <string>path/one</string>
+                                                                                                </value>
+                                                                                            </member>
+                                                                                            <member>
+                                                                                                <name>developer</name>
+                                                                                                <value>
+                                                                                                    <string>jon</string>
+                                                                                                </value>
+                                                                                            </member>
+                                                                                            <member>
+                                                                                                <name>___class___</name>
+                                                                                                <value>
+                                                                                                    <string>DamageControl::Change</string>
+                                                                                                </value>
+                                                                                            </member>
+                                                                                        </struct>
+                                                                                    </value>
+                                                                                    <value>
+                                                                                        <struct>
+                                                                                            <member>
+                                                                                                <name>message</name>
+                                                                                                <value>
+                                                                                                    <string>tjo bing</string>
+                                                                                                </value>
+                                                                                            </member>
+                                                                                            <member>
+                                                                                                <name>time</name>
+                                                                                                <value>
+                                                                                                    <dateTime.iso8601>20040705T12:00:04</dateTime.iso8601>
+                                                                                                </value>
+                                                                                            </member>
+                                                                                            <member>
+                                                                                                <name>revision</name>
+                                                                                                <value>
+                                                                                                    <string>1.2</string>
+                                                                                                </value>
+                                                                                            </member>
+                                                                                            <member>
+                                                                                                <name>path</name>
+                                                                                                <value>
+                                                                                                    <string>path/two</string>
+                                                                                                </value>
+                                                                                            </member>
+                                                                                            <member>
+                                                                                                <name>developer</name>
+                                                                                                <value>
+                                                                                                    <string>jon</string>
+                                                                                                </value>
+                                                                                            </member>
+                                                                                            <member>
+                                                                                                <name>___class___</name>
+                                                                                                <value>
+                                                                                                    <string>DamageControl::Change</string>
+                                                                                                </value>
+                                                                                            </member>
+                                                                                        </struct>
+                                                                                    </value>
+                                                                                </data>
+                                                                            </array>
+                                                                        </value>
+                                                                    </member>
+                                                                    <member>
+                                                                        <name>___class___</name>
+                                                                        <value>
+                                                                            <string>DamageControl::ChangeSet</string>
+                                                                        </value>
+                                                                    </member>
+                                                                </struct>
+                                                            </value>
+                                                        </data>
+                                                    </array>
+                                                </value>
+                                            </member>
+                                            <member>
+                                                <name>___class___</name>
+                                                <value>
+                                                    <string>DamageControl::ChangeSets</string>
                                                 </value>
                                             </member>
                                         </struct>

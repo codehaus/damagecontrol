@@ -27,9 +27,9 @@ module DamageControl
     def test_jira_issue_is_filed_upon_failing_build_complete_event    
       build = Build.new("test_project", Time.now, {"jira_project_key" => "DC"})
       build.status = Build::FAILED
-      mod = Change.new()
-      mod.developer = "damagecontrol"
-      build.modification_set <<  mod
+      change = Change.new()
+      change.developer = "damagecontrol"
+      build.changesets << change
       
       @jira_publisher.process_message(BuildCompleteEvent.new(build))
       assert_equal(

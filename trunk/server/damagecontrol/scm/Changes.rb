@@ -1,105 +1,176 @@
+require 'erb'
 require 'xmlrpc/utils'
+require 'pebbles/TimeUtils'
 
 module DamageControl
 
-  class ChangeSet < Array
+    CHANGESET_TEXT_FORMAT = <<EOF
+MAIN:<%= developer %>:<%= time.utc.strftime("%Y%m%d%H%M%S") %>
+<%= developer%>
+<%= time.utc.strftime("%d %B %Y %H:%M:%S UTC") %> (<%= time_difference %> ago)
+<%= message %>
+----<% each do |change| %>
+<%= change.path %> <%= change.revision %><% end %>
+EOF
+
+  class ChangeSets
+    include XMLRPC::Marshallable
+
+    attr_reader :changesets
+
+    def initialize()
+      @changesets = []
+    end
+
+    def [](change)
+      @changesets[change]
+    end
+
+    def each(&block)
+      @changesets.each(&block)
+    end
+    
+    def length
+      @changesets.length
+    end
+
+    def ==(other)
+      @changesets == other.changesets
+    end
+
+    def << (change_or_changeset)
+      if(change_or_changeset.is_a?(ChangeSet))
+        @changesets << change_or_changeset
+      else
+        changeset = @changesets.find { |a_changeset| a_changeset.can_contain?(change_or_changeset) }
+        if(changeset.nil?)
+          changeset = ChangeSet.new 
+          @changesets << changeset
+        end
+        changeset << change_or_changeset
+      end
+
+      self
+    end
+    
+    def push(*change_or_changesets)
+      change_or_changesets.each { |change_or_changeset| self << (change_or_changeset) }
+      self
+    end
+    
+    def format(template, format_time=Time.new.utc)
+      result = ""
+      each { |changeset| result << changeset.format(template, format_time) << "\n" }
+      result
+    end
+
+  end
+
+  class ChangeSet
+    include XMLRPC::Marshallable
+
+    attr_reader :changes
+
+    def initialize()
+      @changes = []
+    end
+    
+    def << (change)
+      @changes << change
+    end
+
+    def [] (change)
+      @changes[change]
+    end
+
+    def each(&block)
+      @changes.each(&block)
+    end
+    
+    def length
+      @changes.length
+    end
+    
+    def ==(other)
+      @changes == other.changes
+    end
+
     def developer
-      self[0].developer
+      @changes[0].developer
     end
 
     def message
-      self[0].message
+      @changes[0].message
     end
 
     def time
-      self[0].time
+      @changes[0].time
+    end
+    
+    def can_contain?(change)
+      self.developer == change.developer &&
+      self.message == change.message
+    end
+
+    def format(template, format_time=Time.new.utc)
+      time_difference = format_time.difference_as_text(time)
+      ERB.new(template).result(binding)
     end
   end
 
   class Change
     include XMLRPC::Marshallable
-
+    
     def initialize(path="", developer="", message="", revision="", time="")
-      self.path, self.developer, self.message, self.revision, self.time = 
-        path, developer, message, revision, time
+      @path, @developer, @message, @revision, @time = path, developer, message, revision, time
     end
   
     def to_s
       "#{path} #{developer} #{revision} #{time}"
     end
   
-    attr_accessor :path
+    attr_accessor :deleted
     attr_accessor :developer
     attr_accessor :message
-    attr_accessor :revision
+    attr_accessor :path
     attr_accessor :previous_revision
-    # This is an UTC ruby time
+    attr_accessor :revision
+    # This is a UTC ruby time
     attr_accessor :time
+    
+    def developer=(developer)
+      raise "can't be null" if developer.nil?
+      @developer = developer
+    end
     
     def message=(message)
       raise "can't be null" if message.nil?
       @message = message
     end
 
-    def developer=(developer)
-      raise "can't be null" if developer.nil?
-      @developer = developer
+    def path=(path)
+      raise "can't be null" if path.nil?
+      @path = path
     end
-    
+
+    def revision=(revision)
+      raise "can't be null" if revision.nil?
+      @revision = revision
+    end
+
+    def time=(time)
+      raise "time must be a Time object" unless time.is_a?(Time)
+      @time = time
+    end
+
     def ==(change)
       self.path == change.path &&
-        self.developer == change.developer &&
-        self.message == change.message &&
-        self.revision == change.revision &&
-        self.time == change.time
-    end
-  end
-
-  module ChangeUtils
-    def changes_within_period(changes, from_time, to_time)
-      changes_within_period = []
-      last_change = nil
-      changes.each do |change|
-        above = to_time - change.time
-        below = change.time - from_time
-        if(0 <= above && 0 <= below)
-          changes_within_period << change
-          last_change = change
-        end
-        # find the previous revision
-        if(last_change && (last_change.path == change.path) && (last_change.revision != change.revision) && last_change.previous_revision.nil?)
-          last_change.previous_revision = change.revision
-        end
-      end
-      changes_within_period
+      self.developer == change.developer &&
+      self.message == change.message &&
+      self.revision == change.revision &&
+      self.time == change.time
     end
 
-    def convert_changes_to_changesets(changes)
-      changesets = []
-      changes.each do |change|
-        with_matching_changeset(changesets, change) do |changeset|
-          changeset << change
-          changesets << changeset unless changesets.index(changeset)
-        end
-      end
-      changesets
-    end
-
-  private
-
-    def with_matching_changeset(changesets, change)
-      matching_changeset = nil
-      changesets.each do |changeset|
-        # consider match if developer and message is same
-        if(changeset.developer == change.developer && changeset.message == change.message)
-          matching_changeset = changeset
-        end
-      end
-      if matching_changeset.nil?
-        matching_changeset = ChangeSet.new 
-      end
-      yield matching_changeset
-    end
   end
 
 end

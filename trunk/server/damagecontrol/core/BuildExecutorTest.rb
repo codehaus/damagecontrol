@@ -101,7 +101,7 @@ module DamageControl
       }
       mock_scm = MockIt::Mock.new
       mock_scm.__setup(:working_dir) { checkoutdir }
-      mock_scm.__expect(:changes) {|from_time, to_time|
+      mock_scm.__expect(:changesets) {|from_time, to_time|
         assert_equal(last_build_time, from_time)
         assert_equal(current_build_time, to_time)
       }

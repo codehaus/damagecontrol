@@ -2,6 +2,8 @@ require 'damagecontrol/core/Build'
 require 'damagecontrol/core/AsyncComponent'
 require 'damagecontrol/core/BuildEvents'
 require 'damagecontrol/core/ProjectDirectories'
+require 'damagecontrol/scm/Changes'
+require 'damagecontrol/util/Logging'
 require 'pebbles/TimeUtils'
 require 'yaml'
 
@@ -16,6 +18,8 @@ require 'yaml'
 module DamageControl
 
   class BuildHistoryRepository < AsyncComponent
+
+    include Logging
 
     def initialize(channel, project_directories=nil)
       super(channel)
@@ -99,10 +103,12 @@ module DamageControl
       project_names.each do |project_name|
         history = history(project_name)
         history.each do |build|
-          build.modification_set.each do |modification|
-            if (!result.index(build) && criterion.match(modification.message))
-              if(required_project_name==nil || (required_project_name && build.project_name == required_project_name))
-                result << build 
+          build.changesets.each do |changeset|
+            changeset.each do |change|
+              if (!result.index(build) && criterion.match(change.message))
+                if(required_project_name==nil || (required_project_name && build.project_name == required_project_name))
+                  result << build 
+                end
               end
             end
           end
@@ -155,17 +161,43 @@ module DamageControl
       filename = history_file(project_name)
       if(File.exist?(filename))
         file = File.new(filename)
-        yaml = file.read
-        builds = YAML::load(yaml)
-        file.close
-
-        if(!builds.is_a?(Array))
-          raise "#{filename} should contain the YAML representation of a Ruby Array of Build!"
+        begin
+          yaml = file.read
+          builds = YAML::load(yaml)
+          file.close
+          verify(builds)
+        rescue Exception => e
+          begin
+            file.close
+          rescue
+          end
+          upgrade_to_new_and_store_old(filename)
+          builds = []
         end
       end
       builds
     end
     
+    def verify(builds)
+      builds.each do |build|
+        raise "Not a Build: #{build}" unless build.is_a?(Build)
+        raise "ChangeSets not initialised" unless build.changesets
+        build.changesets.each do |changeset|
+          raise "Not a ChangeSet: #{changeset}" unless changeset.is_a?(ChangeSet)
+          changeset.each do |change|
+            raise "Not a Change: #{change}" unless change.is_a?(Change)
+          end
+        end
+      end
+    end
+
+    def upgrade_to_new_and_store_old(filename)
+      backup = "#{filename}.#{Time.now.utc.to_i}.backup"
+      logger.error("#{filename} can't be parsed. might be of an older format")
+      logger.error("Copying it over to #{backup}")
+#      File.move(filename, backup)
+    end
+
     # HACK OF DEATH:
     # some xmlrpc implementations get very confused by an empty struct
     # so we'll patch it by adding a pointless property in it

@@ -1,5 +1,6 @@
 require 'damagecontrol/scm/AbstractSCM'
 require 'damagecontrol/scm/Changes'
+require 'damagecontrol/util/Logging'
 require 'ftools'
 
 module DamageControl
@@ -14,18 +15,18 @@ module DamageControl
       @had_error = false
     end
   
-    def parse_changes_from_log(io)
-      changes = []
+    def parse_changesets_from_log(io)
+      changesets = ChangeSets.new
       while(log_entry = read_log_entry(io))
         @log<<log_entry
         @log<<""
         begin
-          changes += parse_changes(log_entry)
+          parse_changes(log_entry, changesets)
         rescue Exception => e
           error("could not parse log entry: #{log_entry}\ndue to: #{format_exception(e)}")
         end
       end
-      changes
+      changesets
     end
     
     def read_log_entry(io)
@@ -46,6 +47,7 @@ module DamageControl
       return nil if io.eof?
       result = ""
       io.each_line do |line|
+        @current_line += 1
         break if line=~regexp
         result<<line
       end
@@ -68,20 +70,15 @@ module DamageControl
       entries
     end
     
-    def parse_changes(log_entry)
+    def parse_changes(log_entry, changesets)
       entries = split_entries(log_entry)
 
-      path = parse_path(entries[0])
-      
-      changes = []
-      
       entries[1..entries.length].each do |entry|
         change = parse_change(entry)
-        change.path = path
-        changes<<change
+        change.path = parse_path(entries[0])
+        changesets << change
       end
-      
-      changes
+      nil
     end
     
     def parse_path(first_entry)
@@ -108,11 +105,16 @@ module DamageControl
          
       change_entry = change_entry.split(/\r?\n/)
       change = Change.new
-         
-      change.revision = extract_match(change_entry[0], /revision (.*)/)
+
+      change.revision = extract_match(change_entry[0], /revision (.*)$/)
+
+#puts change_entry[0]
+#puts change.revision 
+
       change.previous_revision = determine_previous_revision(change.revision)
       change.time = parse_cvs_time(extract_required_match(change_entry[1], /date: (.*?)(;|$)/))
       change.developer = extract_match(change_entry[1], /author: (.*?);/)
+      change.deleted = extract_match(change_entry[1], /state: (.*?);/) == "dead"
       change.message = change_entry[2..-1].join("\n")
          
       change

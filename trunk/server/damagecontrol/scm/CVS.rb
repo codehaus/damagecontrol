@@ -12,8 +12,6 @@ module DamageControl
   # prior to starting damagecontrol. (TODO: fix that!) 
   class CVS < AbstractSCM
   
-    include ChangeUtils
-  
     attr_reader :cvsroot
     
     def initialize(config_map)
@@ -58,10 +56,10 @@ module DamageControl
       File.join(working_dir_root, mod)
     end
     
-    def changes(from_time, to_time)
+    def changesets(from_time, to_time)
       # exclude commits that occured on from_time
       from_time = from_time + 1
-      all_changes = with_working_dir(working_dir) do
+      with_working_dir(working_dir) do
         command = changes_command(from_time, to_time)
         log = ""
         yield command if block_given?
@@ -75,18 +73,15 @@ module DamageControl
         parser = CVSLogParser.new
         parser.cvspath = path
         parser.cvsmodule = mod
-        parser.parse_changes_from_log(StringIO.new(log))
+        parser.parse_changesets_from_log(StringIO.new(log))
       end
-      
-      #changes_within_period = changes_within_period(all_changes, from_time, to_time)
-      #changes_within_period
-      #convert_changes_to_changesets(changes_within_period)
-      
-      all_changes
     end
     
     def changes_command(from_time, to_time)
-      "log -d\"#{cvsdate(from_time)}<=#{cvsdate(to_time)}\""
+      # https://www.cvshome.org/docs/manual/cvs-1.11.17/cvs_16.html#SEC144
+      # -N => Suppress the header if no revisions are selected.
+      # -S => Do not print the list of tags for this file.
+      "log -N -S -d\"#{cvsdate(from_time)}<=#{cvsdate(to_time)}\""
     end
     
     def cvsdate(time)
@@ -257,7 +252,7 @@ puts result
         "ruby"
       else
         "/home/services/dcontrol/ruby/bin/ruby"
-#        "ruby"
+        "ruby"
       end
     end
     

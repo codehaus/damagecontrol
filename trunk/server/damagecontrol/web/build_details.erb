@@ -67,34 +67,33 @@ build = build_history_repository.lookup(project_name, request.query["timestamp"]
         Changes
       <% end %>
     </td></tr>
-    <% if build.modification_set.nil? || build.modification_set.empty? then %>
+    <% if(build.changesets.length == 0)then %>
       <tr>
         <td colspan="4">
           No changes in this build
         </td>
       </tr>
     <% else %>
-      <tr class="pane">
-        <th class="pane">Developer</td>
-        <th class="pane">File</td>
-        <th class="pane">Revision</td>
-        <th class="pane">Message</td>
-      </tr>
       <%
-      build.modification_set.each do |modification|
+      build.changesets.each do |changeset|
       %>
+        <tr class="pane">
+          <td colspan="2" class="changeset">#{changeset.developer} : #{changeset.message}</td>
+        </tr>
+        <%
+        changeset.each do |change|
+        %>
         <tr>
-          <td><%= modification.developer %></td>
           <td>
-            <% if scm_url(project_name, modification) then %>
-              <a href="<%= scm_url(project_name, modification) %>"><%= modification.path %></a>
+            <% if scm_url(project_name, change) then %>
+              <a href="<%= scm_url(project_name, change) %>"><%= change.path %></a>
             <% else %>
-              <%= modification.path %>
+              <%= change.path %>
             <% end %>
           </td>
-          <td><%= modification.revision %></td>
-          <td><%= modification.message %></td>
+          <td><%= change.revision %></td>
         </tr>
+        <% end %>
       <% end %>
     <% end %>
   </table>

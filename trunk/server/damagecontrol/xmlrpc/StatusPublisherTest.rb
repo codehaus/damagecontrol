@@ -7,10 +7,11 @@ require 'rexml/document'
 require 'net/http'
 require 'damagecontrol/core/BuildScheduler'
 require 'damagecontrol/core/BuildExecutor'
-require 'damagecontrol/util/HubTestHelper'
-require 'damagecontrol/xmlrpc/StatusPublisher'
 require 'damagecontrol/core/BuildHistoryRepository'
 require 'damagecontrol/core/AbstractBuildHistoryTest'
+require 'damagecontrol/scm/Changes'
+require 'damagecontrol/util/HubTestHelper'
+require 'damagecontrol/xmlrpc/StatusPublisher'
 
 module DamageControl
 module XMLRPC
@@ -37,6 +38,10 @@ module XMLRPC
     def test_xml_rpc_response_is_of_expected_format
       xmlrpc_servlet = ::XMLRPC::WEBrickServlet.new
       StatusPublisher.new(xmlrpc_servlet, @bhp)
+      # add some changes
+      @apple2.changesets << 
+        Change.new("path/one",   "jon",   "tjo bing",    "1.1", Time.utc(2004,7,5,12,0,2)) <<
+        Change.new("path/two",   "jon",   "tjo bing",    "1.2", Time.utc(2004,7,5,12,0,4))
 
       httpserver = WEBrick::HTTPServer.new(:Port => 4719)
       httpserver.mount("/test", xmlrpc_servlet)
