@@ -366,7 +366,7 @@ class End2EndTest < Test::Unit::TestCase
   end
 
   def wait_for_build_to_complete
-    sleep 30
+    sleep 35
   end
 
   def create_file(name, content)
