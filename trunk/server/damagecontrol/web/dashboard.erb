@@ -9,6 +9,7 @@
 		projects = project_config_repository.project_names
 	%>
   
+    <div class="dashboard">
   <%
 
   projects.each do |project|
@@ -19,13 +20,10 @@
     label = ""
     label = " (##{last_successful_build.label})" if(last_successful_build)
   %>
-
-    <div class="dashboard">
-      <img src="<%= image %>" />&nbsp;<a href="<%= href %>"><%= project %><%= label %></a><br/>
-    </div>
-
+    <img src="<%= image %>" />&nbsp;<a href="<%= href %>"><%= project %><%= label %></a><br/>
   <%
   end
   %>
+    </div>
 </body>
 </html>

@@ -45,7 +45,7 @@ function distributeCvsrootFields() {
 		clearCvsFields()
 		// TODO: make CVSROOT yellow and blank all the others. Also disable submit.
 	}
-	enableOrDisableCvsFieldsAndUpdateScmSpec()
+	enableOrDisableCvsFields()
 }
 
 function clearCvsFields() {
@@ -80,10 +80,10 @@ function updateCvsRootField() {
 		document.getElementById('cvsprotocol').value + ":" +
 		userAtServerAtPort +
 		document.getElementById('cvsrepodir').value
-	enableOrDisableCvsFieldsAndUpdateScmSpec()
+	enableOrDisableCvsFields()
 }
 
-function enableOrDisableCvsFieldsAndUpdateScmSpec() {
+function enableOrDisableCvsFields() {
 	if(document.getElementById('cvsprotocol').value == "local") {
 		document.getElementById('cvsuser').disabled = true
 		document.getElementById('cvspassword').disabled = true
