@@ -110,6 +110,8 @@ module RSCM
       add_or_edit_and_commit_file(scm, checkout_dir, "src/java/com/thoughtworks/damagecontrolled/Hello.txt", "Bla bla")
       assert(!scm.uptodate?(other_checkout_dir, Time.new.utc))
       changesets = scm.changesets(other_checkout_dir, changesets.time + 1)
+      puts "**************************************"
+      puts changesets.time.inspect
       assert_equal(1, changesets.length)
       assert_equal(1, changesets[0].length)
       assert("src/java/com/thoughtworks/damagecontrolled/Hello.txt", changesets[0][0].path)

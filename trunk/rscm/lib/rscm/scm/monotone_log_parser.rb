@@ -56,17 +56,17 @@ module RSCM
             $1[14..15].to_i,
             $1[17..18].to_i
           )
-        elsif(line =~ /^ChangeLog:$/ && changeset.message.nil?)
+        elsif(line =~ /^ChangeLog:\s*$/ && changeset.message.nil?)
           state = :message
         elsif(state == :message && changeset.message.nil?)
           changeset.message = ""
         elsif(state == :message && changeset.message)
           changeset.message << line
-        elsif(line =~ /^Added files:$/)
+        elsif(line =~ /^Added files:\s*$/)
           state = :added
         elsif(state == :added)
           add_changes(changeset, line, Change::ADDED, path_revisions)
-        elsif(line =~ /^Modified files:$/)
+        elsif(line =~ /^Modified files:\s*$/)
           state = :modified
         elsif(state == :modified)
           add_changes(changeset, line, Change::MODIFIED, path_revisions)
