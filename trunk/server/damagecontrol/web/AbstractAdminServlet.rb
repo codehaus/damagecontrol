@@ -116,7 +116,12 @@ module DamageControl
       selected_build = params[:selected_build] || nil
       base_url = params[:base_url] || ""
       prefix_with_project_name = params[:prefix_with_project_name] == true || false
+      max_number_of_builds = params[:max_number_of_builds] || default_number_of_builds
       erb("components/builds_table.erb", binding)
+    end
+    
+    def default_number_of_builds
+      30
     end
     
     def task(params)
