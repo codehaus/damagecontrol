@@ -75,6 +75,8 @@ module RSCM
           monotone("heads") do |stdout|
             stdout.each_line do |line|
               next if (line =~ /^monotone:/)
+              timestamp = line.split(" ")[2]
+              true if Time.parse(timestamp) == from_identifier
             end
           end
         end
