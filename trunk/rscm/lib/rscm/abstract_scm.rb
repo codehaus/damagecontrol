@@ -44,8 +44,7 @@ module RSCM
     @@classes = []
     def self.register(cls) 
       @@classes << cls unless @@classes.index(cls)
-    end
-      
+    end      
     def self.classes
       @@classes
     end

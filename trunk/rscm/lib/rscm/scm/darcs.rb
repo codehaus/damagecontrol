@@ -5,7 +5,7 @@ require 'fileutils'
 
 module RSCM
   class Darcs < AbstractSCM
-    AbstractSCM.register(self)
+    register self
 
     def initialize(dir=nil)
       @dir = File.expand_path(dir)
