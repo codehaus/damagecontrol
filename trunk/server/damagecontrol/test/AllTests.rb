@@ -37,6 +37,8 @@ require 'damagecontrol/scm/SVNLogParserTest'
 require 'damagecontrol/util/FilePollerTest'
 require 'damagecontrol/util/SlotTest'
 require 'damagecontrol/util/TimerTest'
+require 'damagecontrol/util/FileUtilsTest'
+require 'damagecontrol/util/XMLMergerTest'
 
 require 'damagecontrol/xmlrpc/StatusPublisherTest'
 require 'damagecontrol/xmlrpc/TriggerTest'

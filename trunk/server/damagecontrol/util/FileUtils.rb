@@ -8,25 +8,33 @@ module Pebbles
       attr_accessor :command_line
       attr_accessor :environment
       attr_accessor :working_dir
+      attr_writer :join_stdout_and_stderr
       attr_reader :pid
       attr_reader :exit_code
       
       def initialize
         @stdout_pipe = IO.pipe
         @stdin_pipe = IO.pipe
+        @stderr_pipe = IO.pipe
         
         @environment = {}
+        @join_stdout_and_stderr = false
       end
     
       def stdout
-        parent_read
+        parent_stdout_read
+      end
+      
+      def stderr
+        parent_stderr_read
       end
       
       def stdin
         parent_write
       end
     
-      def execute
+      def start
+        raise "stderr stuff still does not work" unless join_stdout_and_stderr?
         @pid = fork do
           # in subprocess
           Dir.chdir(working_dir)
@@ -34,41 +42,79 @@ module Pebbles
           # both processes now have these open
           # it will not close entirely until both have closed them, which will make the child process hang
           # so we'll close these now in this process since we are not going to use them
-          parent_read.close
+          parent_stdout_read.close
+          parent_stderr_read.close
           parent_write.close
           $stdin.reopen(child_read)
-          $stdout.reopen(child_write)
-          $stderr.reopen(child_write)
+          $stdout.reopen(child_stdout_write)
+          if join_stdout_and_stderr?
+            $stderr.reopen(child_stdout_write) 
+          else
+            $stderr.reopen(child_stderr_write)
+          end
           exec(command_line)
         end
         # both processes now have these open
         # it will not close entirely until both have closed them, which will make the child process hang
         # so we'll close these now in this process since we are not going to use them
         child_read.close
-        child_write.close
+        child_stdout_write.close
+        child_stderr_write.close
+        parent_stderr_read.close if join_stdout_and_stderr?
+      end
+      
+      def execute
+        begin
+          if join_stdout_and_stderr?
+            yield stdin, stdout
+          else
+            yield stdin, stdout, stderr
+          end
+        ensure
+          close_all_streams
+        end
       end
       
       def wait
         ::Process::waitpid(pid)
         @exit_code = $?
+        close_all_streams
+      end
+      
+      def join_stdout_and_stderr?
+        @join_stdout_and_stderr
+      end
+      
+      def close_all_streams
+        stdin.close unless stdin.closed?
+        stdout.close unless stdout.closed?
+        stderr.close unless stderr.closed?
       end
   
       private
       
-        def parent_read
+        def parent_stdout_read
           @stdout_pipe[0]
         end
         
-        def child_write
+        def child_stdout_write
           @stdout_pipe[1]
         end
         
+        def parent_stderr_read
+          @stderr_pipe[0]
+        end
+        
+        def child_stderr_write
+          @stderr_pipe[1]
+        end
+        
         def parent_write
-          @stdin_pipe[0]
+          @stdin_pipe[1]
         end
         
         def child_read
-          @stdin_pipe[1]
+          @stdin_pipe[0]
         end
         
   end
@@ -149,7 +195,8 @@ module FileUtils
       p.command_line = cmd
       p.environment = environment
       p.working_dir = dir
-      p.execute
+      p.join_stdout_and_stderr = true
+      p.start
       ret = if proc.arity == 1 then proc.call(p.stdout) else proc.call(p.stdout, p.stdin) end
       p.wait
       raise ProcessFailedException.new("'#{cmd}' in directory '#{Dir.pwd}' failed with code #{p.exit_code.to_s}") if $? != 0
