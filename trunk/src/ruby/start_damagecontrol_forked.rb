@@ -22,8 +22,9 @@ Logging.quiet
 Dir.chdir(ARGV[0])
 
 start_simple_server(
-  :SocketTriggerPort => 4713, 
-  :WebPort => 8081, 
+  :SocketTriggerPort => 14711, 
+  :HttpPort => 14712,
+  :HttpsPort => 14713,
   :AllowIPs => ["127.0.0.1" ])
 irc_publisher = IRCPublisher.new(@hub, "irc.codehaus.org", '#dce2e', ShortTextTemplate.new)
 irc_publisher.handle = "server"

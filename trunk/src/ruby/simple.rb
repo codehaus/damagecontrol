@@ -22,7 +22,7 @@ def start_simple_server(params = {})
   allow_ips = params[:AllowIPs] || ["127.0.0.1"]
   port = params[:SocketTriggerPort] || 4711
   http_port = params[:HttpPort] || 4712
-  https_port = params[:HttpPort] || 4713
+  https_port = params[:HttpsPort] || 4713
 
   @hub = Hub.new
   LogWriter.new(@hub, logsdir)

@@ -111,7 +111,7 @@ class End2EndTest < Test::Unit::TestCase
     @svn_wc_checkout_dir = "#{basedir}/wc";
     @svn_wc_usage_dir = "#{@svn_wc_checkout_dir}/repo"
   end
-	
+  
   def Xteardown
     Dir.chdir(basedir)
     rmdir(@project)
@@ -122,7 +122,7 @@ class End2EndTest < Test::Unit::TestCase
   def create_cvs_repository
     system("cvs -d#{@cvsroot} init")
   end
-		
+    
   class SysOutProgressReporter
     def initialize(hub)
       hub.add_subscriber(self)
@@ -165,14 +165,14 @@ class End2EndTest < Test::Unit::TestCase
       system("ruby #{damagecontrol_home}/src/ruby/start_damagecontrol_forked.rb #{basedir}")
     }
   end
-	
+  
   def create_cvsmodule(project)
     Dir.chdir(basedir)
     File.mkpath(@project)
     Dir.chdir(@project)
     system("cvs -d#{@cvsroot} import -m 'message' #{project} VENDOR START")
   end
-	
+  
   def install_damagecontrol_into_cvs(build_command_line)
     cvs = CVS.new
     cvs.install_trigger(
@@ -182,23 +182,23 @@ class End2EndTest < Test::Unit::TestCase
           build_command_line,
           "e2eproject-dev@codehaus.org",
           "localhost",
-          "4713",
+          "14711",
           nc_exe_location)
   end
-	
-	
+  
+  
   def checkout_cvs_project(project)
     Dir.chdir(basedir)
     rmdir(project)
     system("cvs -d#{@cvsroot} co #{project}")
   end
-	
+  
   def add_file_to_cvs_project(project, file)
     Dir.chdir("#{basedir}/#{project}")
     system("cvs add #{file}")
     system("cvs com -m 'comment'")
   end
-	
+  
   def script_file(file)
     if windows?
       "#{file}.bat"
@@ -222,19 +222,19 @@ class End2EndTest < Test::Unit::TestCase
       nil
     end
   end
-	
-	def assert_file_content(expected_content, file, message)
-		assert(FileTest::exists?(file), "#{file} doesn't exist, #{message}")
-		File.open(file) do |io|
-			assert_equal(expected_content, io.gets.chomp,
-				"#{file} content wrong, #{message}")
-		end
-	end
-	
-	def delete_checked_out_project(project)
-		Dir.chdir(basedir)
-		rmdir(project)
-	end
+  
+  def assert_file_content(expected_content, file, message)
+    assert(FileTest::exists?(file), "#{file} doesn't exist, #{message}")
+    File.open(file) do |io|
+      assert_equal(expected_content, io.gets.chomp,
+        "#{file} content wrong, #{message}")
+    end
+  end
+  
+  def delete_checked_out_project(project)
+    Dir.chdir(basedir)
+    rmdir(project)
+  end
 
   def wait_less_time_than_default_quiet_period
     sleep BuildScheduler::DEFAULT_QUIET_PERIOD - 1
@@ -245,15 +245,15 @@ class End2EndTest < Test::Unit::TestCase
   end
 
   def verify_output_of_svn_build
-		assert_file_content('"Hello world from DamageControl" ', 
-			"#{builddir}/repo/buildresult.txt", 
-			"build not executed")
+    assert_file_content('"Hello world from DamageControl" ', 
+      "#{builddir}/repo/buildresult.txt", 
+      "build not executed")
   end
   
   def create_file(name, content)
-		File.open(name, "w") do |file|
-			file.puts(content)
-		end
+    File.open(name, "w") do |file|
+      file.puts(content)
+    end
   end
 
   def execute_script_commandline(name)
@@ -280,8 +280,8 @@ class End2EndTest < Test::Unit::TestCase
               'Hello world from DamageControl'
             end
     assert_file_content(expected_content,
-			build_result,
-			"build not executed")
+      build_result,
+      "build not executed")
   end
   
   def TODO_test_builds_on_svn_add
