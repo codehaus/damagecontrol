@@ -10,7 +10,8 @@ module DamageControl
     end
     
     def project_names
-      Dir["#{basedir}/*/conf.yaml"].collect {|f| File.basename(File.dirname(f)) }
+      result = Dir["#{basedir}/*/conf.yaml"].collect {|f| File.basename(File.dirname(f)) }
+      result.sort
     end
     
     def project_dir(project_name)

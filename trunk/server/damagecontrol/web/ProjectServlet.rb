@@ -58,17 +58,22 @@ module DamageControl
       
       # Uninstall the old trigger (if any)
       scm = @scm_factory.get_scm(project_config, @project_directories.checkout_dir(project_name))
-      scm.uninstall_trigger(project_name) if scm.trigger_installed?(project_name)
-      
-      # Install the trigger if trigger=xmlrpc
-      scm.install_trigger(project_name, @nudge_xmlrpc_url) if project_config["trigger"] == "xmlrpc"
+      if(!scm.nil?)
+        scm.uninstall_trigger(project_name) if scm.trigger_installed?(project_name)
+
+        # Install the trigger if trigger=xmlrpc
+        scm.install_trigger(project_name, @nudge_xmlrpc_url) if project_config["trigger"] == "xmlrpc"
+      end
       
       dashboard_redirect
     end
     
     def dashboard
-      last_status = build_status(build_history_repository.last_completed_build(project_name))
-      current_status = build_status(build_history_repository.current_build(project_name))
+      last_completed_build = build_history_repository.last_completed_build(project_name)
+      last_status = build_status(last_completed_build)
+
+      current_build = build_history_repository.current_build(project_name)
+      current_status = build_status(current_build)
 
       render("project_dashboard.erb", binding)
     end
