@@ -6,21 +6,24 @@ module DamageControl
 
   class EmailPublisher < AsyncComponent
   
-    def initialize(channel, subject_template, body_template, from, server="localhost", port=25)
+    def initialize(channel, subject_template, body_template, from, always_mail=false, server="localhost", port=25)
       super(channel)
       @subject_template = subject_template
       @body_template = body_template
       @from = from
+      @always_mail = always_mail
       @server = server
       @port = port
     end
   
     def process_message(message)
       if message.is_a? BuildCompleteEvent
-        if(nag_email = message.build.config["nag_email"])
-          subject = @subject_template.generate(message.build)
-          body = @body_template.generate(message.build)
-          sendmail(subject, body, @from, nag_email)
+        if(!message.build.successful || always_mail)
+          if(nag_email = message.build.config["nag_email"])
+            subject = @subject_template.generate(message.build)
+            body = @body_template.generate(message.build)
+            sendmail(subject, body, @from, nag_email)
+          end
         end
       end
     end
