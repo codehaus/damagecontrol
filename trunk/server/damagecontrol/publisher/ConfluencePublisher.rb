@@ -1,11 +1,10 @@
-require 'damagecontrol/AsyncComponent'
 require "xmlrpc/client"
 
 # Authors: Zohar Melamed, Aslak Hellesoy
 #
 module DamageControl
 
-  class ConfluencePublisher < AsyncComponent
+  class ConfluencePublisher
   
     def initialize(url, user, password)
       @user = user

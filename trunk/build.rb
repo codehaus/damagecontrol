@@ -98,7 +98,7 @@ class Project
   def test
     clean
     unit_test
-#    integration_test
+    integration_test
   end
   
   def existing_file(file)

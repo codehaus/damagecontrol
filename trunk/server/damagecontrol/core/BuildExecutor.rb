@@ -1,7 +1,6 @@
 require 'pebbles/Space'
 require 'damagecontrol/core/Build'
 require 'damagecontrol/core/BuildEvents'
-require 'damagecontrol/core/AsyncComponent'
 require 'damagecontrol/scm/Changes'
 require 'damagecontrol/scm/AbstractSCM'
 require 'damagecontrol/util/FileUtils'

@@ -2,12 +2,12 @@ require 'erb'
 require 'net/smtp'
 require 'damagecontrol/core/Build'
 require 'damagecontrol/core/BuildEvents'
-require 'damagecontrol/core/AsyncComponent'
 require 'damagecontrol/util/Logging'
+require 'pebbles/Space'
 
 module DamageControl
 
-  class EmailPublisher < AsyncComponent
+  class EmailPublisher < Pebbles::Space
 
     include Logging
 
@@ -38,7 +38,7 @@ module DamageControl
       raise "required config parameter #{key}"
     end
   
-    def process_message(message)
+    def on_message(message)
       if message.is_a? BuildCompleteEvent
         if((Build::FAILED == message.build.status) || always_mail)
           if(nag_email = message.build.config["nag_email"])

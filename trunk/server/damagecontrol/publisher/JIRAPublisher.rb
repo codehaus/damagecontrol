@@ -1,14 +1,14 @@
 require 'erb'
 require 'damagecontrol/core/Build'
 require 'damagecontrol/core/BuildEvents'
-require 'damagecontrol/core/AsyncComponent'
+require 'pebbles/Space'
 require 'net/http'
 require 'cgi'
 
 module DamageControl
 
   # See http://www.atlassian.com/software/jira/docs/v2.4/jelly.html
-  class JIRAPublisher < AsyncComponent
+  class JIRAPublisher < Pebbles::Space
   
     def initialize(channel, template, jira_host, jira_user=ENV['JIRA_USER'], jira_password=ENV['JIRA_PASSWORD'])
       super(channel)
@@ -20,7 +20,7 @@ module DamageControl
       @template = File.new("#{template_dir}/#{template}").read
     end
   
-    def process_message(message)
+    def on_message(message)
       if message.is_a? BuildCompleteEvent
         if(Build::FAILED == message.build.status)
           puts "JIRA Publisher go failure message"

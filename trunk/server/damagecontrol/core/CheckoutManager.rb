@@ -13,22 +13,23 @@ module DamageControl
   class CheckoutManager < Pebbles::Space
     include Logging
     
-    def initialize(hub, project_directories, project_config_repository)
+    def initialize(hub, project_directories, project_config_repository, max_queue_size=10)
       super
       hub.add_subscriber(self)
       @hub = hub
       @project_directories = project_directories
       @project_config_repository = project_config_repository
-      
-      @active = []
+      @max_queue_size = max_queue_size
     end
     
     def put(event)
-      unless(@active.index(event.project_name))
-        @active << event.project_name
-        super(event)
-      else
-        logger.info("#{event.project_name} is already in the checkout queue. Not scheduling checkout.")
+      if event.is_a?(DoCheckoutEvent)
+        if(queue.size < @max_queue_size)
+          super(event)
+        else
+          logger.warn("Queue size exceeded. Not scheduling checkout for #{event.project_name}.")
+          logger.warn("Consider increasing polling intervals so checkouts don't stack up")
+        end
       end
     end
 
@@ -36,7 +37,6 @@ module DamageControl
       if event.is_a?(DoCheckoutEvent)
         checked_out_event = CheckedOutEvent.new(event.project_name, checkout(event.project_name), event.force_build)
         @hub.publish_message(checked_out_event)
-        @active.delete(event.project_name)
       end
     end
 

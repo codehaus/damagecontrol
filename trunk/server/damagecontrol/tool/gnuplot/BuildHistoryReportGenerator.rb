@@ -1,6 +1,5 @@
 require 'gplot/Gnuplot'
 require 'damagecontrol/core/Build'
-require 'damagecontrol/core/AsyncComponent'
 require 'damagecontrol/core/BuildHistoryRepository'
 require 'damagecontrol/core/ProjectDirectories'
 require 'pebbles/TimeUtils'

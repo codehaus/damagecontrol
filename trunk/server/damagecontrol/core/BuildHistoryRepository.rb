@@ -1,9 +1,9 @@
 require 'damagecontrol/core/Build'
-require 'damagecontrol/core/AsyncComponent'
 require 'damagecontrol/core/BuildEvents'
 require 'damagecontrol/core/ProjectDirectories'
 require 'damagecontrol/scm/Changes'
 require 'damagecontrol/util/Logging'
+require 'pebbles/Space'
 require 'pebbles/TimeUtils'
 require 'rexml/document'
 require 'yaml'
@@ -18,7 +18,7 @@ require 'yaml'
 # Authors: Steven Meyfroidt, Aslak Hellesoy, Jon Tirsen
 module DamageControl
 
-  class BuildHistoryRepository < AsyncComponent
+  class BuildHistoryRepository < Pebbles::Space
 
     include Logging
 
@@ -50,7 +50,7 @@ module DamageControl
       history.reverse.find {|build| build.status == Build::SUCCESSFUL}
     end
 
-    def process_message(message)
+    def on_message(message)
       if message.is_a?(BuildEvent) && !message.is_a?(BuildProgressEvent)
         register(message.build)
       end

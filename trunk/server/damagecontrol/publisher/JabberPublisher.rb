@@ -1,11 +1,11 @@
 require 'erb'
 require 'jabber4r/jabber4r'
-require 'damagecontrol/core/AsyncComponent'
 require 'damagecontrol/core/BuildEvents'
+require 'pebbles/Space'
 
 module DamageControl
 
-  class JabberPublisher < AsyncComponent
+  class JabberPublisher < Pebbles::Space
   
     attr_accessor :jabber
     attr_reader :channel
@@ -20,7 +20,7 @@ module DamageControl
       @template = File.new("#{template_dir}/#{template}").read
     end
   
-    def process_message(message)
+    def on_message(message)
       if message.is_a?(BuildCompleteEvent)
         build = message.build
         msg = ERB.new(@template).result(binding)

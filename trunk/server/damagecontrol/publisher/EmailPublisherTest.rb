@@ -1,5 +1,4 @@
 require 'test/unit'
-require 'pebbles/mockit'
 require 'damagecontrol/core/BuildEvents'
 require 'damagecontrol/core/Build'
 require 'damagecontrol/core/Hub'
@@ -30,12 +29,12 @@ module DamageControl
       build.url =  "http://moradi.com/public/project?action=build_details&project_name=cheese&timestamp=19710228234500"
       build.timestamp = Time.utc(1971,2,28,23,45,0,0)
 
-      @email_publisher.process_message(BuildCompleteEvent.new(build))
+      @email_publisher.on_message(BuildCompleteEvent.new(build))
       assert_equal("[cheese] BUILD FAILED|<a href=\"http://moradi.com/public/project?action=build_details&project_name=cheese&timestamp=19710228234500\">[cheese] BUILD FAILED</a>|noreply@somewhere.foo|somelist@someproject.bar", @email_publisher.mail_content)
     end
     
     def test_nothing_is_sent_unless_build_complete_event
-      @email_publisher.process_message(nil)
+      @email_publisher.on_message(nil)
       assert_nil(@email_publisher.mail_content)
     end
     

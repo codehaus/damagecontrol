@@ -1,12 +1,12 @@
 require 'jabber4r/jabber4r'
 require 'damagecontrol/util/Timer'
-require 'damagecontrol/core/AsyncComponent'
 require 'damagecontrol/core/BuildEvents'
 require 'damagecontrol/util/FileUtils'
+require 'pebbles/Space'
 
 module DamageControl
 
-  class YahooMessengerPublisher < AsyncComponent
+  class YahooMessengerPublisher < Pebbles::Space
   
     include FileUtils
   
@@ -23,7 +23,7 @@ module DamageControl
       @template = template
     end
   
-    def process_message(message)
+    def on_message(message)
       if message.is_a?(BuildCompleteEvent)
         build = message.build
         

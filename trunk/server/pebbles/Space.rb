@@ -52,6 +52,7 @@ module Pebbles
     
     def clear
       @in_queue.clear
+      @queue.clear
     end
     
     def empty?

@@ -1,5 +1,4 @@
 require 'test/unit'
-require 'mock_with_returns'
 require 'damagecontrol/scm/Changes'
 require 'damagecontrol/core/BuildEvents'
 require 'damagecontrol/core/Build'
@@ -31,7 +30,7 @@ module DamageControl
       change.developer = "damagecontrol"
       build.changesets.add(change)
       
-      @jira_publisher.process_message(BuildCompleteEvent.new(build))
+      @jira_publisher.on_message(BuildCompleteEvent.new(build))
       assert_equal(
     %{
 <JiraJelly xmlns:jira="jelly:com.atlassian.jira.jelly.JiraTagLib">
