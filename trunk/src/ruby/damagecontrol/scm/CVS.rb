@@ -67,8 +67,7 @@ module DamageControl
     end
 
     def checkout_command(scm_spec, directory)
-      os_directory = directory.gsub('/', path_separator)
-      "-d#{cvsroot(scm_spec)} checkout -d #{os_directory} #{mod(scm_spec)}"
+      "-d#{cvsroot(scm_spec)} checkout #{mod(scm_spec)}"
     end
 
     def update_command(scm_spec)
@@ -78,13 +77,19 @@ module DamageControl
     def checkout(scm_spec, directory, &proc)
       scm_spec = to_os_path(scm_spec)
       directory = to_os_path(File.expand_path(directory))
-      File.makedirs(directory)
       if(checked_out?(directory, scm_spec))
+        File.makedirs(directory)
         Dir.chdir(directory)
         cvs(update_command(scm_spec), &proc)
       else
+        File.makedirs(directory + "/..")
         Dir.chdir(directory + "/..")
         cvs(checkout_command(scm_spec, directory), &proc)
+        # Now just move the directory. Fix for http://jira.codehaus.org/secure/ViewIssue.jspa?key=DC-44
+        mod_directory = to_os_path(File.expand_path(mod(scm_spec)))
+
+        moved = File.move(mod_directory, directory)
+puts "#{moved} MOVINNG #{mod_directory} --> #{directory}"
       end
     end
 

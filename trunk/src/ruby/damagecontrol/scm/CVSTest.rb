@@ -67,13 +67,13 @@ module DamageControl
     def test_checkout_command
       root = to_os_path("/some/where")
       assert_equal(
-        "-d :pserver:anonymous@cvs.codehaus.org:/cvsroot/damagecontrol checkout -d #{root} damagecontrol", \
+        "-d:pserver:anonymous@cvs.codehaus.org:/cvsroot/damagecontrol checkout damagecontrol", \
         @cvs.checkout_command(":pserver:anonymous@cvs.codehaus.org:/cvsroot/damagecontrol:damagecontrol", "/some/where"))
     end
     
     def test_update_command
       assert_equal(
-        "-d :pserver:anonymous@cvs.codehaus.org:/cvsroot/damagecontrol update -d -P", \
+        "-d:pserver:anonymous@cvs.codehaus.org:/cvsroot/damagecontrol update -d -P", \
         @cvs.update_command(":pserver:anonymous@cvs.codehaus.org:/cvsroot/damagecontrol:damagecontrol"))
     end
     
