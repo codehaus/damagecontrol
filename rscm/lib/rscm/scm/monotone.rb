@@ -71,16 +71,29 @@ module RSCM
       if (!checked_out?(checkout_dir))
         false
       else
-        with_working_dir(checkout_dir) do
-          monotone("heads") do |stdout|
-            stdout.each_line do |line|
-              next if (line =~ /^monotone:/)
-              timestamp = line.split(" ")[2]
-              true if Time.parse(timestamp) == from_identifier
-            end
-          end
+        lr = local_revision(checkout_dir)
+        hr = head_revision(checkout_dir)
+        lr == hr
+      end
+    end
+
+    def local_revision(checkout_dir)
+      local_revision = nil
+      rev_file = File.expand_path("#{checkout_dir}/MT/revision")
+      local_revision = File.open(rev_file).read.strip
+      local_revision
+    end
+    
+    def head_revision(checkout_dir)
+      # FIXME: this will grab last head if heads are not merged.
+      head_revision = nil
+      monotone("heads", @branch) do |stdout|
+        stdout.each_line do |line|
+          next if (line =~ /^monotone:/)
+          head_revision = line.split(" ")[0]
         end
       end
+      head_revision
     end
 
     def changesets(checkout_dir, from_identifier, to_identifier=Time.infinity)
@@ -108,12 +121,18 @@ module RSCM
     # Checks out silently. Called by superclass' checkout.
     def checkout_silent(checkout_dir, to_identifier)
       checkout_dir = PathConverter.filepath_to_nativepath(checkout_dir, false)
-      monotone("checkout #{checkout_dir}", @branch, @key) do |stdout|
-        stdout.each_line do |line|
-          # TODO: checkout prints nothing to stdout - may be fixed in a future monotone.
-          # When/if it happens we may want to do a kosher implementation of checkout
-          # to get yields as checkouts happen.
-          yield line if block_given?
+      if checked_out?(checkout_dir)
+        with_working_dir(checkout_dir) do
+          monotone("update")
+        end
+      else
+        monotone("checkout #{checkout_dir}", @branch, @key) do |stdout|
+          stdout.each_line do |line|
+            # TODO: checkout prints nothing to stdout - may be fixed in a future monotone.
+            # When/if it happens we may want to do a kosher implementation of checkout
+            # to get yields as checkouts happen.
+            yield line if block_given?
+          end
         end
       end
     end
