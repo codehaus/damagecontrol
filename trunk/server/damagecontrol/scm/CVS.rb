@@ -39,11 +39,11 @@ module DamageControl
       url = "#{cvs_web_url_patched}#{change.path}"
       
       if(change.previous_revision)
-        # point to the viewcvs (rev) and fisheye (r) revisions (no diff view)
-        url << "?rev=#{change.revision}&r=#{change.revision}"
-      else
         # point to the viewcvs and fisheye diffs (if we know the previous revision)
         url << "?r1=#{change.previous_revision}&r2=#{change.revision}"
+      else
+        # point to the viewcvs (rev) and fisheye (r) revisions (no diff view)
+        url << "?rev=#{change.revision}&r=#{change.revision}"
       end
       url
     end
