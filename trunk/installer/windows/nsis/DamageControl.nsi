@@ -88,7 +88,6 @@ Section "DamageControl Server" SecServer
   
   SetOutPath $INSTDIR\DCTray.NET
   File ${ROOTDIR}\DCTray.NET\bin\Release\dctray.exe
-  File ${ROOTDIR}\DCTray.NET\bin\Release\dctray-settings.xml
   
   ;Include a minimal ruby installation (to reduce the size of the installer)
 
