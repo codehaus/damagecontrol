@@ -1,63 +1,12 @@
 = RSCM - Ruby Source Control Management
 
-RSCM is a Ruby library for various Source Control Management (SCM) systems. RSCM provides an intuitive API
-which is described in AbstractSCM.
+RSCM is to SCM what ODBC/JDBC is to databases - a common API to access a wide variety of SCMs. The features are roughly:
 
-bla
-bla
-
-= Feature overview
-
-* API support for several high level operations such as checkout, get changesets, check for uptodate etc.
-* Web interface based on Rails (http://www.rubyonrails.org/)
-* Generation of colourised HTML diffs.
-* Generation of RSS feeds.
-* Generation of URL links to diffs for several popular SCM web front-ends.
-* Generation of URL links to bugs/issues for several popular bug/issue trackers.
-* Changeset emulation for SCMs that don't support it natively (like CVS and StarTeam)
-* RSCM objects are easily serializable to YAML.
-* Uses UTC times according to the SCM server's clock, not the machine running RSCM.
-
-=== Future plans
-
-Implement import/export functionality to allow migrating from one SCM to another while
-keeping the history. Great for migration from archaic SCMs!
-
-Bridging: Your project uses a different SCM type than the one *you* like to use. You set up a local
-repo of your preferred SCM type, and RSCM automatically mediates changesets back and forth between the
-central SCM and your local one.
-
-== RSCM Server
-
-RSCM ships with a web app based on Rails (which you have to install separately). To launch:
-
-  ruby script/server
-  
-You also need to launch (in a separate console) the RSCM daemon process:
-
-  ruby -Ilib lib/rscm/server.rb
-  
-The daemon process is the core of RSCM, that performs SCM access. The web app communicates with this process
-over Drb. The reason why two processes are needed is due to the fact that Dir.chdir may happen in various threads,
-which would confuse the webapp if they ran in the same Ruby process. We tried with forking, but this is not 
-supported on Windows. We may support a fork-based one-process alternative for Linux/Cygwin in the future.
-
-Once the two servers are started, you can access the web app on:
-
-  http://localhost:4712/
-
-== Colourised HTML
-
-The web interface will present changesets as colourised diffs. Even for SCMs you never thought would support
-that kind of feature. (As long as there is an RSCM plugin for it).
-
-== RSS Support
-
-The RSCM daemon can generate RSS feeds for all supported SCMs. The RSS feeds will have one item per changeset.
-Each RSS item's description contains the changeset's commit message, optionally with HTML links to
-issue/bug tracker issues (if detected in the changeset's commit message). The item's description
-will also contain a list of all the modified files, optionally with HTML links to a diff page
-in an SCM web front-end.
+* Check out a working copy (with possibility to specify branch/date/label)
+* Get changesets (changesets are emulated for non-transactional SCMs like CVS and StarTeam)
+* Get diffs
+* Add and commit files
+* Manipluate triggers
 
 == Supported SCMs
 
@@ -75,38 +24,9 @@ Planned:
 
 Loads! How to add support for a new one is described further down in this file.
 
-== Supported Issue trackers
+== Related projects
 
-RSCM can recognise bug/issue numbers (in commit messages) fom a number of popular issue 
-tracking systems. It can also convert a simple textual SCM commit message to include html
-links that can be displayed on web pages, emails and other systems. The built-in RSS generator
-uses this. Currently supported trackers are:
-
-* Bugzilla - http://www.bugzilla.org/
-* JIRA - http://www.atlassian.com/software/jira/
-* RubyForge - http://rubyforge.org/
-* Scarab - http://scarab.tigris.org/
-* SourceForge - http://sourceforge.net/
-
-Planned:
-
-* Trac - http://www.edgewall.com/trac/
-* RT - http://fsck.com/projects/rt/
-
-== SCM web front-ends
-
-RSCM can generate html links to individual diff pages in SCM web frontends. These links can be 
-displayed on web pages, emails and other systems. The built-in RSS generator uses this.  
-Currently supported web front-ends are:
-
-* RSCM Built-in HTML diffs.
-* Fisheye - http://www.cenqua.com/fisheye/
-* ViewCVS - http://viewcvs.sourceforge.net/
-
-Planned:
-
-* Trac - http://www.edgewall.com/trac/
-* Chora - http://horde.org/chora/
+* DamageControl - http://damagecontrol.codehaus.org/. DamageControl adds a web interface to RSCM and tons of other features for continuous integration.
 
 == API usage
 
@@ -124,6 +44,17 @@ Here is an example of how to use RSCM to get a list of changes with Subversion:
     puts changeset
   end
 
+== Future plans
+
+=== Cross-SCM synchronisation
+
+RSCM could be used as a tool to migrate files from one SCM to another (of a different type)
+while keeping the history. -Similar to cvs2svn.
+
+RSCM could also be used as a continuous synchronisation service between SCMs. This can be very useful
+when you have to work with an SCM and you'd rather use a different one. RSCM could synchronise between
+the central SCM and one that you set up on your local machine.
+
 = Implementing support for a new SCM
 
 We'd be happy to receive contributions for more SCMs. You can always
@@ -140,13 +71,16 @@ Let's write an RSCM implementation for the imaginary SCM called Mooky.
 
 Start by writing a test:
 
-<<< test/rscm/mooky/mooky_test.rb
+  test/rscm/mooky/mooky_test.rb
 
 By including GenericSCMTests your test will automatically include the
 acceptance test suite for RSCM. As you will see later, this will be of great
-help when developing the Mooky class.
+help when developing the Mooky class. These tests will check in a test project
+and call various methods on the scm object being tested to verify that it behaves
+correctly. The test project is a Java project, but you don't need Java installed.
+They're just files.
 
-Let's start implementing the Mooky class too. Take a look at.
+Let's implement the Mooky class. Take a look at.
 
   lib/rscm/mooky/mooky.rb
 
@@ -187,9 +121,12 @@ If the SCM has a Java interface, you can take the same approach as for StarTeam.
 Java classes for Changesets that allow easy interaction between Ruby and Java over YAML. 
 You can reuse these classes for other Java based SCMs (if there are any).
 
-== Writing the web interface
+== Writing the web interface (DamageControl only)
 
-Start by creating +app/views/project/_mooky.rhtml+. 
+If you're contributing a new SCM it would be nice if you took the time to implement a web interface
+that can be used to embed it into DamageControl.
+
+In trunk/damagecontrol, start by creating +app/views/project/_mooky.rhtml+. 
 
 Create a table with 2 columns and a row for each +attr_accessor+ in the Mooky class, preferrably
 with some explanatory text for the users so they know how to fill it in.
@@ -197,8 +134,6 @@ with some explanatory text for the users so they know how to fill it in.
 You also need a javascript section at the top
 with a function called +mooky_init()+. This will be called when the page is loaded. If you don't
 have plans to do anything fancy here, just leave it blank.
-
-That's all!
 
 == Wiring it all up
 

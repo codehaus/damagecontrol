@@ -1,0 +1,75 @@
+= DamageControl - a cross platform continuous integration server.
+
+= Feature overview
+
+* Supports all SCMs supported by RSCM.
+* Web interface based on RoR (http://www.rubyonrails.org/)
+* Colourised HTML diffs.
+* RSS feeds for changesets and builds.
+* Generation of URL links to diffs for several popular SCM web front-ends.
+* Generation of URL links to bugs/issues for several popular bug/issue trackers.
+* Uses UTC times according to the SCM server's clock, not the machine running RSCM. No NTP needed!
+
+== DamageControl Server
+
+DamageControl ships with a web app based on Ruby On Rails (which you currently have to install separately). To launch:
+
+  ruby script/server
+  
+You also need to launch (in a separate console) the DamageControl daemon process:
+
+  ruby -Ilib lib/damagecontrol/server.rb
+  
+The daemon process is the core of DamageContriol that performs SCM access and executes builds. The web app communicates with this process over Drb to display results. 
+
+The reason why two processes are needed is due to the fact that Dir.chdir may happen in various threads,
+which would confuse the webapp if they ran in the same Ruby process. We tried with forking, but this is not 
+supported on Windows. We may support a fork-based one-process alternative for Linux/Cygwin in the future.
+
+Once the two servers are started, you can access the web app on:
+
+  http://localhost:4712/
+
+== Colourised HTML diffs
+
+The web interface will present changesets as colourised diffs. Even for SCMs you never thought would support
+that kind of feature. (As long as there is an RSCM plugin for it).
+
+== RSS Support
+
+The DamageControl daemon can generate RSS feeds for all supported SCMs. The RSS feeds will have one item per changeset.
+Each RSS item's description contains the changeset's commit message, optionally with HTML links to
+issue/bug tracker issues (if detected in the changeset's commit message). The item's description
+will also contain a list of all the modified files, optionally with HTML links to a diff page
+in an SCM web front-end.
+
+== Supported Issue trackers
+
+DamageControl can recognise bug/issue numbers (in commit messages) for a number of popular issue 
+tracking systems. It converts the SCM commit message to HTML with links to the issues mentioned in the commit message.
+
+* Bugzilla - http://www.bugzilla.org/
+* JIRA - http://www.atlassian.com/software/jira/
+* RubyForge - http://rubyforge.org/
+* Scarab - http://scarab.tigris.org/
+* SourceForge - http://sourceforge.net/
+* Trac - http://www.edgewall.com/trac/
+
+Planned:
+
+* RT - http://fsck.com/projects/rt/
+
+== SCM web front-ends - diffs
+
+DamageControl's web interface features colourised diffs for all changes in a changeset.
+It can also generate links to individual diff pages in other SCM web frontends:
+
+* RSCM Built-in HTML diffs.
+* Fisheye - http://www.cenqua.com/fisheye/
+* ViewCVS - http://viewcvs.sourceforge.net/
+
+Planned:
+
+* Trac - http://www.edgewall.com/trac/
+* Chora - http://horde.org/chora/
+
