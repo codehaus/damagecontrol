@@ -9,7 +9,11 @@ require 'parsedate'
 require 'stringio'
 
 module RSCM
+  # RSCM implementation for Perforce.
+  #
   # Understands operations against multiple client-workspaces
+  # You need the p4/p4d executable on the PATH in order for it to work.
+  #
   class Perforce < AbstractSCM
     include FileUtils
 
@@ -297,7 +301,7 @@ module RSCM
       attr_reader :number, :developer, :message, :time, :files
 
       def initialize(log)
-        p log
+        debug log
         log =~ /^Change (\d+) by (.*) on (.*)$/
         @number, @developer, @time = Integer($1), $2, Time.utc(*ParseDate.parsedate($3)[0..5])
 
@@ -368,12 +372,6 @@ module RSCM
 end
 
 module Kernel
-  def p(o)
-    puts "-----------------------------------------"
-    puts o
-    puts "-----------------------------------------"
-  end
-
   alias old_system system
   def system(cmd)
     puts "> system: #{cmd}"
