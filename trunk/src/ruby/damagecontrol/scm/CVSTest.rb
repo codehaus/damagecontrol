@@ -80,7 +80,7 @@ module DamageControl
       spec = ":local:#{testrepo}:damagecontrolled"
       build_command = "echo hello"
 
-      expected = "#{project_name},#{spec},#{build_command},."
+      expected = "#{project_name},#{spec},#{build_command}"
       mock_server = start_mock_server(self, expected)
 
       pwd = Dir.getwd
@@ -93,7 +93,6 @@ module DamageControl
         build_command, \
         "localhost", \
         "4713", \
-        ".", \
         nc_exe
       ) { |output|
         #puts output

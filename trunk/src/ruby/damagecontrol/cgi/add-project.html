@@ -4,12 +4,47 @@
 		<script id="clientEventHandlersJS" language="javascript">
 <!--
 
-function protocol_onblur() {
+cvs_spec = new Object();
 
+function setCvsroot(cvsroot) {
+	regexp = new RegExp(":(.*):(.*)@(.*):(.*)")
+	protocolIndex = 1
+	userIndex = 2
+	serverIndex = 3
+	pathIndex = 4
+	if(!regexp.exec(cvsroot)) {
+		regexp = new RegExp(":(local):(.*):(.*)")
+		userIndex = -1
+		serverIndex = -1
+	}
+	tokens = regexp.exec(cvsroot)
+	if(tokens) {
+		cvsprotocol.selectedIndex = findIndex(tokens[protocolIndex])
+		if(userIndex != -1) {
+			cvsuser.value = tokens[userIndex]
+			cvsserver.value = tokens[serverIndex]
+		} else {
+			cvsuser.value = ""
+			cvsserver.value = ""
+		}
+		cvsrepodir.value = tokens[pathIndex]
+	}
 }
 
-function cvsserver_onblur() {
 
+function findIndex(protocol) {
+	arr = new Array("ext", "pserver", "local")
+	for (var i=0; i < arr.length; i++) {
+		if(arr[i] == protocol) {
+			return i + 1
+		}
+	}
+	return 0
+}
+
+
+function getCvsroot() {
+	return ":" + cvsprotocol.value + ":" + cvsuser.value + "@" + cvsserver.value + ":" + cvsrepodir.value
 }
 
 //-->
@@ -38,14 +73,15 @@ function cvsserver_onblur() {
 						<P><FONT face="Verdana">CVSROOT: </FONT>
 						</P>
 					</TD>
-					<TD><INPUT id="cvsroot" onblur="return Text4_onblur()" type="text" size="30" name="Text2"><FONT face="Verdana"></FONT></TD>
+					<TD><INPUT id="cvsroot" onkeyup="setCvsroot(this.value)" type="text" size="74" name="Text2"><FONT face="Verdana"></FONT></TD>
 				</TR>
 				<TR>
 					<TD height="25" width="179">
 						<P><FONT face="Verdana">Protocol: </FONT>
 						</P>
 					</TD>
-					<TD height="25"><SELECT id="cvsprotocol" onblur="return protocol_onblur()" name="cvs_protocol">
+					<TD height="25"><SELECT id="cvsprotocol" onchange="cvsroot.value = getCvsroot()" name="cvs_protocol">
+							<OPTION value=""></OPTION>
 							<OPTION value="ext" selected>ext</OPTION>
 							<OPTION value="pserver">pserver</OPTION>
 							<OPTION value="local">local</OPTION>
@@ -56,34 +92,34 @@ function cvsserver_onblur() {
 						<P><FONT face="Verdana">Server: </FONT>
 						</P>
 					</TD>
-					<TD><INPUT id="cvsserver" onblur="return cvsserver_onblur()" type="text" size="30" name="Text2"><FONT face="Verdana"></FONT></TD>
+					<TD><INPUT id="cvsserver" onkeyup="cvsroot.value = getCvsroot()" type="text" size="30" name="Text2"><FONT face="Verdana"></FONT></TD>
 				</TR>
 				<TR>
 					<TD width="179">
 						<P><FONT face="Verdana">Port: </FONT>
 						</P>
 					</TD>
-					<TD><INPUT id="cvsport" type="text" name="Text2" size="30"><FONT face="Verdana"></FONT></TD>
+					<TD><INPUT id="cvsport" onkeyup="cvsroot.value = getCvsroot()" type="text" name="Text2" size="30"><FONT face="Verdana"></FONT></TD>
 				</TR>
 				<TR>
 					<TD width="179">
 						<P><FONT face="Verdana">Repository directory:&nbsp; </FONT>
 						</P>
 					</TD>
-					<TD><INPUT id="cvsrepodir" type="text" name="Text2" size="30"><FONT face="Verdana"></FONT></TD>
+					<TD><INPUT id="cvsrepodir" onkeyup="cvsroot.value = getCvsroot()" type="text" name="Text2" size="30"><FONT face="Verdana"></FONT></TD>
 				</TR>
 				<TR>
 					<TD width="179">
 						<P><FONT face="Verdana">User name: </FONT>
 						</P>
 					</TD>
-					<TD><INPUT id="cvsuser" type="text" name="Text2" size="30"><FONT face="Verdana"></FONT></TD>
+					<TD><INPUT id="cvsuser" onkeyup="cvsroot.value = getCvsroot()" type="text" name="Text2" size="30"><FONT face="Verdana"></FONT></TD>
 				</TR>
 				<TR>
 					<TD width="179">
 						<P><FONT face="Verdana">Module:&nbsp;&nbsp;&nbsp;</FONT></P>
 					</TD>
-					<TD><INPUT id="cvsmodule" type="text" name="Text6" size="30"><FONT face="Verdana"></FONT></TD>
+					<TD><INPUT id="cvsmodule" onkeyup="cvsroot.value = getCvsroot()" type="text" name="Text6" size="30"><FONT face="Verdana"></FONT></TD>
 				</TR>
 				<TR>
 					<TD width="179"><FONT face="Verdana"></FONT></TD>

@@ -94,8 +94,6 @@ module DamageControl
     # @param project_name a human readable name for the module
     # @param spec full SCM spec (example: :local:/cvsroot/picocontainer:pico)
     # @param build_command_line command line that will run the build
-    # @param relative_path relative path in dc's checkout where build
-    #        command will be executed from
     # @param host where the dc server is running
     # @param port where the dc server is listening
     # @param nc_exe_file where nc.exe file can be copied from (only needed for windows)
@@ -109,7 +107,6 @@ module DamageControl
       build_command_line, \
       dc_host="localhost", \
       dc_port="4711", \
-      relative_path=".", \
       nc_exe_file="", \
       &proc
     )
@@ -117,7 +114,7 @@ module DamageControl
       checkout("#{cvsroot(spec)}:CVSROOT", directory, &proc)
       Dir.chdir("#{directory}/CVSROOT")
       File.open("#{directory}/CVSROOT/loginfo", File::WRONLY | File::APPEND) do |file|
-        script = SocketTrigger.new(nil,nil,nil).trigger_command(project_name, spec, build_command_line, relative_path, nc_command(spec), dc_host, dc_port)
+        script = SocketTrigger.new(nil,nil,nil).trigger_command(project_name, spec, build_command_line, nc_command(spec), dc_host, dc_port)
         file.puts("#{mod(spec)} #{script}")
       end
 
