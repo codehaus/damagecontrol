@@ -22,13 +22,12 @@
 #:include: README
 
 version = '0.5'
-cvs_version = '$Revision: 1.1 $'
+cvs_version = '$Revision: 1.2 $'
 
 module Gnuplot
 
   class Writer
     def writeln (s)
-puts s
       write("#{s}\n")
     end
 
@@ -657,4 +656,4 @@ class Matrix
   end
 end
 
-# $Id: Gnuplot.rb,v 1.1 2004/04/11 23:13:28 rinkrank Exp $
+# $Id: Gnuplot.rb,v 1.2 2004/04/11 23:54:44 rinkrank Exp $

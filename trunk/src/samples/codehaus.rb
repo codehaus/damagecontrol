@@ -14,6 +14,7 @@ require 'damagecontrol/template/ShortTextTemplate'
 require 'damagecontrol/template/HTMLTemplate' 
 require 'damagecontrol/publisher/IRCPublisher' 
 require 'damagecontrol/publisher/FilePublisher' 
+require 'damagecontrol/publisher/GraphPublisher' 
 require 'damagecontrol/publisher/EmailPublisher' 
 require 'damagecontrol/publisher/JIRAPublisher'
 require 'damagecontrol/Logging'
@@ -35,6 +36,7 @@ start_simple_server(
   :AllowIPs => ["127.0.0.1", "64.7.141.17", "66.216.68.111", "81.5.134.59", "217.158.24.17" ])
 
 FilePublisher.new(@hub, "#{buildRoot}/report", HTMLTemplate.new).start 
+GraphPublisher.new(@hub, "#{buildRoot}/report", @build_history_repository).start 
 IRCPublisher.new(@hub, "irc.codehaus.org", "\#damagecontrol", ShortTextTemplate.new).start
 EmailPublisher.new(@hub, ShortTextTemplate.new, HTMLTemplate.new, "dcontrol@builds.codehaus.org").start
 #JIRAPublisher.new(@hub, ShortTextTemplate.new, "jira.codehaus.org").start
