@@ -293,9 +293,9 @@ module RSCM
     def revision_option(from_identifier, to_identifier)
       from = nil
       if(from_identifier.is_a?(Time))
-        from = svndate(from_identifier)
-      else
-        from = from_identifier
+        from = svndate(from_identifier + 1)
+      elsif(from_identifier.is_a?(Numeric))
+        from = from_identifier + 1
       end
 
       to = nil

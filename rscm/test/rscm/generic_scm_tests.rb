@@ -135,7 +135,7 @@ module RSCM
     end
 
     def test_checkout_changeset_identifier
-      work_dir = RSCM.new_temp_dir("label")
+      work_dir = RSCM.new_temp_dir("ids")
       checkout_dir = "#{work_dir}/checkout"
       repository_dir = "#{work_dir}/repository"
       scm = create_scm(repository_dir, "damagecontrolled")
@@ -147,8 +147,7 @@ module RSCM
       before_cs = scm.changesets(checkout_dir, Time.epoch)
 
       add_or_edit_and_commit_file(scm, checkout_dir, "after.txt", "After label")
-      next_identifier = before_cs.latest.identifier + 1
-      after_cs = scm.changesets(checkout_dir, next_identifier)
+      after_cs = scm.changesets(checkout_dir, before_cs.latest.identifier)
       assert_equal(1, after_cs.length)
       assert_equal("after.txt", after_cs[0][0].path)
 

@@ -276,7 +276,7 @@ module RSCM
       if(from_identifier.nil? && to_identifier.nil?)
         ""
       else
-        "-d\"#{cvsdate(from_identifier)}<=#{cvsdate(to_identifier)}\" " 
+        "-d\"#{cvsdate(from_identifier)}<#{cvsdate(to_identifier)}\" " 
       end
     end
       
