@@ -11,7 +11,7 @@ module DamageControl
     end
     
     def available?
-      super && selected_build.archive_dir && File.exists?(selected_build.archive_dir) && !build_artifacts.empty?
+      super && archive_dir && File.exists?(archive_dir) && !build_artifacts.empty?
     end
     
     def icon
@@ -19,7 +19,7 @@ module DamageControl
     end
     
     def build_artifacts
-      Dir["#{selected_build.archive_dir}/*"].collect{|f| f[selected_build.archive_dir.length+1..-1]}
+      Dir["#{archive_dir}/*"].collect{|f| f[archive_dir.length+1..-1]}
     end
     
     def build_artifact_url(file)
@@ -28,6 +28,12 @@ module DamageControl
     
     def content
       erb("components/build_artifacts.erb", binding)
+    end
+
+  private
+
+    def archive_dir
+      @project_directories.archive_dir(selected_build.project_name, selected_build.dc_creation_time)
     end
   end
 end

@@ -11,9 +11,9 @@ module DamageControl
       dc_creation_time = Time.parse_ymdHMS req.path_info.split("/")[3]
       
       if (req.path_info.split("/")[4] == "stdout.log")
-        path = @build_history_repository.stdout_file(project_name, dc_creation_time)
+        path = project_directories.stdout_file(project_name, dc_creation_time)
       else
-        path = @build_history_repository.stderr_file(project_name, dc_creation_time)
+        path = project_directories.stderr_file(project_name, dc_creation_time)
       end
       st = File::stat(path)
       res['content-length'] = st.size

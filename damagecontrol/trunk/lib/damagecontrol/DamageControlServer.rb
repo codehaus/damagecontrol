@@ -67,6 +67,30 @@ module WEBrick
 end
 
 module DamageControl
+  # Backwards compatibility for old DC configs. This will go away one day.
+
+  class Jira < RSCM::Tracker::JIRA
+  end
+  class RubyForgeTracker < RSCM::Tracker::RubyForge
+  end
+  class Scarab < RSCM::Tracker::Scarab
+  end
+  class SourceForgeTracker < RSCM::Tracker::SourceForge
+  end
+  class Bugzilla < RSCM::Tracker::Bugzilla
+  end
+  class CVS < RSCM::CVS
+  end
+  class SVN < RSCM::SVN
+  end
+  class ChangeSets < RSCM::ChangeSets
+  end
+  class ChangeSet < RSCM::ChangeSet
+  end
+  class Change < RSCM::Change
+  end
+
+
   # UPGRADE: Migration of old timestamps in build_history.yaml to new ones
   class Build
     attr_accessor :timestamp, :start_time, :end_time
@@ -146,13 +170,9 @@ module DamageControl
     def init_config_services
       component(:hub, Pebbles::MulticastSpace.new)
       
-      # TODO: It would be nice to merge all of these beasts into one class.
-      # Most classes that depend on one of them generally depend on one or two others too.
-      # We could call it ProjectManager or something.
-      # AH
       component(:project_directories, ProjectDirectories.new(rootdir))
       component(:project_config_repository, ProjectConfigRepository.new(project_directories, public_web_url))
-      component(:build_history_repository, BuildHistoryRepository.new(hub, rootdir, public_web_url))
+      component(:build_history_repository, BuildHistoryRepository.new(hub, project_directories, BuildSerializer.new(web_url)))
     end
     
     def init_components
@@ -194,10 +214,10 @@ module DamageControl
       # For public unauthenticated XML-RPC connections like getting status
       httpd.mount("/public/xmlrpc", public_xmlrpc_servlet)
       
-      httpd.mount("/public/dashboard", DashboardServlet.new(:public, build_history_repository, project_config_repository, build_scheduler))
-      httpd.mount("/public/project", ProjectServlet.new(:public, build_history_repository, project_config_repository, nil, build_scheduler, report_classes, public_web_url + "rss", trig_xmlrpc_url))
+      httpd.mount("/public/dashboard", DashboardServlet.new(:public, build_scheduler, build_history_repository, project_config_repository, project_directories))
+      httpd.mount("/public/project", ProjectServlet.new(:public, build_scheduler, build_history_repository, project_config_repository, project_directories, nil, report_classes, public_web_url + "rss", trig_xmlrpc_url))
       httpd.mount("/public/search", SearchServlet.new(build_history_repository))
-      httpd.mount("/public/log", LogFileServlet.new(:public, build_scheduler, build_history_repository, project_config_repository))
+      httpd.mount("/public/log", LogFileServlet.new(:public, build_scheduler, build_history_repository, project_config_repository, project_directories))
       httpd.mount("/public/root", indexing_file_handler)
       httpd.mount("/public/rss", RssServlet.new(build_history_repository, public_web_url + "project/"))
       
@@ -243,15 +263,15 @@ module DamageControl
       # For private authenticated and encrypted (with eg an Apache proxy) XML-RPC connections like triggering a build
       httpd.mount("/private/xmlrpc", private_xmlrpc_servlet)
 
-      httpd.mount("/private/dashboard", DashboardServlet.new(:private, build_history_repository, project_config_repository, build_scheduler))
-      httpd.mount("/private/project", ProjectServlet.new(:private, build_history_repository, project_config_repository, trigger, build_scheduler, report_classes, public_web_url + "rss", trig_xmlrpc_url))
+      httpd.mount("/private/dashboard", DashboardServlet.new(:private, build_scheduler, build_history_repository, project_config_repository, project_directories))
+      httpd.mount("/private/project", ProjectServlet.new(:private, build_scheduler, build_history_repository, project_config_repository, project_directories, trigger, report_classes, public_web_url + "rss", trig_xmlrpc_url))
       httpd.mount("/private/install_trigger", InstallTriggerServlet.new(project_config_repository, trig_xmlrpc_url))
       httpd.mount("/private/configure", ConfigureProjectServlet.new(project_config_repository, scm_configurator_classes, tracking_configurator_classes, trig_xmlrpc_url))
       httpd.mount("/private/search", SearchServlet.new(build_history_repository))
-      httpd.mount("/private/log", LogFileServlet.new(:private, build_scheduler, build_history_repository, project_config_repository))
+      httpd.mount("/private/log", LogFileServlet.new(:private, build_scheduler, build_history_repository, project_config_repository, project_directories))
       httpd.mount("/private/root", indexing_file_handler)
       
-# TODO: simplify this!!!!!!
+# TODO: simplify this!!!!!! (Rails to the rescue soon)
       httpd.mount("/private/images", WEBrick::HTTPServlet::FileHandler, "#{webdir}/images")
       httpd.mount("/private/project/images", WEBrick::HTTPServlet::FileHandler, "#{webdir}/images")
       httpd.mount("/private/configure/images", WEBrick::HTTPServlet::FileHandler, "#{webdir}/images")
@@ -309,7 +329,7 @@ module DamageControl
     end
     
     def webdir
-      "#{damagecontrol_home}/server/damagecontrol/web"
+      "#{damagecontrol_home}/lib/damagecontrol/web"
     end
     
     def init_build_scheduler

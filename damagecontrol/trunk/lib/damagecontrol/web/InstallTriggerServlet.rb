@@ -9,7 +9,7 @@ module DamageControl
     include FileUtils
     
     def initialize(project_config_repository, trig_xmlrpc_url)
-      super(:private, nil, nil, project_config_repository)
+      super(:private, nil, nil, project_config_repository, nil)
       @trig_xmlrpc_url = trig_xmlrpc_url
     end
     

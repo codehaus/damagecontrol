@@ -4,7 +4,7 @@ require 'damagecontrol/web/AbstractAdminServlet'
 module DamageControl
   class RssServlet < AbstractAdminServlet
     def initialize(build_history_repository, project_root_url)
-      super(:public, nil, build_history_repository, nil)
+      super(:public, nil, build_history_repository, nil, nil)
       @project_root_url = project_root_url      
     end
 

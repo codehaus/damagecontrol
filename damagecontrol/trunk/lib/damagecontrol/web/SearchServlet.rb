@@ -3,7 +3,7 @@ require 'damagecontrol/web/AbstractAdminServlet'
 module DamageControl
   class SearchServlet < AbstractAdminServlet
     def initialize(build_history_repository)
-      super(:public, nil, build_history_repository, nil)
+      super(:public, nil, build_history_repository, nil, nil)
     end
     
     def tasks

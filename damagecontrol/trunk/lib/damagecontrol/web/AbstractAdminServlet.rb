@@ -8,11 +8,17 @@ module DamageControl
     
     include Logging
   
-    def initialize(type, build_scheduler, build_history_repository, project_config_repository)
+    def initialize(type, build_scheduler, build_history_repository, project_config_repository, project_directories)
       @type = type
       @build_scheduler = build_scheduler
       @build_history_repository = build_history_repository
       @project_config_repository = project_config_repository
+      @project_directories = project_directories
+      # debugging
+#      raise "build_scheduler:#{build_scheduler.class.name}" unless build_scheduler.nil? || build_scheduler.is_a?(BuildScheduler)
+#      raise "build_history_repository:#{build_history_repository.class.name}" unless build_history_repository.nil? || build_history_repository.is_a?(BuildHistoryRepository)
+#      raise "project_config_repository:#{project_config_repository.class.name}" unless project_config_repository.nil? || project_config_repository.is_a?(ProjectConfigRepository)
+#      raise "project_directories:#{project_directories.class.name}" unless project_directories.nil? || project_directories.is_a?(ProjectDirectories)
     end
     
     def create_scm_repository
@@ -25,9 +31,10 @@ module DamageControl
 
   protected
   
+    attr_reader :build_scheduler
     attr_reader :build_history_repository
     attr_reader :project_config_repository
-    attr_reader :build_scheduler
+    attr_reader :project_directories
 
     def project_name
       # Use path info instead of query string, this makes better access control possible

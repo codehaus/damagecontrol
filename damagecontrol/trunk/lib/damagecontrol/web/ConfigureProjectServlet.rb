@@ -7,7 +7,7 @@ module DamageControl
     include FileUtils
 
     def initialize(project_config_repository, scm_configurator_classes, tracking_configurator_classes, trig_xmlrpc_url)
-      super(:private, nil, nil, project_config_repository)
+      super(:private, nil, nil, project_config_repository, nil)
       @scm_configurator_classes = scm_configurator_classes
       @tracking_configurator_classes = tracking_configurator_classes
       @trig_xmlrpc_url = trig_xmlrpc_url

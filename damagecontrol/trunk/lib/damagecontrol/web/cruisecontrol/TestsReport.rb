@@ -23,7 +23,7 @@ module DamageControl
     end
     
     def xml_log_file
-      @build_history_repository.xml_log_file(selected_build.project_name, selected_build.dc_creation_time)
+      @project_directories.xml_log_file(selected_build.project_name, selected_build.dc_creation_time)
     end
 
   private

@@ -7,8 +7,8 @@ module DamageControl
   class ProjectServlet < AbstractAdminServlet
     include FileUtils
   
-    def initialize(type, build_history_repository, project_config_repository, trigger, build_scheduler, report_classes, rss_url, trig_xmlrpc_url)
-      super(type, build_scheduler, build_history_repository, project_config_repository)
+    def initialize(type, build_scheduler, build_history_repository, project_config_repository, project_directories, trigger, report_classes, rss_url, trig_xmlrpc_url)
+      super(type, build_scheduler, build_history_repository, project_config_repository, project_directories)
       absolute_template_dir # initialize it
       @trigger = trigger
       @report_classes = report_classes
@@ -51,7 +51,7 @@ module DamageControl
     attr_reader :report_classes
   
     def reports
-      report_classes.collect {|c| c.new(selected_build, project_config_repository, build_history_repository) }
+      report_classes.collect {|c| c.new(selected_build, project_config_repository, project_directories) }
     end
     
     def selected_report

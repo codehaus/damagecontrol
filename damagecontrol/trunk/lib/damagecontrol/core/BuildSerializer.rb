@@ -1,6 +1,8 @@
 require 'yaml'
 require 'fileutils'
 require 'damagecontrol/core/Build'
+require 'rubygems'
+require_gem 'rscm'
 
 module DamageControl
 
@@ -83,7 +85,7 @@ module DamageControl
         puts "Failed to parse changesets with YAML: #{changesets_file}"
         puts e.message
         puts e.backtrace.join("\n")
-        ChangeSets.new
+        RSCM::ChangeSets.new
       end
     end
 

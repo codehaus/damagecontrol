@@ -11,7 +11,7 @@ module DamageControl
     end
     
     def available?
-      super && File.exists?(@build_history_repository.stdout_file(selected_build.project_name, selected_build.dc_creation_time))
+      super && File.exists?(@project_directories.stdout_file(selected_build.project_name, selected_build.dc_creation_time))
     end
     
     def icon
