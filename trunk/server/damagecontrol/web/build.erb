@@ -39,7 +39,7 @@ build.modification_set.each do |modification|
 	path = modification.path
 	if(view_cvs_url)
 		url = "#{view_cvs_url_patched}#{path}"
-		url << "?r1=#{modification.revision}&r2=#{modification.previous_revision}" if(#{modification.previous_revision})
+		url << "?r1=#{modification.revision}&r2=#{modification.previous_revision}" if(modification.previous_revision)
 		path = "<a href=\"#{url}\">#{modification.path}</a>"
 	end
 %>
