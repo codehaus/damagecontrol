@@ -286,7 +286,7 @@ class Project
 
   def run_server
     info("starting server, point a web browser to: http://localhost:4712/private/dashboard")
-    execute_ruby("damagecontrol/DamageControlServer.rb")
+    execute_ruby("server/damagecontrol/DamageControlServer.rb")
   end
   
   def parse_args(args)

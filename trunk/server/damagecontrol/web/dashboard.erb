@@ -5,25 +5,17 @@
 </head>
 <body>
 
-	<%
-		projects = project_config_repository.project_names
-	%>
-  
     <div class="dashboard">
-  <%
-
-  projects.each do |project|
-    href = "project?project_name=#{project}"
-    
-    image = "images/lastcompletedstatus?project_name=#{project}"
-    last_successful_build = build_history_repository.last_successful_build(project)
-    label = ""
-    label = " (##{last_successful_build.label})" if(last_successful_build)
-  %>
-    <img src="<%= image %>" />&nbsp;<a href="<%= href %>"><%= project %><%= label %></a><br/>
-  <%
-  end
-  %>
+      <%= project_status %>
     </div>
+    
+    <div class="dashboard">
+      <%= build_queue %>
+    </div>
+
+    <div class="dashboard">
+      <%= build_executor_status %>
+    </div>
+
 </body>
 </html>
