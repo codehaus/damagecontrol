@@ -57,6 +57,7 @@ module DamageControl
   protected
   
     def tasks
+    
       result = super
       unless project_name.nil?
         if(private?)
@@ -65,13 +66,28 @@ module DamageControl
               task(:icon => "icons/box_into.png", :name => "Clone project", :url => "configure?project_name=#{project_name}&action=clone_project"),
               task(:icon => "icons/wrench.png", :name => "Configure", :url => "configure?project_name=#{project_name}&action=configure"),
               task(:icon => "icons/gears_run.png", :name => "Trig build now", :url => "?project_name=#{project_name}&action=trig_build"),
-              task(:icon => "icons/gear_connection.png", :name => "Install trigger", :url => "install_trigger?project_name=#{project_name}")
+              task(:icon => "icons/gear_connection.png", :name => "Install trigger", :url => "install_trigger?project_name=#{project_name}"),
+              task(:icon => "icons/console_network.png", :name => "Console output", :url => "log?project_name=#{project_name}&timestamp=#{selected_build.timestamp}")
             ]
         end
         result +=
           [
             task(:icon => "icons/folders.png", :name => "Working files", :url => "root/#{project_name}/checkout"),
           ]
+        prev_build = build_history_repository.prev(selected_build)
+        if(prev_build)
+          result +=
+            [
+                task(:icon => "icons/navigate_left.png", :name => "Previous build", :url => build_url(prev_build))
+            ]
+        end
+        next_build = build_history_repository.next(selected_build)
+        if(next_build)
+          result +=
+            [
+                task(:icon => "icons/navigate_right.png", :name => "Next build", :url => build_url(next_build))
+            ]
+        end
       end
       result
     end
@@ -106,6 +122,14 @@ module DamageControl
   
   private
   
+    def has_report_snippet?(build)
+      File.exists?(project_config_repository.report_snippet_file(project_name, build.timestamp_as_s))
+    end
+  
+    def report_snippet(build)
+      File.read(project_config_repository.report_snippet_file(project_name, build.timestamp_as_s))
+    end
+    
     def build_description(build)
       label = "##{build.label}"; 
       label = build.status if label == "#"

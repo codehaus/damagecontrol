@@ -5,17 +5,25 @@
 </head>
 <body>
 
-    <div class="dashboard">
-      <%= project_status %>
-    </div>
-    
-    <div class="dashboard">
-      <%= build_queue %>
-    </div>
+  <table class="dashboard">
+    <tr>
+      <td class="dashboard">
+        <%= project_status %>
+      </td>
 
-    <div class="dashboard">
-      <%= build_executor_status %>
-    </div>
+      <td class="dashboard">
+        <table class="dashboard">
+          <tr>
+            <td class="dashboard">
+              <%= build_queue %>
+            </td>
+            <td class="dashboard">
+              <%= build_executor_status %>
+            </td>
+          </tr>
+      </td>
 
+  </table>
+  
 </body>
 </html>

@@ -11,35 +11,6 @@
 <table class="main-table">
 
   <%
-  # =============== previous/next build pane
-  prev_build = build_history_repository.prev(selected_build)
-  next_build = build_history_repository.next(selected_build)
-  %>
-  
-  <tr><td>
-    <% if prev_build then %>
-    <a href="<%= build_url(prev_build) %>\"><img src="icons/navigate_left.png" /></a>
-    <% end %>
-    <% if next_build then %>
-    <a href="<%= build_url(next_build) %>"><img src="icons/navigate_right.png" /></a>
-    <% end %>
-  </td></tr>
-  
-
-  <%
-  # =============== console output link pane
-  log_url = "log?project_name=#{project_name}&timestamp=#{selected_build.timestamp}"
-  %>
-  <tr><td>
-  <table class="console-output">
-    <tr><td class="console-output">
-    <a href="<%= log_url %>"><image src="icons/console_network.png"/></a>
-    <a href="<%= log_url %>">Console output</a>
-    </td></tr>
-  </table>
-  </td></tr>
-  
-  <%
   # =============== changes pane
   %>
   
@@ -96,7 +67,13 @@
   
   <% end %>
 
-</td></tr>
+  </td></tr>
+  
+  <% if has_report_snippet?(selected_build) %>
+    <tr><td>  
+      <%= report_snippet(selected_build) %>
+    </td></tr>
+  <% end %>
 
 </table>
 
