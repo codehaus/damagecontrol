@@ -8,7 +8,7 @@ module DamageControl
   public
   
     def tracking_class
-      RSCM::Tracker::Jira
+      RSCM::Tracker::JIRA
     end
     
     def tracking_display_name
