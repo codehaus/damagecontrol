@@ -63,22 +63,25 @@ module DamageControl
       working_dir = if current_scm.nil? then project_base_dir else current_scm.working_dir end
       # set up some environment variables the build can use
       environment = { "DAMAGECONTROL_BUILD_LABEL" => current_build.potential_label.to_s }
-      environment["DAMAGECONTROL_CHANGES"] = 
-        current_build.changesets.format(CHANGESET_TEXT_FORMAT, Time.new.utc) unless current_build.changesets.nil?
+      unless current_build.changesets.nil?
+        environment["DAMAGECONTROL_CHANGES"] = 
+          current_build.changesets.format(CHANGESET_TEXT_FORMAT, Time.new.utc)
+      end
       report_progress(current_build.build_command_line)
       begin
         @build_process = Pebbles::Process.new
         @build_process.working_dir = working_dir
-        @build_process.command_line = current_build.build_command_line
         @build_process.environment = environment
-        @build_process.join_stdout_and_stderr = true
-        @build_process.execute do |stdin, stdout|
-          stdout.each_line {|line| report_progress(line) }
+        @build_process.execute(current_build.build_command_line) do |stdin, stdout, stderr|
+          threads = []
+          threads << Thread.new { stdout.each_line {|line| report_progress(line) } }
+          threads << Thread.new { stderr.each_line {|line| report_error(line) } }
+          threads.each{|t| t.join}
         end
         current_build.status = Build::SUCCESSFUL
       rescue Exception => e
         logger.error("build failed: #{format_exception(e)}")
-        report_progress(format_exception(e))
+        report_error(format_exception(e))
         if was_killed?
           current_build.status = Build::KILLED
         else
@@ -180,7 +183,7 @@ module DamageControl
         from_time = last_successful_build.timestamp_as_time
         to_time = current_build.timestamp_as_time
         logger.info("determining change set for #{current_build.project_name}, from #{from_time} to #{to_time}")
-        changesets = current_scm.changesets(from_time, to_time) {|p| report_progress(p)}
+        changesets = current_scm.changesets(from_time, to_time) {|p| report_error(p)}
         current_build.changesets = changesets if changesets
         logger.info("change set for #{current_build.project_name} is #{current_build.changesets.inspect}")
 
@@ -224,7 +227,7 @@ module DamageControl
         logger.error("build failed: #{message}")
         current_build.error_message = message
         current_build.status = Build::FAILED
-        report_progress("Build failed due to: #{message}")
+        report_error("Build failed due to: #{message}")
       ensure
         build_complete
       end
@@ -232,6 +235,10 @@ module DamageControl
     
     def report_progress(progress)
       @channel.publish_message(BuildProgressEvent.new(current_build, progress))
+    end
+
+    def report_error(message)
+      @channel.publish_message(BuildErrorEvent.new(current_build, message))
     end
 
   end

@@ -32,6 +32,7 @@ module DamageControl
     attr_accessor :status
     attr_accessor :url
     attr_accessor :log_file
+    attr_accessor :error_log_file
     attr_accessor :xml_log_file
     attr_accessor :archive_dir
 

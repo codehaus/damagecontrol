@@ -25,6 +25,19 @@ module DamageControl
     end
   end
 
+  class BuildErrorEvent < BuildEvent
+    attr_reader :message
+  
+    def initialize(build, message)
+      super(build)
+      @message = message
+    end
+
+    def ==(event)
+      super(event) && event.message == message
+    end
+  end
+
   class BuildRequestEvent < BuildEvent
   end
 

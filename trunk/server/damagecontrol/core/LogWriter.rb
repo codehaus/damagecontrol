@@ -10,45 +10,87 @@ module DamageControl
     include FileUtils
   
     def initialize(channel)
-      @log_files = {}
+      @open_files = {}
       channel.add_subscriber(self)
     end
     
-    def put(message)
+    def put(event)
       
-      return if !message.is_a? BuildEvent
+      return if !event.is_a? BuildEvent
 
-      build = message.build
+      build = event.build
       
-      if message.is_a? BuildProgressEvent
+      if event.is_a? BuildProgressEvent
         begin
-          log_file(build).puts(message.output)
+          log_file(build).puts(event.output)
           log_file(build).flush
         rescue Exception => e
           logger.error("Couldn't write to file:#{format_exception(e)}")
         end
       end
       
-      if message.is_a? BuildCompleteEvent
+      if event.is_a? BuildErrorEvent
         begin
-          logger.info("closing log file #{build.log_file}")
+          error_log_file(build).puts(event.message)
+          error_log_file(build).flush
+          log_file(build).puts(event.message)
           log_file(build).flush
-          log_file(build).close
-        rescue => e
-          logger.error("BuildCompleteEvent: Couldn't write to file:#{format_exception(e)}")
+        rescue Exception => e
+          logger.error("Couldn't write to file:#{format_exception(e)}")
         end
+      end
+      
+      if event.is_a? BuildCompleteEvent
+        close_log_files(build)
       end
 
     end
     
+    def shutdown
+      @open_files.each do |name, file|
+        file.close unless file.closed?
+        @open_files.delete(name)
+      end
+    end
+    
+    def close_log_files(build)
+        begin
+          close_log_file(build.log_file)
+          close_log_file(build.error_log_file)
+        rescue => e
+          logger.error("BuildCompleteEvent: Couldn't write to file: #{format_exception(e)}")
+        end
+    end
+    
     def log_file(build)
-      file_name = build.log_file
-      file = @log_files[file_name]
+      open_log_file(build.log_file)
+    end
+    
+    def error_log_file(build)
+      open_log_file(build.error_log_file)
+    end
+    
+    private
+    
+    def close_log_file(file_name)
+      log_file = @open_files[file_name]
+      return unless log_file
+      if log_file.closed?
+        @open_files.remove(file_name)
+        return
+      end
+      logger.info("closing log file #{file_name}")
+      log_file.flush
+      log_file.close
+    end
+    
+    def open_log_file(file_name)
+      file = @open_files[file_name]
       if(!file)
         logger.info("opening log file #{file_name}")
         mkdir_p(File.dirname(file_name))
         file = File.open(file_name, "w")
-        @log_files[file_name] = file
+        @open_files[file_name] = file
       end
       file
     end

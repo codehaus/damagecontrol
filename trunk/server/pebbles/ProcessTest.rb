@@ -23,20 +23,21 @@ module Pebbles
       p.wait
     end
     
-    def TODO_test_stdout_and_stderr_with_select
-      p = Pebbles::Process.new
-      p.command_line = "echo stdout >&1 && echo stderr >&2"
-      p.join_stdout_and_stderr = false
-      p.start
-      while(!(p.stdout.eof? && p.stderr.eof?))
-        read = select([p.stdout, p.stderr])
-        puts "available #{read}"
-        read.each do |io|
-          assert_equal("stdout\n", p.stdout.read) if(io == p.stdout)
-          assert_equal("stderr\n", p.stderr.read) if(io == p.stderr)
+    def test_stdout_and_stderr_with_stream_pumpers
+      stdout_result = ""
+      stderr_result = ""
+      threads = []
+      Pebbles::Process.new.execute("echo stdout >&1 && echo stderr >&2") do |stdin, stdout, stderr|
+        threads << Thread.new do
+          stdout_result += stdout.read
         end
+        threads << Thread.new do
+          stderr_result += stderr.read
+        end
+        threads.each{|t| t.join}
       end
-      p.wait
+      assert_equal("stdout\n", stdout_result)
+      assert_equal("stderr\n", stderr_result)
     end
   end
 end

@@ -62,7 +62,8 @@ module Pebbles
         parent_stderr_read.close if join_stdout_and_stderr?
       end
       
-      def execute
+      def execute(command_line=nil)
+        self.command_line = command_line if command_line
         ret = nil
         begin
           start

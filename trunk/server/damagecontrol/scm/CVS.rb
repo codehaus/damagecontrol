@@ -32,14 +32,33 @@ module DamageControl
         parse_log(old_changes_command(from_time, to_time), &proc)
       end
     end
-
+    
+    def new_process
+      p = Pebbles::Process.new
+      p.working_dir = working_dir
+      p.environment = environment
+      p
+    end
+    
     def parse_log(cmd, &proc)
       if block_given? then yield "#{cvs_cmd_without_password(cmd)}\n" else logger.debug("#{cvs_cmd_without_password(cmd)}\n") end
-      cmd_with_io(working_dir, cvs_cmd_with_password(cmd, cvspassword), environment) do |stdout|
-        parser = CVSLogParser.new(stdout)
-        parser.cvspath = path
-        parser.cvsmodule = cvsmodule
-        parser.parse_changesets
+      
+      new_process.execute(cvs_cmd_with_password(cmd, cvspassword)) do |stdin, stdout, stderr|
+        threads = []
+        threads << Thread.new do
+          stderr.each_line do |line|
+            if block_given? then yield line else logger.debug(line) end
+          end
+        end
+        changesets = nil
+        threads << Thread.new do
+          parser = CVSLogParser.new(stdout)
+          parser.cvspath = path
+          parser.cvsmodule = cvsmodule
+          changesets = parser.parse_changesets
+        end
+        threads.each{|t| t.join}
+        changesets
       end
     end
     
@@ -175,7 +194,7 @@ module DamageControl
       # https://www.cvshome.org/docs/manual/cvs-1.11.17/cvs_16.html#SEC144
       # -N => Suppress the header if no revisions are selected.
       # -S => Do not print the list of tags for this file.
-      "log #{branch_option} -N -S -d\"#{cvsdate(from_time)}<=#{cvsdate(to_time)}\""
+      "log #{branch_option}-N -S -d\"#{cvsdate(from_time)}<=#{cvsdate(to_time)}\""
     end
     
     def branch_specified?
@@ -183,20 +202,20 @@ module DamageControl
     end
 
     def branch_option
-      if branch_specified? then "-r#{cvsbranch}" else "" end
+      if branch_specified? then "-r#{cvsbranch} " else "" end
     end
     
     def old_changes_command(from_time, to_time)
       # Many servers don't support the new -S option
-      "log #{branch_option} -N -d\"#{cvsdate(from_time)}<=#{cvsdate(to_time)}\""
+      "log #{branch_option}-N -d\"#{cvsdate(from_time)}<=#{cvsdate(to_time)}\""
     end
     
     def update_command(time)
-      "update #{branch_option} #{time_option(time)} -d -P"
+      "update #{branch_option}#{time_option(time)} -d -P"
     end
     
     def checkout_command(time)
-      "checkout #{branch_option} #{time_option(time)} #{cvsmodule}"
+      "checkout #{branch_option}#{time_option(time)} #{cvsmodule}"
     end
     
     def cvs_cmd_with_password(cmd, password)

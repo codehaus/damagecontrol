@@ -194,7 +194,7 @@ EOF
     end
 
     def ==(change)
-      return false if !other.is_a?(self.class)
+      return false if !change.is_a?(self.class)
       self.path == change.path &&
       self.developer == change.developer &&
       self.message == change.message &&
