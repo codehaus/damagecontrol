@@ -2,15 +2,13 @@ require 'damagecontrol/util/Logging'
 
 DamageControl::Logging.silent
 
-require 'damagecontrol/core/AsyncComponentTest'
 require 'damagecontrol/core/BuildExecutorTest'
 require 'damagecontrol/core/BuildHistoryRepositoryTest'
 require 'damagecontrol/core/BuildSchedulerTest'
-require 'damagecontrol/core/DependentBuildTriggerTest'
 require 'damagecontrol/core/BuildTest'
+require 'damagecontrol/core/DependentBuildTriggerTest'
 #require 'damagecontrol/core/EqualityTest'
 require 'damagecontrol/core/HostVerifyingHandlerTest'
-require 'damagecontrol/core/HubTest'
 require 'damagecontrol/core/LogWriterTest'
 require 'damagecontrol/core/LogMergerTest'
 require 'damagecontrol/core/ArtifactArchiverTest'
@@ -36,8 +34,6 @@ require 'damagecontrol/scm/CVSLogParserTest'
 require 'damagecontrol/scm/SVNLogParserTest'
 
 require 'damagecontrol/util/FilePollerTest'
-require 'damagecontrol/util/SlotTest'
-require 'damagecontrol/util/TimerTest'
 require 'damagecontrol/util/FileUtilsTest'
 require 'damagecontrol/util/XMLMergerTest'
 
@@ -52,7 +48,8 @@ require 'damagecontrol/web/SearchServletTest'
 require 'damagecontrol/web/ProjectStatusTest'
 require 'damagecontrol/web/BuildExecutorStatusTest'
 
-require 'damagecontrol/test/IntegrationTests'
+# let's stick to unit test and e2etest
+#require 'damagecontrol/test/IntegrationTests'
 
 require 'pebbles/RiteMeshTest'
 require 'pebbles/TimeUtilsTest'

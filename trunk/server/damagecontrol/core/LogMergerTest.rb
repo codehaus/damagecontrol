@@ -4,16 +4,18 @@ require 'pebbles/mockit'
 require 'damagecontrol/core/Build'
 require 'damagecontrol/core/LogMerger'
 require 'damagecontrol/scm/NoSCM'
-require 'damagecontrol/util/HubTestHelper'
 
 module DamageControl  
   class LogMergerTest < Test::Unit::TestCase
-    include HubTestHelper
     include FileUtils
     
     def test_copies_away_logs_on_build_complete
+      hub = MockIt::Mock.new
+      hub.__expect(:add_subscriber) do |subscriber|
+        assert(subscriber.is_a?(LogMerger))
+      end
+
       basedir = new_temp_dir
-      create_hub
       
       build_timestamp = "19770615120000"
       build = Build.new("project", build_timestamp, {
@@ -27,10 +29,11 @@ module DamageControl
       touch("#{basedir}/checkout/target/test-reports/TEST-com.thoughtworks.Test.xml")
       touch("#{basedir}/checkout/ant-log.xml")
       
-      LogMerger.new(hub)
-      hub.publish_message(BuildCompleteEvent.new(build))
+      lm = LogMerger.new(hub)
+      lm.put(BuildCompleteEvent.new(build))
       
       assert(File.exists?(build.xml_log_file))
+      hub.__verify
     end
   end
 end

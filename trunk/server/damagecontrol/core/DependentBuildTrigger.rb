@@ -8,7 +8,7 @@ module DamageControl
       @project_config_repository = project_config_repository
     end
 
-    def receive_message(message)
+    def put(message)
       if (message.is_a? BuildCompleteEvent)
         dependents = message.build.config["dependent_projects"]
         return unless dependents

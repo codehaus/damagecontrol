@@ -10,7 +10,6 @@ require 'damagecontrol/core/BuildExecutor'
 require 'damagecontrol/core/BuildHistoryRepository'
 require 'damagecontrol/core/AbstractBuildHistoryTest'
 require 'damagecontrol/scm/Changes'
-require 'damagecontrol/util/HubTestHelper'
 require 'damagecontrol/xmlrpc/StatusPublisher'
 
 module DamageControl

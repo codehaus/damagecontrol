@@ -11,7 +11,7 @@ module DamageControl
       hub.add_subscriber(self)
     end
     
-    def receive_message(message)
+    def put(message)
       if(message.is_a?(BuildCompleteEvent))      
         build = message.build
         

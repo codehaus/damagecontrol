@@ -43,7 +43,7 @@
     <td class="pane" <% if build_executor.percentage_left != 0 then %>rowspan="2"<% end %>>
       #<%= build_executor.index+1 %></td>
     <td class="pane" width="70%"><%= build_executor.status_message %></td>
-    <td class="pane">&nbsp;</td>
+    <td class="pane"><%= build_executor.percentage_left %>&nbsp;</td>
   </tr>
   <% if build_executor.percentage_left != 0 then %>
     <tr>

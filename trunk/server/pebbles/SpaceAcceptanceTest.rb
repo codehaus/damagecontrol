@@ -28,9 +28,9 @@ module Pebbles
 
       # add message should be instant when idle
       timeout(1) do
-        hub.add("three")
-        hub.add("blind")
-        hub.add("mice")
+        hub.put("three")
+        hub.put("blind")
+        hub.put("mice")
       end
       assert_equal(0, a.in_queue.length)
       assert_equal(0, b.in_queue.length)

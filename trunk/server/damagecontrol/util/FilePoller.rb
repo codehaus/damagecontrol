@@ -1,10 +1,8 @@
-require 'damagecontrol/util/Timer'
+require 'pebbles/Clock'
 
 module DamageControl
 
-  class FilePoller
-
-    include TimerMixin
+  class FilePoller < Pebbles::Clock
 
     def initialize(dir_to_poll, file_handler=self)
       @dir_to_poll = File.expand_path(dir_to_poll)
@@ -14,7 +12,7 @@ module DamageControl
       discover_files
     end
     
-    def tick(time)
+    def tick
       foreach do |filename|
         begin
           @file_handler.new_file(filename) if is_new_file(filename)
@@ -23,7 +21,6 @@ module DamageControl
         end
       end
       discover_files
-      schedule_next_tick
     end
     
   private

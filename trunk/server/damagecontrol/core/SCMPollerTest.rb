@@ -1,4 +1,3 @@
-require 'damagecontrol/util/HubTestHelper'
 require 'damagecontrol/core/SCMPoller'
 
 require 'test/unit'
@@ -8,10 +7,7 @@ module DamageControl
 
   class SCMPollerTest < Test::Unit::TestCase
   
-    include HubTestHelper
-
     def setup
-      create_hub
       @to_verify = []
     end
     
@@ -28,11 +24,8 @@ module DamageControl
       to_verify(MockIt::Mock.new)
     end
     
-    def teardown
-      verify_all
-    end
-    
     def test_doesnt_check_scm_if_build_is_executing
+      hub = new_mock
       build_scheduler = new_mock
       build_scheduler.__expect(:project_scheduled?) {|project_name|
         assert_equal("project", project_name)
@@ -51,10 +44,13 @@ module DamageControl
         mock_build_history_repository(10),
         build_scheduler)
         
-      poller.force_tick(10)
+      poller.tick(10)
+
+      verify_all
     end
     
     def test_request_build_without_checking_if_there_is_no_completed_build
+      hub = new_mock
       should_not_poll_scm = new_mock
       should_not_poll_scm.__expect_not_called(:changesets)
       
@@ -70,11 +66,16 @@ module DamageControl
         build_history_repository,
         mock_build_scheduler)
         
-      poller.force_tick(10)
-      assert_message_types_from_hub([BuildRequestEvent])
+      hub.__expect(:publish_message) do |message| 
+        assert(message.is_a?(BuildRequestEvent))
+      end
+      poller.tick(10)
+
+      verify_all
     end
     
     def test_should_not_poll_projects_where_polling_hasnt_been_specified
+      hub = new_mock
       should_not_poll_scm = new_mock
       should_not_poll_scm.__expect_not_called(:changesets)
       
@@ -84,10 +85,13 @@ module DamageControl
         mock_build_history_repository(10),
         mock_build_scheduler)
         
-      poller.force_tick(10)
+      poller.tick(10)
+
+      verify_all
     end
 
     def test_should_not_poll_outside_polling_interval
+      hub = new_mock
       should_not_poll_scm = new_mock
       should_not_poll_scm.__expect_not_called(:changesets)
       
@@ -97,10 +101,13 @@ module DamageControl
         mock_build_history_repository(10),
         mock_build_scheduler)
         
-      poller.force_tick(15)
+      poller.tick(15)
+
+      verify_all
     end
     
     def test_should_poll_during_polling_interval
+      hub = new_mock
       should_poll_scm = new_mock
       should_poll_scm.__expect(:changesets) { |from, to| [] }
       
@@ -110,10 +117,13 @@ module DamageControl
         mock_build_history_repository(10),
         mock_build_scheduler)
         
-      poller.force_tick(20)
+      poller.tick(20)
+
+      verify_all
     end
     
     def test_does_not_send_build_request_when_no_change_has_happened
+      hub = new_mock
       now = 1000
       last_build = 2000
       
@@ -130,12 +140,13 @@ module DamageControl
         mock_build_history_repository(last_build),
         mock_build_scheduler)
       
-      poller.force_tick(now)
+      poller.tick(now)
       
-      assert_message_types_from_hub([])
+      verify_all
     end
     
     def test_sends_build_request_when_changes_since_last_completed_build
+      hub = new_mock
       now = 1000
       last_build = 2000
       project_config = {}
@@ -153,9 +164,13 @@ module DamageControl
         mock_build_history_repository(last_build),
         mock_build_scheduler)
         
+      hub.__expect(:publish_message) do |message| 
+        assert(message.is_a?(BuildRequestEvent))
+      end
+
       poller.poll_project("project", Time.at(now))
       
-      assert_message_types_from_hub([BuildRequestEvent])
+      verify_all
     end
     
     def project_config_with_polling

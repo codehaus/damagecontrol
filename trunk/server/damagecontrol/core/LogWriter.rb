@@ -14,7 +14,7 @@ module DamageControl
       channel.add_subscriber(self)
     end
     
-    def receive_message(message)
+    def put(message)
       
       return if !message.is_a? BuildEvent
 
@@ -25,17 +25,17 @@ module DamageControl
           log_file(build).puts(message.output)
           log_file(build).flush
         rescue Exception => e
-          logger.error("Couldn't write to file #{log_file_name(build)}:#{format_exception(e)}")
+          logger.error("Couldn't write to file:#{format_exception(e)}")
         end
       end
       
       if message.is_a? BuildCompleteEvent
         begin
-          logger.debug("closing file #{log_file_name(build)}") if logger.debug?
+          logger.debug("closing file #{log_file(build)}") if logger.debug?
           log_file(build).flush
           log_file(build).close
         rescue => e
-          logger.error("BuildCompleteEvent: Couldn't write to file #{log_file_name(build)}:#{format_exception(e)}")
+          logger.error("BuildCompleteEvent: Couldn't write to file:#{format_exception(e)}")
         end
       end
 

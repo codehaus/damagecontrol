@@ -11,6 +11,7 @@ module MockIt
       @setup_call_procs={}
     end
     
+    # What's this method needed for? (AH)
     def __expect_not_called(method)
       @expect_not_called<<method
     end

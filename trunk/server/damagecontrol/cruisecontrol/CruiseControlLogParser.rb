@@ -39,15 +39,16 @@ module DamageControl
       while parser.has_next? && !parsed_info || !parsed_build
         res = parser.pull
         handle_error(res)
-                
+
         if res.start_element? and res[0] == 'info'
-	  parse_info(parser, build)
-	  parsed_info = true
-	end
+          parse_info(parser, build)
+          parsed_info = true
+        end
+
         if res.start_element? and res[0] == 'build'
-	  parse_build(res, parser, build)
-	  parsed_build = true
-	end
+          parse_build(res, parser, build)
+          parsed_build = true
+        end
       end
     end
 
@@ -60,7 +61,7 @@ module DamageControl
           build.label = res[1]['value'] if res[1]['name'] == 'label'
           build.timestamp = res[1]['value'] if res[1]['name'] == 'cctimestamp'
           build.project_name = res[1]['value'] if res[1]['name'] == 'projectname'
-	  build.url = logfile_to_url(res[1]['value']) if res[1]['name'] == 'logfile'
+          build.url = logfile_to_url(res[1]['value']) if res[1]['name'] == 'logfile'
         end
                 
         return if res.end_element? and res[0] == 'info'
@@ -69,7 +70,7 @@ module DamageControl
 
     def logfile_to_url(logfile)
       if logfile=~/^(\/|\\)(.*)\.xml$/
-	"#{website_baseurl}?log=#{$2}"
+        "#{website_baseurl}?log=#{$2}"
       else
         "<unknown url>"
       end

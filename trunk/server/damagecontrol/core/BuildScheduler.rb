@@ -1,4 +1,5 @@
-require 'damagecontrol/core/AsyncComponent'
+require 'pebbles/Clock'
+require 'pebbles/Space'
 require 'damagecontrol/core/BuildEvents'
 require 'damagecontrol/core/Build'
 require 'damagecontrol/core/BuildExecutor'
@@ -6,95 +7,39 @@ require 'damagecontrol/util/Logging'
 
 module DamageControl
 
-  class BuildScheduler < AsyncComponent
-    
-    include Logging
+  class PendingBuild < Pebbles::Countdown
+    attr_accessor :build
   
-    attr_reader :executors
-    attr_reader :build_queue
-    
-    DEFAULT_QUIET_PERIOD = 5 # seconds
-    
-    def initialize(hub)
-      super(hub)
-      @executors = []
-      @default_quiet_period = DEFAULT_QUIET_PERIOD
-      reset_build_queue
-    end
-  
-    attr_accessor :default_quiet_period
-    
-    def add_executor(executor)
-      executors<<executor
-    end
-    
-    def find_available_executor
-      executors.find {|executor| !executor.busy? }
-    end
-    
-    def find_build_for_project(project_name)
-      build_queue.find{|qd_build| qd_build.project_name == project_name }
-    end
-    
-    def project_scheduled?(project_name)
-      !find_build_for_project(project_name).nil?
-    end
-    
-    def enqueue_build(build)
-      qd_build = find_build_for_project(build.project_name)
-      
-      if qd_build.nil?
-        build_queue<<build
-      elsif qd_build.timestamp_as_i < build.timestamp_as_i
-        build_queue.delete(qd_build)
-        build_queue<<build
-      end
-    end
-    
-    def project_building?(project_name)
-      executors.find {|e| e.building_project?(project_name) }
-    end
-    
-    def schedule_build(build)
-      available_executor = find_available_executor
-      if quiet_period_elapsed?(build) && !available_executor.nil? && !project_building?(build.project_name)
-        available_executor.schedule_build(build)
-      else
-        # not quite time for you, back on the queue
-        enqueue_build(build)
-      end
-    end
-    
-    def quiet_period(build)
-      if build.quiet_period.nil? 
-        default_quiet_period
-      else 
-        build.quiet_period
-      end
-    end
-    
-    def quiet_period_elapsed?(build)
-      current_time >= build.timestamp_as_i + quiet_period(build)
-    end
-    
-    def reset_build_queue
-      @build_queue = []
-    end
-    
-    def schedule_queued_builds
-      build_queue = self.build_queue.dup
-      reset_build_queue
-      build_queue.each do |build|
-        schedule_build(build)
-      end
-      logger.debug( "build_queue = " + self.build_queue.inspect )
+    def initialize(quiet_period, build_scheduler)
+      super(quiet_period)
+      @build_scheduler = build_scheduler
     end
     
     def tick(time)
-      process_messages
-      schedule_queued_builds
+      @build_scheduler.done(self)
     end
+
+    def exception(e)
+      @build_scheduler.exception(e)
+    end
+  end
+
+  class BuildScheduler < AsyncComponent
+
+    include Logging
+  
+    DEFAULT_QUIET_PERIOD = 5 # seconds
     
+    attr_reader :executors
+    
+    def initialize(hub, quiet_period=DEFAULT_QUIET_PERIOD, exception_logger=nil)
+      super(hub)
+      @quiet_period = quiet_period
+      @executors = []
+      @pending_builds = {}
+      @exception_logger = exception_logger
+    end
+  
     def process_message(event)
       if event.is_a?(BuildRequestEvent)
         schedule_build(event.build)
@@ -103,7 +48,53 @@ module DamageControl
     
     def start
       super
-      executors.each {|executor| executor.start}
+      @executors.each {|executor| executor.start}
+    end
+    
+    def add_executor(executor)
+      @executors << executor
+    end
+    
+    def done(pending_build)
+      unless(project_building?(pending_build.build.project_name))
+        # find an available executor
+        executor = @executors.find {|executor| !executor.busy? }
+        if(executor)
+          @pending_builds.delete(pending_build.build.project_name)
+          executor.put(pending_build.build)
+        else
+          # If no executors are available, just restart the quiet period.
+          pending_build.start
+        end
+      end
+    end
+
+    def exception(e)
+      @exception_logger.exception(e) 
+    end
+    
+    def build_queue
+      queue.collect { |build_request_event| build_request_event.build }
+    end
+
+    def project_building?(project_name)
+      @executors.find {|e| e.building_project?(project_name) }
+    end
+
+  private
+  
+    def schedule_build(build)
+      pending_build = @pending_builds[build.project_name]
+      if(pending_build.nil?)
+        pending_build = PendingBuild.new(quiet_period(build), self)
+        @pending_builds[build.project_name] = pending_build
+      end
+      pending_build.build = build
+      pending_build.start
+    end
+    
+    def quiet_period(build)
+      build.quiet_period ? build.quiet_period : @quiet_period
     end
     
   end

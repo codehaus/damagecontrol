@@ -3,7 +3,6 @@ require 'pebbles/mockit'
 require 'xmlrpc/server'
 require 'damagecontrol/core/BuildScheduler'
 require 'damagecontrol/core/BuildExecutor'
-require 'damagecontrol/util/HubTestHelper'
 require 'damagecontrol/core/LogWriter'
 require 'damagecontrol/core/BuildHistoryRepository'
 require 'damagecontrol/core/ProjectDirectories'
@@ -14,7 +13,6 @@ module DamageControl
 
   class ProjectConfigRepositoryBuildExecutorBuildSchedulerLogWriterIntegrationTest < Test::Unit::TestCase
     
-    include HubTestHelper
     include FileUtils
 
     def setup

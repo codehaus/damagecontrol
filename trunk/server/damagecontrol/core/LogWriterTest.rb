@@ -1,7 +1,7 @@
 require 'test/unit'
+require 'pebbles/mockit'
 require 'damagecontrol/core/LogWriter'
 require 'damagecontrol/core/Build'
-require 'damagecontrol/core/Hub'
 require 'damagecontrol/core/ProjectDirectories'
 require 'damagecontrol/util/FileUtils'
 
@@ -11,7 +11,11 @@ module DamageControl
     include FileUtils
     
     def setup
-      @hub = Hub.new
+      @hub = MockIt::Mock.new
+      @hub.__expect(:add_subscriber) do |subscriber|
+        assert(subscriber.is_a?(LogWriter))
+      end
+
       @basedir = new_temp_dir
       @writer = LogWriter.new(@hub)
       
@@ -24,11 +28,11 @@ module DamageControl
 
     def test_log_writer_creates_new_log_on_build_request_and_closes_it_on_build_complete
       progress_event = BuildProgressEvent.new(@build, "hello")
-      @hub.publish_message(progress_event)
+      @writer.put(progress_event)
       assert(!@writer.log_file(@build).closed?)
       
       complete_event = BuildCompleteEvent.new(@build)
-      @hub.publish_message(complete_event)
+      @writer.put(complete_event)
       assert(@writer.log_file(@build).closed?)
 
       assert_file_content("hello\n", 

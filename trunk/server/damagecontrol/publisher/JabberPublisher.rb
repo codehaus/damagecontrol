@@ -1,6 +1,5 @@
 require 'erb'
 require 'jabber4r/jabber4r'
-require 'damagecontrol/util/Timer'
 require 'damagecontrol/core/AsyncComponent'
 require 'damagecontrol/core/BuildEvents'
 

@@ -13,7 +13,7 @@ module Pebbles
 
       def on_message(o)
         # bounce it back twice as big
-        @space.add("#{o}#{o}")
+        @space.put("#{o}#{o}")
 
         # know when to stop it all
         if(o == "xxxxxxxx")
@@ -30,12 +30,11 @@ module Pebbles
       
       ss.start
       
-      hub.add("x")
+      hub.put("x")
 
       timeout(1) do
         hub.start.join
       end
     end
-    
   end
 end

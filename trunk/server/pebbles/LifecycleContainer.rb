@@ -1,5 +1,3 @@
-require 'test/unit'
-
 module Pebbles
 
   class LifecycleContainer

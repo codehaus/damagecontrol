@@ -4,7 +4,6 @@ require 'damagecontrol/scm/Changes'
 require 'damagecontrol/core/AsyncComponent'
 require 'damagecontrol/core/BuildEvents'
 require 'damagecontrol/util/Logging'
-require 'damagecontrol/util/Timer'
 require 'pebbles/MVCServlet'
 
 module DamageControl

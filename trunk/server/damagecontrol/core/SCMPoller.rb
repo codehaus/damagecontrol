@@ -1,12 +1,11 @@
+require 'pebbles/Clock'
 require 'damagecontrol/core/BuildEvents'
 require 'damagecontrol/core/Build'
-require 'damagecontrol/util/Timer'
 require 'damagecontrol/util/Logging'
 
 module DamageControl
 
-  class SCMPoller
-    include TimerMixin
+  class SCMPoller < Pebbles::Clock
     include Logging
     
     def initialize(hub, polling_interval, project_config_repository, build_history_repository, build_scheduler)

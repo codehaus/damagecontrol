@@ -1,7 +1,7 @@
+require 'pebbles/Space'
 require 'damagecontrol/core/Build'
 require 'damagecontrol/core/BuildEvents'
 require 'damagecontrol/core/AsyncComponent'
-require 'damagecontrol/util/Slot'
 require 'damagecontrol/scm/Changes'
 require 'damagecontrol/util/FileUtils'
 require 'damagecontrol/util/Logging'
@@ -11,9 +11,8 @@ module DamageControl
   # This class tells the build to execute and reports
   # progress as events back to the channel
   #
-  class BuildExecutor
+  class BuildExecutor < Pebbles::Space
   
-    include Threading
     include FileUtils
     include Logging
     
@@ -23,10 +22,9 @@ module DamageControl
     attr_accessor :last_build_request
 
     def initialize(channel, build_history_repository, *args)
+      super
       @channel = channel
       @build_history_repository = build_history_repository
-
-      @scheduled_build_slot = Slot.new
       
       # TODO remove this, just warning people about refactorings
       raise "NOTE: BuildExecutor has been refactored! It now only takes two arguments, like this: BuildExecutor.new(hub, build_history_repository)" unless args.empty?
@@ -121,13 +119,9 @@ module DamageControl
     end
     
     def scheduled_build
-      if busy? then @scheduled_build_slot.get else nil end
+      if busy? then @current_build else nil end
     end
   
-    def schedule_build(build)
-      @scheduled_build_slot.set(build)
-    end
-    
     def status_message
       status = ""
       if busy? then
@@ -138,7 +132,7 @@ module DamageControl
     end
     
     def busy?
-      !@scheduled_build_slot.empty?
+      !@current_build.nil?
     end
     
     def building_project?(project_name)
@@ -186,16 +180,11 @@ module DamageControl
       @channel.publish_message(BuildCompleteEvent.new(current_build))
 
       # atomically frees the slot, we are now no longer busy
-      @scheduled_build_slot.clear
-    end
-
-    # will block until scheduled build becomes available
-    def next_scheduled_build
-      @scheduled_build_slot.get
+      @current_build = nil
     end
     
     def current_build
-      @scheduled_build_slot.get
+      @current_build
     end
     
     def current_scm
@@ -209,8 +198,8 @@ module DamageControl
         @channel.publish_message(BuildStartedEvent.new(current_build))
     end
     
-    def process_next_scheduled_build
-      next_scheduled_build
+    def on_message(build)
+      @current_build = build
       begin
         build_start
         checkout
@@ -223,14 +212,6 @@ module DamageControl
         report_progress("Build failed due to: #{message}")
       ensure
         build_complete
-      end
-    end
-    
-    def start
-      new_thread do
-        while(true)
-          protect { process_next_scheduled_build }
-        end
       end
     end
     
