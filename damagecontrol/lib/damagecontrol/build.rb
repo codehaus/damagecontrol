@@ -87,6 +87,10 @@ module DamageControl
         nil
       end
     end
+    
+    def successful?
+      exit_code == 0
+    end
 
     # Returns the pid of the build process
     def pid
