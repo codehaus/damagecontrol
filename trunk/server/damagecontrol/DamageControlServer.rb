@@ -246,7 +246,7 @@ module DamageControl
     
     def init_build_executors
       # Only use one build executor (don't allow parallel builds)
-      build_scheduler.add_executor('executor1', BuildExecutor.new(hub, build_history_repository))
+      build_scheduler.add_executor(BuildExecutor.new('executor1', hub, build_history_repository))
     end
     
     def polling_interval
