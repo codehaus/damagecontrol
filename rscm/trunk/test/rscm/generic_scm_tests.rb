@@ -55,8 +55,8 @@ module RSCM
       assert(scm.uptodate?(checkout_dir))
 
       # modify file and commit it
-      change_file("#{checkout_dir}/build.xml")
-      change_file("#{checkout_dir}/src/java/com/thoughtworks/damagecontrolled/Thingy.java")
+      change_file(scm, "#{checkout_dir}/build.xml")
+      change_file(scm, "#{checkout_dir}/src/java/com/thoughtworks/damagecontrolled/Thingy.java")
 
       scm.checkout(other_checkout_dir, nil) 
       assert(scm.uptodate?(other_checkout_dir))
@@ -148,8 +148,9 @@ module RSCM
       scm.import(import_copy_dir, "imported\nsources")
     end
     
-    def change_file(file)
+    def change_file(scm, file)
       file = File.expand_path(file)
+      scm.edit(file)
       File.open(file, "w+") do |io|
         io.puts("changed\n")
       end
@@ -167,6 +168,7 @@ module RSCM
 
       message = existed ? "editing" : "adding"
 
+      sleep(1)
       scm.commit(checkout_dir, "#{message} #{relative_filename}")
     end
   end
@@ -188,8 +190,8 @@ module RSCM
         "1",
         scm.label(checkout_dir) 
       )
-      change_file("#{checkout_dir}/build.xml")
-      scm.commit(checkout_dir, "changed something") 
+      change_file(scm, "#{checkout_dir}/build.xml")
+      scm.commit(checkout_dir, "changed something")
       scm.checkout(checkout_dir, nil) 
       assert_equal(
         "2",

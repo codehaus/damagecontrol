@@ -48,7 +48,13 @@ module RSCM
     #
     def label(checkout_dir)
     end
-    
+
+    # Open a file for edit - required by scms that checkout files in read-only mode e.g. perforce
+    #
+    def edit(file)
+    end
+
+
     # Checks out or updates contents from an SCM to +checkout_dir+ - a local working copy.
     #
     # The +to_identifier+ parameter may be optionally specified to obtain files up to a
