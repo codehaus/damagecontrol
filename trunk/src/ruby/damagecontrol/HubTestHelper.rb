@@ -3,6 +3,7 @@ require 'damagecontrol/Hub'
 module DamageControl
 
   module HubTestHelper
+  
     attr_reader :hub
     attr_reader :messages_from_hub
 
@@ -36,6 +37,7 @@ module DamageControl
     def assert_got_message(clazz)
       message_types.index(clazz)
     end
+    
   end
   
 end

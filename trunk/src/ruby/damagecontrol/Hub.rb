@@ -9,7 +9,7 @@ module DamageControl
     def initialize
       super()
       @clock = Clock.new
-    end   
+    end
   end
   
 end

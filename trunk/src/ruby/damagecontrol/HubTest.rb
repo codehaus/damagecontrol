@@ -24,4 +24,5 @@ module DamageControl
       @received_message = message
     end
   end
+  
 end
