@@ -234,8 +234,8 @@ function enableOrDisableCvsFieldsAndUpdateScmSpec() {
 <tr>
   <td>Source control</td>
   <td>
-    <input id="cvsradio" type="radio" value="cvs" name="scm" onClick="showScm('cvs')"/> CVS
-    <input id="svnradio" type="radio" value="svn" name="scm" onClick="showScm('svn')"/> Subversion 
+    <input id="cvsradio" type="radio" value="cvs" name="scm" onClick="showScm('cvs')"<%if(project_config('scm_type')=="cvs")%> selected="true"<%end%>/> CVS
+    <input id="svnradio" type="radio" value="svn" name="scm" onClick="showScm('svn')"<%if(project_config('scm_type')=="svn")%> selected="true"<%end%>/> Subversion 
   </td>
 </tr>
 </table>
