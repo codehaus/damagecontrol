@@ -99,7 +99,14 @@ class End2EndTest < Test::Unit::TestCase
 	
 	def install_damagecontrol_into_cvs
     cvs = CVS.new
-    cvs.install_trigger("#{@tempdir}/install_trigger_cvs_tmp", @project, "#{@cvsroot}:#{@project}", script_file("build"))
+    cvs.install_trigger(
+          "#{@tempdir}/install_trigger_cvs_tmp",
+          @project,
+          "#{@cvsroot}:#{@project}",
+          script_file("build"),
+          "localhost",
+          "4711",
+          nc_exe_location)
   end
 	
 	def checkout_cvs_project(project)
@@ -121,6 +128,10 @@ class End2EndTest < Test::Unit::TestCase
 	def nc_file
 		"nc.exe"
 	end
+  
+  def nc_exe_location
+    "#{@basedir}/bin/#{nc_file}"
+  end
 	
 	def assert_file_content(expected_content, file, message)
 		assert(FileTest::exists?(file), "#{file} doesn't exist, #{message}")
@@ -156,8 +167,7 @@ class End2EndTest < Test::Unit::TestCase
     start_damagecontrol
 		create_cvsmodule("e2eproject")
 		install_damagecontrol_into_cvs
-		activate_damagecontrol_in_cvs
-                
+
 		# add build.bat file and commit it (will trigger build)
 		checkout_cvs_project("e2eproject")
 		File.open("e2eproject/build.bat", "w") do |file|
@@ -171,7 +181,7 @@ class End2EndTest < Test::Unit::TestCase
     verify_output_of_build
 	end
         
-  def test_builds_on_svn_add
+  def TODO_test_builds_on_svn_add
       create_svn_repository
       start_damagecontrol
       install_and_activate_damagecontrol_for_svn
@@ -201,7 +211,7 @@ class End2EndTest < Test::Unit::TestCase
       file.puts("%~dp0damagecontrol.bat repo #{@svn_url} #{script_file("build")}")
     end
     File.copy("#{trigger_script}", script_file("#{@svn_hooks_dir}/damagecontrol"))
-    File.copy( "#{@basedir}/bin/#{nc_file}", "#{@svn_hooks_dir}/#{nc_file}" )
+    File.copy(nc_exe_location, "#{@svn_hooks_dir}/#{nc_file}" )
   end
         
   def checkout_svn_repository

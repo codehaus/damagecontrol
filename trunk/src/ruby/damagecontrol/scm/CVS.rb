@@ -76,13 +76,14 @@ module DamageControl
     end
     
     def checkout(spec, directory, &proc)
-      directory = File.expand_path(directory)
+      spec = to_os_path(spec)
+      directory = to_os_path(File.expand_path(directory))
       File.makedirs(directory)
       if(checked_out?(directory, spec))
         Dir.chdir(directory)
         cvs(update_command(spec), &proc)
       else
-        Dir.chdir(directory)
+        Dir.chdir(directory + "/..")
         cvs(checkout_command(spec, directory), &proc)
       end
     end
@@ -109,7 +110,7 @@ module DamageControl
       build_command_line, \
       dc_host="localhost", \
       dc_port="4711", \
-      nc_exe_file="", \
+      nc_exe_file="nc", \
       &proc
     )
       directory = File.expand_path(directory)
@@ -122,12 +123,12 @@ module DamageControl
 
       if(windows?)
         # install nc.exe
-        File.copy( "#{nc_exe_file}", "#{directory}/nc.exe" )
+        File.copy(nc_exe_file, "#{directory}/nc.exe" )
         system("cvs -d#{cvsroot(spec)} add -kb nc.exe")
 
         # tell cvs to keep a non-,v file in the central repo
         File.open("checkoutlist", File::WRONLY | File::APPEND) do |file|
-          file.puts("nc.exe")
+          file.puts(File.basename(nc_exe_file))
         end
       end
       Dir.chdir("#{directory}")
@@ -136,7 +137,7 @@ module DamageControl
     
     def nc_command(spec)
       if(windows?)
-        "#{path(spec)}/CVSROOT/nc.exe".gsub('/','\\')
+        to_os_path("#{path(spec)}/CVSROOT/nc.exe")
       else
         "nc"
       end
@@ -147,12 +148,12 @@ module DamageControl
       File.exists?(rootcvs)
     end
   
-    def cvs(cmd)
+    def cvs(cmd, &proc)
       cmd = "cvs #{cmd}"
       puts cmd
       io = IO.popen(cmd) do |io|
         io.each_line do |progress|
-          yield progress
+          if block_given? then yield progress else puts progress end
         end
       end
     end
