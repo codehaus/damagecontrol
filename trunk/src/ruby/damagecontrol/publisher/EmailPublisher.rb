@@ -5,6 +5,8 @@ require 'net/smtp'
 module DamageControl
 
   class EmailPublisher < AsyncComponent
+
+    attr_reader :always_mail
   
     def initialize(channel, subject_template, body_template, from, always_mail=false, server="localhost", port=25)
       super(channel)

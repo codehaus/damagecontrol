@@ -14,5 +14,6 @@ Commit CVS project : damagecontrolled
 	Testing DamageControl, breaking test to check for email
 Check for email
 	Subject: BUILD FAILED damagecontrolled
-	Body:
+	BUILD FAILED damagecontrolled
+
 

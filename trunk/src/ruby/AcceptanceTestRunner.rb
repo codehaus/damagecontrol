@@ -36,7 +36,7 @@ class AcceptanceTest
   end
 end
 
-class AcceptanceTestRunner
+class Story
   attr_reader :story
   attr_reader :test_description
   attr_reader :tests
@@ -45,7 +45,8 @@ class AcceptanceTestRunner
     @tests = []
     File.open(file) {|io| parse_stream(io) } unless file.nil?
   end
-  
+
+  # TODO inline this method, used in tests only
   def parse_string(string)
     require 'stringio'
     StringIO.open(string) {|io| parse_stream(io) }
@@ -126,8 +127,43 @@ class AcceptanceTestRunner
   
 end
 
+class AcceptanceTestRunner
+  attr_reader :stories
+
+  def initialize
+    @stories = []
+  end
+
+  def add_story(story)
+    stories<<story
+  end
+
+  def run
+    puts "START"
+    @successful = true
+    stories.each do |story| 
+      begin
+        story.run
+      rescue
+        puts "FAILURE #{$!}"
+        @successful = false
+      end
+    end
+    puts "END"
+  end
+
+  def successful?
+    @successful
+  end
+end
+
 if $0 == __FILE__
-  runner = AcceptanceTestRunner.new("../acceptance/codehaus_test.txt")
-  runner.add_driver(TestDriver.new)
+  runner = AcceptanceTestRunner.new
+  ARGV.each do |file|
+    story = Story.new(file)
+    story.add_driver(TestDriver.new)
+    runner.add_story(story)
+  end
   runner.run
+  exit!(if runner.successful? then 0 else 1 end)
 end

@@ -5,7 +5,6 @@ require 'damagecontrol/scm/SVNTest'
 
 require 'damagecontrol/BuildTest'
 require 'damagecontrol/FilePollerTest'
-#require 'damagecontrol/EqualityTest'
 require 'damagecontrol/AsyncComponentTest'
 require 'damagecontrol/HubTest'
 require 'damagecontrol/BuildDelayerTest'
@@ -31,3 +30,5 @@ require 'damagecontrol/dependency/UpstreamDownstreamTraverserTest'
 #require 'damagecontrol/CruiseControlBridgeTest'
 require 'damagecontrol/cruisecontrol/CruiseControlLogPollerTest'
 require 'damagecontrol/cruisecontrol/CruiseControlLogParserTest'
+
+require 'AcceptanceTestRunnerTest'

@@ -3,7 +3,7 @@ require 'mockit'
 
 require 'AcceptanceTestRunner'
 
-class AcceptanceTestRunnerTest < Test::Unit::TestCase
+class StoryTest < Test::Unit::TestCase
 
 TEST_WITH_STORY_ENTRY =
 <<-EOF
@@ -12,7 +12,7 @@ And this is the another line of the story.
 EOF
 
   def test_parses_story_entry
-    runner = AcceptanceTestRunner.new(nil)
+    runner = Story.new(nil)
     runner.parse_string(TEST_WITH_STORY_ENTRY)
     assert_equal(%{This is a very short story.
 And this is the another line of the story.}, runner.story)
@@ -27,7 +27,7 @@ TEST: This is a very short test.
 EOF
 
   def test_parses_test_with_test_and_story
-    runner = AcceptanceTestRunner.new(nil)
+    runner = Story.new(nil)
     runner.parse_string(TEST_WITH_STORY_AND_TEST)
     assert_equal(%{This is a very short story.
 And this is the another line of the story.}, runner.story)
@@ -43,7 +43,7 @@ Do something
 EOF
 
   def test_parses_test_with_one_step
-    runner = AcceptanceTestRunner.new(nil)
+    runner = Story.new(nil)
     runner.parse_string(TEST_WITH_ONE_STEP)
     assert_equal(1, runner.tests[0].steps.size)
     assert_equal("Do something", runner.tests[0].steps[0].task)
@@ -60,7 +60,7 @@ Do something once again
 EOF
 
   def test_parses_test_with_some_steps
-    runner = AcceptanceTestRunner.new(nil)
+    runner = Story.new(nil)
     runner.parse_string(TEST_WITH_SOME_STEPS)
     assert_equal(3, runner.tests[0].steps.size)
     assert_equal("Do something", runner.tests[0].steps[0].task)
@@ -78,7 +78,7 @@ Do something more : other_argument1 other_argument2
 EOF
 
   def test_parses_test_with_some_steps_and_arguments
-    runner = AcceptanceTestRunner.new(nil)
+    runner = Story.new(nil)
     runner.parse_string(TEST_WITH_SOME_STEPS_WITH_ARGUMENTS)
     assert_equal(2, runner.tests[0].steps.size)
     assert_equal("Do something", runner.tests[0].steps[0].task)
@@ -112,7 +112,7 @@ Do something with complicated arguments : simple_argument1 simple_argument2
 EOF
 
   def test_parses_step_with_multi_line_argument_and_step_before
-    runner = AcceptanceTestRunner.new(nil)
+    runner = Story.new(nil)
     runner.parse_string(TEST_WITH_MULTI_LINE_ARGUMENTS_TASK_BEFORE)
     assert_equal(2, runner.tests[0].steps.size)
     assert_equal("Task before", runner.tests[0].steps[0].task)
@@ -120,7 +120,7 @@ EOF
   end
 
   def test_parses_step_with_multi_line_argument_and_step_after
-    runner = AcceptanceTestRunner.new(nil)
+    runner = Story.new(nil)
     runner.parse_string(TEST_WITH_MULTI_LINE_ARGUMENTS_TASK_AFTER)
     assert_equal(2, runner.tests[0].steps.size)
     check_multi_line_step(runner.tests[0].steps[0])
@@ -136,7 +136,7 @@ Check out or update CVS project : :ext:dcontrol@cvs.codehaus.org:/cvsroot/damage
 EOF
 
   def test_handles_colons_in_arguments
-    runner = AcceptanceTestRunner.new(nil)
+    runner = Story.new(nil)
     runner.parse_string(TEST_WITH_COLON_IN_ARGUMENT)
     assert_equal("Check out or update CVS project", runner.tests[0].steps[0].task)
     assert_equal([":ext:dcontrol@cvs.codehaus.org:/cvsroot/damagecontrol", "damagecontrolled"], 
@@ -157,7 +157,6 @@ def test_task_converted_to_method_name_with_underscores
   
   def test_executing_test_step_runs_method_on_test_driver
     driver = Mock.new
-    driver.__setup(:respond_to?) { true }
     
     driver.__expect(:test_step1) {}
     driver.__expect(:test_step2) {|*args|  assert_equal(["arg1", "arg2"], args) }
@@ -180,13 +179,13 @@ A little bit of that.}, content)
   end
   
   def test_run_failing_test_from_file
-    runner = AcceptanceTestRunner.new("failing_test.txt")
+    runner = Story.new("failing_test.txt")
     runner.add_driver(FailingDriver.new)
     assert_raises(RuntimeError) { runner.run }
   end
   
   def test_missing_method_throws_exception_with_clear_message
-    runner = AcceptanceTestRunner.new(nil)
+    runner = Story.new(nil)
     test = AcceptanceTest.new("Failing test")
     test.steps<<TestStep.new("This task is not implemented", [])
     runner.tests<<test
@@ -194,4 +193,31 @@ A little bit of that.}, content)
     assert_raises(NoMethodError) { runner.run }
   end
 
+end
+
+class AcceptanceTestRunnerTest < Test::Unit::TestCase
+  def test_runs_stories_and_is_successful
+    story1 = Mock.new
+    story1.__expect(:run) { }
+    story2 = Mock.new
+    story2.__expect(:run) { }
+
+    runner = AcceptanceTestRunner.new
+    runner.add_story(story1)
+    runner.add_story(story2)
+    runner.run
+    assert(runner.successful?)
+
+    story1.__verify
+    story2.__verify
+  end
+
+  def test_run_failing_test_and_successful_returns_false
+    story = Mock.new
+    story.__expect(:run) { fail }
+    runner = AcceptanceTestRunner.new
+    runner.add_story(story)
+    runner.run
+    assert(!runner.successful?)
+  end
 end
