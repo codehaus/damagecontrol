@@ -1,0 +1,35 @@
+Index: src/test/org/picocontainer/sample/tulip/FlowerMarketGui.java
+===================================================================
+RCS file: /home/projects/picocontainer/scm/sample/src/test/org/picocontainer/sample/tulip/FlowerMarketGui.java,v
+retrieving revision 1.1
+retrieving revision 1.2
+diff -u -r1.1 -r1.2
+--- src/test/org/picocontainer/sample/tulip/FlowerMarketGui.java        25 Nov 2003 22:07:59 -0000      1.1
++++ src/test/org/picocontainer/sample/tulip/FlowerMarketGui.java        5 Jun 2004 19:27:45 -0000       1.2
+@@ -1,6 +1,6 @@
+ package org.picocontainer.sample.tulip;
+
+-import org.picocontainer.lifecycle.Startable;
++import org.picocontainer.Startable;
+
+ import javax.swing.*;
+ import javax.swing.table.DefaultTableModel;
+@@ -9,7 +9,7 @@
+ /**
+  * @author Aslak Helles&oslash;y
+  * @author Jon Tirs&eacute;n
+- * @version $Revision: 1.1 $
++ * @version $Revision: 1.2 $
+  */
+ public class FlowerMarketGui extends FlowerMarketStub implements Startable {
+     private DefaultTableModel bidsTableModel;
+@@ -26,6 +26,9 @@
+         frame.pack();
+         frame.setBounds(700, 100, 300, 600);
+         frame.show();
++    }
++
++    public void stop() {
+     }
+
+     public void sellBid(String flower) {

@@ -1,5 +1,6 @@
 require 'fileutils'
 require 'rscm/tempdir'
+require 'rscm/path_converter'
 
 module RSCM
 
@@ -115,7 +116,7 @@ module RSCM
       assert("src/java/com/thoughtworks/damagecontrolled/Hello.txt", scm.checkout(other_checkout_dir).sort[0])
     end
     
-    def Xtest_trigger
+    def test_trigger
       work_dir = RSCM.new_temp_dir
       path = "OftenModified"
       checkout_dir = "#{work_dir}/#{path}/checkout"
@@ -139,27 +140,7 @@ module RSCM
       assert_same(scm.class, scm2.class)
     end
 
-EXPECTED_DIFF = <<-EOF
-===================================================================
---- afile.txt   (revision 2)
-+++ afile.txt   (revision 1)
-@@ -1,2 +1 @@
--one two three four
--five six
-+
-Index: afile.txt
-===================================================================
---- afile.txt   (revision 3)
-+++ afile.txt   (revision 2)
-@@ -1,3 +1,2 @@
--one to threee
--hello
--four five six
-+one two three four
-+five six
-EOF
-
-    def Xtest_diff
+    def test_diff
       work_dir = RSCM.new_temp_dir
       path = "diffing"
       checkout_dir = "#{work_dir}/#{path}/checkout"
@@ -203,9 +184,6 @@ EOF
       
       changesets = scm.changesets(checkout_dir, Time.epoch)
 
-      changesets.diff(checkout_dir, scm) do |io|
-        puts io.read
-      end
     end
 
   private
