@@ -22,6 +22,7 @@ require 'damagecontrol/web/ProjectServlet'
 module DamageControl
   class DamageControlServer
     include FileUtils
+    include Logging
   
     attr_reader :params
     attr_reader :components
@@ -29,13 +30,17 @@ module DamageControl
     def initialize(params={})
       @params = params
       @components = []
-      create_components
+    end
+    
+    def startup_time
+      @startup_time = Time.now if @startup_time.nil?
+      @startup_time
     end
   
     def startup_message
-      message = "Starting #{DamageControl::VERSION_TEXT} at #{Time.now}"
+      message = "Starting #{DamageControl::VERSION_TEXT} at #{startup_time}, root directory = #{rootdir.inspect}, config = #{params.inspect}"
       puts message
-      Logging.logger.info(message)
+      logger.info(message)
     end
     
     def component(name, instance)
@@ -44,23 +49,45 @@ module DamageControl
       components << instance
     end
     
-    def create_components
+    def rootdir
+      params[:RootDir] || damagecontrol_home
+    end
+    
+    def checkoutdir
+      "#{rootdir}/checkout"
+    end
+    
+    def logdir
+      "#{rootdir}/log"
+    end
+    
+    def allow_ips
+      params[:AllowIPs] || nil
+    end
+    
+    def socket_trigger_port
+      params[:SocketTriggerPort] || 4711
+    end
+    
+    def http_port 
+      params[:HttpPort] || 4712
+    end
+    
+    def https_port
+      params[:HttpsPort] || 4713
+    end
+    
+    def logging_level
       Logging.quiet
-
-      rootdir = params[:RootDir] || damagecontrol_home
-      allow_ips = params[:AllowIPs] || nil 
-      port = params[:SocketTriggerPort] || 4711
-      http_port = params[:HttpPort] || 4712
-      https_port = params[:HttpsPort] || 4713
+    end
     
-      logdir = "#{rootdir}/log"
-      checkoutdir = "#{rootdir}/checkout"
+    def init_components                
+      component(:hub, Hub.new)
+      component(:log_writer, LogWriter.new(hub, logdir))
+    
+      component(:host_verifier, if allow_ips.nil? then OpenHostVerifier.new else HostVerifier.new(allow_ips) end)
       
-      @hub = Hub.new
-      LogWriter.new(@hub, logdir)
-    
-      host_verifier = if allow_ips.nil? then OpenHostVerifier.new else HostVerifier.new(allow_ips) end
-      @socket_trigger = SocketTrigger.new(@hub, port, host_verifier)
+      component(:socket_trigger, SocketTrigger.new(@hub, socket_trigger_port, host_verifier))
     
       public_xmlrpc_servlet = ::XMLRPC::WEBrickServlet.new
       private_xmlrpc_servlet = ::XMLRPC::WEBrickServlet.new
@@ -76,10 +103,8 @@ module DamageControl
       DamageControl::XMLRPC::ServerControl.new(private_xmlrpc_servlet)
       DamageControl::XMLRPC::ConnectionTester.new(public_xmlrpc_servlet)
       
-      scheduler = BuildScheduler.new(@hub)
-      # Only use one build executor (don't allow parallel builds)
-      scheduler.add_executor(BuildExecutor.new(@hub, build_history_repository, checkoutdir))
-    
+      init_build_scheduler
+      
       component(:httpd, WEBrick::HTTPServer.new(
         :Port => http_port, 
         :RequestHandler => HostVerifyingHandler.new(host_verifier)
@@ -91,10 +116,32 @@ module DamageControl
       httpd.mount("/private/xmlrpc", private_xmlrpc_servlet)
 
       httpd.mount("/private/admin", ProjectServlet.new(build_history_repository, project_config_repository, trigger))
+      
+      init_custom_components
+    end
+    
+    def checkoutdir
+      "#{rootdir}/checkout"
+    end
+    
+    def init_build_scheduler
+      component(:scheduler, BuildScheduler.new(hub))
+      init_build_executors
+    end
+    
+    def init_build_executors
+      # Only use one build executor (don't allow parallel builds)
+      scheduler.add_executor(BuildExecutor.new(hub, build_history_repository, project_directories))
+    end
+    
+    def init_custom_components
     end
       
     def start
       startup_message
+      logging_level
+      
+      init_components
 
       at_exit { shutdown }
       @threads = []
@@ -109,10 +156,27 @@ module DamageControl
       @threads.each {|thread| thread.join }
     end
     
+    def format_exception(e)
+      e.message + "\n\t" + e.backtrace.join("\n\t")
+    end
+    
     def shutdown
-      components.each do |component|
-        component.shutdown if(component.respond_to?(:shutdown))
-      end
+      httpd.shutdown
+      
+      # this stuff doesn't work for some reason :-(
+      #components.each do |component|
+      #  begin
+      #    if(component.respond_to?(:shutdown))
+      #      # shut down components in a separate thread
+      #      Thread.new do
+      #        logger.info("shutting down #{component}", e)
+      #        component.shutdown 
+      #      end
+      #    end
+      #  rescue Exception => e
+      #    logger.error("could not shut down #{component}: #{format_exception(e)}")
+      #  end
+      #end
     end
   end
 end

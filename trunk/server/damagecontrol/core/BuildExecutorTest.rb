@@ -9,6 +9,7 @@ require 'damagecontrol/core/BuildExecutor'
 require 'damagecontrol/util/HubTestHelper'
 require 'damagecontrol/util/FileUtils'
 require 'damagecontrol/core/BuildHistoryRepository'
+require 'damagecontrol/core/ProjectDirectories'
 
 module DamageControl
 
@@ -29,9 +30,14 @@ module DamageControl
   
     def setup
       create_hub
-      @build_executor = BuildExecutor.new(hub, BuildHistoryRepository.new(hub), File.expand_path("#{damagecontrol_home}/testdata"))
+      @basedir = new_temp_dir("BuildExecutorTest")
+      @build_executor = BuildExecutor.new(hub, BuildHistoryRepository.new(hub), ProjectDirectories.new(@basedir))
       @build = Build.new("damagecontrolled", Time.now, {"build_command_line" => "echo Hello world from DamageControl!"})
       @quiet_period = 10
+    end
+    
+    def teardown
+      rm_rf(@basedir)
     end
   
     def test_when_build_scheduled_executes_sends_start_process_and_complete
@@ -57,27 +63,8 @@ module DamageControl
       assert_equal(Build::FAILED, messages_from_hub[-1].build.status)
     end
     
-    def test_succesful_ant_build
-    
-      @build = Build.new("damagecontrolled", Time.now, { "build_command_line" => "#{ant} compile"})
-      
-      successful = nil
-      hub.add_subscriber(Subscriber.new do |message|
-        if (message.is_a?(BuildProgressEvent))
-          puts message.output
-          successful = true if(/BUILD SUCCESSFUL/ =~ message.output)
-        end
-      end)
-      
-      @build_executor.schedule_build(@build)
-      @build_executor.process_next_scheduled_build
-
-      assert(successful, "ant build should succeed (HINT: is ant on your PATH?)")
-      
-    end
-    
-    def test_checks_out_and_determines_changes_before_building
-      basedir = new_temp_dir("BuildExecutorTest")
+    def test_checks_out_and_determines_changes_before_building      
+      checkoutdir = "#{@basedir}/damagecontrolled/checkout/damagecontrolled"
       
       mock_build_history = MockIt::Mock.new
       mock_build_history.__expect(:last_succesful_build) { |project_name|
@@ -89,18 +76,18 @@ module DamageControl
       mock_scm = MockIt::Mock.new
       mock_scm.__expect(:changes) { |scm_spec, dir, time_before, time_after|
         assert_equal("scm_spec", scm_spec)
-        assert_equal("#{basedir}/damagecontrolled", dir)
+        assert_equal(checkoutdir, dir)
         assert_equal(Time.utc(2004, 04, 02, 12, 00, 00), time_before)
         assert_equal(Time.utc(2004, 04, 02, 13, 00, 00), time_after)
       }
       mock_scm.__expect(:checkout) { |scm_spec, dir|
         assert_equal("scm_spec", scm_spec)
-        assert_equal("#{basedir}/damagecontrolled", dir)
+        assert_equal(checkoutdir, dir)
       }
       
-      FileUtils.mkdir_p("#{basedir}/damagecontrolled")
+      FileUtils.mkdir_p(checkoutdir)
       
-      @build_executor = BuildExecutor.new(hub, mock_build_history, basedir, mock_scm)
+      @build_executor = BuildExecutor.new(hub, mock_build_history, ProjectDirectories.new(@basedir), mock_scm)
       @build = Build.new("damagecontrolled", Time.now,
         { "scm_spec" => "scm_spec", "build_command_line" => "echo hello world"})
       @build.timestamp = Time.utc(2004, 04, 02, 13, 00, 00)

@@ -96,10 +96,11 @@ module DamageControl
     end
 
     def start
-      Thread.new {
+      Thread.new do
         begin
           @server = TCPServer.new(port)
-          at_exit { @server.shutdown }
+          # doesn't seem to work properly
+          #at_exit { @server.shutdown }
           logger.info "#{self} listening on port #{port}"
           
           while (socket = @server.accept)
@@ -111,7 +112,7 @@ module DamageControl
         ensure
           puts "Stopped SocketTrigger listening on port #{port}"
         end
-      }
+      end
     end
     
     def get_ip

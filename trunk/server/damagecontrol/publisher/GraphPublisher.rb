@@ -8,16 +8,16 @@ module DamageControl
 
   class GraphPublisher < AsyncComponent
   
-    def initialize(channel, target_base_dir, build_history_repository)
+    def initialize(channel, project_directories, build_history_repository)
       super(channel)
-      @target_base_dir = target_base_dir
+      @project_directories = project_directories
       @bhrg = DamageControl::Tool::Plot::BuildHistoryReportGenerator.new(build_history_repository)
     end
   
     def process_message(message)
       if message.is_a? BuildCompleteEvent
         build = message.build
-        dir = "#{@target_base_dir}/#{build.project_name}"
+        dir = project_directories.report_dir(build.project_name)
         FileUtils.mkpath(dir)
         @bhrg.generate(dir, build.project_name)
       end

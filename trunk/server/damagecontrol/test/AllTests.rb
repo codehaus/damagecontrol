@@ -20,7 +20,6 @@ require 'damagecontrol/core/BuildSchedulerTest'
 require 'damagecontrol/core/HostVerifyingHandlerTest'
 
 require 'damagecontrol/publisher/IRCPublisherTest'
-require 'damagecontrol/publisher/FilePublisherTest'
 require 'damagecontrol/publisher/EmailPublisherTest'
 require 'damagecontrol/core/BuildHistoryRepositoryTest'
 require 'damagecontrol/core/ProjectConfigRepositoryTest'

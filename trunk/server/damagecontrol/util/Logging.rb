@@ -25,6 +25,11 @@ module DamageControl
     end
     module_function :logger
 
+    def debug
+      logger.level = Log4r::DEBUG
+    end
+    module_function :debug
+    
     def quiet
       logger.level = Log4r::INFO
     end

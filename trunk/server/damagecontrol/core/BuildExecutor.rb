@@ -2,7 +2,6 @@ require 'damagecontrol/core/Build'
 require 'damagecontrol/core/BuildEvents'
 require 'damagecontrol/core/AsyncComponent'
 require 'damagecontrol/scm/DefaultSCMRegistry'
-require 'damagecontrol/util/FileSystem'
 require 'damagecontrol/util/Slot'
 
 module DamageControl
@@ -19,11 +18,10 @@ module DamageControl
     
     attr_accessor :last_build_request
 
-    def initialize(channel, build_history, builds_dir, scm = DefaultSCMRegistry.new)
+    def initialize(channel, build_history, project_directories, scm = DefaultSCMRegistry.new)
       @channel = channel
-      @builds_dir = builds_dir
+      @project_directories = project_directories
       @scm = scm
-      @filesystem = FileSystem.new
       @scheduled_build_slot = Slot.new
       @build_history = build_history
     end
@@ -68,7 +66,7 @@ module DamageControl
     end
  
     def project_base_dir
-      "#{@builds_dir}/#{current_build.project_name}"
+      @project_directories.checkout_dir(current_build.project_name)
     end
     
     def checkout?

@@ -1,7 +1,7 @@
 require 'test/unit'
 require 'net/http'
 require 'pebbles/mockit'
-require 'damagecontrol/simple'
+require 'damagecontrol/DamageControlServer'
 
 module DamageControl
 

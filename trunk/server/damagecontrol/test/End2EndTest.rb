@@ -17,7 +17,6 @@ include DamageControl
 # turn off debug logging
 Logging.quiet
 
-
 def wait_for(timeout=60, &proc)
   0.upto(timeout) do
     return if proc.call
@@ -287,10 +286,18 @@ class DamageControlServerDriver < Driver
     assert_server_running
   end
   
+  def bindir
+    "#{damagecontrol_home}/bin"
+  end
+  
+  def new_project(project)
+    system("ruby #{bindir}/newproject.rb --rootdir #{basedir} --projectname #{project}")
+  end
+  
   def setup_project_config(project, scm_spec, build_command_line)
-    pcr = ProjectConfigRepository.new(ProjectDirectories.new(basedir))
-    pcr.new_project(project)
-    pcr.modify_project_config(project,
+    new_project(project)
+    
+    ProjectConfigRepository.new(ProjectDirectories.new(basedir)).modify_project_config(project,
       {
         "scm_spec" => scm_spec,
         "build_command_line" => build_command_line,
@@ -330,7 +337,7 @@ class DamageControlServerDriver < Driver
   end
   
   def server_shutdown?
-    @server_startup_result == true
+    !@server_startup_result.nil?
   end
   
   def teardown
@@ -339,7 +346,8 @@ class DamageControlServerDriver < Driver
     assert(!server_shutdown?, "server did not start up properly")
     shutdown_server
     wait_for(20) { server_shutdown? }
-    assert(server_shutdown?, "server did not shut down properly")
+    assert(server_shutdown?, "server did not shut down")
+    assert(@server_startup_result, "server did not start up/shut down cleanly")
   end
 end
 
@@ -485,7 +493,7 @@ class End2EndTest < Test::Unit::TestCase
   end
   
   def build_result
-    "#{basedir}/checkout/#{project}/buildresult.txt"
+    "#{basedir}/#{project}/checkout/#{project}/buildresult.txt"
   end
   
   def assert_not_built_yet
@@ -499,8 +507,6 @@ class End2EndTest < Test::Unit::TestCase
             else
               'Hello world from DamageControl'
             end
-    assert_file_content(expected_content,
-      build_result,
-      "build not executed")
+    assert_file_content(expected_content, build_result, "build not executed")
   end
 end
