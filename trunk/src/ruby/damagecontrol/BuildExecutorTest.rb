@@ -39,7 +39,12 @@ module DamageControl
       @build = Build.new("damagecontrolled", { "build_command_line" => "bad_command"})
       @build_executor.schedule_build(@build)
       @build_executor.process_next_scheduled_build
-      assert(messages_from_hub[-2].is_a?(BuildStartedEvent))
+      # what happens for bad_command is different on windows and linux
+      if(windows?)
+        assert(messages_from_hub[-2].is_a?(BuildStartedEvent))
+      else
+        assert(messages_from_hub[-2].is_a?(BuildProgressEvent))
+      end
       assert(messages_from_hub[-1].is_a?(BuildCompleteEvent))
       assert(!messages_from_hub[-1].build.successful)
     end
