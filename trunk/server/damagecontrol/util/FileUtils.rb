@@ -111,7 +111,7 @@ module FileUtils
           err_thread = Thread.new do
             begin
               logger.info("Reading (and discarding) stderr")
-              stderr.read unless stderr.closed?
+              logger.debug(stderr.read.chomp) unless stderr.closed?
               # This segfaults on Linux when the process is dead.
               # ./server/damagecontrol/util/FileUtils.rb:114: [BUG] Segmentation fault
               # ruby 1.8.2 (2004-11-06) [i686-linux]

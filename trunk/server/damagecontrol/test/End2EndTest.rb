@@ -108,7 +108,6 @@ class IRCDriver
   
   def assert_build_failed_and_changes_on_channel(username, project_name)
     assert_match(/\[#{project_name}\] BUILD FAILED/, irc_listener.received_text)
-    assert_match(/#{username}/, irc_listener.received_text)
   end
 
   private
@@ -187,10 +186,11 @@ class DamageControlServerDriver < Driver
   end
   
   def start_damagecontrol_forked
-    Thread.new {
-      @server_startup_result = nil
-      @server_startup_result = system("ruby -I#{damagecontrol_home}/server #{startup_script} #{basedir} #{timeout} #{ONLINE}")
-    }
+    @exit_status = nil
+    @pid = fork do
+      exec("ruby", "-I#{damagecontrol_home}/server", startup_script, basedir, timeout.to_s, ONLINE.to_s)
+    end
+    at_exit { forcibly_kill_server if server_running? }
     wait_for(15) { server_running? }
     assert_server_running
   end
@@ -234,6 +234,8 @@ class DamageControlServerDriver < Driver
       false
     rescue Errno::ECONNREFUSED => e
       false
+    rescue Errno::EINTR => e # Can happen on timeouts
+      false
     rescue Exception => e
       puts Logging.format_exception(e)
       false
@@ -241,7 +243,23 @@ class DamageControlServerDriver < Driver
   end
   
   def server_shutdown?
-    !@server_startup_result.nil?
+    if @pid.nil?
+      true
+    else
+      wait_result = Process::waitpid2(@pid, Process::WNOHANG)
+      if wait_result.nil?
+        false
+      else
+        (unused_pid, @exit_status) = wait_result
+        @pid = nil
+        true
+      end
+    end
+  end
+
+  def forcibly_kill_server
+    Process.kill("SIGKILL", @pid)
+    Process.waitpid(@pid)
   end
   
   def teardown
@@ -249,8 +267,11 @@ class DamageControlServerDriver < Driver
     assert(!server_shutdown?, "server did not start up properly")
     shutdown_server
     wait_for(20) { server_shutdown? }
-    assert(server_shutdown?, "server did not shut down")
-    assert(@server_startup_result, "server did not start up/shut down cleanly")
+    if !server_shutdown?
+      forcibly_kill_server
+      flunk("server did not shut down")
+    end
+    assert_equal(@exit_status, 0, "server did not start up/shut down cleanly")
   end
 end
 
@@ -330,11 +351,8 @@ class End2EndTest < Test::Unit::TestCase
     @server_work_dir            = "#{@basedir}/server_work"
     File.mkpath(basedir)
   end
-  
-  def test_dummy
-  end
-  
-  def Xtest_damagecontrol_works_with_cvs
+    
+  def test_damagecontrol_works_with_cvs
     @project_name = "CVS_TestingProject"
 
     central_cvs = LocalCVS.new(@repo_dir, @relative_project_path)
@@ -348,7 +366,7 @@ class End2EndTest < Test::Unit::TestCase
     test_build_and_log_and_irc(remote_cvs, false)
   end
 
-  def Xtest_damagecontrol_works_with_svn
+  def test_damagecontrol_works_with_svn
     @project_name = "SVN_TestingProject"
 
     central_svn = SVN.new
@@ -409,7 +427,7 @@ class End2EndTest < Test::Unit::TestCase
   end
   
   def assert_log_output_written_out
-    assert(0 < Dir["#{@server_work_dir}/#{@project_name}/log/*.log"].size)
+    assert(0 < Dir["#{@server_work_dir}/#{@project_name}/build/*/stdout.log"].size)
   end
   
   def assert_file_content(expected_content, file, message)

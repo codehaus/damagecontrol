@@ -384,14 +384,18 @@ module DamageControl
       trap("TERM") { shutdown }
       @threads = []
       components.each do |component|
-        @threads << Thread.new { component.start } if(component.respond_to?(:start))
-      end
-      
+        if component.respond_to?(:start)
+          thread = Thread.new { component.start }
+          thread[:name] = component.to_s()
+          @threads << thread
+        end
+      end  
       self
     end
 
     def wait_for_shutdown
       @threads.each {|thread| thread.join }
+      puts 
     end
     
     def shutdown
