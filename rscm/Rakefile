@@ -23,7 +23,7 @@ fl.exclude('test/**/darcs*.rb')    # Incomplete/unsupported for now - reactivate
 fl.exclude('test/**/perforce*.rb') # Incomplete/unsupported for now - reactivate when more complete!
 fl.exclude('test/**/starteam*.rb') # Too bloody hard to test without a StarTeam server license! Tested ad-hoc.
 Rake::TestTask.new { |t|
-  t.libs << "test" << "app/controllers"
+  t.libs << "test"
   t.test_files = fl
   t.verbose = true
 }

@@ -32,20 +32,20 @@ module RSCM
     end
 
     def test_should_convert_os_path_to_native_url
-      p = nil
-      nurl = nil
+      path = nil
+      nativeurl = nil
 
       if(WIN32)
-        p = "c:/scm/damagecontrol"
-        nurl = "file:///c:/scm/damagecontrol"
+        path = "c:/scm/damagecontrol"
+        nativeurl = "file:///c:/scm/damagecontrol"
       elsif(CYGWIN)
-        p = "/cygdrive/c/scm/damagecontrol"
-        nurl = "file:///c:/scm/damagecontrol"
+        path = "/cygdrive/c/scm/damagecontrol"
+        nativeurl = "file:///c:/scm/damagecontrol"
       else
-        p = "/cygdrive/c/scm/damagecontrol"
-        nurl = "file:///cygdrive/c/scm/damagecontrol"      
+        path = "/cygdrive/c/scm/damagecontrol"
+        nativeurl = "file:///cygdrive/c/scm/damagecontrol"      
       end
-      assert_equal(nurl, filepath_to_nativeurl(p))
+      assert_equal(nativeurl, filepath_to_nativeurl(path))
     end
   
   end
