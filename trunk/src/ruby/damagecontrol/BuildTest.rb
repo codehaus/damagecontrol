@@ -15,7 +15,7 @@ module DamageControl
       build = Build.new( \
         "DamageControlled", \
         ":local:/foo/bar:zap", \
-        "ant.bat compile", \
+        "#{ant} compile", \
         ".", \
         nil)
 
@@ -37,6 +37,12 @@ module DamageControl
       }
       assert(successful, "Ant build should succeed")
       
+    end
+    
+  private
+  
+    def ant
+      windows? ? "ant.bat" : "ant"
     end
   end
 
