@@ -36,19 +36,13 @@ module DamageControl
     
     # Works with ViewCVS
     def web_url_to_change(change)
-      # for backwards compatibility with old settings
-      if(project_config["view_cvs_url"])
-        project_config["cvs_web_url"] = project_config["view_cvs_url"] unless project_config["cvs_web_url"]
-      end
-      project_config.delete("view_cvs_url")
-
-      cvs_web_url = project_config["cvs_web_url"]
+      scm_web_url = project_config["scm_web_url"]
 
       # TODO better handling of working dir for the file
-      return "root/#{project_name}/checkout/#{project_name}/#{change.path}" if cvs_web_url.nil? || cvs_web_url == "" 
+      return "root/#{project_name}/checkout/#{project_name}/#{change.path}" if scm_web_url.nil? || scm_web_url == "" 
 
-      cvs_web_url_patched = ensure_trailing_slash(cvs_web_url)
-      url = "#{cvs_web_url_patched}#{change.path}"
+      scm_web_url = ensure_trailing_slash(scm_web_url)
+      url = "#{scm_web_url}#{change.path}"
       
       if(change.previous_revision)
         # point to the viewcvs and fisheye diffs (if we know the previous revision)
@@ -57,6 +51,7 @@ module DamageControl
         # point to the viewcvs (rev) and fisheye (r) revisions (no diff view)
         url << "?rev=#{change.revision}&r=#{change.revision}"
       end
+      
       url
     end
     
