@@ -1,0 +1,52 @@
+<?xml version="1.0"?>
+
+<!--
+This is an example of the format of the return value from the fetch_all()
+(it's an array of struct)
+-->
+<methodResponse>
+  <params>
+    <param>
+      <value>
+        <array>
+          <data>
+            <value>
+              <struct>
+                <member>
+                  <name>name</name>
+                  <value><string>three</string></value>
+                </member>
+                <member>
+                  <name>last_build_result</name>
+
+                  <value><string>failed</string></value>
+                </member>
+                <member>
+                  <name>current_build_status</name>
+                  <value><string>successful</string></value>
+                </member>
+              </struct>
+            </value>
+            <value>
+              <struct>
+                <member>
+                  <name>name</name>
+                  <value><string>blind</string></value>
+                </member>
+                <member>
+                  <name>last_build_result</name>
+
+                  <value><string>successful</string></value>
+                </member>
+                <member>
+                  <name>current_build_status</name>
+                  <value><string>failed</string></value>
+                </member>
+              </struct>
+            </value>
+          </data>
+        </array>
+      </value>
+    </param>
+  </params>
+</methodResponse>
