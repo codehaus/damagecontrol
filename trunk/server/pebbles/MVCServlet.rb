@@ -52,7 +52,7 @@ module Pebbles
       super(req, res)
 
       # http://lab.artlung.com/other/anti-cache/
-      response["CacheControl"] = "no-cache"
+#      response["CacheControl"] = "no-cache"
       response["Pragma"] = "no-cache"
       response["Expires"] = "-1"
       
