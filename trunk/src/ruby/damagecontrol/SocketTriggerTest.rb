@@ -79,30 +79,6 @@ module DamageControl
       
     end
 
-    IPCONFIG_EXE_OUTPUT = <<-EOF
-
-Windows IP Configuration
-
-
-Ethernet adapter Local Area Connection:
-
-        Media State . . . . . . . . . . . : Media disconnected
-
-Ethernet adapter Wireless Network Connection:
-
-        Connection-specific DNS Suffix  . : lan
-        IP Address. . . . . . . . . . . . : 10.0.0.9
-        Subnet Mask . . . . . . . . . . . : 255.0.0.0
-        Default Gateway . . . . . . . . . : 10.0.0.138
-    EOF
-    
-    def test_parses_ipconfig_output_on_windows
-      assert_equal("(unknown)", 
-        @socket_trigger.get_ip_from_ipconfig_exe_output("this is unparsable"))
-      assert_equal("10.0.0.9", 
-        @socket_trigger.get_ip_from_ipconfig_exe_output(IPCONFIG_EXE_OUTPUT))
-    end
-
   end
   
 end
