@@ -46,7 +46,7 @@ module DamageControl
     include DamageControl
 
     def initialize(path)
-      super(/^-+/)
+      super(/^------------------------------------------------------------------------/)
       @path = path ? path : ""
     end
 

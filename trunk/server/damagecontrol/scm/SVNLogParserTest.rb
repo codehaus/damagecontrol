@@ -87,6 +87,17 @@ EOF
 
       end
     end
+
+    def test_parses_entire_log_into_changesets
+      File.open("#{damagecontrol_home}/testdata/cargo-svn.log") do |io|
+        parser = SVNLogParser.new(io, "trunk/proxytoys")
+        changesets = parser.parse_changesets(nil, nil)
+        changesets.each do |cs|
+          puts cs.revision
+        end
+        assert_equal(16, changesets.length)
+      end
+    end
     
     def test_skips_entries_outside_range
       File.open("#{damagecontrol_home}/testdata/proxytoys-svn.log") do |io|
