@@ -1,6 +1,5 @@
 #!/usr/bin/env ruby
 
-
 $VERBOSE = nil
 
 class Project
