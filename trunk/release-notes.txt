@@ -1,0 +1,35 @@
+The DamageControl Team (Jon Tirsen and Aslak Hellesoy) are proud to release DamageControl 0.2 prerelease (this prerelease is for Windows only).
+
+http://damagecontrol.codehaus.org/
+
+DamageControl is a Continuous Integration server with the follwoing main features:
+
+o Simple configuration. No XML. All web based configuration.
+o Supports building of Java/Ant/Ruby/.NET/C++/Cobol/whatever - DamageControl is platform agnostic.
+o Self contained - comes with its own web server and Ruby runtime. (DamageControl is written in Ruby).
+o Support for as many projects as your RAM and disks allow. In one single server.
+o Multi channel notification on build results. (Email, IRC, built-in Web pages, DCTray - windows system tray)
+o Supports parallel builds.
+o Builds are trigged by the SCM (CVS) upon commits. DamageControl can install SCM triggers automatically.
+
+You can look at a live deployment here: http://builds.codehaus.org/public/dashboard (Yes, DamageControl runs on Linux too)
+If you want to add a project, go here: http://builds.codehaus.org/private/dashboard (ask Jon or Aslak for username/password)
+N.B! Due to a misconfiguration of the Apache proxy on Codehaus, this doesn't work with IE yet. Use a real browser like Firfox or Opera.
+You can also monitor these Codehaus DamageControl server's activity on irc://irc.codehaus.org/damagecontrol
+
+Things that didn't go into this release, but will go into one of the upcoming releases:
+
+o Subversion support (nearly there!).
+o Perforce suport.
+o Support for poll based builds (in addition to trigged builds)
+o Better layout (once we grok div and css properly).
+o RPM packages for linux
+o More notification channels (RSS, Yahoo! messenger, Jabber, Eclipse plugin, IDEA plugin, Apple dock)
+
+See http://jira.codehaus.org/secure/BrowseProject.jspa?id=10260 for a full list of bugs and feature requests. Feel free to register your own feature requests!
+
+Want to get involved with the development? -> Get on the user mailing list.
+Got questions about how to use the damn thing? -> Get on the dev mailing list.
+More info about mailing lists here -> http://docs.codehaus.org/display/DESPOTS/Project+Mailing+Lists
+
+The DamageControl Team
