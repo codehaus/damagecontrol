@@ -35,7 +35,7 @@ module DamageControl
             rss,
             "Changesets for #{@name}",
             "http://localhost:4712/", # TODO point to web version of changeset
-            project.description, 
+            project.name, 
             project.tracker || Tracker::Null.new, 
             project.scm_web || SCMWeb::Null.new        
           )
