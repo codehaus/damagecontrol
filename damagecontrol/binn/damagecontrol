@@ -1,0 +1,7 @@
+begin
+  require 'damagecontrol/app'
+rescue LoadError
+  require 'rubygems'
+  require_gem 'damagecontrol'
+end
+DamageControl::App.new.run

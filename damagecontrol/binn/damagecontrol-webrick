@@ -1,0 +1,2 @@
+rails_webrick_server = File.dirname(__FILE__) + "/../script/server"
+load(rails_webrick_server)
