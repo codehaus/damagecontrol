@@ -11,7 +11,7 @@ module DamageControl
     end
     
     def available?
-      super && selected_build.log_file && File.exists?(selected_build.error_log_file)
+      super && selected_build.error_log_file && File.exists?(selected_build.error_log_file)
     end
     
     def icon
