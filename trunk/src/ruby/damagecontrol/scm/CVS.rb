@@ -169,7 +169,7 @@ module DamageControl
     end
     
     def checked_out?(directory, scm_spec)
-      rootcvs = File.expand_path("#{directory}/#{mod(scm_spec)}/CVS/Root")
+      rootcvs = File.expand_path("#{directory}/CVS/Root")
       File.exists?(rootcvs)
     end
   
