@@ -15,7 +15,7 @@ module DamageControl
   
     attr_accessor :port
     
-    def initialize(channel, port=4711, allowed_client_hostnames=["localhost"], allowed_client_ips=["127.0.0.1"] )
+    def initialize(channel, port=4711, allowed_client_ips=["127.0.0.1"], allowed_client_hostnames=["localhost"])
       @channel = channel
       @port = port
       @allowed_client_hostnames = allowed_client_hostnames
