@@ -1,3 +1,4 @@
+$VERBOSE = nil
 
 $damagecontrol_home = File::expand_path(".")
 

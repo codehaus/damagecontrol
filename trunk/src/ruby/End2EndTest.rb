@@ -35,22 +35,22 @@ class End2EndTest < Test::Unit::TestCase
 	end
 	
 	class BuildBootstrapper
-		def initialize(hub, basedir, build_command_line)
+		def initialize(hub, basedir)
 			@hub = hub
 			@hub.add_subscriber(self)
 			@basedir = basedir
-			@build_command_line = build_command_line
 		end
 		
 		def bootstrap_build(build_spec)
-			build = Build.new(@project)
+			command, project_name, cvsroot, build_command_line = build_spec.split
+			build = Build.new(project_name)
 			def build.build
 				puts "building #{self}"
 				super()
 				puts "built #{self}"
 			end
-			build.basedir = @basedir
-			build.build_command_line = @build_command_line
+			build.basedir = "#{@basedir}/#{project_name}"
+			build.build_command_line = build_command_line
 			build
 		end
 		
@@ -65,7 +65,7 @@ class End2EndTest < Test::Unit::TestCase
 	def start_damagecontrol(build_command_line)
 		hub = Hub.new
 		SocketTrigger.new(hub).start
-		BuildBootstrapper.new(hub, "#{@tempdir}/#{@project}", script_file("build"))
+		BuildBootstrapper.new(hub, "#{@tempdir}")
 		BuildExecutor.new(hub)
 	end
 	
@@ -94,7 +94,7 @@ class End2EndTest < Test::Unit::TestCase
 		Dir.chdir("CVSROOT")
 		File.open("loginfo", File::WRONLY | File::APPEND) do |file|
 			file.puts
-			file.puts("DEFAULT #{trigger_script} #{@project} %{sVv}")
+			file.puts("DEFAULT #{trigger_script} #{@project} #(@cvsroot} #{script_file("build")} %{sVv}")
 		end
 		system("cvs com -m 'message'")
 	end
