@@ -46,9 +46,6 @@ module DamageControl
     end
     
     def changes(from_time, to_time)
-      # hackish, to ensure we really get the changes we want let's increase the time span with one second each way
-      from_time = from_time - 1
-      to_time = to_time + 1
       with_working_dir(working_dir) do
         cvs_with_io(changes_command(from_time, to_time)) do |io|
           parser = CVSLogParser.new

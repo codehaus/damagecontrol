@@ -26,8 +26,8 @@ module DamageControl
       
       # modify file and commit it
       change_file("#{cvs.working_dir}/build.xml")
-      time_before = Time.now.utc
       sleep(1)
+      time_before = Time.now.utc
       cvs.commit("changed something")
       sleep(1)
       time_after = Time.now.utc
