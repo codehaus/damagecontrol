@@ -78,10 +78,6 @@ module DamageControl
       assert_equal(@build_command_line, build.build_command_line)
       
     end
-
-    def test_ko
-      fail "Go to JIRA please!"
-    end
   end
   
 end
