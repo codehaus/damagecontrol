@@ -46,9 +46,9 @@ module DamageControl
       socket = MockIt::Mock.new
       socket.__setup(:peeraddr) { [nil, nil, "host.evil.com", "0.6.6.6"] }
       socket.__expect(:print) {|message|
-        assert_match(message, /doesn.t allow/)
-        assert_match(message, /host.evil.com/)
-        assert_match(message, /0.6.6.6/)
+        assert_match(/doesn.t allow/, message)
+        assert_match(/host.evil.com/, message)
+        assert_match(/0.6.6.6/, message)
       }
       socket.__expect(:close) { }
       verifier = MockIt::Mock.new
