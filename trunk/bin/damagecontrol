@@ -1,8 +1,12 @@
 #!/bin/sh
-# TODO: only set this if it isn't already set
-DAMAGECONTROL_WORK=~/.damagecontrol
+if [ -z "$DAMAGECONTROL_WORK" ] ; then
+	DAMAGECONTROL_WORK=~/.damagecontrol
+fi
 
-# TODO: Users have to define $DAMAGECONTROL_HOME (where DC was installed/unpacked)
+if [ -z "$DAMAGECONTROL_HOME"] ; then
+	echo "Please define DAMAGECONTROL_HOME before starting DamageControl"
+	exit 1;
+fi
 cd $DAMAGECONTROL_HOME
 export DAMAGECONTROL_HOME=`pwd`
 exec ruby -I"$DAMAGECONTROL_HOME/server" $*
