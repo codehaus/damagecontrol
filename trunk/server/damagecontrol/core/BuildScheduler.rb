@@ -32,6 +32,7 @@ module DamageControl
   
     def on_message(event)
       if event.is_a?(CheckedOutEvent)
+puts "BC: < CHECKED OUT #{event.project_name}"
         build = @project_config_repository.create_build(event.project_name)
         if(event.changesets_or_last_commit_time.is_a?(ChangeSets))
           build.changesets = event.changesets_or_last_commit_time
