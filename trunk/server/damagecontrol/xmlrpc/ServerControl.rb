@@ -41,7 +41,7 @@ module XMLRPC
     end
     
     def shutdown_with_message(message)
-      shutdown_with_message("DamageControl server is shutting down in 5 secs", 5)
+      shutdown_with_message_and_time("DamageControl server is shutting down in 5 secs", 5)
     end
     
     def shutdown
