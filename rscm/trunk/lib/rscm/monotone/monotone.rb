@@ -4,7 +4,7 @@ require 'fileutils'
 module RSCM
   class Monotone < AbstractSCM
     def initialize(db_file=nil, branch=nil)
-      @db_file = File.expand_path(db_file) unless @db_file
+      @db_file = File.expand_path(db_file) if db_file
       @branch = branch
     end
 
@@ -26,28 +26,22 @@ module RSCM
 
       to_add = Dir["#{dir}/**/*"].collect{|p| p[dir.length+1..-1]}
       
-      cmd = "monotone --db=\"#{@db_file}\" add #{to_add.join(' ')}"
+      add_cmd = "monotone --db=\"#{@db_file}\" add #{to_add.join(' ')}"
+      commit_cmd = "monotone --db=\"#{@db_file}\" --branch=\"#{@branch}\" commit '#{message}'"
 
-      puts "IMPORTING: #{cmd}"
-      safer_popen(cmd) do |stdout|
-        stdout.each_line do |line|
-          yield line if block_given?
+      puts "IMPORTING: #{add_cmd}"
+      with_working_dir(dir) do
+        safer_popen(add_cmd) do |stdout|
+          stdout.each_line do |line|
+            yield line if block_given?
+          end
+        end
+        safer_popen(commit_cmd) do |stdout|
+          stdout.each_line do |line|
+            yield line if block_given?
+          end
         end
       end
-
-#      with_working_dir(dir) do
-#        Dir.chdir(dir) do
-#          Dir.glob("*") do |to_add|
-#          end
-#        end
-#        
-#        cmd = "monotone --db=\"#{@db_file}\" --branch=\"#{@branch}\" commit '#{message}'"
-#        safer_popen(cmd) do |stdout|
-#          stdout.each_line do |line|
-#            yield line if block_given?
-#          end
-#        end
-#      end
     end
 
     def checkout(checkout_dir)
