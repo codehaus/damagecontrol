@@ -49,12 +49,8 @@ module DamageControl
     
     def breadcrumbs
       result = "<a href=\"dashboard\">Dashboard</a>"
-      result << " > #{request.query['project_name']}" if request.query['project_name']
+      result << " > <a href=\"project?project_name=#{project_name}\">#{project_name}</a>" if request.query['project_name']
       result
-    end
-    
-    def right_top_nav
-      "<a href=\"root/<%= project_name %>/checkout\">Checked out files...</a>"
     end
     
   private

@@ -21,6 +21,7 @@ module DamageControl
     end
   
     def default_action
+      project_name = nil
       render("dashboard.erb", binding)
     end
     

@@ -162,7 +162,7 @@ module DamageControl
         if(last_successful_build && last_successful_build.label)
           current_build.potential_label = last_successful_build.label + 1
         else
-          current_build.potential_label = 0
+          current_build.potential_label = 1
         end
 
         @channel.publish_message(BuildStartedEvent.new(current_build))

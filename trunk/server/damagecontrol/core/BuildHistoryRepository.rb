@@ -92,6 +92,24 @@ module DamageControl
       end
       build_periods
     end
+    
+    def search(s, required_project_name=nil)
+      criterion = Regexp.new(".*#{s}.*")
+      result = []
+      project_names.each do |project_name|
+        history = history(project_name)
+        history.each do |build|
+          build.modification_set.each do |modification|
+            if (!result.index(build) && criterion.match(modification.message))
+              if(required_project_name==nil || (required_project_name && build.project_name == required_project_name))
+                result << build 
+              end
+            end
+          end
+        end
+      end
+      result
+    end
 
   private
 

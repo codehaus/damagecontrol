@@ -83,6 +83,8 @@ module DamageControl
       current_build = build_history_repository.current_build(project_name)
       current_status = build_status(current_build)
 
+      find_method = "history"
+      builds = build_history_repository.history(project_name)
       render("project_dashboard.erb", binding)
     end
     
@@ -90,8 +92,20 @@ module DamageControl
       assert_private
       @trigger.trig(project_name, Build.format_timestamp(Time.now))
       dashboard_redirect
+      render("project_dashboard.erb", binding)
     end
   
+    def search
+      criterion = request.query['search']
+      required_project_name = request.query['project_name']
+      current_build = build_history_repository.current_build(project_name)
+      current_status = build_status(current_build)
+      builds = build_history_repository.search(criterion, required_project_name)
+      find_method = "search"
+      
+      render("project_dashboard.erb", binding)
+    end
+
   private
   
     def dashboard_redirect

@@ -185,6 +185,38 @@ module DamageControl
       builds_per_january = month_builds[Time.utc(2004, 01, 01)]
       assert_equal([week_zero_one, week_zero_two, week_one_one, week_one_two, week_two_one], builds_per_january)
     end
+    
+    def test_should_allow_searching_in_commit_comments
+      a = Build.new("test", Time.utc(2004, 01, 01, 12, 00, 00))
+      b = Build.new("test", Time.utc(2004, 01, 04, 12, 00, 00))
+      c = Build.new("test", Time.utc(2004, 01, 05, 12, 00, 00))
+      
+      b.modification_set << Modification.new("some/where", "aslak", "funny message")
+      b.modification_set << Modification.new("some/where/else", "aslak", "funny message again")
+      c.modification_set << Modification.new("some/path", "jon", "some other funny message")
+      
+      @bhp.register(a)
+      @bhp.register(b)
+      @bhp.register(c)
+
+      assert_equal([b,c], @bhp.search("funny"))
+    end
+
+    def test_should_only_search_in_project_when_specified
+      a = Build.new("test", Time.utc(2004, 01, 01, 12, 00, 00))
+      b = Build.new("test", Time.utc(2004, 01, 04, 12, 00, 00))
+      c = Build.new("onlythisone", Time.utc(2004, 01, 05, 12, 00, 00))
+      
+      b.modification_set << Modification.new("some/where", "aslak", "funny message")
+      b.modification_set << Modification.new("some/where/else", "aslak", "funny message again")
+      c.modification_set << Modification.new("some/path", "jon", "some other funny message")
+      
+      @bhp.register(a)
+      @bhp.register(b)
+      @bhp.register(c)
+
+      assert_equal([c], @bhp.search("funny", "onlythisone"))
+    end
 
   end
 end

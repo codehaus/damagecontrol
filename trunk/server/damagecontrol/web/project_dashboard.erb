@@ -7,39 +7,55 @@
 
 <table class="main-table">
 <tr><td>
-<h1 class="pane"><img src="images/lastcompletedstatus?project_name=<%= project_name %>"/> <%= project_name %> <%= current_status %></h1>
+<% if find_method == "history"%>
+    <h1 class="pane"><img src="images/lastcompletedstatus?project_name=<%= project_name %>"/> <%= project_name %> <%= current_status %></h1>
+<% end %>
 </td></tr>
 
 <tr><td>
 <table class="pane" width="100%">
 
   <tr class="pane">
-    <td class="pane-header" colspan="3">Build history</td>
+    <td class="pane-header" colspan="3">
+<% if find_method == "history"%>
+    Build history
+<% else %>
+    Search results
+<% end %>
+    </td>
   </tr>
   
 <%
-  builds = build_history_repository.history(project_name).reverse
-  
   if builds.empty?
 %>
 
   <tr class="pane">
-    <td class="pane" colspan="1">Never built</td>
+    <td class="pane" colspan="1">
+<% if find_method == "history"%>
+    Never built
+<% else %>
+    No matching builds were found
+<% end %>
+    </td>
   </tr>
   
 <% else %>
 
   <%
-    builds.each do |build|
+    builds.reverse.each do |build|
       color = if build.successful? then "green" else "red" end
       color = "grey" if !build.completed?
       image = "images/#{color}-16.gif"
+      link_start = ""
+      link_start = "#{build.project_name } " if (find_method == "search")
+      label = "##{build.label}"; 
+      label = build.status if label == "#"
+      link_text = "#{link_start}#{build.timestamp_for_humans} (#{label})"
   %>
   <tr class="pane">
-    <% label = "##{build.label}"; label = build.status if label == "#" %>
-    <td class="pane"><img src="<%= image %>" />&nbsp;<a href="log?project_name=<%= project_name %>&timestamp=<%= build.timestamp %>"><%= build.timestamp_for_humans %> (<%= label %>)</a></td>
+    <td class="pane"><img src="<%= image %>" />&nbsp;<a href="log?project_name=<%= project_name %>&timestamp=<%= build.timestamp %>"><%= link_text %></a></td>
   </tr>
-  <% end %>
+<% end %>
 
 </table>
 </td></tr>
