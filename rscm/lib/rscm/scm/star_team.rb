@@ -49,7 +49,7 @@ module RSCM
       "StarTeam"
     end
     
-    def changesets(checkout_dir, from_identifier=Time.epoch, to_identifier=Time.infinity, files=nil, &proc)
+    def changesets(checkout_dir, from_identifier=Time.epoch, to_identifier=Time.infinity, &proc)
       # just assuming it is a Time for now, may support labels later.
       # the java class really wants rfc822 and not rfc2822, but this works ok anyway.
       from = from_identifier.to_rfc2822

@@ -58,8 +58,8 @@ module RSCM
       client(checkout_dir).submit(message, &proc)
     end
 
-    def changesets(checkout_dir, from_identifier, to_identifier = nil, files = nil)
-      client(checkout_dir).changesets(from_identifier, to_identifier, files)
+    def changesets(checkout_dir, from_identifier, to_identifier=Time.infinity)
+      client(checkout_dir).changesets(from_identifier, to_identifier)
     end
 
     def uptodate?(checkout_dir, from_identifier)
@@ -254,7 +254,7 @@ module RSCM
       p4("sync -n").empty?
     end
 
-    def changesets(from_identifier, to_identifier, files)
+    def changesets(from_identifier, to_identifier)
       changesets = changelists(from_identifier, to_identifier).collect {|changelist| to_changeset(changelist)}
       ChangeSets.new(changesets)
     end

@@ -138,7 +138,7 @@ module RSCM
       end
       relative_added_file_paths = to_relative(checkout_dir, added_file_paths)
       relative_added_file_paths.each do |path|
-        yield path
+        yield path if block_given?
       end
       relative_added_file_paths
     end
@@ -146,7 +146,7 @@ module RSCM
     # Returns a ChangeSets object for the period specified by +from_identifier+
     # and +to_identifier+. See AbstractSCM for details about the parameters.
     #
-    def changesets(checkout_dir, from_identifier, to_identifier=Time.infinity, files=nil)
+    def changesets(checkout_dir, from_identifier, to_identifier=Time.infinity)
       # Should be overridden by subclasses
       changesets = ChangeSets.new
       changesets.add(
