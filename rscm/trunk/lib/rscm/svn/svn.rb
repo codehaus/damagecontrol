@@ -14,19 +14,15 @@ module RSCM
     include FileUtils
     include PathConverter
     
-    attr_accessor :svnurl
-    attr_accessor :svnpath
+    attr_accessor :url
+    attr_accessor :path
 
-    def initialize(svnurl=nil, svnpath="")
-      @svnurl, @svnpath = svnurl, svnpath
+    def initialize(url=nil, path="")
+      @url, @path = url, path
     end
 
     def name
       "Subversion"
-    end
-
-    def form_file
-      File.dirname(__FILE__) + "/svn_configure_form.rhtml"
     end
 
     def add(checkout_dir, relative_filename)
@@ -70,7 +66,7 @@ module RSCM
     end
 
     def update_commandline
-      "svn update #{svnurl} #{checkout_dir}"
+      "svn update #{url} #{checkout_dir}"
     end
 
     def uptodate?(checkout_dir, from_identifier)
@@ -96,7 +92,7 @@ module RSCM
       cmd = "svn log #{repourl} -r HEAD"
       with_working_dir(checkout_dir) do
         IO.popen(cmd) do |stdout|
-          parser = SVNLogParser.new(stdout, svnpath, checkout_dir)
+          parser = SVNLogParser.new(stdout, path, checkout_dir)
           changesets = parser.parse_changesets
           changesets[0].revision.to_i
         end
@@ -155,7 +151,7 @@ module RSCM
     end
     
     def import(dir, message)
-      import_cmd = "import #{svnurl} -m \"#{message}\""
+      import_cmd = "import #{url} -m \"#{message}\""
       svn(dir, import_cmd)
     end
 
@@ -167,7 +163,7 @@ module RSCM
 
       with_working_dir(checkout_dir) do
         IO.popen(command) do |stdout|
-          parser = SVNLogParser.new(stdout, svnpath, checkout_dir)
+          parser = SVNLogParser.new(stdout, path, checkout_dir)
           changesets = parser.parse_changesets(from_identifier, to_identifier)
         end
       end
@@ -176,8 +172,8 @@ module RSCM
     
     # url pointing to the root of the repo
     def repourl
-      last = (svnpath.nil? || svnpath == "") ? -1 : -(svnpath.length)-2
-      svnurl[0..last]
+      last = (path.nil? || path == "") ? -1 : -(path.length)-2
+      url[0..last]
     end
 
   private
@@ -207,8 +203,8 @@ module RSCM
     end
     
     def svnrootdir
-      last = (svnpath.nil? || svnpath == "") ? -1 : -(svnpath.length)-2
-      result = svnurl["file://".length..last]
+      last = (path.nil? || path == "") ? -1 : -(path.length)-2
+      result = url["file://".length..last]
       # for windows, turn /c:/blabla into c:/blabla"
       if(result =~ /^\/[a-zA-Z]:/)
         result = result[1..-1]
@@ -244,7 +240,7 @@ module RSCM
 
     def checkout_command(checkout_dir)
       checkout_dir = "\"#{checkout_dir}\""
-      "checkout #{svnurl} #{checkout_dir}"
+      "checkout #{url} #{checkout_dir}"
     end
 
     def update_command
@@ -296,7 +292,7 @@ module RSCM
     end
     
     def local?
-      if(svnurl =~ /^file:/)
+      if(url =~ /^file:/)
         return true
       else
         return false

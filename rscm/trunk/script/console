@@ -1,4 +1,4 @@
-#!C:/ruby/bin/ruby
+#!/usr/bin/env ruby
 
 if ARGV[0]
   ENV['RAILS_ENV'] = ARGV[0]

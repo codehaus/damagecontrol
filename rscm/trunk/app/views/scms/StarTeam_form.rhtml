@@ -1,0 +1,38 @@
+<img src="images/starteam.png"/>
+<%= @scms.class.name %>
+<table width="100%">
+  <tr>
+    <td class="config_cell">User name</td>
+    <td width="75%"><input class="setting-input" name="RSCM::StarTeam[user_name]" type="text" value="<%= 'user_name' %>"></td>
+  </tr>
+  <tr>
+    <td class="config_cell">Password</td>
+    <td><input class="setting-input" name="RSCM::StarTeam[password]" type="password" value="<%= 'password' %>"></td>
+  </tr>
+  <tr>
+    <td>&nbsp;</td>
+    <td class="setting-description">
+      <b>Warning!</b> Password will be shown in cleartext in configuration files.
+    </td>
+  </tr>
+  <tr>
+    <td class="config_cell">Server name</td>
+    <td><input class="setting-input" name="RSCM::StarTeam[server_name]" type="text" value="<%= 'server_name' %>"></td>
+  </tr>
+  <tr>
+    <td class="config_cell">Server port</td>
+    <td><input class="setting-input" name="RSCM::StarTeam[server_port]" type="text" value="<%= 'server_port' %>"></td>
+  </tr>
+  <tr>
+    <td class="config_cell">Project name</td>
+    <td><input class="setting-input" name="RSCM::StarTeam[project_name]" type="text" value="<%= 'project_name' %>"></td>
+  </tr>
+  <tr>
+    <td class="config_cell">View name</td>
+    <td><input class="setting-input" name="RSCM::StarTeam[view_name]" type="text" value="<%= 'view_name' %>"></td>
+  </tr>
+  <tr>
+    <td class="config_cell">Folder name</td>
+    <td><input class="setting-input" name="RSCM::StarTeam[folder_name]" type="text" value="<%= 'folder_name' %>"></td>
+  </tr>
+</table>

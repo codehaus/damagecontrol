@@ -19,20 +19,16 @@ module RSCM
   #
   class StarTeam < AbstractSCM
 
-    attr_accessor :st_user_name, :st_password, :st_server_name, :st_server_port, :st_project_name, :st_view_name, :st_folder_name
+    attr_accessor :user_name, :password, :server_name, :server_port, :project_name, :view_name, :folder_name
 
-    def initialize(st_user_name=nil, st_password=nil, st_server_name=nil, st_server_port=nil, st_project_name=nil, st_view_name=nil, st_folder_name=nil)
-      @st_user_name, @st_password, @st_server_name, @st_server_port, @st_project_name, @st_view_name, @st_folder_name = st_user_name, st_password, st_server_name, st_server_port, st_project_name, st_view_name, st_folder_name
+    def initialize(user_name=nil, password=nil, server_name=nil, server_port=nil, project_name=nil, view_name=nil, folder_name=nil)
+      @user_name, @password, @server_name, @server_port, @project_name, @view_name, @folder_name = user_name, password, server_name, server_port, project_name, view_name, folder_name
     end
 
     def name
       "StarTeam"
     end
     
-    def form_file
-      File.dirname(__FILE__) + "/starteam_configure_form.rhtml"
-    end
-
     def changesets(checkout_dir, from_identifier=Time.epoch, to_identifier=Time.infinity, files=nil)
       # just assuming it is a Time for now, may support labels later.
       # the java class really wants rfc822 and not rfc2822, but this works ok anyway.
@@ -44,9 +40,9 @@ module RSCM
 
       # Just a little sanity check
       if(changesets.latest)
-        latest_time = changesets.latest.time
-        if(latest_time < from_identifier || to_identifier < latest_time)
-          raise "Latest time (#{latest_time}) is not within #{from_identifier}-#{to_identifier}"
+        latetime = changesets.latest.time
+        if(latetime < from_identifier || to_identifier < latetime)
+          raise "Latest time (#{latetime}) is not within #{from_identifier}-#{to_identifier}"
         end
       end
       changesets
@@ -73,7 +69,7 @@ module RSCM
       raise "The ANT_HOME environment variable must be defined and point to the Ant installation directory" unless ENV['ANT_HOME']
 
       clazz = "org.rubyforge.rscm.starteam.StarTeam"
-      ctor_args = "#{@st_user_name};#{@st_password};#{@st_server_name};#{@st_server_port};#{@st_project_name};#{@st_view_name};#{@st_folder_name}"
+      ctor_args = "#{@user_name};#{@password};#{@server_name};#{@server_port};#{@project_name};#{@view_name};#{@folder_name}"
 
 #     Uncomment if you're not Aslak - to run against a bogus java class.
 #      clazz = "org.rubyforge.rscm.TestScm"

@@ -1,4 +1,4 @@
-#!C:/ruby/bin/ruby
+#!/usr/bin/env ruby
 
 require 'webrick'
 require 'optparse'
