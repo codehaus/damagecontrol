@@ -83,16 +83,20 @@ module DamageControl
     
     def trigger_installed?(project_name)
       cvsroot_cvs = create_cvsroot_cvs
-      cvsroot_cvs.checkout
-      loginfo = File.join(cvsroot_cvs.working_dir, "loginfo")
-      return false if !File.exist?(loginfo)
-      loginfo_file = File.new(loginfo)
-      loginfo_content = loginfo_file.read
-      loginfo_file.close
-      in_local_copy = trigger_in_string?(loginfo_content, project_name)
-      entries = File.join(cvsroot_cvs.working_dir, "CVS", "Entries")
-      committed = File.mtime(entries) >= File.mtime(loginfo)
-      in_local_copy && committed
+      begin
+        cvsroot_cvs.checkout
+        loginfo = File.join(cvsroot_cvs.working_dir, "loginfo")
+        return false if !File.exist?(loginfo)
+        loginfo_file = File.new(loginfo)
+        loginfo_content = loginfo_file.read
+        loginfo_file.close
+        in_local_copy = trigger_in_string?(loginfo_content, project_name)
+        entries = File.join(cvsroot_cvs.working_dir, "CVS", "Entries")
+        committed = File.mtime(entries) >= File.mtime(loginfo)
+        in_local_copy && committed
+      rescue
+        false
+      end
     end
 
     def uninstall_trigger(project_name)
