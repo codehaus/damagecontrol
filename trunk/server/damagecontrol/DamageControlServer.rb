@@ -20,7 +20,6 @@ require 'damagecontrol/core/LogMerger'
 require 'damagecontrol/core/ArtifactArchiver'
 require 'damagecontrol/core/BuildHistoryRepository'
 require 'damagecontrol/core/ProjectConfigRepository'
-require 'damagecontrol/core/BuildNumberIncreaser'
 require 'damagecontrol/core/HostVerifier'
 require 'damagecontrol/web/ProjectServlet'
 require 'damagecontrol/web/InstallTriggerServlet'
@@ -320,7 +319,6 @@ module DamageControl
       component(:log_writer, LogWriter.new(hub, build_history_repository))
       component(:log_merger, LogMerger.new(hub, build_history_repository))
       component(:artifact_archiver, ArtifactArchiver.new(hub, project_directories))
-      component(:build_number_increaser, BuildNumberIncreaser.new(hub, project_config_repository))
       component(:dependent_build_trigger, DependentBuildTrigger.new(hub, project_config_repository))
       component(:build_scheduler, BuildScheduler.new(hub))
       init_build_executors
