@@ -89,16 +89,11 @@ module FileUtils
         begin
           res = proc.call(stdout, process)
         ensure
-#          process.kill
+          process.kill
         end
       end
       if(ret.nil?)
-        msg = "\n" +
-          "---------------------------------------\n" +
-          "Process was killed: #{cmd}\n" +
-          "Dir: #{dir}\n" +
-          "---------------------------------------\n" 
-        raise ProcessFailedException.new(msg)
+        return
       end
       if(ret != 0)
         msg = "\n" +
