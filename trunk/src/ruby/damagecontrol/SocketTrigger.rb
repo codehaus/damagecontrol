@@ -1,7 +1,7 @@
 require 'socket'
 require 'damagecontrol/BuildEvents'
 require 'damagecontrol/Hub'
-require 'damagecontrol/BuildResult'
+require 'damagecontrol/Build'
 
 module DamageControl
 
@@ -52,7 +52,7 @@ module DamageControl
 
     def bootstrap_build(build_spec, root_dir)
       project_name, scm_spec, build_command_line, build_path = build_spec.split(",")
-      BuildResult.new(project_name.chomp, scm_spec.chomp, build_command_line.chomp, build_path.chomp, root_dir.chomp)
+      Build.new(project_name.chomp, scm_spec.chomp, build_command_line.chomp, build_path.chomp, root_dir.chomp)
     end
 
     def do_accept(payload)

@@ -5,7 +5,7 @@ require 'damagecontrol/ant/ant'
 
 module DamageControl
 
-  class BuildResult
+  class Build
 
     # these should ideally be set before exceution
     # they are exposed as accessors only so they can be re-set from a cc log file

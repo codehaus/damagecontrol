@@ -3,7 +3,7 @@ $:<<'../../lib'
 require 'damagecontrol/scm/CVSTest'
 require 'damagecontrol/scm/SVNTest'
 
-require 'damagecontrol/BuildResultTest'
+require 'damagecontrol/BuildTest'
 require 'damagecontrol/FilePollerTest'
 #require 'damagecontrol/EqualityTest'
 require 'damagecontrol/AsyncComponentTest'

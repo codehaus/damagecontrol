@@ -3,7 +3,7 @@ require 'test/unit'
 require 'damagecontrol/BuildEvents'
 require 'damagecontrol/SocketTrigger'
 require 'damagecontrol/Hub'
-require 'damagecontrol/BuildResult'
+require 'damagecontrol/Build'
 require 'damagecontrol/BuildDelayer'
 require 'damagecontrol/Clock'
 
@@ -22,7 +22,7 @@ module DamageControl
       @b.quiet_period = 5000
       @b.clock = @fake_clock
       
-      @msg = BuildRequestEvent.new(BuildResult.new("foo"))
+      @msg = BuildRequestEvent.new(Build.new("foo"))
       
       @fake_clock.change_time(2000)
       @b.receive_message(@msg)

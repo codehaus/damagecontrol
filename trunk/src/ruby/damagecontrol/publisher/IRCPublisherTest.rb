@@ -2,7 +2,7 @@ require 'test/unit'
 require 'mock_with_returns'
 require 'damagecontrol/publisher/IRCPublisher'
 require 'damagecontrol/Hub'
-require 'damagecontrol/BuildResult'
+require 'damagecontrol/Build'
 require 'damagecontrol/FileUtils'
 require 'damagecontrol/templates/MockTemplate'
 

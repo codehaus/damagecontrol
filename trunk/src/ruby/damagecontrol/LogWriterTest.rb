@@ -1,7 +1,7 @@
 require 'test/unit'
 require 'mock_with_returns'
 require 'damagecontrol/LogWriter'
-require 'damagecontrol/BuildResult'
+require 'damagecontrol/Build'
 require 'ftools'
 require 'stringio'
 
@@ -16,7 +16,7 @@ module DamageControl
 
       @writer = LogWriter.new(@hub, @file_system)
       
-      @build = BuildResult.new("plopp", ":local:/foo/bar:zap", nil, nil, "/some/where")
+      @build = Build.new("plopp", ":local:/foo/bar:zap", nil, nil, "/some/where")
       @build.label = "a_label"
     end
 

@@ -9,7 +9,7 @@ module DamageControl
       @did_generate = false
     end
 
-    def generate(build_result)
+    def generate(build)
       @did_generate = true
     %{
 Hello

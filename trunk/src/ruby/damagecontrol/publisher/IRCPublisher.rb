@@ -31,10 +31,10 @@ module DamageControl
 
   private
 
-    def post_irc_message(build_result)
+    def post_irc_message(build)
       @irc.connect(server, handle) unless @irc.connected?
       @irc.join_channel(channel) if @irc.connected? && !@irc.in_channel?
-      @irc.send_message_to_channel(@template.generate(build_result))
+      @irc.send_message_to_channel(@template.generate(build))
     end
 
   end

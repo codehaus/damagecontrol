@@ -1,7 +1,7 @@
 require 'damagecontrol/Hub'
 require 'damagecontrol/FilePoller'
 require 'damagecontrol/BuildEvents'
-require 'damagecontrol/BuildResult'
+require 'damagecontrol/Build'
 require 'damagecontrol/cruisecontrol/CruiseControlLogParser'
 
 module DamageControl
@@ -14,9 +14,9 @@ module DamageControl
     end
   
     def new_file(file)
-      build_result = BuildResult.new
-      @ccparser.parse(file, build_result)
-      evt = BuildCompleteEvent.new(build_result)
+      build = Build.new
+      @ccparser.parse(file, build)
+      evt = BuildCompleteEvent.new(build)
       @hub.publish_message(evt)
     end
   end

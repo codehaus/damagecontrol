@@ -5,14 +5,14 @@ module DamageControl
   class HTMLTemplateTest < Test::Unit::TestCase
     
     def test_failed_build
-      build_result = BuildResult.new("Test Project")
-      build_result.label = "999"
-      build_result.timestamp = "20030929145347"
-      build_result.error_message = "Knockout"
-      build_result.successful = false
+      build = Build.new("Test Project")
+      build.label = "999"
+      build.timestamp = "20030929145347"
+      build.error_message = "Knockout"
+      build.successful = false
 
       htmlTemplate = HTMLTemplate.new
-      assert_equal(expected, htmlTemplate.generate(build_result))
+      assert_equal(expected, htmlTemplate.generate(build))
     end
 
   private

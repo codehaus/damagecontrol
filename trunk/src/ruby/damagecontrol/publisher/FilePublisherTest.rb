@@ -1,7 +1,7 @@
 require 'test/unit'
 require 'mock_with_returns'
 require 'damagecontrol/BuildEvents'
-require 'damagecontrol/BuildResult'
+require 'damagecontrol/Build'
 require 'damagecontrol/Hub'
 require 'damagecontrol/publisher/FilePublisher'
 require 'damagecontrol/templates/MockTemplate'
@@ -19,11 +19,11 @@ module DamageControl
     end
   
     def test_file_is_written_in_correct_location_upon_build_complete_event    
-      build_result = BuildResult.new
-      build_result.label = "123"
+      build = Build.new
+      build.label = "123"
       
       @template.__return(:file_name, "trash.txt")
-      @template.__next(:generate) { |build_result2|
+      @template.__next(:generate) { |build2|
         "some content"
       }
 
@@ -40,7 +40,7 @@ module DamageControl
         return file
       }
       
-      @file_publisher.process_message(BuildCompleteEvent.new(build_result))
+      @file_publisher.process_message(BuildCompleteEvent.new(build))
 
       @template.__verify
       @filesystem.__verify
