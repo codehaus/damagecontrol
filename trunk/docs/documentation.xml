@@ -1069,6 +1069,35 @@ component(:irc_publisher,
 
         <screen><prompt># </prompt><userinput>mono MonoTray.exe</userinput></screen>
       </section>
+
+      <section>
+        <title>DamageControl on your website</title>
+
+        <para>One of the best features of DamageControl are the good-looking
+        friendly status images that indicate with green or red light, wether
+        your project can be build at the moment. If you would like to let your
+        project website visitors know that you are using DamageControl and
+        that your projects currently builds (or does not builds), you should
+        add following code to your website.</para>
+
+        <example>
+          <title>Embedding the DamageControl status image in HTML
+          pages</title>
+
+          <programlisting>&lt;p&gt;
+  &lt;a href="http://<replaceable>builds.yourserver.com</replaceable>/public/project/<replaceable>myproject</replaceable>"&gt;
+    &lt;img src="http://<replaceable>builds.yourserver.com</replaceable>/public/images/lastcompletedstatus/<replaceable>myproject</replaceable>" 
+      alt="project build status" height="32" width="32"&gt;
+  &lt;/a&gt;
+&lt;/p&gt;</programlisting>
+
+          <para>You have to replace
+          <literal><replaceable>builds.yourserver.com</replaceable></literal>
+          with the hostname of your DamageControl installation and
+          <literal><replaceable>myproject</replaceable></literal> with the
+          actual name of your project.</para>
+        </example>
+      </section>
     </section>
 
     <section>
