@@ -6,7 +6,17 @@
     <attainGoal name="jar:install"/>
     <mkdir dir="${basedir}/target/site"/>
     <copy todir="${basedir}/target/site">
-      <fileset dir="${basedir}/docs"/>
+      <fileset dir="${basedir}/docs">
+        <exclude name="**/images/*"/>
+      </fileset>
+      <filterset>
+        <filter token="JAR_FILE" value="${maven.final.name}.jar"/>
+      </filterset>
+    </copy>
+    <copy todir="${basedir}/target/site">
+      <fileset dir="${basedir}/docs">
+        <include name="**/images/*"/>
+      </fileset>
     </copy>
     <copy file="${basedir}/target/${maven.final.name}.jar" todir="${basedir}/target/site"/>
   </goal>

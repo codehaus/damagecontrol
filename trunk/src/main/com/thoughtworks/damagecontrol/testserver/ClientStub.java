@@ -7,7 +7,7 @@ import java.util.LinkedList;
 
 /**
  * @author Aslak Helles&oslash;y
- * @version $Revision: 1.1 $
+ * @version $Revision: 1.2 $
  */
 public class ClientStub implements Runnable {
     private final Socket socket;
@@ -32,7 +32,6 @@ public class ClientStub implements Runnable {
     public void pushLine(String line) {
         lineQueue.add(line);
         synchronized (lineQueue) {
-            System.out.println("NOTIFYING THAT THERE IS STUFF IN QUEUE");
             lineQueue.notify();
         }
     }
@@ -59,7 +58,6 @@ public class ClientStub implements Runnable {
         if(lineQueue.isEmpty()) {
             synchronized(lineQueue) {
                 // wait until there is something in our queue
-                System.out.println("WAITING FOR LINE IN QUEUE");
                 lineQueue.wait();
             }
         }
