@@ -104,13 +104,7 @@ module Plot
       plot.grid
       plot.output "build_durations_per_#{period_name}_by_build.png"
 
-#      plot.xdata "time"
-#      plot.timefmt "\"%y/%m/%d-%H:%M:%S\""
-#      plotstart = first_period.strftime("%y/%m/%d-%H:%M:%S")
-#      plotend = last_period.strftime("%y/%m/%d-%H:%M:%S")
-#      plot.xrange "\"#{plotstart}\"", "\"#{plotend}\""
       plot.yrange "0", ""
-#      plot.format "x \"%Y-%m-%d\""
       plot.data "style linespoints"
 
       build_duration_per_successful_build_ds = build_duration_per_successful_build_array.gpds("title"=>"Build duration for successful builds", "xgrid"=>x_values, "using"=>"1:2")
