@@ -6,7 +6,7 @@ module RSCM
   class SubversionLogParser
     def initialize(io, path, checkout_dir)
       @io = io
-      @changeset_parser = SVNLogEntryParser.new(path, checkout_dir)
+      @changeset_parser = SubversionLogEntryParser.new(path, checkout_dir)
     end
     
     def parse_changesets(&line_proc)
@@ -23,7 +23,7 @@ module RSCM
     end
   end
   
-  class SVNLogEntryParser < Parser
+  class SubversionLogEntryParser < Parser
 
     def initialize(path, checkout_dir)
       super(/^------------------------------------------------------------------------/)

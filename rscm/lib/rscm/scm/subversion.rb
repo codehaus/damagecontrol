@@ -1,7 +1,7 @@
 require 'rscm/abstract_scm'
 require 'rscm/path_converter'
 require 'rscm/line_editor'
-require 'rscm/svn/svn_log_parser'
+require 'rscm/scm/subversion_log_parser'
 
 module RSCM
 
