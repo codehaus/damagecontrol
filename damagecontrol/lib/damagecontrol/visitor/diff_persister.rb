@@ -1,6 +1,6 @@
 require 'rscm/changes'
 require 'rscm/logging'
-require 'damagecontrol/directories'
+require 'damagecontrol/changeset_ext.rb'
 
 module DamageControl
   module Visitor
@@ -8,25 +8,18 @@ module DamageControl
     # Visitor that persists unified diffs to disk.
     #
     class DiffPersister
-      # Creates a new Differ that will persist diffs to file.
-      #
-      def initialize(scm, project_name)
-        @scm, @project_name = scm, project_name
-      end
-
       def visit_changesets(changesets)
       end
 
       def visit_changeset(changeset)
         @changeset = changeset
-        Log.info "Writing diffs for #{@project_name} changeset #{changeset.identifier}"
       end
 
       def visit_change(change)
-        diff_file = Directories.diff_file(@project_name, @changeset, change)
-        Log.info " Writing diff for #{change.path} -> #{diff_file}"
-        checkout_dir = Directories.checkout_dir(@project_name)
-        @scm.diff(checkout_dir, change) do |diff_io|
+        change.changeset = @changeset
+        diff_file = change.diff_file
+        checkout_dir = change.changeset.project.checkout_dir
+        change.changeset.project.scm.diff(checkout_dir, change) do |diff_io|
           FileUtils.mkdir_p(File.dirname(diff_file))
           File.open(diff_file, "w") do |io|
             diff_io.each_line do |line|
@@ -34,6 +27,7 @@ module DamageControl
             end
           end
         end
+        Log.info "Wrote diff for #{change.path} -> #{diff_file}"
       end
 
     end

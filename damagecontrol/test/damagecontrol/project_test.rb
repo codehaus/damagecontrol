@@ -15,10 +15,14 @@ module DamageControl
     end
     
     def test_poll_should_get_changesets_from_start_time_if_last_change_time_unknown
-      ENV["DAMAGECONTROL_HOME"] = RSCM.new_temp_dir("start_time")
+      dir = RSCM.new_temp_dir("ProjectTest1")
+
+      @p.dir = dir
       @p.scm = new_mock
+      @p.scm.__setup(:name) {"MockSCM"}
       changesets = new_mock
       changesets.__expect(:empty?) {true}
+      changesets.__expect(:each) {Proc.new{|changeset|}}
       @p.scm.__expect(:changesets) do |checkout_dir, from|
         assert_equal(@p.start_time, from)
         changesets
@@ -29,31 +33,34 @@ module DamageControl
     end
 
     def test_poll_should_poll_until_quiet_period_elapsed
-      ENV["DAMAGECONTROL_HOME"] = RSCM.new_temp_dir("quiet_period")
-
+      dir = RSCM.new_temp_dir("ProjectTest2")
+      @p.dir = dir
       @p.quiet_period = 0
       @p.scm = new_mock
       @p.scm.__setup(:name) {"mooky"}
       @p.scm.__expect(:changesets) do |checkout_dir, from|
         assert_equal(@p.start_time, from)
-        "foo"
+        cs = RSCM::ChangeSets.new
+        cs.add(RSCM::ChangeSet.new)
+        cs
       end
       @p.scm.__expect(:transactional?) {false}
       @p.scm.__expect(:changesets) do |checkout_dir, from|
         assert_equal(@p.start_time, from)
-        "bar"
+        RSCM::ChangeSets.new
       end
       @p.scm.__expect(:changesets) do |checkout_dir, from|
         assert_equal(@p.start_time, from)
-        "bar"
+        RSCM::ChangeSets.new
       end
       @p.poll do |cs|
-        assert_equal("bar", cs)
+        assert_equal(RSCM::ChangeSets, cs.class)
       end
     end
 
     def test_poll_should_get_changesets_from_last_change_time_if_known
-      ENV["DAMAGECONTROL_HOME"] = RSCM.new_temp_dir("last")
+      dir = RSCM.new_temp_dir("ProjectTest3")
+      @p.dir = dir
 
       a = Time.new.utc
       FileUtils.mkdir_p("#{@p.changesets_dir}/#{a.ymdHMS}")
@@ -63,8 +70,10 @@ module DamageControl
         YAML::dump(cs, io)
       end
       @p.scm = new_mock
+      @p.scm.__setup(:name) {"MockSCM"}
       changesets = new_mock
       changesets.__expect(:empty?) {false}
+      changesets.__expect(:each) {Proc.new{|changeset|}}
       @p.scm.__expect(:changesets) do |checkout_dir, from|
         assert_equal(a+1, from)
         changesets
@@ -76,69 +85,22 @@ module DamageControl
     end
     
     def test_should_look_at_folders_to_determine_next_changeset_time
-      changesets_dir = RSCM.new_temp_dir("folders")
-      ENV["DAMAGECONTROL_HOME"] = changesets_dir
+      dir = RSCM.new_temp_dir("ProjectTest4")
+      @p.dir = dir
 
       a = Time.new.utc
       b = a + 1
       c = b + 1
-      FileUtils.mkdir_p("#{changesets_dir}/#{a.ymdHMS}")
-      FileUtils.touch("#{changesets_dir}/#{a.ymdHMS}/changeset.yaml")
-      FileUtils.mkdir_p("#{changesets_dir}/#{c.ymdHMS}")
-      FileUtils.touch("#{changesets_dir}/#{c.ymdHMS}/changeset.yaml")
-      FileUtils.mkdir_p("#{changesets_dir}/#{b.ymdHMS}")
-      FileUtils.touch("#{changesets_dir}/#{b.ymdHMS}/changeset.yaml")
+      FileUtils.mkdir_p("#{@p.changesets_dir}/#{a.ymdHMS}")
+      FileUtils.touch("#{@p.changesets_dir}/#{a.ymdHMS}/changeset.yaml")
+      FileUtils.mkdir_p("#{@p.changesets_dir}/#{c.ymdHMS}")
+      FileUtils.touch("#{@p.changesets_dir}/#{c.ymdHMS}/changeset.yaml")
+      FileUtils.mkdir_p("#{@p.changesets_dir}/#{b.ymdHMS}")
+      FileUtils.touch("#{@p.changesets_dir}/#{b.ymdHMS}/changeset.yaml")
       
-      assert_equal(c+1, @p.next_changeset_identifier(changesets_dir))
+      assert_equal(c+1, @p.next_changeset_identifier(@p.changesets_dir))
     end
 
-    def test_should_checkout_from_changeset_identifier_and_execute_build
-      home = RSCM.new_temp_dir("execute")
-      ENV["DAMAGECONTROL_HOME"] = home
-
-      p = Project.new("mooky")
-      p.scm = new_mock
-      p.scm.__expect(:checkout) do |checkout_dir, changeset_identifier|
-        assert_equal("boo", changeset_identifier)
-      end
-
-      before = Time.new
-      p.execute_build("boo", "Test") do |build|
-        now = Time.new
-        assert(before <= build.time)
-        assert(build.time <= now)
-        build.execute("some command")
-
-        assert_equal("some command", File.open("#{home}/projects/mooky/changesets/boo/builds/#{build.time.to_s}/command").read)
-      end
-      
-    end
-    
-    def test_should_load_persisted_builds_that_are_frozen
-      p = Project.new("mooky")
-      home = RSCM.new_temp_dir("load_builds")
-      ENV["DAMAGECONTROL_HOME"] = home
-
-      changeset_identifier = Time.new.utc
-      build_1_time = changeset_identifier + 10
-      build_2_time = changeset_identifier + 20
-      FileUtils.mkdir_p("#{home}/projects/mooky/changesets/#{changeset_identifier.ymdHMS}/builds/#{build_1_time.ymdHMS}")
-      FileUtils.touch("#{home}/projects/mooky/changesets/#{changeset_identifier.ymdHMS}/builds/#{build_1_time.ymdHMS}/command")
-      FileUtils.mkdir_p("#{home}/projects/mooky/changesets/#{changeset_identifier.ymdHMS}/builds/#{build_2_time.ymdHMS}")
-
-      builds = p.builds(changeset_identifier)
-      assert_equal(2, builds.length)
-      assert_equal(build_1_time, builds[0].time)
-      assert_equal(build_2_time, builds[1].time)
-      assert_raises(BuildException, "shouldn't be able to execute persisted build") do
-        builds[0].execute("this should fail because command file exists")
-      end
-      builds[1].execute("echo \"this should pass since command doesn't exist\"")
-      assert_raises(BuildException, "shouldn't be able to execute persisted build") do
-        builds[1].execute("this should fail because command file exists")
-      end
-    end
-    
     def test_should_tell_each_publisher_to_publish_build
       p = Project.new("mooky")
       p.publishers = []
@@ -166,7 +128,7 @@ module DamageControl
       p.start_time = "19710228234533"
       assert_equal(Time.utc(1971,2,28,23,45,33), p.start_time)
     end
-    
+
     def test_should_support_template_cloning
       # Create a template object
       template_project = Project.new

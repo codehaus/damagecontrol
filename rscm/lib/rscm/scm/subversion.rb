@@ -145,7 +145,7 @@ module RSCM
         # on stdout (and an error msg on std err).
         exists = false
         cmd = "svn log #{url} -r HEAD"
-        IO.popen(cmd) do |stdout|
+        safer_popen(cmd) do |stdout|
           stdout.each_line do |line|
             exists = true
           end

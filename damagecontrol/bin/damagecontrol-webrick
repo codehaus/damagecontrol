@@ -1,2 +1,6 @@
+# Need to know the basedir - same as damagecontrol daemon process
+require 'damagecontrol/app'
+BASEDIR = basedir
+
 rails_webrick_server = File.dirname(__FILE__) + "/../script/server"
 load(rails_webrick_server)

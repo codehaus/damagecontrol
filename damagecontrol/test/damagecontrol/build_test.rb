@@ -7,37 +7,33 @@ module DamageControl
   class BuildTest < Test::Unit::TestCase
     include MockIt
     
-    def test_should_write_stderr_and_stdout_to_files_on_execute
-      home = RSCM.new_temp_dir("successful_execute")
+    def test_should_persist_exit_code_stderr_and_stdout
+      temp = RSCM.new_temp_dir("test_should_persist_failure")
+      $execute_dir = "#{temp}/execute"
+      changeset_dir = "#{temp}/changeset"
 
-      ENV["DAMAGECONTROL_HOME"] = home
-      t = Time.utc(1971, 2, 28, 23, 45, 00)
-      build = Build.new("mooky", "some_rev", t, "Test")
-      a_program = File.expand_path(File.dirname(__FILE__) + "/a_program.rb")
-      build.execute("ruby #{a_program} 0", {'foo' => 'zap'})
-      stderr = "#{home}/projects/mooky/changesets/some_rev/builds/19710228234500/stderr.log"
-      assert_equal("this\nis\nstderr\nzap", File.read(stderr))
-      stdout = "#{home}/projects/mooky/changesets/some_rev/builds/19710228234500/stdout.log"
-      assert_equal("this\nis\nstdout\n0", File.read(stdout))
-      assert_equal(0, build.exit_code)
-    end
+      p = new_mock
 
-    def test_should_persist_failure
-      home = RSCM.new_temp_dir("failed_execute")
+      changeset = new_mock
+      changeset.__setup(:dir) {changeset_dir}
+      changeset.__setup(:project) {p}
 
-      ENV["DAMAGECONTROL_HOME"] = home
-      t = Time.utc(1971, 2, 28, 23, 45, 00)
-      build = Build.new("mooky", "some_rev", t, "Test")
+      t = Time.utc(1971,2,28,23,45,00)
+      build = Build.new(changeset, t, "Testing")
+      def build.execute_dir
+        $execute_dir
+      end
+      
       a_program = File.expand_path(File.dirname(__FILE__) + "/a_program.rb")
       build.execute("ruby #{a_program} 44", {'foo' => 'bar'})
-      stderr = "#{home}/projects/mooky/changesets/some_rev/builds/19710228234500/stderr.log"
+      stderr = File.expand_path("#{changeset_dir}/builds/19710228234500/stderr.log")
       assert_equal("this\nis\nstderr\nbar", File.read(stderr))
-      stdout = "#{home}/projects/mooky/changesets/some_rev/builds/19710228234500/stdout.log"
+      stdout = File.expand_path("#{changeset_dir}/builds/19710228234500/stdout.log")
       assert_equal("this\nis\nstdout\n44", File.read(stdout))
       assert_equal(44, build.exit_code)
     end
 
-    def Xtest_should_kill_long_running_build
+    def TODOtest_should_kill_long_running_build
       home = RSCM.new_temp_dir("killing")
 
       ENV["DAMAGECONTROL_HOME"] = home

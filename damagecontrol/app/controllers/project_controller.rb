@@ -1,6 +1,5 @@
 require 'rscm'
 require 'damagecontrol/project'
-require 'damagecontrol/directories'
 require 'damagecontrol/diff_parser'
 require 'damagecontrol/diff_htmlizer'
 require 'damagecontrol/publisher/base'
@@ -16,7 +15,7 @@ class ProjectController < ApplicationController
   end
 
   def index
-    @projects = ::DamageControl::Project.find_all
+    @projects = ::DamageControl::Project.find_all("#{BASEDIR}/projects")
     @navigation_name = "null"
   end
 
@@ -107,7 +106,7 @@ protected
 
       html = ""
       dp = DamageControl::DiffParser.new
-      diff_file = DamageControl::Directories.diff_file(@project.name, @changeset, change)
+      diff_file = change.diff_file
       if(File.exist?(diff_file))
         File.open(diff_file) do |diffs_io|
           diffs = dp.parse_diffs(diffs_io)

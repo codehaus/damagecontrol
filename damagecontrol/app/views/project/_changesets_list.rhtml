@@ -20,7 +20,7 @@
       <%= link_to("#{changeset.identifier} (#{changeset.developer})", :action => "changeset", :id => @project.name, :params => {"changeset" => changeset.identifier}) %>
     </td>
     <td width="100%">
-      <% @project.builds(changeset.identifier).each do |build| %>
+      <% @project.changeset(changeset.identifier).builds.each do |build| %>
       <%= tag("img", :src => build.small_image) %>
       <% end %>
     </td>
