@@ -178,10 +178,8 @@ module DamageControl
       current_build = build_history_repository.current_build(project_name)
 			onecompleted = false
       history.delete_if { |b| 
-				puts "#{b.status} #{onecompleted}"
 				onecompleted = !(b != current_build && !b.completed?) || onecompleted
 				if b.queued? && onecompleted
-					puts "delete it"
 					true
 				else
 					b != current_build && !b.completed? && !b.queued?
