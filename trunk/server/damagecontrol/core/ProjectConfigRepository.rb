@@ -5,6 +5,7 @@ require 'yaml'
 
 # for default config
 require 'damagecontrol/scm/NoSCM'
+require 'damagecontrol/scm/NoTracker'
 
 module DamageControl
 

@@ -79,7 +79,6 @@ module DamageControl
 		
 		def	find_cirular_dependencies(name, projects)
 			project = ""
-			puts "\n\n\n\n\n\nchecking #{name}"
 			if @checked_projects
 				puts "list of checked projects exists"
 				@checked_projects << name
