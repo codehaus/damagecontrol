@@ -67,7 +67,7 @@ module RSCM
 
   private
   
-    STATES = {"M" => Change::MODIFIED, "A" => Change::ADDED, "D" => Change::DELETED}
+    STATES = {"M" => Change::MODIFIED, "A" => Change::ADDED, "D" => Change::DELETED} unless defined? STATES
 
     def parse_header(line)
       @changeset = ChangeSet.new

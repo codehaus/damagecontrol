@@ -15,7 +15,7 @@ module RSCM
       ]
       assert_equal(
         expected_scms_classes.collect{|c| c.name}.sort,
-        AbstractSCM.scm_classes.collect{|c| c.name}.sort)
+        AbstractSCM.classes.collect{|c| c.name}.sort)
     end
   end
 end

@@ -6,8 +6,8 @@ require 'ftools'
 module RSCM
 
   class CvsLogParser < AbstractLogParser
-    REVISION_SEPARATOR = /^----------------------------$/
-    ENTRY_SEPARATOR = /^=============================================================================$/
+    REVISION_SEPARATOR = /^----------------------------$/ unless defined? REVISION_SEPARATOR
+    ENTRY_SEPARATOR = /^=============================================================================$/ unless defined? ENTRY_SEPARATOR
     
     attr_accessor :cvspath
     attr_accessor :cvsmodule
@@ -154,7 +154,7 @@ module RSCM
     # The state field is "Exp" both for added and modified files. retards!
     # We need some additional logic to figure out whether it is added or not.
     # Maybe look at the revision. (1.1 means new I think. - deal with it later)
-    STATES = {"dead" => Change::DELETED, "Exp" => Change::MODIFIED}
+    STATES = {"dead" => Change::DELETED, "Exp" => Change::MODIFIED} unless defined? STATES
 
   end
 

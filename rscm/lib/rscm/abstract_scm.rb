@@ -41,13 +41,13 @@ module RSCM
   class AbstractSCM
     include FileUtils
 
-    @@scm_classes = []
-    def AbstractSCM.register(scm_class) 
-      @@scm_classes << scm_class unless @@scm_classes.index(scm_class)
+    @@classes = []
+    def self.register(cls) 
+      @@classes << cls unless @@classes.index(cls)
     end
-    
-    def AbstractSCM.scm_classes
-      @@scm_classes
+      
+    def self.classes
+      @@classes
     end
 
     # Load all sources under scm, so SCM classes can register themselves
