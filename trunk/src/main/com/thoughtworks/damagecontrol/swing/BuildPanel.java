@@ -7,7 +7,7 @@ import java.awt.*;
 
 /**
  * @author Aslak Helles&oslash;y
- * @version $Revision: 1.1 $
+ * @version $Revision: 1.2 $
  */
 public class BuildPanel extends JPanel {
     private Document progressDocument = new PlainDocument();
@@ -15,6 +15,8 @@ public class BuildPanel extends JPanel {
 
     public BuildPanel() {
         setLayout(new BorderLayout());
+        progressArea.setEditable(false);
+        progressArea.setFont(new Font("Courier New",Font.PLAIN, 12));
         add(new JScrollPane(progressArea), BorderLayout.CENTER);
     }
 

@@ -10,7 +10,7 @@ import java.io.File;
 
 /**
  * @author Aslak Helles&oslash;y
- * @version $Revision: 1.3 $
+ * @version $Revision: 1.4 $
  */
 public class GuiBuilder {
     private BuildPanel buildPanel = new BuildPanel();
@@ -32,9 +32,8 @@ public class GuiBuilder {
         CharConsumer textAdder = b.buildPanel();
         f.pack();
         f.show();
-        System.out.println("SHOWED FRAME");
 
-        URLPumper urlPumper= new URLPumper(new File("data").toURL(), 1000, textAdder);
+        URLPumper urlPumper= new URLPumper(new File("target/site/logs/index.log").toURL(), 1000, textAdder);
         urlPumper.startPumping();
     }
 }

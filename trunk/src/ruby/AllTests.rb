@@ -15,10 +15,15 @@ require 'damagecontrol/scm/SVNTest'
 
 require 'damagecontrol/publisher/IRCPublisherTest'
 require 'damagecontrol/publisher/WebsitePublisherTest'
-require 'damagecontrol/publisher/HTMLPublisherTest'
+require 'damagecontrol/publisher/FilePublisherTest'
+#require 'damagecontrol/publisher/HTMLPublisherTest'
+
+require 'damagecontrol/templates/HTMLTemplateTest'
+
 #require 'damagecontrol/CVSPollerTest'
 require 'damagecontrol/dependency/AllTraverserTest'
 require 'damagecontrol/dependency/UpstreamDownstreamTraverserTest'
 
 #require 'damagecontrol/CruiseControlBridgeTest'
 require 'damagecontrol/cruisecontrol/CruiseControlLogPollerTest'
+require 'damagecontrol/cruisecontrol/CruiseControlLogParserTest'

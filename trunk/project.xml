@@ -38,6 +38,33 @@
     </mailingLists>
 
     <developers>
+        <developer>
+            <name>Aslak Helles&oslash;y</name>
+            <id>rinkrank</id>
+            <email>nospam.rinkrank@codehaus.org</email>
+            <organization></organization>
+            <roles>
+                <role>Developer</role>
+            </roles>
+        </developer>
+        <developer>
+            <name>Jon Tirs&eacute;n</name>
+            <id>tirsen</id>
+            <email>nospam.tirsen@codehaus.org</email>
+            <organization></organization>
+            <roles>
+                <role>Developer</role>
+            </roles>
+        </developer>
+        <developer>
+            <name>Mike Mason</name>
+            <id>mgm</id>
+            <email>nospam.mgm@codehaus.org</email>
+            <organization></organization>
+            <roles>
+                <role>Developer</role>
+            </roles>
+        </developer>
     </developers>
 
     <contributors>
