@@ -5,11 +5,11 @@ package damagecontrol;
  * There will typically be concrete implementations
  * for various tools like Ant, Maven, Make, pure exec etc.
  *
- * It is usually associated with a {@link BuildScheduler}
+ * It is usually associated with a {@link Scheduler}
  * that is responsible for invoking the actual build.
  * 
  * @author Aslak Helles&oslash;y
- * @version $Revision: 1.2 $
+ * @version $Revision: 1.3 $
  */
 public interface Builder {
     /**
@@ -18,13 +18,6 @@ public interface Builder {
      */
     void build();
 
-    /**
-     * Returns the build number. This value should be incremented
-     * for each successful invocation of {@link #build}. It should not
-     * be invoked for an unsuccessful build.
-     * @return the build number.
-     */
-    int getBuildNumber();
+    void addBuildListener(BuildListener buildListener);
 
-    String getName();
 }

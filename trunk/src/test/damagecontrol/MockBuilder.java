@@ -1,38 +1,43 @@
 package damagecontrol;
 
-/**
- * 
- * @author Aslak Helles&oslash;y
- * @version $Revision: 1.2 $
- */
-public class MockBuilder implements Builder {
-    private long buildDurationMillis;
-    private int buildCount;
-    private String name;
+import EDU.oswego.cs.dl.util.concurrent.Latch;
 
-    public MockBuilder(String name, long buildDurationMillis) {
-        this.name = name;
-        this.buildDurationMillis = buildDurationMillis;
+/**
+ *
+ * @author Aslak Helles&oslash;y
+ * @version $Revision: 1.3 $
+ */
+public class MockBuilder extends AbstractBuilder {
+    private boolean wasBuilt;
+    private Latch nextBuildLatch = new Latch();
+    private String output;
+
+    public MockBuilder() {
+        super(null, null);
+    }
+
+    public MockBuilder(String output) {
+        super(null, null);
+        this.output = output;
     }
 
     public void build() {
+        synchronized (this) {
+            nextBuildLatch.release();
+            nextBuildLatch = new Latch();
+        }
+        wasBuilt = true;
+        fireBuildFinished(new BuildEvent(this, true, output));
+    }
+
+    public synchronized void waitForBuildComplete() {
         try {
-            Thread.sleep(buildDurationMillis);
-            buildCount++;
+            nextBuildLatch.attempt(1000);
         } catch (InterruptedException e) {
-            System.out.println("WTF!!!");
         }
     }
 
-    public int getBuildNumber() {
-        return buildCount;
-    }
-
-    public String getName() {
-        return name;
-    }
-
-    public String toString() {
-        return getName();
+    public boolean wasBuilt() {
+        return wasBuilt;
     }
 }

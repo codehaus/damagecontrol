@@ -6,8 +6,9 @@ import java.util.Map;
 import java.util.HashMap;
 
 /**
- * Commits to an SCM are frequently done in several operations, and
- * a build for a particular project should not be invoked until
+ * Commits to an SCM are sometimes  done in several operations,
+ * (depending on whether the SCM supports atomic commits).
+ * In such cases, a build for a particular project should not be invoked until
  * that project has been quiet for a while.
  *
  * This build scheduler will defer the invocation of a builder until
@@ -18,19 +19,28 @@ import java.util.HashMap;
  * queue will push it back in the queue, allowing other builds to be handled before.
  *
  * @author Aslak Helles&oslash;y
- * @version $Revision: 1.2 $
+ * @version $Revision: 1.1 $
  */
-public class QuietPeriodBuildScheduler implements BuildScheduler {
+public class QuietPeriodScheduler implements Scheduler {
     /**
      * Sync lock used to keep waiting until quiet period is fulfilled.
      */
     private final Object lock = new Object();
     private final List builderQueue = new LinkedList();
 
+    private Clock clock;
     private long pollIntervalMilliseconds;
     private final long quietPerionMilliseconds;
 
     private Builder currentlyRunningBuilder;
+
+    public void requestBuild(String builderName) {
+
+    }
+
+    public void registerBuilder(String builderName, Builder builder) {
+        
+    }
 
     private Runnable builder = new Runnable() {
         public void run() {
@@ -72,13 +82,16 @@ public class QuietPeriodBuildScheduler implements BuildScheduler {
     private Thread buildThread = new Thread(builder);
     private Map buildRequestTimes = new HashMap();
 
-    public QuietPeriodBuildScheduler(long pollIntervalMilliseconds, long quietPerionMilliseconds) {
+    public QuietPeriodScheduler(Clock clock, long pollIntervalMilliseconds, long quietPerionMilliseconds) {
+        this.clock = clock;
         this.pollIntervalMilliseconds = pollIntervalMilliseconds;
         this.quietPerionMilliseconds = quietPerionMilliseconds;
         buildThread.start();
     }
 
     public void requestBuild(Builder requestedBuilder) {
+        clock.waitUntil(clock.currentTimeMillis() + quietPerionMilliseconds);
+
         // Put the builder in the back of the queue.
         builderQueue.remove(requestedBuilder);
         builderQueue.add(requestedBuilder);
@@ -90,7 +103,7 @@ public class QuietPeriodBuildScheduler implements BuildScheduler {
         }
     }
 
-    public Builder getCurrentlyRunningBuilder() {
-        return currentlyRunningBuilder;
+    public void stop() {
     }
+
 }
