@@ -16,9 +16,9 @@ module DamageControl
   end
 
   class SVNLogParser
-    def initialize(io, path)
+    def initialize(io, path, debug=false)
       @io = io
-      @changeset_parser = SVNLogEntryParser.new(path)
+      @changeset_parser = SVNLogEntryParser.new(path, debug)
     end
     
     # we need to pass in dates, since the log may contain changes outside the desired dates.
@@ -45,14 +45,21 @@ module DamageControl
   class SVNLogEntryParser < Pebbles::Parser
     include DamageControl
 
-    def initialize(path)
+    def initialize(path, debug=false)
       super(/^------------------------------------------------------------------------/)
       @path = path ? path : ""
+      @debug = debug
+if(@debug)
+puts "***********************************************************"
+puts "Parsing SVN log"
+puts "***********************************************************"
+end
     end
 
   protected
 
     def parse_line(line)
+puts line if @debug
       if(@changeset.nil?)
         parse_header(line)
       elsif(line.strip == "")

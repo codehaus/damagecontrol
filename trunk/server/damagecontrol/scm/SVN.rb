@@ -85,9 +85,9 @@ module DamageControl
 
     def head_revision(checkout_dir)
       cmd_with_io(checkout_dir, "svn log -r HEAD") do |io|
-        parser = SVNLogParser.new(io, svnpath)
-        last_changeset = parser.parse_changesets[0]
-        last_changeset.revision.to_i
+        parser = SVNLogParser.new(io, svnpath, true)
+        changesets = parser.parse_changesets
+        changesets[0].revision.to_i
       end
     end
 
