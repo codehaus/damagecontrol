@@ -91,7 +91,7 @@ module DamageControl
       loginfo_file.close
       in_local_copy = trigger_in_string?(loginfo_content, project_name)
       entries = File.join(cvsroot_cvs.working_dir, "CVS", "Entries")
-      committed = File.mtime(entries) > File.mtime(loginfo)
+      committed = File.mtime(entries) >= File.mtime(loginfo)
       in_local_copy && committed
     end
 
