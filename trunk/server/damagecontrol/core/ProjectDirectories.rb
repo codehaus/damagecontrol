@@ -1,3 +1,5 @@
+require 'damagecontrol/util/FileUtils'
+
 module DamageControl
 
   class ProjectDirectories
@@ -23,7 +25,7 @@ module DamageControl
     end
     
     def log_dir(project_name)
-      "#{project_dir(project_name)}/log"
+      FileUtils.mkdir_p("#{project_dir(project_name)}/log")
     end
 
     def report_dir(project_name)
@@ -32,7 +34,15 @@ module DamageControl
 
     def project_config_file(project_name)
       "#{project_dir(project_name)}/#{CONFIG_FILE_NAME}"
-    end    
+    end
+    
+    def log_timestamps(project_name)
+      Dir["#{log_dir(project_name)}/*.log"].collect {|f| File.basename(f, ".log") }.sort
+    end
+    
+    def log_file(project_name, timestamp)
+      "#{log_dir(project_name)}/#{timestamp}.log"
+    end
   end
   
 end

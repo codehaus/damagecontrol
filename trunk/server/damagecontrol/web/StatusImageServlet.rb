@@ -12,7 +12,7 @@ module DamageControl
       super(req, res)
       project_name = req.query['project_name'] || required_parameter('project_name')
       path = status_image(project_name)
-      st = File::stat(status_image(project_name))
+      st = File::stat(path)
       res['content-length'] = st.size
       res.body = open(path, "rb")
     end

@@ -53,8 +53,12 @@ module DamageControl
     attr_accessor :start_time
     attr_accessor :end_time
     
-    def build_duration_seconds
+    def duration_seconds
       end_time - start_time
+    end
+    
+    def duration_formatted
+      "#{duration_seconds / 60}:#{duration_seconds % 60}"
     end
     
     def completed?

@@ -5,13 +5,34 @@
 <h1><%= project_name %></h1>
 <table>
   <tr class="dashboard">
-    <td class="dashboard">Last completed build</td>
+    <td class="dashboard_header">Last completed build</td>
     <td class="dashboard"><img src="	images/lastcompletedstatus?project_name=<%= project_name %>"/> <%= last_status %></td>
   </tr>
 <% if(last_completed_build != current_build) %>
   <tr class="dashboard">
-    <td class="dashboard">Current build</td>
+    <td class="dashboard_header">Current build</td>
     <td class="dashboard"><img src="images/currentstatus?project_name=<%= project_name %>"/> <%= current_status %></td>
+  </tr>
+<% end %>
+  <tr class="dashboard">
+    <td colspan="2">&nbsp;</td>
+  </tr>
+  <tr class="dashboard">
+    <td class="dashboard_header" colspan="2">Build history</td>
+  </tr>
+  <tr class="dashboard">
+    <td class="dashboard_header">Timestamp</a></td>
+    <td class="dashboard_header">Status</td>
+    <td class="dashboard_header">Time</td>
+  </tr>
+<%
+  builds = build_history_repository.build_history(project_name).reverse
+  builds.each do |build|
+%>
+  <tr class="dashboard">
+    <td class="dashboard"><a href="log?project_name=<%= project_name %>&timestamp=<%= build.timestamp %>"><%= build.timestamp %></a></td>
+    <td class="dashboard"><%= build.status %></td>
+    <td class="dashboard"><%= build.duration_formatted %></td>
   </tr>
 <% end %>
 </table>

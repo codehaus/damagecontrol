@@ -20,6 +20,7 @@ require 'damagecontrol/core/HostVerifier'
 require 'damagecontrol/web/ProjectServlet'
 require 'damagecontrol/web/DashboardServlet'
 require 'damagecontrol/web/StatusImageServlet'
+require 'damagecontrol/web/LogFileServlet'
 
 module DamageControl
 
@@ -131,7 +132,7 @@ module DamageControl
       init_config_services
       
       component(:warning_server, WarningServer.new())
-      component(:log_writer, LogWriter.new(hub, @project_directories))
+      component(:log_writer, LogWriter.new(hub, project_directories))
       component(:host_verifier, if allow_ips.nil? then OpenHostVerifier.new else HostVerifier.new(allow_ips) end)
       
       init_build_scheduler
@@ -157,7 +158,7 @@ module DamageControl
       httpd.mount("/public/xmlrpc", public_xmlrpc_servlet)
       
       httpd.mount("/public/dashboard", DashboardServlet.new(build_history_repository, project_config_repository, build_scheduler, :public))
-      httpd.mount("/public/project", ProjectServlet.new(build_history_repository, nil, nil, :public, build_scheduler, @project_directories, nudge_xmlrpc_url))
+      httpd.mount("/public/project", ProjectServlet.new(build_history_repository, nil, nil, :public, build_scheduler, project_directories, nudge_xmlrpc_url))
       
       httpd.mount("/public/images", WEBrick::HTTPServlet::FileHandler, "#{webdir}/images")
       httpd.mount("/public/images/currentstatus", CurrentStatusImageServlet.new(build_history_repository, build_scheduler))
@@ -173,7 +174,8 @@ module DamageControl
       httpd.mount("/private/xmlrpc", private_xmlrpc_servlet)
 
       httpd.mount("/private/dashboard", DashboardServlet.new(build_history_repository, project_config_repository, build_scheduler, :private))
-      httpd.mount("/private/project", ProjectServlet.new(build_history_repository, project_config_repository, trigger, :private, build_scheduler, @project_directories, nudge_xmlrpc_url))
+      httpd.mount("/private/project", ProjectServlet.new(build_history_repository, project_config_repository, trigger, :private, build_scheduler, project_directories, nudge_xmlrpc_url))
+      httpd.mount("/private/log", LogFileServlet.new(project_directories))
       
       httpd.mount("/private/images", WEBrick::HTTPServlet::FileHandler, "#{webdir}/images")
       httpd.mount("/private/images/currentstatus", CurrentStatusImageServlet.new(build_history_repository, build_scheduler))
