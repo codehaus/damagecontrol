@@ -20,11 +20,13 @@ module DamageControl
     def process_message(message)
       if message.is_a? BuildCompleteEvent
         if(!message.build.successful)
+          puts "JIRA Publisher go failure message"
           jira_project_key = message.build.config["jira_project_key"]
           if(@jira_user && @jira_password && jira_project_key)
 #          assignee = message.build.modification_set[0].developer
             assignee = "damagecontrol"
             jelly_script = create_jelly_script("Fix broken build", @template.generate(message.build), jira_project_key, assignee)
+            puts "Posting JIRA issue"
             post_script(jelly_script)
           else
             puts "Not posting JIRA issue:"
