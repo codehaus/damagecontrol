@@ -16,7 +16,7 @@ module DamageControl
     end
     
     def test_poll_should_get_changesets_from_epoch_if_last_change_time_unknown
-      ENV["RSCM_BASE"] = RSCM.new_temp_dir + "/epoch"
+      ENV["DAMAGECONTROL_HOME"] = RSCM.new_temp_dir + "/epoch"
       @p.scm = new_mock
       changesets = new_mock
       @p.scm.__expect(:changesets) do |checkout_dir, from|
@@ -30,7 +30,7 @@ module DamageControl
     end
 
     def test_poll_should_poll_until_quiet_period_elapsed
-      ENV["RSCM_BASE"] = RSCM.new_temp_dir + "/quiet_period"
+      ENV["DAMAGECONTROL_HOME"] = RSCM.new_temp_dir + "/quiet_period"
 
       @p.quiet_period = 0
       @p.scm = new_mock
@@ -54,7 +54,7 @@ module DamageControl
     end
 
     def test_poll_should_get_changesets_from_last_change_time_if_known
-      ENV["RSCM_BASE"] = RSCM.new_temp_dir + "/last"
+      ENV["DAMAGECONTROL_HOME"] = RSCM.new_temp_dir + "/last"
 
       a = Time.new.utc
       FileUtils.mkdir_p("#{@p.changesets_dir}/#{a.ymdHMS}")
@@ -77,7 +77,7 @@ module DamageControl
     
     def test_should_look_at_folders_to_determine_next_changeset_time
       changesets_dir = RSCM.new_temp_dir + "/folders"
-      ENV["RSCM_BASE"] = changesets_dir
+      ENV["DAMAGECONTROL_HOME"] = changesets_dir
 
       a = Time.new.utc
       b = a + 1
