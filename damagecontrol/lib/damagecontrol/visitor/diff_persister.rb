@@ -19,7 +19,7 @@ module DamageControl
 
       def visit_changeset(changeset)
         @changeset = changeset
-        Log.info "Writing diffs for #{@project_name} changeset #{changeset.id}"
+        Log.info "Writing diffs for #{@project_name} changeset #{changeset.identifier}"
       end
 
       def visit_change(change)

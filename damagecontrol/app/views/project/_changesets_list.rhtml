@@ -17,12 +17,15 @@
   %>
   <tr class="build-row">
     <td nowrap="nowrap">
-      <%= link_to("#{changeset.id} (#{changeset.developer})", :action => "changesets", :id => @project.name, :params => {"changeset" => changeset.id}) %>
+      <%= link_to("#{changeset.identifier} (#{changeset.developer})", :action => "changesets", :id => @project.name, :params => {"changeset" => changeset.identifier}) %>
+      <% @project.builds(changeset.identifier).each do |build| %>
+      <%= tag("img", :src => "/images/green-16.gif") %>
+      <% end %>
     </td>
   </tr>
   <% end %>
 
-  <% if(!@select_changeset_ids.empty?) %>
+  <% if(!@select_changeset_identifiers.empty?) %>
     <tr class="build-row">
       <td class="build-cell-even">
         <form method="get" action="<%= url_for(:action => "changesets", :id => @project.name) %>">
@@ -30,9 +33,9 @@
           <select name="changeset" onchange="submit()">
           
           <%
-            @select_changeset_ids.reverse.each do |changeset_id|
+            @select_changeset_identifiers.reverse.each do |changeset_identifier|
           %>
-            <option value="<%= changeset_id %>"><%= changeset_id %></option>      
+            <option value="<%= changeset_identifier %>"><%= changeset_identifier %></option>      
           <% end %>
           
           </select>

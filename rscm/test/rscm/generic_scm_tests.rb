@@ -86,7 +86,7 @@ module RSCM
       # why is this nil when running as the dcontrol user on codehaus? --jon
       #assert_equal(username, changeset.developer)
       assert(changeset.developer)
-      assert(changeset.id)
+      assert(changeset.identifier)
 
       assert_equal("build.xml", changeset[0].path)
       assert(changeset[0].revision)
@@ -134,7 +134,7 @@ module RSCM
       end
     end
 
-    def test_checkout_changeset_id
+    def test_checkout_changeset_identifier
       work_dir = RSCM.new_temp_dir("label")
       checkout_dir = "#{work_dir}/checkout"
       repository_dir = "#{work_dir}/repository"
@@ -147,12 +147,12 @@ module RSCM
       before_cs = scm.changesets(checkout_dir, Time.epoch)
 
       add_or_edit_and_commit_file(scm, checkout_dir, "after.txt", "After label")
-      next_id = before_cs.latest.id + 1
-      after_cs = scm.changesets(checkout_dir, next_id)
+      next_identifier = before_cs.latest.identifier + 1
+      after_cs = scm.changesets(checkout_dir, next_identifier)
       assert_equal(1, after_cs.length)
       assert_equal("after.txt", after_cs[0][0].path)
 
-      scm.checkout(checkout_dir, before_cs.latest.id)
+      scm.checkout(checkout_dir, before_cs.latest.identifier)
 
       assert(File.exist?("#{checkout_dir}/before.txt"))
       assert(!File.exist?("#{checkout_dir}/after.txt"))

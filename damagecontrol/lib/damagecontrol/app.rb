@@ -18,8 +18,10 @@ REGISTRY = Needle::Registry.define do |b|
       b.persister.save_changesets(project, changesets)
       b.persister.save_diffs(project, changesets)
       b.persister.save_rss(project)
-      # TODO: stick project+changesets pairs on the channel
-      project.checkout(changesets.latest.id)
+      project.build(changesets.latest.identifier) do |build|
+        # TODO: execute the real thing
+        build.execute("hello!")
+      end
     end
   end
 

@@ -4,7 +4,7 @@ require 'rscm/path_converter'
 
 class String
   # Turns a String into a Time or an int
-  def to_id
+  def to_identifier
     if(self =~ /20\d\d\d\d\d\d\d\d\d\d\d\d/)
       # Assume it's a timestamp string - convert to time.
       Time.parse_ymdHMS(self)
@@ -110,8 +110,8 @@ module RSCM
     def checkout(checkout_dir, to_identifier=Time.infinity) # :yield: file
       before = Dir["#{checkout_dir}/**/*"]
 
-      # We expect subclasses to implement this as a protected method.
-      checkout_silent(checkout_dir)
+      # We expect subclasses to implement this as a protected method (unless this whole method is overridden).
+      checkout_silent(checkout_dir, to_identifier)
 
       after = Dir["#{checkout_dir}/**/*"]
       added = (after - before)

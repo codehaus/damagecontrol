@@ -29,18 +29,45 @@ module DamageControl
     end
     module_function :checkout_list_file
 
+    def changeset_dir(project_name, changeset_identifier)
+      "#{changesets_dir(project_name)}/#{changeset_identifier.to_s}"
+    end
+    module_function :changeset_dir
+
+    def builds_dir(project_name, changeset_identifier)
+      "#{changeset_dir(project_name, changeset_identifier)}/builds"
+    end
+    module_function :builds_dir
+
+    def build_dirs(project_name, changeset_identifier)
+      Dir["#{builds_dir(project_name, changeset_identifier)}/*"]
+    end
+    module_function :build_dirs
+    
+    # Dir for a build created at time +time+
+    def build_dir(project_name, changeset_identifier, time)
+      "#{builds_dir(project_name, changeset_identifier)}/#{time.to_s}"
+    end
+    module_function :build_dir
+    
+    # File containing the build command for a build created at time +time+
+    def build_command_file(project_name, changeset_identifier, time)
+      "#{build_dir(project_name, changeset_identifier, time)}/command"
+    end
+    module_function :build_command_file
+
     def changesets_dir(project_name)
       "#{project_dir(project_name)}/changesets"
     end
     module_function :changesets_dir
 
     def changesets_rss_file(project_name)
-      "#{changesets_dir(project_name)}/rss.xml"
+      "#{changesets_dir(project_name)}/changesets.rss"
     end
     module_function :changesets_rss_file
 
     def diff_file(project_name, changeset, change)
-      "#{changesets_dir(project_name)}/#{changeset.id.to_s}/#{change.path}.diff"
+      "#{changesets_dir(project_name)}/#{changeset.identifier.to_s}/diffs/#{change.path}.diff"
     end
     module_function :diff_file
 

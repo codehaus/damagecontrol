@@ -27,7 +27,7 @@ module DamageControl
     # We'll get upto the latest 15 changesets and turn them into RSS.
     def save_rss(project)
       Log.info "Generating RSS for #{project.name}"
-      last_15_changesets = project.changesets_persister.load_upto(project.changesets_persister.latest_id, 15)
+      last_15_changesets = project.changesets_persister.load_upto(project.changesets_persister.latest_identifier, 15)
       RSS::Maker.make("2.0") do |rss|
         FileUtils.mkdir_p(File.dirname(project.changesets_rss_file))
         File.open(project.changesets_rss_file, "w") do |io|

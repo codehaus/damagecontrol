@@ -5,7 +5,8 @@
   <tr class="pane">
     <td colspan="3" class="changeset">
       <div class="changeset-message">
-        <b><%= changeset.developer %>:</b><br>
+        <b><%= changeset.developer %></b>
+        (<%= changeset.time.to_human %> UTC)<br>
         <%= @project.tracker.highlight(changeset.message) %>
       </div>
     </td>
