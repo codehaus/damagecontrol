@@ -20,11 +20,14 @@ module DamageControl
   #
   class Build
   
-    attr_reader :project, :changeset, :time
-  
     # Creates a new Build for a +project+'s +changeset+, created at +time+.
     def initialize(project_name, changeset_identifier, time)
       @project_name, @changeset_identifier, @time = project_name, changeset_identifier, time
+    end
+
+    # The changeset we belong to
+    def changeset
+      Directories.changeset
     end
     
     # Executes the +cmd+ command for this build and persists the command for future reference.
@@ -62,7 +65,11 @@ module DamageControl
     
     # Returns the exit code of the build process, or nil if the process was killed
     def exit_code
-      File.read(exit_code_file).to_i
+      if(File.exist?(exit_code_file))
+        File.read(exit_code_file).to_i
+      else
+        nil
+      end
     end
 
     # Returns the pid of the build process

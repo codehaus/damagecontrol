@@ -195,6 +195,15 @@ module DamageControl
       end
     end
 
+    # Returns the latest build.
+    def latest_build
+      changeset_identifiers.reverse.each do |changeset_identifier|
+        builds = builds(changeset_identifier)
+        return builds[-1] unless builds.empty?
+      end
+      nil
+    end
+
   private
 
     def project_config_file
