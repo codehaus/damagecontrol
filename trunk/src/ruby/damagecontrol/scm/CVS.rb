@@ -138,9 +138,6 @@ module DamageControl
         file.puts(File.basename(conf_file_name))
       end
 
-      File.copy(nc_exe_file, "#{directory}/nc.exe" )
-      system("cvs -d#{cvsroot(scm_spec)} add -kb nc.exe")
-
       if(windows?)
         # install nc.exe
         File.copy(nc_exe_file, "#{directory}/nc.exe" )
