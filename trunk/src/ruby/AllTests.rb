@@ -1,5 +1,6 @@
 $:<<'../../lib'
 
+
 require 'damagecontrol/Logging'
 DamageControl::Logging.silent
 
