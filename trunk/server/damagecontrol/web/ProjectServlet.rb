@@ -1,27 +1,10 @@
 require 'damagecontrol/web/AbstractAdminServlet'
 require 'damagecontrol/scm/SCMFactory'
 require 'damagecontrol/util/FileUtils'
+require 'damagecontrol/web/ConsoleOutputReport'
+require 'damagecontrol/web/ChangesReport'
 
 module DamageControl
-  class Tab
-    attr_reader :id
-    attr_reader :title
-    attr_reader :content
-    attr_reader :icon
-    
-    def initialize(id, title, content, icon=nil)
-      @id = id
-      @title = title
-      @content = content
-      @icon = icon
-    end
-    
-    def ==(other_tab)
-      return false unless other_tab.is_a? Tab
-      id == other_tab.id
-    end
-  end
-  
   class ProjectServlet < AbstractAdminServlet
     include FileUtils
   
@@ -62,33 +45,23 @@ module DamageControl
     
   protected
 
-    def tabs
-      tabs = []
-      if selected_build
-        tabs +=
-          [
-            Tab.new("changes", "Changes", changes(:changesets => selected_build.changesets), "icons/document_edit.png")
-          ]
-      end
-      if selected_build.log_file && File.exists?(selected_build.log_file)
-        tabs +=
-          [
-            Tab.new("console", "Console Output", "<pre class=\"console\">#{File.read(selected_build.log_file)}</pre>", "icons/console_network.png")
-          ]
-      end
-      tabs
+    def reports
+      [
+        ChangesReport.new(selected_build, project_config_repository),
+        ConsoleOutputReport.new(selected_build, project_config_repository)
+      ]
     end
     
-    def selected_tab
-      id = selected_tab_id
-      tabs.find {|t| id == t.id }
+    def selected_report
+      id = selected_report_id
+      reports.find {|t| id == t.id }
     end
     
-    def selected_tab_id
-      request.query["tab"] || default_tab_id
+    def selected_report_id
+      request.query["report"] || default_report_id
     end
     
-    def default_tab_id
+    def default_report_id
       "changes"
     end
     
@@ -134,24 +107,9 @@ module DamageControl
       end
     end
     
-    def quote_message(message)
-      m = html_quote(message)
-      jira_url = ensure_trailing_slash(project_config["jira_url"])
-      if(jira_url)
-        m.gsub(/([A-Z]+-[0-9]+)/, "<a href=\"#{jira_url}browse/\\1\">\\1</a>")
-      else
-        m
-      end
-    end
-
     def project_search_form(params)
       project_name = params[:project_name] || required_param(:project_name)
       erb("components/search_form.erb", binding)
-    end
-    
-    def changes(params)
-      changesets = params[:changesets] || required_param(:changesets)
-      erb("components/changes.erb", binding)
     end
     
     def navigation

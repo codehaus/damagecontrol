@@ -34,19 +34,19 @@ module DamageControl
     def current_build(project_name)
       history = history(project_name)
       return nil unless history
-      patch_build(history[-1])
+      history[-1]
     end
     
     def last_completed_build(project_name)
       history = history(project_name)
       return nil unless history
-      patch_build(history.reverse.find {|build| build.completed?})
+      history.reverse.find {|build| build.completed?}
     end
     
     def last_successful_build(project_name)
       history = history(project_name)
       return nil unless history
-      patch_build(history.reverse.find {|build| build.status == Build::SUCCESSFUL})
+      history.reverse.find {|build| build.status == Build::SUCCESSFUL}
     end
 
     def process_message(message)
@@ -118,7 +118,7 @@ module DamageControl
       timestamp = Build.timestamp_to_time(timestamp) if timestamp.is_a?(String)
       history = history(project_name)
       history.each do |build|
-        return patch_build(build) if build.timestamp_as_time == timestamp
+        return build if build.timestamp_as_time == timestamp
       end
       nil
     end
@@ -126,22 +126,22 @@ module DamageControl
     def next(build)
       h = history(build.project_name)
       i = h.index(build)
-      return patch_build(h[i + 1]) unless i == h.length - 1
+      return h[i + 1] unless i == h.length - 1
     end
 
     def prev(build)
       h = history(build.project_name)
       i = h.index(build)
-      return patch_build(h[i - 1]) unless i == 0
+      return h[i - 1] unless i == 0
     end
 
     def previous_successful_build(build)
       history = history(build.project_name)
       return nil unless history
       idx = history.index(build)
-      patch_build(history[0..idx].reverse.find do |a_build| 
+      history[0..idx].reverse.find do |a_build| 
         a_build.status == Build::SUCCESSFUL && a_build != build
-      end)
+      end
     end
 
   private
@@ -195,16 +195,6 @@ module DamageControl
       File.move(filename, backup)
     end
 
-    # HACK OF DEATH:
-    # some xmlrpc implementations get very confused by an empty struct
-    # so we'll patch it by adding a pointless property in it
-    # (did that take me like on day to figure out?!)
-    # -- Jon Tirsen
-    def patch_build(build)
-      build.config["apa"]="banan" unless build.nil?
-      build
-    end
-    
     def dump(history, project_name)
       puts "saving"
       # safe writing of history file

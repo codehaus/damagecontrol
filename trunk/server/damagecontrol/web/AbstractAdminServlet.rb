@@ -102,10 +102,6 @@ module DamageControl
       result
     end
     
-    def scm_url(change)
-      create_scm.web_url_to_change(change)
-    end
-    
     def build_description(build)
       label = "##{build.label}"; 
       label = build.status if label == "#"
@@ -134,20 +130,7 @@ module DamageControl
       raise "required keyed parameter #{param.inspect}"
     end
     
-    def file_icon(change)
-      icon = FILE_ICONS[change.status]
-      icon = "fileicons/document_warning.png" unless icon
-      icon
-    end
-    
   private
-    FILE_ICONS = {
-      Change::MODIFIED => "fileicons/document_edit.png",
-      Change::DELETED  => "fileicons/document_delete.png",
-      Change::ADDED    => "fileicons/document_new.png",
-      Change::MOVED    => "fileicons/document_exchange.png"
-    }
-    
     def build_url(build)
       return nil unless build
       "?action=build_details&project_name=#{build.project_name}&timestamp=#{build.timestamp}"

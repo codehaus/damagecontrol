@@ -3,6 +3,14 @@ require 'uri'
 require 'pebbles/RiteMesh'
 
 module Pebbles
+  module HTMLQuoting
+    # TODO: use the standard CGI class for this (might be something is WebRick too)
+    def html_quote(text)
+      return "" unless text
+      text.gsub(/</, "&lt;").gsub(/\r?\n/, "<br/>")
+    end
+  end
+
   module SimpleERB
     protected
     
@@ -48,12 +56,6 @@ module Pebbles
       raise WEBrick::HTTPStatus::BadRequest, "parameter required `#{parameter}'."
     end
     
-    # TODO: use the standard CGI class for this (might be something is WebRick too)
-    def html_quote(text)
-      return "" unless text
-      text.gsub(/</, "&lt;").gsub("\n", "<br/>")
-    end
-
     def redirect(url)
       response["Location"] = url
       response.status = WEBrick::HTTPStatus::Found.code
@@ -75,6 +77,7 @@ module Pebbles
   class MVCServlet < SimpleServlet
     
     include RiteMesh
+    include HTMLQuoting
     
     def service(request, response)
       super(request, response)

@@ -7,11 +7,13 @@ require 'damagecontrol/util/HubTestHelper'
 require 'damagecontrol/core/LogWriter'
 require 'damagecontrol/core/BuildHistoryRepository'
 require 'damagecontrol/core/ProjectDirectories'
+require 'damagecontrol/core/ProjectConfigRepository'
+require 'damagecontrol/scm/SCMFactory'
 require 'damagecontrol/scm/AbstractSCM'
 
 module DamageControl
 
-  class BuildExecutorBuildSchedulerLogWriterIntegrationTest < Test::Unit::TestCase
+  class ProjectConfigRepositoryBuildExecutorBuildSchedulerLogWriterIntegrationTest < Test::Unit::TestCase
     
     include HubTestHelper
     include FileUtils
@@ -23,9 +25,12 @@ module DamageControl
       @scheduler = BuildScheduler.new(hub)
       @scheduler.default_quiet_period = 0
       @scheduler.add_executor(@executor)
-      @build = Build.new("test", Time.now, {"build_command_line" => "echo 'Hello'"})
-      @build.scm = StubSCM.new(@basedir)
-      LogWriter.new(hub, ProjectDirectories.new(@basedir))
+      @project_config_repository = ProjectConfigRepository.new(ProjectDirectories.new(@basedir), SCMFactory.new, nil)
+      @project_config_repository.new_project("test")
+      @project_config_repository.modify_project_config("test",
+        {"build_command_line" => "echo 'Hello'", "scm_type" => StubSCM.name })
+      @build = @project_config_repository.create_build("test", Time.now)
+      LogWriter.new(hub)
     end
 
     def test_executor_scheduler_and_logwriter_plays_along_nicely
@@ -39,9 +44,6 @@ module DamageControl
   end
   
   class StubSCM < AbstractSCM
-    def initialize(basedir)
-      super("checkout_dir" => basedir)
-    end
   end
 
 end 

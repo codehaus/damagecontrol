@@ -122,7 +122,7 @@ module DamageControl
       mock_scm.__verify
       mock_build_history.__verify
     end
-
+    
     def ant
       windows? ? "ant.bat" : "ant"
     end

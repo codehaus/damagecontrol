@@ -9,13 +9,17 @@
 
 <table class="tab" nowrap="nowrap" width="100%">
   <tr>
-    <% tabs.each do |tab| %>
-  
-      <td nowrap="true" valign="center" <% if selected_tab == tab then %>class="selected_tab"<% else %>class="tab"<% end %>>
-      <% if selected_tab != tab then %><a href="?project_name=<%= project_name %>&timestamp=<%= selected_build.timestamp %>&tab=<%= tab.id %>"><% end %>
-      <% if tab.icon then %><img valign="center" src="<%= tab.icon %>" />&nbsp;<% end %><%= tab.title %>
-      <% if selected_tab != tab then %></a><% end %>
-      </td>
+    <% reports.each do |report| 
+      selected = selected_report == report
+      %>
+    
+      <% if report.available? %>
+        <td valign="center" nowrap="nowrap" <% if selected then %>class="selected_tab"<% else %>class="tab"<% end %>>
+        <% if !selected then %><a href="?project_name=<%= project_name %>&timestamp=<%= selected_build.timestamp %>&report=<%= report.id %>"><% end %>
+        <% if report.icon then %><img valign="center" src="<%= report.icon %>" />&nbsp;<% end %><%= report.title %>
+        <% if !selected then %></a><% end %>
+        </td>
+      <% end %>
     
     <% end %>
     <td width="100%" class="tab_filler">
@@ -23,8 +27,8 @@
     </td>
   </tr>
   <tr>
-    <td colspan="<%= tabs.size + 1 %>">
-      <%= selected_tab.content %>
+    <td colspan="<%= reports.size + 1 %>">
+      <%= selected_report.content %>
     </td>
   </tr>
 </table>

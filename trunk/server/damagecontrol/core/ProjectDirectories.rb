@@ -56,6 +56,10 @@ module DamageControl
     def log_file(project_name, timestamp)
       "#{log_dir(project_name)}/#{timestamp}.log"
     end
+    
+    def archive_dir(project_name, timestamp)
+      "#{project_dir(project_name)}/archive/#{timestamp}"
+    end
 
   end
   

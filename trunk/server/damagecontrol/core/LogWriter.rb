@@ -1,17 +1,16 @@
-require 'ftools'
 require 'damagecontrol/core/BuildEvents'
 require 'damagecontrol/util/Logging'
+require 'damagecontrol/util/FileUtils'
 
 module DamageControl
 
   class LogWriter
     
     include Logging
+    include FileUtils
   
-    def initialize(channel, project_directories)
+    def initialize(channel)
       @log_files = {}
-      @project_directories = project_directories
-
       channel.add_subscriber(self)
     end
     
@@ -42,17 +41,12 @@ module DamageControl
 
     end
     
-    def log_file_name(build)
-      log_dir = @project_directories.log_dir(build.project_name)
-      "#{log_dir}/#{build.timestamp}.log"
-    end
-
     def log_file(build)
-      file_name = log_file_name(build)
+      file_name = build.log_file
       file = @log_files[file_name]
       if(!file)
         logger.debug("opening file #{file_name}") if logger.debug?
-        File.makedirs(File.dirname(file_name))
+        mkdir_p(File.dirname(file_name))
         file = File.open(file_name, "w")
         @log_files[file_name] = file
       end

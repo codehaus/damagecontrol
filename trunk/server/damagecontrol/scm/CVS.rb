@@ -20,43 +20,15 @@ module DamageControl
       @password = config_map["cvspassword"]
     end
     
-    # Works with ViewCVS
-    def web_url_to_change(change)
-      # for backwards compatibility with old settings
-      if(config_map["view_cvs_url"])
-        config_map["cvs_web_url"] = config_map["view_cvs_url"] unless config_map["cvs_web_url"]
-      end
-      config_map.delete("view_cvs_url")
-
-      cvs_web_url = config_map["cvs_web_url"]
-
-      return super if cvs_web_url.nil? || cvs_web_url == "" 
-
-      cvs_web_url_patched = ensure_trailing_slash(cvs_web_url)
-      url = "#{cvs_web_url_patched}#{change.path}"
-      
-      if(change.previous_revision)
-        # point to the viewcvs and fisheye diffs (if we know the previous revision)
-        url << "?r1=#{change.previous_revision}&r2=#{change.revision}"
-      else
-        # point to the viewcvs (rev) and fisheye (r) revisions (no diff view)
-        url << "?rev=#{change.revision}&r=#{change.revision}"
-      end
-      url
-    end
-    
     def changesets(from_time, to_time)
       # exclude commits that occured on from_time
       from_time = from_time + 1
 
       log = ""
-      cvs(working_dir, changes_command(from_time, to_time)) do |io|
-        io.each_line do |line|
-          log << line
-          yield line if block_given?
-        end
+      cvs(working_dir, changes_command(from_time, to_time)) do |line|
+        log << line
+        #yield line if block_given?
       end
-
       parser = CVSLogParser.new(StringIO.new(log))
       parser.cvspath = path
       parser.cvsmodule = mod

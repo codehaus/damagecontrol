@@ -54,10 +54,12 @@ module DamageControl
       end
     end
     
+    # TODO don't think these are used anymore --jon
     def checkout_dir(project_name)
       project_directories.checkout_dir(project_name)
     end
     
+    # TODO don't think these are used anymore --jon
     def log_dir(project_name)
       project_directories.log_dir(project_name)
     end
@@ -78,8 +80,9 @@ module DamageControl
       build = Build.new(project_name, timestamp, project_config(project_name))
       build.url = "#{public_web_url}/project?action=build_details&project_name=#{build.project_name}&timestamp=#{build.timestamp}"
       build.scm = create_scm(project_name)
-      build.potential_label = peek_next_build_number(project_name)
-      build.log_file = File.expand_path("#{log_dir(project_name)}/#{build.timestamp_as_s}.log")
+      build.potential_label = peek_next_build_number(project_name).to_s
+      build.log_file = "#{log_dir(project_name)}/#{build.timestamp_as_s}.log"
+      build.archive_dir = project_directories.archive_dir(project_name, build.timestamp_as_s)
       build
     end
     

@@ -148,6 +148,7 @@ EOF
     
     def initialize(path="", developer="", message="", revision="", time="")
       @path, @developer, @message, @revision, @time = path, developer, message, revision, time
+      @url = ""
     end
   
     def to_s

@@ -25,10 +25,6 @@ module DamageControl
       "#{to_os_path(script)} --url #{dc_url} --projectname #{project_name}"
     end
 
-    def web_url_to_change(change)
-      "root/#{config_map['project_name']}/#{working_dir}/#{change.path}"
-    end
-    
     def checkout(time = nil, &proc)
     end
 

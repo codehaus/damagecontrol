@@ -13,10 +13,10 @@ module DamageControl
     def setup
       @hub = Hub.new
       @basedir = new_temp_dir
-      @project_directories = ProjectDirectories.new(@basedir)
-      @writer = LogWriter.new(@hub, @project_directories)
+      @writer = LogWriter.new(@hub)
       
       @build = Build.new("project_name")
+      @build.log_file = "#{@basedir}/project_name/log/19770614002000.log"
 
       @build.label = "a_label"
       @build.timestamp = "19770614002000"

@@ -1,7 +1,10 @@
 require 'fileutils'
 require 'ftools'
+require 'damagecontrol/util/Logging'
 
 module FileUtils
+
+  include DamageControl::Logging
 
   class ProcessFailedException < StandardError
   end
@@ -65,6 +68,12 @@ module FileUtils
     else
       url
     end
+  end
+  
+  def make_relative(basedir, targetdir)
+    targetdir = File.expand_path(targetdir)
+    basedir = File.expand_path(basedir)
+    [File.expand_path(basedir).length+1..-1]
   end
   
   def cmd_with_io(dir, cmd, environment = {}, &proc)

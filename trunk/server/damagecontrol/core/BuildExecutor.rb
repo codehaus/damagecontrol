@@ -153,7 +153,7 @@ module DamageControl
     
     def build_complete
       logger.info("build complete #{current_build.project_name}")
-      current_build.end_time = Time.now.to_i
+      current_build.end_time = Time.now.utc
       @channel.publish_message(BuildCompleteEvent.new(current_build))
 
       # atomically frees the slot, we are now no longer busy
@@ -175,7 +175,7 @@ module DamageControl
     
     def build_start
       logger.info("build starting #{current_build.project_name}")
-        current_build.start_time = Time.now.to_i
+        current_build.start_time = Time.now.utc
         determine_changeset
         @channel.publish_message(BuildStartedEvent.new(current_build))
     end
