@@ -16,13 +16,18 @@ class Hash
   end
 end
 
-module Matchable
+module Pebbles
+  module Matchable
 
-  def matches?(regexp)
-    instance_values = instance_variables.collect { |field_name| instance_eval(field_name) }
-    matches_helper(instance_values, regexp)
+    def matches?(regexp)
+      instance_values = []
+      instance_variables.each do |field_name|
+        instance_values << instance_eval(field_name) unless (respond_to?("matches_ignores", true) && matches_ignores.index(field_name))
+      end
+      matches_helper(instance_values, regexp)
+    end
+
   end
-
 end
 
 def matches_helper(array, regexp)

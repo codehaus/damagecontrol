@@ -1,11 +1,13 @@
 require 'damagecontrol/core/BuildEvents'
 require 'damagecontrol/scm/Changes'
+require 'pebbles/Matchable'
 require 'xmlrpc/utils'
 
 module DamageControl
 
   class Build
     include XMLRPC::Marshallable
+    include Pebbles::Matchable
 
     IDLE           = "IDLE"
     SUCCESSFUL     = "SUCCESSFUL"
@@ -110,7 +112,13 @@ module DamageControl
       config == o.config &&
       timestamp == o.timestamp
     end
-    
+
+  private
+    # don't allow search in these fields
+    def matches_ignores
+      ["@project_name"]
+    end
+
   end
 end
 

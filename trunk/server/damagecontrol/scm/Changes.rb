@@ -1,6 +1,7 @@
 require 'erb'
 require 'xmlrpc/utils'
 require 'pebbles/TimeUtils'
+require 'pebbles/Matchable'
 
 module DamageControl
 
@@ -15,6 +16,7 @@ EOF
 
   class ChangeSets
     include XMLRPC::Marshallable
+    include Pebbles::Matchable
 
     attr_reader :changesets
 
@@ -68,6 +70,7 @@ EOF
 
   class ChangeSet
     include XMLRPC::Marshallable
+    include Pebbles::Matchable
 
     attr_reader :changes
 
@@ -124,6 +127,7 @@ EOF
 
   class Change
     include XMLRPC::Marshallable
+    include Pebbles::Matchable
     
     def initialize(path="", developer="", message="", revision="", time="")
       @path, @developer, @message, @revision, @time = path, developer, message, revision, time

@@ -97,20 +97,14 @@ module DamageControl
       build_periods
     end
     
-    def search(s, required_project_name=nil)
-      criterion = Regexp.new(".*#{s}.*")
+    def search(criterion, required_project_name=nil)
+      criterion = Regexp.new(".*#{criterion}.*") unless criterion.is_a?(Regexp)
       result = []
       project_names.each do |project_name|
-        history = history(project_name)
-        history.each do |build|
-          build.changesets.each do |changeset|
-            changeset.each do |change|
-              if (!result.index(build) && criterion.match(change.message))
-                if(required_project_name==nil || (required_project_name && build.project_name == required_project_name))
-                  result << build 
-                end
-              end
-            end
+        if(required_project_name == project_name || required_project_name.nil?)
+          history = history(project_name)
+          history.each do |build|
+            result << build if build.matches?(criterion)
           end
         end
       end

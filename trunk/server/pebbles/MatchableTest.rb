@@ -2,15 +2,21 @@ require 'test/unit'
 require 'pebbles/Matchable'
 
 class SomeMatchingClass
-  include Matchable
+  include Pebbles::Matchable
   def initialize
     @some_field = "Hello World"
+    @some_ignored_field = "Don't find me"
   end
 
+private
+
+  def matches_ignores
+    ["@some_ignored_field"]
+  end
 end
 
 class SomeNonMatchingClass
-  include Matchable
+  include Pebbles::Matchable
   def initialize
     @some_field = "Bonjour Monde"
   end
@@ -23,7 +29,7 @@ class SomeNonMatchableClass
 end
 
 class SomeMatchableClassWithNonMatchableMember
-  include Matchable
+  include Pebbles::Matchable
   def initialize
     @some_field = SomeNonMatchableClass.new
   end
@@ -61,6 +67,10 @@ class MatchableTest < Test::Unit::TestCase
   def test_search_in_map_searches_in_values_only
     assert({SomeNonMatchingClass.new => SomeMatchingClass.new}.matches?(/orld/))
     assert(!{SomeMatchingClass.new => SomeNonMatchingClass.new}.matches?(/orld/))
+  end
+
+  def test_ignore_fields_can_be_specified
+    assert(!SomeMatchingClass.new.matches?(/find me/))
   end
 
 end
