@@ -87,6 +87,8 @@ module DamageControl
     
     def test_same_build_registered_twice_doesnt_add_twice
       @bhp.register(@apple2)
+      @bhp.register(@apple2)
+      @bhp.register(@apple2)
       apple_list = @bhp.history("apple")
       assert_equal([@apple1, @apple2], apple_list)      
     end
