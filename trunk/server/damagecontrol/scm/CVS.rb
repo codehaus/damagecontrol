@@ -21,6 +21,7 @@ module DamageControl
       super(config_map)
       @cvsroot = config_map["cvsroot"] || required_config_param("cvsroot")
       @mod = config_map["cvsmodule"] || required_config_param("cvsmodule")
+      @password = config_map["cvspassword"]
     end
     
     # Works with ViewCVS
@@ -52,10 +53,8 @@ module DamageControl
       # exclude commits that occured on from_time
       from_time = from_time + 1
 
-      command = changes_command(from_time, to_time)
       log = ""
-      yield command if block_given?
-      cvs(working_dir, command) do |io|
+      cvs(working_dir, changes_command(from_time, to_time)) do |io|
         io.each_line do |line|
           log << line
           yield line if block_given?
@@ -66,6 +65,10 @@ module DamageControl
       parser.cvspath = path
       parser.cvsmodule = mod
       parser.parse_changesets
+    end
+    
+    def login_command
+      "cvs -d'#{cvsroot_with_password}' login"
     end
     
     def checkout(time = nil, &proc)
@@ -164,20 +167,22 @@ module DamageControl
       # https://www.cvshome.org/docs/manual/cvs-1.11.17/cvs_16.html#SEC144
       # -N => Suppress the header if no revisions are selected.
       # -S => Do not print the list of tags for this file.
-      "log -N -S -d\"#{cvsdate(from_time)}<=#{cvsdate(to_time)}\""
+      "log -N -d\"#{cvsdate(from_time)}<=#{cvsdate(to_time)}\""
     end
     
     def update_command(time)
-      "-d#{@cvsroot} update #{time_option(time)} -d -P"
+      "update #{time_option(time)} -d -P"
     end
     
     def checkout_command(time)
-      "-d#{@cvsroot} checkout #{time_option(time)} #{mod}"
+      "checkout #{time_option(time)} #{mod}"
     end
 
     def cvs(dir, cmd, &proc)
-      cmd = "cvs -q #{cmd} 2>&1"
-      cmd_with_io(dir, cmd) do |io|
+      cmd_with_password = "cvs -q -d'#{cvsroot}' #{cmd}"
+      cmd_without_password = "cvs -q -d'#{cvsroot('********')}' #{cmd}"
+      if block_given? then yield "#{cmd_without_password}\n" else logger.debug("#{cmd_without_password}\n") end
+      cmd_with_io(dir, cmd_with_password) do |io|
         io.each_line do |progress|
           if block_given? then yield progress else logger.debug(progress) end
         end
@@ -199,8 +204,21 @@ module DamageControl
         
   private
 
+    def cvsroot(password=@password)
+      protocol, user, host, path = parse_cvsroot
+      if @password && @password != ""
+        ":#{protocol}:#{user}:#{password}@#{host}:#{path}"
+      else
+        ":#{protocol}:#{user}@#{host}:#{path}"
+      end
+    end
+    
+    def pserver?
+      protocol == "pserver"
+    end
+    
     def create_cvsroot_cvs
-      CVS.new("cvsroot" => @cvsroot, "cvsmodule" => "CVSROOT", "checkout_dir" => checkout_dir)
+      CVS.new("cvsroot" => @cvsroot, "cvsmodule" => "CVSROOT", "cvspassword" => @password, "checkout_dir" => checkout_dir)
     end
 
     def time_option(time)
@@ -213,6 +231,10 @@ module DamageControl
     
     def path
       parse_cvsroot[3]
+    end
+    
+    def protocol
+      parse_cvsroot[0]
     end
     
     # parses the cvsroot into tokens

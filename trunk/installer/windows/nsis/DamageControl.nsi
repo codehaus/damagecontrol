@@ -84,11 +84,6 @@ Section "DamageControl Server" SecServer
   File "${DISTDIR}\release-notes.txt"
   File /r "${DISTDIR}\*"
 
-  ; Include DCTray.NET
-  
-  SetOutPath $INSTDIR\DCTray.NET
-  File ${ROOTDIR}\DCTray.NET\bin\Release\dctray.exe
-  
   ;Include a minimal ruby installation (to reduce the size of the installer)
 
   SetOutPath $INSTDIR\ruby\bin
@@ -104,14 +99,14 @@ Section "DamageControl Server" SecServer
   SetOutPath $INSTDIR\ruby\lib\ruby\1.8\net
   File /r ${RUBY_HOME}\lib\ruby\1.8\net\*.rb
   
-  SetOutPath $INSTDIR\ruby\lib\ruby\1.8\i386-mswin32
-  File /r ${RUBY_HOME}\lib\ruby\1.8\i386-mswin32\*.so
+  SetOutPath $INSTDIR\ruby\lib\ruby\1.8\i386-cygwin
+  File /r ${RUBY_HOME}\lib\ruby\1.8\i386-cygwin\*.so
   
-  SetOutPath $INSTDIR\ruby\lib\ruby\1.8\i386-mswin32\digest
-  File /r ${RUBY_HOME}\lib\ruby\1.8\i386-mswin32\digest\*.so
+  SetOutPath $INSTDIR\ruby\lib\ruby\1.8\i386-cygwin\digest
+  File /r ${RUBY_HOME}\lib\ruby\1.8\i386-cygwin\digest\*.so
   
-  SetOutPath $INSTDIR\ruby\lib\ruby\1.8\i386-mswin32\racc
-  File /r ${RUBY_HOME}\lib\ruby\1.8\i386-mswin32\racc\*.so
+  SetOutPath $INSTDIR\ruby\lib\ruby\1.8\i386-cygwin\racc
+  File /r ${RUBY_HOME}\lib\ruby\1.8\i386-cygwin\racc\*.so
   
   SetOutPath $INSTDIR\ruby\lib\ruby\1.8\webrick
   File /r ${RUBY_HOME}\lib\ruby\1.8\webrick\*.rb
@@ -146,6 +141,17 @@ Section "DamageControl Server" SecServer
 
 SectionEnd
 
+Section "DCTray.NET" SecDCTray
+  SetOutPath "$INSTDIR\DCTray.NET"
+  File ${ROOTDIR}\DCTray.NET\bin\Release\dctray.exe
+  
+  !insertmacro MUI_STARTMENU_WRITE_BEGIN Application
+    ;Create shortcuts
+    CreateDirectory "$SMPROGRAMS\$STARTMENU_FOLDER"
+    CreateShortCut "$SMPROGRAMS\$STARTMENU_FOLDER\DCTray.NET Systray Monitor.lnk" "$INSTDIR\DCTray.NET\dctray.exe"
+  !insertmacro MUI_STARTMENU_WRITE_END
+SectionEnd
+
 ;--------------------------------
 ;Installer Functions
 
@@ -172,10 +178,12 @@ FunctionEnd
 
   ;Language strings
   LangString DESC_SecServer ${LANG_ENGLISH} "The DamageControl server. Runs and monitors builds for multiple projects."
+  LangString DESC_SecDCTray ${LANG_ENGLISH} "DamageControl systray monitor."
 
   ;Assign language strings to sections
   !insertmacro MUI_FUNCTION_DESCRIPTION_BEGIN
     !insertmacro MUI_DESCRIPTION_TEXT ${SecServer} $(DESC_SecServer)
+    !insertmacro MUI_DESCRIPTION_TEXT ${SecDCTray} $(DESC_SecDCTray)
   !insertmacro MUI_FUNCTION_DESCRIPTION_END
 
 ;--------------------------------

@@ -49,5 +49,14 @@ module DamageControl
       if windows? then ".cmd" else "" end
     end
       
+    def cmd(dir, cmd, &proc)
+      if block_given? then yield "#{cmd}\n" else logger.debug("#{cmd}\n") end
+      cmd_with_io(dir, cmd) do |io|
+        io.each_line do |progress|
+          if block_given? then yield progress else logger.debug(progress) end
+        end
+      end
+    end
+    
   end
 end

@@ -4,6 +4,8 @@ require 'damagecontrol/core/AsyncComponent'
 require 'damagecontrol/util/Slot'
 require 'damagecontrol/scm/SCMFactory'
 require 'damagecontrol/scm/Changes'
+require 'damagecontrol/util/FileUtils'
+require 'damagecontrol/util/Logging'
 
 module DamageControl
   
@@ -13,6 +15,8 @@ module DamageControl
   class BuildExecutor
   
     include Threading
+    include FileUtils
+    include Logging
     
     attr_reader :current_build
     attr_reader :builds_dir
@@ -56,27 +60,25 @@ module DamageControl
       current_build.status = Build::BUILDING
 
       working_dir = if current_scm.nil? then project_base_dir else current_scm.working_dir end
-      with_working_directory(working_dir) do
-        # set up some environment variables the build can use
-
-        ENV["DAMAGECONTROL_CHANGES"] = 
-          current_build.changesets.format(CHANGESET_TEXT_FORMAT, Time.new.utc) unless current_build.changesets.nil?
-
-        ENV["DAMAGECONTROL_BUILD_LABEL"] = current_build.potential_label.to_s
-
-        IO.foreach("|#{current_build.build_command_line} 2>&1") do |line|
-          report_progress(line)
-        end
-        if($? == 0)
+      # set up some environment variables the build can use
+      environment = { "DAMAGECONTROL_BUILD_LABEL" => current_build.potential_label.to_s }
+      environment["DAMAGECONTROL_CHANGES"] = 
+        current_build.changesets.format(CHANGESET_TEXT_FORMAT, Time.new.utc) unless current_build.changesets.nil?
+      report_progress(current_build.build_command_line)
+      begin
+        cmd_with_io(working_dir, current_build.build_command_line, environment) do |io|
+          io.each_line {|line| report_progress(line) }
           current_build.status = Build::SUCCESSFUL
-        else
-          current_build.status = Build::FAILED
         end
+      rescue Exception => e
+        logger.error("build failed: #{format_exception(e)}")
+        report_progress(format_exception(e))
+        current_build.status = Build::FAILED
+      end
 
-        # set the label
-        if(current_build.successful? && current_build.potential_label)
-          current_build.label = current_build.potential_label
-        end
+      # set the label
+      if(current_build.successful? && current_build.potential_label)
+        current_build.label = current_build.potential_label
       end
 
     end

@@ -30,14 +30,14 @@ module DamageControl
     def test_checkout_command
       cvs = create_cvs(":pserver:anonymous@cvs.codehaus.org:/cvsroot/damagecontrol", "damagecontrol")
       assert_equal(
-        '-d:pserver:anonymous@cvs.codehaus.org:/cvsroot/damagecontrol checkout -D "1977-06-15 12:00:00 UTC" damagecontrol', \
+        'checkout -D "1977-06-15 12:00:00 UTC" damagecontrol', \
         cvs.checkout_command(jons_birthday))
     end
     
     def test_update_command
       cvs = create_cvs(":pserver:anonymous@cvs.codehaus.org:/cvsroot/damagecontrol", "damagecontrol")
       assert_equal(
-        '-d:pserver:anonymous@cvs.codehaus.org:/cvsroot/damagecontrol update -D "1977-06-15 12:00:00 UTC" -d -P', \
+        'update -D "1977-06-15 12:00:00 UTC" -d -P', \
         cvs.update_command(jons_birthday))
     end
     

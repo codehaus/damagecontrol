@@ -63,30 +63,33 @@ module FileUtils
     end
   end
   
-  def cmd_with_io(dir, cmd, &proc)
+  def cmd_with_io(dir, cmd, environment = {}, &proc)
     begin
-      parent, child = IO.pipe
-      pid = fork
+      parent_rd, child_wr = IO.pipe
+      child_rd, parent_wr = IO.pipe
       logger.debug("executing #{cmd}")
-      if pid
-        # in parent process
-        child.close
-        ret = yield parent
-        parent.close
-        Process::waitpid(pid)
-        raise Exception.new("'#{cmd}' in directory '#{Dir.pwd}' failed with code #{$?.to_s}") if $? != 0
-        logger.debug("successfully executed #{cmd}")
-        ret
-      else
+      pid = fork do
         # in subprocess
         File.mkpath(dir)
         Dir.chdir(dir)
-        parent.close
-        $stdin.reopen(child)
-        $stdout.reopen(child)
-        $stderr.reopen(child)
+        environment.each {|key, val| ENV[key] = val}
+        parent_rd.close
+        parent_wr.close
+        $stdin.reopen(child_rd)
+        $stdout.reopen(child_wr)
+        $stderr.reopen(child_wr)
         exec(cmd)
       end
+      # in parent process
+      child_wr.close
+      child_rd.close
+      ret = if proc.arity == 1 then proc.call(parent_rd) else proc.call(parent_rd, parent_wr) end
+      parent_rd.close
+      parent_wr.close
+      Process::waitpid(pid)
+      raise Exception.new("'#{cmd}' in directory '#{Dir.pwd}' failed with code #{$?.to_s}") if $? != 0
+      logger.debug("successfully executed #{cmd}")
+      ret
     rescue NotImplementedError
       puts "DamageControl only runs in Cygwin on Windows"
       exit!

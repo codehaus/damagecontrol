@@ -39,8 +39,14 @@ function showScm(scm) {
   <td><input class="scm_info" name="project_name" type="text" value="<%= project_name %>"/></td>
 </tr>
 <tr>
+  <% 
+    # Hackish/Neat trick:
+    # the inspect will convert backslashes to double backslashes and do all sorts of nice things
+    # it will also add " " around the string so it is not needed in the actual html
+    build_command_line_attrib_value = project_config['build_command_line'].inspect
+  %>
   <td>Build command</td>
-  <td><input class="scm_info" name="build_command_line" type="text" value="<%= project_config['build_command_line'] %>"/></td>
+  <td><input class="scm_info" name="build_command_line" type="text" value=<%= build_command_line_attrib_value %>/></td>
 </tr>
 <tr>
 </tr>

@@ -90,14 +90,6 @@ module DamageControl
       cmd(dir, "svnadmin #{cmd}", &proc)
     end
     
-    def cmd(dir, cmd, &proc)
-      cmd_with_io(dir, cmd) do |io|
-        io.each_line do |progress|
-          if block_given? then yield progress else logger.debug(progress) end
-        end
-      end
-    end
-    
     def install_trigger(*args)
       raise "can't automatically install trigger for Subversion, you need to install it manually"
     end

@@ -6,6 +6,7 @@ require 'fileutils'
 
 class Object
   def system(*args)
+    info(args.join(" "))
     result = super(*args)
     raise "#{args} failed" if ($? != 0)
   end
@@ -101,8 +102,15 @@ class Project
     integration_test
   end
   
-  def makensis_exe
-    "C:\\Program Files\\NSIS\\makensis.exe"
+  def makensis_executable
+    existing_file(params["makensis_executable"]) ||
+      existing_file("/cygdrive/c/Program Files/NSIS/makensis.exe") || 
+      existing_file("C:\\Program Files\\NSIS\\makensis.exe") ||
+      fail("NSIS needs to be installed, download from http://nsis.sf.net (you may need to add option -Dmakensis_executable=<path to makensis.exe>)")
+  end
+  
+  def existing_file(file)
+    if !file.nil? && File.exists?(file) then file else nil end
   end
 
   def write_file(file, content)
@@ -142,17 +150,18 @@ class Project
       @echo off
       set DAMAGECONTROL_HOME=%~dp0..
       cd %DAMAGECONTROL_HOME%
-      set CYGWIN_HOME="%DAMAGECONTROL_HOME%\cygwin"
-      set PATH="%CYGWIN_HOME%\bin";%PATH%
-      bash -c "/bin/ruby -I server #{target} %1 %2 %3 %4 %5 %6 %7 %8 %9"
+      set RUBY_HOME="%DAMAGECONTROL_HOME%\\ruby"
+      set PATH="%RUBY_HOME%\\bin";%PATH%
+      echo %RUBY_HOME%\\bin\\ruby -I "%DAMAGECONTROL_HOME%\\server" "#{target}" %1 %2 %3 %4 %5 %6 %7 %8 %9
+      %RUBY_HOME%\\bin\\ruby -I "%DAMAGECONTROL_HOME%\\server" "#{target}" %1 %2 %3 %4 %5 %6 %7 %8 %9
       pause
-    })
+    }.gsub(/\n/, "\r\n"))
     write_file(script, %{
       \#!/bin/sh
       DAMAGECONTROL_HOME=`dirname $0`/..
       cd $DAMAGECONTROL_HOME
       export DAMAGECONTROL_HOME=`pwd`
-      ruby -I"$DAMAGECONTROL_HOME/server" "$DAMAGECONTROL_HOME/#{target}" $*
+      ruby -I"$DAMAGECONTROL_HOME/server" "#{target}" $*
     })
     system("chmod +x #{script}") unless windows?
   end
@@ -176,17 +185,17 @@ class Project
   end
   
   def svn_executable
-    params["svn_executable"] || "#{ENV['SVN_HOME']}/svn.exe" || fail("Define the svn_executable variable to point to your Subversion client binary eg. -Dsvn_executable=c:\bin\svn.exe") 
+    params["svn_executable"] || "#{ENV['SVN_HOME']}/svn.exe" || fail("Define the svn_executable variable to point to your Subversion client binary eg. -Dsvn_executable=c:\bin\svn.exe")
   end
   
   def installer_nodeps
     # call these to verify they are defined before starting to build
     ruby_home
     cvs_executable
+    makensis_executable
     #svn_executable
 
-    fail("NSIS needs to be installed, download from http://nsis.sf.net (or not installed to default place: #{makensis_exe})") if !File.exists?(makensis_exe)
-    system("#{makensis_exe} /DVERSION=#{version} /DSVN_BIN= /DCVS_EXECUTABLE=#{cvs_executable} /DRUBY_HOME=#{ruby_home} installer/windows/nsis/DamageControl.nsi")
+    system("\"#{makensis_executable}\" /DVERSION=#{version} /DSVN_BIN= /DCVS_EXECUTABLE='#{cvs_executable}' /DRUBY_HOME='#{ruby_home}' installer/windows/nsis/DamageControl.nsi")
   end
   
   def archive
@@ -205,7 +214,8 @@ class Project
   end
   
   def clean
-    rm_rf("target")
+    rm_rf("target") if windows?
+    system("rm -rf target") unless windows?
   end
   
   def username
@@ -216,8 +226,8 @@ class Project
     "#{username}@beaver.codehaus.org:/home/projects/damagecontrol/dist/distributions"
   end
   
-  def scp_exe
-    "pscp"
+  def scp_executable
+    if windows? then "pscp" else "scp" end
   end
   
   def upload_nodeps
@@ -226,7 +236,7 @@ class Project
   end
   
   def upload_if_exists(file)
-    system("#{scp_exe} #{file} #{deploy_dest}") if File.exists?(file)
+    system("#{scp_executable} #{file} #{deploy_dest}") if File.exists?(file)
   end
     
   def shutdown_server(message)
