@@ -83,7 +83,7 @@ module RSCM
     # be used if you *really* want to create a central repository. 
     # 
     # This method should throw an exception if the repository cannot be created (for
-    # example if the repository is 'remote'.
+    # example if the repository is 'remote' or if it already exists).
     #
     def create
     end
@@ -117,6 +117,8 @@ module RSCM
     end
 
     # Checks out or updates contents from an SCM to +checkout_dir+ - a local working copy.
+    # If this is a distributed SCM, this method should create a 'working copy' repository
+    # if one doesn't already exist.
     #
     # The +to_identifier+ parameter may be optionally specified to obtain files up to a
     # particular time or label. +time_label+ should either be a Time (in UTC - according to
