@@ -19,11 +19,7 @@ module RSCM
 
     def create
       with_working_dir(@dir) do
-        IO.popen("darcs initialize") do |stdout|
-          stdout.each_line do |line|
-            yield line if block_given?
-          end
-        end
+        darcs("initialize")
       end
     end
     
@@ -31,42 +27,90 @@ module RSCM
       ENV["EMAIL"] = "dcontrol@codehaus.org"
       FileUtils.cp_r(Dir.glob("#{dir}/*"), @dir)
       with_working_dir(@dir) do
-puts "IN::::: #{@dir}"
-        cmd = "darcs add --recursive ."
-puts cmd
-        IO.popen(cmd) do |stdout|
-          stdout.each_line do |line|
-            yield line if block_given?
-          end
-        end
-puts $?
+        darcs("add --recursive .")
+        
         logfile = Tempfile.new("darcs_logfile")
-        logfile.print(message)
+        logfile.print("something nice\n")
+        logfile.print(message + "\n")
         logfile.close
         
-        cmd = "darcs record --all --patch-name \"something nice\" --logfile #{PathConverter.filepath_to_nativepath(logfile.path, false)}"
-puts cmd
-        IO.popen(cmd) do |stdout|
-          stdout.each_line do |line|
-            yield line if block_given?
-          end
-        end
-puts $?
+        darcs("record --all --logfile #{PathConverter.filepath_to_nativepath(logfile.path, false)}")
       end
     end
 
-    def checkout(checkout_dir) # :yield: file
-      with_working_dir(File.dirname(checkout_dir)) do
-cmd = "darcs get --verbose --repo-name #{File.basename(checkout_dir)} #{@dir}"
-puts cmd
-        IO.popen(cmd) do |stdout|
-          stdout.each_line do |line|
-puts line
-            yield line if block_given?
+    def commit(checkout_dir, message)
+      logfile = Tempfile.new("darcs_logfile")
+      logfile.print("something nice\n")
+      logfile.print(message + "\n")
+      logfile.close
+
+      with_working_dir(checkout_dir) do
+        darcs("record --all --logfile #{PathConverter.filepath_to_nativepath(logfile.path, false)}")
+      end
+    end
+
+    def add(checkout_dir, relative_filename)
+      with_working_dir(checkout_dir) do
+        darcs("add #{relative_filename}")
+      end
+    end
+
+    def checked_out?(checkout_dir)
+      File.exists?("#{checkout_dir}/_darcs")
+    end
+
+    def uptodate?(checkout_dir, from_identifier)
+      if (!checked_out?(checkout_dir))
+        false
+      else
+        with_working_dir(checkout_dir) do
+          darcs("pull --dry-run #{@dir}") do |io|
+            io.each_line do |line|
+              if (line =~ /No remote changes to pull in!/)
+                true
+              else
+                false
+              end
+            end
           end
         end
       end
-puts $?
+    end
+
+    def changesets(checkout_dir, from_identifier, to_identifier=Time.infinity)
+      from_identifier = Time.epoch if from_identifier.nil?
+      to_identifier = Time.infinity if to_identifier.nil?
+      with_working_dir(checkout_dir) do
+        darcs("changes --verbose") do |stdout|
+          DarcsLogParser.new.parse_changesets(stdout, from_identifier, to_identifier)
+        end
+      end
+    end
+  
+  protected
+
+    def checkout_silent(checkout_dir, to_identifier) # :yield: file
+      with_working_dir(File.dirname(checkout_dir)) do
+        darcs("get --repo-name #{File.basename(checkout_dir)} #{@dir}")
+      end
+    end
+
+    def ignore_paths
+      return [/_darcs/]
+    end
+
+  private
+
+    def darcs(darcs_cmd)
+      cmd = "darcs #{darcs_cmd}"
+
+      safer_popen(cmd, "r+") do |io|
+        if(block_given?)
+          return(yield(io))
+        else
+          io.read
+        end
+      end
     end
   end
 end
