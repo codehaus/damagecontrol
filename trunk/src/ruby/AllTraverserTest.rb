@@ -23,23 +23,36 @@ class DependencyGraph
 	
 	def add_project(name)
 		project = Project.new(name)
-		@projects.push(project)
+		@projects << project
 		project
 	end
 end
 
 class AllTraverser
 	def traverse(dependency_graph)
-		@projects = dependency_graph.projects
-		project = next_buildable_project()
-		yield project
-		@projects.each {|project| yield project}
+		@projects_to_build = dependency_graph.projects
+		@projects_built = Array.new
+		while (!all_projects_built())
+			project = next_buildable_project()
+			yield project
+		end
+	end
+	
+	def all_projects_built
+		@projects_to_build.empty?
 	end
 	
 	def next_buildable_project
-		project = @projects.find {|project| project.dependencies.empty?}
-		@projects.delete(project)
+		project = @projects_to_build.find {|project| 
+			dependencies_left_to_build_for_project(project).empty?
+		}
+		@projects_to_build.delete(project)
+		@projects_built << project
 		project
+	end
+	
+	def dependencies_left_to_build_for_project(project) 
+		project.dependencies - @projects_built
 	end
 end
 
@@ -86,5 +99,23 @@ class AllTraverserTest < Test::Unit::TestCase
 		b = project("B")
 		a.add_tip_dependency(b)
 		assert_build_order("BA")
+	end
+	
+	def test_three_projects_with_dependencies
+		a = project("A")
+		b = project("B")
+		c = project("C")
+		b.add_tip_dependency(a)
+		c.add_tip_dependency(b)
+		assert_build_order("ABC")
+	end
+	
+	def test_three_projects_with_reversed_dependencies
+		a = project("A")
+		b = project("B")
+		c = project("C")
+		b.add_tip_dependency(c)
+		a.add_tip_dependency(b)
+		assert_build_order("CBA")
 	end
 end
