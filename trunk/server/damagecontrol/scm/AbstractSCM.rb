@@ -6,10 +6,16 @@ module DamageControl
     include FileUtils
     include Logging
     
-    attr_reader :checkout_dir
-    attr_reader :config_map
-
-  protected
+    public
+    
+      attr_reader :checkout_dir
+      attr_reader :config_map
+  
+      def working_dir
+        checkout_dir
+      end    
+      
+    protected
 
     def initialize(config_map)
       @config_map = config_map
@@ -59,6 +65,5 @@ puts result
       url << "?r1=#{change.revision}&r2=#{change.previous_revision}" if(change.previous_revision)
       url
     end
-    
   end
 end

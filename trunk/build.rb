@@ -35,6 +35,7 @@ module Files
     src_length = src.size + 1
     files = all_files_recursively(src).collect {|f| File.expand_path(f)[src_length..-1]}
     files.delete_if {|f| f =~ /CVS\//}
+    files.delete_if {|f| f=~ /^\.#/}
   end
   
   def copy_dir(src, dest)
@@ -241,8 +242,8 @@ class Project
       home = "/home/services/dcontrol"
       mkdir_p("#{home}/damagecontrol.new")
       system("cp -a target/dist/* #{home}/damagecontrol.new")
-      system("rm -rf #{home}/damagecontrol.old")
-      system("mv #{home}/damagecontrol #{home}/damagecontrol.old")
+      system("rm -rf #{home}/damagecontrol.old") rescue
+      system("mv #{home}/damagecontrol #{home}/damagecontrol.old") rescue
       system("mv #{home}/damagecontrol.new #{home}/damagecontrol")
     end
     shutdown_server("DamageControl is restarting (self upgrade)") rescue info("could not shutdown server")

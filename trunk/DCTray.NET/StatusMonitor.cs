@@ -30,7 +30,7 @@ namespace ThoughtWorks.DamageControl.DCTray
 		Timer pollTimer;
 		IContainer components;
 
-		ProjectStatus _currentProjectStatus = new ProjectStatus("unknown", BuildStatus.Unknown, BuildStatus.Unknown, "http://damagecontrol.codehaus.org", DateTime.MinValue, 0);
+		ProjectStatus _currentProjectStatus = new ProjectStatus("unknown", BuildStatus.Unknown, BuildStatus.Unknown, "http://damagecontrol.codehaus.org", DateTime.MinValue, "0");
 		Settings _settings;
 
 		#endregion
@@ -235,7 +235,7 @@ namespace ThoughtWorks.DamageControl.DCTray
 			Hashtable buildStatusRaw = CallDamageControlServer("status.last_completed_build", projectName);
 			DumpHashtable("last", buildStatusRaw);
 			BuildStatus buildStatus = ToBuildStatus((string) buildStatusRaw["status"]);
-			string label = buildStatusRaw["label"].ToString();
+			string label = buildStatusRaw["label"] == null ? "none" : buildStatusRaw["label"].ToString();
 			string url = (string) buildStatusRaw["url"];
 			DateTime lastBuildDate = TimestampToDate((string) buildStatusRaw["timestamp"]);
 
@@ -272,11 +272,7 @@ namespace ThoughtWorks.DamageControl.DCTray
 		Hashtable CallDamageControlServer(string methodName, string projectName)
 		{
 			XmlRpcRequest client = new XmlRpcRequest();
-<<<<<<< StatusMonitor.cs
-			client.MethodName = "status.current_build";
-=======
-			client.MethodName = "status.last_completed_build";
->>>>>>> 1.4
+			client.MethodName = methodName;
 			client.Params.Add(projectName);
 			XmlRpcResponse response = client.Send(Settings.RemoteServerUrl);
 			if (response.IsFault) 

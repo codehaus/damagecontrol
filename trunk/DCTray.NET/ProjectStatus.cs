@@ -14,9 +14,9 @@ namespace ThoughtWorks.DamageControl.DCTray
 		BuildStatus buildStatus;
 		string buildStatusUrl;
 		DateTime lastBuildDate;
-		int lastBuildLabel;
+		string lastBuildLabel;
 
-		public ProjectStatus(string projectName, BuildStatus currentBuildStatus, BuildStatus buildStatus, string buildStatusUrl, DateTime lastBuildDate, int lastBuildLabel)
+		public ProjectStatus(string projectName, BuildStatus currentBuildStatus, BuildStatus buildStatus, string buildStatusUrl, DateTime lastBuildDate, string lastBuildLabel)
 		{
 			this.projectName = projectName;
 			this.currentBuildStatus = currentBuildStatus;
@@ -66,7 +66,7 @@ namespace ThoughtWorks.DamageControl.DCTray
 			}
 		}
 
-		public int LastBuildLabel
+		public string LastBuildLabel
 		{
 			get
 			{

@@ -81,7 +81,14 @@ Section "DamageControl Server" SecServer
   SetOutPath "$INSTDIR" 
   
   File "${DISTDIR}\license.txt"
+  File "${DISTDIR}\release-notes.txt"
   File /r "${DISTDIR}\*"
+
+  ; Include DCTray.NET
+  
+  SetOutPath $INSTDIR\DCTray.NET
+  File ${ROOTDIR}\DCTray.NET\bin\Release\dctray.exe
+  File ${ROOTDIR}\DCTray.NET\bin\Release\dctray-settings.xml
   
   ;Include a minimal ruby installation (to reduce the size of the installer)
 
@@ -133,6 +140,7 @@ Section "DamageControl Server" SecServer
     CreateShortCut "$SMPROGRAMS\$STARTMENU_FOLDER\Modify settings.lnk" "$WINDIR\notepad.exe" "$INSTDIR\bin\server.rb"
     CreateShortCut "$SMPROGRAMS\$STARTMENU_FOLDER\Dashboard.lnk" "http://localhost:4712/private/dashboard"
     CreateShortCut "$SMPROGRAMS\$STARTMENU_FOLDER\DamageControl Website.lnk" "http://damagecontrol.codehaus.org"
+    CreateShortCut "$SMPROGRAMS\$STARTMENU_FOLDER\DCTray.NET Systray Monitor.lnk" "$INSTDIR\DCTray.NET\dctray.exe"
     CreateShortCut "$SMPROGRAMS\$STARTMENU_FOLDER\Uninstall.lnk" "$INSTDIR\Uninstall.exe"
   
   !insertmacro MUI_STARTMENU_WRITE_END
