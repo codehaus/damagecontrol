@@ -118,6 +118,7 @@ class Project
   def dist_nodeps
     mkdir_p("target/dist")
     cp("license.txt", "target/dist")
+    cp("release-notes.txt", "target/dist")
     copy_dir("bin", "target/dist/bin")
     copy_dir("server", "target/dist/server")
     generate_startup_scripts
@@ -161,7 +162,7 @@ class Project
   end
   
   def installer
-    dist
+    dist_nodeps
     installer_nodeps
   end
   
