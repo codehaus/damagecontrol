@@ -6,6 +6,8 @@ module DamageControl
     class Growl < Base
       register self
     
+      NOTIFICATION_TYPES = ["Build Successful", "Build Failed"] unless defined? NOTIFICATION_TYPES
+    
       ann :description => "Hosts", :tip => "Comma-separated list of (OS X) hosts that will receive Growl notifications. Requires Growl 0.6 or later."
       attr_reader :hosts
 
@@ -18,10 +20,20 @@ module DamageControl
       end    
 
       def publish(build)
+        message = nil
+        type = nil
+        if(build.successful?)
+          message = "#{build.project.name}: #{build.status_message} build (by #{build.changeset.developer})"
+          type = 0
+        else
+          message = "#{build.project.name}: #{build.changeset.developer} broke the build"
+          type = 1
+        end
         @hosts.split(%r{,\s*}).each do |host|
           begin
-            g = ::Growl.new("localhost", "DamageControl", ["DamageControl Notification"])
-            g.notify("DamageControl Notification", "#{build.project.name}", "Build #{build.status_message}", 0, true)
+            g = ::Growl.new(host, "DamageControl", NOTIFICATION_TYPES)
+            # A bug in Ruby-Growl (or Growl) prevents the message from being sticky.
+            g.notify(NOTIFICATION_TYPES[type], "DC", message, 0, true)
           rescue Exception => e
             Log.info("Growl publisher failed to notify #{host}: #{e.message}")
           end

@@ -6,6 +6,8 @@ module DamageControl
     class Email < Base
       register self
     
+      attr_accessor :enabled
+
       ann :description => "How to deliver email [\"sendmail\"|\"smtp\"]"
       attr_accessor :delivery_method
 
@@ -33,7 +35,7 @@ module DamageControl
     end
 
     class BuildMailer < ActionMailer::Base
-      def email(build, email_publisher)
+      def email(build, email_publisher, foo=nil, bar=nil)
         Log.info("Sending email to #{email_publisher.recipients.inspect}")
         @delivery_method = email_publisher.delivery_method
         @recipients = email_publisher.recipients.split(%r{,\s*})
@@ -42,7 +44,7 @@ module DamageControl
 
         @subject = "#{build.project.name} Build #{build.status_message}"
         @sent_on = Time.new.utc
-        @body["build"] = build
+        @body = {"build" => build}
       end
       
       # We have to define this, since our name is used to find the email template

@@ -6,12 +6,12 @@ require 'damagecontrol/publisher/fixture'
 
 module DamageControl
   module Publisher
-    class JabberTest < Test::Unit::TestCase
+    class GrowlTest < Test::Unit::TestCase
       include MockIt
       include Fixture
   
       def test_should_send_message_on_publish
-        Jabber.new.publish(mock_build(false))
+        Growl.new.publish(mock_build(false))
       end
     end
   end
