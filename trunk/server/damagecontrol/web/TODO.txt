@@ -3,14 +3,7 @@ TODO:
 
 o Include SCM images in distro for firewalled installations.
 o TW logo and link to homepage.
-o Optionally only allow trigging/polling for projects with SCM in a certain place (codehaus)
-  this can allow other projects to try out DC. option to disallow completely.
-o remove SCM settings from the readonly view
-o broader fields (css path must be fixed too)
 o display windows/unix icon according to path
-o make sure SCM radio is checked
-o make sure SCM is expanded if check checked
-o make all javascript perfectly runnable without server
 
 o Trigger settings:
   - xmlrpc: nothing more to specify, since the server should know.
@@ -36,9 +29,6 @@ o Help text:
       This can be a good way to specify additional params such as ftp passwords
       
   - Tagging: BUILD_${DAMAGECONTROL_LABEL}
-  - Artifacts: URLs to where artifacts go. Ex: http://some.where/blah/blah-${DAMAGECONTROL_LABEL}.jar
-      DC will not deploy anything here, but you can have your own build process do it for you.
-      DC will display the link on the project status page.
       
   - Unix groups: (Only if DC or the SCM is running on a unix box). The groups DC must be a member of in order to build. In addition to this you may have to talk to your local unix admin.
       The reason this must be specified is that on some unix systems group permissions must be explicitly set for new shells

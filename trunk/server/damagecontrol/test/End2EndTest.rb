@@ -1,4 +1,5 @@
-# HEY! It's better to run a local IRC server (there is one called Join Me!) and set the DC_TEST_IRC_HOST to localhost (see E2EStartServerForked.rb)
+# HEY! It's better to run a local IRC server (there is one called Join Me!) and do a
+# export DC_TEST_IRC_HOST=localhost (see E2EStartServerForked.rb)
 # Works like a charm. Aslak.
 ONLINE=true
 

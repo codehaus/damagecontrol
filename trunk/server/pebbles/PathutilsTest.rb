@@ -6,18 +6,26 @@ module Pebbles
 
     include Pebbles::Pathutils
 
-    def test_should_convert_cygwin_path_to_windows_path
-      if(cygwin?)
-        assert_equal("c:\\scm\\damagecontrol", filepath_to_nativepath("/cygdrive/c/scm/damagecontrol", false))
-        # This format is needed when passing to an IO.popen on non-cygwin windows (like windows native svn)
-        assert_equal("c:\\\\scm\\\\damagecontrol", filepath_to_nativepath("/cygdrive/c/scm/damagecontrol", true))
+    def test_should_convert_os_path_to_native_path
+      p1 = "/cygdrive/c/scm/damagecontrol"
+      n1 = p1
+      n2 = p1
+      if(CYGWIN)
+        n1 = "c:\\scm\\damagecontrol"
+        # This format is needed when passing to an IO.popen on non-cygwin windows tools (like windows native svn)
+        n2 = "c:\\\\scm\\\\damagecontrol"
       end
+      assert_equal(n1, filepath_to_nativepath(p1, false))
+      assert_equal(n2, filepath_to_nativepath(p1, true))
     end
 
-    def test_should_convert_cygwin_path_to_windows_url
-      if(cygwin?)
-        assert_equal("file:///scm/damagecontrol", filepath_to_nativeurl("/cygdrive/c/scm/damagecontrol"))
+    def test_should_convert_os_path_to_native_url
+      p = "/cygdrive/c/scm/damagecontrol"
+      nurl = "file:///cygdrive/c/scm/damagecontrol"
+      if(CYGWIN)
+        nurl = "file:///scm/damagecontrol"
       end
+      assert_equal(nurl, filepath_to_nativeurl(p))
     end
   
   end

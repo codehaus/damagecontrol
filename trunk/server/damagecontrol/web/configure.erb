@@ -47,14 +47,11 @@ function showScm(scm) {
 </tr>
 <tr>
   <% 
-    # Hackish/Neat trick:
-    # the inspect will convert backslashes to double backslashes and do all sorts of nice things
-    # it will also add " " around the string so it is not needed in the actual html
-    # TODO: It also garbles double quotes! (AH)
-    build_command_line_attrib_value = project_config['build_command_line'] ? project_config['build_command_line'].inspect : "\"\""
+    require 'cgi'
+    build_command_line_attrib_value = project_config['build_command_line'] ? CGI.escapeHTML(project_config['build_command_line']) : ""
   %>
   <td class="setting-name">Build command</td>
-  <td><input class="setting-input" name="build_command_line" type="text" value=<%= build_command_line_attrib_value %>/></td>
+  <td><input class="setting-input" name="build_command_line" type="text" value="<%= build_command_line_attrib_value %>"/></td>
 </tr>
 <tr>
 </tr>
