@@ -1,4 +1,4 @@
-<table class="pane" nowrap="nowrap">
+<table nowrap="nowrap" class="pane" nowrap="nowrap">
 
   <tr>
     <td class="pane-header">
@@ -32,7 +32,7 @@
       prefix = "#{build.project_name} " if prefix_with_project_name
   %>
   <tr class="build-row">
-    <td>
+    <td nowrap="nowrap">
       <img width="16" height="16" src="<%= image %>" />&nbsp;
     <% if selected_build == build then%><span class="highlighted-build"><% end %>
       <a class="tip" href="<%= base_url %><%= build_url(build) %>">
