@@ -25,5 +25,8 @@ module RSCM
       assert_equal("bang bang", Whatever.zap[:desc])
       assert_equal("a top tip", Whatever.zap[:tip])
     end
+    
+    # TODO: try several classes with same attr name
+    # TODO: try with class hierarchies
   end
 end
