@@ -31,7 +31,13 @@ class Project
   
   def run_test(test)
     Dir.chdir("#{$damagecontrol_home}/src/ruby")
-    system("ruby #{test}")
+    system("ruby #{test}") || fail
+    fail if ($? != 0)
+  end
+
+  def fail
+    puts "BUILD FAILED"
+    exit(1)
   end
 
   def unit_test
@@ -57,6 +63,7 @@ class Project
     else
       args.each {|target| instance_eval(target) }
     end
+    puts "BUILD SUCCESSFUL"
   end
 end
 
