@@ -19,7 +19,7 @@ module DamageControl
       rm_rf(testcheckout)
       
       # create cvs repo and import test project, check it out afterwards
-      cvs = CVS.new(":local:#{testrepo}", "damagecontrolled", testcheckout)
+      cvs = CVS.new("cvsroot" => ":local:#{testrepo}", "cvsmodule" => "damagecontrolled", "checkout_dir_root" => testcheckout)
       create_repo(testrepo)
       import_damagecontrolled(cvs)
       cvs.checkout

@@ -1,6 +1,5 @@
+require 'damagecontrol/scm/AbstractSCM'
 require 'damagecontrol/scm/Changes'
-require 'damagecontrol/util/FileUtils'
-require 'damagecontrol/util/Logging'
 require 'ftools'
 
 module DamageControl
@@ -9,19 +8,20 @@ module DamageControl
   #
   # If pserver is used, the user is assumed to already be authenticated with cvs login
   # prior to starting damagecontrol. (TODO: fix that!) 
-  class CVS
+  class CVS < AbstractSCM
   
-    include FileUtils
-    include Logging
     include ChangeUtils
-    
+  
     attr_reader :cvsroot
     
-    def initialize(cvsroot, mod, working_dir_root)
-      @cvsroot, @mod = cvsroot, mod
-      @working_dir_root = to_os_path(File.expand_path(working_dir_root)) unless working_dir_root.nil?
+    def initialize(config_map)
+      super(config_map)
+      cvsroot = config_map["cvsroot"] || required_config_param("cvsroot")
+      cvsmodule = config_map["cvsmodule"] || required_config_param("cvsmodule")
+      
+      @cvsroot, @mod = cvsroot, cvsmodule
     end
-  
+    
     def protocol
       parse_cvsroot[0]
     end
@@ -42,22 +42,40 @@ module DamageControl
       @mod
     end
     
+    def web_url_to_change(change)
+      view_cvs_url = config_map["view_cvs_url"]
+      return "root/#{config_map['project_name']}/checkout/#{mod}/#{change.path}" if view_cvs_url.nil?
+      
+      view_cvs_url_patched = "#{view_cvs_url}/" if(view_cvs_url && view_cvs_url[-1..-1] != "/")
+      url = "#{view_cvs_url_patched}#{change.path}"
+      url << "?r1=#{change.revision}&r2=#{change.previous_revision}" if(change.previous_revision)
+      url
+    end
+    
     def working_dir
-      File.join(@working_dir_root, mod)
+      File.join(working_dir_root, mod)
     end
     
     def changes(from_time, to_time)
       all_changes = with_working_dir(working_dir) do
-        cvs_with_io(changes_command(nil, to_time)) do |io|
+        if block_given?
+          cvs_with_io(changes_command(from_time, to_time)) do |io|
+            io.each_line {|line| yield line}
+          end
+        end
+        cvs_with_io(changes_command(from_time, to_time)) do |io|
           parser = CVSLogParser.new
           parser.cvspath = path
           parser.cvsmodule = mod
           parser.parse_changes_from_log(io)
         end
       end
-      changes_within_period = changes_within_period(all_changes, from_time, to_time)
-      changes_within_period
-#      convert_changes_to_changesets(changes_within_period)
+      
+      #changes_within_period = changes_within_period(all_changes, from_time, to_time)
+      #changes_within_period
+      #convert_changes_to_changesets(changes_within_period)
+      
+      all_changes
     end
     
     def changes_command(from_time, to_time)
@@ -102,7 +120,7 @@ module DamageControl
           cvs(update_command(time), &proc)
         end
       else
-        with_working_dir(@working_dir_root) do
+        with_working_dir(working_dir_root) do
           cvs(checkout_command(time), &proc)
         end
       end
@@ -123,7 +141,7 @@ module DamageControl
       dc_url="http://localhost:4712/private/xmlrpc", \
       &proc
     )
-      cvsroot_cvs = CVS.new(@cvsroot, "CVSROOT", @working_dir_root)
+      cvsroot_cvs = create_cvsroot_cvs
       cvsroot_cvs.checkout(&proc)
       with_working_dir(cvsroot_cvs.working_dir) do
         # install trigger command
@@ -159,9 +177,13 @@ result = build.trig(project_name, Time.now.utc.strftime("%Y%m%d%H%M%S"))
 puts result
 }
     end
+    
+    def create_cvsroot_cvs
+      CVS.new("cvsroot" => @cvsroot, "cvsmodule" => "CVSROOT", "working_dir_root" => working_dir_root)
+    end
 
     def trigger_installed?(project_name)
-      cvsroot_cvs = CVS.new(@cvsroot, "CVSROOT", @working_dir_root)
+      cvsroot_cvs = create_cvsroot_cvs
       cvsroot_cvs.checkout
       loginfo_file = File.new(File.join(cvsroot_cvs.working_dir, "loginfo"))
       loginfo_content = loginfo_file.read
@@ -170,7 +192,7 @@ puts result
     end
 
     def uninstall_trigger(project_name)
-      cvsroot_cvs = CVS.new(@cvsroot, "CVSROOT", @working_dir_root)
+      cvsroot_cvs = create_cvsroot_cvs
       cvsroot_cvs.checkout
       loginfo_file = File.new(File.join(cvsroot_cvs.working_dir, "loginfo"))
       loginfo_content = loginfo_file.read
@@ -211,7 +233,7 @@ puts result
     end
     
     def checked_out?
-      rootcvs = File.expand_path("#{@working_dir_root}/CVS/Root")
+      rootcvs = File.expand_path("#{working_dir_root}/CVS/Root")
       File.exists?(rootcvs)
     end
         
@@ -354,15 +376,15 @@ puts "executing #{cmd}"
     
     def parse_change(change_entry)
       raise "can't parse: #{change_entry}" if change_entry=~/-------*/
-      
+         
       change_entry = change_entry.split(/\r?\n/)
       change = Change.new
-      
+         
       change.revision = extract_match(change_entry[0], /revision (.*)/)
       change.time = parse_cvs_time(extract_match(change_entry[1], /date: (.*?);/))
       change.developer = extract_match(change_entry[1], /author: (.*?);/)
       change.message = change_entry[2..-1].join("\n")
-      
+         
       change
     end
     

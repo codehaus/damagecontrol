@@ -58,17 +58,9 @@ module DamageControl
       result
     end
     
-    def scm_url(project_name, modification)
-      view_cvs_url = project_config_repository.project_config(project_name)["view_cvs_url"]
-
-puts "view_cvs_url=#{view_cvs_url}"
-      return nil if view_cvs_url.nil?
-      view_cvs_url_patched = "#{view_cvs_url}/" if(view_cvs_url && view_cvs_url[-1..-1] != "/")
-
-puts "view_cvs_url_patched=#{view_cvs_url_patched}"
-      url = "#{view_cvs_url_patched}#{modification.path}"
-      url << "?r1=#{modification.revision}&r2=#{modification.previous_revision}" if(modification.previous_revision)
-      url
+    def scm_url(project_name, change)
+      scm = SCMFactory.new.get_scm(project_config_repository.project_config(project_name), "/dev/null")
+      scm.web_url_to_change(change)
     end
     
     def builds_table(params)

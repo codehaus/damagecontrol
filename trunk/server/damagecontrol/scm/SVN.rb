@@ -1,11 +1,12 @@
 require 'ftools'
+require 'damagecontrol/scm/AbstractSCM'
 
 module DamageControl
 
-  class SVN
-  
-    def initialize(svnurl, working_dir_root)
-      @svnurl = svnurl
+  class SVN < AbstractSCM
+    def initialize(config_map)
+      super(config_map)
+      @svnurl = config_map["svnurl"] || required_config_param("svnurl")
     end
   
     def checkout(directory, &proc)
@@ -25,7 +26,7 @@ module DamageControl
         io.each_line do |progress|
           yield progress
         end
-      end    
+      end
     end
     
   end

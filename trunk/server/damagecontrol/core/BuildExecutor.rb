@@ -105,20 +105,28 @@ module DamageControl
     end
     
     def determine_changeset
-      return if !checkout?
+      if !checkout?
+        logger.info("does not determine changeset for #{current_build.project_name} because scm not configured")
+        return 
+      end
       # this won't work the first build, so I just skip it
       # the first time a project is built it will have a changeset of every file in the repository
       # this is almost useless information and there's no point in spending lots of time trying to code around it
-      return unless File.exists?(current_scm.working_dir)
+      unless File.exists?(current_scm.working_dir)
+        logger.info("does not determine changeset for #{current_build.project_name} because project not yet checked out")
+        return 
+      end
       
       begin
         last_successful_build = @build_history.last_successful_build(current_build.project_name)
         # we have no record of when the last succesful build was made, don't determine the changeset
         # (might be a new project, see comment above)
         return if last_successful_build.nil?
-        time_before = last_successful_build.timestamp_as_time        
-        time_after = current_build.timestamp_as_time
-        current_build.modification_set = current_scm.changes(time_before, time_after) unless current_scm.nil?
+        from_time = last_successful_build.timestamp_as_time        
+        to_time = current_build.timestamp_as_time
+        logger.info("determining change set for #{current_build.project_name}, from #{from_time} to #{to_time}")
+        current_build.modification_set = current_scm.changes(from_time, to_time) {|p| report_progress(p)}
+        logger.info("change set for #{current_build.project_name} is #{current_build.modification_set.inspect}")
 
       rescue Exception => e
         logger.error "could not determine changeset: #{format_exception(e)}"
@@ -151,9 +159,8 @@ module DamageControl
       @scm_factory.get_scm(current_build.config, project_checkout_dir)
     end
     
-    def process_next_scheduled_build
-      next_scheduled_build
-      begin
+    def build_start
+      logger.info("build starting #{current_build.project_name}")
         current_build.start_time = Time.now.to_i
 
         # set potential label
@@ -163,9 +170,15 @@ module DamageControl
         else
           current_build.potential_label = 1
         end
-
+        
         @channel.publish_message(BuildStartedEvent.new(current_build))
-
+    end
+    
+    def process_next_scheduled_build
+      next_scheduled_build
+      begin
+        build_start
+        
         determine_changeset
         checkout
         execute
