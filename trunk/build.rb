@@ -61,9 +61,14 @@ end
 class Project
 
   include Files
+  
+  attr_accessor :targets
+  attr_accessor :params
 
   def initialize
     $damagecontrol_home = File::expand_path(".")
+    self.targets = []
+    self.params = {}
   end
   
   def execute_ruby(test, safe_level=0)
@@ -104,7 +109,7 @@ class Project
     DamageControl::VERSION
   end
   
-  def dist
+  def dist_nodeps
     mkdir_p("target/dist")
     cp("license.txt", "target/dist")
     copy_dir("bin", "target/dist/bin")
@@ -149,7 +154,6 @@ class Project
   end
   
   def installer
-    test
     dist
     installer_nodeps
   end
@@ -162,7 +166,6 @@ class Project
   end
   
   def archive
-    test
     dist
     archive_nodeps
   end
@@ -182,7 +185,7 @@ class Project
   end
   
   def username
-    "tirsen"
+    params["user"] || ENV["USERNAME"] || ENV["USER"]
   end
   
   def deploy_dest
@@ -193,27 +196,46 @@ class Project
     "pscp"
   end
   
-  def upload
-    dist
-    installer_nodeps
-    archive_nodeps
-    upload_nodeps
+  def upload_nodeps
+    upload_if_exists("target/DamageControl-#{version}.exe")
+    upload_if_exists("target/damagecontrol-#{version}.tar.gz")
   end
   
-  def upload_nodeps
-    system("#{scp_exe} target/DamageControl-#{version}.exe #{deploy_dest}")
-    system("#{scp_exe} target/damagecontrol-#{version}.tar.gz #{deploy_dest}")
+  def upload_if_exists(file)
+    system("#{scp_exe} #{file} #{deploy_dest}") if File.exists?(file)
+  end
+    
+  def shutdown_server(message)
+    begin
+      require 'xmlrpc/client'
+      client = ::XMLRPC::Client.new2("http://localhost:4712/private/xmlrpc")
+      info(client.proxy("control").shutdown_with_message(message))
+    rescue XMLRPC::FaultException => e
+      fail(e.faultString)
+    end
+  end
+  
+  def self_upgrade
+    shutdown_server("DamageControl is shutting down (self upgrade)") rescue info("could not shutdown server")
+    # daemontools should automatically start it again
+  end
+  
+  def dc_build
+    clean
+    test
+    dist_nodeps
+    archive_nodeps
+    upload_nodeps
+    self_upgrade
   end
   
   def release
     clean
     test
-    upload
-  end
-  
-  def all
-    unit_test
-    integration_test
+    dist_nodeps
+    archive_nodeps
+    installer_nodeps
+    upload_nodeps
   end
   
   def default
@@ -224,15 +246,27 @@ class Project
     execute_ruby("damagecontrol/DamageControlServer.rb")
   end
   
+  def parse_args(args)
+    self.targets = args.dup.delete_if {|t| t =~/-.*/}
+    self.params = {}
+    args.each do |t| 
+      if(t =~/-D(.*)=(.*)/)
+        params[$1] = $2
+      end
+    end
+  end
+  
   def run(args)
+    parse_args(args)
     begin
-      if args.nil? || args == []
+      if targets.nil? || targets == []
         default
       else
-        args.each {|target| instance_eval(target) }
+        targets.each {|target| instance_eval(target) }
       end
     rescue Exception => e
-      fail(e.message + e.backtrace.join("\n"))
+      #fail(e.message + "\n\t" + e.backtrace.join("\n\t"))
+      fail(e.message)
     end
     puts "BUILD SUCCESSFUL"
   end

@@ -40,8 +40,8 @@ def server.init_custom_components
   require 'damagecontrol/publisher/EmailPublisher'
   component(:email_publisher, EmailPublisher.new(hub, self, "short_text_build_result.erb", "short_html_build_result.erb", "dcontrol@builds.codehaus.org"))
   
-  require 'damagecontrol/core/SelfUpgrader'
-  component(:self_upgrader, SelfUpgrader.new(hub))
+  #require 'damagecontrol/core/SelfUpgrader'
+  #component(:self_upgrader, SelfUpgrader.new(hub))
   
 end
 
