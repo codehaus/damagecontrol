@@ -267,6 +267,7 @@ module DamageControl
     end
     
     def init_scm_poller
+
       if(polling_interval > 0)
         component(:scm_poller, 
           SCMPoller.new(hub, polling_interval, @project_directories, project_config_repository, build_history_repository, build_scheduler))
