@@ -62,10 +62,7 @@ trackers = [
     <td width="25%">Source Control</td>
     <td class="config_cell"><%= tip(:txt => "scm_tip") %></td>
     <td width="75%">
-      <select name="scm" class="setting-input" onchange="showElement(this.value, scms)">
-      <% @scms.each do |scm| %>
-        <option value="<%= scm.class.name %>" <%if(scm.selected?)%>selected<%end%>><%= scm.name %></option>
-      <% end %>
+      <%= text_or_select(@edit, :name => "scm", :values => @scms, :onchange => "showElement(this.value, scms)") %>
     </td>
   </tr>
 </table>
@@ -76,14 +73,6 @@ trackers = [
   </div>
 <% end %>
 
-<% if(@project.scm && !@project.scm.exists? && @project.scm.can_create?) %>
-  <%= link_to("create", :controller => "scm", :action => "create", :id => @project.name) %><br>
-<% end %>
-
-<% if(@project.scm && @project.scm.exists?) %>
-  <%= link_to("checkout", :controller => "scm", :action => "checkout", :id => @project.name) %>
-<% end %>  
-
 </div>
 
 <div id="tracker_tab" style="display:none">
@@ -91,19 +80,13 @@ By specifying an issue tracker issue numbers/ids in developers' SCM commit messa
 will be detected and highlighted with external links to the particular issue. 
 This way people browsing changesets can easily navigate to related issues.
 <table width="100%">
-<tr>
-  <td>Issue tracker</td>
-  <td>
-    <% @trackers.each do |tracker| %>
-      <input 
-        type="radio" 
-        value="<%= tracker.class.name %>" 
-        name="tracker" 
-        onClick="javascript:showElement('<%= tracker.class.name %>', trackers)"<% if(tracker.selected?) %>checked="true"<%end%>/>
-      <%= tracker.name %>
-    <% end %>
-  </td>
-</tr>
+  <tr>
+    <td width="25%">Issue tracker</td>
+    <td class="config_cell"><%= tip(:txt => "scm_tip") %></td>
+    <td width="75%">
+      <%= text_or_select(@edit, :name => "tracker", :values => @trackers, :onchange => "showElement(this.value, trackers)") %>
+    </td>
+  </tr>
 </table>
 
   <% @trackers.each do |tracker| %>

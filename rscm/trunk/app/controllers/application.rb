@@ -10,8 +10,6 @@ Rscm = DRbObject.new(nil, 'druby://localhost:9000')
 class ApplicationController < ActionController::Base
 
   def initialize
-    @tab = "project_tab"
-    @controller = self
     @sidebar_links = [
       {
         :controller => "project", 
@@ -20,11 +18,27 @@ class ApplicationController < ActionController::Base
         :name       => "New project"
       }
     ]
+    @tab = "project_tab"
+    @controller = self
   end
-  
+
+  # Loads the project specified by the +id+ parameter and places it into the @project variable  
+  def load_project
+    project_name = @params["id"]
+    @project = RSCM::Project.load(project_name)
+  end
+
   def breadcrumbs
     subpaths = @request.path.split(/\//)
 #    subpaths.collect { |p| link_to_unless_current(p) }.links.join(" ")
+  end
+  
+protected
+
+  # Sets the links to display in the sidebar. Override this method in other controllers
+  # To change what to display.
+  def set_sidebar_links
+
   end
   
 end
@@ -55,6 +69,24 @@ module ActionView
         content_tag("a", options[:value], "href" => options[:value])
       else
         options[:value]
+      end
+    end
+    
+    def text_or_select(input, options)
+      if(input)
+        options[:class] = "setting-input" unless options[:class]
+        
+        option_tags = ""
+        values = options.delete(:values)
+        values.each do |value|
+          option_attrs = {:value => value.class.name}
+          option_attrs[:selected] = "true" if value.selected?
+          option_tag = content_tag("option", value.name, option_attrs)
+          option_tags << option_tag
+        end
+        content_tag("select", option_tags, options)
+      else
+        "JALLA"
       end
     end
     

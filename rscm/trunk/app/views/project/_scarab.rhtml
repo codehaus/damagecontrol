@@ -1,24 +1,19 @@
-<img src="images/scarab.gif"/>
+<script>
+var scarab_baseurl_tip = "<div class='tp1'>The URL of the Scarab installation.</div>";
+var scarab_module_key_tip = "<div class='tp1'>The Scarab module key.</div>";
+</script>
+
 <table width="100%">
   <tr>
-    <td class="setting-name">Scarab Base URL</td>
+    <td width="25%" class="setting-name">Scarab Base URL</td>
+    <td><%= tip(:txt => 'scarab_baseurl_tip') %></td>
     <td width="75%"><%= text_or_input(@edit, :name => "RSCM::Tracker::Scarab[baseurl]", :value => scarab.baseurl) %></td>
   </tr>
   <tr>
-    <td>&nbsp;</td>
-    <td class="setting-description">
-      Enter the URL of the Scarab installation here.
-    </td>
-  </tr>
-  <tr>
     <td class="setting-name">Scarab Module</td>
+    <td><%= tip(:txt => 'scarab_module_key_tip') %></td>
     <td width="75%"><%= text_or_input(@edit, :name => "RSCM::Tracker::Scarab[module_key]", :value => scarab.module_key) %></td>
-  </tr>
-  <tr>
-    <td>&nbsp;</td>
-    <td class="setting-description">
-      Enter the module key of the project here
-    </td>
   </tr>
 </table>
 
+<img align="center" src="/images/scarab.gif"/>

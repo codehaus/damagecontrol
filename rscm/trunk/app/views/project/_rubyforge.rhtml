@@ -1,25 +1,19 @@
-<img src="images/rubyforge.png"/>
+<script>
+var rubyforge_group_id_tip = "<div class='tp1'>The ID of the project (group_id). Example: <br><tt>http://rubyforge.org/tracker/index.php?func=detail&amp;aid=1120&amp;group_id=<strong>426</strong>&amp;atid=1698</tt>.</div>";
+var rubyforge_tracker_id_tip = "<div class='tp1'>The ID of the tracker (aid). Example: <br><tt>http://rubyforge.org/tracker/index.php?func=detail&amp;aid=<strong>1120</strong>&amp;group_id=426&amp;atid=1698</tt>.</div>";
+</script>
+
 <table width="100%">
   <tr>
-    <td class="setting-name">Project ID</td>
+    <td width="25%" class="setting-name">Project ID</td>
+    <td><%= tip(:txt => 'rubyforge_group_id_tip') %></td>
     <td width="75%"><%= text_or_input(@edit, :name => "RSCM::Tracker::RubyForge[group_id]", :value => rubyforge.group_id) %></td>
   </tr>
   <tr>
-    <td>&nbsp;</td>
-    <td class="setting-description">
-      Enter the ID of your RubyForge.net project here (group_id)
-    </td>
-  </tr>
-  <tr>
     <td class="setting-name">Tracker ID</td>
+    <td><%= tip(:txt => 'rubyforge_tracker_id_tip') %></td>
     <td width="75%"><%= text_or_input(@edit, :name => "RSCM::Tracker::RubyForge[tracker_id]", :value => rubyforge.tracker_id) %></td>
-  </tr>
-  <tr>
-    <td>&nbsp;</td>
-    <td class="setting-description">
-      Enter the ID of the tracker here. If you open a bug in the tracker
-      enter the value of the URL parameter <strong>atid</strong> here. Example: <tt>http://rubyforge.org/tracker/index.php?func=detail&amp;aid=<strong>1120</strong>&amp;group_id=426&amp;atid=1698</tt>.
-    </td>
   </tr>
 </table>
 
+<img src="/images/rubyforge.png"/>

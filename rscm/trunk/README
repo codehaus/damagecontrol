@@ -41,23 +41,6 @@ Create new projects by going to:
 
   http://localhost:3000/project/view
 
-=== IMPORTANT WINDOWS NOTE
-
-If you intend to run the RSCM server on Windows, you should run a Cygwin build of Ruby. This is because
-the win32 build of windows will block the web server while accessing the SCM - multi threading mised with
-external processes doesn't work well on the win32 ruby.
-
-We recommend that you just download and unpack the Cygwin Ruby from http://ftp.ruby-lang.org/pub/ruby/binaries/cygwin/
-As of this writing you should get the latest 1.8 distro. There is no need to install Cygwin separately, just
-make sure your path *starts* with:
-
-  <rscm>\bin;<cygwin ruby>\usr\local\bin
-  
-If you're using CVS or Subversion with RSCM, these should be native win32 binaries and *not* Cygwin binaries.
-
-Finally, you may also have to install rubygems from http://rubyforge.org/projects/rubygems
-since this is currently not included in the Cygwin build of Ruby.
-
 == RSS Support
 
 The RSCM daemon can generate RSS feeds for all supported SCMs. The RSS feeds will have one item per changeset.

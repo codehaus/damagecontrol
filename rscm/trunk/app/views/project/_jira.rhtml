@@ -1,24 +1,19 @@
-<img src="images/jira.gif"/>
+<script>
+var jira_baseurl_tip = "<div class='tp1'>The base URL of the JIRA installation (not the URL to the specific JIRA project).</div>";
+var jira_project_id_tip = "<div class='tp1'>The id of the JIRA project.</div>";
+</script>
+
 <table width="100%">
   <tr>
-    <td class="setting-name">Base URL</td>
+    <td width="25%" class="setting-name">Base URL</td>
+    <td><%= tip(:txt => 'jira_baseurl_tip') %></td>
     <td width="75%"><%= text_or_input(@edit, :name => "RSCM::Tracker::JIRA[baseurl]", :value => jira.baseurl) %></td>
   </tr>
   <tr>
-    <td>&nbsp;</td>
-    <td class="setting-description">
-      Enter the base URL of the JIRA installation here (not of the specific JIRA project)
-    </td>
-  </tr>
-  <tr>
     <td class="setting-name">Project id</td>
+    <td><%= tip(:txt => 'jira_project_id_tip') %></td>
     <td width="75%"><%= text_or_input(@edit, :name => "RSCM::Tracker::JIRA[project_id]", :value => jira.project_id) %></td>
-  </tr>
-  <tr>
-    <td>&nbsp;</td>
-    <td class="setting-description">
-      The id of the JIRA project
-    </td>
   </tr>
 </table>
 
+<img src="/images/jira.gif"/>

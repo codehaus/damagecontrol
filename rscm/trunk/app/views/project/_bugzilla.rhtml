@@ -1,14 +1,13 @@
-<img src="images/bugzilla.png"/>
+<script>
+var bugzilla_url_tip = "<div class='tp1'>The URL of the Bugzilla installation.</div>";
+</script>
+
 <table width="100%">
   <tr>
-    <td class="setting-name">Bugzilla URL</td>
+    <td width="25%" class="setting-name">Bugzilla URL</td>
+    <td><%= tip(:txt => 'bugzilla_url_tip') %></td>
     <td width="75%"><%= text_or_input(@edit, :name => "RSCM::Tracker::Bugzilla[url]", :value => bugzilla.url) %></td>
-  </tr>
-  <tr>
-    <td>&nbsp;</td>
-    <td class="setting-description">
-      Enter the URL of the Bugzilla installation here.
-    </td>
   </tr>
 </table>
 
+<img src="/images/bugzilla.png"/>

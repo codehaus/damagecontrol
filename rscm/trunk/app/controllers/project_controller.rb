@@ -44,16 +44,42 @@ class ProjectController < ApplicationController
     project.scm     = instantiate_from_params("scm")
     project.tracker = instantiate_from_params("tracker")
     
-    Rscm.save_project(project)
+    begin
+      Rscm.save_project(project)
+    rescue => e
+      return render_text("Couldn't connect to RSCM server. Please make sure it's running.<br>" + e.message)
+    end
 
     redirect_to(:action => "view", :id => project.name)
+  end
+
+protected
+
+  def set_sidebar_links
+    if(@project && @project.scm && !@project.scm.exists? && @project.scm.can_create?)
+      @sidebar_links << {
+        :controller => "scm", 
+        :action     => "create", 
+        :image      => "/images/24x24/safe_new.png",
+        :name       => "Create #{@project.scm.name} repository"
+      }
+    end
+
+    if(@project && @project.scm && @project.scm.exists?)
+      @sidebar_links << {
+        :controller => "scm", 
+        :action     => "checkout", 
+        :image      => "/images/24x24/safe_out.png",
+        :name       => "Check out from #{@project.scm.name} now"
+      }
+    end
+
   end
 
 private
 
   def load
-    project_name = @params["id"]
-    @project = RSCM::Project.load(project_name)
+    load_project
 
     scm = @project.scm
     def scm.selected?
@@ -71,6 +97,8 @@ private
 
     @trackers = RSCM::TRACKERS.dup
     @trackers.each_index {|i| @trackers[i] = @project.tracker if @trackers[i].class == @project.tracker.class}
+
+    set_sidebar_links
   end
 
   # Instantiates an object from parameters

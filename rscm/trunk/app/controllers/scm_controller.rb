@@ -6,16 +6,16 @@ class ScmController < ApplicationController
 
   # Checks out a working copy into the project's checkout dir.
   def checkout
-    project = load_project
+    load_project
 
     # Do this asynch to give a fast response
     # TODO: guard against multiple concurrent checkouts
     Thread.new do
-      project.checkout
+      @project.checkout
     end
 
     # Doing a redirect since this *should* be called via HTTP POST. TODO: verify METHOD
-    redirect_to :action => "checkout_status", :id => project.name
+    redirect_to :action => "checkout_status", :id => @project.name
   end
 
   # Shows the status page with the JS magic that
@@ -26,9 +26,9 @@ class ScmController < ApplicationController
 
   # Sends the file containing the files currently being checked out.to the client
   def checkout_list
-    project = load_project
-    if(File.exist?(project.checkout_list_file))
-      send_file(project.checkout_list_file)
+    load_project
+    if(File.exist?(@project.checkout_list_file))
+      send_file(@project.checkout_list_file)
     else
       render_text("No files checked out yet")
     end
@@ -36,9 +36,9 @@ class ScmController < ApplicationController
 
   # Creates the SCM repo
   def create
-    project = load_project
-    project.scm.create
-    redirect_to :controller => "project", :action => "view", :id => project.name
+    load_project
+    @project.scm.create
+    redirect_to :controller => "project", :action => "view", :id => @project.name
   end
 
 end
