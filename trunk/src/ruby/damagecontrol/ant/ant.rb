@@ -8,21 +8,24 @@ module Ant
   #
   # Author Aslak Hellesoy
   #
-  # @param javacmd java vm executable
-  # @classpath classpath for ant. if nil, it will be calculated
-  # @ant_home ant installation directory
-  # @ant_opts options to pass to the vm
-  # @args options to pass to ant
+  # ant_args    arguments to ant (ant targets)
+  # vm_args     arguments to pass to the vm
+  # ant_home    ant installation directory
+  # java_home   jdk installation directory
+  # javacmd     java vm executable. if nil, it will be "java"
+  # classpath   classpath for ant. if nil it will be calculated.
+  # jikespath   path to jikes executable
   #
   def commandline(
-    args      = "", \
-    ant_opts  = ENV['ANT_OPTS'], \
-    ant_home  = ENV['ANT_HOME'],\
-    jikespath = ENV['JIKESPATH'], \
+    ant_args  = "", \
+    vm_args   = ENV['ANT_OPTS'] , \
+    ant_home  = ENV['ANT_HOME'] , \
     java_home = ENV['JAVA_HOME'], \
-    javacmd   = ENV['JAVACMD'], \
-    classpath = ENV['CLASSPATH'] \
-    )
+    javacmd   = ENV['JAVACMD']  , \
+    classpath = ENV['CLASSPATH'], \
+    jikespath = ENV['JIKESPATH'])
+
+    current_dir = Dir.getwd
 
     if( !ant_home )
       raise "ant_home *MUST* be set!"
@@ -48,10 +51,11 @@ module Ant
     end
     
     if( jikespath )
-      ant_opts << " -Djikes.class.path=#{jikespath}"
+      vm_args << " -Djikes.class.path=#{jikespath}"
     end
 
-    "#{javacmd} -classpath #{classpath} -Dant.home=#{ant_home} #{ant_opts} org.apache.tools.ant.Main #{args}"
+    Dir.chdir(current_dir)
+    "#{javacmd} -classpath #{classpath} -Dant.home=#{ant_home} #{vm_args} org.apache.tools.ant.Main #{ant_args}"
   end
 end
 
@@ -68,7 +72,7 @@ end
 
 if($0 == __FILE__)
   include Ant
-  args = ARGV ? ARGV.join : ""
-  cmdline = commandline(args)
+  ant_args = ARGV ? ARGV.join : ""
+  cmdline = commandline(ant_args)
   system(cmdline)
 end
