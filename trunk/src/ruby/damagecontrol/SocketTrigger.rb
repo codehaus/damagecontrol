@@ -59,9 +59,9 @@ module DamageControl
             end
           end
           begin
-            process_payload(payload)
             socket.print("DamageControl server on #{get_ip} got message from #{client_ip}\r\n")
             socket.print("http://damagecontrol.codehaus.org/\r\n")
+            process_payload(payload)
           rescue => e
             print_error(e)
             socket.print("DamageControl exception:\n")
