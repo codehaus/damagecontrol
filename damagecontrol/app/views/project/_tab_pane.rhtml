@@ -7,7 +7,7 @@
 
 <ul id="foldertab">
   <% tab_pane.each do |o| %>
-  <li><a href="javascript:showElement('<%= o.class.name %>', <%= tab_pane.name %>)"><img src="/images/growlicon.png" width="20" height="20"><%= o.name %></a></li>
+  <li><a href="javascript:showElement('<%= o.class.name %>', <%= tab_pane.name %>)"><img src="/images/publisher/<%= underscore(demodulize(o.class.name)) %>.png"><%= o.name %></a></li>
   <% end %>
 </ul>
 

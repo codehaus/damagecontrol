@@ -67,7 +67,15 @@ module DamageControl
     
     # Tells all publishers to publish a build
     def publish(build)
-      @publishers.each { |publisher| publisher.publish(build) }
+      @publishers.each do |publisher| 
+        begin
+          publisher.publish(build) 
+        rescue => e
+          Log.error "Error running publisher #{publisher.name} for project #{name}"
+          Log.error  e.message
+          Log.error "  " + e.backtrace.join("  \n")
+        end
+      end
     end
     
     # Saves the state of this project to persistent store (YAML)

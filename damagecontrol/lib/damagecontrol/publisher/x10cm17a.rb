@@ -5,11 +5,11 @@ require 'rscm/annotations'
 # http://blade.nagaokaut.ac.jp/cgi-bin/scat.rb/ruby/ruby-talk/124460
 module DamageControl
   module Publisher
-    class CM11A < Base
+    class X10Cm17A < Base
       register self
     
       def name
-        "X10-CM11A"
+        "X10-CM17A"
       end    
 
       def publish(build)
