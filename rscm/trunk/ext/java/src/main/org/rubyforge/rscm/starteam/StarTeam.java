@@ -40,9 +40,8 @@ import java.util.regex.Pattern;
 import java.util.regex.Matcher;
 
 /**
- * Java helper for the RSCM implementation of StarTeam. This class has borrowed a lot from
- * CruiseControl's StarTeam class - but is highly simplified. It's still quite complex since
- * the native StarTeam API ermm... is *different*.
+ * Java helper for the RSCM implementation of StarTeam. This class has borrowed a lot of code from
+ * CruiseControl's StarTeam class (for changesets) and from Ant (for checkout).
  *
  * @author Aslak Helles&oslash;y
  */
@@ -91,7 +90,6 @@ public class StarTeam implements RSCM {
         Date from = parseRfc822(fromSpecifier);
         Date to = parseRfc822(toSpecifier);
 
-        System.out.println("CHANGESETS FOR " + url + " " + from + "-" + to + " - FOLDER:" + folderName);
         ChangeSets changeSets = new ChangeSets();
 
         Server server = null;

@@ -11,7 +11,7 @@ module RSCM
       StarTeam.new("a_user_name", "a_password", "a_server_name", "49201", "a_project_name", "a_view_name", "a_folder_name")
     end
 
-    def Xtest_changesets
+    def test_changesets
       changesets = create_scm(nil, nil).changesets(nil, Time.new, Time.new)
       assert_equal(1, changesets.length)
       assert_equal(Time.utc(2004, 11, 30, 04, 52, 24), changesets[0][0].time)
