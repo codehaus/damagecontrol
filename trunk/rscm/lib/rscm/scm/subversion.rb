@@ -17,7 +17,8 @@ module RSCM
     include PathConverter
     
     ann :description => "Repository URL"
-    ann :tip => "If you specify a local URL (starting with file://) DamageControl can create the repository for you after you save (unless the repository already exists).<br>Using a file:// URL will also give you the option to have DamageControl install a trigger in Subversion, so that you don't have to use polling to detect changes.<br>On Windows, file URLs must look like file:///C:/jupiter/mars"
+#    ann :tip => "If you specify a local URL (starting with file://) DamageControl can create the repository for you after you save (unless the repository already exists).<br>Using a file:// URL will also give you the option to have DamageControl install a trigger in Subversion, so that you don't have to use polling to detect changes.<br>On Windows, file URLs must look like file:///C:/jupiter/mars"
+    ann :tip => "If you use ssh, specify the URL as svn+ssh://username@server/path/to/repo"
     attr_accessor :url
 
     ann :description => "Path"

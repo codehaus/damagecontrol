@@ -131,15 +131,15 @@ module RSCM
     # For some SCMs this is not possible, or at least very hard. In that case, just override
     # the checkout_silent method instead of this method (should be protected).
     def checkout(checkout_dir, to_identifier=Time.infinity) # :yield: file
-      checkout_time = Time.now
+      # the OS doesn't store file timestamps with fractions.
+      before_checkout_time = Time.now.utc - 1
 
       # We expect subclasses to implement this as a protected method (unless this whole method is overridden).
       checkout_silent(checkout_dir, to_identifier)
-
       files = Dir["#{checkout_dir}/**/*"]
       added = []
       files.each do |file|
-        added << file if File.mtime(file) > checkout_time
+        added << file if File.mtime(file).utc > before_checkout_time
       end
       ignore_paths.each do |regex|
         added.delete_if{|path| path =~ regex}
