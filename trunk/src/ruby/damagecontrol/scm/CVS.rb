@@ -304,7 +304,7 @@ module DamageControl
       
         if line=~/revision (.*)/
           modification.revision = $1
-        elsif line=~/date: (.*);  author: (.*);  state: (.*);  lines: (.*)/
+        elsif line=~/date: (.*);  author: (.*);  state: (.*);(.*)/
           modification.time = $1
           modification.developer = $2
         else

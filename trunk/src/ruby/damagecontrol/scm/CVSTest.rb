@@ -1,5 +1,6 @@
 require 'test/unit'
 require 'ftools'
+require 'stringio'
 require 'fileutils'
 require 'socket'
 require 'damagecontrol/scm/CVS'
@@ -214,17 +215,12 @@ module DamageControl
     end
     
     def test_extracts_log_entries
-      def @parser.number_of_entries; @number_of_entries end
-      def @parser.parse_modifications(log_entry)
-        @number_of_entries = 0 unless defined?(@number_of_entries)
-        @number_of_entries+=1
-        []
-      end
-  
       File.open("#{damagecontrol_home}/testdata/cvs-test.log") do |io|
-        @parser.parse_log(io)
+        changeset = @parser.parse_log(io)
+        assert_equal(46, changeset.length)
+        assert_equal("self test\n", changeset[0].message)
+        assert_equal("o YAML config (BuildBootstrapper)\no EmailPublisher\n", changeset[45].message)
       end
-      assert_equal(220, @parser.number_of_entries)
     end
     
     
@@ -244,10 +240,18 @@ module DamageControl
       assert_equal("Quiet period is configurable for each project\n", modification.message)
     end
     
-    def test_split_entries
+    def test_can_split_entries_separated_by_line_of_dashes
       entries = @parser.split_entries(LOG_ENTRY)
       assert_equal(5, entries.length)
       assert_equal(MODIFICATION_ENTRY, entries[1])
+    end
+    
+    def test_log_from_e2e_test
+      io = StringIO.new(LOG_FROM_E2E_TEST)
+      changeset = @parser.parse_log(io)
+      assert_equal(2, changeset.length)
+      assert_equal("comment\n", changeset[0].message)
+      assert_equal("comment\n", changeset[1].message)
     end
 
     MODIFICATION_ENTRY = <<-EOF
@@ -256,7 +260,31 @@ date: 2003/11/09 17:53:37;  author: tirsen;  state: Exp;  lines: +3 -4
 Quiet period is configurable for each project
 EOF
 
-LOG_ENTRY = <<-EOF
+    LOG_FROM_E2E_TEST = <<-EOF
+=============================================================================
+
+RCS file: C:\projects\damagecontrol\target\temp_e2e_1081547757\repository/e2eproject/build.bat,v
+Working file: build.bat
+head: 1.2
+branch:
+locks: strict
+access list:
+symbolic names:
+keyword substitution: kv
+total revisions: 2;     selected revisions: 2
+description:
+----------------------------
+revision 1.2
+date: 2004/04/09 21:56:47;  author: jtirsen;  state: Exp;  lines: +1 -1
+comment
+----------------------------
+revision 1.1
+date: 2004/04/09 21:56:12;  author: jtirsen;  state: Exp;
+comment
+=============================================================================EOF
+EOF
+
+    LOG_ENTRY = <<-EOF
 =============================================================================
 
 RCS file: /cvsroot/damagecontrol/damagecontrol/src/ruby/damagecontrol/BuildExecutorTest.rb,v

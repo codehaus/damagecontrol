@@ -219,7 +219,7 @@ class End2EndTest < Test::Unit::TestCase
   
   def commit(project)
     with_working_dir("#{basedir}/#{project}") do
-      system("cvs com -m 'comment'")
+      system("cvs com -m \"comment\"")
     end
   end
   
