@@ -18,18 +18,7 @@ class ApplicationController < ActionController::Base
     subpaths = @request.path.split(/\//)
 #    subpaths.collect { |p| link_to_unless_current(p) }.links.join(" ")
   end
-
-  # Loads the project corresponding to the id
-  # Returns nil if the id param is not specified
-  def load_project
-    project_name = @params["id"]
-    # We're returning a DRB proxy
-    project_name ? Rscm.load_project(project_name) : nil
-  end
-
-  def find_all_projects
-    Rscm.find_all_projects
-  end
+  
 end
 
 module ActionView
@@ -50,9 +39,9 @@ module ActionView
   end
 end
 
-# Add some generic web capabilities to the RSCM classes
-
 module RSCM
+
+  # Add some generic web capabilities to the RSCM classes
   module Web
     module Configuration
 

@@ -5,7 +5,7 @@ class ProjectController < ApplicationController
   layout 'rscm'
 
   def index
-    @projects = find_all_projects
+    @projects = RSCM::Project.find_all
   end
 
   def view
@@ -37,7 +37,12 @@ class ProjectController < ApplicationController
     
     # TODO: loop through query params and override the selected?
     # method for the one that has matching class name to the scm_name param
-  end  
+  end
+  
+  def rss
+    project = RSCM::Project.load(@params["id"])
+    send_file(project.rss_file)
+  end
 
   def delete
     # TODO: delete it
@@ -50,7 +55,7 @@ class ProjectController < ApplicationController
     project.scm     = instantiate_from_params("scm")
     project.tracker = instantiate_from_params("tracker")
     
-    project.save
+    Rscm.save_project(project)
 
     redirect_to(:action => "view", :id => project.name)
   end

@@ -102,6 +102,7 @@ module RSCM
     end
 
     def changesets(checkout_dir, from_identifier, to_identifier=Time.infinity, files=nil)
+      checkout(checkout_dir) unless uptodate?(checkout_dir, nil) # must checkout to get changesets
       begin
         parse_log(checkout_dir, new_changes_command(from_identifier, to_identifier, files))
       rescue => e

@@ -8,7 +8,8 @@ class ScmController < ApplicationController
   def checkout
     project = load_project
 
-    # We'll check out asynch (takes time!)
+    # Do this asynch to give a fast response
+    # TODO: guard against multiple concurrent checkouts
     Thread.new do
       project.checkout
     end

@@ -93,6 +93,12 @@ module RSCM
     end
 
     def to_rss(title, link, description, message_linker, change_linker)
+      raise "title" unless title
+      raise "link" unless link
+      raise "description" unless description
+      raise "message_linker" unless message_linker
+      raise "change_linker" unless change_linker
+
       RSS::Maker.make("2.0") do |rss|
         rss.channel.title = title
         rss.channel.link = link

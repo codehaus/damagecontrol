@@ -4,8 +4,8 @@ require 'fileutils'
 require 'rscm/directories'
 
 module RSCM
+  # Represents a project with associated SCM, Tracker and SCMWeb
   class Project
-    include DRb::DRbUndumped
 
     attr_accessor :name
     attr_accessor :description
@@ -14,6 +14,7 @@ module RSCM
 
     attr_accessor :scm
     attr_accessor :tracker
+    attr_accessor :scm_web
   
     # Loads the project with the given +name+.
     def Project.load(name)
@@ -32,6 +33,7 @@ module RSCM
     def initialize
       @scm = nil
       @tracker = Tracker::Null.new
+      @scm_web = SCMWeb::Null.new
     end
 
     # Saves the state of this project to persistent store (YAML)
@@ -40,9 +42,15 @@ module RSCM
       FileUtils.mkdir_p(File.dirname(f))
       File.open(f, "w") do |io|
         YAML::dump(self, io)
-      end      
+      end
+      
+      if(rss_enabled)
+        RSS_SERVICE.add_project(self)
+      end
+
     end
     
+    # Path to file containing pathnames of latest checked out files.
     def checkout_list_file
       Directories.checkout_list_file(name)
     end
@@ -51,10 +59,42 @@ module RSCM
     # Writes the checked out files to +checkout_list_file+.
     def checkout
       File.open(checkout_list_file, "w") do |f|
-        scm.checkout(Directories.checkout_dir(name)) do |file_name|
+        scm.checkout(checkout_dir) do |file_name|
           f << file_name << "\n"
+          f.flush
         end
       end
     end
+    
+    # Writes RSS for the last week to file. See +rss_file+
+    def write_rss
+      # approx 1 week back
+      from = Time.new - 3600*24*7
+      changesets = @scm.changesets(checkout_dir, from)
+
+      FileUtils.mkdir_p(File.dirname(rss_file))
+      File.open(rss_file, "w") do |io|
+        rss = changesets.to_rss(
+          "Changesets for #{name}", 
+          @home_page, # TODO point to web version of changeset
+          @description, 
+          @tracker || Tracker::Null.new, 
+          @scm_web || SCMWeb::Null.new
+        )
+        io.write(rss)
+      end
+    end
+
+    # Where RSS is written.
+    def rss_file
+      Directories.rss_file(name)
+    end
+
+  private
+
+    def checkout_dir
+      Directories.checkout_dir(name)
+    end
+
   end
 end

@@ -7,6 +7,10 @@ module RSCM
       def change_url(change, anchor=false)
         change.path
       end
+
+      def changeset_url(changeset, anchor=false)
+        "http://foo.bar/"
+      end
     end
 
     class ViewCVS

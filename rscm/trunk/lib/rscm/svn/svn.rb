@@ -263,7 +263,7 @@ module RSCM
       # http://svnbook.red-bean.com/svnbook-1.1/svn-book.html#svn-ch-3-sect-3.3
       # file_list = files.join('\n')
 # WEIRD cygwin bug garbles this!?!?!?!
-      "log --verbose #{revision_option(from_identifier, to_identifier)}"
+      "log --verbose #{revision_option(from_identifier, to_identifier)} #{url}"
     end
 
     def revision_option(from_identifier, to_identifier)
