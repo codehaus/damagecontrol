@@ -60,7 +60,7 @@ module DamageControl
           from_time, 
           nil
         ))
-          logger.info("no changes in #{project_name}")
+          logger.info("#{project_name} seems to be uptodate")
         else
           logger.info("changes in #{project_name}, requesting build")
           changesets = scm.changesets(
@@ -69,6 +69,10 @@ module DamageControl
             nil,
             nil
           )
+          if(changesets.empty?)
+            logger.info("WARNING!!!! we decided #{project_name} was not uptodate, yet there were no changes. This is contradictory!!")
+            return
+          end
           request_build(project_name, changesets)
         end
       end

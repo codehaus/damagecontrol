@@ -81,67 +81,15 @@ module FileUtils
       url
     end
   end
-  
-  # Executes a command in a directory with the given environment.
-  #
-  # Can be used in the following way:
-  #
-  # a) cmd_with_io(...) { |stdout| ... }
-  # b) cmd_with_io(...) { |stdin, stdout| ... }
-  # c) cmd_with_io(...) { |stdin, stdout, stderr| ... }
-  #
-  # If option a) or b) is used, an internal thread will read (and discard)
-  # stderr - to avoid that the stderr buffer fills up.
-  #
-  # If option c) is used, it is the caller's responsibility to read all streams,
-  # typically in a separate thread for each.
-  #
-  def cmd_with_io_old(dir, cmd, environment = {}, &proc)
-    begin
-      File.mkpath(dir)
-      p = Pebbles::Process.new
-      p.command_line = cmd
-      p.environment = environment
-      p.working_dir = dir
-      err_thread = nil
-      ret = p.execute do |stdin, stdout, stderr|
-        if(proc.arity == 3)
-          proc.call(stdin, stdout, stderr)
-        else
-          # see http://jira.codehaus.org/browse/DC-312
-          err_thread = Thread.new do
-            begin
-              logger.info("Reading (and discarding) stderr")
-              logger.debug(stderr.read.chomp) unless stderr.closed?
-              # This segfaults on Linux when the process is dead.
-              # ./server/damagecontrol/util/FileUtils.rb:114: [BUG] Segmentation fault
-              # ruby 1.8.2 (2004-11-06) [i686-linux]
-            rescue
-              # Some times we get a IOError: closed stream even if the stream is closed.
-            end
-          end
-          if(proc.arity == 2)
-            proc.call(stdin, stdout)
-          else # 1
-            proc.call(stdout)
-          end
-        end
-      end
-      err_thread.join if err_thread
-      logger.debug("successfully executed #{cmd.inspect} in directory #{dir.inspect}")
-      ret
-    rescue NotImplementedError => e
-      puts e.backtrace.join("\n")
-      puts "DamageControl only runs in Cygwin on Windows"
-      exit!
-    end
-  end
-  
+    
   def cmd_with_io(dir, cmd, stderr_file, environment, timeout, &proc)
     with_working_dir(dir) do
-      stdout = nil
       ret = Pebbles::Process2.new(cmd, stderr_file, environment, timeout).execute do |stdout, process|
-        proc.call(stdout, process)
+        begin
+          proc.call(stdout, process)
+        ensure
+          process.kill
+        end
       end
       if(ret != 0)
         msg = "\n" +

@@ -293,10 +293,11 @@ end
     system("#{scp_executable} #{file} #{deploy_dest}") if File.exists?(file)
   end
     
-  def shutdown_server(message)
+  def shutdown_server
     begin
       require 'xmlrpc/client'
       client = ::XMLRPC::Client.new2("http://localhost:4712/private/xmlrpc")
+      message = "DamageControl is restarting (self upgrade)"
       info(client.proxy("control").shutdown_with_message_and_time(message, 10))
     rescue XMLRPC::FaultException => e
       fail(e.faultString)
@@ -312,7 +313,7 @@ end
       system("mv #{home}/damagecontrol #{home}/damagecontrol.old")
       system("mv #{home}/damagecontrol.new #{home}/damagecontrol")
     end
-    shutdown_server("DamageControl is restarting (self upgrade)") rescue info("could not shutdown server")
+    shutdown_server rescue info("could not shutdown server")
     # daemontools should automatically start it again
   end
   

@@ -22,6 +22,7 @@ module Pebbles
       
       niceness = ENV['DC_NICE']
       @cmd2 = "nice --adjustment=#{niceness} #{@cmd2}" if niceness
+puts @cmd2
     end
     
     def execute(&proc)
