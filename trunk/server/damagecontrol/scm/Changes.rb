@@ -1,3 +1,5 @@
+require 'xmlrpc/utils'
+
 module DamageControl
 
   class ChangeSet < Array
@@ -15,6 +17,8 @@ module DamageControl
   end
 
   class Change
+    include XMLRPC::Marshallable
+
     def initialize(path="", developer="", message="", revision="", time="")
       self.path, self.developer, self.message, self.revision, self.time = 
         path, developer, message, revision, time
@@ -53,13 +57,11 @@ module DamageControl
 
   module ChangeUtils
     def changes_within_period(changes, from_time, to_time)
-puts "                                       #{from_time} #{to_time}"
       changes_within_period = []
       last_change = nil
       changes.each do |change|
         above = to_time - change.time
         below = change.time - from_time
-puts "#{change} #{below} #{above}"
         if(0 <= above && 0 <= below)
           changes_within_period << change
           last_change = change
