@@ -1,4 +1,7 @@
 module DamageControl
+  class SCMError < RuntimeError
+  end
+
   class SCM
     # determine whether this SCM can handle a particular path
     def handles_spec?(spec)

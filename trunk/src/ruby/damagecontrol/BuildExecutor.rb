@@ -39,17 +39,10 @@ module DamageControl
       @filesystem.makedirs(project_base_dir)
       @filesystem.chdir(project_base_dir)
  
-      # temp hack that only works for Ant/Maven and Ruby tests. We need to get the return code!!!
-      did_read_ant_or_maven_build_failed = false
-      did_read_ruby_tests_failed = false
-      # some of the error messages are on stderr, which isn't available to popen
       IO.foreach("|#{current_build.build_command_line} 2>&1") do |line|
         report_progress(line)
-        did_read_ant_or_maven_build_failed = true if /FAILED/ =~ line
-        did_read_ruby_tests_failed = true if /Failure!!!/ =~ line || /Error!!!/ =~ line
       end
-      
-      current_build.successful = !(did_read_ant_or_maven_build_failed || did_read_ruby_tests_failed)
+      current_build.successful = ($? == 0)
     end
  
     def project_base_dir
@@ -70,8 +63,13 @@ module DamageControl
     
     def tick(time)
         if quiet_period_elapsed
-          checkout if checkout?
-          execute
+          begin
+            checkout if checkout?
+            execute
+          rescue Exception => e
+            report_progress("Build failed due to: #{e}")
+            current_build.successful = false
+          end
           @channel.publish_message(BuildCompleteEvent.new(current_build))
         end
     end

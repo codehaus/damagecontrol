@@ -43,7 +43,7 @@ class Project
   
   def all
     unit_test
-#   integration_test
+    integration_test
   end
   
   def default

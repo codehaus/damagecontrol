@@ -12,16 +12,20 @@ module DamageControl
       @messages_from_hub = []
       @hub
     end
+    
+    def messages_from_hub
+      @messages_from_hub
+    end
         
     def receive_message(message)
-      @messages_from_hub<<message
+      messages_from_hub<<message
     end
     
     def message_types
-      @messages_from_hub.collect{|message| message.class}
+      messages_from_hub.collect{|message| message.class}
     end
     
-    def assert_message_types(expected)
+    def assert_message_types_from_hub(expected)
       assert_equal(expected, message_types)
     end
 

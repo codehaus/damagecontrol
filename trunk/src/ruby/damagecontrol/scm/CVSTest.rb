@@ -112,6 +112,12 @@ module DamageControl
       
       assert(!@mock_server.alive?, "mock server didn't get incoming connection")
     end
+    
+    def test_invalid_cvs_command_raises_error
+      assert_raises(SCMError, "invalid cvs command did not raise error") do
+        @cvs.cvs("invalid_command") { |line| }
+      end
+    end
 
   private
   

@@ -21,7 +21,7 @@ module DamageControl
     def test_executes_process_and_sends_build_complete_on_build_request
       hub.publish_message(BuildRequestEvent.new(@build))
       @build_executor.force_tick
-      assert_message_types([BuildRequestEvent, BuildProgressEvent, BuildCompleteEvent])
+      assert_message_types_from_hub([BuildRequestEvent, BuildProgressEvent, BuildCompleteEvent])
       assert_equal("Hello world from DamageControl!", messages_from_hub[1].output.chomp.chomp(" "))
       assert_equal(BuildCompleteEvent.new(@build), messages_from_hub[2])
     end
@@ -61,19 +61,25 @@ module DamageControl
       build_request_at_time(0)
       assert(!@build_executor.quiet_period_elapsed, "quiet period should not have elapsed yet")
       @build_executor.force_tick
-      assert_message_types([BuildRequestEvent])
+      assert_message_types_from_hub([BuildRequestEvent])
       
       @build_executor.clock.advance(@quiet_period)
       assert(@build_executor.quiet_period_elapsed)
       @build_executor.force_tick
-      assert_message_types([BuildRequestEvent, BuildCompleteEvent])
+      assert_message_types_from_hub([BuildRequestEvent, BuildCompleteEvent])
     end
     
-    def test_build_failed
+    def test_failing_build_sends_build_complete_event_with_successful_flag_set_to_false
+      build = Build.new("damagecontrolled", { "build_command_line" => "bad_command"})
+      hub.publish_message(BuildRequestEvent.new(build))
+      @build_executor.force_tick
+      assert_message_types_from_hub([BuildRequestEvent, BuildProgressEvent, BuildProgressEvent, BuildCompleteEvent])
+      assert(!messages_from_hub[3].build.successful)
+    end
     
-      build = Build.new(
-        "damagecontrolled",
-        { "scm_spec" => ":local:/foo/bar:zap", "build_command_line" => "#{ant} compile"})
+    def test_succesful_ant_build
+    
+      build = Build.new("damagecontrolled", { "build_command_line" => "#{ant} compile"})
       
       successful = nil
       hub.add_subscriber(Subscriber.new do |message|

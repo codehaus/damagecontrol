@@ -40,7 +40,7 @@ class End2EndTest < Test::Unit::TestCase
     @svn_wc_usage_dir = "#{@svn_wc_checkout_dir}/repo"
 	end
 	
-	def teardown
+	def Xteardown
 		Dir.chdir(@tempdir)
 		rmdir(@project)
 		rmdir(@cvsrootdir)
@@ -84,7 +84,7 @@ class End2EndTest < Test::Unit::TestCase
     if(@@damagecontrol_started == false) then
       @hub = Hub.new
       SocketTrigger.new(@hub).start
-      BuildExecutor.new(@hub, "#{@tempdir}/builds")
+      BuildExecutor.new(@hub, buildsdir).start
       @@damagecontrol_started = true
     end
 	end
@@ -97,13 +97,13 @@ class End2EndTest < Test::Unit::TestCase
 		system("cvs -d#{@cvsroot} import -m 'message' #{project} VENDOR START")
 	end
 	
-	def install_damagecontrol_into_cvs
+	def install_damagecontrol_into_cvs(build_command_line)
     cvs = CVS.new
     cvs.install_trigger(
           "#{@tempdir}/install_trigger_cvs_tmp",
           @project,
           "#{@cvsroot}:#{@project}",
-          script_file("build"),
+          build_command_line,
           "e2eproject-dev@codehaus.org",
           "localhost",
           "4711",
@@ -151,37 +151,36 @@ class End2EndTest < Test::Unit::TestCase
     sleep 5
   end
 
-  def verify_output_of_build
-		assert_file_content('"Hello world from DamageControl" ', 
-			"#{buildsdir}/e2eproject/buildresult.txt", 
-			"build not executed")
-  end
-
   def verify_output_of_svn_build
 		assert_file_content('"Hello world from DamageControl" ', 
 			"#{buildsdir}/repo/buildresult.txt", 
 			"build not executed")
   end
-
+  
+  def create_file(name, content)
+		File.open(name, "w") do |file|
+			file.puts(content)
+		end
+  end
+  
 	def test_builds_on_cvs_add
 		create_cvs_repository
-    start_damagecontrol
 		create_cvsmodule("e2eproject")
-		install_damagecontrol_into_cvs
-
-		# add build.bat file and commit it (will trigger build)
+		install_damagecontrol_into_cvs("build.bat")
+    
+    start_damagecontrol
+    
+    # add build.bat file and commit it (will trigger build)
 		checkout_cvs_project("e2eproject")
-		File.open("e2eproject/build.bat", "w") do |file|
-			file.puts('echo "Hello world from DamageControl" > buildresult.txt')
-		end
+    create_file("e2eproject/build.bat", 'echo "Hello world from DamageControl" > buildresult.txt')
 		add_file_to_cvs_project("e2eproject", "build.bat")
-		
-		delete_checked_out_project("e2eproject") # will be checked out by bootstrapper
-		
+  
 		wait_for_build_to_complete
-    verify_output_of_build
+		assert_file_content('"Hello world from DamageControl" ', 
+			"#{buildsdir}/e2eproject/buildresult.txt", 
+			"build not executed")
 	end
-        
+  
   def TODO_test_builds_on_svn_add
       create_svn_repository
       start_damagecontrol
