@@ -91,7 +91,7 @@ module DamageControl
     end
   
     def startup_message
-      message = "Starting #{DamageControl::VERSION_TEXT} at #{startup_time}, root directory = #{rootdir.inspect}, config = #{params.inspect}"
+      message = "Starting #{DamageControl::VERSION_TEXT} at #{startup_time}, root directory = #{rootdir.inspect}, damagecontrol home = #{damagecontrol_home}, config = #{params.inspect}"
       root_logger.info(message)
     end
     
