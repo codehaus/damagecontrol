@@ -211,7 +211,15 @@ puts result
     end
     
     def trigger_command(project_name, dc_url)
-      "ruby " + to_os_path("#{path}/CVSROOT/#{trigger_script_name}") + " #{dc_url} #{project_name}"
+      "#{ruby_path} " + to_os_path("#{path}/CVSROOT/#{trigger_script_name}") + " #{dc_url} #{project_name}"
+    end
+    
+    def ruby_path
+      if(windows?)
+        "ruby"
+      else
+        "/home/services/dcontrol/ruby/bin/ruby"
+      end
     end
     
     def cvs(cmd, &proc)
