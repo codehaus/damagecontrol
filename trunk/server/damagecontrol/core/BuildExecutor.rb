@@ -183,7 +183,7 @@ module DamageControl
         from_time = last_successful_build.timestamp_as_time
         to_time = current_build.timestamp_as_time
         logger.info("determining change set for #{current_build.project_name}, from #{from_time} to #{to_time}")
-        changesets = current_scm.changesets(from_time, to_time) {|p| report_error(p)}
+        changesets = current_scm.changesets(from_time, to_time) {|p| report_progress(p)}
         current_build.changesets = changesets if changesets
         logger.info("change set for #{current_build.project_name} is #{current_build.changesets.inspect}")
 
