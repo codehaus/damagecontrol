@@ -26,7 +26,7 @@ module DamageControl
     end
     
     def build_queue
-      build_queue = build_scheduler.build_queue.sort {|b1, b2| b1.timestamp_as_time == b2.timestamp_as_time }
+      build_queue = build_scheduler.build_queue.sort {|b1, b2| b1.timestamp_as_time <=> b2.timestamp_as_time }
       erb("components/build_queue.erb", binding)
     end
     

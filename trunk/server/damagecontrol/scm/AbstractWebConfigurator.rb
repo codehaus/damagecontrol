@@ -22,7 +22,11 @@ module DamageControl
         # copy the key/values from the request over to the project_config
         # request.each do |key, value| won't work - it takes too much.
         configuration_keys.each do |key|
-          project_config[key] = request.query[key]
+          if (request.query[key])
+            project_config[key] = request.query[key].to_s
+          else
+            project_config[key] = nil
+          end
         end
       end
       

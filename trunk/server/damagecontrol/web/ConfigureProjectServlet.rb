@@ -39,10 +39,14 @@ module DamageControl
       # copy the key/values from the request over to the project_config
       # request.each do |key, value| won't work - it takes too much.
       KEYS.each do |key|
-        project_config[key] = request.query[key]
+        if (request.query[key])
+          project_config[key] = request.query[key].to_s 
+        else
+          project_config[key] = nil
+        end
       end
       dependent_projects = request.query['dependent_projects']
-      project_config['dependent_projects'] = dependent_projects.split(",").collect{|p| p.chomp } if dependent_projects
+      project_config['dependent_projects'] = dependent_projects.split(",").collect{|p| p.strip } if dependent_projects
       scm_configurators(project_config).each do |scm_configurator|
         scm_configurator.store_configuration_from_request(request)
       end
