@@ -13,7 +13,7 @@ module DamageControl
 			@clock = Clock.new if @clock == nil
 			@clock
 		end
-
+		
 		def start
 			Thread.new {
 				begin

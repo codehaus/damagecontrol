@@ -6,33 +6,61 @@ require 'socket'
 
 module DamageControl
 
+	class SocketRequestEvent
+		attr_reader :payload
+		
+		def initialize(payload)
+			@payload = payload
+		end
+		
+		def ==(other)
+			other.is_a?(SocketRequestEvent) && \
+				@payload == other.payload
+		end
+	end
+
 	class SocketTrigger
 	
 		attr_accessor :port
 		
-		def initialize(hub, build)
+		def initialize(hub)
 			@hub = hub
-			@build = build
 			@port = 4711
 		end
 		
-		def do_accept()
-			@hub.publish_message(BuildRequestEvent.new(@build))
+		def do_accept(payload)
+			@hub.publish_message(SocketRequestEvent.new(payload))
 		end
 		
 		def start
-			Thread.new() {
-				puts "Starting server"
-				$stdout.flush
-				
-				@server = TCPServer.new(port)
-				puts "Server started"				
-				$stdout.flush
-				
-				while (session = @server.accept)
-					do_accept()
-					session.print("got your message\r\n\r\n")
-					session.close()
+			Thread.new {
+				begin
+					puts "starting #{self}"
+					$stdout.flush
+					
+					@server = TCPServer.new(port)
+					puts "Server started"				
+					$stdout.flush
+					
+					while (session = @server.accept)
+						begin
+							puts "got request"
+							payload = session.gets
+							puts "got request on socket: #{payload}"
+							do_accept(payload)
+							session.print("got your message\r\n\r\n")
+						ensure
+							session.close()
+						end
+					end
+				rescue
+					$stderr.print $!
+					$stderr.print "\n"
+					$stderr.print $!.backtrace.join("\n")
+					$stderr.print "\n"
+					@error = $!
+				ensure
+					puts "stopping #{self}"
 				end
 			}
 		end

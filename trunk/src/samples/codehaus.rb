@@ -12,7 +12,7 @@ require 'damagecontrol/IRCPublisher'
 include DamageControl
 
 build = Build.new("picocontainer")
-build.basedir = "~/pico"
+build.basedir = "builds"
 build.build_command_line = "maven jar:install"
 hub = Hub.new
 BuildExecutor.new(hub)

@@ -34,17 +34,38 @@ class End2EndTest < Test::Unit::TestCase
 		system("cvs -d#{@cvsroot} init")
 	end
 	
-	def start_damagecontrol(build_command_line)
-		build = Build.new(@project)
-		def project.build
-			puts "building #{self}"
-			super()
-			puts "built #{self}"
+	class BuildBootstrapper
+		def initialize(hub, basedir, build_command_line)
+			@hub = hub
+			@hub.add_subscriber(self)
+			@basedir = basedir
+			@build_command_line = build_command_line
 		end
-		build.basedir = "#{@tempdir}/#{@project}"
-		build.build_command_line = build_command_line
+		
+		def bootstrap_build(build_spec)
+			build = Build.new(@project)
+			def build.build
+				puts "building #{self}"
+				super()
+				puts "built #{self}"
+			end
+			build.basedir = @basedir
+			build.build_command_line = @build_command_line
+			build
+		end
+		
+		def receive_message(message)
+			if (message.is_a?(SocketRequestEvent))
+				build = bootstrap_build(message.payload)
+				@hub.publish_message(BuildRequestEvent.new(build))
+			end
+		end
+	end
+	
+	def start_damagecontrol(build_command_line)
 		hub = Hub.new
-		SocketTrigger.new(hub, build).start
+		SocketTrigger.new(hub).start
+		BuildBootstrapper.new(hub, "#{@tempdir}/#{@project}", script_file("build"))
 		BuildExecutor.new(hub)
 	end
 	
@@ -119,7 +140,7 @@ class End2EndTest < Test::Unit::TestCase
 		
 		# verify output of build
 		buildresult = "#{@tempdir}/e2eproject/buildresult.txt"
-		assert(FileTest::exists?(buildresult))
+		assert(FileTest::exists?(buildresult), "build not executed, build result not created")
 		File.open(buildresult) do |file|
 			assert_equal('"Hello world from DamageControl" ', file.gets.chomp)
 		end

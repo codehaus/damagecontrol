@@ -13,14 +13,12 @@ module DamageControl
 
 		def test_fires_build_request_on_socket_accept
 
-			build = Build.new("foo")
-			
-			bre = BuildRequestEvent.new(build)
-
 			hub = Hub.new()
-			@s = SocketTrigger.new(hub, build)
-			@s.do_accept()
-			assert_equal( bre, hub.last_message() )
+			@s = SocketTrigger.new(hub)
+			@s.do_accept("foo")
+
+			evt = SocketRequestEvent.new("foo")
+			assert_equal( evt, hub.last_message() )
 			
 		end
 				
