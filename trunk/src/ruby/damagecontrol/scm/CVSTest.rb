@@ -73,18 +73,19 @@ module DamageControl
     end
 
     def test_install_trigger
-    
-      testrepo = File.expand_path("target/cvstestrepo")
-      testcheckout = File.expand_path("target/cvstestcheckout")
+      testrepo = File.expand_path("#{damagecontrol_home}/target/cvstestrepo")
+      testcheckout = File.expand_path("#{damagecontrol_home}/target/cvstestcheckout")
       
       project_name = "DamageControlled"
       spec = ":local:#{testrepo}:damagecontrolled"
       build_command = "ant"
 
-      expected = "#{project_name} #{spec.gsub('/','\\')} #{build_command} ."
+      expected = "#{project_name},#{spec},#{build_command},."
       mock_server = start_mock_server(self, expected)
 
+      pwd = Dir.getwd
       create_repo(testrepo)
+      Dir.chdir(pwd)
       @cvs.install_trigger(
         testcheckout, \
         project_name, \
@@ -93,7 +94,7 @@ module DamageControl
         "localhost", \
         "4713", \
         ".", \
-        "C:/scm/damagecontrol/bin/nc.exe"
+        nc_exe
       ) { |output|
         #puts output
       }
@@ -108,6 +109,14 @@ module DamageControl
 
   private
   
+    def nc_exe
+      if(windows?)
+        File.expand_path("#{damagecontrol_home}/bin/nc.exe").gsub('/','\\')
+      else
+        nil
+      end
+    end
+
     def create_repo(dir)
       File.mkpath(dir)
       Dir.chdir(dir)
@@ -115,7 +124,7 @@ module DamageControl
     end
     
     def import_damagecontrolled(testcheckout, spec)
-      Dir.chdir("C:/scm/damagecontrol/testdata/damagecontrolled")
+      Dir.chdir("#{damagecontrol_home}/testdata/damagecontrolled")
       system("cvs -d#{@cvs.cvsroot(spec)} -q import -m \"\" #{@cvs.mod(spec)} dc-vendor dc-release")
     end
 
@@ -125,7 +134,7 @@ module DamageControl
         session = TCPServer.new(4713).accept
         payload = session.gets
         session.close()
-#        test.assert_equal(expected, payload)
+        test.assert_equal(expected, payload.chomp)
       }
     end
   end

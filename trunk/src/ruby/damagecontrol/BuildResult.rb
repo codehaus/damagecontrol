@@ -1,12 +1,11 @@
 require 'damagecontrol/FileSystem'
 require 'damagecontrol/scm/DefaultSCMRegistry'
+require 'damagecontrol/BuildEvents'
 require 'damagecontrol/ant/ant'
 
 module DamageControl
 
   class BuildResult
-
-    include Ant
 
     # these should ideally be set before exceution
     # they are exposed as accessors only so they can be re-set from a cc log file
@@ -33,11 +32,18 @@ module DamageControl
       @global_checkout_root_dir = global_checkout_root_dir
       @filesystem               = filesystem
       @scm                      = scm
+      
+      @label                    = Time.now.to_i.to_s
     end
     
-    def execute(&proc)
-      @scm.checkout(scm_spec, checkout_dir, &proc)
-      do_build(&proc)
+    def execute(hub)
+      @scm.checkout(scm_spec, checkout_dir) { |progress|
+        hub.publish_message(BuildProgressEvent.new(self, progress))
+      }
+      do_build { |progress|
+        hub.publish_message(BuildProgressEvent.new(self, progress))
+      }
+      hub.publish_message(BuildCompleteEvent.new(self))
     end
 
     def absolute_build_path
@@ -45,15 +51,27 @@ module DamageControl
     end
 
     def checkout_dir
-      "#{@global_checkout_root_dir}/#{project_name}/#{@scm.mod(scm_spec)}/#{branch}"
-    end
-    
-    def branch
-      "MAIN"
+      "#{branch_dir}/checkout"
     end
 
+    def reports_dir
+      "#{branch_dir}/reports"
+    end
+    
+    def log_file
+      "#{logs_dir}/#{label}.log"
+    end
+    
   private
   
+    def logs_dir
+      "#{branch_dir}/logs"
+    end
+
+    def branch_dir
+      "#{@global_checkout_root_dir}/#{project_name}/#{@scm.mod(scm_spec)}/#{@scm.branch(scm_spec)}"
+    end
+
     def do_build
       puts "Changing dir to #{absolute_build_path}"
       @filesystem.chdir("#{absolute_build_path}")
@@ -66,6 +84,8 @@ module DamageControl
       end
     end
     
+    include Ant
+
     def translate_command_to_ruby(build_command_line)
       tokens = build_command_line.split(" ")
       if(tokens[0] == "ant")

@@ -11,7 +11,7 @@ module DamageControl
     include FileUtils
 
     def setup
-      @dir = File.expand_path("FilePoller#{Time.now.to_i}")
+      @dir = File.expand_path("#{damagecontrol_home}/target/polltest/FilePoller#{Time.now.to_i}")
       File.makedirs(@dir)
       
       @file_handler = Mock.new
@@ -19,8 +19,7 @@ module DamageControl
     end
 
     def teardown
-      puts "deleteing " + @dir
-      delete(@dir)
+      rmdir(@dir)
     end
     
     def test_checks_periodically_and_doesnt_trig_on_empty_directory

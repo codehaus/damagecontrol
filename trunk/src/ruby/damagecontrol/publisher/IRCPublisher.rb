@@ -24,11 +24,8 @@ module DamageControl
     end
   
     def process_message(event)
-      puts "MESSAGE!!!!!!!!!!!!"
       if event.is_a? BuildCompleteEvent
-        puts "POSTING!!!!!!!!!!!!"
         post_irc_message(event.build)
-        puts "CONSUMING!!!!!!!!!!!!"
       end
     end
 

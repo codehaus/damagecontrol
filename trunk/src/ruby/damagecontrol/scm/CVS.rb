@@ -1,6 +1,5 @@
 require 'damagecontrol/scm/SCM'
 require 'damagecontrol/FileUtils'
-require 'damagecontrol/BuildBootstrapper'
 
 module DamageControl
 
@@ -34,6 +33,11 @@ module DamageControl
         when spec =~ /^:ext:/     then md[1..5]
         when spec =~ /^:pserver:/ then md[1..5]
       end
+    end
+
+    def branch(spec)
+      # TODO: add support for branches in the scm_spec
+      "MAIN"
     end
 
     def cvsroot(spec)
@@ -112,8 +116,8 @@ module DamageControl
       checkout("#{cvsroot(spec)}:CVSROOT", directory, &proc)
       Dir.chdir("#{directory}/CVSROOT")
       File.open("#{directory}/CVSROOT/loginfo", File::WRONLY | File::APPEND) do |file|
-        script = BuildBootstrapper.new.trigger_command(project_name, spec, build_command_line, relative_path, nc_command(spec), dc_host, dc_port, path_separator)
-        file.puts("#{mod(spec)} #{script}")
+        script = SocketTrigger.new(nil,nil,nil).trigger_command(project_name, spec, build_command_line, relative_path, nc_command(spec), dc_host, dc_port)
+        file.puts("#{mod(spec)} #{script} %{sVv}")
       end
 
       if(windows?)
@@ -132,7 +136,7 @@ module DamageControl
     
     def nc_command(spec)
       if(windows?)
-        "#{path(spec)}/CVSROOT/nc.exe".gsub('/',path_separator)
+        "#{path(spec)}/CVSROOT/nc.exe".gsub('/','\\')
       else
         "nc"
       end

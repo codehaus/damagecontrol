@@ -10,31 +10,15 @@ module DamageControl
       }
       false
     end
-  
-    def path_separator
-      windows? ? '\\' : '/'
-    end
-  
-    def is_special_filename(filename)
-      filename == '.' || filename == '..'
+    
+    def rmdir(dir)
+      if windows?
+        system("rmdir /S /Q #{dir}")
+      else
+        system("rm -Rf #{dir}")
+      end
     end
     
-    def delete(item)
-      delete_directory(item) if FileTest::directory?(item) && !is_special_filename(item)
-      File.rm_f(item) if FileTest::file?(item)
-    end
-    
-    def delete_directory(dir)
-      Dir.foreach(dir) do |file|  delete_file_in_dir(dir, file) end
-      File.rm_f(dir)
-    end
-    
-    def delete_file_in_dir(dir, filename)
-      delete("#{dir}/#{filename}") unless is_special_filename(filename)
-    end
-
-    alias :rmdir :delete
-
     def damagecontrol_home
       $damagecontrol_home = find_damagecontrol_home if $damagecontrol_home.nil?
       $damagecontrol_home 
@@ -47,12 +31,7 @@ module DamageControl
         find_damagecontrol_home("#{path}/..")
       end
     end
-    
-    # returns file relative damagecontrol-home
-    def damagecontrol_file(filename)
-      "#{damagecontrol_home}/#{filename}"
-    end
-
+        
     # returns file relative target (used in build)
     def target_file(filename)
       damagecontrol_file("target/#{filename}")

@@ -39,5 +39,14 @@ module DamageControl
       end
     end
 
+    def branch(spec)
+      scm = find_scm(spec)
+      if scm
+        scm.branch(spec)
+      else
+        super(spec)
+      end
+    end
+
   end
 end

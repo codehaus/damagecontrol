@@ -1,19 +1,19 @@
 require 'test/unit'
 require 'ftools'
+require 'damagecontrol/FileUtils'
 require 'damagecontrol/FilePoller'
 require 'damagecontrol/cruisecontrol/CruiseControlLogHandler'
 
 module DamageControl
   class CruiseControlLogPollerTest < Test::Unit::TestCase
-    
     include HubTestHelper
     include FileUtils
     
     def setup
-      @dir = "test#{Time.new.to_i}"
+      @dir = "#{damagecontrol_home}/target/polltest/test#{Time.new.to_i}"
       File.mkpath(@dir)
       create_hub
-      @log_file = damagecontrol_file("testdata/log20030929145347.xml")
+      @log_file = "#{damagecontrol_home}/testdata/log20030929145347.xml"
 
       cchandler = CruiseControlLogHandler.new(hub)
 
