@@ -10,10 +10,26 @@ require 'damagecontrol/scm/SCM'
 
 require 'damagecontrol/Logging'
 
+require 'damagecontrol/publisher/IRCPublisher'
+require 'damagecontrol/template/ShortTextTemplate'
+
 include DamageControl
 
 # turn off debug logging
 Logging.quiet
+
+class IRCListener < IRCConnection
+  attr_reader :received_text
+  
+  def initialize
+    super
+    @received_text = ""
+  end
+
+  def on_recv_cmnd_privmsg(msg)
+    @received_text += msg.args[0]
+  end
+end
 
 class End2EndTest < Test::Unit::TestCase
 
@@ -24,13 +40,38 @@ class End2EndTest < Test::Unit::TestCase
     install_damagecontrol_into_cvs(execute_script_commandline("build"))
     start_damagecontrol
     
+    join_irc_channel
+    
     add_and_commit_file
     
     wait_less_time_than_default_quiet_period
     assert_not_built_yet
     
     wait_for_build_to_complete
-    assert_build_success
+    assert_build_produced_correct_output
+    assert_build_successful_on_irc_channel
+  end
+  
+  attr_reader :irc_listener
+  
+  def join_irc_channel
+    @irc_listener = IRCListener.new
+    irc_listener.connect("irc.codehaus.org", "dctest")
+    sleep 1
+    assert(irc_listener.connected?)
+    irc_listener.join_channel("#damagecontrol")
+    puts "joined"
+    sleep 1
+    assert(irc_listener.in_channel?)
+    irc_listener.send_message_to_channel("Hello, this is DamageControl's test-suite. I'm just here to check that DamageControl is performing its duties well.")
+    sleep 1
+    irc_listener.send_message_to_channel("I expect DamageControl to pop by soon and notify me of the build status, please ignore this.")
+    sleep 1
+  end
+  
+  def assert_build_successful_on_irc_channel
+    assert(irc_listener.received_text =~ /BUILD SUCCESSFUL/)
+    irc_listener.send_message_to_channel("Test successful. Thank you for your cooperation.")
   end
   
   def add_and_commit_file
@@ -118,6 +159,7 @@ class End2EndTest < Test::Unit::TestCase
         :SocketTriggerPort => 4713, 
         :WebPort => 8081, 
         :AllowIPs => ["127.0.0.1" ])
+      IRCPublisher.new(@hub, "irc.codehaus.org", "\#damagecontrol", ShortTextTemplate.new).start
       @@damagecontrol_started = true
     end
   end
@@ -133,15 +175,16 @@ class End2EndTest < Test::Unit::TestCase
   def install_damagecontrol_into_cvs(build_command_line)
     cvs = CVS.new
     cvs.install_trigger(
-                        "#{@tempdir}/install_trigger_cvs_tmp",
+          "#{@tempdir}/install_trigger_cvs_tmp",
           @project,
-                        "#{@cvsroot}:#{@project}",
+          "#{@cvsroot}:#{@project}",
           build_command_line,
-                        "e2eproject-dev@codehaus.org",
-                        "localhost",
-                        "4713",
-                        nc_exe_location)
+          "e2eproject-dev@codehaus.org",
+          "localhost",
+          "4713",
+          nc_exe_location)
   end
+	
 	
   def checkout_cvs_project(project)
     Dir.chdir(@tempdir)
@@ -228,7 +271,7 @@ class End2EndTest < Test::Unit::TestCase
     assert(!File.exists?(build_result), "build executed before quiet period elapsed")
   end
   
-  def assert_build_success
+  def assert_build_produced_correct_output
     expected_content =
             if windows?
               '"Hello world from DamageControl" '
