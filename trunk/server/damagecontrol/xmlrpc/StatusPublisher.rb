@@ -45,8 +45,8 @@ module XMLRPC
       @build_history_repository.last_successful_build(project_name)
     end
     
-    def global_search(text)
-      @build_history_repository.search(text)
+    def global_search(regexp)
+      @build_history_repository.search(Regexp.new(regexp))
     end
     
   end
