@@ -37,6 +37,14 @@ module RSCM
     def empty?
       @changesets.empty?
     end
+    
+    def developers
+      result = []
+      each do |changeset|
+        result << changeset.developer unless result.index(changeset.developer)
+      end
+      result
+    end
 
     # Adds a Change or a ChangeSet.
     # If the argument is a Change and no corresponding ChangeSet exists,
