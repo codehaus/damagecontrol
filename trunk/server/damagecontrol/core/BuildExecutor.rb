@@ -158,42 +158,35 @@ module DamageControl
     def determine_changeset
       current_build.status = Build::DETERMINING_CHANGESETS
       if !current_build.changesets.empty?
-        logger.info("does not determine changeset for #{current_build.project_name} because other component (such as SCMPoller) has already determined it")
+        logger.info("not determining changeset for #{current_build.project_name} because other component (such as SCMPoller) has already determined it")
         return
       end
       if !checkout?
-        logger.info("does not determine changeset for #{current_build.project_name} because scm not configured")
+        logger.info("not determining changeset for #{current_build.project_name} because scm not configured")
         return 
       end
       unless File.exists?(checkout_dir)
         # this won't work the first build, so I just skip it
         # the first time a project is built it will have a changeset of every file in the repository
         # this is almost useless information and there's no point in spending lots of time trying to code around it (not to mention executing it)
-        logger.info("does not determine changeset for #{current_build.project_name} because project not yet checked out")
+        logger.info("not determining changeset for #{current_build.project_name} because project not yet checked out - #{checkout_dir} does not exist")
         return
       end
       
       begin
         last_successful_build = @build_history_repository.last_successful_build(current_build.project_name)
-        # we have no record of when the last succesful build was made, don't determine the changeset
-        # (might be a new project, see comment above)
-        if last_successful_build.nil?
-          logger.info("does not determine changesets because there were no last successful build")
-          return
-        end
-        from_time = last_successful_build.scm_commit_time
-        to_time = current_build.scm_commit_time
-        logger.info("determining change set for #{current_build.project_name}, from #{from_time} to #{to_time}")
-        changesets = current_scm.changesets(checkout_dir, from_time, to_time, nil) {|p| report_progress(p)}
-        current_build.changesets = changesets if changesets
+        from_time = last_successful_build ? last_successful_build.scm_commit_time : nil
+        from_time = from_time ? from_time + 1 : nil
+        logger.info("Determining changesets for #{current_build.project_name} from #{from_time}")
+        changesets = current_scm.changesets(checkout_dir, from_time, nil, nil) {|p| report_progress(p)}
+        # Only store changesets if the previous commit time was known
+        current_build.changesets = changesets if changesets && from_time
         
         # Set last commit time
         changesets = changesets.sort do |a,b|
           a.time <=> b.time
         end
         current_build.scm_commit_time = changesets[-1] ? changesets[-1].time : nil
-        
-        logger.info("change set for #{current_build.project_name} is #{current_build.changesets.inspect}")
 
       rescue Exception => e
         logger.error "could not determine changeset: #{format_exception(e)}"

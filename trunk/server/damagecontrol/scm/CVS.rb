@@ -309,7 +309,7 @@ module DamageControl
   private
   
     def command_line(password, cmd)
-      "cvs \"-d#{cvsroot_with_password(password)}\" #{cmd}"
+      "cvs '-d#{cvsroot_with_password(password)}' #{cmd}"
     end
 
     def create_cvsroot_cvs
