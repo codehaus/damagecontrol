@@ -18,13 +18,12 @@ module DamageControl
     end
   end
 
-  # This class listens for incoming connections. For each connection
-  # it reads one line of payload which is sent to the hub wrapped in
-  # a SocketRequestEvent object. Then it closes the connection and
-  # listens for new connections.
+  # This class listens for incoming connections. For each incoming
+  # connection it will read one line of payload. The payload is parsed
+  # into a Build object which is then wrapped in a BuildRequestEvent
+  # and sent to the hub.
   #
-  # Consumes:
-  # Emits: BuildRequestEvent
+  # Then it closes the connection and listens for new connections.
   #
   class SocketTrigger
   
@@ -50,13 +49,13 @@ module DamageControl
       "echo #{project_name},#{spec.gsub('/', replace_string)},#{build_command_line},#{relative_path}|#{nc_command} #{dc_host} #{dc_port}"
     end
 
-    def bootstrap_build(build_spec, root_dir)
+    def create_build(build_spec)
       project_name, scm_spec, build_command_line, build_path = build_spec.split(",")
-      Build.new(project_name.chomp, scm_spec.chomp, build_command_line.chomp, build_path.chomp, root_dir.chomp)
+      Build.new(project_name.chomp, scm_spec.chomp, build_command_line.chomp, build_path.chomp, @root_dir.chomp)
     end
 
     def do_accept(payload)
-      build = bootstrap_build(payload, @root_dir);
+      build = create_build(payload);
       @hub.publish_message(BuildRequestEvent.new(build))
     end
     
