@@ -128,13 +128,15 @@ module DamageControl
 
     def test_install_trigger
       @got_request = false
-      testrepo = File.expand_path("#{damagecontrol_home}/target/cvstestrepo")
+      basedir = new_temp_dir
+      testrepo = File.expand_path("#{basedir}/cvstestrepo")
       rm_rf(testrepo)
-      testcheckout = File.expand_path("#{damagecontrol_home}/target/cvstestcheckout/CVSROOT")
+      testcheckout = File.expand_path("#{basedir}/cvstestcheckout/CVSROOT")
       rm_rf(testcheckout)
       
       project_name = "DamageControlled"
       spec = ":local:#{testrepo}:damagecontrolled"
+      system("cvs init #{testrepo}")
       build_command = "echo hello"
       nag_email = "maillist@project.bar"
 
@@ -145,10 +147,9 @@ module DamageControl
         testcheckout,
         project_name,
         spec,
-        "http://localhost:4713/private/xmlrpc",
-        nc_exe
+        "http://localhost:4713/private/xmlrpc"
       ) { |output|
-        #puts output
+        puts output
       }
 
       import_damagecontrolled(spec)

@@ -133,8 +133,7 @@ class CVSDriver < Driver
           "#{basedir}/install_trigger_cvs_tmp",
           project,
           scm_spec(project),
-          "http://localhost:14712/private/xmlrpc",
-          nc_exe_location)
+          "http://localhost:14712/private/xmlrpc")
   end
   
   def scm_spec(project)

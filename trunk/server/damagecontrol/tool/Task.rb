@@ -1,12 +1,12 @@
 require 'damagecontrol/DamageControlServer'
 require 'getoptlong'
 
-module DamageControl
-
 def symbol(string)
   if string=="" then return nil end
   if string.is_a? String then string.intern else string end
 end
+
+module DamageControl
 
 module ParseCommandLineOptions
   class CommandLineError < Exception
@@ -113,7 +113,7 @@ class XMLRPCClientTask < Task
   commandline_option :url
   
   def xmlrpc_client(name)
-    client = XMLRPC::Client.new2(url)
+    client = ::XMLRPC::Client.new2(url)
     client.proxy(name)
   end
   

@@ -142,10 +142,7 @@ module DamageControl
     # @param directory where to temporarily check out during install
     # @param project_name a human readable name for the module
     # @param scm_spec full SCM spec (example: :local:/cvsroot/picocontainer:pico)
-    # @param build_command_line command line that will run the build
-    # @param host where the dc server is running
-    # @param port where the dc server is listening
-    # @param nc_exe_file where nc.exe file can be copied from (only needed for windows)
+    # @param dc_url where the dc server is running
     #
     # @block &proc a block that can handle the output (should typically log to file)
     #
@@ -153,15 +150,14 @@ module DamageControl
       directory, \
       project_name, \
       scm_spec, \
-      dc_url="http://localhost:4711/private/xmlrpc", \
-      nc_exe_file="#{damagecontrol_home}/bin/nc.exe", \
+      dc_url="http://localhost:4712/private/xmlrpc", \
       &proc
     )
       directory = File.expand_path(directory)
       checkout("#{cvsroot(scm_spec)}:CVSROOT", directory, &proc)
       with_working_dir(directory) do
         # install trigger command
-        File.open("#{directory}/loginfo", File::WRONLY | File::APPEND) do |file|
+        File.open("loginfo", File::WRONLY | File::APPEND) do |file|
           trigger_command = trigger_command(project_name, scm_spec, dc_url)
           file.puts("#{mod(scm_spec)} #{trigger_command}")
         end
@@ -194,11 +190,7 @@ module DamageControl
     end
     
     def trigger_command(project_name, scm_spec, dc_url)
-      if(windows?)
-        to_os_path("#{path(scm_spec)}/CVSROOT/#{trigger_script_name}") + " #{dc_url} #{project_name}"
-      else
-        "ruby $CVSROOT/CVSROOT/#{trigger_script_name} #{dc_url} #{project_name}"
-      end
+      "ruby " + to_os_path("#{path(scm_spec)}/CVSROOT/#{trigger_script_name}") + " #{dc_url} #{project_name}"
     end
 
     def trigger_script
