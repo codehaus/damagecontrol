@@ -68,6 +68,10 @@ module DamageControl
     def completed?
       status == SUCCESSFUL || status == FAILED || status == KILLED
     end
+		
+		def queued?
+			status == "QUEUED"
+		end
     
     def successful?
       status == SUCCESSFUL

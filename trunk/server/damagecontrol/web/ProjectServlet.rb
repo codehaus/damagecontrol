@@ -174,10 +174,20 @@ module DamageControl
     end
     
     def build_history
-      history = build_history_repository.history(project_name)
+      history = build_history_repository.history(project_name).reverse
       current_build = build_history_repository.current_build(project_name)
-      history.delete_if {|b| b != current_build && !b.completed?}
-      history
+			onecompleted = false
+      history.delete_if { |b| 
+				puts "#{b.status} #{onecompleted}"
+				onecompleted = !(b != current_build && !b.completed?) || onecompleted
+				if b.queued? && onecompleted
+					puts "delete it"
+					true
+				else
+					b != current_build && !b.completed? && !b.queued?
+				end
+			}
+      history.reverse
     end
     
   end
