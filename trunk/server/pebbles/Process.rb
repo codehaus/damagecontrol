@@ -1,5 +1,11 @@
 module Pebbles
 
+  at_exit do
+    ObjectSpace.each_object(Pebbles::Process) do |p|
+      p.kill if p.executing?
+    end
+  end
+
   class ProcessFailedException < StandardError
   end
   
