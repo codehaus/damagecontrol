@@ -279,6 +279,7 @@ module DamageControl
 
   class LocalCVS < CVS
     def initialize(basedir, cvsmodule)
+      super
       self.cvsroot = ":local:#{basedir}/cvsroot"
       self.cvsmodule = cvsmodule
       self.checkout_dir = "#{basedir}/checkout"
