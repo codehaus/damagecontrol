@@ -1,4 +1,6 @@
 require 'test/unit'
+require 'mockit'
+
 require 'damagecontrol/Build'
 require 'damagecontrol/Hub'
 require 'damagecontrol/BuildExecutor'
@@ -70,11 +72,35 @@ module DamageControl
       
     end
     
+    def test_determines_changes_and_checks_out
+      mock_scm = MockIt::Mock.new
+      #mock_scm.__expect(:changes) { |dir, scm_spec, time_before, time_after|
+      #  assert_equal("scm_spec", scm_spec)
+      #  assert_equal("bulds/damagecontrolled", dir)
+      #}
+      mock_scm.__expect(:checkout) { |scm_spec, dir|
+        assert_equal("scm_spec", scm_spec)
+        assert_equal("builds/damagecontrolled", dir)
+      }
+      
+      @build_executor = BuildExecutor.new(hub, "builds", mock_scm)
+      @build = Build.new("damagecontrolled",
+        { "scm_spec" => "scm_spec", "build_command_line" => "echo hello world"})
+
+      @build_executor.schedule_build(@build)
+      @build_executor.process_next_scheduled_build
+      
+      assert_equal(nil, @build.error_message)
+      assert_equal(Build::SUCCESSFUL, @build.status)
+      
+      mock_scm.__verify
+    end
+    
     private
     
     def ant
       windows? ? "ant.bat" : "ant"
     end
   end
-    
+  
 end

@@ -49,7 +49,7 @@ module MockIt
     end
     
     def assert_all_expected_methods_called
-      assert(@expected_validation_procs.empty?, "not all expected methods called, calls left: #{@expected_calls}")
+      assert(@expected_validation_procs.empty?, "not all expected methods called, calls left: #{@expected_methods.inspect}")
     end
     
     def is_setup_call(method)

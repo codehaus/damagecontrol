@@ -16,7 +16,6 @@ module DamageControl
     
     attr_reader :current_build
     attr_reader :builds_dir
-    attr_writer :checkout
     
     attr_accessor :last_build_request
 
@@ -25,13 +24,12 @@ module DamageControl
       @builds_dir = builds_dir
       @scm = scm
       @filesystem = FileSystem.new
-      @checkout = true
       @scheduled_build_slot = Slot.new
     end
     
     def checkout
       current_build.status = Build::CHECKING_OUT
-
+      
       @scm.checkout(current_build.scm_spec, project_base_dir) do |progress| 
         report_progress(progress)
       end
@@ -58,7 +56,7 @@ module DamageControl
     end
     
     def checkout?
-      @checkout && !current_build.scm_spec.nil?
+      !current_build.scm_spec.nil?
     end
     
     def scheduled_build
@@ -102,9 +100,10 @@ module DamageControl
         checkout if checkout?
         execute
       rescue Exception => e
-        stacktrace = e.backtrace.join("\n")
-        report_progress("Build failed due to: #{stacktrace}")
-        current_build.status = Build::SUCCESSFUL
+        message = e.message + e.backtrace.join("\n")
+        current_build.error_message = message
+        current_build.status = Build::FAILED
+        report_progress("Build failed due to: #{message}")
       ensure
         build_complete
       end
