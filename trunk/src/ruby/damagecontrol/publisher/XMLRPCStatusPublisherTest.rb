@@ -54,7 +54,7 @@ module DamageControl
       h = Net::HTTP.new('localhost', 4719)
       resp, data = h.post2('/test', XMLRPC_CALL_DATA, header)
       
-      parser = XMLRPC::XMLParser::XMLParser.new
+      parser = XMLRPC::XMLParser::NQXMLParser.new
       actual_build_list_map = parser.parseMethodResponse(data)
 
       # Read the expected file and make it one line (the xml rpc client is a bit flaky)
