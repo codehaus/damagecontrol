@@ -1,0 +1,40 @@
+<html>
+<head>
+<title><%= project_name %> build</title>
+<link type="text/css" rel="stylesheet" href="css/style.css">
+</head>
+<body>
+
+<%
+build = build_history_repository.lookup(project_name, request.query["timestamp"])
+url = "log?project_name=#{project_name}&timestamp=#{request.query['timestamp']}"
+%>
+<h1 class="pane"><img src="images/timestampstatus?project_name=<%= project_name %>&timestamp=<%= request.query['timestamp'] %>"/> <%= build_description(build) %></h1>
+
+<a href="#{url}">Console output</a>
+<table class="main-table">
+<tr><td>
+<table>
+	<tr>
+		<td class="config_cell">Developer</td>
+		<td class="config_cell">File</td>
+		<td class="config_cell">Revision</td>
+		<td class="config_cell">Message</td>
+	</tr>
+<%
+view_cvs_url = project_config_repository.project_config(project_name)["view_cvs_url"]
+view_cvs_url_patched = "#{view_cvs_url}/" if(view_cvs_url && view_cvs_url[-1] != "/")
+build.modification_set.each do |modification|
+	path = modification.path
+	path = "<a href=\"#{view_cvs_url_patched}#{path}\">#{path}</a>" if(view_cvs_url)
+%>
+	<tr>
+		<td><%= modification.developer %></td>
+		<td><%= path %></td>
+		<td><%= modification.revision %></td>
+		<td><%= modification.message %></td>
+	</tr>
+<% end %>
+</table>
+
+</body></html>

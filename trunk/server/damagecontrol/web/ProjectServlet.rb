@@ -43,7 +43,8 @@ module DamageControl
     KEYS = [
       "build_command_line", 
       "project_name", 
-      "unix_groups", 
+      "unix_groups",
+      "view_cvs_url",
       "trigger", 
       "nag_email", 
       "scm_type", 
@@ -107,9 +108,20 @@ module DamageControl
       
       render("project_dashboard.erb", binding)
     end
+    
+    def build_details
+      render("build.erb", binding)
+    end
 
+    def build_description(build)
+      label = "##{build.label}"; 
+      label = build.status if label == "#"
+      "#{build.timestamp_for_humans} (#{label})"
+    end
+
+    attr_reader :project_config_repository
   private
-  
+    
     def dashboard_redirect
       action_redirect(:dashboard, { "project_name" => project_name })
     end

@@ -111,6 +111,15 @@ module DamageControl
       result
     end
 
+    def lookup(project_name, timestamp)
+      timestamp = Build.timestamp_to_time(timestamp) if timestamp.is_a?(String)
+      history = history(project_name)
+      history.each do |build|
+        return build if build.timestamp_as_time == timestamp
+      end
+      nil
+    end
+
   private
 
     def populate_cache_from_files

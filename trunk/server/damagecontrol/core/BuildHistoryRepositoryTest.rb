@@ -217,6 +217,22 @@ module DamageControl
 
       assert_equal([c], @bhp.search("funny", "onlythisone"))
     end
+    
+    def test_should_retrieve_build_by_timestamp
+      t = Time.utc(2004, 01, 04, 12, 00, 00)
+      p1 = Build.new("t", Time.utc(2004, 01, 01, 12, 00, 00))
+      pt = Build.new("t", t)
+      p3 = Build.new("t", Time.utc(2004, 01, 05, 12, 00, 00))
+      xt = Build.new("x", t)
+      
+      @bhp.register(p1)
+      @bhp.register(pt)
+      @bhp.register(p3)
+      @bhp.register(xt)
+      
+      assert_equal(pt, @bhp.lookup("t", t))
+      assert_equal(pt, @bhp.lookup("t", "20040104120000"))
+    end
 
   end
 end

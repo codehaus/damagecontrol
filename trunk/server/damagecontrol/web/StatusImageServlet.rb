@@ -34,7 +34,7 @@ module DamageControl
     def status_image(project_name)
       color = "grey"
       pulse = ""
-      build = @build_history_repository.send(last_or_current, project_name)
+      build = find_build(project_name)
       if(!build.nil? && build.completed?)
         color = if build.successful? then "green" else "red" end
         pulse = "-pulse" if @build_scheduler.project_building?(project_name)
@@ -47,16 +47,25 @@ module DamageControl
   class CurrentStatusImageServlet < StatusImageServlet
     protected
     
-    def last_or_current
-      :current_build
+    def find_build(project_name)
+      @build_history_repository.current_build(project_name)
     end
   end
 
   class LastCompletedImageServlet < StatusImageServlet
     protected
     
-    def last_or_current
-      :last_completed_build
+    def find_build(project_name)
+      @build_history_repository.last_completed_build(project_name)
+    end
+  end
+
+  class TimestampImageServlet < StatusImageServlet
+    protected
+    
+    def find_build(project_name)
+      timestamp = request.query["timestamp"]
+      @build_history_repository.lookup(project_name, timestamp)
     end
   end
 end

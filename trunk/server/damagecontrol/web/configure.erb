@@ -285,6 +285,10 @@ function enableOrDisableCvsFieldsAndUpdateScmSpec() {
 			<td>Module</td>
 			<td><input class="scm_info" name="cvsmodule" id="cvsmodule" onKeyUp="updateCvsRootField()" type="text" value="<%= project_config['cvsmodule'] %>"></td>
 		</tr>
+		<tr>
+			<td>ViewCVS base URL</td>
+			<td><input class="scm_info" name="view_cvs_url" id="view_cvs_url" type="text" value="<%= project_config['view_cvs_url'] %>"></td>
+		</tr>
 	</table>
 
 </div>
