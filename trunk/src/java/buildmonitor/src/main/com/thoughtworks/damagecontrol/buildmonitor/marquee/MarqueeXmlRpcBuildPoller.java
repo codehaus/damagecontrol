@@ -17,7 +17,6 @@ import javax.net.ssl.X509TrustManager;
 import java.net.URL;
 import java.security.KeyManagementException;
 import java.security.NoSuchAlgorithmException;
-import java.security.cert.CertificateException;
 import java.security.cert.X509Certificate;
 import java.util.Map;
 
@@ -26,7 +25,7 @@ import java.util.Map;
  * server using the Marquee XML-RPC library.
  *
  * @author Aslak Helles&oslash;y
- * @version $Revision: 1.4 $
+ * @version $Revision: 1.5 $
  */
 public class MarqueeXmlRpcBuildPoller implements BuildPoller {
     private final XmlRpcClient xmlRpcClient;
@@ -49,22 +48,11 @@ public class MarqueeXmlRpcBuildPoller implements BuildPoller {
                     return new X509Certificate[0];
                 }
 
-                public void checkClientTrusted(X509Certificate[] x509Certificates, String s) throws CertificateException {
-                    System.out.println("checkClientTrusted s = " + s);
-                    for (int i = 0; i < x509Certificates.length; i++) {
-                        X509Certificate x509Certificate = x509Certificates[i];
-                        System.out.println("x509Certificate = " + x509Certificate);
-                    }
+                public void checkClientTrusted(X509Certificate[] x509Certificates, String s) {
                 }
 
-                public void checkServerTrusted(X509Certificate[] x509Certificates, String s) throws CertificateException {
-                    System.out.println("checkServerTrusted s = " + s);
-                    for (int i = 0; i < x509Certificates.length; i++) {
-                        X509Certificate x509Certificate = x509Certificates[i];
-                        System.out.println("x509Certificate = " + x509Certificate);
-                    }
+                public void checkServerTrusted(X509Certificate[] x509Certificates, String s) {
                 }
-
             };
 
             SSLContext context = SSLContext.getInstance("TLS");

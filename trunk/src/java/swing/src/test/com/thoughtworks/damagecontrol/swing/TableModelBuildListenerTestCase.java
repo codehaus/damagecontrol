@@ -13,7 +13,7 @@ import java.util.Vector;
 
 /**
  * @author Aslak Helles&oslash;y
- * @version $Revision: 1.3 $
+ * @version $Revision: 1.4 $
  */
 public class TableModelBuildListenerTestCase extends TestCase {
     public void testStatusIsReportedForBuildStarted() throws InvocationTargetException, InterruptedException {
@@ -21,18 +21,18 @@ public class TableModelBuildListenerTestCase extends TestCase {
         List appleList = new ArrayList();
         Map apple1 = new HashMap();
         apple1.put(BuildConstants.PROJECT_NAME_FIELD, "apple");
-        apple1.put(BuildConstants.SUCCESSFUL_FIELD, Boolean.TRUE);
+        apple1.put(BuildConstants.STATUS_FIELD, Boolean.TRUE);
         appleList.add(apple1);
 
         Map apple2 = new HashMap();
         apple2.put(BuildConstants.PROJECT_NAME_FIELD, "apple");
-        apple2.put(BuildConstants.SUCCESSFUL_FIELD, Boolean.FALSE);
+        apple2.put(BuildConstants.STATUS_FIELD, Boolean.FALSE);
         appleList.add(apple2);
 
         List pearList = new ArrayList();
         Map pear1 = new HashMap();
         pear1.put(BuildConstants.PROJECT_NAME_FIELD, "pear");
-        pear1.put(BuildConstants.SUCCESSFUL_FIELD, Boolean.TRUE);
+        pear1.put(BuildConstants.STATUS_FIELD, Boolean.TRUE);
         pearList.add(pear1);
 
         TableModelBuildListener buildListener = new TableModelBuildListener();

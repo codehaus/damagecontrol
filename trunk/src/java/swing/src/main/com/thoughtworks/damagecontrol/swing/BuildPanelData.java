@@ -39,7 +39,7 @@ import java.util.Map;
 
 /**
  * @author Aslak Helles&oslash;y
- * @version $Revision: 1.2 $
+ * @version $Revision: 1.3 $
  */
 public class BuildPanelData implements BuildConstants {
     private JPanel buildPanel;
@@ -90,12 +90,20 @@ public class BuildPanelData implements BuildConstants {
                 Map build = (Map) buildSet.getSelected();
                 String label = asText(build);
                 JLabel result = (JLabel) super.getTableCellRendererComponent(table, label, isSelected, hasFocus, row, column);
-                Boolean success = (Boolean) build.get(BuildConstants.SUCCESSFUL_FIELD);
-                if(success.booleanValue()) {
-                    result.setBackground(Color.green);
-                } else {
-                    result.setBackground(Color.red);
-                }
+                String status = (String) build.get(BuildConstants.STATUS_FIELD);
+                    if(BuildConstants.STATUS_SUCCESSFUL.equals(status)) {
+                        result.setBackground(Color.green);
+                    } else if (BuildConstants.STATUS_FAILED.equals(status)) {
+                        result.setBackground(Color.red);
+                    } else if (BuildConstants.STATUS_IDLE.equals(status)) {
+                        result.setBackground(Color.gray.brighter());
+                    } else if (BuildConstants.STATUS_QUEUED.equals(status)) {
+                        result.setBackground(Color.orange);
+                    } else if (BuildConstants.STATUS_BUILDING.equals(status)) {
+                        result.setBackground(Color.yellow);
+                    } else if (BuildConstants.STATUS_CHECKING_OUT.equals(status)) {
+                        result.setBackground(Color.yellow.brighter());
+                    }
                 return result;
             }
         });
@@ -131,8 +139,9 @@ public class BuildPanelData implements BuildConstants {
         final Date now = new Date();
         long timestamp = Long.parseLong((String) build.get(BuildConstants.TIMESTAMP_FIELD));
         final Date time = new Date(timestamp);
+        String status = (String) build.get(BuildConstants.STATUS_FIELD);
         final long interval = now.getTime() - time.getTime();
-        DateFormat dateFormat = new SimpleDateFormat() {
+        DateFormat dateFormat = new SimpleDateFormat() /*{
             public StringBuffer format(Date date, StringBuffer toAppendTo, FieldPosition pos) {
                 if(interval < 5 * MINUTE) {
                     return toAppendTo.append("Less than 5 minutes ago");
@@ -141,20 +150,20 @@ public class BuildPanelData implements BuildConstants {
                     return toAppendTo.append("Less than 15 minutes ago");
                 }
                 if(interval < HOUR) {
-                    return toAppendTo.append("Less than 15 minutes ago");
+                    return toAppendTo.append("Less than one hour ago");
                 }
                 if(interval < 15 * MINUTE) {
                     return toAppendTo.append("Less than 15 minutes ago");
                 }
                 return super.format(date, toAppendTo, pos);
             }
-        };
-        return dateFormat.format(time);
+        }*/;
+        return status + " (" + dateFormat.format(time) + ")";
     }
 
     private void updateDetails(Map build) {
         timestamp.setText((String) build.get(BuildConstants.TIMESTAMP_FIELD));
-        String stat = build.get(BuildConstants.SUCCESSFUL_FIELD).toString();
+        String stat = build.get(BuildConstants.STATUS_FIELD).toString();
         status.setText(stat);
 
         Map config = (Map) build.get(BuildConstants.CONFIG_FIELD);

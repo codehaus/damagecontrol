@@ -1,4 +1,5 @@
 require 'test/unit'
+require 'damagecontrol/Build'
 require 'damagecontrol/template/HTMLTemplate'
 
 module DamageControl
@@ -9,7 +10,7 @@ module DamageControl
       build.label = "999"
       build.timestamp = "20030929145347"
       build.error_message = "Knockout"
-      build.successful = false
+      build.status = Build::FAILED
       build.start_time = 1000
       build.end_time = 1004
 

@@ -27,6 +27,7 @@ module DamageControl
   
     def test_email_is_sent_upon_build_complete_event    
       build = Build.new("project_name", {"nag_email" => "somelist@someproject.bar"})
+      build.status = Build::FAILED
 
       @body_template.__setup(:file_type) { "email" }
       @body_template.__expect(:generate) { |build2|

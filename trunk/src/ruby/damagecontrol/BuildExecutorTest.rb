@@ -1,4 +1,5 @@
 require 'test/unit'
+require 'damagecontrol/Build'
 require 'damagecontrol/Hub'
 require 'damagecontrol/BuildExecutor'
 require 'damagecontrol/HubTestHelper'
@@ -47,7 +48,7 @@ module DamageControl
 #        assert(messages_from_hub[-2].is_a?(BuildProgressEvent))
 #      end
       assert(messages_from_hub[-1].is_a?(BuildCompleteEvent))
-      assert(!messages_from_hub[-1].build.successful)
+      assert_equal(Build::FAILED, messages_from_hub[-1].build.status)
     end
     
     def test_succesful_ant_build

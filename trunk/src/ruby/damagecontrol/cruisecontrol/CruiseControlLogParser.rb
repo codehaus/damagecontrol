@@ -1,3 +1,5 @@
+require 'damagecontrol/Build'
+
 # some ruby distros include an old crappy REXML-version
 begin
   require 'rexml/parsers/pullparser'
@@ -51,9 +53,9 @@ module DamageControl
     def parse_build(res, parser, build)
       if res[1]['error']
         build.error_message = res[1]['error']
-        build.successful = false
+        build.status = Build::FAILED
       else
-        build.successful = true
+        build.status = Build::SUCCESSFUL
       end
     end
 

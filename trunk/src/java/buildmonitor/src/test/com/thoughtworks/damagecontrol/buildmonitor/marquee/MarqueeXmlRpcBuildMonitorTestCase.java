@@ -25,7 +25,7 @@ import java.util.Map;
 //that goes against the ruby server
 /**
  * @author Aslak Helles&oslash;y
- * @version $Revision: 1.5 $
+ * @version $Revision: 1.6 $
  */
 public class MarqueeXmlRpcBuildMonitorTestCase extends TestCase {
     private IOException serverEx;
@@ -56,7 +56,7 @@ public class MarqueeXmlRpcBuildMonitorTestCase extends TestCase {
                 boolean waiting = true;
                 ServerSocket fakeServer = null;
                 try {
-                    fakeServer = new ServerSocket(4315);
+                    fakeServer = new ServerSocket(14315);
                     fakeServer.setSoTimeout(1000);
                 } catch (IOException e) {
                     e.printStackTrace();
@@ -111,7 +111,7 @@ public class MarqueeXmlRpcBuildMonitorTestCase extends TestCase {
         apple1.put(BuildConstants.CONFIG_FIELD, Collections.singletonMap("build_command_line", "Apple1"));
         apple1.put(BuildConstants.MODIFICATION_SET_FIELD, Collections.EMPTY_LIST);
         apple1.put(BuildConstants.TIMESTAMP_FIELD, "20040316225946");
-        apple1.put(BuildConstants.SUCCESSFUL_FIELD, Boolean.TRUE);
+        apple1.put(BuildConstants.STATUS_FIELD, BuildConstants.STATUS_SUCCESSFUL);
         apple1.put("___class___", "DamageControl::Build");
         expectedBuildList.add(apple1);
 
@@ -120,7 +120,7 @@ public class MarqueeXmlRpcBuildMonitorTestCase extends TestCase {
         apple2.put(BuildConstants.CONFIG_FIELD, Collections.singletonMap("build_command_line", "Apple2"));
         apple2.put(BuildConstants.MODIFICATION_SET_FIELD, Collections.EMPTY_LIST);
         apple2.put(BuildConstants.TIMESTAMP_FIELD, "20040316225948");
-        apple2.put(BuildConstants.SUCCESSFUL_FIELD, Boolean.FALSE);
+        apple2.put(BuildConstants.STATUS_FIELD, BuildConstants.STATUS_FAILED);
         apple2.put("___class___", "DamageControl::Build");
         expectedBuildList.add(apple2);
 
@@ -134,7 +134,7 @@ public class MarqueeXmlRpcBuildMonitorTestCase extends TestCase {
             }
         });
 
-        BuildPoller buildMonitor = new MarqueeXmlRpcBuildPoller(new URL("https://localhost:10443/"));
+        BuildPoller buildMonitor = new MarqueeXmlRpcBuildPoller(new URL("http://localhost:14315/"));
         buildMonitor.addBuildListener((BuildListener) mockBuildListener.proxy());
         buildMonitor.poll();
 

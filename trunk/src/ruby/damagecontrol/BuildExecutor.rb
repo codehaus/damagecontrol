@@ -1,3 +1,4 @@
+require 'damagecontrol/Build'
 require 'damagecontrol/BuildEvents'
 require 'damagecontrol/AsyncComponent'
 require 'damagecontrol/scm/DefaultSCMRegistry'
@@ -29,19 +30,27 @@ module DamageControl
     end
     
     def checkout
+      current_build.status = Build::CHECKING_OUT
+
       @scm.checkout(current_build.scm_spec, project_base_dir) do |progress| 
         report_progress(progress)
       end
     end
 
     def execute
+      current_build.status = Build::BUILDING
+
       @filesystem.makedirs(project_base_dir)
       @filesystem.chdir(project_base_dir)
  
       IO.foreach("|#{current_build.build_command_line} 2>&1") do |line|
         report_progress(line)
       end
-      current_build.successful = ($? == 0)
+      if($? == 0)
+        current_build.status = Build::SUCCESSFUL
+      else
+        current_build.status = Build::FAILED
+      end
     end
  
     def project_base_dir
@@ -89,13 +98,13 @@ module DamageControl
     def process_next_scheduled_build
       next_scheduled_build
       begin
-      	build_started
+        build_started
         checkout if checkout?
         execute
       rescue Exception => e
         stacktrace = e.backtrace.join("\n")
         report_progress("Build failed due to: #{stacktrace}")
-        current_build.successful = false
+        current_build.status = Build::SUCCESSFUL
       ensure
         build_complete
       end

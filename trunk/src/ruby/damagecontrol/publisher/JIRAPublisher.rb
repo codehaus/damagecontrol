@@ -1,3 +1,4 @@
+require 'damagecontrol/Build'
 require 'damagecontrol/BuildEvents'
 require 'damagecontrol/AsyncComponent'
 require 'net/http'
@@ -19,7 +20,7 @@ module DamageControl
   
     def process_message(message)
       if message.is_a? BuildCompleteEvent
-        if(!message.build.successful)
+        if(Build::FAILED == message.build.status)
           puts "JIRA Publisher go failure message"
           jira_project_key = message.build.config["jira_project_key"]
           if(@jira_user && @jira_password && jira_project_key)

@@ -39,9 +39,9 @@
                       </value>
                     </member>
                     <member>
-                      <name>successful</name>
+                      <name>status</name>
                       <value>
-                        <boolean>1</boolean>
+                        <string>SUCCESSFUL</string>
                       </value>
                     </member>
                     <member>
@@ -88,9 +88,9 @@
                         </value>
                       </member>
                       <member>
-                        <name>successful</name>
+                        <name>status</name>
                         <value>
-                          <boolean>0</boolean>
+                          <string>FAILED</string>
                         </value>
                       </member>
                       <member>

@@ -26,7 +26,7 @@ module DamageControl
     
     def test_exits_on_successful_damagecontrol
       build = Build.new("damagecontrol")
-      build.successful = true
+      build.status = Build::SUCCESSFUL
       hub.publish_message(BuildCompleteEvent.new(build))
       @su.force_tick
       assert(@su.did_exit?)
@@ -34,7 +34,7 @@ module DamageControl
 
     def test_doesnt_exit_on_failed_damagecontrol
       build = Build.new("damagecontrol")
-      build.successful = false
+      build.status = Build::FAILED
       hub.publish_message(BuildCompleteEvent.new(build))
       @su.force_tick
       assert(!@su.did_exit?)
@@ -42,7 +42,7 @@ module DamageControl
 
     def test_doesnt_exit_on_successfuk_other_project
       build = Build.new("mustard")
-      build.successful = false
+      build.status = Build::FAILED
       hub.publish_message(BuildCompleteEvent.new(build))
       @su.force_tick
       assert(!@su.did_exit?)

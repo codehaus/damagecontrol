@@ -1,3 +1,5 @@
+require 'damagecontrol/Build'
+
 module DamageControl
 
   # Exits if the build is successful and the project
@@ -7,7 +9,7 @@ module DamageControl
   class SelfUpgrader < AsyncComponent
     def process_message(message)
       if message.is_a? BuildCompleteEvent        
-        if(message.build.successful && message.build.project_name == "damagecontrol")
+        if((Build::SUCCESSFUL == message.build.status) && message.build.project_name == "damagecontrol")
           do_exit
         end
       end

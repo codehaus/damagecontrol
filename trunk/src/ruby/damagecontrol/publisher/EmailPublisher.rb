@@ -1,3 +1,4 @@
+require 'damagecontrol/Build'
 require 'damagecontrol/BuildEvents'
 require 'damagecontrol/AsyncComponent'
 require 'net/smtp'
@@ -21,7 +22,7 @@ module DamageControl
   
     def process_message(message)
       if message.is_a? BuildCompleteEvent
-        if(!message.build.successful || always_mail)
+        if((Build::FAILED == message.build.status) || always_mail)
           if(nag_email = message.build.config["nag_email"])
             subject = @subject_template.generate(message.build)
             body = @body_template.generate(message.build)

@@ -16,7 +16,7 @@ module DamageControl
       assert_equal('dxbranch', build.project_name)
       assert_equal('build.698', build.label)
       assert_equal('20030929145347', build.timestamp)
-      assert_equal(false, build.successful)
+      assert_equal(Build::FAILED, build.status)
       assert_equal("BUILD FAILED detected", build.error_message)
     end
     
