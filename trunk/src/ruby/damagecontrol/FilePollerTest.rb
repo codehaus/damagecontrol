@@ -1,6 +1,6 @@
 require 'test/unit'
-require 'mock_with_returns'
 require 'ftools'
+require 'mockit'
 require 'damagecontrol/FilePoller'
 require 'damagecontrol/FileUtils'
 
@@ -33,7 +33,7 @@ module DamageControl
     
     def test_new_file_calls_new_file
       puts"test_new_file_calls_new_file"
-      @file_handler.__next(:new_file) { |file_name|
+      @file_handler.__expect(:new_file) { |file_name|
         assert_equal("#{@dir}/newfile", file_name)
       }
     
@@ -43,10 +43,10 @@ module DamageControl
     end
     
     def test_two_newfiles_calls_new_file_for_each
-      @file_handler.__next(:new_file) { |file_name|
+      @file_handler.__expect(:new_file) { |file_name|
         assert_equal("#{@dir}/newfile1", file_name)
       }
-      @file_handler.__next(:new_file) { |file_name|
+      @file_handler.__expect(:new_file) { |file_name|
         assert_equal("#{@dir}/newfile2", file_name)
       }
 
