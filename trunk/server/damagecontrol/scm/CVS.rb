@@ -252,7 +252,7 @@ puts result
         "ruby"
       else
         "/home/services/dcontrol/ruby/bin/ruby"
-        "ruby"
+#        "ruby"
       end
     end
     

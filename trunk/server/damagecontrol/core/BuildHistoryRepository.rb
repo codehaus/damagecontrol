@@ -195,7 +195,7 @@ module DamageControl
       backup = "#{filename}.#{Time.now.utc.to_i}.backup"
       logger.error("#{filename} can't be parsed. might be of an older format")
       logger.error("Copying it over to #{backup}")
-#      File.move(filename, backup)
+      File.move(filename, backup)
     end
 
     # HACK OF DEATH:
