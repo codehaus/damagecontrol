@@ -45,30 +45,8 @@ module DamageControl
     end
     
     def parse_project_config(config_content)
-      eof_stripped = ""
-      config_content.each do |line|
-        if(line.chomp == "...")
-          break
-        else
-          # Workaround for new Ruby symbol semantics in YAML.
-          # A String that starts with a colon will be converted
-          # to a symbol, which is not what we want.
-          # Therefore, replace the offending ":"s with "_" and take it out afterwards.
-          line.gsub!(/:pserver:/, "_pserver:")
-          line.gsub!(/:local:/, "_local:")
-          line.gsub!(/:ext:/, "_ext:")
-
-          eof_stripped << line
-        end
-      end
-      config = YAML::load(eof_stripped)
+      config = YAML::load(config_content)
       raise InvalidProjectConfiguration.new(config_content) unless config.is_a? Hash
-      config.each do |key, value|
-        break if value.nil?
-        value.gsub!(/_pserver:/, ":pserver:")
-        value.gsub!(/_local:/, ":local:")
-        value.gsub!(/_ext:/, ":ext:")
-      end
       config
     end
     
