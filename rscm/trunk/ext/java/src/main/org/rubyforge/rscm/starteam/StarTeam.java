@@ -12,6 +12,19 @@ import com.starbase.starteam.UserAccount;
 import com.starbase.starteam.View;
 import com.starbase.starteam.ViewConfiguration;
 import com.starbase.util.OLEDate;
+import org.apache.tools.ant.BuildEvent;
+import org.apache.tools.ant.BuildListener;
+import org.apache.tools.ant.DefaultLogger;
+import org.apache.tools.ant.Project;
+import org.apache.tools.ant.Target;
+import org.apache.tools.ant.Task;
+import org.apache.tools.ant.BuildException;
+import org.apache.tools.ant.taskdefs.optional.starteam.StarTeamCheckout;
+import org.apache.tools.ant.taskdefs.optional.starteam.StarTeamTask;
+import org.rubyforge.rscm.Change;
+import org.rubyforge.rscm.ChangeSets;
+import org.rubyforge.rscm.RSCM;
+import org.rubyforge.rscm.YamlDumpable;
 
 import java.text.DateFormat;
 import java.text.ParseException;
@@ -19,37 +32,65 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Iterator;
+import java.util.List;
 import java.util.Locale;
 import java.util.Map;
-
-import org.rubyforge.rscm.Change;
-import org.rubyforge.rscm.ChangeSets;
-import org.rubyforge.rscm.RSCM;
+import java.util.ArrayList;
+import java.util.regex.Pattern;
+import java.util.regex.Matcher;
 
 /**
  * Java helper for the RSCM implementation of StarTeam. This class has borrowed a lot from
  * CruiseControl's StarTeam class - but is highly simplified. It's still quite complex since
- * the native StarTeam API ermm... SUCKS.
+ * the native StarTeam API ermm... is *different*.
  *
  * @author Aslak Helles&oslash;y
  */
 public class StarTeam implements RSCM {
+    // http://hedwig.sourceforge.net/xref/org/apache/james/util/RFC822Date.html
+    private static final DateFormat dx = new SimpleDateFormat("EE, d MMM yyyy HH:mm:ss zzzzz", Locale.US);
+    private static final DateFormat dy = new SimpleDateFormat("EE d MMM yyyy HH:mm:ss zzzzz", Locale.US);
+    private static final DateFormat dz = new SimpleDateFormat("d MMM yyyy HH:mm:ss zzzzz", Locale.US);
+    private static final Pattern removingProcessesPattern = Pattern.compile("removing processed (.*) from UnmatchedFileMap");
+
     private boolean canLookupEmails = true;
     private static final DateFormat ISO8601_FORMAT = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss", Locale.UK);;
-    private final String url;
+    private final String userName;
+    private final String password;
+    private final String serverName;
+    private final String serverPort;
+    private final String projectName;
+    private final String viewName;
     private final String folderName;
+    private final String url;
 
-    public StarTeam(String url, String folderName) {
-        this.url = url;
-        this.folderName = folderName;
-    }
+    private Pattern checkingOutPattern;
+    private Map starTeamFileToFileSystemFiles = new HashMap();
 
     public StarTeam(String userName, String password, String serverName, String serverPort, String projectName, String viewName, String folderName) {
-        this(userName + ":" + password + "@" + serverName + ":" + Integer.parseInt(serverPort) + "/" + projectName + "/" + viewName, folderName);
+        this.userName = userName;
+        this.password = password;
+        this.serverName = serverName;
+        this.serverPort = serverPort;
+        this.projectName = projectName;
+        this.viewName = viewName;
+        this.folderName = folderName;
+
+        this.url = userName + ":" + password + "@" + serverName + ":" + Integer.parseInt(serverPort) + "/" + projectName + "/" + viewName;
+
+        // compute regexp to match the checked out files.
+        String checkingOutPatternSpec = "Checking out: " + viewName + ".";
+        if(folderName != null) {
+            checkingOutPatternSpec += folderName + ".";
+        }
+        checkingOutPatternSpec += "(.*) \\-\\-> (.*)";
+        checkingOutPattern = Pattern.compile(checkingOutPatternSpec, Pattern.DOTALL);
     }
 
+    public YamlDumpable getChangeSets(String fromSpecifier, String toSpecifier) {
+        Date from = parseRfc822(fromSpecifier);
+        Date to = parseRfc822(toSpecifier);
 
-    public ChangeSets getChangeSets(Date from, Date to) {
         System.out.println("CHANGESETS FOR " + url + " " + from + "-" + to + " - FOLDER:" + folderName);
         ChangeSets changeSets = new ChangeSets();
 
@@ -107,6 +148,88 @@ public class StarTeam implements RSCM {
                 server.disconnect();
             }
         }
+    }
+
+    private void antInit(Task task, BuildListener buildListener) {
+        Project project = new Project();
+        project.init();
+        final DefaultLogger defaultLogger = new DefaultLogger();
+        defaultLogger.setOutputPrintStream(System.out);
+//        project.addBuildListener(defaultLogger);
+        project.addBuildListener(buildListener);
+        task.setProject(project);
+        task.setTaskType("stcheckout");
+        task.setTaskName("stcheckout");
+        task.setOwningTarget(new Target());
+    }
+
+    private void starteamInit(StarTeamTask task) {
+        task.setUserName(userName);
+        task.setPassword(password);
+        task.setProjectname(projectName);
+        task.setViewname(viewName);
+        task.setServername(serverName);
+        task.setServerport(serverPort);
+    }
+
+    public YamlDumpable checkout(String dir, String toIdentifier) {
+        StarTeamCheckout checkout = new StarTeamCheckout();
+        final List checkedOutFiles = new ArrayList();
+        BuildListener buildListener = new BuildListener() {
+            public void buildStarted(BuildEvent event) {
+            }
+
+            public void buildFinished(BuildEvent event) {
+            }
+
+            public void targetStarted(BuildEvent event) {
+            }
+
+            public void targetFinished(BuildEvent event) {
+            }
+
+            public void taskStarted(BuildEvent event) {
+            }
+
+            public void taskFinished(BuildEvent event) {
+            }
+
+            public void messageLogged(BuildEvent event) {
+                final String message = event.getMessage();
+                if (event.getPriority() == 2) {
+                    Matcher checkingOutMatcher = checkingOutPattern.matcher(message.trim());
+                    if (checkingOutMatcher.matches()) {
+                        String starTeamPath = checkingOutMatcher.group(1).replace('\\', '/');
+                        String fileSystemPath = checkingOutMatcher.group(2);
+                        // we have to stick it on the path, because it is only when we get a
+                        // removing processed that the file exists on disk, and we can check
+                        // whether the file is a dir or a file.
+                        starTeamFileToFileSystemFiles.put(fileSystemPath, starTeamPath);
+                    }
+                } else if (event.getPriority() == 4) {
+                    Matcher removingProcessedMatcher = removingProcessesPattern.matcher(message.trim());
+                    if (removingProcessedMatcher.matches()) {
+                        String fileSystemPath = removingProcessedMatcher.group(1);
+                        java.io.File file = new java.io.File(fileSystemPath);
+                        if (file.isFile()) {
+                            String starTeamPath = (String) starTeamFileToFileSystemFiles.remove(fileSystemPath);
+                            if(starTeamPath == null) {
+                                throw new BuildException("No starteam path for " + fileSystemPath);
+                            }
+                            checkedOutFiles.add(starTeamPath);
+                        }
+                    }
+                }
+            }
+        };
+
+        antInit(checkout, buildListener);
+        starteamInit(checkout);
+        checkout.setRootStarteamFolder(folderName);
+
+        checkout.setRootLocalFolder(dir);
+        checkout.execute();
+        return null;
     }
 
     /**
@@ -212,5 +335,21 @@ public class StarTeam implements RSCM {
         }
 
         changeSets.add(change);
+    }
+
+    private static Date parseRfc822(String rfcdate) {
+        try {
+            return dx.parse(rfcdate);
+        } catch (ParseException e) {
+            try {
+                return dz.parse(rfcdate);
+            } catch (ParseException f) {
+                try {
+                    return dy.parse(rfcdate);
+                } catch (ParseException g) {
+                    throw new RuntimeException(g);
+                }
+            }
+        }
     }
 }

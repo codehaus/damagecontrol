@@ -1,45 +1,44 @@
 package org.rubyforge.rscm.starteam;
 
 import junit.framework.TestCase;
-import org.rubyforge.rscm.ChangeSets;
 import org.rubyforge.rscm.RSCM;
+import org.rubyforge.rscm.TestScm;
+import org.rubyforge.rscm.YamlDumpable;
 
 import java.io.IOException;
 import java.io.PrintWriter;
-import java.util.Calendar;
-import java.util.Date;
-import java.util.GregorianCalendar;
-import java.util.TimeZone;
+import java.io.StringWriter;
 
 /**
  * @author Aslak Helles&oslash;y
  */
 public class StarTeamTest extends TestCase {
+    private String userName = System.getProperty("starteam_user");
+    private String password = System.getProperty("starteam_password");
+    private String serverName = "192.168.254.21";
+    private String serverPort = "49201";
+    private String projectName = "NGST Application";
+    private String viewName = "NGST Application";
+    private String folderName = "/bundles";
+    private RSCM starTeam;
+
+    protected void setUp() throws Exception {
+        starTeam = new StarTeam(userName, password, serverName, serverPort, projectName, viewName, folderName);
+        starTeam = new TestScm(null, null);
+    }
 
     public void testShouldConvertChangesToYaml() throws IOException {
-        String userName = "andybarba";
-        String password = "";
-        String serverName = "192.168.254.21";
-        String serverPort = "49201";
-        String projectName = "NGST Application";
-        String viewName = "NGST Application";
-        String folderName = "java";
-        RSCM starTeam = new StarTeam(userName, password, serverName, serverPort, projectName, viewName, folderName);
-
-        TimeZone UTC = TimeZone.getTimeZone("UTC");
-//        Calendar cal = new GregorianCalendar(UTC, Locale.UK);
-        Calendar cal = new GregorianCalendar();
-        cal.set(2005, Calendar.JANUARY, 4, 02, 0, 0);
-        Date from = cal.getTime();
-
-        cal.set(Calendar.HOUR, 03);
-//        cal.set(Calendar.MINUTE, 26);
-        Date to = cal.getTime();
-        to = null;
-
-        ChangeSets changeSets = starTeam.getChangeSets(from, to);
+        YamlDumpable changeSets = starTeam.getChangeSets("4 Jan 2005 04:02:00 -0000", "4 Jan 2005 04:26:00 -0000");
         final PrintWriter out = new PrintWriter(System.out);
-        changeSets.write(out);
+        changeSets.dumpYaml(out);
         out.flush();
+    }
+
+    public void testShouldCheckout() throws IOException {
+        YamlDumpable files = starTeam.checkout("target/starteam/checkout", null);
+        String expected = "--- \n- eenie/meenie/minee/mo\n- catch/a/redneck/by\n- the/toe\n";
+        StringWriter yaml = new StringWriter();
+        files.dumpYaml(yaml);
+        assertEquals(expected, yaml.toString());
     }
 }

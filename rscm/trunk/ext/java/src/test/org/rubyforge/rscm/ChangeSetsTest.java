@@ -11,10 +11,10 @@ import java.io.StringWriter;
  */
 public class ChangeSetsTest extends TestCase {
     public void testShouldSerializeChangeSetsToYaml() throws IOException {
-        ChangeSets changeSets = new TestScm().getChangeSets(null, null);
+        YamlDumpable changeSets = new TestScm().getChangeSets(null, null);
         StringWriter yaml = new StringWriter();
         PrintWriter out = new PrintWriter(yaml);
-        changeSets.write(out);
+        changeSets.dumpYaml(out);
         out.flush();
         System.out.println(yaml);
     }

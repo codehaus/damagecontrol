@@ -1,6 +1,6 @@
 package org.rubyforge.rscm;
 
-import java.util.Date;
+import java.util.List;
 
 /**
  * Java implementation of part of the RSCM API.
@@ -8,6 +8,12 @@ import java.util.Date;
  * @author Aslak Helles&oslash;y
  */
 public interface RSCM {
-    // TODO: move folderName to starteam's ctor, it's a bit weird here - may not fit with other scms.
-    ChangeSets getChangeSets(Date from, Date to);
+    YamlDumpable getChangeSets(String fromIdentifier, String toIdentifier);
+
+    /**
+     * @param dir where to check out
+     * @param toIdentifier date (java.util.Date) or label (java.lang.String)
+     * @return
+     */
+    YamlDumpable checkout(String dir, String toIdentifier);
 }

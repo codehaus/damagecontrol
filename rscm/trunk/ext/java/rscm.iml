@@ -44,6 +44,8 @@
       </library>
     </orderEntry>
     <orderEntry type="library" name="cglib-full-2.0" level="application" />
+    <orderEntry type="library" name="ant-1.6" level="application" />
+    <orderEntry type="library" name="ant-starteam" level="application" />
     <orderEntryProperties />
   </component>
 </module>

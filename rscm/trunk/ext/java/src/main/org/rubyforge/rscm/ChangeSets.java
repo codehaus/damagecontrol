@@ -9,14 +9,14 @@ import java.util.List;
 /**
  * @author Aslak Helles&oslash;y
  */
-public class ChangeSets {
+public class ChangeSets implements YamlDumpable {
     private List changeSets = new ArrayList();
 
     public void add(ChangeSet changeSet) {
         changeSets.add(changeSet);
     }
 
-    public void write(Writer out) throws IOException {
+    public void dumpYaml(Writer out) throws IOException {
         out.write("--- !ruby/object:RSCM::ChangeSets \n");
         out.write("changesets: \n");
         for (Iterator iterator = changeSets.iterator(); iterator.hasNext();) {

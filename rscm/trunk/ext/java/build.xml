@@ -4,6 +4,7 @@
 
     <target name="compile">
         <fail unless="ENV.RSCM_STARTEAM">The RSCM_STARTEAM environment variable must be defined and point to the StarTeam SDK directory</fail>
+        <fail unless="ENV.ANT_HOME">The ANT_HOME environment variable must be defined and point to the Ant installation directory</fail>
 
         <mkdir dir="target/classes"/>
         <javac destdir="target/classes" debug="on" includeantruntime="true">
@@ -25,10 +26,14 @@
 
     <target name="test" depends="compile">
         <mkdir dir="target/testlogs"/>
-        <junit fork="yes" forkmode="once" printsummary="yes" failureproperty="tests.failed">
+        <junit fork="yes" forkmode="once" printsummary="yes" failureproperty="tests.failed" includeantruntime="true">
             <classpath>
                 <pathelement location="target/classes"/>
-                <fileset dir="${starteam.home}/Lib"/>
+                <fileset dir="${ENV.RSCM_STARTEAM}/Lib"/>
+                <fileset dir="${ENV.ANT_HOME}/lib">
+                    <include name="ant-starteam.jar"/>
+                </fileset>
+ 
             </classpath>
             <jvmarg value="-Djava.library.path=${ENV.RSCM_STARTEAM}/Lib"/>
 

@@ -23,7 +23,15 @@ public class TestScm implements RSCM {
         this.bar = bar;
     }
 
-    public ChangeSets getChangeSets(Date from, Date to) {
+    public YamlDumpable checkout(String dir, String toIdentifier) {
+        final YamlList yamlList = new YamlList();
+        yamlList.add("eenie/meenie/minee/mo");
+        yamlList.add("catch/a/redneck/by");
+        yamlList.add("the/toe");
+        return yamlList;
+    }
+
+    public YamlDumpable getChangeSets(String fromIdentifier, String toIdentifier) {
         ChangeSets changeSets = new ChangeSets();
 
         changeSets.add(new Change("rinkrank",
@@ -51,4 +59,5 @@ public class TestScm implements RSCM {
         cal.set(year, month, day, hour, min, sec);
         return cal.getTime();
     }
+
 }
