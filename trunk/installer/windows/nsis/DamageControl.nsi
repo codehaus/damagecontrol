@@ -110,6 +110,9 @@ Section "Working Directory" SecWork
   SetOutPath $PROFILE\.damagecontrol
   File ${ROOTDIR}\bin\damagecontrol.cmd
   File ${ROOTDIR}\bin\server.rb
+  
+  ;Include a default log configuration
+  File "${ROOTDIR}\installer\windows\nsis\log4r.xml"
 
 SectionEnd
 
@@ -127,6 +130,8 @@ Section "DamageControl Server" SecServer
   ;Include extra Windows cygwin binaries
   SetOutPath $INSTDIR\bin
   File /r "${ROOTDIR}\installer\windows\bin\*"
+  
+  ;Include 
     
   ;Store installation folder
   WriteRegStr HKCU "Software\Modern UI Test" "" $INSTDIR
@@ -190,6 +195,8 @@ Section "DCTray.NET" SecDCTray
   
   !insertmacro MUI_STARTMENU_WRITE_BEGIN Application
   
+    SetShellVarContext all ; (Add to "All Users" Start Menu if possible)
+    
     CreateDirectory "$SMPROGRAMS\$STARTMENU_FOLDER"
     CreateShortCut "$SMPROGRAMS\$STARTMENU_FOLDER\DCTray.NET Systray Monitor.lnk" "$INSTDIR\DCTray.NET\DCWindowsTray.exe"
     
@@ -239,6 +246,7 @@ FunctionEnd
 Var STARTMENU_FOLDER_TEMP
 
 Section "Uninstall"
+  SetShellVarContext all ; (Also delete from "All Users" Start Menu if possible)
 
   Delete "$INSTDIR\Uninstall.exe"
 
