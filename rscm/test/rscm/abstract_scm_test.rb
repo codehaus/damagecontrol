@@ -14,7 +14,7 @@ module RSCM
         Subversion
       ]
       assert_equal(
-        expected_scms_classes.collect{|c| c.name}.sort,
+        expected_scms_classes.collect{|c| c.name},
         AbstractSCM.classes.collect{|c| c.name}.sort)
     end
   end

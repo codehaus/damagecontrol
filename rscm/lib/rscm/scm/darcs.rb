@@ -1,13 +1,15 @@
-require 'rscm/abstract_scm'
 require 'tempfile'
-require 'rscm/path_converter'
 require 'fileutils'
+require 'rscm'
 
 module RSCM
   class Darcs < AbstractSCM
     register self
 
-    def initialize(dir=nil)
+    ann :description => "Directory"
+    attr_accessor :dir
+
+    def initialize(dir=".")
       @dir = File.expand_path(dir)
     end
 
