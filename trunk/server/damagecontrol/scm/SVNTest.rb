@@ -36,6 +36,7 @@ module DamageControl
       )
       change_file("#{checkout_dir}/build.xml")
       scm.commit(checkout_dir, "changed something") { |line| logger.debug(line) }
+      scm.checkout(checkout_dir, nil) { |line| logger.debug(line) }
       assert_equal(
         "2",
         scm.label(checkout_dir) { |line| logger.debug(line) }

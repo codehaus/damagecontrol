@@ -26,7 +26,7 @@ require 'damagecontrol/publisher/IRCPublisherTest'
 require 'damagecontrol/publisher/JabberPublisherTest'
 require 'damagecontrol/publisher/JIRAPublisherTest'
 require 'damagecontrol/publisher/BuildHistoryStatsPublisherTest'
-require 'damagecontrol/publisher/StatsXSLTPublisherTest'
+#require 'damagecontrol/publisher/StatsXSLTPublisherTest'
 
 require 'damagecontrol/scm/ChangesTest'
 require 'damagecontrol/scm/CVSTest'

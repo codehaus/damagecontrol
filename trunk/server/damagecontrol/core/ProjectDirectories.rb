@@ -6,9 +6,6 @@ module DamageControl
   # use ProjectConfigRepository instead (and delegate methods from there to here)
   # cheers --jon
   class ProjectDirectories
-    CONFIG_FILE_NAME = "conf.yaml"
-    HISTORY_FILE_NAME = "build_history.yaml"
-      
     attr_reader :basedir
   
     def initialize(basedir)
@@ -41,13 +38,9 @@ module DamageControl
     end
 
     def project_config_file(project_name)
-      "#{project_dir(project_name)}/#{CONFIG_FILE_NAME}"
+      "#{project_dir(project_name)}/conf.yaml"
     end    
 
-    def build_history_file(project_name)
-      "#{project_dir(project_name)}/#{HISTORY_FILE_NAME}"
-    end    
-    
     def log_file(project_name, dc_creation_time)
       "#{log_dir(project_name)}/#{dc_creation_time}.log"
     end

@@ -29,12 +29,11 @@ module DamageControl
       assert_response_ok(response)
     end
 
-    def Xtest_creates_new_project_when_complete_project_data_is_posted
+    def test_creates_new_project_when_complete_project_data_is_posted
       response, data = store_configuration("Chicago")
       assert_response_ok(response)
       assert(@server.project_config_repository.project_exists?("Chicago"))
-      assert_equal({"project_name" => "Chicago"},
-        @server.project_config_repository.project_config("Chicago"))
+      assert_equal("Chicago",@server.project_config_repository.project_config("Chicago")["project_name"])
     end
     
     def test_asks_for_project_name_when_project_name_not_specified

@@ -58,8 +58,6 @@ module DamageControl
     # Build duration in seconds. Should be set when the build is complete
     attr_accessor :duration 
 
-    attr_accessor :potential_label
-    
     def dc_end_time
       dc_start_time + duration if duration
     end

@@ -67,6 +67,7 @@ module DamageControl
       mock_hub.__expect(:put) {|message| 
         assert(message.is_a?(BuildStateChangedEvent))
         assert_equal(Build::BUILDING, message.build.status)
+        assert_equal(45, message.build.label)
       }
       mock_hub.__expect(:put) {|message| assert(message.is_a?(BuildProgressEvent))}
       mock_hub.__expect(:put) {|message| assert(message.is_a?(BuildErrorEvent), "message was #{message}")}
@@ -82,10 +83,14 @@ module DamageControl
       mock_build_history = new_mock
       mock_build_history.__expect(:last_successful_build) {nil}
 
+      project_config_repository = new_mock
+      project_config_repository.__setup(:checkout_dir) { |project_name| assert_equal("damagecontrolled", project_name); "some_dir" }
+      project_config_repository.__expect(:inc_build_label) {45}
+
       @build_executor = BuildExecutor.new(
         'executor1', 
         mock_hub, 
-        new_mock.__setup(:checkout_dir) { |project_name| assert_equal("damagecontrolled", project_name); "some_dir" },
+        project_config_repository,
         mock_build_history
       )
       @build_executor.start
@@ -103,7 +108,7 @@ module DamageControl
       mock_scm = new_mock
       mock_scm.__expect(:changesets) {cs = ChangeSets.new; cs.add(Change.new(nil,nil,nil,nil,Time.new.utc)); cs}
       mock_scm.__expect(:checkout) {}
-      mock_scm.__expect(:label) {}
+      mock_scm.__expect(:label) { nil }
 
       mock_hub = new_mock
       mock_hub.__expect(:put) {|message| 
@@ -124,6 +129,7 @@ module DamageControl
       mock_hub.__expect(:put) {|message| 
         assert(message.is_a?(BuildStateChangedEvent))
         assert_equal(Build::BUILDING, message.build.status)
+        assert_equal(23, message.build.label)
       }
       mock_hub.__expect(:put) {|message| 
         assert(message.is_a?(BuildProgressEvent))
@@ -151,7 +157,7 @@ module DamageControl
       @build_executor = BuildExecutor.new(
         'executor1', 
         mock_hub, 
-        new_mock.__setup(:checkout_dir) {"some_dir"},
+        new_mock.__setup(:checkout_dir) {"some_dir"}.__expect(:inc_build_label) {23},
         mock_build_history
       )
       @build_executor.on_message(@build)
@@ -161,6 +167,7 @@ module DamageControl
       mock_scm = new_mock
       mock_scm.__expect(:changesets) {ChangeSets.new}
       mock_scm.__expect(:checkout) {}
+      mock_scm.__expect(:label) {23}
 
       mock_build_history = new_mock
       mock_build_history.__expect(:last_successful_build) { |project_name|
@@ -182,14 +189,8 @@ module DamageControl
       @build = Build.new("damagecontrolled", { "build_command_line" => "bad_command"})
       @build.scm = mock_scm
       @build_executor.on_message(@build)
-      # what happens for bad_command is different on windows and linux
-      # windows? returns false on cygwin, so this doesn't work
-#      if(windows?)
-#        assert(messages_from_hub[-2].is_a?(BuildStartedEvent))
-#      else
-#        assert(messages_from_hub[-2].is_a?(BuildProgressEvent))
-#      end
       assert_equal(Build::FAILED, @build.status)
+      assert_equal(23, @build.label)
     end
     
     def test_checks_out_and_determines_changeset_before_building      
@@ -213,7 +214,7 @@ module DamageControl
         cs = ChangeSets.new; cs.add(Change.new(nil,nil,nil,nil,Time.new.utc)); cs
       }
       mock_scm.__expect(:checkout) {}
-      mock_scm.__expect(:label) {}
+      mock_scm.__expect(:label) { 39 }
 
       mock_hub = new_mock
       mock_hub.__expect(:put) {|message| 
@@ -234,6 +235,7 @@ module DamageControl
       mock_hub.__expect(:put) {|message| 
         assert(message.is_a?(BuildStateChangedEvent))
         assert_equal(Build::BUILDING, message.build.status)
+        assert_equal(39, message.build.label)
       }
       mock_hub.__expect(:put) {|message| assert(message.is_a?(BuildProgressEvent), message)}
       mock_hub.__expect(:put) {|message| assert(message.is_a?(BuildProgressEvent), message)}

@@ -91,16 +91,8 @@ module DamageControl
       svn(checkout_dir, commit_command(message), &line_proc)
     end
 
-    def label(checkout_dir, &line_proc)
-      revision = nil
-      svn(checkout_dir, "status --show-updates") do |io|
-        io.each_line { |line|
-          if(line =~ /([0-9])/)
-            revision = $1
-          end
-        }
-      end
-      revision
+    def label(checkout_dir)
+      local_revision(checkout_dir).to_s
     end
 
     def can_create?

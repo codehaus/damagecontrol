@@ -124,7 +124,7 @@ module DamageControl
     
     def build_description(build)
       label = "##{build.label}"; 
-      label = build.status if label == "#"
+#      label = build.status if label == "#"
       "#{build.dc_creation_time.to_human} (#{label})"
     end
 

@@ -34,7 +34,7 @@ module DamageControl
       assert(@pcr.project_exists?("newproject"))
       assert_equal(
         {
-					"tracking" => create_default_tracker,
+          "tracking" => create_default_tracker,
           "project_name" => "newproject",
           "scm" => create_default_scm,
         },
@@ -55,10 +55,10 @@ module DamageControl
     def create_default_scm
       NoSCM.new
     end
-		
-		def create_default_tracker
-			NoTracker.new
-		end
+    
+    def create_default_tracker
+      NoTracker.new
+    end
 
     def test_creates_build_with_proper_attributes_from_project_config
       @pcr.new_project("newproject")
@@ -73,13 +73,13 @@ module DamageControl
       assert_match(/http:\/\/localhost\/public\/project\/newproject\?dc_creation_time=2\d\d\d\d\d\d\d\d\d\d\d\d\d/, build.url)
     end
     
-    def test_next_build_number
+    def test_inc_build_label
       @pcr.new_project("newproject")
-      assert_equal(1, @pcr.next_build_number("newproject"))
-      assert_equal(2, @pcr.peek_next_build_number("newproject"))
-      assert_equal(2, @pcr.next_build_number("newproject"))
-      assert_equal(3, @pcr.next_build_number("newproject"))
-      assert_equal(4, @pcr.next_build_number("newproject"))
+      assert_equal(1, @pcr.inc_build_label("newproject"))
+      assert_equal(2, @pcr.peek_next_build_label("newproject"))
+      assert_equal(2, @pcr.inc_build_label("newproject"))
+      assert_equal(3, @pcr.inc_build_label("newproject"))
+      assert_equal(4, @pcr.inc_build_label("newproject"))
     end
   end
   

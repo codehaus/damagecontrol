@@ -205,6 +205,7 @@ module DamageControl
       httpd.mount("/public/root", indexing_file_handler)
       httpd.mount("/public/rss", RssServlet.new(build_history_repository, public_web_url + "project/"))
       
+# TODO: simplify this!!!!!!
       httpd.mount("/public/images", WEBrick::HTTPServlet::FileHandler, "#{webdir}/images")
       httpd.mount("/public/project/images", WEBrick::HTTPServlet::FileHandler, "#{webdir}/images")
       httpd.mount("/public/search/images", WEBrick::HTTPServlet::FileHandler, "#{webdir}/images")
@@ -220,8 +221,8 @@ module DamageControl
       httpd.mount("/public/css", WEBrick::HTTPServlet::FileHandler, "#{webdir}/css")
       httpd.mount("/public/project/css", WEBrick::HTTPServlet::FileHandler, "#{webdir}/css")
       httpd.mount("/public/search/css", WEBrick::HTTPServlet::FileHandler, "#{webdir}/css")
-			
-			httpd.mount("/favicon.ico", WEBrick::HTTPServlet::FileHandler, "#{webdir}/icons/ico/damagecontrol-icon-square.ico")
+      
+      httpd.mount("/favicon.ico", WEBrick::HTTPServlet::FileHandler, "#{webdir}/icons/ico/damagecontrol-icon-square.ico")
     end
     
     def indexing_file_handler
@@ -254,6 +255,7 @@ module DamageControl
       httpd.mount("/private/log", LogFileServlet.new(:private, build_scheduler, build_history_repository, project_config_repository))
       httpd.mount("/private/root", indexing_file_handler)
       
+# TODO: simplify this!!!!!!
       httpd.mount("/private/images", WEBrick::HTTPServlet::FileHandler, "#{webdir}/images")
       httpd.mount("/private/project/images", WEBrick::HTTPServlet::FileHandler, "#{webdir}/images")
       httpd.mount("/private/configure/images", WEBrick::HTTPServlet::FileHandler, "#{webdir}/images")
@@ -326,7 +328,7 @@ module DamageControl
     
     def init_build_executors
       # Only use one build executor (don't allow parallel builds)
-      build_scheduler.add_executor(BuildExecutor.new('executor1', hub, project_directories, build_history_repository))
+      build_scheduler.add_executor(BuildExecutor.new('executor1', hub, project_config_repository, build_history_repository))
     end
     
     def polling_interval

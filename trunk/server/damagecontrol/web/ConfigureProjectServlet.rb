@@ -32,7 +32,7 @@ module DamageControl
     end
     
     def configure
-      configure_page(project_name, project_config, project_config_repository.peek_next_build_number(project_name))
+      configure_page(project_name, project_config, project_config_repository.peek_next_build_label(project_name))
     end
         
     def store_configuration
@@ -58,9 +58,13 @@ module DamageControl
       tracking_configurators(project_config).find{|c| c.tracking_id == request.query['tracking_id'] }.store_configuration_from_request(request)
 
       @project_config_repository.modify_project_config(project_name, project_config)
-      @project_config_repository.set_next_build_number(project_name, request.query["next_build_number"].chomp.to_i) if request.query["next_build_number"]
+      @project_config_repository.set_next_build_label(project_name, request.query["next_build_label"].chomp.to_i) if request.query["next_build_label"]
       
       action_redirect(:configure, { "project_name" => project_name })
+    end
+    
+    def next_build_label
+      @project_config_repository.project_config(project_name)["next_build_label"]
     end
     
   private
@@ -126,7 +130,7 @@ module DamageControl
     end
     
     def to_boolean(param)
-      if param then true else false end
+      param ? true : false
     end
     
     def scm_configurators(project_config = self.project_config)

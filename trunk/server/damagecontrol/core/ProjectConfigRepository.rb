@@ -28,7 +28,7 @@ module DamageControl
 
   class ProjectConfigRepository < ProjectDirectories
     include FileUtils
-		include Logging
+    include Logging
     
     def initialize(project_directories, public_web_url)
       @project_directories = project_directories
@@ -93,7 +93,7 @@ module DamageControl
       ymdHMS = build.dc_creation_time.ymdHMS
       build.url = "#{ensure_trailing_slash(@public_web_url)}project/#{build.project_name}?dc_creation_time=#{ymdHMS}"
       build.scm = create_scm(project_name)
-      build.potential_label = peek_next_build_number(project_name).to_s
+      build.label = peek_next_build_label(project_name).to_s
       build.archive_dir = @project_directories.archive_dir(project_name, ymdHMS)
       build
     end
@@ -103,31 +103,32 @@ module DamageControl
       config_map["scm"]
     end
     
-    def next_build_number_file
-      @project_directories.next_build_number_file(project_name)
-    end
-    
-    def next_build_number(project_name)
-      number = peek_next_build_number(project_name)
-			logger.info("increasing the build number for project: #{project_name} to #{number}")
-      set_next_build_number(project_name, number + 1)
+    def inc_build_label(project_name)
+      number = peek_next_build_label(project_name)
+      logger.info("increasing the build number for project: #{project_name} to #{number}")
+      set_next_build_label(project_name, number + 1)
       number
     end
     
-    def peek_next_build_number(project_name)
+    def peek_next_build_label(project_name)
       return 1 if !project_exists?(project_name)
       config_map = project_config(project_name)
-      config_map["next_build_number"] ? config_map["next_build_number"] : 1
+      next_build_label = config_map["next_build_label"] || config_map["next_build_number"] # bwc with old format
+      next_build_label ? next_build_label : 1
     end
     
-    def set_next_build_number(project_name, number)
+    def set_next_build_label(project_name, number)
       config_map = project_config(project_name)
-      config_map["next_build_number"] = number
+      config_map["next_build_label"] = number
       modify_project_config(project_name, config_map)
     end
 
   private
       
+    def next_build_label_file
+      @project_directories.next_build_label_file(project_name)
+    end
+    
     def upgrade_removed_key(removed_key, config_map)
       config_map.delete(removed_key)
     end

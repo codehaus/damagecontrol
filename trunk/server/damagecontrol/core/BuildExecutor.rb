@@ -22,10 +22,10 @@ module DamageControl
     
     attr_accessor :last_build_request
 
-    def initialize(name, channel, project_directories, build_history_repository)
+    def initialize(name, channel, project_config_repository, build_history_repository)
       super
       @channel = channel
-      @project_directories = project_directories
+      @project_config_repository = project_config_repository
       @build_history_repository = build_history_repository
       @name = name
     end
@@ -47,10 +47,18 @@ module DamageControl
       current_scm.checkout(checkout_dir, nil) do |progress|
         report_progress(progress)
       end
+
+      # set the label
+      scm_label = current_scm.label(checkout_dir)
+      if(scm_label)
+        current_build.label = scm_label
+      else
+        current_build.label = @project_config_repository.inc_build_label(current_build.project_name)
+      end
     end
     
     def checkout_dir
-      @project_directories.checkout_dir(current_build.project_name)
+      @project_config_repository.checkout_dir(current_build.project_name)
     end
     
     def with_working_directory(dir)
@@ -69,7 +77,7 @@ module DamageControl
       @channel.put(BuildStateChangedEvent.new(current_build))
 
       # set up some environment variables the build can use
-      environment = { "DAMAGECONTROL_BUILD_LABEL" => current_build.potential_label.to_s }
+      environment = { "DAMAGECONTROL_BUILD_LABEL" => current_build.label.to_s }
       unless current_build.changesets.nil?
         environment["DAMAGECONTROL_CHANGES"] = 
           current_build.changesets.format(CHANGESET_TEXT_FORMAT, Time.new.utc)
@@ -97,17 +105,6 @@ module DamageControl
         end
         @channel.put(BuildStateChangedEvent.new(current_build))
       end
-
-      # set the label
-      if(current_build.successful?)
-        current_scm_label = current_scm.label(checkout_dir)
-        if(current_scm_label)
-          current_build.label = current_scm_label
-        else
-          current_build.label = current_build.potential_label
-        end
-      end
-
     end
     
     def build_process
