@@ -1,4 +1,3 @@
-require 'rubygems'
 require 'action_mailer'
 require 'damagecontrol/publisher/base'
 
@@ -16,14 +15,10 @@ module DamageControl
       ann :description => "Who sends the email"
       attr_accessor :from
       
-      ann :description => "Active", :type => TrueClass # ? syntax doesn't work for attrs :-(
-      attr_accessor :active
-      
       def initialize
         @delivery_method = "sendmail"
         @recipients = ""
         @from = "\"DamageControl\" <dcontrol@codehaus.org>"
-        @active = false
       end
       
       def name

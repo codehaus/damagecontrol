@@ -3,6 +3,7 @@ require 'damagecontrol/project'
 require 'damagecontrol/directories'
 require 'damagecontrol/diff_parser'
 require 'damagecontrol/diff_htmlizer'
+require 'damagecontrol/publisher/base'
 
 class ProjectController < ApplicationController
 

@@ -15,6 +15,8 @@ require 'damagecontrol/publisher/base'
 module DamageControl
   # Represents a project with associated SCM, Tracker and SCMWeb
   class Project
+    # TODO: move to scms? not sure....
+    DEFAULT_QUIET_PERIOD = 10 unless defined? DEFAULT_QUIET_PERIOD
 
     attr_accessor :name
     attr_accessor :description
@@ -71,13 +73,19 @@ module DamageControl
       @scm_web = SCMWeb::Null.new
       # Default start time is 2 weeks ago
       @start_time = Time.now.utc - (3600*24*14)
+      @quiet_period = DEFAULT_QUIET_PERIOD
     end
     
     # Tells all publishers to publish a build
     def publish(build)
       @publishers.each do |publisher| 
         begin
-          publisher.publish(build) 
+          if(publisher.enabled)
+            Log.info("Publishing #{publisher.name} for #{@name}")
+            publisher.publish(build) 
+          else
+            Log.info("Skipping disabled publisher #{publisher.name} for #{@name}")
+          end
         rescue => e
           Log.error "Error running publisher #{publisher.name} for project #{name}"
           Log.error  e.message
@@ -126,10 +134,11 @@ module DamageControl
         # When the changesets are not changing, we can consider the last commit done
         # and the quiet period elapsed. This is not 100% failsafe, but will work
         # under most circumstances. In the worst case, we'll miss some files in
-        # the changesets, but they will be part of the next changeset (on next poll).
+        # the changesets for really slow commits, but they will be part of the next 
+        # changeset (on next poll).
         commit_in_progress = true
         while(commit_in_progress)
-          @quiet_period ||= 5
+          @quiet_period ||= DEFAULT_QUIET_PERIOD
           Log.info "Sleeping for #{@quiet_period} seconds since #{name}'s SCM (#{@scm.name}) is not transactional."
           sleep @quiet_period
           next_changesets = @scm.changesets(checkout_dir, from)

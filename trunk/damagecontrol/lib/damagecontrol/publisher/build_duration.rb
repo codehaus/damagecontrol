@@ -1,12 +1,10 @@
-require 'rscm/annotations'
-require 'damagecontrol/project'
-require 'rscm/annotations'
+require 'damagecontrol/publisher/base'
 
 module DamageControl
   module Publisher
     class BuildDuration < Base
       register self
-    
+
       def name
         "Build Duration"
       end    

@@ -1,14 +1,9 @@
-require 'rscm/annotations'
-require 'damagecontrol/project'
-require 'rscm/annotations'
+require 'damagecontrol/publisher/base'
 
 module DamageControl
   module Publisher
     class AmbientOrb < Base
       register self
-    
-      def initialize
-      end
 
       def name
         "Ambient Orb"

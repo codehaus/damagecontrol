@@ -7,7 +7,12 @@
 
 <ul id="foldertab">
   <% tab_pane.each do |o| %>
-  <li><a href="javascript:showElement('<%= o.class.name %>', <%= tab_pane.name %>)"><img src="/images/publisher/<%= underscore(demodulize(o.class.name)) %>.png"> <%= o.name %></a></li>
+  <li>
+   	<a alt="<%= o.name %>" href="javascript:showElement('<%= o.class.name %>', <%= tab_pane.name %>)">
+   	  <img src="/images/publisher/<%= underscore(demodulize(o.class.name)) %>.png">
+  	  </a>
+  	  <%= text_or_checkbox(:name => "#{tab_pane.name}[#{o.class.name}][@enabled]", :value => o.enabled, :editable => true) %>
+  </li>
   <% end %>
 </ul>
 

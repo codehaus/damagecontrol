@@ -22,6 +22,12 @@ module DamageControl
   #               artifacts/
   #
   class Build
+
+    # TODO: we want to store the following additional info for a build (time related)
+    #  * Total Duration
+    #  * Duration of checkpoints (compile, test, javadocs...) - should be configurable in project.
+    #  * 
+
     attr_reader :time
   
     # Creates a new Build for a +project+'s +changeset+, created at +time+.
@@ -67,7 +73,8 @@ module DamageControl
             end
             
             # there is nothing to read, since we're redirecting to file,
-            # but we still need to read in order to block till process id done.
+            # but we still need to read in order to block until the process is done.
+            # TODO: don't redirect stdout - we want to intercept checkpoints
             io.read
           end
         end
@@ -111,6 +118,11 @@ module DamageControl
 
     def stderr
       Directories.stderr(@project_name, @changeset_identifier, @time)
+    end
+    
+    # The directory of the build
+    def dir
+      Directories.build_dir(@project_name, @changeset_identifier, @time)
     end
 
   private

@@ -25,9 +25,12 @@ class Class
   def ann(anns)
     $attr_anns ||= {}
     $attr_anns.merge!(anns)
-    def self.method_missing(sym, *args) #:nodoc:
-      @@anns[self][sym] || {}
-    end
+  end
+
+  def method_missing(sym, *args) #:nodoc:
+    anns = @@anns[self]
+    return superclass.method_missing(sym, *args) if(anns.nil?)
+    anns[sym]
   end
 
   alias old_attr_reader attr_reader #:nodoc:

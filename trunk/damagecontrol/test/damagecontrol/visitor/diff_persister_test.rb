@@ -34,13 +34,13 @@ module DamageControl
         diff2 = "This\ris\na\r\ndiff for 2"
         diff3 = "This\ris\na\r\ndiff for 3"
 
-        scm = MockSCM.new("#{basedir}/mooky/checkout", [diff1, diff2, diff3])
+        scm = MockSCM.new("#{basedir}/projects/mooky/checkout", [diff1, diff2, diff3])
         dp = DiffPersister.new(scm, "mooky")
 
         changesets.accept(dp)
-        assert_equal(diff1, File.open("#{basedir}/mooky/changesets/20040705120004/diffs/path/one.diff").read)
-        assert_equal(diff2, File.open("#{basedir}/mooky/changesets/20040705120004/diffs/path/two.diff").read)
-        assert_equal(diff3, File.open("#{basedir}/mooky/changesets/20040705120006/diffs/path/three.diff").read)
+        assert_equal(diff1, File.open("#{basedir}/projects/mooky/changesets/20040705120004/diffs/path/one.diff").read)
+        assert_equal(diff2, File.open("#{basedir}/projects/mooky/changesets/20040705120004/diffs/path/two.diff").read)
+        assert_equal(diff3, File.open("#{basedir}/projects/mooky/changesets/20040705120006/diffs/path/three.diff").read)
 
       end
 
