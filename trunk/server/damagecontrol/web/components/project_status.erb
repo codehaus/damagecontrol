@@ -8,7 +8,7 @@ projects.each do |project|
   label = ""
   label = " (##{last_successful_build.label})" if(last_successful_build)
 %>
-  <img src="<%= image %>" />&nbsp;<a href="<%= href %>"><%= project %><%= label %></a><br/>
+  <img width="32" height="32" src="<%= image %>" />&nbsp;<a href="<%= href %>"><%= project %><%= label %></a><br/>
 <%
 end
 %>
