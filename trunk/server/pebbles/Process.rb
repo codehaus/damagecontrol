@@ -1,4 +1,6 @@
 module Pebbles
+  
+
   class ProcessFailedException < StandardError
   end
   
@@ -31,10 +33,11 @@ module Pebbles
       def stdin
         parent_write
       end
-    
+      
       def start
         @pid = fork do
           # in subprocess
+          cleanup
           Dir.chdir(working_dir) if working_dir
           environment.each {|key, val| ENV[key] = val}
           # both processes now have these open
@@ -102,6 +105,12 @@ module Pebbles
   
       private
       
+        def cleanup
+          if(defined?(BasicSocket))
+            ObjectSpace.each_object(::BasicSocket) {|s| s.close unless s.closed? }
+          end
+        end
+    
         def join_stdout_and_stderr?
           @join_stdout_and_stderr
         end
