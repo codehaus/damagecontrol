@@ -1,13 +1,30 @@
-require 'rubygems'
 require 'drb'
+require 'rubygems'
 require 'needle'
 require_gem 'rscm'
 require 'damagecontrol/poller'
+require 'damagecontrol/standard_persister'
 
-
+# Wire up the whole app with Needle's nice block based DI framework.
+# I wonder - is BDI? (Block Dependency Injection)
 REGISTRY = Needle::Registry.define do |b|
-  b.poller     { DamageControl::Poller.new }
-  b.drb_server { DamageControl::DrbServer.new('druby://localhost:9000') }
+  b.persister do
+    DamageControl::StandardPersister.new
+  end 
+
+  b.poller do 
+    # Use a poller that persists the basic stuff
+    DamageControl::Poller.new do |project, changesets|
+      b.persister.save_changesets(project, changesets)
+      b.persister.save_diffs(project)
+      b.persister.save_rss(project)
+      # TODO: stick project+changesets pairs on the channel
+    end
+  end
+
+  b.drb_server do 
+    DamageControl::DrbServer.new('druby://localhost:9000')
+  end
 end
   
 module DamageControl

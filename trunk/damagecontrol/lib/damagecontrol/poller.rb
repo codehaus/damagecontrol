@@ -1,4 +1,3 @@
-require 'rss/maker'
 require 'rscm/logging'
 require 'rscm/time_ext'
 require 'damagecontrol/project'
@@ -8,9 +7,13 @@ module DamageControl
   class Poller
     attr_reader :projects
 
-    def initialize(sleeptime=60)
+    # Creates a new poller. Takes a block that will
+    # receive |project, changesets| each time new
+    # +changesets+ are found in a polled +project+
+    def initialize(sleeptime=60, &proc)
       @projects = []
       @sleeptime = sleeptime
+      @proc = proc
     end
 
     # Adds a project to poll. If the project is already added it is replaced
@@ -21,52 +24,17 @@ module DamageControl
     end
     
     # Polls all registered projects and persists RSS, changesets and diffs to disk.
+    # If a block is passed, the project and the changesets will be yielded to the block
+    # for each new changesets object.
     def poll
       @projects.each do |project|
         begin
           if(project.scm_exists?)
             project.poll do |changesets|
-              start = Time.now
-        
               if(changesets.empty?)
                 Log.info "No changesets for #{project.name}"
               else
-              
-                # Save the changesets to disk as YAML
-                Log.info "Saving changesets for #{project.name}"
-                changesets.accept(project.changesets_persister)
-                Log.info "Saved changesets for #{project.name} in #{Time.now.difference_as_text(start)}"
-                start = Time.now
-        
-                # Get the diff for each change and save them.
-                # They may be turned into HTML on the fly later (quick)
-                Log.info "Getting diffs for #{project.name}"
-                dp = DamageControl::Visitor::DiffPersister.new(project.scm, project.name)
-                changesets.accept(dp)
-                Log.info "Saved diffs for #{project.name} in #{Time.now.difference_as_text(start)}"
-                start = Time.now
-        
-                # Now we need to update the RSS. The RSS spec says max 15 items in a channel,
-                # (http://www.chadfowler.com/ruby/rss/)
-                # We'll get upto the latest 15 changesets and turn them into RSS.
-                Log.info "Generating RSS for #{project.name}"
-                last_15_changesets = project.changesets_persister.load_upto(project.changesets_persister.latest_id, 15)
-                RSS::Maker.make("2.0") do |rss|
-                  FileUtils.mkdir_p(File.dirname(project.changesets_rss_file))
-                  File.open(project.changesets_rss_file, "w") do |io|
-                    rss_writer = DamageControl::Visitor::RssWriter.new(
-                      rss,
-                      "Changesets for #{@name}",
-                      "http://localhost:4712/", # TODO point to web version of changeset
-                      project.description, 
-                      project.tracker || Tracker::Null.new, 
-                      project.scm_web || SCMWeb::Null.new        
-                    )
-                    last_15_changesets.accept(rss_writer)
-                    io.write(rss.to_rss)
-                  end
-                end
-                Log.info "Done generating RSS for #{project.name} in #{Time.now.difference_as_text(start)}"
+                @proc.call(project, changesets)
               end
             end
           end
@@ -99,6 +67,6 @@ module DamageControl
       Project.find_all.each do |project|
         add_project(project)
       end
-    end
+    end    
   end
 end

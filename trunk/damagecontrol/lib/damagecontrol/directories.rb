@@ -60,8 +60,8 @@ module DamageControl
     module_function :project_dir
 
     def basedir
-      if(ENV['RSCM_BASE'])
-        ENV['RSCM_BASE']
+      if(ENV['DAMAGECONTROL_HOME'])
+        ENV['DAMAGECONTROL_HOME']
       elsif(WINDOWS)
         RSCM::PathConverter.nativepath_to_filepath("#{ENV['HOMEDRIVE']}#{ENV['HOMEPATH']}/.damagecontrol").gsub(/\\/, "/")
       else

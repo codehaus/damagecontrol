@@ -22,7 +22,7 @@ module DamageControl
 
       def test_should_persist_diff_for_each_change
         basedir = RSCM.new_temp_dir("differ")
-        ENV["RSCM_BASE"] = basedir
+        ENV["DAMAGECONTROL_HOME"] = basedir
 
         setup_changes
         changesets = RSCM::ChangeSets.new

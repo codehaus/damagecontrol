@@ -1,8 +1,6 @@
 require 'fileutils'
 require 'yaml'
-require 'rscm/logging'
-require 'rscm/time_ext'
-require 'rscm/changes'
+require 'rscm'
 require 'damagecontrol/tracker'
 require 'damagecontrol/scm_web'
 require 'damagecontrol/directories'
@@ -29,7 +27,9 @@ module DamageControl
 
     # Loads the project with the given +name+.
     def Project.load(name)
-      File.open(Directories.project_config_file(name)) do |io|
+      config_file = Directories.project_config_file(name)
+      Log.info "Loading project from #{config_file}"
+      File.open(config_file) do |io|
         YAML::load(io)
       end
     end
