@@ -33,14 +33,6 @@ class ScmController < ApplicationController
     end
   end
   
-  def diff
-    changeset_id = @params["changeset"]
-    #@path = @params["path"]
-    project_name = @params["id"]
-    @diff_html = RSCM::Directories.changeset_html_file(project_name, changeset_id)
-    #render_text(File.open("C:/scm/dc_svn/rscm/trunk/target/work/RSCM/changesets/1274/changeset.html").read)
-  end
-
   # Creates the SCM repo
   def create
     load_project

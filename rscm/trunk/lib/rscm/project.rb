@@ -1,10 +1,14 @@
 require 'yaml'
 require 'drb'
+require 'rss/maker'
 require 'fileutils'
 require 'rscm/directories'
 require 'rscm/changes'
 require 'rscm/diff_parser'
 require 'rscm/diff_htmlizer'
+require 'rscm/visitor/yaml_persister'
+require 'rscm/visitor/diff_persister'
+require 'rscm/visitor/rss_writer'
 
 class String
   # Turns a String into a new int or time, representing the next changeset id
@@ -92,42 +96,38 @@ puts "Getting changesets for #{name} from #{from}"
       if(changesets.empty?)
 puts "No changesets for #{name} from #{from}"
       else
-        changesets.save(changesets_dir)
+      
+        # Save the changesets to disk as YAML
+puts "Saving changesets for #{@name}"
+        changesets.accept(changesets_persister)
 
-# !!!! TODO: pass in an array of changeset visitors, like [cs_saver, cs_diff_writer, cs_rss_writer]
-# While at it introduce logger.rb and replace puts statements across the codebase.
-
-        # Get the diffs and make HTML diffs
-        # TODO: maybe only save diff to disk and generate
-        # HTML on the fly later
-#        dp = DiffParser.new
-#        changesets.each do |changeset|
-#          changeset_html_file = changeset_html_file(changeset.id)
-#puts "Writing HTML diff to #{changeset_html_file}"
-#          File.open(changeset_html_file, "w") do |html|
-#            diff_htmlizer = DiffHtmlizer.new(html)
-#            changeset.diff(checkout_dir, @scm) do |diff_io|
-#              dp.parse_diffs(diff_io).accept(diff_htmlizer)
-#            end
-#          end
-#        end
+        # Get the diff for each change and save them.
+        # They may be turned into HTML on the fly later (quick)
+puts "Getting diffs for #{@name}"
+        dp = RSCM::Visitor::DiffPersister.new(@scm, @name)
+        changesets.accept(dp)
 
         # Now we need to update the RSS. The RSS spec says max 15 items in a channel,
-        # So we'll get upto the latest 15 changesets and RSS it..
         # (http://www.chadfowler.com/ruby/rss/)
-        latest_id = latest_changeset_id
-        if(latest_id)
-          last_changesets = ChangeSets.load_upto(changesets_dir, latest_id, 15)
-          title = "Changesets for #{@name}"
-          last_changesets.write_rss(
-            title,
-            changesets_rss_file,
-            "http://localhost:4712/", # TODO point to web version of changeset
-            @description || title, 
-            @tracker || Tracker::Null.new, 
-            @scm_web || SCMWeb::Null.new        
-          )
+        # We'll get upto the latest 15 changesets and turn them into RSS.
+puts "Generating RSS for #{@name}"
+        last_changesets = changesets_persister.load_upto(changesets_persister.latest_id, 15)
+        RSS::Maker.make("2.0") do |rss|
+          FileUtils.mkdir_p(File.dirname(changesets_rss_file))
+          File.open(changesets_rss_file, "w") do |io|
+            rss_writer = RSCM::Visitor::RssWriter.new(
+              rss,
+              "Changesets for #{@name}",
+              "http://localhost:4712/", # TODO point to web version of changeset
+              @description, 
+              @tracker || Tracker::Null.new, 
+              @scm_web || SCMWeb::Null.new        
+            )
+            last_changesets.accept(rss_writer)
+            io.write(rss.to_rss)
+          end
         end
+
       end
     end
 
@@ -137,7 +137,7 @@ puts "No changesets for #{name} from #{from}"
     # +changesets_dir+. If there are none, this method returns nil.
     def next_changeset_identifier(d=changesets_dir)
       # See String extension at top of this file.
-      latest_id = ChangeSets.latest_id(d)
+      latest_id = RSCM::Visitor::YamlPersister.new(d).latest_id
       latest_id ? latest_id.to_s.next_changeset_id : nil
     end
     
@@ -179,15 +179,15 @@ puts "No changesets for #{name} from #{from}"
     end
     
     def changesets(changeset_id, prior)
-      ChangeSets.load_upto(changesets_dir, changeset_id, prior)
+      changesets_persister.load_upto(changeset_id, prior)
     end
 
     def changeset_ids
-      ChangeSets.ids(changesets_dir)
+      changesets_persister.ids
     end
     
     def latest_changeset_id
-      ChangeSets.latest_id(changesets_dir)
+      changesets_persister.latest_id
     end
     
     def delete
@@ -200,6 +200,10 @@ puts "No changesets for #{name} from #{from}"
     end
 
   private
+
+    def changesets_persister
+      @@changesets_persister ||= RSCM::Visitor::YamlPersister.new(changesets_dir)
+    end
 
     def project_config_file
       Directories.project_config_file(name)

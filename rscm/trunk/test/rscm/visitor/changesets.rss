@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<rss version="2.0"
+  xmlns:trackback="http://madskills.com/public/xml/rss/module/trackback/">
+  <channel>
+    <title>Mooky</title>
+    <link>http://damagecontrol.codehaus.org/</link>
+    <description>This feed contains SCM changes for the DamageControl project</description>
+    <item>
+      <title>Fixed CATCH-22</title>
+      <link>http://cvs.damagecontrol.codehaus.org/</link>
+      <description>&lt;b&gt;jon&lt;/b&gt;&lt;br/&gt;
+Fixed &lt;a href=&quot;http://jira.codehaus.org/browse/CATCH-22&quot;&gt;CATCH-22&lt;/a&gt;&lt;p/&gt;
+&lt;a href=&quot;http://cvs.damagecontrol.codehaus.org/path/one?rev=1.1&amp;r=1.1&quot;&gt;path/one&lt;/a&gt;&lt;br/&gt;
+&lt;a href=&quot;http://cvs.damagecontrol.codehaus.org/path/two?rev=1.2&amp;r=1.2&quot;&gt;path/two&lt;/a&gt;&lt;br/&gt;
+</description>
+      <author>jon</author>
+      <pubDate>Mon, 05 Jul 2004 12:00:04 -0000</pubDate>
+    </item>
+    <item>
+      <title>hipp hurra</title>
+      <link>http://cvs.damagecontrol.codehaus.org/</link>
+      <description>&lt;b&gt;jon&lt;/b&gt;&lt;br/&gt;
+hipp hurra&lt;p/&gt;
+&lt;a href=&quot;http://cvs.damagecontrol.codehaus.org/path/three?rev=1.3&amp;r=1.3&quot;&gt;path/three&lt;/a&gt;&lt;br/&gt;
+</description>
+      <author>jon</author>
+      <pubDate>Mon, 05 Jul 2004 12:00:06 -0000</pubDate>
+    </item>
+
+    <generator>RSCM - Ruby Source Control Management</generator>
+
+
+  </channel>
+</rss>

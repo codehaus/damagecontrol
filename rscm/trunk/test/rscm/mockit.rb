@@ -5,6 +5,7 @@ module MockIt
   def setup
     @to_verify = []
   end
+  module_function :setup
     
   def teardown
     super

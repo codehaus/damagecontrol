@@ -1,4 +1,3 @@
-require 'rss/maker'
 require 'xmlrpc/utils'
 require 'rscm/directories'
 require 'rscm/time_ext'
@@ -7,6 +6,8 @@ module RSCM
 
   # TODO: add a hook to get committers from a separate class - to support registered pairs
   # We'll be able to do lots of cool analysis with visitors later -> graphs. mmmmm.
+  # TODO: fix the sorting - write a test for it!
+  
   # A collection of changesets.
   class ChangeSets
     include Enumerable
@@ -17,11 +18,26 @@ module RSCM
     def initialize(changesets=[])
       @changesets = changesets
     end
+    
+    # Accepts a visitor that will receive callbacks while
+    # iterating over this instance's internal structure.
+    # The visitor should respond to the following methods:
+    #
+    # * visit_changesets(changesets)
+    # * visit_changeset(changeset)
+    # * visit_change(change)
+    #
+    def accept(visitor)
+      visitor.visit_changesets(self)
+      @changesets.each{|changeset| changeset.accept(visitor)}
+    end
 
+    # TODO: remove
     def [](change)
       sorted[change]
     end
 
+    # TODO: remove
     def each(&block)
       sorted.each(&block)
     end
@@ -98,103 +114,10 @@ module RSCM
       time
     end
 
-    # Writes RSS for the changesets to file.
-    # TODO: take this out and add support for visitors instead.
-    def write_rss(title, rss_file, link, description, message_linker, change_linker)
-      FileUtils.mkdir_p(File.dirname(rss_file))
-      File.open(rss_file, "w") do |io|
-        rss = to_rss(
-          title, 
-          link,
-          description, 
-          message_linker, 
-          change_linker
-        )
-        io.write(rss)
-      end
-    end
-
-    # Writes the changesets to several YAML files.
-    def save(changesets_dir)
-      self.each do |changeset|
-        changeset.save(changesets_dir)
-      end
-    end
-
-    # Loads +prior+ number of changesets upto +last_changeset_id+ 
-    # from the +changesets+ dir. +last_changeset_id+ should be the 
-    # dirname of the folder containing the last changeset.
-    def ChangeSets.load_upto(changesets_dir, last_changeset_id, prior)
-      last_changeset_id = last_changeset_id.to_i
-      ids = ChangeSets.ids(changesets_dir)
-      last = ids.index(last_changeset_id)
-
-      changesets = ChangeSets.new
-      if(last)
-        first = last - prior + 1
-        first = 0 if first < 0
-
-        ids[first..last].each do |id|
-          changesets.add(YAML::load_file("#{changesets_dir}/#{id}/changeset.yaml"))
-        end
-      end
-      changesets
-    end
-
-    # Returns a sorted array of ints representing the changeset directories.
-    def ChangeSets.ids(changesets_dir)
-      dirs = Dir["#{changesets_dir}/*"].find_all {|f| File.directory?(f) && File.exist?("#{f}/changeset.yaml")}
-      # Turn them into ints so they can be sorted.
-      dirs.collect { |dir| File.basename(dir).to_i }.sort
-    end
-
-    # Returns the id of the latest changeset.
-    def ChangeSets.latest_id(changesets_dir)
-      ChangeSets.ids(changesets_dir)[-1]
-    end
-
-    # Yields an IO containing a unified diff.
-    # The diff can be handed to DiffParser to create an array
-    # of Diff objects which in turn can be turned into HTML
-    # with a DiffHtmlizer.
-    def diff(checkout_dir, scm, &block)
-      each { |changeset| changeset.diff(checkout_dir, scm, &block) }
-    end
-
   private
 
     def sorted
       @changesets.sort!
-    end
-
-    def to_rss(title, link, description, message_linker, change_linker)
-      raise "title" unless title
-      raise "link" unless link
-      raise "description" unless description
-      raise "message_linker" unless message_linker
-      raise "change_linker" unless change_linker
-
-      RSS::Maker.make("2.0") do |rss|
-        rss.channel.title = title
-        rss.channel.link = link
-        rss.channel.description = description
-        rss.channel.generator = "RSCM - Ruby Source Control Management"
-
-        changesets.each do |changeset|
-          item = rss.items.new_item
-          
-          item.pubDate = changeset.time
-          item.author = changeset.developer
-          item.title = changeset.message
-          item.link = change_linker.changeset_url(changeset, true)
-          item.description = "<b>#{changeset.developer}</b><br/>\n"
-          item.description << message_linker.highlight(changeset.message).gsub(/\n/, "<br/>\n") << "<p/>\n"
-          changeset.each do |change|
-            item.description << change_linker.change_url(change, true) << "<br/>\n"
-          end
-        end
-        rss.to_rss
-      end
     end
 
   end
@@ -213,6 +136,11 @@ module RSCM
       @changes = changes
     end
     
+    def accept(visitor)
+      visitor.visit_changeset(self)
+      @changes.each{|change| change.accept(visitor)}
+    end
+
     def << (change)
       @changes << change
       self.time = change.time if self.time.nil? || self.time < change.time unless change.time.nil?
@@ -271,23 +199,11 @@ module RSCM
       result
     end
     
-    def save(changesets_dir)
-      changeset_file = "#{changesets_dir}/#{id}/changeset.yaml"
-      dir = File.dirname(changeset_file)
-      FileUtils.mkdir_p(dir)
-      File.open(changeset_file, "w") do |io|
-        YAML::dump(self, io)
-      end
-    end
-    
     # Returns the id of the changeset or +time+ in ymdHMS format if undefined.
     def id
       @revision || @time.ymdHMS
     end
     
-    def diff(checkout_dir, scm, &block)
-      each { |change| change.diff(checkout_dir, scm, &block) }
-    end
   end
 
   class Change
@@ -320,6 +236,10 @@ module RSCM
       @path, @developer, @message, @revision, @time, @status = path, developer, message, revision, time, status
     end
   
+    def accept(visitor)
+      visitor.visit_change(self)
+    end
+
     def to_s
       "#{path} | #{revision}"
     end
@@ -351,10 +271,6 @@ module RSCM
     def time=(time)
       raise "time must be a Time object" unless time.is_a?(Time)
       @time = time
-    end
-
-    def diff(checkout_dir, scm, &block)
-      scm.diff(checkout_dir, self, &block)
     end
 
     def ==(other)

@@ -96,6 +96,7 @@ RSCM can generate html links to individual diff pages in SCM web frontends. Thes
 displayed on web pages, emails and other systems. The built-in RSS generator uses this.  
 Currently supported web front-ends are:
 
+* RSCM Built-in HTML diffs.
 * Fisheye - http://www.cenqua.com/fisheye/
 * ViewCVS - http://viewcvs.sourceforge.net/
 
@@ -103,8 +104,6 @@ Planned:
 
 * Trac - http://www.edgewall.com/trac/
 * Chora - http://horde.org/chora/
-
-This way links to diffs can be easily created.
 
 == API usage
 

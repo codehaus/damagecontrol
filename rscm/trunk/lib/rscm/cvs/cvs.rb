@@ -98,7 +98,7 @@ module RSCM
       end
     end
     
-    def diff(checkout_dir, change, &block)
+    def diff(checkout_dir, change)
       with_working_dir(checkout_dir) do
         opts = case change.status
           when /#{Change::MODIFIED}/; "#{revision_option(change.previous_revision)} #{revision_option(change.revision)}"

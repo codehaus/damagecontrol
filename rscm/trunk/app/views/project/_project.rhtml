@@ -1,6 +1,7 @@
 <script>
 var project_name_page_tip = "<div class='tp1'>The project name should not use space characters, as it will be used to create a folder on the server.</div>";
 var project_description_tip = "<div class='tp1'>A short description of the project. Will be used in various notifications such as RSS.</div>";
+var project_home_page_tip = "<div class='tp1'>URL to the project's home page or documentation.</div>";
 </script>
 
 <input name="project" type="hidden" value="<%= project.class.name %>"/>
@@ -23,6 +24,7 @@ var project_description_tip = "<div class='tp1'>A short description of the proje
 </tr>
 <tr>
   <td colspan="2">Project home page</td>
+  <td><%= tip(:txt => 'project_home_page_tip') %></td>
   <td><%= text_or_input(@edit, :name => "RSCM::Project[home_page]", :value => project.home_page) %></td>
 </tr>
 </table>
