@@ -36,7 +36,7 @@ module DamageControl
           log_file(build).flush
           log_file(build).close
         rescue => e
-          logger.error("BuildCompleteEvent: Couldn't write to file #{log_file_name(build)}:#{format_exception(e)}"
+          logger.error("BuildCompleteEvent: Couldn't write to file #{log_file_name(build)}:#{format_exception(e)}")
         end
       end
 

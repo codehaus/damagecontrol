@@ -60,6 +60,7 @@ module DamageControl
     def changes(from_time, to_time)
       all_changes = with_working_dir(working_dir) do
         if block_given?
+          yield changes_command(from_time, to_time)
           cvs_with_io(changes_command(from_time, to_time)) do |io|
             io.each_line {|line| yield line}
           end
