@@ -29,6 +29,10 @@ module DamageControl
       nil
     end
     
+    def extra_css
+      []
+    end
+    
     def ==(other_tab)
       return false unless other_tab.is_a? self.class
       id == other_tab.id

@@ -1,8 +1,10 @@
 require 'damagecontrol/web/AbstractAdminServlet'
 require 'damagecontrol/scm/SCMFactory'
 require 'damagecontrol/util/FileUtils'
+
 require 'damagecontrol/web/ConsoleOutputReport'
 require 'damagecontrol/web/ChangesReport'
+require 'damagecontrol/web/cruisecontrol/TestResultReport'
 
 module DamageControl
   class ProjectServlet < AbstractAdminServlet
@@ -47,9 +49,10 @@ module DamageControl
 
     def reports
       [
-        ChangesReport.new(selected_build, project_config_repository),
-        ConsoleOutputReport.new(selected_build, project_config_repository)
-      ]
+        ChangesReport,
+        ConsoleOutputReport,
+        TestResultReport
+      ].collect {|report_class| report_class.new(selected_build, project_config_repository) }
     end
     
     def selected_report
@@ -63,6 +66,10 @@ module DamageControl
     
     def default_report_id
       "changes"
+    end
+    
+    def extra_css
+      selected_report.extra_css
     end
     
     def tasks    

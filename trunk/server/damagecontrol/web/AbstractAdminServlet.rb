@@ -130,6 +130,10 @@ module DamageControl
       raise "required keyed parameter #{param.inspect}"
     end
     
+    def extra_css
+      []
+    end
+    
   private
     def build_url(build)
       return nil unless build

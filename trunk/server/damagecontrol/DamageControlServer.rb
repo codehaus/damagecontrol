@@ -159,7 +159,6 @@ module DamageControl
       component(:project_directories, @project_directories)
       component(:project_config_repository, ProjectConfigRepository.new(project_directories, scm_factory, public_web_url))
       component(:build_history_repository, BuildHistoryRepository.new(hub, @project_directories))
-      component(:log_archiver, LogArchiver.new(hub, project_config_repository))
     end
     
     def init_components
@@ -257,6 +256,7 @@ module DamageControl
     
     def init_build_scheduler
       component(:log_writer, LogWriter.new(hub))
+      component(:log_archiver, LogArchiver.new(hub))
       component(:build_number_increaser, BuildNumberIncreaser.new(hub, project_config_repository))
       component(:dependent_build_trigger, DependentBuildTrigger.new(hub, project_config_repository))
       component(:build_scheduler, BuildScheduler.new(hub))

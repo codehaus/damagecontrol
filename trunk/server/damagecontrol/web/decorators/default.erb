@@ -1,7 +1,10 @@
 <html>
 <head>
 <link rel="stylesheet" href="css/style.css" type="text/css">
-<link rel="stylesheet" href="css/cruisecontrol.css" type="text/css">
+<% extra_css.each do |css| %>
+  <link rel="stylesheet" href="<%= css %>" type="text/css">
+<% end %>
+
 <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
 
 <% if auto_refresh? %>
@@ -16,7 +19,7 @@
 <table id="main-table" width="100%" border="0">
 
 <tr><td  id="top-panel" colspan="2">
-<a href="http://damagecontrol.codehaus.org/"><img class="logo" src="images/damagecontrol-logo.png"/></a>
+<a href="dashboard"><img class="logo" src="images/damagecontrol-logo.png"/></a>
 </td></tr>
 
 <tr id="top-nav">

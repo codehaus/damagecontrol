@@ -196,7 +196,6 @@ module DamageControl
     end
 
     def dump(history, project_name)
-      puts "saving"
       # safe writing of history file
       file = history_file(project_name)
       writing_file = "#{file}.writing"
