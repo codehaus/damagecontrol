@@ -58,6 +58,10 @@ module DamageControl
       project_directories.checkout_dir(project_name)
     end
     
+    def log_dir(project_name)
+      project_directories.log_dir(project_name)
+    end
+    
     def modify_project_config(project_name, config_map)
       config_map["project_name"] = project_name
       # remove empty pairs
@@ -75,6 +79,7 @@ module DamageControl
       build.url = "#{public_web_url}/project?action=build_details&project_name=#{build.project_name}&timestamp=#{build.timestamp}"
       build.scm = create_scm(project_name)
       build.potential_label = peek_next_build_number(project_name)
+      build.log_file = File.expand_path("#{log_dir(project_name)}/#{build.timestamp_as_s}.log")
       build
     end
     
