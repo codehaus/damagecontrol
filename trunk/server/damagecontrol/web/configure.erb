@@ -25,37 +25,35 @@ function executeOnLoad() {
   <% end %>
 }
 
-initialScm = "<%= project_config['scm_type'] %>"
-oldScmDiv = null
+scmconfigurators = [
+<% scm_configurators.each do |scm_configurator| %>
+	"<%=scm_configurator.scm_id %>",
+<% end %> "" ];
+
 function showScm(scm) {
-  if(!oldScmDiv) {
-    oldScmDiv = document.getElementById(initialScm)
-  }
-  if(oldScmDiv) {
-    oldScmDiv.style.display = 'none'
-  }
-  newScmDiv = document.getElementById(scm)
-  newScmDiv.style.display = 'block'
-  oldScmDiv = newScmDiv
+	for (i=0;i<scmconfigurators.length-1;i++) {
+		oldTrackerDiv = document.getElementById(scmconfigurators[i]);
+		oldTrackerDiv.style.display = 'none'
+	}
+  newTrackerDiv = document.getElementById(scm);
+  newTrackerDiv.style.display = 'block';
 }
 
-initialTracker = "<%= project_config['tracker_type'] %>"
-oldTrackerDiv = null
+trackingconfigurators = [
+<% tracking_configurators.each do |tracking_configurator| %>
+	"<%=tracking_configurator.tracking_id %>",
+<% end %> "" ];
 
 function showTracker(tracker) {
-  if(!oldTrackerDiv) {
-    oldTrackerDiv = document.getElementById(initialTracker)
-  }
-  if(oldTrackerDiv) {
-    oldTrackerDiv.style.display = 'none'
-  }
-  newTrackerDiv = document.getElementById(tracker)
-  newTrackerDiv.style.display = 'block'
-  oldTrackerDiv = newTrackerDiv
+	for (i=0;i<trackingconfigurators.length-1;i++) {
+		oldTrackerDiv = document.getElementById(trackingconfigurators[i]);
+		oldTrackerDiv.style.display = 'none'
+	}
+  newTrackerDiv = document.getElementById(tracker);
+  newTrackerDiv.style.display = 'block';
 }
 
 function configureAction() {
-	//alert(document.forms[0].elements[0].value)
 	if (window.location.href.indexOf("/configure/")!=-1) {
 		document.forms[0].action=document.forms[0].elements[0].value;
 	} else {
