@@ -50,7 +50,7 @@ puts result
     end
 
     # Works with ViewCVS (which works with CVS and SVN) and Fisheye (works with CVS and soon SVN)
-    def web_url_to_change(change)
+    def view_cvs_url_to_change(change)
       view_cvs_url = config_map["view_cvs_url"]
       return "root/#{config_map['project_name']}/checkout/#{mod}/#{change.path}" if view_cvs_url.nil? || view_cvs_url == "" 
       
