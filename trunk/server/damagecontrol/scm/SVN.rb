@@ -153,8 +153,10 @@ module DamageControl
       yield command if block_given?
 
       execute(command, checkout_dir) do |stdin, stdout, stderr, pid|
+        logger.debug("Reading log from stdout")
         parser = SVNLogParser.new(stdout, svnpath)
         changesets = parser.parse_changesets(scm_from_time, scm_to_time, &line_proc)
+        logger.debug("DONE Reading log from stdout")
       end
       changesets
     end
@@ -168,13 +170,13 @@ module DamageControl
           stdout.each_line do |progress|
               if block_given? then yield progress else logger.debug(progress) end
           end
-          logger.debug("DONE Reading stdout")
+          logger.info("DONE Reading stdout")
         ensure
           logger.debug("Reading stderr")
           stderr.each_line do |progress|
               if block_given? then yield progress else logger.debug(progress) end
           end
-          logger.debug("DONE Reading stderr")
+          logger.info("DONE Reading stderr")
         end
       end
     end
