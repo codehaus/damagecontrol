@@ -15,8 +15,6 @@ module DamageControl
     FAILED = "FAILED"
     QUEUED = "QUEUED"
     BUILDING = "BUILDING"
-    DETERMINING_CHANGESETS = "DETERMINING CHANGESETS"
-    CHECKING_OUT = "CHECKING OUT"
     KILLED = "KILLED"
 
     attr_accessor :project_name

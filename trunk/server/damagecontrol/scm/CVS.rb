@@ -1,4 +1,6 @@
 require 'stringio'
+require 'parsedate'
+require 'pebbles/LineEditor'
 require 'pebbles/Pathutils'
 require 'damagecontrol/scm/AbstractSCM'
 require 'damagecontrol/scm/CVSLogParser'
@@ -9,8 +11,10 @@ module DamageControl
 
   # Handles parsing of CVS roots, checkouts and installation of trigger scripts
   class CVS < AbstractSCM
+    include ParseDate
     include FileUtils
     include Pebbles::Pathutils
+    include Pebbles::LineEditor
 
   public
     attr_accessor :cvsbranch
@@ -47,31 +51,55 @@ module DamageControl
       cvs(dir, "import -m \"initial import\" #{modulename} VENDOR START")
     end
 
-    def changesets(checkout_dir, from_time, to_time, &proc)
-      # exclude commits that occured on from_time
-      from_time = from_time + 1
-      begin
-        parse_log(checkout_dir, new_changes_command(from_time, to_time), &proc)
-      rescue Pebbles::ProcessFailedException => e
-        parse_log(checkout_dir, old_changes_command(from_time, to_time), &proc)
+    def checkout(checkout_dir, scm_from_time, scm_to_time, &line_proc)
+      checked_out_files = []
+      if(checked_out?(checkout_dir))
+        path_regex = /^[U|P] (.*)/
+        cvs(checkout_dir, update_command(scm_to_time)) do |line|
+          if(line =~ path_regex)
+            checked_out_files << $1
+          end
+          line_proc.call(line) if block_given?
+        end
+        changesets(checkout_dir, scm_from_time, scm_to_time, checked_out_files, &line_proc)
+      else
+        path_regex = /^[U|P] checkout\/(.*)/
+        # This is a workaround for the fact that -d . doesn't work - must be an existing sub folder.
+        mkdir_p(checkout_dir) unless File.exist?(checkout_dir)
+        target_dir = File.basename(checkout_dir)
+        run_checkout_command_dir = File.dirname(checkout_dir)
+        # -D is sticky, but subsequent updates will reset stickiness with -A
+        cvs(run_checkout_command_dir, checkout_command(scm_to_time, target_dir)) do |line|
+          if(line =~ path_regex)
+            checked_out_files << $1
+          end
+          line_proc.call(line) if block_given?
+        end
+        # See comment in AbstractSCM.checkout
+        most_recent_timestamp(changesets(checkout_dir, scm_from_time, scm_to_time, checked_out_files, &line_proc))
       end
     end
     
-    def uptodate?(checkout_dir, start_time, end_time)
-      if(!checked_out?(checkout_dir))
-        # might as well check it out if it isn't checked out
-        checkout(checkout_dir)
-        false
-      end
-
-      changesets = changesets(
-        checkout_dir,
-        start_time,
-        end_time
-      )
-      changesets.empty?
+    def commit(checkout_dir, message, &proc)
+      cvs(checkout_dir, commit_command(message), &proc)
     end
 
+    def can_install_trigger?
+      begin
+        exists?
+      rescue
+        false
+      end
+    end
+    
+    def changesets(checkout_dir, scm_from_time, scm_to_time, files, &line_proc)
+      begin
+        parse_log(checkout_dir, new_changes_command(scm_from_time, scm_to_time, files), &line_proc)
+      rescue Pebbles::ProcessFailedException => e
+        parse_log(checkout_dir, old_changes_command(scm_from_time, scm_to_time, files), &line_proc)
+      end
+    end
+    
     def new_process(checkout_dir)
       p = Pebbles::Process.new
       p.working_dir = checkout_dir
@@ -101,95 +129,52 @@ module DamageControl
       end
     end
     
-    def checkout(checkout_dir, time = nil, &proc)
-      if(checked_out?(checkout_dir))
-        cvs(checkout_dir, update_command(time), &proc)
-      else
-        # This is a workaround for the fact that -d . doesn't work - must be an existing sub folder.
-        mkdir_p(checkout_dir) unless File.exist?(checkout_dir)
-        target_dir = File.basename(checkout_dir)
-        run_checkout_command_dir = File.dirname(checkout_dir)
-        # -D is sticky, but subsequent updates will reset stickiness with -A
-        cvs(run_checkout_command_dir, checkout_command(nil, target_dir), &proc)
-      end
-    end
-    
-    def commit(checkout_dir, message, &proc)
-      cvs(checkout_dir, commit_command(message), &proc)
-    end
-
-    def can_install_trigger?
-      begin
-        exists?
-      rescue
-        false
-      end
-    end
-    
-    # Installs and activates the trigger script in the repository
-    # for this SCM. Upon subsequent checkins, the damage
-    # control server will be notified over a XML-RPC and start
-    # put a new request on the build request queue.
-    #
-    # @param damagecontrol_install_dir where DC is installed
-    # @trigger_files_checkout_dir where the SCM can check out admin files.
-    #   This may be ignored by some SCMs (like SVN), but some need it, and it is therefore in the API.
-    #   CVS will check out the CVSROOT admin files here. It is recommended that this
-    #   dir is a sibling dir to the checkout_dir
-    # @param trigger_xml_rpc_url where the dc server is running
-    #
-    # @block &proc a block that can handle the output (should typically log to file)
-    #
-    def install_trigger(damagecontrol_install_dir, project_name, trigger_files_checkout_dir, trigger_xml_rpc_url, &proc)
-      raise "project_name can't be null or empty" if (project_name.nil? || project_name == "")
+    def install_trigger(trigger_command, trigger_files_checkout_dir, &line_proc)
       raise "cvsmodule can't be null or empty" if (cvsmodule.nil? || cvsmodule == "")
 
       cvsroot_cvs = create_cvsroot_cvs
-      cvsroot_cvs.checkout(trigger_files_checkout_dir, &proc)
+      cvsroot_cvs.checkout(trigger_files_checkout_dir, nil, nil, &line_proc)
       with_working_dir(trigger_files_checkout_dir) do
         # install trigger command
         File.open("loginfo", File::WRONLY | File::APPEND) do |file|
-          file.puts("#{cvsmodule} #{trigger_command(damagecontrol_install_dir, project_name, trigger_xml_rpc_url)}")
+          file.puts("#{cvsmodule} #{trigger_command}")
         end
-        system("#{cvs_executable} commit -m \"Installed DamageControl trigger for #{project_name}\"")
+        system("#{cvs_executable} commit -m \"Installed trigger for CVS module '#{cvsmodule}'\"")
       end
-      raise "Couldn't install/commit trigger to loginfo" unless trigger_installed?(trigger_files_checkout_dir, project_name)
     end
     
-    def trigger_installed?(trigger_files_checkout_dir, project_name)
+    def trigger_installed?(trigger_command, trigger_files_checkout_dir, &line_proc)
+      regex = /#{cvsmodule} #{trigger_command}/
       cvsroot_cvs = create_cvsroot_cvs
       begin
-        cvsroot_cvs.checkout(trigger_files_checkout_dir)
+        cvsroot_cvs.checkout(trigger_files_checkout_dir, nil, nil, &line_proc)
         loginfo = File.join(trigger_files_checkout_dir, "loginfo")
         return false if !File.exist?(loginfo)
-        loginfo_file = File.new(loginfo)
-        loginfo_content = loginfo_file.read
-        loginfo_file.close
-        in_local_copy = trigger_in_string?(loginfo_content, project_name)
-        entries = File.join(trigger_files_checkout_dir, "CVS", "Entries")
-        
+
+        # returns true if commented out. doesn't modify the file.
+        in_local_copy = comment_out(File.new(loginfo), regex, "# ", "")
         # Also verify that loginfo has been committed back to the repo
+        entries = File.join(trigger_files_checkout_dir, "CVS", "Entries")
         committed = File.mtime(entries) >= File.mtime(loginfo)
+
         in_local_copy && committed
-      rescue
+      rescue Exception => e
+        puts e.message
+        puts e.backtrace.join("\n")
         false
       end
     end
 
-    def uninstall_trigger(trigger_files_checkout_dir, project_name)
+    def uninstall_trigger(trigger_command, trigger_files_checkout_dir, &line_proc)
+      regex = /#{cvsmodule} #{trigger_command}/
       cvsroot_cvs = create_cvsroot_cvs
-      cvsroot_cvs.checkout(trigger_files_checkout_dir)
-      loginfo_file = File.new(File.join(trigger_files_checkout_dir, "loginfo"))
-      loginfo_content = loginfo_file.read
-      loginfo_file.close
-      modified_loginfo = disable_trigger_from_string(loginfo_content, project_name, Time.new.utc)
-      loginfo_file = File.new(File.join(trigger_files_checkout_dir, "loginfo"), "w")
-      loginfo_file.write(modified_loginfo)
-      loginfo_file.close
+      cvsroot_cvs.checkout(trigger_files_checkout_dir, nil, nil, &line_proc)
+      loginfo_path = File.join(trigger_files_checkout_dir, "loginfo")
+      File.comment_out(loginfo_path, regex, "# ")
       with_working_dir(trigger_files_checkout_dir) do
-        system("#{cvs_executable} commit -m \"Disabled DamageControl trigger for #{project_name}\"")
+        system("#{cvs_executable} commit -m \"Disabled DamageControl trigger for /#{regex}/\"")
       end
-      raise "Couldn't uninstall/commit trigger to loginfo" unless !trigger_installed?(trigger_files_checkout_dir, project_name)
+      raise "Couldn't uninstall/commit trigger to loginfo" unless !trigger_installed?(regex, trigger_files_checkout_dir)
     end
 
     def create
@@ -227,9 +212,6 @@ module DamageControl
       loginfo_content.each_line do |line|
         # TODO: couldn't find out how to express this with a single regexp.
         matches = line[0..0] != "#" && line =~ /requestbuild/
-        # The old formats - we want to match them to so they get deleted.
-        matches = line[0..0] != "#" && line =~ /.*ruby.*dctrigger.rb http.* #{project_name}$/ unless matches
-        matches = line[0..0] != "#" && line =~ /^cat .* | nc.*4711$/ unless matches
         if(matches)
           formatted_date = date.strftime("%B %d, %Y")
           modified << "# Disabled by DamageControl on #{formatted_date}\n"
@@ -241,11 +223,16 @@ module DamageControl
       modified
     end
     
-    def new_changes_command(from_time, to_time)
+    def new_changes_command(scm_from_time, scm_to_time, files)
       # https://www.cvshome.org/docs/manual/cvs-1.11.17/cvs_16.html#SEC144
       # -N => Suppress the header if no revisions are selected.
       # -S => Do not print the list of tags for this file.
-      "log #{branch_option}-N -S -d\"#{cvsdate(from_time)}<=#{cvsdate(to_time)}\""
+      "log #{branch_option}-N -S #{period_option(scm_from_time, scm_to_time)}#{files.join(' ')}"
+    end
+    
+    def old_changes_command(scm_from_time, scm_to_time, files)
+      # Many servers don't support the new -S option
+      "log #{branch_option}-N #{period_option(scm_from_time, scm_to_time)}#{files.join(' ')}"
     end
     
     def branch_specified?
@@ -256,21 +243,17 @@ module DamageControl
       if branch_specified? then "-r#{cvsbranch} " else "" end
     end
     
-    def old_changes_command(from_time, to_time)
-      # Many servers don't support the new -S option
-      "log #{branch_option}-N -d\"#{cvsdate(from_time)}<=#{cvsdate(to_time)}\""
+    def update_command(scm_to_time)
+      "update #{branch_option}#{to_time_option(scm_to_time)} -d -P -A"
     end
     
-    def update_command(time)
-      "update #{branch_option}#{time_option(time)} -d -P -A"
-    end
-    
-    def checkout_command(time, target_dir)
-      "checkout #{branch_option}#{time_option(time)} -d #{target_dir} #{cvsmodule}"
+    def checkout_command(scm_to_time, target_dir)
+      "checkout #{branch_option}#{to_time_option(scm_to_time)} -d #{target_dir} #{cvsmodule}"
     end
     
     def cvs_cmd_with_password(cmd, password)
-      "#{cvs_executable} -q -d'#{cvsroot_with_password(password)}' #{cmd}"
+      result = "#{cvs_executable} -q -d'#{cvsroot_with_password(password)}' #{cmd}"
+      result
     end
     
     def cvs_cmd_without_password(cmd)
@@ -293,6 +276,13 @@ module DamageControl
     end
 
   protected
+    def period_option(scm_from_time, scm_to_time)
+      if(scm_from_time.nil? && scm_to_time.nil?)
+        ""
+      else
+        "-d\"#{cvsdate(scm_from_time)}<=#{cvsdate(scm_to_time)}\" " 
+      end
+    end
       
     def cvsdate(time)
       return "" unless time
@@ -326,7 +316,7 @@ module DamageControl
       cvs
     end
 
-    def time_option(time)
+    def to_time_option(time)
       if time.nil? then "" else "-D \"#{cvsdate(time)}\"" end
     end
 

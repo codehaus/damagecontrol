@@ -7,6 +7,32 @@ module FileUtils
 
   include DamageControl::Logging
 
+  def all_files_recursively(dir)
+    if File.directory?(dir)
+      entries = Dir["#{dir}/*"]
+      entries.collect {|entry| all_files_recursively(entry)}.flatten
+    else
+      dir
+    end
+  end
+  
+  def all_files(src)
+    src = File.expand_path(src)
+    src_length = src.size + 1
+    files = all_files_recursively(src).collect {|f| File.expand_path(f)[src_length..-1]}
+    files.delete_if {|f| f =~ /CVS\//}
+    files.delete_if {|f| f=~ /^\.#/}
+  end
+  
+  def copy_dir(src, dest)
+    files = all_files(src)
+    files.each do |file|
+      file_dest = "#{dest}/#{File.dirname(file)}"
+      mkdir_p(file_dest)
+      cp("#{src}/#{file}", file_dest)
+    end
+  end
+
   def new_temp_dir(identifier = self)
     identifier = identifier.to_s
     identifier.gsub!(/\(|:|\)/, '_')

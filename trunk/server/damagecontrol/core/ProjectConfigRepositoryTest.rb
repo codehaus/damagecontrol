@@ -55,18 +55,16 @@ module DamageControl
     end
 
     def test_can_create_build_from_project_config
-      timestamp = Build.format_timestamp(Time.utc(2004, 06, 15, 12, 00, 00))
       @pcr.new_project("newproject")
       @pcr.modify_project_config("newproject", { "scm_type" => NoSCM.name })
-      build = @pcr.create_build("newproject", timestamp)
-      assert_equal(timestamp, build.timestamp)
+      build = @pcr.create_build("newproject")
       assert_equal(
         {
           "project_name" => "newproject",
           "scm" => create_default_scm
         },
         build.config)
-      assert_equal("http://localhost/public/project?project_name=newproject&timestamp=20040615120000", build.url)
+      assert_match(/http:\/\/localhost\/public\/project\?project_name=newproject&timestamp=2\d\d\d\d\d\d\d\d\d\d\d\d\d/, build.url)
     end
     
     def test_next_build_number

@@ -2,7 +2,11 @@ require 'tempfile'
 
 module Pebbles
   module LineEditor
-    def uncomment(original, line_regex, comment_template, output)
+    # Comments out line by line if they match the line_regex.
+    # Does not comment out already commented out lines.
+    # If comment_template is nil, the matching lines will be deleted
+    def comment_out(original, line_regex, comment_template, output)
+      did_comment_out = false
       already_commented_exp = /^[#{comment_template}]/ unless comment_template.nil?
       original.each_line do |line|
         out_line = nil
@@ -10,6 +14,7 @@ module Pebbles
           if(already_commented_exp && already_commented_exp =~ line)
             out_line = line
           else
+            did_comment_out = true
             out_line = "#{comment_template}#{line}" unless comment_template.nil?
           end
         else
@@ -17,18 +22,19 @@ module Pebbles
         end
         output << out_line unless out_line.nil?
       end
+      did_comment_out
     end
-    module_function :uncomment
+    module_function :comment_out
   end
 end
 
 class File
 
-  def File.uncomment(path, line_regex, comment_template)
+  def File.comment_out(path, line_regex, comment_template)
     temp_file = Tempfile.new(File.basename(path))
     temp_file_path = temp_file.path
     original = File.new(path)
-    Pebbles::LineEditor.uncomment(original, line_regex, comment_template, temp_file)
+    Pebbles::LineEditor.comment_out(original, line_regex, comment_template, temp_file)
 
     temp_file.close
     original.close

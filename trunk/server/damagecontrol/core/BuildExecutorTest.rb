@@ -10,6 +10,7 @@ require 'damagecontrol/core/BuildHistoryRepository'
 require 'damagecontrol/core/ProjectConfigRepository'
 require 'damagecontrol/core/ProjectDirectories'
 require 'damagecontrol/scm/NoSCM'
+require 'damagecontrol/scm/Changes'
 require 'damagecontrol/util/FileUtils'
 
 module DamageControl
@@ -46,45 +47,35 @@ module DamageControl
     def test_can_kill_a_running_build 
       # this blocks forever
       @build.config["build_command_line"] = "cat"
-      @build.scm = NoSCM.new
-      @build.scm.checkout_dir = "."
-
       mock_hub = new_mock
       mock_hub.__expect(:publish_message) {|message| assert(message.is_a?(BuildStartedEvent))}
       mock_hub.__expect(:publish_message) {|message| assert(message.is_a?(BuildProgressEvent))}
       mock_hub.__expect(:publish_message) {|message| assert(message.is_a?(BuildErrorEvent), "message was #{message}")}
+
+      @build.scm = new_mock.__expect(:label){"a_label"}
 
       mock_hub.__expect(:publish_message) {|message| 
         assert(message.is_a?(BuildCompleteEvent))
         assert_equal(Build::KILLED, message.build.status) 
       }
 
-      mock_build_history = new_mock
-      mock_build_history.__expect(:last_successful_build) {nil}
-
-      @build_executor = BuildExecutor.new(
+      build_executor = BuildExecutor.new(
         'executor1', 
         mock_hub, 
-        new_mock.__setup(:checkout_dir) { |project_name| assert_equal("damagecontrolled", project_name); "some_dir" },
-        mock_build_history
+        new_mock.__expect(:checkout_dir).__expect(:checkout_dir)
       )
-      @build_executor.start
-      @build_executor.put(@build) 
+      build_executor.start
+      build_executor.put(@build) 
 
-      wait_for { @build_executor.build_process_executing? } 
+      wait_for { build_executor.build_process_executing? } 
 
-      assert(@build_executor.build_process_executing?) 
-      @build_executor.kill_build_process 
-      assert(!@build_executor.build_process_executing?) 
-      @build_executor.shutdown
+      assert(build_executor.build_process_executing?) 
+      build_executor.kill_build_process 
+      assert(!build_executor.build_process_executing?) 
+      build_executor.shutdown
     end
     
     def test_when_build_scheduled_executes_sends_start_process_and_complete
-      mock_scm = new_mock
-      mock_scm.__expect(:changesets) {}
-      mock_scm.__expect(:checkout) {}
-      mock_scm.__expect(:label) {}
-
       mock_hub = new_mock
       mock_hub.__expect(:publish_message) {|message| assert(message.is_a?(BuildStartedEvent))}
       mock_hub.__expect(:publish_message) {|message| 
@@ -97,49 +88,29 @@ module DamageControl
       }
       mock_hub.__expect(:publish_message) {|message| assert(message.is_a?(BuildCompleteEvent))}
 
-      @build.scm = mock_scm
+      @build.scm = new_mock.__expect(:label) {"a_label"}
 
-      mock_build_history = new_mock
-      mock_build_history.__expect(:last_successful_build) { |project_name|
-        assert_equal("damagecontrolled", project_name)
-        b = Build.new("damagecontrolled")
-        b
-      }
-
-      @build_executor = BuildExecutor.new(
+      build_executor = BuildExecutor.new(
         'executor1', 
         mock_hub, 
-        new_mock.__setup(:checkout_dir) {"some_dir"},
-        mock_build_history
+        new_mock.__setup(:checkout_dir) {"some_dir"}
       )
-      @build_executor.on_message(@build)
+      build_executor.on_message(@build)
     end
     
     def test_failing_build_sends_build_complete_event_with_successful_flag_set_to_false
-      mock_scm = new_mock
-      mock_scm.__expect(:changesets) {}
-      mock_scm.__expect(:checkout) {}
-
-      mock_build_history = new_mock
-      mock_build_history.__expect(:last_successful_build) { |project_name|
-        assert_equal("damagecontrolled", project_name)
-        b = Build.new("damagecontrolled")
-        b
-      }
-
+      
       mock_hub = new_mock
       mock_hub.__setup(:publish_message) {|message|}
 
-      @build_executor = BuildExecutor.new(
+      build_executor = BuildExecutor.new(
         'executor1', 
         mock_hub, 
-        new_mock.__setup(:checkout_dir) {"some_dir"},
-        mock_build_history
+        new_mock.__setup(:checkout_dir) {"some_dir"}
       )
 
       @build = Build.new("damagecontrolled", Time.now, { "build_command_line" => "bad_command"})
-      @build.scm = mock_scm
-      @build_executor.on_message(@build)
+      build_executor.on_message(@build)
       # what happens for bad_command is different on windows and linux
       # windows? returns false on cygwin, so this doesn't work
 #      if(windows?)
@@ -150,26 +121,13 @@ module DamageControl
       assert_equal(Build::FAILED, @build.status)
     end
     
-    def test_checks_out_and_determines_changeset_before_building      
+    def test_checks_out_before_building      
       checkoutdir = "#{@basedir}/damagecontrolled/checkout/damagecontrolled"
       FileUtils.mkdir_p(checkoutdir)
       last_build_time = Time.utc(2004, 04, 02, 12, 00, 00)
       current_build_time = Time.utc(2004, 04, 02, 13, 00, 00)
       
-      mock_build_history = new_mock.__expect(:last_successful_build) { |project_name|
-        assert_equal("damagecontrolled", project_name)
-        b = Build.new("damagecontrolled")
-        b.timestamp = last_build_time
-        b
-      }
-
-      mock_scm = new_mock.__setup(:working_dir) { checkoutdir }
-      mock_scm.__expect(:changesets) {|checkout_dir, from_time, to_time|
-        assert_equal("some_dir", checkout_dir)
-        assert_equal(last_build_time, from_time)
-        assert_equal(current_build_time, to_time)
-      }
-      mock_scm.__expect(:checkout) {}
+      mock_scm = new_mock
       mock_scm.__expect(:label) {}
 
       mock_hub = new_mock
@@ -178,25 +136,28 @@ module DamageControl
       mock_hub.__expect(:publish_message) {|message| assert(message.is_a?(BuildProgressEvent))}
       mock_hub.__expect(:publish_message) {|message| assert(message.is_a?(BuildCompleteEvent))}
       
-      @build_executor = BuildExecutor.new(
+      build_executor = BuildExecutor.new(
         'executor1', 
         mock_hub, 
-        new_mock.__setup(:checkout_dir) { "some_dir" },
-        mock_build_history
+        new_mock.__expect(:checkout_dir).__expect(:checkout_dir)
       )
       @build = Build.new("damagecontrolled", Time.now,
         { "build_command_line" => "echo hello world"})
       @build.scm = mock_scm
       @build.timestamp = current_build_time
 
-      @build_executor.on_message(@build)
+      build_executor.on_message(@build)
       
       assert_equal(nil, @build.error_message)
       assert_equal(Build::SUCCESSFUL, @build.status)
     end
     
     def test_can_execute_builds_with_matching_executor_selector
-      e = BuildExecutor.new("executor1", new_mock, new_mock, new_mock)
+      e = BuildExecutor.new(
+        "executor1", 
+        new_mock, 
+        new_mock
+      )
       assert(e.can_execute?(@build))
       @build.config["executor_selector"] = ".*"
       assert(e.can_execute?(@build))

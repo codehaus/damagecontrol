@@ -7,6 +7,7 @@ require 'damagecontrol/util/Logging'
 
 module DamageControl
 
+  # This class is responsible for scheduling builds among several BuildExecutors
   class BuildScheduler < Pebbles::Space
 
     include Logging
@@ -20,16 +21,17 @@ module DamageControl
     def initialize(multicast_space, default_quiet_period=DEFAULT_QUIET_PERIOD, exception_logger=nil)
       super
       @channel = multicast_space
-      @channel.add_consumer(self) unless @channel.nil?
-
       @default_quiet_period = default_quiet_period
+      @exception_logger = exception_logger
+
+      @channel.add_consumer(self) unless @channel.nil?
       @executors = []
       @build_queue = []
-      @exception_logger = exception_logger
     end
   
     def on_message(event)
       if event.is_a?(BuildRequestEvent)
+        event.build.status = Build::QUEUED
         schedule_build(event.build)
       end
       if event.is_a?(BuildCompleteEvent)
@@ -62,10 +64,6 @@ module DamageControl
     def kill_named_executor(executor_name)
       executor = executors.find{|e| e.name == executor_name}
       executor.kill_build_process
-    end
-
-    def project_building?(project_name)
-      @executors.find {|e| e.building_project?(project_name) }
     end
 
   private

@@ -13,9 +13,7 @@ require 'xmlrpc/utils'
 # (The methods that take a line_proc should yield each output line from 
 # the underlying SCM command line (if appliccable))
 #
-# checkout(utc_time, &line_proc) -> nil
-# changesets(utc_time, &line_proc) -> DamageControl::Changesets
-# checkout(utc_time, &line_proc)
+# checkout(utc_time, &line_proc) -> Changesets
 # atomic? -> [true|false] (TODO: avoid quiet period for atomic SCMs)
 #
 # 3) Implement LocalSnoopy < Snoopy. This is to support proper compliance testing
@@ -30,7 +28,6 @@ require 'xmlrpc/utils'
 # 4) (Optional) If the native SCM supports triggers, implement the following methods:
 # (In either Snoopy or LocalSnoopy depending on the native trigger installation mechanism)
 #
-# can_install_trigger? -> true
 # install_trigger(damagecontrol_install_dir, project_name, dc_xml_rpx_url) -> nil (throw ex on failure)
 # uninstall_trigger(project_name) -> nil (throw ex on failure)
 # trigger_installed?(project_name) -> [true|false]
@@ -52,57 +49,14 @@ module DamageControl
     
   public
 
-    def checkout(checkout_dir, utc_time = nil, &proc)
+    # Should return an utc time of the latest checkin, according to the SCM's clock.
+    # If this is the fisrst checkout, null can be returned (to minimise size)
+    def checkout(checkout_dir, scm_from_time, scm_to_time, &line_proc)
     end
-
-    def changesets(checkout_dir, from_time, to_time, &proc)
-      ChangeSets.new
-    end
-    
-    # It is recommended that this method first checks for checked_out?
-    # and does a checkout followed by return false. (See CVS and SVN)
-    # TODO: remove the need for this and add this logic to the
-    # BuildExecutor
-    # TODO: add a generic test that tests uptodate? on a repo that
-    # isn't checked out and verifies that it returns false rather
-    # than throwing an exception
-    def uptodate?(checkout_dir, from_time, to_time, &proc)
-      true
+        
+    def label(checkout_dir, &line_proc)
     end
     
-    def checked_out?(checkout_dir)
-      false
-    end
-
-    def label(checkout_dir, &proc)
-      nil
-    end
-    
-    def can_install_trigger?
-      false
-    end
-
-    def exists?
-      true
-    end
-
-    def uptodate?
-      true
-    end
-
-    def trigger_installed?(project_name)
-      false
-    end
-
-    def can_create?
-      false
-    end
-
-    def trigger_command(damagecontrol_install_dir, project_name, trigger_xml_rpc_url="http://localhost:4712/private/xmlrpc", script_suffix="")
-      script = "sh #{damagecontrol_install_dir}/bin/requestbuild#{script_suffix}"
-      "#{script} --url #{trigger_xml_rpc_url} --projectname #{project_name}"
-    end
-
     def ==(other_scm)
       return false if self.class != other_scm.class
       self.instance_variables.each do |var|
@@ -110,10 +64,28 @@ module DamageControl
       end
       true
     end
+    
+    # Installs and activates a trigger script in the repository
+    #
+    # @param trigger command - the command to execute upon commits
+    # @param trigger_files_checkout_dir - a place where admin files can be checked out (CVS needs this)
+    # @block &line_proc a block that can handle the output (should typically log to file)
+    #
+    #def install_trigger(trigger_command, trigger_files_checkout_dir, &line_proc)
+    #end
+
+    # Use this from checkout if it is a first checkout (and not "update" to use cvs terms)
+    def most_recent_timestamp(changesets)
+      most_recent = nil
+      changesets.each do |changeset|
+        most_recent = changeset.time if most_recent.nil? || most_recent < changeset.time
+      end
+      most_recent
+    end
 
   protected
 
-    def cmd(dir, cmd, &proc)
+    def cmd(dir, cmd, &line_proc)
       if block_given? then yield "#{cmd}\n" else logger.debug("#{cmd}\n") end
       cmd_with_io(dir, cmd) do |io|
         io.each_line do |progress|

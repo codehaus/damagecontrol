@@ -20,9 +20,7 @@ module DamageControl
     end
     
     def test_read_log_entry
-      assert_equal("blahblah\n", CVSLogParser.new(StringIO.new("blahblah\n============\nubbaubba\n===========")).next_log_entry)
       assert_equal(nil, CVSLogParser.new(StringIO.new("")).next_log_entry)
-      assert_equal(nil, CVSLogParser.new(StringIO.new("============\n===========")).next_log_entry)
     end
     
     def test_parses_entire_log_into_changesets
@@ -30,9 +28,9 @@ module DamageControl
         @parser = CVSLogParser.new(io)
         changesets = @parser.parse_changesets
         
-        assert_equal(18, changesets.length)
+        assert_equal(24, changesets.length)
         assert_match(/o YAML config \(BuildBootstrapper\)/, changesets[2].message)
-        assert_match(/removed some output/, changesets[17].message)
+        assert_match(/failure/, changesets[17].message)
       end
     end
     
@@ -193,15 +191,15 @@ EOF
          
       #puts changesets.format(CHANGESET_TEXT_FORMAT, Time.new.utc)
      
-      assert_equal(9, changesets.length)
+      assert_equal(10, changesets.length)
       expected_change = Change.new
       expected_change.path = "server/damagecontrol/scm/CVS.rb"
       expected_change.developer = "tirsen"
       expected_change.message = "fixed some stuff in the log parser\n"
-      expected_change.revision = "1.18"
-      expected_change.time = Time.utc(2004, 7, 5, 9, 38, 21)
+      expected_change.revision = "1.19"
+      expected_change.time = Time.utc(2004, 7, 5, 9, 41, 51)
       
-      assert_equal(expected_change, changesets[0][1])
+      assert_equal(expected_change, changesets[0][0])
     end
 
 LOG_FROM_05_07_2004_19_41 = <<-EOF
@@ -461,6 +459,107 @@ EOF
       assert_equal(Change::MODIFIED, changesets[1][0].status)
       assert_equal(Change::MODIFIED, changesets[2][0].status)
       assert_equal(Change::ADDED,    changesets[3][0].status)
+    end
+
+# https://sitemesh.dev.java.net/source/browse/sitemesh/.cvsignore
+# The default commit message probably showed up in vi, and the committer
+# probably just left it there. Not sure why CVS kept it this way
+# (lines starting with CVS: should be ignored in commit message afik).
+# Anyway, the parser nw knows how to deal with this. (AH)
+LOG_WITH_WEIRD_CVS_AND_MANY_DASHES = <<EOF
+? log.txt
+
+RCS file: /cvs/sitemesh/.cvsignore,v
+Working file: .cvsignore
+head: 1.3
+branch:
+locks: strict
+access list:
+keyword substitution: kv
+total revisions: 3; selected revisions: 3
+description:
+----------------------------
+revision 1.3
+date: 2004/05/03 09:03:56;  author: rhallier;  state: Exp;  lines: +2 -0
+Issue number:  SIM-90
+
+Obtained from: JIRA
+
+Submitted by:  rhallier
+
+Reviewed by:   
+
+CVS: ----------------------------------------------------------------------
+
+CVS: Issue number:
+
+CVS:   If this change addresses one or more issues,
+
+CVS:   then enter the issue number(s) here.
+
+CVS: Obtained from:
+
+CVS:   If this change has been taken from another system,
+
+CVS:   then name the system in this line, otherwise delete it.
+
+CVS: Submitted by:
+
+CVS:   If this code has been contributed to the project by someone else; i.e.,
+
+CVS:   they sent us a patch or a set of diffs, then include their name/email
+
+CVS:   address here. If this is your work then delete this line.
+
+CVS: Reviewed by:
+
+CVS:   If we are doing pre-commit code reviews and someone else has
+
+CVS:   reviewed your changes, include their name(s) here.
+
+CVS:   If you have not had it reviewed then delete this line.
+----------------------------
+revision 1.2
+date: 2003/11/22 07:56:51;  author: hani;  state: Exp;  lines: +2 -1
+Ignore IDEA files
+----------------------------
+revision 1.1
+date: 2003/11/03 16:27:37;  author: mbogaert;  state: Exp;
+Moved from SF.
+=============================================================================
+
+RCS file: /cvs/sitemesh/CHANGES.txt,v
+Working file: CHANGES.txt
+head: 1.3
+branch:
+locks: strict
+access list:
+keyword substitution: kv
+total revisions: 3; selected revisions: 3
+description:
+----------------------------
+revision 1.3
+date: 2004/10/08 07:18:38;  author: hani;  state: Exp;  lines: +18 -0
+More files not updated for release
+----------------------------
+revision 1.2
+date: 2004/09/24 14:04:12;  author: jwalnes1;  state: Exp;  lines: +19 -0
+Preparing for 2.2 release.
+Issue number:
+Obtained from:
+Submitted by:
+Reviewed by:
+----------------------------
+revision 1.1
+date: 2004/07/22 01:30:27;  author: farkas;  state: Exp;
+Final changes for 2.1 release
+=============================================================================
+EOF
+
+    def test_can_parse_logs_with_cvs_and_dashes_in_commit_message
+      @parser = CVSLogParser.new(StringIO.new(LOG_WITH_WEIRD_CVS_AND_MANY_DASHES))
+      changesets = @parser.parse_changesets
+      assert_equal(6, changesets.length)
     end
 
   end

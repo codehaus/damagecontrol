@@ -62,7 +62,6 @@ module DamageControl
       end
       config_map["project_name"] = project_name
       config_map = upgrade_project_config(config_map)
-#      config_map["scm"].checkout_dir = checkout_dir(project_name)
       config_map
     end
     
@@ -90,8 +89,8 @@ module DamageControl
       end
     end
 
-    def create_build(project_name, timestamp)
-      build = Build.new(project_name, timestamp, project_config(project_name))
+    def create_build(project_name)
+      build = Build.new(project_name, Time.now.utc, project_config(project_name))
       build.url = "#{ensure_trailing_slash(@public_web_url)}project?project_name=#{build.project_name}&timestamp=#{build.timestamp}"
       build.scm = create_scm(project_name)
       build.potential_label = peek_next_build_number(project_name).to_s

@@ -17,7 +17,7 @@ module DamageControl
     
     def trig_build
       assert_private
-      @trigger.trig(project_name, Build.format_timestamp(Time.now))
+      @trigger.request(project_name)
       sleep 0.5
       build_details_redirect
     end

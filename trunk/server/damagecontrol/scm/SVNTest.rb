@@ -1,4 +1,5 @@
 require 'test/unit'
+require 'stringio'
 require 'damagecontrol/scm/GenericSCMTests'
 require 'damagecontrol/scm/SVN'
 require 'damagecontrol/scm/Changes'
@@ -18,12 +19,12 @@ module DamageControl
       work_dir = new_temp_dir
       checkout_dir = "#{work_dir}/blah/checkout"
       repository_dir = "#{work_dir}/repository"
-      scm = create_scm(repository_dir, "damagecontrolled") { |line| logger.debug(line) }
+      scm = create_scm(repository_dir, "damagecontrolled")
       scm.create {|line| logger.debug(line)}
-
+      now = Time.new.utc
       path = "#{damagecontrol_home}/testdata/damagecontrolled"
       scm.import(path) { |line| logger.debug(line) }
-      scm.checkout(checkout_dir) { |line| logger.debug(line) }
+      scm.checkout(checkout_dir, nil, nil) { |line| logger.debug(line) }
       assert_equal(
         "1",
         scm.label(checkout_dir) { |line| logger.debug(line) }

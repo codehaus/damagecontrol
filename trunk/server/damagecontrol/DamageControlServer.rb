@@ -10,6 +10,7 @@ require 'damagecontrol/Version'
 require 'damagecontrol/core/Hub'
 require 'damagecontrol/core/BuildExecutor'
 require 'damagecontrol/core/BuildScheduler'
+require 'damagecontrol/core/CheckoutManager'
 require 'damagecontrol/core/DependentBuildTrigger'
 require 'damagecontrol/core/SCMPoller'
 require 'damagecontrol/core/HostVerifyingHandler'
@@ -132,6 +133,10 @@ module DamageControl
     def init_config_services
       component(:hub, Hub.new)
       
+      # TODO: It would be nice to merge all of these beasts into one class.
+      # Most classes that depend on one of them generally depend on one or two others too.
+      # We could call it ProjectManager or something.
+      # AH
       component(:project_directories, ProjectDirectories.new(@rootdir))
       component(:project_config_repository, ProjectConfigRepository.new(project_directories, public_web_url))
       component(:build_history_repository, BuildHistoryRepository.new(hub, project_directories))
@@ -208,7 +213,7 @@ module DamageControl
       DamageControl::XMLRPC::StatusPublisher.new(private_xmlrpc_servlet, build_history_repository)
       DamageControl::XMLRPC::ConnectionTester.new(private_xmlrpc_servlet)
       DamageControl::XMLRPC::ServerControl.new(private_xmlrpc_servlet, hub)
-      component(:trigger, DamageControl::XMLRPC::Trigger.new(private_xmlrpc_servlet, @hub, project_config_repository))
+      component(:trigger, DamageControl::XMLRPC::Trigger.new(private_xmlrpc_servlet, @hub, project_config_repository, checkout_manager, public_web_url))
       # For private authenticated and encrypted (with eg an Apache proxy) XML-RPC connections like triggering a build
       httpd.mount("/private/xmlrpc", private_xmlrpc_servlet)
 
@@ -252,6 +257,7 @@ module DamageControl
     end
     
     def init_build_scheduler
+      component(:checkout_manager, CheckoutManager.new(hub, project_directories, project_config_repository, build_history_repository))
       component(:log_writer, LogWriter.new(hub))
       component(:log_merger, LogMerger.new(hub, project_directories))
       component(:artifact_archiver, ArtifactArchiver.new(hub, project_directories))
@@ -263,7 +269,7 @@ module DamageControl
     
     def init_build_executors
       # Only use one build executor (don't allow parallel builds)
-      build_scheduler.add_executor(BuildExecutor.new('executor1', hub, project_directories, build_history_repository))
+      build_scheduler.add_executor(BuildExecutor.new('executor1', hub, project_directories))
     end
     
     def polling_interval
@@ -274,7 +280,7 @@ module DamageControl
 
       if(polling_interval > 0)
         component(:scm_poller, 
-          SCMPoller.new(hub, polling_interval, @project_directories, project_config_repository, build_history_repository, build_scheduler))
+          SCMPoller.new(hub, polling_interval, project_config_repository, build_scheduler, checkout_manager))
       end
     end
     

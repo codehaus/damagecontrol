@@ -8,6 +8,8 @@ require 'ftools'
 module DamageControl
 
   class CVSLogParser < AbstractLogParser
+    REVISION_SEPARATOR = /^----------------------------$/
+    ENTRY_SEPARATOR = /^=============================================================================$/
 
     include Logging
     
@@ -34,13 +36,13 @@ module DamageControl
     end
     
     def next_log_entry
-      read_until_matching_line(/====*/)
+      read_until_matching_line(ENTRY_SEPARATOR)
     end
     
     def split_entries(log_entry)
       entries = [""]
       log_entry.each_line do |line|
-        if line=~/----*/
+        if line=~REVISION_SEPARATOR
           entries << ""
         else
           entries[entries.length-1] << line
@@ -83,7 +85,7 @@ module DamageControl
     end
     
     def parse_change(change_entry)
-      raise "can't parse: #{change_entry}" if change_entry=~/-------*/
+      raise "can't parse: #{change_entry}" if change_entry=~REVISION_SEPARATOR
          
       change_entry = change_entry.split(/\r?\n/)
       change = Change.new
@@ -124,7 +126,7 @@ module DamageControl
       if string=~regexp
         return($1)
       else
-        error("can't parse: #{string}\nexpected to match regexp: #{regexp.to_s}")
+        error("can't parse: '#{string}'\nexpected to match regexp: #{regexp.to_s}")
         ""
       end
     end

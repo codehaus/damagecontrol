@@ -27,7 +27,7 @@ module DamageControl
     def test_jira_issue_is_filed_upon_failing_build_complete_event    
       build = Build.new("test_project", Time.now, {"jira_project_key" => "DC"})
       build.status = Build::FAILED
-      change = Change.new()
+      change = Change.new("", "", "", "", Time.new)
       change.developer = "damagecontrol"
       build.changesets.add(change)
       

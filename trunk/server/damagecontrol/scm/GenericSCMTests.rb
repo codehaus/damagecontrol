@@ -4,7 +4,7 @@ module DamageControl
   module GenericSCMTests
     include FileUtils
 
-    def create_scm(repository_dir, project_name)
+    def create_scm(repository_dir, path)
       raise "including classes must implement this method"
     end
 
@@ -17,23 +17,26 @@ module DamageControl
       repository_dir = "#{work_dir}/repository"
       scm = create_scm(repository_dir, "damagecontrolled") { |line| logger.debug(line) }
       scm.create {|line| logger.debug(line)}
-
       path = "#{damagecontrol_home}/testdata/damagecontrolled"
-      scm.import(path) { |line| logger.debug(line) }
-      scm.checkout(checkout_dir) { |line| logger.debug(line) }
+      import_dir = "#{work_dir}/damagecontrolled"
+      copy_dir(path, import_dir)
+
+      before_import = Time.new.utc
+      sleep(1)
+      scm.import(import_dir) { |line| logger.debug(line) }
+      timestamp = scm.checkout(checkout_dir, before_import, nil) { |line| logger.debug(line) }
+      assert(before_import < timestamp)
       
       # modify file and commit it
       sleep(1)
-      time_before = Time.now.utc
+      before_change = Time.now.utc
       sleep(1)
       change_file("#{checkout_dir}/build.xml")
       change_file("#{checkout_dir}/src/java/com/thoughtworks/damagecontrolled/Thingy.java")
       scm.commit(checkout_dir, "changed something") { |line| logger.debug(line) }
-      sleep(1)
-      time_after = Time.now.utc
       
       # check that we now have one more change
-      changesets = scm.changesets(checkout_dir, time_before, time_after) { |line| logger.debug(line) }
+      changesets = scm.checkout(checkout_dir, before_change, nil) { |line| logger.debug(line) }
 
       assert_equal(1, changesets.length)
       changeset = changesets[0]
@@ -53,7 +56,6 @@ module DamageControl
       assert(changeset[1].previous_revision)
     end
     
-    
     def test_uptodate
       work_dir = new_temp_dir
       checkout_dir = "#{work_dir}/WeCanCallItWhatWeWant/checkout"
@@ -61,49 +63,53 @@ module DamageControl
       repository_dir = "#{work_dir}/repository"
       scm = create_scm(repository_dir, "damagecontrolled") { |line| logger.debug(line) }
       scm.create {|line| logger.debug(line)}
-
       path = "#{damagecontrol_home}/testdata/damagecontrolled"
-      scm.import(path) { |line| logger.debug(line) }
-      scm.checkout(checkout_dir) { |line| logger.debug(line) }
-      scm.checkout(other_checkout_dir) { |line| logger.debug(line) }
+
+      before_import = Time.now.utc
+      sleep(1)
+      scm.import(path)
+      assert(before_import < scm.checkout(checkout_dir, before_import, nil))
+      assert(before_import < scm.checkout(other_checkout_dir, before_import, nil))
       
       # modify file and commit it
       sleep(1)
-      time_1 = Time.now.utc
+      before_change = Time.now.utc
       sleep(1)
       change_file("#{other_checkout_dir}/build.xml")
       change_file("#{other_checkout_dir}/src/java/com/thoughtworks/damagecontrolled/Thingy.java")
-      scm.commit(other_checkout_dir, "changed something") { |line| logger.debug(line) }
+      scm.commit(other_checkout_dir, "changed something")
       sleep(1)
-      time_2 = Time.now.utc
+      after_change = Time.now.utc
 
-      assert(!scm.uptodate?(checkout_dir, time_1, time_2))
-      sleep(1)
-      time_3 = Time.now.utc
-      scm.checkout(checkout_dir) { |line| logger.debug(line) }      
-      assert(scm.uptodate?(checkout_dir, time_2, time_3))
+      changesets = scm.checkout(checkout_dir, before_change, nil) { |line| puts line }
+      assert(1, changesets.length)
+      
+      build_xml = changesets[0][0]
+      assert(before_change < build_xml.time, "'{before_change}' should be < '#{build_xml.time}'")
+      assert(build_xml.time < after_change)
+      assert_equal("build.xml", build_xml.path)
+      assert_equal("src/java/com/thoughtworks/damagecontrolled/Thingy.java", changesets[0][1].path)
+
+      changesets = scm.checkout(checkout_dir, before_change, nil)
+      assert(0, changesets.length)
     end
     
     # test_install_uninstall_install_trigger_should_work_as_many_times_as_we_like
     def test_3
       work_dir = new_temp_dir
-      project_name = "OftenModified"
-      checkout_dir = "#{work_dir}/#{project_name}/checkout"
+      path = "OftenModified"
+      checkout_dir = "#{work_dir}/#{path}/checkout"
       repository_dir = "#{work_dir}/repository"
-      scm = create_scm(repository_dir, project_name) { |line| logger.debug(line) }
+      scm = create_scm(repository_dir, path)
       scm.create {|line| logger.debug(line)}
       
       trigger_files_checkout_dir = File.expand_path("#{checkout_dir}/../trigger")
+      trigger_command = "bla bla"
       (1..3).each do
-        assert(!scm.trigger_installed?(trigger_files_checkout_dir, project_name))
-        scm.install_trigger(
-          damagecontrol_home,
-          project_name,
-          trigger_files_checkout_dir,
-          "http://localhost:4713/private/xmlrpc"
-        ) {|line| logger.debug(line)}
-        assert(scm.trigger_installed?(trigger_files_checkout_dir, project_name))
-        scm.uninstall_trigger(trigger_files_checkout_dir, project_name)
+        assert(!scm.trigger_installed?(trigger_command, trigger_files_checkout_dir))
+        scm.install_trigger(trigger_command, trigger_files_checkout_dir)
+        assert(scm.trigger_installed?(trigger_command, trigger_files_checkout_dir))
+        scm.uninstall_trigger(trigger_command, trigger_files_checkout_dir)
       end
     end
     

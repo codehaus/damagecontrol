@@ -16,6 +16,16 @@ MAIN:<%= developer %>:<%= time.utc.strftime("%Y%m%d%H%M%S") %>
 <%= change.path %> <%= change.revision %><% end %>
 EOF
 
+  # Represents an entry in the SCM. The path is relative from the root of the SCM.
+  # The timestamp should in UTC be according to the SCM's clock.
+  class Entry
+    attr_reader :path, :timestamp
+  
+    def initialize(path, timestamp)
+      @path, @timestamp = path, timestamp
+    end
+  end
+
   class ChangeSets
     include XMLRPC::Marshallable
     include Pebbles::Matchable
@@ -109,6 +119,12 @@ EOF
     
     def << (change)
       @changes << change
+      
+      # TODO: These may go away one day (AH)
+      change.revision = revision if revision
+      change.developer = developer if developer
+      change.message = message if message
+      change.time = time if time
     end
 
     def [] (change)
@@ -122,6 +138,11 @@ EOF
     def length
       @changes.length
     end
+
+    def time=(time)
+      raise "time must be a Time object" unless time.is_a?(Time)
+      @time = time
+    end
     
     def ==(other)
       return false if !other.is_a?(self.class)
@@ -130,7 +151,8 @@ EOF
 
     def can_contain?(change)
       self.developer == change.developer &&
-      self.message == change.message
+      self.message == change.message &&
+      (self.time - change.time).abs < 60
     end
 
     def format(template, format_time=Time.new.utc)
@@ -160,6 +182,7 @@ EOF
     end
   end
 
+  # TODO: use Entry instead of path and time
   class Change
     include XMLRPC::Marshallable
     include Pebbles::Matchable
@@ -169,13 +192,23 @@ EOF
     ADDED = "ADDED"
     MOVED = "MOVED"
     
-    def initialize(path="", developer="", message="", revision="", time="")
+    attr_accessor :status
+    attr_accessor :path
+    attr_accessor :previous_revision
+    attr_accessor :revision
+
+    # TODO: Remove redundant attributes that are in ChangeSet
+    attr_accessor :developer
+    attr_accessor :message
+    # This is a UTC ruby time
+    attr_accessor :time
+    
+    def initialize(path="", developer="", message="", revision="", time=nil)
       @path, @developer, @message, @revision, @time = path, developer, message, revision, time
-      @url = ""
     end
   
     def to_s
-      "#{path} #{developer} #{revision} #{time}"
+      "#{path} #{developer} #{revision} #{time} #{message}"
     end
 
     def to_rss_description
@@ -183,15 +216,6 @@ EOF
       status_text + path
     end
   
-    attr_accessor :status
-    attr_accessor :developer
-    attr_accessor :message
-    attr_accessor :path
-    attr_accessor :previous_revision
-    attr_accessor :revision
-    # This is a UTC ruby time
-    attr_accessor :time
-    
     def developer=(developer)
       raise "can't be null" if developer.nil?
       @developer = developer

@@ -24,8 +24,8 @@ def server.logging_level
 end
 
 def server.init_build_executors
-  build_scheduler.add_executor(BuildExecutor.new('executor1', hub, project_directories, build_history_repository))
-  build_scheduler.add_executor(BuildExecutor.new('executor2', hub, project_directories, build_history_repository))
+  build_scheduler.add_executor(BuildExecutor.new('jon', hub, project_directories, build_history_repository, project_config_repository))
+  build_scheduler.add_executor(BuildExecutor.new('aslak', hub, project_directories, build_history_repository, project_config_repository))
 end
 
 def server.init_custom_components

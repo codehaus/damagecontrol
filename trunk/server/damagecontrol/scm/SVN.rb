@@ -31,11 +31,26 @@ module DamageControl
       commit(checkout_dir, "#{message} #{relative_filename}", &line_proc)
     end
 
-    def checkout(checkout_dir, time = nil, &line_proc)
+    def checkout(checkout_dir, scm_from_time, scm_to_time, &line_proc)
+      checked_out_files = []
+      path_regex = /^[A|D|U]\s*(.*)/
       if(checked_out?(checkout_dir))
-        svn(checkout_dir, update_command(time), &line_proc)
+        svn(checkout_dir, update_command(scm_from_time, scm_to_time)) do |line|
+          if(line =~ path_regex)
+            checked_out_files << $1
+          end
+          line_proc.call(line) if block_given?
+        end
+        changesets(checkout_dir, scm_from_time, scm_to_time, checked_out_files, &line_proc)
       else
-        svn(checkout_dir, checkout_command(checkout_dir), &line_proc)
+        svn(checkout_dir, checkout_command(scm_from_time, scm_to_time)) do |line|
+          if(line =~ path_regex)
+            checked_out_files << $1
+          end
+          line_proc.call(line) if block_given?
+        end
+        # See comment in AbstractSCM.checkout
+          most_recent_timestamp(changesets(checkout_dir, scm_from_time, scm_to_time, checked_out_files, &line_proc))
       end
     end
 
@@ -55,64 +70,26 @@ module DamageControl
       revision
     end
 
-    def changesets(checkout_dir, from_time, to_time, &line_proc)
-      command = changes_command(from_time, to_time)
+  private
+  
+    def changesets(checkout_dir, scm_from_time, scm_to_time, files, &line_proc)
+      command = changes_command(scm_from_time, scm_to_time, files)
       yield command if block_given?
 
       cmd_with_io(checkout_dir, "svn #{command}") do |io|
         parser = SVNLogParser.new(io, svnpath)
-        parser.parse_changesets(from_time, to_time, &line_proc)
+        parser.parse_changesets(scm_from_time, scm_to_time, &line_proc)
       end
     end
 
-    def local_revision(checkout_dir)
-      local_revision = nil
-      svn(checkout_dir, "info") do |line|
-        if(line =~ /Revision: (\d)*/)
-          return $1.to_i
-        end
-      end
-    end
-
-    def head_revision(checkout_dir)
-      cmd_with_io(checkout_dir, "svn log -r HEAD") do |io|
-        parser = SVNLogParser.new(io, svnpath)
-        last_changeset = parser.parse_changesets[0]
-        last_changeset.revision.to_i
-      end
-    end
-
-    def uptodate?(checkout_dir, start_time, end_time)
-      if(!checked_out?(checkout_dir))
-        # might as well check it out if it isn't checked out
-        # TODO: is this the right place to do that? prolly not.
-        checkout(checkout_dir)
-        false
-      else
-        local_revision(checkout_dir) == head_revision(checkout_dir)
-      end
-    end
-
-  private
-  
     def svn(dir, cmd, &line_proc)
       command_line = "svn #{cmd}"
-      yield command_line if block_given?
-      cmd_with_io(dir, command_line) { |io|
-        io.each_line { |line|
-          yield line if block_given?
-        }
-      }
+      cmd(dir, command_line, &line_proc)
     end
 
     def svnadmin(dir, cmd, &line_proc)
       command_line = "svnadmin #{cmd}"
-      yield command_line if block_given?
-      cmd_with_io(dir, command_line) { |io|
-        io.each_line { |line|
-          yield line if block_given?
-        }
-      }
+      cmd(dir, command_line, &line_proc)
     end
     
     def checked_out?(checkout_dir)
@@ -120,28 +97,46 @@ module DamageControl
       File.exists?(rootentries)
     end
 
-    def checkout_command(checkout_dir)
-      native_checkout_dir = filepath_to_nativepath(checkout_dir, true)
+    def checkout_command(scm_from_time, scm_to_time)
       "checkout #{svnurl} ."
     end
 
-    def update_command(time)
+    def update_command(scm_from_time, scm_to_time)
       "update"
     end
     
+    def changes_command(scm_from_time, scm_to_time, files)
+      # http://svnbook.red-bean.com/svnbook-1.1/svn-book.html#svn-ch-3-sect-3.3
+      file_list = files.join('\n')
+# WEIRD cygwin bug garbles this!?!?!?!
+      "log --verbose #{revision_option(scm_from_time, scm_to_time)} #{svnurl}"
+    end
+
+    def revision_option(scm_from_time, scm_to_time)
+      from = svndate(scm_from_time)
+      to = svndate(scm_to_time)
+      revision_option = nil
+      if(from && to.nil?)
+        revision_option = "--revision {\"#{from}\"}:HEAD"
+      elsif(from.nil? && to)
+        revision_option = "--revision {\"#{to}\"}"
+      elsif(from.nil? && to.nil?)
+        revision_option = ""
+      elsif(from && to)
+        revision_option = "--revision {\"#{from}\"}:{\"#{to}\"}"
+      end
+      revision_option
+    end
+    
+    def svndate(time)
+      return nil unless time
+      time.utc.strftime("%Y-%m-%d %H:%M:%S")
+    end
+
     def commit_command(message)
       "commit -m \"#{message}\""
     end
     
-    def changes_command(from_time, to_time)
-      # http://svnbook.red-bean.com/svnbook-1.1/svn-book.html#svn-ch-3-sect-3.3
-      "log -v --revision {\"#{svndate(from_time)}\"}:{\"#{svndate(to_time)}\"} #{svnurl}"
-    end
-
-    def svndate(time)
-      time.utc.strftime("%Y-%m-%d %H:%M:%S")
-    end
-
     def install_trigger(*args)
       raise "can't automatically install trigger for Subversion, you need to install it manually"
     end
@@ -168,8 +163,9 @@ module DamageControl
     def import(dir, &line_proc)
 #      mkdir_cmd = "mkdir #{filepath_to_nativepath(dir, true)} #{svnurl} -m \"creating directories\""
 #      svn(dir, import_cmd, &line_proc)
-
-      import_cmd = "import #{filepath_to_nativepath(dir, true)} #{svnurl} -m \"initial import\""
+#      import_cmd = "import #{filepath_to_nativepath(dir, true)} #{svnurl} -m \"initial import\""
+puts "Importing #{dir}"
+      import_cmd = "import #{svnurl} -m \"initial import\""
       svn(dir, import_cmd, &line_proc)
     end
 
@@ -177,25 +173,24 @@ module DamageControl
       true
     end
 
-    def install_trigger(damagecontrol_install_dir, project_name, trigger_files_checkout_dir, dc_url="http://localhost:4712/private/xmlrpc", &proc)
-      mode = File.exists?(post_commit_file) ? File::APPEND|File::WRONLY : File::CREAT|File::WRONLY
+    def install_trigger(trigger_command, damagecontrol_install_dir, &proc)
+      post_commit_exists = File.exists?(post_commit_file)
+      mode = post_commit_exists ? File::APPEND|File::WRONLY : File::CREAT|File::WRONLY
       File.open(post_commit_file, mode) do |file|
-        trigger_command = trigger_command(damagecontrol_install_dir, project_name, dc_url)
-        file.puts("#!/bin/sh")
+        file.puts("#!/bin/sh") unless post_commit_exists 
         file.puts(trigger_command)
       end
       system("chmod g+x #{post_commit_file}")
     end
     
-    def uninstall_trigger(trigger_files_checkout_dir, project_name)
-      File.uncomment(post_commit_file, /#{project_name}/, "# ")
+    def uninstall_trigger(trigger_command, trigger_files_checkout_dir)
+      File.comment_out(post_commit_file, /#{trigger_command}/, "# ")
     end
     
-    def trigger_installed?(trigger_files_checkout_dir, project_name)
+    def trigger_installed?(trigger_command, trigger_files_checkout_dir)
       return false unless File.exist?(post_commit_file)
-      # This is not exatly accurate, but it will do for  now
-      post_commit_contents = File.new(post_commit_file).read
-      Regexp.new("^[^# ].*--projectname #{project_name}") =~ post_commit_contents ? true : false
+      in_post_commit = comment_out(File.new(post_commit_file), /#{trigger_command}/, "# ", "")
+      in_post_commit
     end
     
     def add_file(relative_filename, content, is_new)

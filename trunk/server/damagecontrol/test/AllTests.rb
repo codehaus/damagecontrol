@@ -6,9 +6,9 @@ DamageControl::Logging.silent
 
 require 'damagecontrol/core/BuildExecutorTest'
 require 'damagecontrol/core/BuildHistoryRepositoryTest'
-#!
 require 'damagecontrol/core/BuildSchedulerTest'
 require 'damagecontrol/core/BuildTest'
+require 'damagecontrol/core/CheckoutManagerTest'
 require 'damagecontrol/core/DependentBuildTriggerTest'
 #require 'damagecontrol/core/EqualityTest'
 require 'damagecontrol/core/HostVerifyingHandlerTest'

@@ -205,14 +205,15 @@ module DamageControl
     end
     
     def test_should_allow_searching_in_anything
-      a = Build.new("test", Time.utc(2004, 01, 01, 12, 00, 00))
-      b = Build.new("test", Time.utc(2004, 01, 04, 12, 00, 00))
-      c = Build.new("test", Time.utc(2004, 01, 05, 12, 00, 00))
+      time = Time.new.utc
+      a = Build.new("test", time)
+      b = Build.new("test", time + 1)
+      c = Build.new("test", time + 2)
       
-      b.changesets.add(Change.new("some/where", "aslak", "funny message"))
-      b.changesets.add(Change.new("some/where/else", "aslak", "funny message again"))
-      c.changesets.add(Change.new("some/path", "jon", "some other funny message"))
-      
+      b.changesets.add(Change.new("some/where", "aslak", "funny message", "r1", time))
+      b.changesets.add(Change.new("some/where/else", "aslak", "funny message again", "r1", time))
+      c.changesets.add(Change.new("some/path", "jon", "some other funny message", "r1", time))
+     
       @bhp.register(a)
       @bhp.register(b)
       @bhp.register(c)
@@ -223,13 +224,14 @@ module DamageControl
     end
 
     def test_should_only_search_in_project_when_project_name_specified
-      a = Build.new("test", Time.utc(2004, 01, 01, 12, 00, 00))
-      b = Build.new("test", Time.utc(2004, 01, 04, 12, 00, 00))
-      c = Build.new("onlythisone", Time.utc(2004, 01, 05, 12, 00, 00))
+      time = Time.new.utc
+      a = Build.new("test", time)
+      b = Build.new("test", time + 1)
+      c = Build.new("onlythisone", time + 2)
       
-      b.changesets.add(Change.new("some/where", "aslak", "funny message"))
-      b.changesets.add(Change.new("some/where/else", "aslak", "funny message again"))
-      c.changesets.add(Change.new("some/path", "jon", "some other funny message"))
+      b.changesets.add(Change.new("some/where", "aslak", "funny message", "r1", time))
+      b.changesets.add(Change.new("some/where/else", "aslak", "funny message again", "r1", time))
+      c.changesets.add(Change.new("some/path", "jon", "some other funny message", "r1", time))
       
       @bhp.register(a)
       @bhp.register(b)

@@ -12,13 +12,13 @@ module DamageControl
       unless project_name.nil?
         if(private?)
           scm = project_config["scm"]
-          if(scm.can_create? && !scm.exists?)
+          if(scm.respond_to?(:create) && !scm.exists?)
             result +=
               [
                 task(:icon => "largeicons/package_new.png", :name => "Create repository", :url => "configure?project_name=#{project_name}&action=create_scm")
               ]
           end
-          if(scm.can_install_trigger?)
+          if(scm.respond_to?(:install_trigger))
             result +=
               [
                 task(:icon => "largeicons/gear_connection.png", :name => "Install trigger", :url => "install_trigger?project_name=#{project_name}"),
