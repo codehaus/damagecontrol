@@ -28,7 +28,8 @@ module RSCM
     Tracker::JIRA.new,
     Tracker::RubyForge.new,
     Tracker::SourceForge.new,
-    Tracker::Scarab.new
+    Tracker::Scarab.new,
+    Tracker::Trac.new
   ]
 
   SCM_WEBS = [

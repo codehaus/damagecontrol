@@ -41,6 +41,27 @@ module RSCM
         end
       end
     end
+    
+    class Trac < Base
+      attr_accessor :url
+
+      def initialize(url=nil)
+        @url = url
+      end
+      
+      def name
+        "Trac"
+      end
+
+      def highlight(s)
+        url = PathConverter.ensure_trailing_slash(@url)
+        if (url)
+          htmlize(s.gsub(/#([0-9]+)/, "<a href=\"#{url}/ticket/\\1\">#\\1</a>"))
+        else
+          htmlize(s)
+        end
+      end
+    end
 
     class JIRA < Base
       attr_accessor :baseurl
