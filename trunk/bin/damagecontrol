@@ -1,12 +1,28 @@
 #!/bin/sh
+
+if [ -z $1 ] ; then
+	echo "ERROR: Please specify the Server Configuration File"
+	exit 1
+else
+	echo $1 | grep "^/" > /dev/null
+	if [ "$?" = "0" ] ; then
+		CONFIIGFILE=$1
+	else
+		CONFIGFILE=$PWD/$1
+	fi
+fi
+
 if [ -z "$DAMAGECONTROL_WORK" ] ; then
 	DAMAGECONTROL_WORK=~/.damagecontrol
 fi
 
 if [ -z "$DAMAGECONTROL_HOME" ] ; then
-	echo "Please define DAMAGECONTROL_HOME before starting DamageControl"
+	echo "ERROR: Please define DAMAGECONTROL_HOME before starting DamageControl"
 	exit 1;
 fi
 cd $DAMAGECONTROL_HOME
 export DAMAGECONTROL_HOME=`pwd`
-exec ruby -I"$DAMAGECONTROL_HOME/server" $*
+
+echo "INFO: Using configuration file: $CONFIGFILE"
+
+exec ruby -I"$DAMAGECONTROL_HOME/server" $CONFIGFILE
