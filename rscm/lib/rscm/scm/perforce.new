@@ -8,138 +8,26 @@ require 'pp'
 require 'parsedate'
 require 'stringio'
 
-
 module RSCM
-  # RSCM implementation for Perforce.
-  #
-  # Understands operations against multiple client-workspaces
-  # You need the p4/p4d executable on the PATH in order for it to work.
-  #
-  class Perforce < AbstractSCM
-    register self
-
+  # Understands administrative operations on a perforce depot
+  class P4Repository
     include FileUtils
+                     
+    @@counter = 0
 
-    ann :description => "P4CLIENT", :tip => "The Perforce client workspace name"
-    attr_accessor :client_name
-
-    ann :description => "P4PORT", :tip => "The host where the Perforce server is available e.g. 10.12.1.55:1666"
-    attr_accessor :port
-
-    ann :description => "P4USER", :tip => "Perforce username"
-    attr_accessor :user
-
-    ann :description => "P4PASSWD", :tip => "Perforce password"
-    attr_accessor :pwd
-
-    def initialize(client_name = "", port = "", user = "", pwd = "")
-      @client_name, @port, @user, @pwd = client_name, port, user, pwd
-    end
-
-    def create
-    end
-
-    def name
-      "Perforce"
-    end
-
-    def transactional?
-      true
+    def initialize(port)
+      @port = port
     end
 
     def import(dir, comment)
       with_create_client(dir) do |client|
         client.add_all(list_files)
-        client.submit(comment)
+        client.commit(comment)
       end
     end
 
-    def checkout(checkout_dir, to_identifier = nil, &proc)
-      client.checkout(to_identifier, &proc)
-    end
-
-    def add(checkout_dir, relative_filename)
-      client.add(relative_filename)
-    end
-
-    def commit(checkout_dir, message, &proc)
-      client.submit(message, &proc)
-    end
-
-    def changesets(checkout_dir, from_identifier, to_identifier=Time.infinity)
-      client.changesets(from_identifier, to_identifier)
-    end
-
-    def uptodate?(checkout_dir, from_identifier)
-      client.uptodate?
-    end
-
-    def edit(file)
-      client.edit(file)
-    end
-
-    def trigger_installed?(trigger_command, trigger_files_checkout_dir)
-      p4admin.trigger_installed?(trigger_command)
-    end
-
-    def install_trigger(trigger_command, damagecontrol_install_dir)
-      p4admin.install_trigger(trigger_command)
-    end
-
-    def uninstall_trigger(trigger_command, trigger_files_checkout_dir)
-      p4admin.uninstall_trigger(trigger_command)
-    end
-
-    private
-    def p4admin
-      @p4admin ||= P4Admin.new
-    end
-
-    def client
-      @p4 ||= P4Client.new(@client_name, @port, @user, @pwd)
-    end
-
-    def with_create_client(rootdir)
-      raise "needs a block" unless block_given?
-      rootdir = File.expand_path(rootdir)
-      with_working_dir(rootdir) do
-        client = create_client(rootdir)
-        begin
-          yield client
-        ensure
-          delete_client(client)
-        end
-      end
-    end
-
-    def delete_client(client)
-      p4admin.delete_client(client)
-    end
-
-    def create_client(rootdir)
-      rootdir = File.expand_path(rootdir) if rootdir =~ /\.\./
-      mkdir_p(rootdir)
-      p4admin.create_client(rootdir)
-    end
-
-    def list_files
-      files = Dir["**/*"].delete_if{|f| File.directory?(f)}
-      files.collect{|f| File.expand_path(f)}
-    end
-  end
-
-  # Understands p4 administrative operations (not specific to a client)
-  class P4Admin
-    @@counter = 0
-
-    def create_client(rootdir)
-      name = next_name
-      popen("client -i", "w+", clientspec(name, rootdir))
-      P4Client.new(name)
-    end
-
-    def delete_client(client)
-      execute("client -d #{client.name}")
+    def create_workspace(checkout_dir, name)
+      create_client(checkout_dir, name)
     end
 
     def trigger_installed?(trigger_command)
@@ -152,6 +40,9 @@ module RSCM
 
     def uninstall_trigger(trigger_command)
       popen("triggers -i", "a+", triggerspec_without(trigger_command))
+    end
+
+    def create
     end
 
     def triggerspec_with(trigger_command)
@@ -180,8 +71,37 @@ module RSCM
       execute("triggers -o")
     end
 
+    private
+    def with_create_client(rootdir)
+      raise "needs a block" unless block_given?
+      rootdir = File.expand_path(rootdir)
+      with_working_dir(rootdir) do
+        client = create_client(rootdir)
+        begin
+          yield client
+        ensure
+          delete_client(client)
+        end
+      end
+    end
+
+    def create_client(rootdir, name = next_name)
+      rootdir = File.expand_path(rootdir) if rootdir =~ /\.\./
+      mkdir_p(rootdir)
+      popen("client -i", "w+", clientspec(name, rootdir))
+      Perforce.new(name, rootdir)
+    end
+
+    def next_name
+      "client#{@@counter += 1}"
+    end
+
+    def delete_client(client)
+      execute("client -d #{client.name}")
+    end
+
     def popen(cmd, mode, input)
-      IO.popen("p4 -p 1666 #{cmd}", mode) do |io|
+      IO.popen("p4 -p #{@port} #{cmd}", mode) do |io|
         io.puts(input)
         io.close_write
         io.each_line {|line| debug(line)}
@@ -189,33 +109,47 @@ module RSCM
     end
 
     def execute(cmd)
-      cmd = "p4 -p 1666 #{cmd}"
+      cmd = "p4 -p #{@port} #{cmd}"
       puts "> executing: #{cmd}"
       `#{cmd}`
     end
 
-    def next_name
-      "client#{@@counter += 1}"
+    def list_files
+      files = Dir["**/*"].delete_if {|f| File.directory?(f)}
+      files.collect {|f| File.expand_path(f)}
     end
   end
 
   # Understands operations against a client-workspace
-  class P4Client
+  class Perforce < AbstractSCM
     DATE_FORMAT = "%Y/%m/%d:%H:%M:%S"
     STATUS = { "add" => Change::ADDED, "edit" => Change::MODIFIED, "delete" => Change::DELETED }
     PERFORCE_EPOCH = Time.utc(1970, 1, 1, 6, 0, 1)  #perforce doesn't like Time.utc(1970)
 
-    def initialize(name, port = "1666", user = ENV["LOGNAME"], pwd = "")
-      @name, @port, @user, @pwd = name, port, user, pwd
+    ann :description => "Client name", :tip => "The Perforce client workspace name"
+    attr_accessor :name
+
+    ann :description => "Port", :tip => "The host where the Perforce server is available e.g. 10.12.1.55:1666"
+    attr_accessor :port
+
+    ann :description => "Username", :tip => "Perforce username"
+    attr_accessor :user
+
+    ann :description => "Password", :tip => "Perforce password"
+    attr_accessor :pwd
+
+    register self
+
+    def initialize(name = nil, rootdir = nil, port = "1666", user = ENV["LOGNAME"], pwd = "")
+      @name, @rootdir, @port, @user, @pwd = name, rootdir, port, user, pwd
     end
 
-    def uptodate?
+    def uptodate?(since)
       p4("sync -n").empty?
     end
 
-    def changesets(from_identifier, to_identifier)
-      changesets = changelists(from_identifier, to_identifier).collect {|changelist| to_changeset(changelist)}
-      ChangeSets.new(changesets)
+    def changesets(from, to = Time.infinity)
+      ChangeSets.new(changelists(from, to).collect {|c| to_changeset(c)})
     end
 
     def name
@@ -228,22 +162,18 @@ module RSCM
     end
 
     def add(relative_path)
-      add_file(rootdir + "/" + relative_path)
+      add_file(absolute_path(relative_path))
     end
 
     def add_all(files)
       files.each {|file| add_file(file)}
     end
 
-    def submit(comment)
-      IO.popen(p4cmd("submit -i"), "w+") do |io|
-        io.puts(submitspec(comment))
-        io.close_write
-        io.each_line {|progress| debug progress}
-      end
+    def commit(message, &proc)
+      submit(message, &proc)
     end
 
-    def checkout(to_identifier)
+    def checkout(to_identifier = nil)
       cmd = to_identifier.nil? ? "sync" : "sync //...@#{to_identifier}"
       checked_out_files = []
       p4(cmd).collect do |output|
@@ -258,12 +188,23 @@ module RSCM
     end
 
     private
+    def absolute_path(relative_path)
+      rootdir + "/" + relative_path
+    end
+
     def rootdir
       unless @rootdir
-        p4("info") =~ /Client root: (.+)/
-        @rootdir = $1
+        @rootdir = $1 if p4("info") =~ /Client root: (.+)/
       end
       @rootdir
+    end
+
+    def submit(comment)
+      IO.popen(p4cmd("submit -i"), "w+") do |io|
+        io.puts(submitspec(comment))
+        io.close_write
+        io.each_line {|progress| debug progress}
+      end
     end
 
     def add_file(absolute_path)
@@ -366,6 +307,7 @@ module RSCM
         end
       end
     end
+
   end
 
 end
