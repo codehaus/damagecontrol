@@ -4,5 +4,12 @@
 <link type="text/css" rel="stylesheet" href="/stylesheets/style.css">
 </head>
 <body onLoad="executeOnLoad()">
+<script>
+// http://developer.irt.org/script/1428.htm - add timezone
+function intercept(a) {
+  if(a.href.indexOf('?') == -1) a.href += '?'; else a.href += '&';
+  a.href += 'timezone=' + new Date().getTimezoneOffset()
+}
+</script>
 <%= @content_for_layout %>
 </body></html>
