@@ -2,6 +2,7 @@ require 'damagecontrol/core/Build'
 require 'damagecontrol/core/BuildEvents'
 require 'damagecontrol/core/AsyncComponent'
 require 'damagecontrol/util/Slot'
+require 'damagecontrol/scm/SCMFactory'
 
 module DamageControl
   
@@ -17,16 +18,17 @@ module DamageControl
     
     attr_accessor :last_build_request
 
-    def initialize(channel, build_history, project_directories)
+    def initialize(channel, build_history, project_directories, scm_factory=SCMFactory.new)
       @channel = channel
       @build_history = build_history
       @project_directories = project_directories
+      @scm_factory = scm_factory
 
       @scheduled_build_slot = Slot.new
     end
     
     def checkout?
-      !current_scm.nil? && !current_build.scm_spec.nil? && current_build.scm_spec != ""
+      !current_scm.nil?
     end
     
     def checkout
@@ -71,7 +73,7 @@ module DamageControl
     end
  
     def checkout?
-      !current_build.get_scm(nil).nil?
+      !current_scm.nil?
     end
     
     def project_base_dir
@@ -139,7 +141,7 @@ module DamageControl
     end
     
     def current_scm
-      current_build.get_scm(project_checkout_dir)
+      @scm_factory.get_scm(current_build.config, project_checkout_dir)
     end
     
     def process_next_scheduled_build

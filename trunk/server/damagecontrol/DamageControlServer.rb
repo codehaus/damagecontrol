@@ -1,6 +1,7 @@
 #!/usr/bin/env ruby
 
 require 'xmlrpc/server'
+require 'socket'
 require 'webrick'
  
 require 'damagecontrol/Version'
@@ -109,6 +110,14 @@ module DamageControl
       params[:HttpsPort] || 4713
     end
     
+    def nudge_xmlrpc_url
+      params[:NudgeXmlrpcUrl] || "http://#{get_ip}:#{http_port}/private/xmlrpc"
+    end
+    
+    def get_ip
+      IPSocket.getaddress(Socket.gethostname)
+    end
+    
     def init_config_services
       component(:hub, Hub.new)
       
@@ -147,7 +156,7 @@ module DamageControl
       httpd.mount("/public/xmlrpc", public_xmlrpc_servlet)
       
       httpd.mount("/public/dashboard", DashboardServlet.new(build_history_repository, project_config_repository, build_scheduler, :public))
-      httpd.mount("/public/project", ProjectServlet.new(build_history_repository, nil, nil, :public, build_scheduler))
+      httpd.mount("/public/project", ProjectServlet.new(build_history_repository, nil, nil, :public, build_scheduler, @project_directories, nudge_xmlrpc_url))
       
       httpd.mount("/public/images", WEBrick::HTTPServlet::FileHandler, "#{webdir}/images")
       httpd.mount("/public/css", WEBrick::HTTPServlet::FileHandler, "#{webdir}/css")
@@ -161,7 +170,7 @@ module DamageControl
       httpd.mount("/private/xmlrpc", private_xmlrpc_servlet)
 
       httpd.mount("/private/dashboard", DashboardServlet.new(build_history_repository, project_config_repository, build_scheduler, :private))
-      httpd.mount("/private/project", ProjectServlet.new(build_history_repository, project_config_repository, trigger, :private, build_scheduler))
+      httpd.mount("/private/project", ProjectServlet.new(build_history_repository, project_config_repository, trigger, :private, build_scheduler, @project_directories, nudge_xmlrpc_url))
       
       httpd.mount("/private/images", WEBrick::HTTPServlet::FileHandler, "#{webdir}/images")
       httpd.mount("/private/css", WEBrick::HTTPServlet::FileHandler, "#{webdir}/css")

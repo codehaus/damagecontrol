@@ -65,7 +65,7 @@ module DamageControl
       assert_equal(Build::FAILED, messages_from_hub[-1].build.status)
     end
     
-    def test_checks_out_before_building      
+    def test_checks_out_and_determines_changeset_before_building      
       checkoutdir = "#{@basedir}/damagecontrolled/checkout/damagecontrolled"
       last_build_time = Time.utc(2004, 04, 02, 12, 00, 00)
       current_build_time = Time.utc(2004, 04, 02, 13, 00, 00)
@@ -87,7 +87,7 @@ module DamageControl
       
       FileUtils.mkdir_p(checkoutdir)
       
-      @build_executor = BuildExecutor.new(hub, mock_build_history, ProjectDirectories.new(@basedir))
+      @build_executor = BuildExecutor.new(hub, mock_build_history, ProjectDirectories.new(@basedir), MockScmFactory.new(mock_scm))
       @build = Build.new("damagecontrolled", Time.now,
         { "build_command_line" => "echo hello world"})
       def @build.scm=(scm)
@@ -105,8 +105,8 @@ module DamageControl
       assert_equal(nil, @build.error_message)
       assert_equal(Build::SUCCESSFUL, @build.status)
       
-      mock_build_history.__verify
       mock_scm.__verify
+      mock_build_history.__verify
     end
     
     private
@@ -116,4 +116,13 @@ module DamageControl
     end
   end
   
+  class MockScmFactory
+    def initialize(scm)
+      @scm = scm
+    end
+
+    def get_scm(config_map, checkout_dir_root)
+      @scm
+    end
+  end
 end

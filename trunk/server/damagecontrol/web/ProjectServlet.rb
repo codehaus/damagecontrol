@@ -1,11 +1,16 @@
 require 'damagecontrol/web/AbstractAdminServlet'
+require 'damagecontrol/scm/SCMFactory'
 
 module DamageControl
   class ProjectServlet < AbstractAdminServlet
-    def initialize(build_history_repository, project_config_repository, trigger, type, build_scheduler)
+    def initialize(build_history_repository, project_config_repository, trigger, type, build_scheduler, project_directories, nudge_xmlrpc_url)
       super(type, build_scheduler, build_history_repository)
       @project_config_repository = project_config_repository
       @trigger = trigger
+      @project_directories = project_directories
+      @nudge_xmlrpc_url = nudge_xmlrpc_url
+
+      @scm_factory = SCMFactory.new
     end
 
     def templatedir
@@ -50,6 +55,11 @@ module DamageControl
       end
 
       @project_config_repository.modify_project_config(project_name, project_config)
+      
+      # Now install the trigger
+      scm = @scm_factory.get_scm(project_config, @project_directories.checkout_dir(project_name))
+      scm.uninstall_trigger(project_name) if scm.trigger_installed?(project_name)
+      scm.install_trigger(project_name, @nudge_xmlrpc_url)
       
       dashboard_redirect
     end

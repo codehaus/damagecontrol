@@ -1,6 +1,4 @@
 require 'damagecontrol/core/BuildEvents'
-require 'damagecontrol/scm/CVS'
-require 'damagecontrol/scm/SVN'
 require 'xmlrpc/utils'
 
 module DamageControl
@@ -125,14 +123,6 @@ module DamageControl
       timestamp == o.timestamp
     end
     
-    def get_scm(checkout_dir_root)
-      case config["scm_type"]
-        when "cvs"
-          CVS.new(config["cvsroot"], config["cvsmodule"], checkout_dir_root)
-        when "svn"
-          SVN.new(config["svnurl"], checkout_dir_root)
-      end
-    end
   end
 end
 
