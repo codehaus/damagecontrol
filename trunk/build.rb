@@ -2,6 +2,7 @@
 
 $VERBOSE = nil
 
+
 class Object
   def system(*args)
     result = super(*args)
