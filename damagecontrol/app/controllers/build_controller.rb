@@ -27,7 +27,7 @@ private
     load_project
     changeset_identifier = @params["changeset"].to_identifier
     build_time = @params["build"].to_identifier
-    @build = @project.build(changeset_identifier, build_time)
+    @build = @project.changeset(changeset_identifier).build(build_time)
   end
 
 end
