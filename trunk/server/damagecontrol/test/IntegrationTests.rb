@@ -18,7 +18,7 @@ module DamageControl
     def setup
       @basedir = new_temp_dir("integration")
       create_hub
-      @executor = BuildExecutor.new(hub, BuildHistoryRepository.new(hub))
+      @executor = BuildExecutor.new('executor1', hub, BuildHistoryRepository.new(hub))
       @scheduler = BuildScheduler.new(hub)
       @scheduler.default_quiet_period = 0
       @scheduler.add_executor(@executor)

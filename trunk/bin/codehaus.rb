@@ -23,8 +23,8 @@ def server.logging_level
 end
 
 def server.init_build_executors
-  build_scheduler.add_executor(BuildExecutor.new(hub, build_history_repository))
-  build_scheduler.add_executor(BuildExecutor.new(hub, build_history_repository))
+  build_scheduler.add_executor(BuildExecutor.new('executor1', hub, build_history_repository))
+  build_scheduler.add_executor(BuildExecutor.new('executor2', hub, build_history_repository))
 end
 
 
