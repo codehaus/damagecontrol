@@ -174,10 +174,6 @@ module DamageControl
     def determine_changeset
       current_build.status = Build::DETERMINING_CHANGESETS
       @channel.put(BuildStateChangedEvent.new(current_build))
-      if !current_build.changesets.empty?
-        logger.info("not determining changeset for #{current_build.project_name} because other component (such as SCMPoller) has already determined it")
-        return
-      end
       if !checkout?
         logger.info("not determining changeset for #{current_build.project_name} because scm not configured")
         return 
@@ -195,16 +191,23 @@ module DamageControl
         from_time = last_successful_build ? last_successful_build.scm_commit_time : nil
         from_time = from_time ? from_time + 1 : nil
         logger.info("Determining changesets for #{current_build.project_name} from #{from_time}")
-        changesets = current_scm.changesets(checkout_dir, from_time, nil, nil) {|p| report_progress(p)}
+
+        changesets = current_build.changesets
+        if !current_build.changesets.empty?
+          logger.info("not determining changeset for #{current_build.project_name} because other component (such as SCMPoller) has already determined it")
+        else
+          changesets = current_scm.changesets(checkout_dir, from_time, nil, nil) {|p| report_progress(p)}
+        end
+
         # Only store changesets if the previous commit time was known
         current_build.changesets = changesets if changesets && from_time
         
-        # Set last commit timeister
+        # Set last commit time
         changesets = changesets.sort do |a,b|
           a.time <=> b.time
         end
         current_build.scm_commit_time = changesets[-1] ? changesets[-1].time : nil
-        logger.info("Done determining changesets for #{current_build.project_name}")
+        logger.info("Done determining changesets for #{current_build.project_name}. Last commit time: #{current_build.scm_commit_time}")
         @channel.put(BuildStateChangedEvent.new(current_build))
       rescue Exception => e
         logger.error "could not determine changeset: #{format_exception(e)}"

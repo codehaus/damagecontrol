@@ -70,14 +70,14 @@ module DamageControl
       # http://builds.codehaus.org/damagecontrol/private/project/damagecontrol?dc_creation_time=20041130053221
       # The bad file:
       # http://builds.codehaus.org/damagecontrol/private/root/damagecontrol/build/20041130053221/changesets.yaml
+      changesets_file = "#{build_dir}/changesets.yaml"
       begin
-        changesets_file = "#{build_dir}/changesets.yaml"
         changesets = File.open(changesets_file) do |io|
           YAML::load(io)
         end
         changesets
       rescue Exception => e
-        puts "Failed to parse changesets with YAML:"
+        puts "Failed to parse changesets with YAML: #{changesets_file}"
         puts e.message
         puts e.backtrace.join("\n")
         ChangeSets.new
