@@ -153,6 +153,14 @@ module DamageControl
           :selected_build => selected_build,
           :builds => build_history)
     end
+    
+    def project_title
+      if(project_config["home_page"])
+        "<a href=\"#{project_config['home_page']}\">#{project_name}</a>"
+      else
+        project_name
+      end
+    end
   
   private
   

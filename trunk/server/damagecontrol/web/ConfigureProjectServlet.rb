@@ -113,6 +113,7 @@ module DamageControl
       "trigger", 
       "nag_email", 
       "scm_web_url",
+      "home_page",
       "fixed_build_time_hhmm"
     ]
     

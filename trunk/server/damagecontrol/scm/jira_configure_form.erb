@@ -2,12 +2,22 @@
 <table width="100%">
   <tr>
     <td class="setting-name">Jira URL</td>
-    <td width="75%"><input class="setting-input" name="jira_url" id="jira_url" type="text" value="<%=  jira_url %>"></td>
+    <td width="75%"><input class="setting-input" name="jira_url" id="jira_url" type="text" value="<%= jira_url %>"></td>
   </tr>
   <tr>
     <td>&nbsp;</td>
     <td class="setting-description">
       Enter the URL of the Jira installation here, not of the specific Jira module
+    </td>
+  </tr>
+  <tr>
+    <td class="setting-name">Jira Project id</td>
+    <td width="75%"><input class="setting-input" name="jira_project_id" id="jira_project_id" type="text" value="<%= jira_project_id %>"></td>
+  </tr>
+  <tr>
+    <td>&nbsp;</td>
+    <td class="setting-description">
+      The id of the JIRA project
     </td>
   </tr>
 </table>

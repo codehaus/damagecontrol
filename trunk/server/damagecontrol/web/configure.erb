@@ -72,9 +72,9 @@ function configureAction() {
 </script>
 
 <ul id="foldertab">
-    <li><a href="javascript:showTab('general_tab')">General</a></li>
-    <li><a href="javascript:showTab('scm_tab')">Source Control</a></li>
-    <li><a href="javascript:showTab('tracker_tab')">Issue Tracker</a></li>
+    <li><a href="javascript:showTab('general_tab')"><img src="smallicons/wrench.png"> General</a></li>
+    <li><a href="javascript:showTab('scm_tab')"><img src="smallicons/safe.png"> Source Control</a></li>
+    <li><a href="javascript:showTab('tracker_tab')"><img src="smallicons/scroll_information.png"> Issue Tracker</a></li>
 </ul>
 
 <form onsubmit="configureAction();" id="configform">
@@ -111,6 +111,10 @@ function configureAction() {
   <td class="setting-description">
     Several email addresses can be specified here, separated by a comma or a space charatcter.
   </td>
+</tr>
+<tr>
+  <td>Project home page</td>
+  <td><input class="setting-input" name="home_page" id="home_page" type="text" value="<%= project_config['home_page'] %>"></td>
 </tr>
 <tr>
   <td>ViewCVS/Fisheye URL</td>
