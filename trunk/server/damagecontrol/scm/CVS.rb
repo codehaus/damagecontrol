@@ -130,7 +130,9 @@ module DamageControl
     end
     
     def trigger_installed?(trigger_command, trigger_files_checkout_dir, &line_proc)
-      regex = /#{cvsmodule} #{trigger_command}/
+      loginfo_line = "#{cvsmodule} #{trigger_command}"
+      regex = Regexp.new(Regexp.escape(loginfo_line))
+
       cvsroot_cvs = create_cvsroot_cvs
       begin
         cvsroot_cvs.checkout(trigger_files_checkout_dir, nil, &line_proc)
@@ -152,15 +154,17 @@ module DamageControl
     end
 
     def uninstall_trigger(trigger_command, trigger_files_checkout_dir, &line_proc)
-      regex = /#{cvsmodule} #{trigger_command}/
+      loginfo_line = "#{cvsmodule} #{trigger_command}"
+      regex = Regexp.new(Regexp.escape(loginfo_line))
+
       cvsroot_cvs = create_cvsroot_cvs
       cvsroot_cvs.checkout(trigger_files_checkout_dir, nil, &line_proc)
       loginfo_path = File.join(trigger_files_checkout_dir, "loginfo")
       File.comment_out(loginfo_path, regex, "# ")
       with_working_dir(trigger_files_checkout_dir) do
-        system("#{cvs_executable} commit -m \"Disabled DamageControl trigger for /#{regex}/\"")
+        commit(trigger_files_checkout_dir, "Uninstalled trigger for CVS module '#{cvsmodule}'")
       end
-      raise "Couldn't uninstall/commit trigger to loginfo" unless !trigger_installed?(regex, trigger_files_checkout_dir)
+      raise "Couldn't uninstall/commit trigger to loginfo" if trigger_installed?(trigger_command, trigger_files_checkout_dir)
     end
 
     def create

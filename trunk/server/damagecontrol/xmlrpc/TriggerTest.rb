@@ -1,7 +1,6 @@
 require 'test/unit'
 require 'pebbles/mockit'
 require 'xmlrpc/server'
-require 'damagecontrol/util/FileUtils'
 require 'damagecontrol/xmlrpc/Trigger'
 
 module DamageControl
@@ -9,7 +8,6 @@ module XMLRPC
 
   class TriggerTest < Test::Unit::TestCase
     include MockIt
-    include FileUtils
     
     def test_adds_handler_in_initialize
       rpc_servlet = new_mock
@@ -51,11 +49,18 @@ module XMLRPC
       
     end
     
-    def test_trigger_url
-      expected = "sh #{damagecontrol_home}/bin/requestbuild --url http://builds.codehaus.org/damagecontrol/private/xmlrpc --projectname jalla"
-      assert_equal(expected, Trigger.trigger_command(damagecontrol_home, "jalla", "http://builds.codehaus.org/damagecontrol/private/xmlrpc"))
+    def test_unix_trigger_url
+      ENV['WINDIR'] = nil
+      ENV['windir'] = nil
+      expected = "/some/where/bin/requestbuild --url http://builds.codehaus.org/damagecontrol/private/xmlrpc --projectname jalla"
+      assert_equal(expected, Trigger.trigger_command("/some/where", "jalla", "http://builds.codehaus.org/damagecontrol/private/xmlrpc"))
     end
-
+    
+    def test_win_trigger_url
+      ENV['windir'] = "blah"
+      expected = "C:\\somewhere\\bin\\requestbuild --url http://builds.codehaus.org/damagecontrol/private/xmlrpc --projectname jalla"
+      assert_equal(expected, Trigger.trigger_command("C:\\somewhere", "jalla", "http://builds.codehaus.org/damagecontrol/private/xmlrpc"))
+    end
   end
 
 end

@@ -1,9 +1,11 @@
 require 'damagecontrol/web/AbstractAdminServlet'
 require 'damagecontrol/util/FileUtils'
+require 'pebbles/Pathutils'
 
 module DamageControl
   class ProjectServlet < AbstractAdminServlet
     include FileUtils
+    include Pebbles::Pathutils
   
     def initialize(type, build_history_repository, project_config_repository, trigger, build_scheduler, report_classes, rss_url, trig_xmlrpc_url)
       super(type, build_scheduler, build_history_repository, project_config_repository)
@@ -90,12 +92,14 @@ module DamageControl
           end
           # Install/uninstall trigger
           if(scm.exists?)
-            trigger_command = DamageControl::XMLRPC::Trigger.trigger_command(damagecontrol_home, project_name, @trig_xmlrpc_url)
+            native_damagecontrol_home = filepath_to_nativepath(damagecontrol_home, false)
+            trigger_command = DamageControl::XMLRPC::Trigger.trigger_command(native_damagecontrol_home, project_name, @trig_xmlrpc_url)
             trigger_files_checkout_dir = project_config_repository.trigger_checkout_dir(project_name)
-            if(scm.supports_trigger? && scm.trigger_installed?(trigger_command, trigger_files_checkout_dir))
+            installed = scm.trigger_installed?(trigger_command, trigger_files_checkout_dir)
+            if(scm.supports_trigger? && installed)
               result +=
                 [
-                  task(:icon => "largeicons/gear_delete.png", :name => "Uninstall trigger", :url => "install_trigger/#{project_name}?install=false"),
+                  task(:icon => "largeicons/gear_delete.png", :name => "Uninstall trigger", :url => "../install_trigger/#{project_name}?install=false"),
                 ]
             elsif(scm.supports_trigger?)
               result +=

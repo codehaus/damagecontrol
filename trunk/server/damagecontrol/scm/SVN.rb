@@ -16,10 +16,6 @@ module DamageControl
     attr_accessor :svnurl
     attr_accessor :svnpath
 
-    # set to true if the local svn binaries (for trigger installation) is native windows
-    # triggers don't work with cygwin svn (svn bug)
-    attr_accessor :native_windows
-
     def name
       "Subversion"
     end
@@ -126,11 +122,19 @@ module DamageControl
 
     def create(&line_proc)      
       native_path = filepath_to_nativepath(svnrootdir, true)
-      mkdir_p(native_path)
+      mkdir_p(nativepath_to_filepath(native_path))
       svnadmin(svnrootdir, "create #{native_path}", &line_proc)
     end
 
     def install_trigger(trigger_command, damagecontrol_install_dir, &proc)
+      if (windows?)
+        install_win_trigger(trigger_command, damagecontrol_install_dir, &proc)
+      else
+        install_unix_trigger(trigger_command, damagecontrol_install_dir, &proc)
+      end
+    end
+    
+    def install_unix_trigger(trigger_command, damagecontrol_install_dir, &proc)
       post_commit_exists = File.exists?(post_commit_file)
       mode = post_commit_exists ? File::APPEND|File::WRONLY : File::CREAT|File::WRONLY
       begin
@@ -141,19 +145,27 @@ module DamageControl
         system("chmod g+x #{post_commit_file}")
       rescue
         raise "Didn't have persmissions to write to #{post_commit_file}. " +
-        "Try to manually add the following line:\n\n#{trigger_command}\n\n" +
-        "Finally make it executable with chmod g+x #{post_commit_file}\n\n"
+              "Try to manually add the following line:\n\n#{trigger_command}\n\n" +
+              "Finally make it executable with chmod g+x #{post_commit_file}\n\n"
+      end
+    end
+    
+    def install_win_trigger(trigger_command, damagecontrol_install_dir, &proc)
+      post_commit_exists = File.exists?(post_commit_file)
+      mode = post_commit_exists ? File::APPEND|File::WRONLY : File::CREAT|File::WRONLY
+      File.open(post_commit_file, mode) do |file|
+        file.puts("#{trigger_command}\n" )
       end
     end
     
     def uninstall_trigger(trigger_command, trigger_files_checkout_dir)
-      File.comment_out(post_commit_file, /#{trigger_command}/, "# ")
+      File.comment_out(post_commit_file, /#{Regexp.escape(trigger_command)}/, nil)
     end
     
     def trigger_installed?(trigger_command, trigger_files_checkout_dir)
       return false unless File.exist?(post_commit_file)
-      in_post_commit = comment_out(File.new(post_commit_file), /#{trigger_command}/, "# ", "")
-      in_post_commit
+      not_already_commented = comment_out(File.new(post_commit_file), /#{Regexp.escape(trigger_command)}/, "# ", "")
+      not_already_commented
     end
     
     def import(dir, &line_proc)
@@ -273,7 +285,7 @@ module DamageControl
     def post_commit_file
       # We actualy need to use the .cmd when on cygwin. The cygwin svn post-commit
       # hook is hosed. We'll be relying on native windows
-      native_windows ? "#{svnrootdir}/hooks/post-commit.cmd" : "#{svnrootdir}/hooks/post-commit"
+      FileUtils::windows? ? "#{svnrootdir}/hooks/post-commit.cmd" : "#{svnrootdir}/hooks/post-commit"
     end
     
   end

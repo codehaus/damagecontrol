@@ -186,6 +186,13 @@ module DamageControl
         logger.info("determining change set for #{current_build.project_name}, from #{from_time} to #{to_time}")
         changesets = current_scm.changesets(checkout_dir, from_time, to_time, nil) {|p| report_progress(p)}
         current_build.changesets = changesets if changesets
+        
+        # Set last commit time
+        changesets = changesets.sort do |a,b|
+          a.time <=> b.time
+        end
+        current_build.scm_commit_time = changesets[-1] ? changesets[-1].time : nil
+        
         logger.info("change set for #{current_build.project_name} is #{current_build.changesets.inspect}")
 
       rescue Exception => e

@@ -50,5 +50,23 @@ EOF
       File.open("testdata/file_to_edit.copy") {|file| actual = file.read}
       assert_equal(expected, actual)
     end
+    
+    def test_should_work_with_windows_paths
+      output = ""
+      winstuff = "c:\\Projects\\damagecontrol\\bin\\requestbuild --url http://53.233.149.7:4712/private/xmlrpc --projectname bla"
+      original = StringIO.new(winstuff)
+
+      with_backslash = "Projects\\damagecontrol"
+      regexp = /#{Regexp.escape(with_backslash)}/
+
+      assert(comment_out(original, regexp, "# ", output))
+    end
+
+    def test_should_work_with_unix_paths
+      uxstuff = "/Projects/damagecontrol/bin/requestbuild --url http://53.233.149.7:4712/private/xmlrpc --projectname bla"
+      original = StringIO.new(uxstuff)      
+      output = ""
+      assert(comment_out(original, /#{uxstuff}/, "# ", output))
+    end
   end
 end

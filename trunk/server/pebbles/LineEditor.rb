@@ -5,6 +5,7 @@ module Pebbles
     # Comments out line by line if they match the line_regex.
     # Does not comment out already commented out lines.
     # If comment_template is nil, the matching lines will be deleted
+    # Returns true if at least one line is commented out or changed
     def comment_out(original, line_regex, comment_template, output)
       did_comment_out = false
       already_commented_exp = /^[#{comment_template}]/ unless comment_template.nil?

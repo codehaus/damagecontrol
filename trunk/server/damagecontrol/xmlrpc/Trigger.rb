@@ -1,12 +1,15 @@
 require 'xmlrpc/server'
 require 'damagecontrol/core/Build'
 require 'damagecontrol/core/BuildEvents'
+require 'damagecontrol/util/FileUtils'
 require 'damagecontrol/util/Logging'
 
 module DamageControl
 module XMLRPC
 
   class Trigger
+    include FileUtils
+    
     DEPRECATED_MESSAGE = 'The trig(project_name, timestamp) method is deprecated. Please use request(project_name) instead'
 
     INTERFACE = ::XMLRPC::interface("build") {
@@ -48,10 +51,12 @@ EOF
       message = "\n#{DEPRECATED_MESSAGE}\n#{result}"
       message
     end
-    
+
+
     # The trigger command that will trig a build for a certain project 
-    def Trigger.trigger_command(damagecontrol_install_dir, project_name, trigger_xml_rpc_url="http://localhost:4712/private/xmlrpc") 
-      script = "sh #{damagecontrol_install_dir}/bin/requestbuild" 
+    def Trigger.trigger_command(damagecontrol_install_dir, project_name, trigger_xml_rpc_url="http://localhost:4712/private/xmlrpc")
+      delim = FileUtils::windows? ? "\\" : "/"
+      script = "#{damagecontrol_install_dir}#{delim}bin#{delim}requestbuild" 
       "#{script} --url #{trigger_xml_rpc_url} --projectname #{project_name}" 
     end
   end

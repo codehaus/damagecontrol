@@ -129,6 +129,25 @@ EOF
       assert_equal("Added path/one", description.get_text("p[1]/ul/li").value)
       assert_equal("aslak", description.get_text("p[2]/strong").value)      
     end
+    
+    def test_should_sort_by_time
+      changesets = ChangeSets.new
+      changesets.add(@change1)
+      changesets.add(@change4)
+      changesets.add(@change2)
+      changesets.add(@change7)
+      changesets.add(@change5)
+      changesets.add(@change3)
+      changesets.add(@change6)
+      
+      changesets = changesets.sort do |a,b|
+        a.time <=> b.time
+      end
+      assert_equal(4, changesets.length)
+
+      assert_equal(@change1.time, changesets[0].time)
+      assert_equal(@change7.time, changesets[-1].time)
+    end
 
   end
 

@@ -100,5 +100,9 @@ module FileUtils
       exit!
     end
   end
+  
+  def windows?
+    ENV['WINDIR'] || ENV['windir']
+  end
 
 end
