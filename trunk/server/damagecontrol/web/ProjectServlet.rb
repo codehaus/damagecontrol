@@ -26,6 +26,7 @@ module DamageControl
     def trig_build
       assert_private
       @trigger.trig(project_name, Build.format_timestamp(Time.now))
+      sleep 0.5
       dashboard_redirect
       render("project_dashboard.erb", binding)
     end
