@@ -121,6 +121,8 @@ class Project
     {
       "dctrigger" => "bin/dctrigger.rb",
       "server" => "bin/server.rb",
+      "codehaus" => "bin/codehaus.rb",
+      "ccbridge" => "bin/ccbridge.rb",
       "newproject" => "server/damagecontrol/tool/admin/newproject.rb",
       "requestbuild" => "server/damagecontrol/tool/admin/requestbuild.rb",
       "shutdownserver" => "server/damagecontrol/tool/admin/shutdownserver.rb"
