@@ -88,7 +88,8 @@ module Pebbles
     def close_all_streams
       stdin.close unless stdin.closed?
       stdout.close unless stdout.closed?
-      stderr.close unless stderr.closed?
+      # Closing stderr seems to cause segfault on linux if a different thread is reading it...
+      # stderr.close unless stderr.closed?
     end
 
     def stdin
