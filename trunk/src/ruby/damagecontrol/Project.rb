@@ -49,8 +49,8 @@ module DamageControl
 		
 		def build
 			Dir.chdir(basedir) unless basedir.nil?
-			IO.popen(build_command_line) {|f|
-				yield(f)
+			IO.popen(build_command_line) {|output|
+				yield(output)
 			}
 		end
 		

@@ -20,9 +20,9 @@ module DamageControl
 		def test_executes_process_and_sends_build_complete_on_build_request
 			hub.publish_message(BuildRequestEvent.new(@project))
 			assert_message_types("DamageControl::BuildRequestEvent DamageControl::BuildProgressEvent DamageControl::BuildCompleteEvent")
-			assert_equal(BuildProgressEvent.new(@project, "Hello Aslak!\n"), messages[1])
-			assert_equal("Hello Aslak!\n", messages[1].output)
-			assert_equal(BuildCompleteEvent.new(@project), messages[2])
+			assert_equal(BuildProgressEvent.new(@project, "Hello Aslak!\n"), messages_from_hub[1])
+			assert_equal("Hello Aslak!\n", messages_from_hub[1].output)
+			assert_equal(BuildCompleteEvent.new(@project), messages_from_hub[2])
 		end
 		
 		def test_doesnt_do_anything_on_other_events

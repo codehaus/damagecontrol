@@ -1,3 +1,5 @@
+require 'damagecontrol/CruiseControlLogPoller'
+
 module DamageControl
 
 	class BuildCompleteEvent
@@ -6,6 +8,7 @@ module DamageControl
 
 		def initialize (project)
 			@project = project
+			@build = Build.new
 		end
 		
 		def ==(event)

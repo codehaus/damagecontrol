@@ -22,10 +22,6 @@ module DamageControl
 			rmdir(@dir)
 		end
 		
-		def assert_no_messages
-			assert(messages.empty?)
-		end
-	
 		def test_new_log_sends_build_complete_event
 			@ccpoller.force_tick
 			assert_no_messages
@@ -33,8 +29,8 @@ module DamageControl
 			copy(@log_file, "#{@dir}/log.xml")
 			@ccpoller.force_tick
 			assert_message_types("DamageControl::BuildCompleteEvent")
-			assert_equal('dxbranch', messages[0].project.name)
-			assert_equal('build.698', messages[0].build.label)
+			assert_equal('dxbranch', messages_from_hub[0].project.name)
+			assert_equal('build.698', messages_from_hub[0].build.label)
 		end
 		
 	end
