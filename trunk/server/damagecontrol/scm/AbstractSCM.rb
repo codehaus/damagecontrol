@@ -6,16 +6,17 @@ module DamageControl
     include FileUtils
     include Logging
     
+    attr_reader :checkout_dir
+
   protected
 
     attr_reader :config_map
-    attr_reader :working_dir_root
 
     def initialize(config_map)
       @config_map = config_map
 
-      working_dir_root = config_map["working_dir_root"] || required_config_param("working_dir_root")
-      @working_dir_root = to_os_path(File.expand_path(working_dir_root)) unless working_dir_root.nil?
+      checkout_dir = config_map["checkout_dir"] || required_config_param("checkout_dir")
+      @checkout_dir = to_os_path(File.expand_path(checkout_dir)) unless checkout_dir.nil?
     end
 
     def required_config_param(param)

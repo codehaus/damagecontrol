@@ -12,9 +12,9 @@ module DamageControl
       "svn" => DamageControl::SVN
     }
     
-    def get_scm(config_map, checkout_dir_root)
+    def get_scm(config_map, checkout_dir)
       config_map = config_map.dup
-      config_map["working_dir_root"] = checkout_dir_root
+      config_map["checkout_dir"] = checkout_dir
       
       scm_class = scm_class_name(config_map["scm_type"])
       scm_class.new(config_map)

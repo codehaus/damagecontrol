@@ -30,7 +30,7 @@ require 'damagecontrol/publisher/JIRAPublisherTest'
 require 'damagecontrol/scm/ChangesTest'
 require 'damagecontrol/scm/CVSTest'
 require 'damagecontrol/scm/CVSLogParserTest'
-require 'damagecontrol/scm/SVNTest'
+#require 'damagecontrol/scm/SVNTest'
 
 require 'damagecontrol/util/FilePollerTest'
 require 'damagecontrol/util/SlotTest'

@@ -16,10 +16,8 @@ module DamageControl
     
     def initialize(config_map)
       super(config_map)
-      cvsroot = config_map["cvsroot"] || required_config_param("cvsroot")
-      cvsmodule = config_map["cvsmodule"] || required_config_param("cvsmodule")
-      
-      @cvsroot, @mod = cvsroot, cvsmodule
+      @cvsroot = config_map["cvsroot"] || required_config_param("cvsroot")
+      @mod = config_map["cvsmodule"] || required_config_param("cvsmodule")
     end
     
     def protocol
@@ -52,29 +50,24 @@ module DamageControl
       url
     end
     
-    def working_dir
-      File.join(working_dir_root, mod)
-    end
-    
     def changesets(from_time, to_time)
       # exclude commits that occured on from_time
       from_time = from_time + 1
-      with_working_dir(working_dir) do
-        command = changes_command(from_time, to_time)
-        log = ""
-        yield command if block_given?
-        cvs_with_io(command) do |io|
-          io.each_line do |line|
-            log << line
-            yield line if block_given?
-          end
+
+      command = changes_command(from_time, to_time)
+      log = ""
+      yield command if block_given?
+      cvs(working_dir, command) do |io|
+        io.each_line do |line|
+          log << line
+          yield line if block_given?
         end
-        
-        parser = CVSLogParser.new
-        parser.cvspath = path
-        parser.cvsmodule = mod
-        parser.parse_changesets_from_log(StringIO.new(log))
       end
+
+      parser = CVSLogParser.new
+      parser.cvspath = path
+      parser.cvsmodule = mod
+      parser.parse_changesets_from_log(StringIO.new(log))
     end
     
     def changes_command(from_time, to_time)
@@ -91,9 +84,7 @@ module DamageControl
     end
     
     def commit(message, &proc)
-      with_working_dir(working_dir) do
-        cvs(commit_command(message), &proc)
-      end
+      cvs(working_dir, commit_command(message), &proc)
     end
 
     def commit_command(message)
@@ -112,20 +103,16 @@ module DamageControl
       "-d#{@cvsroot} update #{time_option(time)} -d -P"
     end
     
-    def is_local_connection_method
-      @cvsroot =~ /^:local:/
-    end
-    
     def checkout(time = nil, &proc)
       if(checked_out?)
-        with_working_dir(working_dir) do
-          cvs(update_command(time), &proc)
-        end
+        cvs(working_dir, update_command(time), &proc)
       else
-        with_working_dir(working_dir_root) do
-          cvs(checkout_command(time), &proc)
-        end
+        cvs(checkout_dir, checkout_command(time), &proc)
       end
+    end
+    
+    def working_dir
+      "#{checkout_dir}/#{mod}"
     end
     
     # Installs and activates the trigger script in the repository
@@ -181,7 +168,7 @@ puts result
     end
     
     def create_cvsroot_cvs
-      CVS.new("cvsroot" => @cvsroot, "cvsmodule" => "CVSROOT", "working_dir_root" => working_dir_root)
+      CVS.new("cvsroot" => @cvsroot, "cvsmodule" => "CVSROOT", "checkout_dir" => checkout_dir)
     end
 
     def trigger_installed?(project_name)
@@ -235,7 +222,7 @@ puts result
     end
     
     def checked_out?
-      rootcvs = File.expand_path("#{working_dir_root}/CVS/Root")
+      rootcvs = File.expand_path("#{working_dir}/CVS/Root")
       File.exists?(rootcvs)
     end
         
@@ -256,24 +243,13 @@ puts result
       end
     end
     
-    def cvs(cmd, &proc)
-      cvs_with_io(cmd) do |io|
+    def cvs(dir, cmd, &proc)
+      cmd = "cvs -q #{cmd} 2>&1"
+      cmd_with_io(dir, cmd) do |io|
         io.each_line do |progress|
           if block_given? then yield progress else logger.debug(progress) end
         end
       end
-    end
-  
-    def cvs_with_io(cmd, &proc)
-      cmd = "cvs -q #{cmd} 2>&1"
-      logger.debug("executing #{cmd}")
-      ret = nil
-      io = IO.popen("#{cmd}") do |io|
-        ret = yield io
-      end
-      raise Exception.new("'#{cmd}' in directory '#{Dir.pwd}' failed with code #{$?.to_s}") if $? != 0
-      logger.debug("executed #{cmd}")
-      ret
     end
 
   private
@@ -296,41 +272,41 @@ puts result
 
   end
 
-
   ##################################################################################
   # This is only used during testing
   ##################################################################################
+
   class LocalCVS < CVS
     def initialize(basedir, mod)
-      super("cvsroot" => ":local:#{basedir}/cvsroot}", "cvsmodule" => mod, "working_dir_root" => "#{basedir}/checkout")
-      @cvsrootdir = "#{basedir}/cvsroot}"
+      super("cvsroot" => ":local:#{basedir}/cvsroot", "cvsmodule" => mod, "checkout_dir" => "#{basedir}/checkout")
+      @cvsrootdir = "#{basedir}/cvsroot"
     end
 
     def create
       File.mkpath(@cvsrootdir)
-      cvs("-d#{cvsroot} init")
+      cvs(@cvsrootdir, "-d#{cvsroot} init")
     end
 
     def import(dir)
-      with_working_dir(dir) do
-        modulename = File.basename(dir)
-        cvs("-d#{cvsroot} import -m \"initial import\" #{modulename} VENDOR START")
-      end    
+      modulename = File.basename(dir)
+      cvs(dir, "-d#{cvsroot} import -m \"initial import\" #{modulename} VENDOR START")
     end
 
-    def add_file(relative_filename, content, is_new)
+    # TODO: refactor. This is ugly!
+    def add_or_edit_and_commit_file(relative_filename, content)
+      existed = false
       with_working_dir(working_dir) do
         File.mkpath(File.dirname(relative_filename))
+        existed = File.exist?(relative_filename)
         File.open(relative_filename, "w") do |file|
           file.puts(content)
         end
-
-        if(is_new)
-          cvs("add #{relative_filename}")
-        end
-
-        cvs("com -m \"adding #{relative_filename}\"")
       end
+      cvs(working_dir, "add #{relative_filename}") unless(existed)
+
+      message = existed ? "editing" : "adding"
+
+      cvs(working_dir, "com -m \"#{message} #{relative_filename}\"")
     end
   end
 end

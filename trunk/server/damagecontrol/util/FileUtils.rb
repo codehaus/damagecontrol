@@ -60,4 +60,18 @@ module FileUtils
     end
   end
   
+  def cmd_with_io(dir, cmd, &proc)
+    with_working_dir(dir) do
+      logger.debug("in directory #{dir}")
+      logger.debug("executing #{cmd}")
+      ret = nil
+      io = IO.popen("#{cmd}") do |io|
+        ret = yield io
+      end
+      raise Exception.new("'#{cmd}' in directory '#{Dir.pwd}' failed with code #{$?.to_s}") if $? != 0
+      logger.debug("successfully executed #{cmd}")
+      ret
+    end
+  end
+
 end

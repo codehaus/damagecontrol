@@ -1,7 +1,5 @@
 require 'test/unit'
-require 'ftools'
-require 'fileutils'
-require 'stringio'
+require 'damagecontrol/util/FileUtils'
 
 module DamageControl
   class AbstractSCMTest < Test::Unit::TestCase
@@ -38,7 +36,7 @@ module DamageControl
       assert_equal(2, changeset.length)
 
       assert_equal("changed something", changeset.message)
-      assert(changeset.developer)
+      assert(username, changeset.developer)
       assert(changeset.revision)
 
       assert_equal("build.xml", changeset[0].path)

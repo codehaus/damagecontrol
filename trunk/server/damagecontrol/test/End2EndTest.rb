@@ -248,7 +248,7 @@ class End2EndTest < Test::Unit::TestCase
   end
   
   def TODO_test_damagecontrol_works_with_svn
-    svn = LocalSVN.new()
+    svn = LocalSVN.new(@basedir, mod)
     test_build_and_log_and_irc(svn)
   end
   
@@ -269,7 +269,7 @@ class End2EndTest < Test::Unit::TestCase
     
     # add build.bat file and commit it (will trigger build)
     scm.checkout
-    scm.add_file(script_file("build"), 'echo "Hello world from DamageControl" > buildresult.txt', true)
+    scm.add_or_edit_and_commit_file(script_file("build"), 'echo "Hello world from DamageControl" > buildresult.txt')
     
     wait_less_time_than_default_quiet_period
     assert_not_built_yet
@@ -282,7 +282,7 @@ class End2EndTest < Test::Unit::TestCase
     irc.reset_log
     
     # update the buld file to something bogus, which should fail the build
-    scm.add_file(script_file("build"), 'this_will_not_work', false)
+    scm.add_or_edit_and_commit_file(script_file("build"), 'this_will_not_work')
 
     wait_for_build_to_fail
     irc.assert_build_failed_and_changes_on_channel(username)

@@ -1,15 +1,10 @@
 require 'test/unit'
-require 'ftools'
-require 'stringio'
-require 'fileutils'
 require 'damagecontrol/scm/AbstractSCMTest'
 require 'damagecontrol/scm/CVS'
 require 'webrick'
 
 module DamageControl
   class CVSTest < AbstractSCMTest
-    include ::FileUtils
-    include FileUtils
   
     def create_scm
       LocalCVS.new(new_temp_dir, "damagecontrolled")
@@ -18,13 +13,13 @@ module DamageControl
     def test_can_build_a_cvs_rdiff_command_for_retrieving_the_changes_between_two_dates
       time_before = Time.utc(2004,01,01,12,00,00) 
       time_after = Time.utc(2004,01,01,13,00,00)
-      cvs = CVS.new({"cvsroot" => ":local:repo", "cvsmodule" => "module", "working_dir_root" => "."})
+      cvs = CVS.new({"cvsroot" => ":local:repo", "cvsmodule" => "module", "checkout_dir" => "."})
       assert_equal("log -N -S -d\"2004-01-01 12:00:00 UTC<=2004-01-01 13:00:00 UTC\"",
         cvs.changes_command(time_before, time_after))
     end
     
-    def create_cvs(cvsroot, cvsmodule, working_dir_root=new_temp_dir)
-      CVS.new("cvsroot" => cvsroot, "cvsmodule" => cvsmodule, "working_dir_root" => working_dir_root)
+    def create_cvs(cvsroot, cvsmodule, checkout_dir=new_temp_dir)
+      CVS.new("cvsroot" => cvsroot, "cvsmodule" => cvsmodule, "checkout_dir" => checkout_dir)
     end
     
     def test_parse_local_unix_cvsroot
@@ -153,23 +148,9 @@ EOF
     def test_invalid_cvs_command_raises_error
       cvs = create_cvs("cvsroot", "cvsmodule")
       assert_raises(Exception, "invalid cvs command did not raise error") do
-        cvs.cvs("invalid_command") { |line| }
+        cvs.cvs(cvs.checkout_dir, "invalid_command") { |line| }
       end
     end
 
-  private
-  
-    def create_repo(dir)
-      with_working_dir(dir) do
-        system("cvs -d:local:#{dir} init")
-      end
-    end
-    
-    def import_damagecontrolled(cvs)
-      with_working_dir("#{damagecontrol_home}/testdata/damagecontrolled") do
-        cmd = "cvs -d#{cvs.cvsroot} -q import -m \"\" #{cvs.mod} dc-vendor dc-release"
-        system(cmd)
-      end
-    end
   end
 end

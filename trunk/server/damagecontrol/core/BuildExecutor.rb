@@ -129,7 +129,7 @@ module DamageControl
         changesets = current_scm.changesets(from_time, to_time) {|p| report_progress(p)}
         if(changesets)
           changesets.each do |changeset|
-            current_build.changesets << changeset 
+            current_build.changesets.add(changeset)
           end
         end
         logger.info("change set for #{current_build.project_name} is #{current_build.changesets.inspect}")
