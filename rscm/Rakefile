@@ -11,7 +11,7 @@ require 'lib/rubyforge_file_publisher'
 
 PKG_BUILD     = ENV['PKG_BUILD'] ? '.' + ENV['PKG_BUILD'] : ''
 PKG_NAME      = 'rscm'
-PKG_VERSION   = '0.2.0' + PKG_BUILD
+PKG_VERSION   = '0.2.1' + PKG_BUILD
 PKG_FILE_NAME = "#{PKG_NAME}-#{PKG_VERSION}"
 
 desc "Default Task"
@@ -36,6 +36,7 @@ rd = Rake::RDocTask.new { |rdoc|
   rdoc.title    = 'RSCM - Ruby Source Control Management API'
   rdoc.options << '--line-numbers' << '--inline-source'
   rdoc.rdoc_files.include('README')
+  rdoc.rdoc_files.include('CHANGELOG')
   rdoc.rdoc_files.include('lib/**/*.rb')
   rdoc.rdoc_files.include('docs/**/*.rd')
 }
