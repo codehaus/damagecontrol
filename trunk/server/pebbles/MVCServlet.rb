@@ -13,10 +13,6 @@ module Pebbles
       Thread.current["response"] = res
 
       response["Content-Type"] = content_type
-      # http://lab.artlung.com/other/anti-cache/
-      response["CacheControl"] = "no-cache"
-      response["Pragma"] = "no-cache"
-      response["Expires"] = "-1"
     end
     
   protected
@@ -54,6 +50,11 @@ module Pebbles
     
     def service(req, res)
       super(req, res)
+
+      # http://lab.artlung.com/other/anti-cache/
+      response["CacheControl"] = "no-cache"
+      response["Pragma"] = "no-cache"
+      response["Expires"] = "-1"
       
       action = req.query['action'] || "default_action"
       
