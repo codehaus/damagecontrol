@@ -161,7 +161,9 @@ module DamageControl
         last_successful_build = @build_history_repository.last_successful_build(current_build.project_name)
         # we have no record of when the last succesful build was made, don't determine the changeset
         # (might be a new project, see comment above)
-        return if last_successful_build.nil?
+        if last_successful_build.nil?
+          logger.info("does not determine changesets because there were no last successful build")
+        end
         from_time = last_successful_build.timestamp_as_time        
         to_time = current_build.timestamp_as_time
         logger.info("determining change set for #{current_build.project_name}, from #{from_time} to #{to_time}")
@@ -193,9 +195,9 @@ module DamageControl
     
     def build_start
       logger.info("build starting #{current_build.project_name}")
-        current_build.start_time = Time.now.utc
-        determine_changeset
-        @channel.publish_message(BuildStartedEvent.new(current_build))
+      current_build.start_time = Time.now.utc
+      determine_changeset
+      @channel.publish_message(BuildStartedEvent.new(current_build))
     end
     
     def on_message(build)

@@ -31,7 +31,7 @@ module DamageControl
       
       if message.is_a? BuildCompleteEvent
         begin
-          logger.debug("closing file #{log_file(build)}") if logger.debug?
+          logger.info("closing log file #{build.log_file}")
           log_file(build).flush
           log_file(build).close
         rescue => e
@@ -45,7 +45,7 @@ module DamageControl
       file_name = build.log_file
       file = @log_files[file_name]
       if(!file)
-        logger.debug("opening file #{file_name}") if logger.debug?
+        logger.info("opening log file #{file_name}")
         mkdir_p(File.dirname(file_name))
         file = File.open(file_name, "w")
         @log_files[file_name] = file

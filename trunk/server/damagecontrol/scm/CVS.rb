@@ -15,24 +15,24 @@ module DamageControl
     attr_accessor :cvspassword
     attr_accessor :cvsmodule
     attr_accessor :rsh_client
+    attr_accessor :cvs_executable
     
-    def changesets(from_time, to_time)
-      # exclude commits that occured on from_time
-      from_time = from_time + 1
-
-      log = ""
-      cvs(working_dir, changes_command(from_time, to_time)) do |line|
-        log << line
-        #yield line if block_given?
-      end
-      parser = CVSLogParser.new(StringIO.new(log))
-      parser.cvspath = path
-      parser.cvsmodule = cvsmodule
-      parser.parse_changesets
+    def initialize
+      self.cvs_executable = "cvs"
     end
     
-    def login_command
-      "cvs -d'#{cvsroot_with_password}' login"
+    def changesets(from_time, to_time, &proc)
+      # exclude commits that occured on from_time
+      from_time = from_time + 1
+      
+      cmd = changes_command(from_time, to_time)
+      if block_given? then yield "#{cvs_cmd_without_password(cmd)}\n" else logger.debug("#{cmd_without_cvspassword}\n") end
+      cmd_with_io(working_dir, cvs_cmd_with_password(cmd, cvspassword), environment) do |stdout|
+        parser = CVSLogParser.new(stdout)
+        parser.cvspath = path
+        parser.cvsmodule = cvsmodule
+        parser.parse_changesets
+      end
     end
     
     def checkout(time = nil, &proc)
@@ -77,7 +77,7 @@ module DamageControl
         File.open("loginfo", File::WRONLY | File::APPEND) do |file|
           file.puts("#{cvsmodule} #{trigger_command(damagecontrol_install_dir, project_name, dc_url)}")
         end
-        system("cvs commit -m \"Installed DamageControl trigger for #{project_name}\"")
+        system("#{cvs_executable} commit -m \"Installed DamageControl trigger for #{project_name}\"")
       end
     end
     
@@ -110,7 +110,7 @@ module DamageControl
       loginfo_file.write(modified_loginfo)
       loginfo_file.close
       with_working_dir(cvsroot_cvs.working_dir) do
-        system("cvs commit -m \"Disabled DamageControl trigger for #{project_name}\"")
+        system("#{cvs_executable} commit -m \"Disabled DamageControl trigger for #{project_name}\"")
       end
     end
 
@@ -177,14 +177,24 @@ module DamageControl
     def checkout_command(time)
       "checkout #{time_option(time)} #{cvsmodule}"
     end
-
-    def cvs(dir, cmd, &proc)
-      cmd_with_cvspassword = "cvs -q -d'#{cvsroot_with_password}' #{cmd}"
-      cmd_without_cvspassword = "cvs -q -d'#{cvsroot_with_password('********')}' #{cmd}"
+    
+    def cvs_cmd_with_password(cmd, password)
+      "#{cvs_executable} -q -d'#{cvsroot_with_password(password)}' #{cmd}"
+    end
+    
+    def cvs_cmd_without_password(cmd)
+      cvs_cmd_with_password(cmd, '********')
+    end
+    
+    def environment
       env = {}
       env["CVS_RSH"] = rsh_client if rsh_client && rsh_client != ""
-      if block_given? then yield "#{cmd_without_cvspassword}\n" else logger.debug("#{cmd_without_cvspassword}\n") end
-      cmd_with_io(dir, cmd_with_cvspassword, env) do |io|
+      env
+    end
+    
+    def cvs(dir, cmd)
+      if block_given? then yield "#{cvs_cmd_without_password(cmd)}\n" else logger.debug("#{cmd_without_cvspassword}\n") end
+      cmd_with_io(dir, cvs_cmd_with_password(cmd, cvspassword), environment) do |io|
         io.each_line do |progress|
           if block_given? then yield progress else logger.debug(progress) end
         end
@@ -204,8 +214,10 @@ module DamageControl
       File.exists?(rootcvs)
     end
         
-    def cvsroot_with_password(password=self.cvspassword)
-      if password && password != ""
+    def cvsroot_with_password(password)
+      if local?
+        cvsroot
+      elsif password && password != ""
         protocol, user, host, path = parse_cvsroot(cvsroot)
         ":#{protocol}:#{user}:#{password}@#{host}:#{path}"
       else

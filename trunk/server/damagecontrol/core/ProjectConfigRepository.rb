@@ -92,7 +92,7 @@ module DamageControl
 
     def create_build(project_name, timestamp)
       build = Build.new(project_name, timestamp, project_config(project_name))
-      build.url = "#{@public_web_url}/project?action=build_details&project_name=#{build.project_name}&timestamp=#{build.timestamp}"
+      build.url = "#{@public_web_url}/project?project_name=#{build.project_name}&timestamp=#{build.timestamp}"
       build.scm = create_scm(project_name)
       build.potential_label = peek_next_build_number(project_name).to_s
       build.log_file = "#{log_dir(project_name)}/#{build.timestamp_as_s}.log"
