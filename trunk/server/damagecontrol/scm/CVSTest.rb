@@ -14,10 +14,6 @@ module DamageControl
       @cvs = CVS.new
     end
     
-    def teardown
-      @httpd.shutdown unless @httpd.nil?
-    end
-    
     def test_modifiying_one_file_produce_correct_changeset
       # create a couple of temp directories and clean them up
       testrepo = File.expand_path("#{damagecontrol_home}/target/cvstestrepo")
@@ -122,12 +118,7 @@ module DamageControl
       assert(!@cvs.handles_spec?("starteam://username:password@server/project/view/folder"))
     end
     
-    def got_request
-      @got_request = true
-    end
-
     def test_install_trigger
-      @got_request = false
       basedir = new_temp_dir
       testrepo = File.expand_path("#{basedir}/cvstestrepo")
       rm_rf(testrepo)
@@ -140,8 +131,6 @@ module DamageControl
       build_command = "echo hello"
       nag_email = "maillist@project.bar"
 
-      start_mock_server(self)
-
       create_repo(testrepo)
       @cvs.install_trigger(
         testcheckout,
@@ -152,9 +141,7 @@ module DamageControl
         puts output
       }
 
-      import_damagecontrolled(spec)
-      
-      assert(@got_request, "mock server didn't get incoming connection")
+      assert_match(/damagecontrolled ruby (.*)dctrigger.rb http:\/\/localhost:4713\/private\/xmlrpc DamageControlled/, File.new("#{testcheckout}/loginfo").read)
     end
     
     def test_invalid_cvs_command_raises_error
@@ -165,14 +152,6 @@ module DamageControl
 
   private
   
-    def nc_exe
-      if(windows?)
-        File.expand_path("#{damagecontrol_home}/bin/nc.exe").gsub('/','\\')
-      else
-        nil
-      end
-    end
-
     def create_repo(dir)
       with_working_dir(dir) do
         system("cvs -d:local:#{dir} init")
@@ -184,20 +163,6 @@ module DamageControl
         cmd = "cvs -d#{@cvs.cvsroot(spec)} -q import -m \"\" #{@cvs.mod(spec)} dc-vendor dc-release"
         system(cmd)
       end
-    end
-
-    def start_mock_server(test)
-      Thread.abort_on_exception = true
-      httpd = WEBrick::HTTPServer.new(
-        :Port => 4713
-      )
-
-      # For public unauthenticated XML-RPC connections like getting status
-      httpd.mount_proc("/private/xmlrpc") do |req, res|
-        test.got_request
-      end
-
-      Thread.new { httpd.start }
     end
   end
 

@@ -108,7 +108,6 @@ module DamageControl
           end
         rescue => e
           logger.error(format_exception(e))
-          @error = e
         ensure
           puts "Stopped SocketTrigger listening on port #{port}"
         end
@@ -121,7 +120,6 @@ module DamageControl
       rescue => e
         # fails if socket is closed, which it might be. just ignore that.
         logger.error(format_exception(e))
-        @error = e
       end
     end
     
