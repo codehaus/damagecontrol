@@ -14,9 +14,6 @@ class ActionController::Base
   end
 
   def instantiate_from_hash(clazz, attr_hash)
-STDERR.puts clazz.name
-STDERR.puts attr_hash.inspect
-STDERR.puts "----------"
     object = clazz.new
     attr_hash.each do |attr_name, attr_value|
       setter = attr_name[1..-1] + "="
@@ -25,11 +22,18 @@ STDERR.puts "----------"
     object
   end
 
-  # Returns an object from a select_pane
-  def selected(name)
+  # Returns the selected object from a select_pane and defines
+  # the selected? method on it to return true (so that define_selected
+  # will work properly
+  #
+  def find_selected(name)
     array = instantiate_array_from_hashes(@params[name])
     selected = @params["#{name}_selected"]
-    array.find { |o| o.class.name == selected }
+    selected_object = array.find { |o| o.class.name == selected }
+    def selected_object.selected?
+      true
+    end
+    selected_object
   end
     
 protected
@@ -133,7 +137,7 @@ module ActionView
     
     # Renders a tab pane where each tab contains rendered objects
     def tab_pane(name, array)
-      select(array)
+      define_selected!(array)
       $pane_name = name
       def array.name
         $pane_name
@@ -141,8 +145,12 @@ module ActionView
       render_partial("tab_pane", array)
     end
 
+    # Renders a pane (div) with a combo (select) that will
+    # Show one of the objects in the array (which are rendered with render_object).
+    # If one of the objects in the array respond to selected? and return true,
+    # it is preselected in the combo.
     def select_pane(description, name, array)
-      select(array)
+      define_selected!(array)
       $pane_name = name
       $pane_description = description
       def array.name
@@ -154,15 +162,13 @@ module ActionView
       render_partial("select_pane", array)
     end
 
-    # defines selected? on each object, making only the first one return true
-    def select(array)
-      selected = array[0]
-      def selected.selected?
-        true
-      end
-      array[1..-1].each do |o|
-        def o.selected?
-          false
+    # defines selected? => false on each object that doesn't already have selected? defined.
+    def define_selected!(array)
+      array.each do |o|
+        unless(o.respond_to?(:selected?))
+          def o.selected?
+            false
+          end
         end
       end
     end
