@@ -238,6 +238,16 @@ module DamageControl
       end
       nil
     end
+    
+    # Creates a duplicate of ourself, applying simple standard #{blah}
+    # transformations of all key,value pairs in +local_assigns+.
+    def dupe(local_assigns)
+      yaml = YAML::dump(self)
+      b = binding
+      local_assigns.each { |key, value| eval "#{key} = local_assigns[\"#{key}\"]", b }
+      new_yaml = eval("\"#{yaml}\"", b)
+      YAML::load(new_yaml)
+    end
 
   private
 
