@@ -1,0 +1,23 @@
+<script>
+function mooky_init() {
+  alert("Mooky! You'll find me under the 'Source Control' tab.")
+}
+
+var mooky_foo_tip = "<div class='tp1'>The bar value.</div>";
+var mooky_bar_tip = "<div class='tp1'>The foo value.</div>";
+
+</script>
+
+<img src="images/mooky.png"/>
+<table width="100%">
+  <tr>
+    <td width="25%" class="setting-name">Foo</td>
+    <td><%= tip(:txt => 'mooky_foo_tip') %></td>
+    <td width="75%"><%= text_or_input(@edit, :name => "RSCM::Mooky[foo]", :value => mooky.foo) %></td>
+  </tr>
+  <tr>
+    <td class="setting-name">Bar</td>
+    <td><%= tip(:txt => 'mooky_bar_tip') %></td>
+    <td width="75%"><%= text_or_input(@edit, :name => "RSCM::Mooky[bar]", :value => mooky.bar) %></td>
+  </tr>
+</table>

@@ -1,0 +1,70 @@
+<script><!--
+
+function setTab(tab) {
+  stickyTab = tab
+  showElement(stickyTab, tabs)
+}
+
+function executeOnLoad() {
+<% @scms.each do |scm| %>
+  <%= scm.short %>_init();
+<% end %>
+  tab = "<%= @params['tab'] || 'tabs[0]' %>"
+  setTab(tab)
+}
+
+function showElement(selected, elements) {
+  // hide all divs in the group unless selected
+  for(element in elements) {
+    id = elements[element]
+    style = "none"
+    if(id == selected) {
+      style = "block"
+    }
+    document.getElementById(id).style.display = style
+  }
+}
+
+tabs = ["projects", "scms", "trackers", "changesets"]
+
+scms = [
+<% @scms.each do |scm| %>
+  "<%=scm.class.name %>",
+<% end %> "" ];
+scm_tip = "<div class='tp1'>If you don't find your SCM here, file a feature request in RSCM's JIRA</div>";
+
+trackers = [
+<% @trackers.each do |tracker| %>
+  "<%=tracker.class.name %>",
+<% end %> "" ];
+
+// -->
+</script>
+
+<ul id="foldertab">
+  <li><a href="javascript:setTab('projects')"><img src="/images/16x16/wrench.png"> General</a></li>
+  <li><a href="javascript:setTab('scms')"><img src="/images/16x16/safe.png"> Source Control</a></li>
+  <li><a href="javascript:setTab('trackers')"><img src="/images/16x16/scroll_information.png"> Issue Tracker</a></li>
+</ul>
+
+<% if(@edit) %>
+<form action="/project/save">
+<% end %>
+
+<div id="projects" style="display:block">
+  <%= render_partial("project", @project) %>
+</div>
+
+<div id="scms" style="display:none">
+  <%= render_partial("scms", @scms) %>
+</div>
+
+<div id="trackers" style="display:none">
+  <%= render_partial("trackers", @trackers) %>
+</div>
+
+<% if(@edit) %>
+  <input type="submit" value="Save"/>
+  
+</form>
+<% end %>

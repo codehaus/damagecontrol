@@ -1,0 +1,19 @@
+<script>
+var sourceforge_group_id_tip = "<div class='tp1'>The ID of the project (group_id). Example: <br><tt>http://sourceforge.net/tracker/index.php?func=detail&amp;aid=1051927&amp;group_id=<strong>7856</strong>&amp;atid=107856</tt>.</div>";
+var sourceforge_tracker_id_tip = "<div class='tp1'>The ID of the tracker (aid). Example: <br><tt>http://sourceforge.net/tracker/index.php?func=detail&amp;aid=<strong>1051927</strong>&amp;group_id=7856&amp;atid=107856</tt>.</div>";
+</script>
+
+<table width="100%">
+  <tr>
+    <td width="25%" class="setting-name">Project ID</td>
+    <td><%= tip(:txt => 'sourceforge_group_id_tip') %></td>
+    <td width="75%"><%= text_or_input(@edit, :name => "RSCM::Tracker::SourceForge[group_id]", :value => sourceforge.group_id) %></td>
+  </tr>
+  <tr>
+    <td class="setting-name">Tracker ID</td>
+    <td><%= tip(:txt => 'sourceforge_tracker_id_tip') %></td>
+    <td width="75%"><%= text_or_input(@edit, :name => "RSCM::Tracker::SourceForge[tracker_id]", :value => sourceforge.tracker_id) %></td>
+  </tr>
+</table>
+
+<img src="/images/sourceforge.gif"/>

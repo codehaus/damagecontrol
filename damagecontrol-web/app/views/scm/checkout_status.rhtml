@@ -1,0 +1,44 @@
+<script>
+var nl = /\n/gi;
+
+var req;
+
+function loadXMLDoc(url) {
+    if (window.XMLHttpRequest) {
+        req = new XMLHttpRequest();
+        req.onreadystatechange = processReqChange;
+        req.open("GET", url, true);
+        req.send(null);
+    } else if (window.ActiveXObject) {
+        req = new ActiveXObject("Microsoft.XMLHTTP");
+        if (req) {
+            req.onreadystatechange = processReqChange;
+            req.open("GET", url, true);
+            req.send();
+        }
+    }
+}
+
+function processReqChange() {
+    // only if req shows "loaded"
+    if (req.readyState == 4) {
+        // only if "OK"
+        if (req.status == 200) {
+            var checkout_list = window.frames['checkout_list']
+            checkout_list.document.body.innerHTML = req.responseText.replace(nl, "<br>")
+            checkout_list.scrollBy(0, 3000)
+
+            setTimeout("loadXMLDoc('<%= @checkout_list_path %>')", 1000)
+        } else {
+            alert("There was a problem retrieving the XML data:\n" +
+                req.responseText);
+        }
+    }
+}
+
+function executeOnLoad() {
+    loadXMLDoc('<%= @checkout_list_path %>')
+}
+</script>
+
+<iframe id="checkout_list" name="checkout_list" rows="20" cols="120">Your browser doesn't support IFRAME.</iframe>

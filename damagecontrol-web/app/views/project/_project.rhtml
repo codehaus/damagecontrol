@@ -1,0 +1,30 @@
+<script>
+var project_name_page_tip = "<div class='tp1'>The project name should not use space characters, as it will be used to create a folder on the server.</div>";
+var project_description_tip = "<div class='tp1'>A short description of the project. Will be used in various notifications such as RSS.</div>";
+var project_home_page_tip = "<div class='tp1'>URL to the project's home page or documentation.</div>";
+</script>
+
+<input name="project" type="hidden" value="<%= project.class.name %>"/>
+
+<table width="100%">
+<tr>
+  <td width="25%" class="setting-name">Project name</td>
+  <td><%= tip(:txt => 'project_name_page_tip') %></td>
+  <td width="75%">
+    <%= text_or_input(@new_project, :name => "RSCM::Project[name]", :value => project.name) %>
+    <% if(@edit) %>
+      <%= tag("input", :type => "hidden", :name => "RSCM::Project[name]", :value => project.name) %>
+    <% end %>
+  </td>
+</tr>
+<tr>
+  <td>Project description</td>
+  <td><%= tip(:txt => 'project_description_tip') %></td>
+  <td><%= text_or_input(@edit, :name => "RSCM::Project[description]", :value => project.description) %></td>
+</tr>
+<tr>
+  <td>Project home page</td>
+  <td><%= tip(:txt => 'project_home_page_tip') %></td>
+  <td><%= text_or_input(@edit, :name => "RSCM::Project[home_page]", :value => project.home_page) %></td>
+</tr>
+</table>
