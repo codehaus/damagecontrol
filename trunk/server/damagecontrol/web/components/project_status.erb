@@ -8,16 +8,16 @@
 </tr>
 
 <%
-project_statuses.each do |project|
+project_statuses.each do |project_status|
 %>
 <tr>
-    <td><img width="32" height="32" src="<%= project.image %>" /></td>
-    <td><a href="<%= project.href %>"><%= project.name %><%= project.label %></a></td>
-    <td><%= project.time_since_last_success %></td>
-    <td><%= project.last_duration %></td>
+    <td><img width="32" height="32" src="<%= project_status.image %>" /></td>
+    <td><a href="<%= project_status.href %>"><%= project_status.project_name %><%= project_status.label %></a></td>
+    <td><%= project_status.time_since_last_success %></td>
+    <td><%= project_status.last_duration %></td>
     <% if private? %>
-    <td align="center" style="border-left: 1px solid #bbb; color: #bbb;"> <a href="configure/<%= project.name %>?action=configure" title="Configure <%= project.name %>"><img src="largeicons/wrench.png" width="24" height="24"/></a>
-        | <a href="project/<%= project.name %>?action=trig_build" title="Trigger build for <%= project.name %>"><img src="largeicons/gears_run.png
+    <td align="center" style="border-left: 1px solid #bbb; color: #bbb;"> <a href="configure/<%= project_status.project_name %>?action=configure" title="Configure <%= project_status.project_name %>"><img src="largeicons/wrench.png" width="24" height="24"/></a>
+        | <a href="project/<%= project_status.project_name %>?action=trig_build" title="Trigger build for <%= project_status.project_name %>"><img src="largeicons/gears_run.png
 " width="24" height="24"/></a></td>
     <% else %>
        <td>&nbsp;</td>

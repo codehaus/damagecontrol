@@ -27,7 +27,7 @@ module DamageControl
   protected
   
     def project_status
-      project_statuses = project_config_repository.project_names.collect {|n| ProjectStatus.new(n, build_history_repository)}
+      project_statuses = project_config_repository.project_names.collect {|project_name| ProjectStatus.new(project_name, build_history_repository)}
       erb("components/project_status.erb", binding)
     end
     

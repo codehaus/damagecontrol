@@ -4,23 +4,23 @@ module DamageControl
   class ProjectStatus
     include Pebbles::TimeUtils
 
-    attr_reader :name
-    
-    def initialize(name, build_history_repository)
-      @name = name
+    attr_reader :project_name
+
+    def initialize(project_name, build_history_repository)
+      @project_name = project_name
       @build_history_repository = build_history_repository
     end
     
     def href
-      "project/#{name}"
+      "project/#{@project_name}"
     end
     
     def image
-      "images/lastcompletedstatus/#{name}"
-			color = "grey"
+      "images/lastcompletedstatus/#{@project_name}"
+      color = "grey"
       pulse = ""
       build = last_completed_build
-			
+      
       if(build && build.completed?)
         color = if build.successful? then "green" else "red" end
         pulse = "-pulse" if ongoing_build?
@@ -29,15 +29,15 @@ module DamageControl
     end
     
     def last_successful_build
-      @build_history_repository.last_successful_build(name)
+      @build_history_repository.last_successful_build(@project_name)
     end
     
     def last_completed_build
-      @build_history_repository.last_completed_build(name)
+      @build_history_repository.last_completed_build(@project_name)
     end
     
     def current_build
-      current_build = @build_history_repository.current_build(name)
+      current_build = @build_history_repository.current_build(@project_name)
       current_build = nil if current_build != nil && current_build.completed?
       current_build
     end
@@ -51,8 +51,8 @@ module DamageControl
     end
     
     def time_since_last_success
-      if(last_successful_build  && last_successful_build.dc_end_time)
-        Time.now.utc.difference_as_text(last_successful_build.dc_end_time)
+      if(last_successful_build  && last_successful_build.duration)
+        duration_as_text(last_successful_build.duration)
       else 
         "Never successfuly built" 
       end

@@ -9,9 +9,10 @@ module DamageControl
     include Logging
     include FileUtils
   
-    def initialize(channel)
+    def initialize(channel, build_history_repository)
       @open_files = {}
       channel.add_consumer(self)
+      @build_history_repository = build_history_repository
     end
     
     def put(event)
@@ -22,8 +23,8 @@ module DamageControl
       
       if event.is_a? BuildProgressEvent
         begin
-          log_file(build).puts(event.output)
-          log_file(build).flush
+          stdout_file(build).puts(event.output)
+          stdout_file(build).flush
         rescue Exception => e
           logger.error("Couldn't write to file:#{format_exception(e)}")
         end
@@ -31,17 +32,17 @@ module DamageControl
       
       if event.is_a? BuildErrorEvent
         begin
-          error_log_file(build).puts(event.message)
-          error_log_file(build).flush
-          log_file(build).puts(event.message)
-          log_file(build).flush
+          stderr_file(build).puts(event.message)
+          stderr_file(build).flush
+          stdout_file(build).puts(event.message)
+          stdout_file(build).flush
         rescue Exception => e
           logger.error("Couldn't write to file:#{format_exception(e)}")
         end
       end
       
       if event.is_a? BuildCompleteEvent
-        close_log_files(build)
+        close_files(build)
       end
 
     end
@@ -53,38 +54,38 @@ module DamageControl
       end
     end
     
-    def close_log_files(build)
-        begin
-          close_log_file(build.log_file)
-          close_log_file(build.error_log_file)
-        rescue => e
-          logger.error("BuildCompleteEvent: Couldn't write to file: #{format_exception(e)}")
-        end
+    def stdout_file(build)
+      open_file(@build_history_repository.stdout_file(build.project_name, build.dc_creation_time))
     end
     
-    def log_file(build)
-      open_log_file(build.log_file)
+    def stderr_file(build)
+      open_file(@build_history_repository.stderr_file(build.project_name, build.dc_creation_time))
     end
     
-    def error_log_file(build)
-      open_log_file(build.error_log_file)
+  private
+    
+    def close_files(build)
+      begin
+        close_file(@build_history_repository.stdout_file(build.project_name, build.dc_creation_time))
+        close_file(@build_history_repository.stderr_file(build.project_name, build.dc_creation_time))
+      rescue => e
+        logger.error("BuildCompleteEvent: Couldn't write to file: #{format_exception(e)}")
+      end
     end
     
-    private
-    
-    def close_log_file(file_name)
-      log_file = @open_files[file_name]
-      return unless log_file
-      if log_file.closed?
+    def close_file(file_name)
+      stdout_file = @open_files[file_name]
+      return unless stdout_file
+      if stdout_file.closed?
         @open_files.remove(file_name)
         return
       end
       logger.info("closing log file #{file_name}")
-      log_file.flush
-      log_file.close
+      stdout_file.flush
+      stdout_file.close
     end
     
-    def open_log_file(file_name)
+    def open_file(file_name)
       file = @open_files[file_name]
       if(!file)
         logger.info("opening log file #{file_name}")

@@ -48,15 +48,15 @@ class Time
   end
   
   def to_rss
-    strftime("%a, %d %b %Y %H:%M:%S %Z")
+    utc.strftime("%a, %d %b %Y %H:%M:%S GMT0:00")
   end
   
   def to_human
-    strftime("%d %b %Y %H:%M:%S")
+    utc.strftime("%d %b %Y %H:%M:%S")
   end
   
   def ymdHMS
-    strftime("%Y%m%d%H%M%S")
+    utc.strftime("%Y%m%d%H%M%S")
   end
   
   def ==(o)

@@ -8,7 +8,7 @@ module DamageControl
     include XSLT
   
     def available?
-      selected_build.xml_log_file && File.exists?(selected_build.xml_log_file)
+      super && File.exists?(@build_history_repository.xml_log_file(selected_build.project_name, selected_build.dc_creation_time))
     end
     
     def content

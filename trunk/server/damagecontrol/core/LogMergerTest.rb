@@ -22,19 +22,23 @@ module DamageControl
       })
       build.dc_start_time = Time.utc(1977,6,15,12,0,0,0)
       
-      build.xml_log_file = "#{basedir}/project/log/19770615120000.xml"
+      log_xml = "#{basedir}/build/19770615120000/log.xml"
       
       mkdir_p("#{basedir}/checkout/target/test-reports")
       touch("#{basedir}/checkout/target/test-reports/TEST-com.thoughtworks.Test.xml")
       touch("#{basedir}/checkout/ant-log.xml")
       
+      build_history_repository = new_mock
+      build_history_repository.__expect(:checkout_dir) { "#{basedir}/checkout" }
+      build_history_repository.__expect(:xml_log_file) { log_xml }
+
       lm = LogMerger.new(
         hub,
-        new_mock.__expect(:checkout_dir) { "#{basedir}/checkout" }
+        build_history_repository
       )
       lm.put(BuildCompleteEvent.new(build))
       
-      assert(File.exists?(build.xml_log_file))
+      assert(File.exists?(log_xml))
     end
   end
 end

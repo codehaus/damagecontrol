@@ -7,11 +7,11 @@ module DamageControl
     end
     
     def title
-      "Errors"
+      "Standard Error"
     end
     
     def available?
-      super && selected_build.error_log_file && File.exists?(selected_build.error_log_file)
+      super && File.exists?(@build_history_repository.stderr_file(selected_build.project_name, selected_build.dc_creation_time))
     end
     
     def icon

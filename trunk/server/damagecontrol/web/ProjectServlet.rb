@@ -44,7 +44,7 @@ module DamageControl
     attr_reader :report_classes
   
     def reports
-      report_classes.collect {|c| c.new(selected_build, project_config_repository) }
+      report_classes.collect {|c| c.new(selected_build, project_config_repository, build_history_repository) }
     end
     
     def selected_report
@@ -161,12 +161,19 @@ module DamageControl
     end
     
     def selected_build
-      dc_creation_time = request.query['dc_creation_time']
-      if dc_creation_time then
-        build_history_repository.lookup(project_name, request.query['dc_creation_time'])
-      else
-        last_build
+      # Let's cache this in a thread local. It is called many times and we want
+      # to avoid hitting the filesystem too much to parse the build over and over.
+      result = Thread.current["selected_build"]
+      if(result.nil?)
+        dc_creation_time = Time.parse_ymdHMS(request.query["dc_creation_time"].to_s)
+        if dc_creation_time then
+          result = build_history_repository.lookup(project_name, dc_creation_time)
+        else
+          result = last_build
+        end
+        Thread.current["selected_build"] = result
       end
+      result
     end
     
     def last_build
@@ -176,15 +183,15 @@ module DamageControl
     def build_history
       history = build_history_repository.history(project_name).reverse
       current_build = build_history_repository.current_build(project_name)
-			onecompleted = false
+      onecompleted = false
       history.delete_if { |b| 
-				onecompleted = !(b != current_build && !b.completed?) || onecompleted
-				if b.queued? && onecompleted
-					true
-				else
-					b != current_build && !b.completed? && !b.queued?
-				end
-			}
+        onecompleted = !(b != current_build && !b.completed?) || onecompleted
+        if b.queued? && onecompleted
+          true
+        else
+          b != current_build && !b.completed? && !b.queued?
+        end
+      }
       history.reverse
     end
     

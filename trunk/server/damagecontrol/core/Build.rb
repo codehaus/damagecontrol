@@ -26,14 +26,12 @@ module DamageControl
     attr_accessor :config
     attr_accessor :changesets
     attr_accessor :label
+    # This can go - it is redundant to what goes in stderr log. and it is never accessed
     attr_accessor :error_message
     attr_accessor :status
 
 #START FIXME - not portable data
     attr_accessor :url
-    attr_accessor :log_file
-    attr_accessor :error_log_file
-    attr_accessor :xml_log_file
     attr_accessor :archive_dir
 #END FIXME
 
@@ -46,6 +44,7 @@ module DamageControl
 
     # The timestamp when the build started.
     # This timestamp should be in UTC according to the DC machine.
+    # It is used to estimate remaining time for the progress bar
     # DON'T USE THIS TO IDENTIFY/LOOK UP BUILDS
     attr_accessor :dc_start_time
     
@@ -68,10 +67,10 @@ module DamageControl
     def completed?
       status == SUCCESSFUL || status == FAILED || status == KILLED
     end
-		
-		def queued?
-			status == "QUEUED"
-		end
+    
+    def queued?
+      status == QUEUED
+    end
     
     def successful?
       status == SUCCESSFUL
@@ -111,15 +110,11 @@ module DamageControl
       return false unless o.is_a? Build
       project_name == o.project_name &&
       status == o.status &&
+      label == o.label&&
       config == o.config &&
-      dc_creation_time == o.dc_creation_time
+      dc_creation_time == o.dc_creation_time &&
+      changesets == o.changesets
     end
-
-  private
-    # don't allow search in these fields
-#    def matches_ignores
-#      ["@project_name"]
-#    end
 
   end
 end

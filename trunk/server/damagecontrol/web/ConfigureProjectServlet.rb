@@ -67,46 +67,46 @@ module DamageControl
   
     def configure_page(project_name, project_config, next_build_number)
       action = "store_configuration"
-			# this is needed to have a fresh list of already checked dependencies
-			@checked_projects = [ ]
-			circular_dependency = find_cirular_dependencies(project_name, project_config['dependent_projects'])
+      # this is needed to have a fresh list of already checked dependencies
+      @checked_projects = []
+      circular_dependency = find_cirular_dependencies(project_name, project_config['dependent_projects'])
       dependent_projects = from_array(project_config['dependent_projects'])
       logs_to_merge = from_array(project_config['logs_to_merge'])
       artifacts_to_archive = from_array(project_config['artifacts_to_archive'])
       fixed_build_time_hhmm = project_config['fixed_build_time_hhmm']
       render("configure.erb", binding)
     end
-		
-		def	find_cirular_dependencies(name, projects)
-			project = ""
-			if @checked_projects
-				puts "list of checked projects exists"
-				@checked_projects << name
-			else
-				puts "making new list of checked projects"
-				@checked_projects = [ name ]
-			end
-			if projects then
-				#puts "there are dependent projects"
-				projects.each { |project|
-					#puts "one project is called #{project}"
-					return "There are circular dependencies: Project <b>#{name}</b> depends on <b>#{project}</b>" if name == project
-					if !@checked_projects.include?(project)
-						subproject_config = project_config_repository.project_config(project)
-						#puts "recursing to check project #{project}"
-						sub_circular = find_cirular_dependencies(name, subproject_config['dependent_projects'])
-						return sub_circular if sub_circular
-					else
-						#puts "project #{project} was already checked"
-					end
-				}
-				return nil
-			else
-				return nil
-			end
-			rescue Exception => e
-			return "The dependent project <b>#{project}</b> does not exist"
-		end
+    
+    def find_cirular_dependencies(name, projects)
+      project = ""
+      if @checked_projects
+        puts "list of checked projects exists"
+        @checked_projects << name
+      else
+        puts "making new list of checked projects"
+        @checked_projects = [ name ]
+      end
+      if projects then
+        #puts "there are dependent projects"
+        projects.each { |project|
+          #puts "one project is called #{project}"
+          return "There are circular dependencies: Project <b>#{name}</b> depends on <b>#{project}</b>" if name == project
+          if !@checked_projects.include?(project)
+            subproject_config = project_config_repository.project_config(project)
+            #puts "recursing to check project #{project}"
+            sub_circular = find_cirular_dependencies(name, subproject_config['dependent_projects'])
+            return sub_circular if sub_circular
+          else
+            #puts "project #{project} was already checked"
+          end
+        }
+        return nil
+      else
+        return nil
+      end
+      rescue Exception => e
+      return "The dependent project <b>#{project}</b> does not exist"
+    end
   
     KEYS = [
       "build_command_line", 

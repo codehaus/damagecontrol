@@ -201,18 +201,13 @@ module DamageControl
     def svn(dir, cmd, &line_proc)
       command_line = "svn #{cmd}"
 
+      # not specifying stderr - cmd_with_io will read it in a separate thread.
       cmd_with_io(dir, command_line) do |stdout|
         begin
           logger.info("Reading stdout")
           stdout.each_line do |progress|
               if block_given? then yield progress else logger.debug(progress) end
           end
-        ensure
-#          logger.info("Reading stderr")
-#          stderr.each_line do |progress|
-#              if block_given? then yield progress else logger.debug(progress) end
-#          end
-#          logger.info("DONE Reading stderr")
         end
       end
     end
@@ -220,6 +215,7 @@ module DamageControl
     def svnadmin(dir, cmd, &line_proc)
       command_line = "svnadmin #{cmd}"
 
+      # not specifying stderr - cmd_with_io will read it in a separate thread.
       cmd_with_io(dir, command_line) do |stdout|
         stdout.each_line do |progress|
             if block_given? then yield progress else logger.debug(progress) end

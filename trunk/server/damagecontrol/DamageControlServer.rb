@@ -80,51 +80,6 @@ module DamageControl
     def initialize(params={})
       @params = params
       @components = []
-      @rootdir = rootdir
-    end
-    
-    def upgrade(project_directories, project_config_repository, build_history_repository)
-      # Migrate build history timestamps to new format
-      histories = {}
-      project_directories.project_names.each do |project_name|
-        history = build_history_repository.history(project_name)
-        history.each do |build|
-          # transform old fields to new ones
-          if(!build.dc_creation_time)
-            if build.timestamp
-              build.dc_creation_time = Time.parse_ymdHMS(build.timestamp)
-            end
-          end
-
-          if(!build.dc_start_time)
-            if build.start_time
-              build.dc_start_time = build.start_time if build.start_time
-            else
-              build.dc_start_time = build.dc_creation_time
-            end
-          end
-          
-          if(!build.duration)
-            if build.end_time && build.start_time
-              build.duration = build.end_time - build.start_time 
-            else
-              build.duration = 1
-            end
-          end
-          
-          # remove old
-          build.start_time = nil
-          build.end_time = nil
-          build.timestamp = nil
-        end
-        
-        histories[project_name] = history
-      end
-
-      histories.each do |project_name, history|
-        logger.info("Upgrading build history for #{project_name}")
-        build_history_repository.dump(history, project_name)
-      end
     end
     
     def startup_time
@@ -193,11 +148,9 @@ module DamageControl
       # Most classes that depend on one of them generally depend on one or two others too.
       # We could call it ProjectManager or something.
       # AH
-      component(:project_directories, ProjectDirectories.new(@rootdir))
+      component(:project_directories, ProjectDirectories.new(rootdir))
       component(:project_config_repository, ProjectConfigRepository.new(project_directories, public_web_url))
-      component(:build_history_repository, BuildHistoryRepository.new(hub, project_directories))
-
-      upgrade(project_directories, project_config_repository, build_history_repository)
+      component(:build_history_repository, BuildHistoryRepository.new(hub, rootdir, public_web_url))
     end
     
     def init_components
@@ -241,7 +194,7 @@ module DamageControl
       httpd.mount("/public/dashboard", DashboardServlet.new(:public, build_history_repository, project_config_repository, build_scheduler))
       httpd.mount("/public/project", ProjectServlet.new(:public, build_history_repository, project_config_repository, nil, build_scheduler, report_classes, public_web_url + "rss", trig_xmlrpc_url))
       httpd.mount("/public/search", SearchServlet.new(build_history_repository))
-      httpd.mount("/public/log", LogFileServlet.new(project_directories))
+      httpd.mount("/public/log", LogFileServlet.new(:public, build_scheduler, build_history_repository, project_config_repository))
       httpd.mount("/public/root", indexing_file_handler)
       httpd.mount("/public/rss", RssServlet.new(build_history_repository, public_web_url + "project/"))
       
@@ -289,7 +242,7 @@ module DamageControl
       httpd.mount("/private/install_trigger", InstallTriggerServlet.new(project_config_repository, trig_xmlrpc_url))
       httpd.mount("/private/configure", ConfigureProjectServlet.new(project_config_repository, scm_configurator_classes, tracking_configurator_classes, trig_xmlrpc_url))
       httpd.mount("/private/search", SearchServlet.new(build_history_repository))
-      httpd.mount("/private/log", LogFileServlet.new(project_directories))
+      httpd.mount("/private/log", LogFileServlet.new(:private, build_scheduler, build_history_repository, project_config_repository))
       httpd.mount("/private/root", indexing_file_handler)
       
       httpd.mount("/private/images", WEBrick::HTTPServlet::FileHandler, "#{webdir}/images")
@@ -352,7 +305,7 @@ module DamageControl
     end
     
     def init_build_scheduler
-      component(:log_writer, LogWriter.new(hub))
+      component(:log_writer, LogWriter.new(hub, build_history_repository))
       component(:log_merger, LogMerger.new(hub, project_directories))
       component(:artifact_archiver, ArtifactArchiver.new(hub, project_directories))
       component(:build_number_increaser, BuildNumberIncreaser.new(hub, project_config_repository))

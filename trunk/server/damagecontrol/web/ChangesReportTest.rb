@@ -12,15 +12,16 @@ module DamageControl
     include Pebbles::MVCServletTesting
     include MockIt
     
-		def setup
-			build = Build.new("myprojectname")
+    def setup
+      build = Build.new("myprojectname")
       jira = Jira.new
       jira.jira_url = "http://jira.codehaus.org/"
       @report = ChangesReport.new(build, mock_project_config_repository({
         "tracking" => jira
-      }))
-		end
-		
+      }),
+      new_mock)
+    end
+    
     def mock_project_config_repository(project_config)
       @project_config_repository = new_mock
       @project_config_repository.__setup(:project_exists?) {|p| true }

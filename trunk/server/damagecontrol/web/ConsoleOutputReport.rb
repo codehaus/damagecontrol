@@ -7,11 +7,11 @@ module DamageControl
     end
     
     def title
-      "Console output"
+      "Standard Out"
     end
     
     def available?
-      super && selected_build.log_file && File.exists?(selected_build.log_file)
+      super && File.exists?(@build_history_repository.stdout_file(selected_build.project_name, selected_build.dc_creation_time))
     end
     
     def icon

@@ -36,6 +36,10 @@ module DamageControl
       request.path_info[1..-1]
     end
     
+    def dc_creation_time
+      Time.parse_ymdHMS(request.query["dc_creation_time"].to_s)
+    end
+    
     def project_exists?
       @project_config_repository.project_exists?(project_name)
     end
@@ -159,6 +163,7 @@ module DamageControl
     end
     
   private
+
     def build_url(build)
       return nil unless build
       "#{build.project_name}?dc_creation_time=#{build.dc_creation_time.ymdHMS}"

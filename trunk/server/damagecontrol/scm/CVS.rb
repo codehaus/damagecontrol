@@ -255,6 +255,7 @@ module DamageControl
 
       execed_command_line = command_line(cvspassword, cmd)
 
+      # not specifying stderr - cmd_with_io will read it in a separate thread.
       cmd_with_io(dir, execed_command_line, environment) do |stdin, stdout|
         stdout.each_line do |progress|
           if block_given? then yield progress else logger.debug(progress) end

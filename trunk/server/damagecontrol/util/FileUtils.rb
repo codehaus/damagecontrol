@@ -32,10 +32,10 @@ module FileUtils
     end
   end
 
-  def new_temp_dir(identifier = self)
+  def new_temp_dir(identifier = self, parent=".")
     identifier = identifier.to_s
     identifier.gsub!(/\(|:|\)/, '_')
-    dir = "#{damagecontrol_home}/target/temp_#{identifier}_#{Time.new.to_i}"
+    dir = "#{damagecontrol_home}/target/#{parent}/temp_#{identifier}_#{Time.new.to_i}"
     mkdir_p(dir)
     dir
   end
@@ -92,7 +92,7 @@ module FileUtils
   # If option a) or b) is used, an internal thread will read (and discard)
   # stderr - to avoid that the stderr buffer fills up.
   #
-  # If option c) is used, it is the callers responsibility to read all streams,
+  # If option c) is used, it is the caller's responsibility to read all streams,
   # typically in a separate thread for each.
   #
   def cmd_with_io(dir, cmd, environment = {}, &proc)
@@ -108,7 +108,13 @@ module FileUtils
           proc.call(stdin, stdout, stderr)
         else
           # see http://jira.codehaus.org/browse/DC-312
-          err_thread = Thread.new { stderr.read }
+          err_thread = Thread.new do
+            begin
+              stderr.read unless stderr.closed?
+            rescue
+              # Some times we get a IOError: closed stream even if the stream is closed.
+            end
+          end
           if(proc.arity == 2)
             proc.call(stdin, stdout)
           else # 1

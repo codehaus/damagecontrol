@@ -4,9 +4,10 @@ module DamageControl
   class Report
     include Pebbles::SimpleERB
     
-    def initialize(selected_build, project_config_repository)
+    def initialize(selected_build, project_config_repository, build_history_repository)
       @selected_build = selected_build
       @project_config_repository = project_config_repository
+      @build_history_repository = build_history_repository
     end
     
     def id

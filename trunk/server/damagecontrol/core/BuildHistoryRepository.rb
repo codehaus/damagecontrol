@@ -1,12 +1,12 @@
+require 'cgi'
+require 'yaml'
+require 'rexml/document'
 require 'damagecontrol/core/Build'
-require 'damagecontrol/core/BuildEvents'
-require 'damagecontrol/core/ProjectDirectories'
-require 'damagecontrol/scm/Changes'
+require 'damagecontrol/core/BuildSerializer'
 require 'damagecontrol/util/Logging'
+require 'damagecontrol/util/FileUtils'
 require 'pebbles/Space'
 require 'pebbles/TimeUtils'
-require 'rexml/document'
-require 'yaml'
 
 # Captures and persists build history.
 # All reads are from memory, which is populated from files at startup.
@@ -20,208 +20,148 @@ module DamageControl
 
   class BuildHistoryRepository < Pebbles::Space
 
+    include FileUtils
     include Logging
 
-    def initialize(channel, project_directories=nil)
+    def initialize(channel, basedir, html_url=nil)
       super
       channel.add_consumer(self)
-      @project_directories = project_directories
-      @history = {}
-      
-      if(@project_directories)
-        populate_cache_from_files
-      end
+      @basedir = basedir
+      @html_url = html_url
+      @build_serializer = BuildSerializer.new
     end
     
-    def current_build(project_name)
-      history = history(project_name)
-      return nil unless history
-      history.reverse.find {|b| b.status != Build::QUEUED }
-    end
-    
-    def last_completed_build(project_name)
-      history = history(project_name)
-      return nil unless history
-      history.reverse.find {|build| build.completed?}
-    end
-    
-    def last_successful_build(project_name)
-      history = history(project_name)
-      return nil unless history
-      history.reverse.find {|build| build.status == Build::SUCCESSFUL}
-    end
-
     def on_message(message)
       if message.is_a?(BuildEvent) && !message.is_a?(BuildProgressEvent)
         register(message.build)
       end
     end
     
-    def build_with_number(project_name, label)
-      history(project_name).find {|b| b.label.to_s == label.to_s }
+    # TODO rename to dump (more aligned with YAML terminology - we're doing a similar thing)
+    def register(build)
+      @build_serializer.dump(build, build_dir(build.project_name, build.dc_creation_time))
+      
+      write_rss(build.project_name)
+    end
+    
+    # returns a build object
+    def lookup(project_name, dc_creation_time, with_changesets=false)
+      @build_serializer.load(build_dir(project_name, dc_creation_time), with_changesets)
+    end    
+
+    def current_build(project_name)
+      build_dirs(project_name).reverse.each do |build_dir|
+        build = @build_serializer.load(build_dir)
+        return build unless build.status == Build::QUEUED
+      end
+      nil
+    end
+    
+    def last_completed_build(project_name)
+      build_dirs(project_name).reverse.each do |build_dir|
+        build = @build_serializer.load(build_dir)
+        return build if build.completed?
+      end
+      nil
+    end
+    
+    def last_successful_build(project_name)
+      build_dirs(project_name).reverse.each do |build_dir|
+        build = @build_serializer.load(build_dir)
+        return build if build.successful?
+      end
+      nil
     end
     
     def history(project_name)
-      return [] unless @history.has_key?(project_name)
-      result = @history[project_name]
-      result
+      build_dirs(project_name).collect do |build_dir|
+        @build_serializer.load(build_dir)
+      end
     end
 
-    def lookup(project_name, dc_creation_time)
-      dc_creation_time = Time.parse_ymdHMS(dc_creation_time) if dc_creation_time.is_a?(String)
-      history = history(project_name)
-      history.each do |build|start
-        return build if build.dc_creation_time == dc_creation_time
+    def project_names
+      Dir["#{@basedir}/*"].collect do |filename|
+        File.basename(filename)
+      end.sort
+    end
+    
+    def next(build)
+      build_dirs(build.project_name).each do |build_dir|
+        b = @build_serializer.load(build_dir)
+        return b if b.dc_creation_time > build.dc_creation_time
       end
       nil
-    end    
-
-    def register(build)
-      history = history(build.project_name)
-      if(history.empty?)
-        @history[build.project_name] = history
-      end
-      history << build unless history.index(build)
-      if(@project_directories)
-        dump(history, build.project_name)
-      end
-    end
-    
-    def project_names
-      @history.keys.sort
-    end
-    
-    def search(regexp, required_project_name=nil)
-      result = []
-      project_names.each do |project_name|
-        if(required_project_name == project_name || required_project_name.nil?)
-          history = history(project_name)
-          history.each do |build|
-            result << build if build =~ regexp
-          end
-        end
-      end
-      result
-    end
-
-    def next(build)
-      return nil unless build
-      h = history(build.project_name)
-      i = h.index(build)
-      return h[i + 1] unless i == h.length - 1
     end
 
     def prev(build)
-      return nil unless build
-      h = history(build.project_name)
-      i = h.index(build)
-      return h[i - 1] unless i == 0
-    end
-
-    def previous_successful_build(build)
-      history = history(build.project_name)
-      return nil unless history
-      idx = history.index(build)
-      history[0..idx].reverse.find do |a_build| 
-        a_build.status == Build::SUCCESSFUL && a_build != build
+      build_dirs(build.project_name).reverse.each do |build_dir|
+        b = @build_serializer.load(build_dir)
+        return b if b.dc_creation_time < build.dc_creation_time
       end
+      nil
     end
 
-    def to_rss(project_name, html_url)
+    def to_rss(project_name)
+      File.new(rss_file(project_name)).read
+    end
+    
+#### Files and directories ####
+    
+    def checkout_dir(project_name)
+      "#{project_dir(project_name)}/checkout"
+    end
+
+    def stdout_file(project_name, dc_creation_time)
+      "#{build_dir(project_name, dc_creation_time)}/stdout.log"
+    end
+
+    def stderr_file(project_name, dc_creation_time)
+      "#{build_dir(project_name, dc_creation_time)}/stderr.log"
+    end
+
+    def xml_log_file(project_name, dc_creation_time)
+      "#{build_dir(project_name, dc_creation_time)}/log.xml"
+    end
+
+  private
+  
+    # writes rss to disk
+    def write_rss(project_name)
       rss = REXML::Document.new
       rss.add_element("rss")
       rss.root.add_attribute("version", "2.0")
       channel = rss.root.add_element("channel")
       channel.add_element("title").add_text("DamageControl: #{project_name}")
       channel.add_element("description").add_text("Build results for #{project_name}")
-      channel.add_element("link").add_text(html_url)
+      channel.add_element("link").add_text("#{@html_url}#{CGI.escape(project_name)}")
       history(project_name).reverse.each do |build|
-        if build.completed?
-          channel.add(build.to_rss_item)
-        end
+        channel.add(build.to_rss_item)
       end
-      rss
-    end
 
-    # should ideally be private, but need access when upgrading formats
-    def dump(history, project_name)
-      # safe writing of history file
-      file = history_file(project_name)
-      writing_file = "#{file}.writing"
-      old_file = "#{file}.old"
-      # writing on temporary file: prepare
-      File.open(writing_file, "w") do |io|
-        YAML::dump(history, io)
-      end
-      # move away old file as backup
-      File.delete(old_file) if File.exist?(old_file)
-      File.move(file, old_file) if File.exist?(file)
-      # rename = semi-atomic operation: commit!
-      File.move(writing_file, file)
-    end
-
-  private
-
-    def populate_cache_from_files
-      @project_directories.project_names.each do |project_name|
-        builds = load(project_name)
-        @history[project_name] = builds unless builds.nil?
+      File.open(rss_file(project_name), "w") do |io|
+        io.puts(rss.to_s)
       end
     end
 
-    def load(project_name)
-      builds = nil
-      filename = history_file(project_name)
-			logger.info("Loading project #{project_name} with history #{filename}")
-      if(File.exist?(filename))
-        file = File.new(filename)
-        begin
-          yaml = file.read
-          builds = YAML::load(yaml)
-          file.close
-          verify(builds)
-        rescue Exception => e
-          begin
-            file.close
-          rescue
-          end
-          upgrade_to_new_and_store_old(filename)
-					backupfile = "#{filename}.old"
-					if (File.exists?(backupfile))
-						logger.info("Using backupfile #{backupfile} instead")
-						File.rename(backupfile, filename)
-						builds = load(project_name)
-					else
-          	builds = []
-					end
-        end
-      end
-      builds
-    end
-    
-    def verify(builds)
-      builds.each do |build|
-        raise "Not a Build: #{build}" unless build.is_a?(Build)
-        raise "ChangeSets not initialised" unless build.changesets
-        build.changesets.each do |changeset|
-          raise "Not a ChangeSet: #{changeset}" unless changeset.is_a?(ChangeSet)
-          changeset.each do |change|
-            raise "Not a Change: #{change}" unless change.is_a?(Change)
-          end
-        end
-      end
+    def project_dir(project_name)
+      "#{@basedir}/#{project_name}"
     end
 
-    def upgrade_to_new_and_store_old(filename)
-      backup = "#{filename}.#{Time.now.utc.to_i}.backup"
-      logger.error("#{filename} can't be parsed. might be of an older format")
-      logger.error("Copying it over to #{backup}")
-      File.move(filename, backup)
+    def builds_dir(project_name)
+      "#{project_dir(project_name)}/build"
     end
 
-    def history_file(project_name)
-      File.expand_path(@project_directories.build_history_file(project_name))
+    def build_dirs(project_name)
+      Dir["#{builds_dir(project_name)}/[0-9]*"].sort
     end
-        
+
+    def build_dir(project_name, dc_creation_time)
+      "#{builds_dir(project_name)}/#{dc_creation_time.ymdHMS}"
+    end
+
+    def rss_file(project_name)
+      "#{builds_dir(project_name)}/rss.xml"
+    end
+
   end
 end

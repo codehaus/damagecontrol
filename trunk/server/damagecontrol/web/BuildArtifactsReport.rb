@@ -23,7 +23,7 @@ module DamageControl
     end
     
     def build_artifact_url(file)
-      "root/#{selected_build.project_name}/archive/#{selected_build.dc_start_time.ymdHMS}/#{file}"
+      "root/#{selected_build.project_name}/archive/#{selected_build.dc_creation_time.ymdHMS}/#{file}"
     end
     
     def content
