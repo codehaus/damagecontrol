@@ -20,7 +20,7 @@ LogWriter.new(hub, "#{buildRoot}/logs")
 FilePublisher.new(hub, "#{buildRoot}/reports", HTMLTemplate.new).start 
 IRCPublisher.new(hub, "irc.codehaus.org", "\#damagecontrol", ShortTextTemplate.new).start 
 # Only accept connections from the same host or from hogshead.codehaus.org 
-st = SocketTrigger.new(hub, 4713, ["127.0.0.2", "66.216.68.111"]).start 
+st = SocketTrigger.new(hub, 4713, ["127.0.0.1", "66.216.68.111"]).start 
  
 # wait until ctrl-c 
 st.join 
