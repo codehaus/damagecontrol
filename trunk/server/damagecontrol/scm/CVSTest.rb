@@ -44,7 +44,7 @@ module DamageControl
     def test_update_command
       cvs = create_cvs(":pserver:anonymous@cvs.codehaus.org:/cvsroot/damagecontrol", "damagecontrol")
       assert_equal(
-        "update -D \"1977-06-15 12:00:00 UTC\" -d -P -A",
+        "update -D \"1977-06-15 12:00:00 UTC\" -d -P -A -C",
         cvs.update_command(jons_birthday))
     end
     

@@ -102,7 +102,7 @@ module DamageControl
       cvsroot_cvs = create_cvsroot_cvs
       cvsroot_cvs.checkout(trigger_files_checkout_dir, nil, nil, &line_proc)
       with_working_dir(trigger_files_checkout_dir) do
-        trigger_line = "#{cvsmodule} #{trigger_command}"
+        trigger_line = "#{cvsmodule} #{trigger_command}\n"
         File.open("loginfo", File::WRONLY | File::APPEND) do |file|
           file.puts(trigger_line)
         end
@@ -200,7 +200,8 @@ module DamageControl
     end
     
     def update_command(scm_to_time)
-      "update #{branch_option}#{to_time_option(scm_to_time)} -d -P -A"
+      # get a clean copy
+      "update #{branch_option}#{to_time_option(scm_to_time)} -d -P -A -C"
     end
     
     def checkout_command(scm_to_time, target_dir)

@@ -105,7 +105,7 @@ module DamageControl
       mode = post_commit_exists ? File::APPEND|File::WRONLY : File::CREAT|File::WRONLY
       File.open(post_commit_file, mode) do |file|
         file.puts("#!/bin/sh") unless post_commit_exists 
-        file.puts(trigger_command)
+        file.puts("#{trigger_command}\n" )
       end
       system("chmod g+x #{post_commit_file}")
     end
