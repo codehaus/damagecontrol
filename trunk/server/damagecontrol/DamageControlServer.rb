@@ -115,11 +115,13 @@ module DamageControl
     end
     
     def web_url
-      params[:ExternalWebUrl] || "http://#{get_ip}:#{http_port}/"
+      url = params[:ExternalWebUrl] || "http://#{get_ip}:#{http_port}/"
+      ensure_trailing_slash(url)
     end
     
     def public_web_url
-      params[:PublicWebUrl] || "#{web_url}public/"
+      url = params[:PublicWebUrl] || "#{web_url}public/"
+      ensure_trailing_slash(url)
     end
     
     def get_ip

@@ -12,7 +12,7 @@ module DamageControl
     attr_reader :basedir
   
     def initialize(basedir)
-      @basedir = basedir
+      @basedir = File.expand_path(basedir)
     end
     
     def project_names

@@ -179,8 +179,20 @@ end
   
   def generate_startup_script(script, target)
     win_target = target.gsub(/\//, "\\")
+
     write_file("#{script}.cmd",
 %{@echo off
+set DAMAGECONTROL_WORK=%USERPROFILE%\\.damagecontrol
+
+echo **************************************************
+echo DamageControl's working files will be stored under
+echo %DAMAGECONTROL_WORK%
+echo This can be changed in 
+echo %~dp0server.cmd
+echo **************************************************
+
+mkdir %DAMAGECONTROL_WORK%
+
 set DAMAGECONTROL_HOME=%~dp0..
 cd %DAMAGECONTROL_HOME%
 set RUBY_HOME=%DAMAGECONTROL_HOME%\\ruby
@@ -188,13 +200,18 @@ set PATH=%~dp0;%RUBY_HOME%\\bin;%PATH%
 set CMD=ruby -I "%DAMAGECONTROL_HOME%\\server" "#{target}" %1 %2 %3 %4 %5 %6 %7 %8 %9
 echo %CMD%
 %CMD%
-pause}.gsub(/\n/, "\r\n"))
+pause
+}.gsub(/\n/, "\r\n"))
+
     write_file(script,
 %{\#!/bin/sh
+DAMAGECONTROL_WORK=~/.damagecontrol
 DAMAGECONTROL_HOME=`dirname $0`/..
 cd $DAMAGECONTROL_HOME
 export DAMAGECONTROL_HOME=`pwd`
-exec ruby -I"$DAMAGECONTROL_HOME/server" "#{target}" $*})
+exec ruby -I"$DAMAGECONTROL_HOME/server" "#{target}" $*
+})
+
     system("chmod +x #{script}") unless windows?
   end
   
@@ -357,7 +374,7 @@ exec ruby -I"$DAMAGECONTROL_HOME/server" "#{target}" $*})
 #    test
 #    dist_nodeps
 #    archive_nodeps
-    installer_from_build
+    installer_from_local_build
     upload_nodeps
   end
   

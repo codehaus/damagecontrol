@@ -79,7 +79,11 @@ module Pebbles
       ensure
         close_all_streams
       end
-      raise ProcessFailedException.new("'#{command_line}' in directory '#{working_dir}' failed with code #{exit_code.to_s}") if exit_code != 0
+      raise ProcessFailedException.new(
+        "\n\nThe command\n#{command_line}\nrun from directory\n#{working_dir}\nfailed with process return code\n#{exit_code.to_s}\n" +
+        "Try to manually cd to the directory and run the command to diagnose further.\nAlso try to look up the documentation\n" +
+        "for the failing process to find out what this error code might mean. Note: This is NOT an error code from DamageControl or Ruby, but\n" +
+        "from a process that was launched by DamageControl.") if exit_code != 0
       ret
     end
 

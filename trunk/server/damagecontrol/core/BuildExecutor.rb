@@ -90,9 +90,13 @@ module DamageControl
       end
 
       # set the label
-      if(current_build.successful? && current_build.potential_label)
+      if(current_build.successful?)
         current_scm_label = current_scm.label(checkout_dir)
-        current_build.label = current_scm_label ? current_scm_label : current_build.potential_label
+        if(current_scm_label)
+          current_build.label = current_scm_label
+        else
+          current_build.label = current_build.potential_label
+        end
       end
 
     end

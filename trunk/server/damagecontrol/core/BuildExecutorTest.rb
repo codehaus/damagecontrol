@@ -83,6 +83,7 @@ module DamageControl
       mock_scm = new_mock
       mock_scm.__expect(:changesets) {}
       mock_scm.__expect(:checkout) {}
+      mock_scm.__expect(:label) {}
 
       mock_hub = new_mock
       mock_hub.__expect(:publish_message) {|message| assert(message.is_a?(BuildStartedEvent))}
@@ -169,6 +170,7 @@ module DamageControl
         assert_equal(current_build_time, to_time)
       }
       mock_scm.__expect(:checkout) {}
+      mock_scm.__expect(:label) {}
 
       mock_hub = new_mock
       mock_hub.__expect(:publish_message) {|message| assert(message.is_a?(BuildStartedEvent))}

@@ -5,7 +5,7 @@ require 'damagecontrol/DamageControlServer'
 include DamageControl
 
 server = DamageControlServer.new(
-  :RootDir => ENV["DAMAGECONTROL_HOME"] || "#{$damagecontrol_home}/work",
+  :RootDir => ENV["DAMAGECONTROL_WORK"],
   :HttpPort => 4712,
   :PollingInterval => 60 # specified in seconds
   # to allow access only from localhost then uncomment line below (when running behind an Apache proxy for example)
