@@ -1,4 +1,3 @@
-
 $:<<'../../lib'
 
 require 'damagecontrol/Logging'
