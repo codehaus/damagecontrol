@@ -14,19 +14,20 @@ module DamageControl
     
     def receive_message(message)
       
-      if message.is_a? BuildEvent
-        build = message.build
+      return if !message.is_a? BuildEvent
 
-        if message.is_a? BuildProgressEvent
-          puts("[#{build.project_name}]:" + message.output)
-          begin
-            log_file(build).puts(message.output)
-            log_file(build).flush
+      build = message.build
+      
+      if message.is_a? BuildProgressEvent
+        puts("[#{build.project_name}]:" + message.output)
+        begin
+          log_file(build).puts(message.output)
+          log_file(build).flush
         rescue => e
           puts "BuildProgressEvent: Couldn't write to file #{log_file_name(build)}:#{e.message}"
         end
       end
-
+      
       if message.is_a? BuildCompleteEvent
         puts("[#{build.project_name}]: BUILD COMPLETE")
         begin
@@ -36,6 +37,7 @@ module DamageControl
           puts "BuildCompleteEvent: Couldn't write to file #{log_file_name(build)}:#{e.message}"
         end
       end
+
     end
     
     def log_file_name(build)
