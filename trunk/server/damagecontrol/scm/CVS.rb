@@ -293,7 +293,11 @@ puts "executing #{cmd}"
     def parse_log(io)
       modifications = []
       while(log_entry = read_log_entry(io))
-        modifications += parse_modifications(log_entry)
+        begin
+          modifications += parse_modifications(log_entry)
+        rescue Exception => e
+          logger.error("could not parse log entry: #{log_entry.inspect}\ndue to: #{format_exception(e)}")
+        end
       end
       modifications
     end
@@ -329,6 +333,9 @@ puts "executing #{cmd}"
         if line =~ /RCS file: (.*),v/
           file = $1
         end
+        if line =~ /Working file: (.*),v/
+          file = $1
+        end
       end
       
       modifications = []
@@ -358,37 +365,27 @@ puts "executing #{cmd}"
       modification_entry = modification_entry.split(/\r?\n/)
       modification = Modification.new
       
-      revision_regexp = /revision (.*)/
-      if modification_entry[0]=~revision_regexp
-        modification.revision = $1
-      else
-        raise_unparsable_entry(modification_entry, revision_regexp)
-      end
-      
-      date_regexp = /date: (.*?);/
-      if modification_entry[1]=~date_regexp
-          # 2003/11/09 15:39:25
-          modification.time = Time.utc($1[0..3], $1[5..6], $1[8..9], $1[11..12], $1[14..15], $1[17..18])
-      else
-        raise_unparsable_entry(modification_entry, date_regexp)
-      end
-      
-      author_regexp = /author: (.*?);/
-      if modification_entry[1]=~author_regexp
-        modification.developer = $1
-      else
-        raise_unparsable_entry(modification_entry, author_regexp)
-      end
-      
+      modification.revision = parse_entry(modification_entry[0], /revision (.*)/)
+      modification.time = parse_cvs_time(parse_entry(modification_entry[1], /date: (.*?);/))
+      modification.developer = parse_entry(modification_entry[1], /author: (.*?);/)
       modification.message = modification_entry[2..-1].join("\n")
       
       modification
     end
     
-    def raise_unparsable_entry(modification_entry, regexp)
-      msg = "can't parse modification: #{modification_entry}\nexpected to match regexp: #{regexp.to_s}\nline: #{@current_line}\ncvs log:\n#{@log}"
-      raise msg
+    def parse_cvs_time(time)
+      # 2003/11/09 15:39:25
+      Time.utc(time[0..3], time[5..6], time[8..9], time[11..12], time[14..15], time[17..18])
     end
+    
+    def parse_entry(entry, regexp)
+      if entry=~regexp
+        return($1)
+      else
+        logger.error("can't parse modification: #{modification_entry}\nexpected to match regexp: #{regexp.to_s}\nline: #{@current_line}\ncvs log:\n#{@log}")
+      end
+    end
+    
   end
 
 end

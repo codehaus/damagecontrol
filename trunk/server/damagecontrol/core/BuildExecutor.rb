@@ -121,8 +121,7 @@ module DamageControl
         current_build.modification_set = current_scm.changes(time_before, time_after) unless current_scm.nil?
 
       rescue Exception => e
-        msg = e.message + e.backtrace.join("\n")
-        logger.error "could not determine changeset: #{msg}"
+        logger.error "could not determine changeset: #{format_exception(e)}"
       end
     end
     

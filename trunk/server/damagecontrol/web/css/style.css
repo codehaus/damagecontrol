@@ -16,6 +16,7 @@ a:hover {
 
 img {
   vertical-align: middle;
+  border: 0;
 }
 
 .scm_info {
@@ -72,6 +73,9 @@ img {
 }
 
 .footer {
+  position: absolute;
+  bottom: 0;
+  padding: 10px;
   float: bottom;
   font-size: 8pt;
   text-align: center;
@@ -104,7 +108,7 @@ td.pane-header {
   font-weight: bold;
 }
 
-td.pane-column-header {
+th.pane {
   border: 1px #7f7f7f solid;
   font-weight: bold;
 }

@@ -4,8 +4,7 @@ require 'damagecontrol/scm/SCMFactory'
 module DamageControl
   class ProjectServlet < AbstractAdminServlet
     def initialize(build_history_repository, project_config_repository, trigger, type, build_scheduler, project_directories, nudge_xmlrpc_url)
-      super(type, build_scheduler, build_history_repository)
-      @project_config_repository = project_config_repository
+      super(type, build_scheduler, build_history_repository, project_config_repository)
       @trigger = trigger
       @project_directories = project_directories
       @nudge_xmlrpc_url = nudge_xmlrpc_url
@@ -20,10 +19,12 @@ module DamageControl
     
     def tasks
       result = {}
-      result["DamageControl's working copy"] = "root/#{project_name}/checkout"
-      if(private?)
-        result["Configure"] = "?project_name=#{project_name}&action=configure"
-        result["Nudge build now"] = "?project_name=#{project_name}&action=trig_build"
+      unless project_name.nil?
+        result["Working files"] = "root/#{project_name}/checkout"
+        if(private?)
+          result["Configure"] = "?project_name=#{project_name}&action=configure"
+          result["Nudge build now"] = "?project_name=#{project_name}&action=trig_build"
+        end
       end
       result
     end
@@ -86,7 +87,6 @@ module DamageControl
       current_build = build_history_repository.current_build(project_name)
       current_status = build_status(current_build)
 
-      find_method = "history"
       builds = build_history_repository.history(project_name)
       render("project_dashboard.erb", binding)
     end
@@ -106,11 +106,11 @@ module DamageControl
       builds = build_history_repository.search(criterion, required_project_name)
       find_method = "search"
       
-      render("project_dashboard.erb", binding)
+      render("search_results.erb", binding)
     end
     
     def build_details
-      render("build.erb", binding)
+      render("build_details.erb", binding)
     end
 
     def build_description(build)
@@ -119,23 +119,12 @@ module DamageControl
       "#{build.timestamp_for_humans} (#{label})"
     end
 
-    attr_reader :project_config_repository
   private
     
     def dashboard_redirect
       action_redirect(:dashboard, { "project_name" => project_name })
     end
     
-    def build_url(build)
-      return nil unless build
-      "?action=build_details&project_name=#{build.project_name}&timestamp=#{build.timestamp}"
-    end
-    
-    def build_status(build)
-      return "Never built" if build.nil?
-      build.status
-    end
-
     def project_name
       request.query['project_name']
     end

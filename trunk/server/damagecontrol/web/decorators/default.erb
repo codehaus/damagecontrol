@@ -14,11 +14,6 @@
 
 <div class="top-panel">
 <a href="http://damagecontrol.codehaus.org/"><img class="logo" src="images/damagecontrol-logo.png"/></a>
-<% if auto_refresh? %>
-  <a href="<%= auto_refresh_url_prefix %>auto_refresh=false">Turn auto refresh off</a>
-<% else %>
-  <a href="<%= auto_refresh_url_prefix %>auto_refresh=true">Turn auto refresh on</a>
-<% end %>
 </div>
 
 <div class="top-nav">
@@ -26,6 +21,11 @@
 	<%= breadcrumbs %>
 	</div>
 	<div class="right-top-nav">
+    <% if auto_refresh? %>
+      <a href="<%= auto_refresh_url_prefix %>auto_refresh=false">Turn auto refresh off</a>
+    <% else %>
+      <a href="<%= auto_refresh_url_prefix %>auto_refresh=true">Turn auto refresh on</a>
+    <% end %>
 	</div>
 </div>
 
@@ -38,11 +38,11 @@
 
 	<div class="task-entry">
 		<form action="project">
-			Search <%if(project_name)%><%= project_name %><%end%> builds: 
+			Search <%if(defined?(project_name))%><%= project_name %><%end%> builds: 
 			<input name="search" value="<%= request.query['search'] %>"/>
 			<input name="action" value="search" type="hidden"/>
-			<% if(project_name) %>
-			<input name=project_name value="<%= project_name %>" type="hidden"/>
+			<% if(defined?(project_name)) %>
+			<input name="project_name" value="<%= project_name %>" type="hidden"/>
 			<% end %>
 			<input type="submit" value="Go"/>
 		</form>

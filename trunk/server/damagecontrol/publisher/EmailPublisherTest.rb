@@ -33,7 +33,7 @@ module DamageControl
       build.status = Build::FAILED
 
       @email_publisher.process_message(BuildCompleteEvent.new(build))
-      assert_equal("[cheese] BUILD FAILED|<a href=\"http://moradi.com/public/project?project_name=cheese\">[cheese] BUILD FAILED</a>|noreply@somewhere.foo|somelist@someproject.bar", @email_publisher.mail_content)
+      assert_equal("[cheese] BUILD FAILED: http://moradi.com/public/project?project_name=cheese|<a href=\"http://moradi.com/public/project?project_name=cheese\">[cheese] BUILD FAILED</a>|noreply@somewhere.foo|somelist@someproject.bar", @email_publisher.mail_content)
     end
     
     def test_nothing_is_sent_unless_build_complete_event

@@ -1,0 +1,40 @@
+<table class="pane">
+
+  <tr>
+    <td class="pane-header">
+      <%= header_text %>
+    </td>
+  </tr>
+  
+<%
+  if builds.empty?
+%>
+
+  <tr class="pane">
+    <td class="pane">
+      <%= empty_text %>
+    </td>
+  </tr>
+  
+<% else %>
+
+  <%
+    builds.reverse.each do |build|
+      color = if build.successful? then "green" else "red" end
+      color = "grey" if !build.completed?
+      image = "images/#{color}-16.gif"
+      prefix = ""
+      prefix = "#{build.project_name} " if prefix_with_project_name
+  %>
+  <tr class="pane">
+    <td class="pane">
+      <img src="<%= image %>" />&nbsp;
+      <a href="<%= build_url(build) %>"><%= prefix %><%= build_description(build) %></a>
+    </td>
+  </tr>
+<% end %>
+
+<% end %>
+
+</table>
+

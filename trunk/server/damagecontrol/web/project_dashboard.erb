@@ -7,57 +7,16 @@
 
 <table class="main-table">
 <tr><td>
-<% if find_method == "history"%>
-    <h1 class="pane"><img src="images/lastcompletedstatus?project_name=<%= project_name %>"/> <%= project_name %> <%= current_status %></h1>
-<% end %>
+    <h1 class="pane"><img alt="<%= current_status %>" src="images/lastcompletedstatus?project_name=<%= project_name %>"/> <%= project_name %> <%= current_status %></h1>
 </td></tr>
 
 <tr><td>
-<table class="pane">
 
-  <tr class="pane">
-    <td class="pane-header">
-<% if find_method == "history"%>
-    Build history
-<% else %>
-    Search results
-<% end %>
-    </td>
-  </tr>
-  
-<%
-  if builds.empty?
-%>
-
-  <tr class="pane">
-    <td class="pane" colspan="1">
-<% if find_method == "history"%>
-    Never built
-<% else %>
-    No matching builds were found
-<% end %>
-    </td>
-  </tr>
-  
-<% else %>
-
-  <%
-    builds.reverse.each do |build|
-      color = if build.successful? then "green" else "red" end
-      color = "grey" if !build.completed?
-      image = "images/#{color}-16.gif"
-      prefix = ""
-      prefix = "#{build.project_name} " if (find_method == "search")
-  %>
-  <tr class="pane">
-    <td class="pane"><img src="<%= image %>" />&nbsp;<a href="<%= build_url(build) %>"><%= prefix %><%= build_description(build) %></a></td>
-  </tr>
-<% end %>
+<%= builds_table(:header_text => "Build history", :empty_text => "Never built", :css_class => "pane", :builds => builds) %>
 
 </table>
 </td></tr>
 
-<% end %>
-
 </table>
+
 </body></html>
