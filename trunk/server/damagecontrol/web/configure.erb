@@ -3,7 +3,7 @@
 <title>Example Design</title>
 <link type="text/css" rel="stylesheet" href="css/style.css">
 </head>
-<body onLoad="distributeCvsrootFields();showScm('<%= project_config['scm_type'] %>')">
+<body onLoad="distributeCvsrootFields()">
 <script><!--
 
 /*
@@ -243,7 +243,7 @@ function enableOrDisableCvsFieldsAndUpdateScmSpec() {
 </tr>
 </table>
 
-<div id="cvs" style="display:none">
+<div id="cvs" style="<% if(project_config['scm_type']=='cvs')%>display:block<%else%>display:none<%end%>">
 <img src="http://www.wincvs.org/cvs.png"/>
 	<table>
 		<tr>
@@ -289,7 +289,7 @@ function enableOrDisableCvsFieldsAndUpdateScmSpec() {
 
 </div>
 
-<div id="svn" style="display:none">
+<div id="svn" style="<% if(project_config['scm_type']=='svn')%>display:block<%else%>display:none<%end%>">
 <img src="http://subversion.tigris.org/subversion_logo-200x173.png" height="62" width="54"/> (doesn't work yet)
 	<table>
 		<tr>
