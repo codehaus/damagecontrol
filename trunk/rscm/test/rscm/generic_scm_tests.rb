@@ -28,7 +28,7 @@ module RSCM
     # 17) Add and commit a file in CheckoutHere
     # 18) Verify that the changeset (since last changeset) for CheckoutHereToo contains only one file
     def test_basics
-      work_dir = RSCM.new_temp_dir
+      work_dir = RSCM.new_temp_dir("basics")
       checkout_dir = "#{work_dir}/CheckoutHere"
       other_checkout_dir = "#{work_dir}/CheckoutHereToo"
       repository_dir = "#{work_dir}/repository"
@@ -117,7 +117,7 @@ module RSCM
     end
     
     def test_trigger
-      work_dir = RSCM.new_temp_dir
+      work_dir = RSCM.new_temp_dir("trigger")
       path = "OftenModified"
       checkout_dir = "#{work_dir}/#{path}/checkout"
       repository_dir = "#{work_dir}/repository"
@@ -141,7 +141,7 @@ module RSCM
     end
 
     def test_diff
-      work_dir = RSCM.new_temp_dir
+      work_dir = RSCM.new_temp_dir("diff")
       path = "diffing"
       checkout_dir = "#{work_dir}/#{path}/checkout"
       repository_dir = "#{work_dir}/repository"
@@ -226,7 +226,7 @@ module RSCM
     
   module LabelTest
     def test_label
-      work_dir = RSCM.new_temp_dir
+      work_dir = RSCM.new_temp_dir("label")
       checkout_dir = "#{work_dir}/LabelTest"
       repository_dir = "#{work_dir}/repository"
       scm = create_scm(repository_dir, "damagecontrolled")
@@ -254,7 +254,7 @@ module RSCM
 
   module ApplyLabelTest
     def test_apply_label
-      work_dir = RSCM.new_temp_dir
+      work_dir = RSCM.new_temp_dir("label")
       checkout_dir = "#{work_dir}/checkout"
       repository_dir = "#{work_dir}/repository"
       scm = create_scm(repository_dir, "damagecontrolled")
