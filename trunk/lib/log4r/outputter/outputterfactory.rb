@@ -1,5 +1,5 @@
 # :nodoc:
-# Version: $Id: outputterfactory.rb,v 1.1 2004/03/31 19:02:49 tirsen Exp $
+# Version: $Id: outputterfactory.rb,v 1.2 2004/04/22 13:25:47 tirsen Exp $
 
 require "log4r/base"
 require "log4r/repository"

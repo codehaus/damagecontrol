@@ -1,4 +1,4 @@
-# :nodoc:
+# :include: ../rdoc/emailoutputter
 
 require 'log4r/outputter/outputter'
 require 'log4r/staticlogger'
@@ -6,87 +6,8 @@ require 'net/smtp'
 
 module Log4r
 
-  # = EmailOutputter
-  # 
-  # This is an experimental class. It should work fine if Net:SMTP doesn't
-  # give you any problems. Just in case, create a logger named 'log4r'
-  # and give it an outputter to see the logging statements made by
-  # this class. If it fails to send email, it will set itself to OFF
-  # and stop logging.
-  #
-  # In order to use it,
-  #
-  #   require 'log4r/outputter/emailoutputter'
-  #
-  # == SMTP Configuration
-  #
-  # All arguments to Net::SMTP.start are supported. Pass them as hash
-  # parameters to +new+. The to field is specified as a comma-delimited 
-  # list of emails (padded with \s* if desired).
-  #
-  # An example:
-  # 
-  #   EmailOutputter.new 'myemail',
-  #                      :server=>'localhost',
-  #                      :port=>25,
-  #                      :domain=>'somewhere.com',
-  #                      :from=>'me@foo.bar',
-  #                      :to=>'them@foo.bar, me@foo.bar, bozo@clown.net'
-  #
-  # == LogEvent Buffer
-  #
-  # This class has an internal LogEvent buffer to let you accumulate a bunch
-  # of log messages per email. Specify the size of the buffer with the
-  # hash parameter +buffsize+. The default is 100.
-  # 
-  # == Flush Me
-  #
-  # When shutting down your program, you might want to call flush
-  # on this outputter to send the remaining LogEvents. Might as well
-  # flush everything while you're at it:
-  # 
-  #   Outputter.each_outputter {|o| o.flush}
-  #
-  # == Format When?
-  #
-  # You may choose to format the LogEvents as they come in or as the
-  # email is being composed. To do the former, specify a value of +true+
-  # to the hash parameter +formatfirst+. The default is to format 
-  # during email composition.
-  #
-  # == Immediate Notification
-  #
-  # If you want certain log priorities to trigger an immediate email,
-  # set the hash parameter +immediate_at+ to a string list of comma-delimited
-  # trigger levels (padded by \s* if desired).
-  #
-  # == Example
-  #
-  # A security logger sends email to several folks, buffering up to 25
-  # log events and sending immediates on CRIT and WARN
-  #
-  #   EmailOutputter.new 'security', 
-  #                      :to => 'bob@secure.net, frank@secure.net',
-  #                      :buffsize => 25,
-  #                      :immediate_at => 'WARN, CRIT'
-  #                      
-  # == XML Configuration
-  #
-  # See log4r/configurator.rb for details. Here's an example:
-  #
-  #   <outputter name="security" type="EmailOutputter"
-  #              buffsize="25" level="ALL">
-  #     <immediate_at>WARN, CRIT</immediate_at>
-  #     <server>localhost</server>
-  #     <from>me@secure.net</from>
-  #     <to>
-  #       bob@secure.net, frank@secure.net
-  #     </to>
-  #     ...
-  #   </outputter>
-
   class EmailOutputter < Outputter
-    attr_reader :server, :port, :domain, :acct, :authtype
+    attr_reader :server, :port, :domain, :acct, :authtype, :subject
 
     def initialize(_name, hash={})
       super(_name, hash)
@@ -98,7 +19,7 @@ module Log4r
           "EmailOutputter '#{@name}' running SMTP client on #{@server}:#{@port}"
         }
       rescue Exception => e
-        Logger.log_internal (-2) {
+        Logger.log_internal(-2) {
           "EmailOutputter '#{@name}' failed to start SMTP client!"
         }
         Logger.log_internal {e}
@@ -149,6 +70,7 @@ module Log4r
       @acct = (hash[:acct] or hash['acct'])
       @passwd = (hash[:passwd] or hash['passwd'])
       @authtype = (hash[:authtype] or hash['authtype'] or :cram_md5).to_s.intern
+      @subject = (hash[:subject] or hash['subject'] or "Message of #{$0}")
       @params = [@server, @port, @domain, @acct, @passwd, @authtype]
     end
 
@@ -168,7 +90,18 @@ module Log4r
         when true then @buff.join 
         else @buff.collect{|e| @formatter.format e}.join 
         end
-      begin @smtp.sendmail(msg, @from, @to)
+
+      ### build a mail header for RFC 822
+      rfc822msg =
+        "From: #{@from}\n" +
+        "To: #{@to}\n" +
+        "Subject: #{@subject}\n" +
+        "Date: #{Time.now.strftime( "%a, %d %b %Y %H:%M:%S %z %Z")}\n" +
+        "Message-Id: <#{"%.8f" % Time.now.to_f}@#{@domain}>\n\n" +
+        "#{msg}"
+
+      ### send email
+      begin @smtp.sendmail(rfc822msg, @from, @to)
       rescue Exception => e
         Logger.log_internal(-2) {
           "EmailOutputter '#{@name}' couldn't send email!"

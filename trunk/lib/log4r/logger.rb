@@ -2,8 +2,8 @@
 #
 # == Other Info
 # 
-# Version:: $Id: logger.rb,v 1.1 2004/03/31 19:02:48 tirsen Exp $
-# Author:: Leon Torres <leon@ugcs.caltech.edu>
+# Version:: $Id: logger.rb,v 1.2 2004/04/22 13:25:46 tirsen Exp $
+# Author:: Leon Torres <leon(at)ugcs.caltech.edu>
 
 require "log4r/outputter/outputter"
 require "log4r/repository"

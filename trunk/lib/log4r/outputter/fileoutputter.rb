@@ -1,5 +1,5 @@
 # :nodoc:
-# Version:: $Id: fileoutputter.rb,v 1.1 2004/03/31 19:02:49 tirsen Exp $
+# Version:: $Id: fileoutputter.rb,v 1.2 2004/04/22 13:25:47 tirsen Exp $
 
 require "log4r/outputter/iooutputter"
 require "log4r/staticlogger"
@@ -15,11 +15,26 @@ module Log4r
 
     def initialize(_name, hash={})
       super(_name, nil, hash)
-      _filename = (hash[:filename] or hash['filename'])
+
       @trunc = Log4rTools.decode_bool(hash, :trunc, true)
-      raise TypeError, "Filename must be specified" if _filename.nil?
+      _filename = (hash[:filename] or hash['filename'])
+
       if _filename.class != String
         raise TypeError, "Argument 'filename' must be a String", caller
+      end
+
+      # file validation
+      if FileTest.exist?( _filename )
+        if not FileTest.file?( _filename )
+          raise StandardError, "'#{_filename}' is not a regular file", caller
+        elsif not FileTest.writable?( _filename )
+          raise StandardError, "'#{_filename}' is not writable!", caller
+        end
+      else # ensure directory is writable
+        dir = File.dirname( _filename )
+        if not FileTest.writable?( dir )
+          raise StandardError, "'#{dir}' is not writable!"
+        end
       end
 
       @filename = _filename
@@ -30,4 +45,5 @@ module Log4r
     end
 
   end
+  
 end

@@ -1,6 +1,6 @@
 
 # :nodoc:
-# Version:: $Id: rollingfileoutputter.rb,v 1.1 2004/03/31 19:02:49 tirsen Exp $
+# Version:: $Id: rollingfileoutputter.rb,v 1.2 2004/04/22 13:25:47 tirsen Exp $
 
 require "log4r/outputter/fileoutputter"
 require "log4r/staticlogger"
@@ -57,7 +57,6 @@ module Log4r
       # seem to report the correct size when the size changes rapidly
       @datasize += data.size + 1 # the 1 is for newline
       super
-      flush
       roll if requiresRoll
     end
 
@@ -89,7 +88,7 @@ module Log4r
         @out.close
       rescue 
         Logger.log_internal {
-          "RollingFileOutputter could not close #{@filename}"
+          "RollingFileOutputter '#{@name}' could not close #{@filename}"
         }
       end
       @count += 1

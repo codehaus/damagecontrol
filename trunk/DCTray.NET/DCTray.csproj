@@ -138,16 +138,16 @@
                     BuildAction = "Compile"
                 />
                 <File
+                    RelPath = "DCTray.sln"
+                    BuildAction = "Content"
+                />
+                <File
                     RelPath = "Gray.ico"
                     BuildAction = "EmbeddedResource"
                 />
                 <File
                     RelPath = "Green.ico"
                     BuildAction = "EmbeddedResource"
-                />
-                <File
-                    RelPath = "Notes.txt"
-                    BuildAction = "Content"
                 />
                 <File
                     RelPath = "NotifyIconEx.cs"

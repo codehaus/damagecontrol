@@ -1,6 +1,6 @@
 # :include: ../rdoc/syslogoutputter
 #
-# Version:: $Id: syslogoutputter.rb,v 1.1 2004/03/31 19:02:49 tirsen Exp $
+# Version:: $Id: syslogoutputter.rb,v 1.2 2004/04/22 13:25:47 tirsen Exp $
 # Author:: Steve Lumos
 # Author:: Leon Torres
 
@@ -16,7 +16,7 @@ module Log4r
     raise LoadError, "Must let syslogger.rb define custom levels"
   end
   # tune log4r to syslog priorities
-  Configurator.custom_levels("DEBUG", "INFO", "WARNING", "ERR", "CRIT")
+  Configurator.custom_levels("DEBUG", "INFO", "NOTICE", "WARNING", "ERR", "CRIT", "ALERT", "EMERG")
 
   class SyslogOutputter < Outputter
     include Syslog::Constants

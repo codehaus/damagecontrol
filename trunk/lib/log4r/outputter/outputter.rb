@@ -2,7 +2,7 @@
 #
 # == Other Info
 #
-# Version:: $Id: outputter.rb,v 1.1 2004/03/31 19:02:49 tirsen Exp $
+# Version:: $Id: outputter.rb,v 1.2 2004/04/22 13:25:47 tirsen Exp $
 # Author:: Leon Torres <leon@ugcs.caltech.edu>
 
 require "thread"
@@ -73,7 +73,7 @@ module Log4r
     end
 
     # Call flush to force an outputter to write out any buffered
-    # log events.
+    # log events. Similar to IO#flush, so use in a similar fashion.
 
     def flush
     end
@@ -126,5 +126,7 @@ module Log4r
     end
 
     def synch; @mutex.synchronize { yield } end
+    
   end
+
 end

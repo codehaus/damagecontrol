@@ -2,8 +2,7 @@
 #
 # == Other Info
 #
-# Version:: $Id: configurator.rb,v 1.1 2004/03/31 19:02:48 tirsen Exp $
-# Author::  Leon Torres <leon@to.ugcs.caltech.edu>
+# Version:: $Id: configurator.rb,v 1.2 2004/04/22 13:25:46 tirsen Exp $
 
 require "log4r/logger"
 require "log4r/outputter/staticoutputter"
@@ -11,6 +10,7 @@ require "log4r/lib/xmlloader"
 require "log4r/logserver"
 require "log4r/outputter/remoteoutputter"
 
+# TODO: catch unparsed parameters #{FOO} and die
 module Log4r
   # Gets raised when Configurator encounters bad XML.
   class ConfigError < Exception
@@ -22,7 +22,7 @@ module Log4r
     @@params = Hash.new
 
     # Get a parameter's value
-    def self.[](param); @@params[key] end
+    def self.[](param); @@params[param] end
     # Define a parameter with a value
     def self.[]=(param, value); @@params[param] = value end
 
