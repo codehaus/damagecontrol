@@ -126,8 +126,7 @@ module DamageControl
       @got_request = true
     end
 
-    # doesn't work on linux, this is tested by the e2e test anyway
-    def Xtest_install_trigger
+    def test_install_trigger
       @got_request = false
       testrepo = File.expand_path("#{damagecontrol_home}/target/cvstestrepo")
       rm_rf(testrepo)

@@ -321,9 +321,7 @@ class DamageControlServerDriver < Driver
   end
   
   def shutdown_server
-    client = XMLRPC::Client.new2(privateurl)
-    control = client.proxy("control")
-    control.shutdown
+    system("ruby #{bindir}/shutdownserver.rb --url #{privateurl}")
   end
   
   def server_running?
