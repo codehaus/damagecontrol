@@ -8,6 +8,10 @@ module DamageControl
       false
     end
     
+    def get_changes(spec, from, to)
+      raise "can't get changes for #{spec}"
+    end
+    
     # checks out (or updates) path to directory
     def checkout(spec, directory)
       raise "can't check out #{spec}"
