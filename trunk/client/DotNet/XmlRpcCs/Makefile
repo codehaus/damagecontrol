@@ -37,7 +37,7 @@ XmlRpcCs-win.dll: $(SOURCES)
 	mcs $(MCS_OPTIONS) -target:library -out:"XmlRpcCs-win.dll" $(SYSTEM_REFERENCES_BUILD) $(SOURCES)
 
 XmlRpcCs-mono.dll: $(SOURCES)
-	mcs $(MCS_OPTIONS) -target:library -out:"XmlRpcCs-mono.dll" $(SYSTEM_REFERENCES_BUILD) $(SOURCES)
+	mcs $(MCS_OPTIONS) -target:library -out:"XmlRpcCs-mono.dll" $(SYSTEM_REFERENCES_BUILD) -d:__MONO__ $(SOURCES)
 
 clean:
 	rm -f XmlRpcCs-win.dll XmlRpcCs-mono.dll
