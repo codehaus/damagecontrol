@@ -94,6 +94,11 @@ module DamageControl
     def to_boolean(text)
       text && text == "true"
     end
+    
+    # i18n
+    def no_changes_in_this_build
+      "No changes in this build"
+    end
   
   end
 end

@@ -70,7 +70,7 @@ build = build_history_repository.lookup(project_name, request.query["timestamp"]
     <% if(build.changesets.length == 0)then %>
       <tr>
         <td colspan="4">
-          No changes in this build
+          <%= no_changes_in_this_build %>
         </td>
       </tr>
     <% else %>

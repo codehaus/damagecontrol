@@ -29,7 +29,19 @@
   <tr class="pane">
     <td class="pane">
       <img src="<%= image %>" />&nbsp;
-      <a href="<%= build_url(build) %>"><%= prefix %><%= build_description(build) %></a>
+      <a class="tip" href="<%= build_url(build) %>"><%= prefix %><%= build_description(build) %><span>
+        <% if(build.changesets.length == 0) %>
+          <i><%= no_changes_in_this_build %></i>
+        <% else %>
+          <% build.changesets.each do |changeset| %>
+            (by <%= changeset.developer %> <%= changeset.time_difference %> ago) <br/>
+            <i><%= changeset.message %></i><br/>
+            <% changeset.each do |change| %>
+              <%= change.path %><br/>
+            <% end %>
+          <% end %>
+        <% end %>
+      </span></a>
     </td>
   </tr>
 <% end %>
