@@ -10,6 +10,7 @@ module DamageControl
 
     def method_missing(*args)
       "NoSCM does nothing :-)"
+			nil
     end
     
     def checkout(checkout_dir, time = nil, &proc)
