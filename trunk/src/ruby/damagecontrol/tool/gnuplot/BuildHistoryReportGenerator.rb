@@ -196,6 +196,8 @@ end
 end
 end
 
-bhr = DamageControl::BuildHistoryRepository.new(nil, "build_history_sample.yaml")
-r = DamageControl::Tool::Plot::BuildHistoryReportGenerator.new(bhr)
-r.generate(".", ARGV[0])
+if __FILE__ == $0
+  bhr = DamageControl::BuildHistoryRepository.new(nil, "build_history_sample.yaml")
+  r = DamageControl::Tool::Plot::BuildHistoryReportGenerator.new(bhr)
+  r.generate(".", ARGV[0])
+end
