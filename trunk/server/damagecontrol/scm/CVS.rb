@@ -18,7 +18,7 @@ module DamageControl
     attr_accessor :cvs_executable
     
     def cvs_executable
-      "cvs" unless @cvs_executable
+      "cvs" if !defined(@cvs_executable) || @cvs_executable.nil?
       @cvs_executable
     end
     
