@@ -2,20 +2,21 @@ require 'damagecontrol/core/BuildExecutor'
 
 module DamageControl
 	class SSHBuildExecutor < BuildExecutor
-		def initialize(host, username, channel, project_directories, build_history_repository)
-			super("#{username}@#{host}", channel, project_directories, build_history_repository)
+		def initialize(host, username, channel, project_config_repository, build_history_repository)
+			super("#{username}@#{host}", channel, project_config_repository, build_history_repository)
 			@host = host
 			@user = username
 		end
-		
-		def execute
+    
+		def oldexecute
 			#puts current_build.build_command_line = "ssh #{@user}@#{@host} \"#{current_build.build_command_line}\""
 
 			current_build.status = Build::BUILDING
       @channel.put(BuildStateChangedEvent.new(current_build))
 
       # set up some environment variables the build can use
-      environment = { "DAMAGECONTROL_BUILD_LABEL" => current_build.potential_label.to_s }
+      # TODO: do this in the remote shell
+      # environment = { "DAMAGECONTROL_BUILD_LABEL" => current_build.potential_label.to_s }
 			
 			
 			
@@ -34,9 +35,15 @@ module DamageControl
 				# like colors and ^H characters
         @build_process.execute("ssh -t -t -l #{@user} #{@host}") do |stdin, stdout, stderr|
           threads = []
-					threads << Thread.new { 
+					threads << Thread.new {
+            # This thread fills the stdin. The first thing to do is to set the
+            # environment variables
 						sleep(20)
-						stdin << "#{current_build.build_command_line}\n"
+            stdin << "export DAMAGECONTROL_BUILD_LABEL=#{current_build.label.to_s}"
+						# stdin << "#{current_build.build_command_line}\n"
+            
+            stdin << "echo $DAMAGECONTROL_BUILD_LABEL"
+            
 						stdin << "exit\n"
 					}
           threads << Thread.new { stdout.each_line {|line| report_progress(line) } }
