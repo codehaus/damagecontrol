@@ -312,7 +312,7 @@ class End2EndTest < Test::Unit::TestCase
   attr_reader :xmlrpc
   
   def teardown
-    @server.teardown
+    @server.teardown if @server
     @irc.teardown if @irc
     @scm.teardown if @scm
     @xmlrpc.teardown if @xmlrpc
