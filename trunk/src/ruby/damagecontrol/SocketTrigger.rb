@@ -42,8 +42,9 @@ module DamageControl
       @build_bootstrapper = BuildBootstrapper.new
     end
     
-    def process_payload(payload)
-      build = @build_bootstrapper.create_build(payload)
+    def process_payload(build_yaml)
+      build = @build_bootstrapper.create_build(build_yaml)
+      build.status = Build::QUEUED
       @channel.publish_message(BuildRequestEvent.new(build))
     end
 

@@ -16,15 +16,15 @@ import java.util.Map;
 
 /**
  * @author Aslak Helles&oslash;y
- * @version $Revision: 1.5 $
+ * @version $Revision: 1.6 $
  */
 public class BuildPanelDemo {
     private static BuildListener bl;
     private static int i;
 
     public static void main(String[] args) throws MalformedURLException {
-        BuildPanelData buildPanel = new BuildPanelData(createDemoPoller());
-//        BuildPanelData buildPanel = new BuildPanelData(new MarqueeXmlRpcBuildPoller(new URL("http://beaver.codehaus.org:4712/xmlrpc")));
+//        BuildPanelData buildPanel = new BuildPanelData(createDemoPoller());
+        BuildPanelData buildPanel = new BuildPanelData(new MarqueeXmlRpcBuildPoller(new URL("http://beaver.codehaus.org:4712/xmlrpc")));
 //        BuildPanelData buildPanel = new BuildPanelData(new MarqueeXmlRpcBuildPoller(new URL("http://localhost:4712/xmlrpc")));
 
         JFrame f = new JFrame("DamageControl");

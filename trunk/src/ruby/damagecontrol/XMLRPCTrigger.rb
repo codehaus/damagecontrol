@@ -13,11 +13,13 @@ module DamageControl
     def initialize(xmlrpc_server, channel)
       xmlrpc_server.add_handler(INTERFACE, self)
       @channel = channel
-      @bootstrapper = BuildBootstrapper.new
+      @build_bootstrapper = BuildBootstrapper.new
     end
 
     def request(build_yaml)
-      @channel.publish_message(BuildRequestEvent.new(@bootstrapper.create_build(build_yaml)))
+      build = @build_bootstrapper.create_build(build_yaml)
+      build.status = Build::QUEUED
+      @channel.publish_message(BuildRequestEvent.new(build))
       "DamageControl got your message!"
     end
   end

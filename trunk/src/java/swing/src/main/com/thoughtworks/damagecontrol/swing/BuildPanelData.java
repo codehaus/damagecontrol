@@ -39,7 +39,7 @@ import java.util.Map;
 
 /**
  * @author Aslak Helles&oslash;y
- * @version $Revision: 1.3 $
+ * @version $Revision: 1.4 $
  */
 public class BuildPanelData implements BuildConstants {
     private JPanel buildPanel;
@@ -163,15 +163,14 @@ public class BuildPanelData implements BuildConstants {
 
     private void updateDetails(Map build) {
         timestamp.setText((String) build.get(BuildConstants.TIMESTAMP_FIELD));
-        String stat = build.get(BuildConstants.STATUS_FIELD).toString();
-        status.setText(stat);
+        String status = build.get(BuildConstants.STATUS_FIELD).toString();
+        this.status.setText(status);
 
         Map config = (Map) build.get(BuildConstants.CONFIG_FIELD);
         String cmdline = config == null ? null : (String) config.get("build_command_line");
         build_command_line.setText(cmdline);
 
-        System.out.println("stat = " + stat);
-        status.repaint();
+        this.status.repaint();
     }
 
     private class BuildListCellEditor extends DefaultCellEditor {
