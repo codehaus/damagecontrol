@@ -39,7 +39,7 @@
   
   <%
   # =============== console output link pane
-  log_url = "log?project_name=#{project_name}&timestamp=#{request.query['timestamp']}"
+  log_url = "log?project_name=#{project_name}&timestamp=#{selected_build.timestamp}"
   %>
   <table class="pane">
     <tr><td class="pane">
