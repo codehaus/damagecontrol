@@ -2,6 +2,11 @@ require 'yaml'
 
 require 'damagecontrol/core/Build'
 
+# DEPRECATED DEPRECATED DEPRECATED DEPRECATED DEPRECATED DEPRECATED DEPRECATED 
+# DEPRECATED DEPRECATED DEPRECATED DEPRECATED DEPRECATED DEPRECATED DEPRECATED 
+# DEPRECATED DEPRECATED DEPRECATED DEPRECATED DEPRECATED DEPRECATED DEPRECATED 
+# this functionality has been moved to the scm implementations and to ProjectConfigurationRepository
+
 module DamageControl
 
   class BuildBootstrapper
@@ -29,7 +34,7 @@ module DamageControl
         value.gsub!(/_ext:/, ":ext:")
       }
       
-      Build.new(map["project_name"], map)
+      Build.new(map["project_name"], Time.now, map)
     end
 
     def BuildBootstrapper.conf_file(project_name)

@@ -50,14 +50,11 @@ module DamageControl
     def test_can_get_last_succesful_build_of_a_project
       assert_equal(nil, @bhp.last_succesful_build("project_name"))
 
-      build1 = Build.new("project_name")
-      build1.timestamp = Time.utc(2004, 04, 02, 12, 00, 00)
+      build1 = Build.new("project_name", Time.utc(2004, 04, 02, 12, 00, 00))
       build1.status = Build::SUCCESSFUL
-      build2 = Build.new("project_name")
-      build2.timestamp = Time.utc(2004, 04, 02, 13, 00, 00) # one hour later
+      build2 = Build.new("project_name", Time.utc(2004, 04, 02, 13, 00, 00)) # one hour later
       build2.status = Build::SUCCESSFUL
-      failed_build = Build.new("project_name")
-      failed_build.timestamp = Time.utc(2004, 04, 02, 14, 00, 00) # one hour later
+      failed_build = Build.new("project_name", Time.utc(2004, 04, 02, 14, 00, 00)) # two hours later
       failed_build.status = Build::FAILED
       @bhp.register(build2)
       @bhp.register(build1)
@@ -68,13 +65,10 @@ module DamageControl
     end
     
     def test_build_history_is_sorted_according_to_timestamp
-  	  build1 = Build.new("project_name")
-  	  build1.timestamp = Time.utc(2004, 04, 02, 12, 00, 00)
-  	  build2 = Build.new("project_name")
-  	  build2.timestamp = Time.utc(2004, 04, 02, 13, 00, 00) # one hour later
-  	  build3 = Build.new("project_name")
-  	  build3.timestamp = Time.utc(2004, 04, 02, 14, 00, 00) # one hour later
-      
+  	  build1 = Build.new("project_name", Time.utc(2004, 04, 02, 12, 00, 00))
+  	  build2 = Build.new("project_name", Time.utc(2004, 04, 02, 13, 00, 00)) # one hour later
+  	  build3 = Build.new("project_name", Time.utc(2004, 04, 02, 14, 00, 00)) # two hours later
+
       @bhp.register(build3)
       @bhp.register(build1)
       @bhp.register(build2)
@@ -195,30 +189,23 @@ pear:
       assert_equal("3", @bhp.get_build_list_map("3")["3"][0].project_name)
 
       @bhp.process_message(BuildProgressEvent.new(Build.new("4"), nil))
-      assert_equal(Hash.new, @bhp.get_build_list_map("4"))
+      assert_equal({}, @bhp.get_build_list_map("4"))
     end
 
     def test_should_be_able_to_group_builds_per_week_month_and_day
-      week_zero_one = Build.new("test")
-      week_zero_one.timestamp = Time.utc(2004, 01, 01, 12, 00, 00)
+      week_zero_one = Build.new("test", Time.utc(2004, 01, 01, 12, 00, 00))
 
-      week_zero_two = Build.new("test")
-      week_zero_two.timestamp = Time.utc(2004, 01, 04, 12, 00, 00)
+      week_zero_two = Build.new("test", Time.utc(2004, 01, 04, 12, 00, 00))
 
-      week_one_one = Build.new("test")
-      week_one_one.timestamp = Time.utc(2004, 01, 05, 12, 00, 00)
+      week_one_one = Build.new("test", Time.utc(2004, 01, 05, 12, 00, 00))
 
-      week_one_two = Build.new("test")
-      week_one_two.timestamp = Time.utc(2004, 01, 11, 12, 00, 00)
+      week_one_two = Build.new("test", Time.utc(2004, 01, 11, 12, 00, 00))
 
-      week_two_one = Build.new("test")
-      week_two_one.timestamp = Time.utc(2004, 01, 12, 12, 00, 00)
+      week_two_one = Build.new("test", Time.utc(2004, 01, 12, 12, 00, 00))
       
-      week_eight_one = Build.new("test")
-      week_eight_one.timestamp = Time.utc(2004, 02, 28, 12, 00, 00)
+      week_eight_one = Build.new("test", Time.utc(2004, 02, 28, 12, 00, 00))
       
-      week_eight_two = Build.new("test")
-      week_eight_two.timestamp = Time.utc(2004, 02, 28, 13, 00, 00)
+      week_eight_two = Build.new("test", Time.utc(2004, 02, 28, 13, 00, 00))
       
       @bhp.register(week_zero_one)
       @bhp.register(week_zero_two)

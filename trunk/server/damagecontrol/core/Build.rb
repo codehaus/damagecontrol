@@ -62,12 +62,12 @@ module DamageControl
       status == SUCCESSFUL || status == FAILED
     end
     
-    def initialize(project_name = nil, config={})
+    def initialize(project_name = nil, timestamp = Time.now, config={})
       @project_name = project_name
       @config = config
       @status = IDLE
       @modification_set = []
-      @timestamp = Build.format_timestamp(Time.utc(*Time.now.gmtime.to_a))
+      self.timestamp = timestamp
     end
     
     def timestamp=(time)

@@ -1,21 +1,29 @@
 require 'test/unit'
+
+require 'xmlrpc/client'
+
 require 'damagecontrol/core/Build'
-require 'damagecontrol/core/SocketTrigger'
 require 'damagecontrol/core/BuildExecutor'
 require 'damagecontrol/core/BuildScheduler'
-require 'damagecontrol/core/Hub'
+require 'damagecontrol/core/ProjectConfigRepository'
 require 'damagecontrol/util/FileUtils'
 require 'damagecontrol/scm/SCM'
-
+require 'damagecontrol/xmlrpc/ConnectionTester'
 require 'damagecontrol/util/Logging'
-
 require 'damagecontrol/publisher/IRCPublisher'
-require 'damagecontrol/template/ShortTextTemplate'
 
 include DamageControl
 
 # turn off debug logging
 Logging.quiet
+
+
+def wait_for(timeout=60, &proc)
+  0.upto(timeout) do
+    return if proc.call
+    sleep 1
+  end
+end  
 
 class IRCListener < IRCConnection
   attr_reader :received_text
@@ -59,14 +67,7 @@ class IRCDriver
   end
   
   def teardown
-    irc_listener.send_message_to_channel("Test successful. Thank you for your cooperation.")
-  end
-  
-  def wait_for(timeout=60, &proc)
-    0.upto(timeout) do
-      return if proc.call
-      sleep 1
-    end
+    irc_listener.send_message_to_channel("Test ended. Thank you for your cooperation.")
   end
   
   def wait_for_output(output, timeout=60)
@@ -127,21 +128,22 @@ class CVSDriver < Driver
     end
   end
 
-  def install_damagecontrol(project, build_command_line)
+  def install_trigger(project)
     cvs = CVS.new
     cvs.install_trigger(
           "#{basedir}/install_trigger_cvs_tmp",
           project,
-          "#{cvsroot}:#{project}",
-          build_command_line,
-          "#{project}-dev@codehaus.org",
-          "localhost",
-          "14711",
+          scm_spec(project),
+          "http://localhost:14712/private/xmlrpc",
           nc_exe_location)
   end
   
+  def scm_spec(project)
+    "#{cvsroot}:#{project}"
+  end
+  
   def checkoutdir(project)
-    "#{basedir}/#{project}"
+    "#{basedir}/#{project}/checkout/#{project}"
   end
   
   def checkout(project)
@@ -265,7 +267,6 @@ class DamageControlServerDriver < Driver
   include Test::Unit::Assertions
   
   def setup
-    @server_startup_result = true
     start_damagecontrol_forked
   end
   
@@ -279,12 +280,66 @@ class DamageControlServerDriver < Driver
   
   def start_damagecontrol_forked
     Thread.new {
+      @server_startup_result = nil
       @server_startup_result = system("ruby -I#{damagecontrol_home}/server #{startup_script} #{basedir} #{timeout}")
     }
+    wait_for(3) { server_running? }
+    assert_server_running
+  end
+  
+  def setup_project_config(project, scm_spec, build_command_line)
+    pcr = ProjectConfigRepository.new(ProjectDirectories.new(basedir))
+    pcr.new_project(project)
+    pcr.modify_project_config(project,
+      {
+        "scm_spec" => scm_spec,
+        "build_command_line" => build_command_line,
+      })
+  end
+  
+  def baseurl
+    "http://localhost:14712"
+  end
+  
+  def privateurl
+    "#{baseurl}/private/xmlrpc"
+  end
+  
+  def publicurl
+    "#{baseurl}/public/xmlrpc"
+  end
+  
+  def assert_server_running
+    assert(server_running?, "server did not start up properly")
+  end
+  
+  def shutdown_server
+    client = XMLRPC::Client.new2(privateurl)
+    control = client.proxy("control")
+    control.shutdown
+  end
+  
+  def server_running?
+    begin
+      client = XMLRPC::Client.new2(publicurl)
+      control = client.proxy("test")
+      control.ping == DamageControl::XMLRPC::ConnectionTester::PING_RESPONSE
+    rescue
+      false
+    end
+  end
+  
+  def server_shutdown?
+    @server_startup_result == true
   end
   
   def teardown
-    assert(@server_startup_result, "server did not start up properly")
+    assert_server_running
+    puts @server_startup_result
+    assert(!server_shutdown?, "server did not start up properly")
+    shutdown_server
+    wait_for(3) { server_shutdown? }
+    assert(server_shutdown?, "server did not shut down properly")
   end
 end
 
@@ -297,13 +352,14 @@ class End2EndTest < Test::Unit::TestCase
   attr_reader :cvs
   attr_reader :svn
   attr_reader :scm
+  attr_reader :server
   
   def setup
-    @basedir = "#{damagecontrol_home}/target/temp_e2e_#{Time.new.to_i}"
+    @basedir = new_temp_dir("e2e")
     File.mkpath(basedir)
     
     @server = DamageControlServerDriver.new(basedir)
-    @server.setup
+    server.setup
     
     @irc = IRCDriver.new
     irc.setup
@@ -312,7 +368,7 @@ class End2EndTest < Test::Unit::TestCase
   def teardown
     irc.teardown
     scm.teardown unless scm.nil?
-    @server.teardown
+    server.teardown
     
     #FileUtils.rm_rf(basedir)
   end
@@ -332,7 +388,8 @@ class End2EndTest < Test::Unit::TestCase
     scm.create_repository
     scm.create_module(project)
     
-    scm.install_damagecontrol(project, execute_script_commandline("build"))
+    scm.install_trigger(project)
+    server.setup_project_config(project, scm.scm_spec(project), execute_script_commandline("build"))
     
     create_build_script_add_and_commit
     

@@ -133,7 +133,7 @@ module DamageControl
         end
       end
     end
-
+    
     # Installs and activates the trigger script in the repository
     # for a certain module. Upon subsequent checkins, the damage
     # control server will be notified over a socket and start
@@ -153,56 +153,30 @@ module DamageControl
       directory, \
       project_name, \
       scm_spec, \
-      build_command_line, \
-      nag_email, \
-      dc_host="localhost", \
-      dc_port="4711", \
+      dc_url="http://localhost:4711/private/xmlrpc", \
       nc_exe_file="#{damagecontrol_home}/bin/nc.exe", \
       &proc
     )
       directory = File.expand_path(directory)
       checkout("#{cvsroot(scm_spec)}:CVSROOT", directory, &proc)
       with_working_dir(directory) do
-      # install trigger command
-      File.open("#{directory}/loginfo", File::WRONLY | File::APPEND) do |file|
-        conf_file = conf_script(scm_spec, BuildBootstrapper.conf_file(project_name))
-        trigger_command = BuildBootstrapper.trigger_command(project_name, conf_file, nc_command(scm_spec), dc_host, dc_port)
-        file.puts("#{mod(scm_spec)} #{trigger_command}")
-      end
-
-      # install conf file
-      conf_file_name = BuildBootstrapper.conf_file(project_name)
-      conf_file = File.open(conf_file_name, "w")
-      build_spec = BuildBootstrapper.build_spec(project_name, scm_spec, build_command_line, nag_email)
-      conf_file.puts(build_spec)
-      conf_file.flush
-      conf_file.close
-      system("cvs -d#{cvsroot(scm_spec)} add #{conf_file_name}")
-
-      checkoutlist = File.open("checkoutlist", File::WRONLY | File::APPEND) do |file|
-        file.puts(File.basename(conf_file_name))
-      end
-
-      if(windows?)
-        # install nc.exe
-        File.copy(nc_exe_file, "#{directory}/nc.exe" )
-        system("cvs -d#{cvsroot(scm_spec)} add -kb nc.exe")
-
-        # tell cvs to keep a non-,v file in the central repo
-        File.open("checkoutlist", File::WRONLY | File::APPEND) do |file|
-          file.puts(File.basename(nc_exe_file))
+        # install trigger command
+        File.open("#{directory}/loginfo", File::WRONLY | File::APPEND) do |file|
+          trigger_command = trigger_command(project_name, scm_spec, dc_url)
+          file.puts("#{mod(scm_spec)} #{trigger_command}")
         end
-      end
-      
-      system("cvs commit -m \"Installed damagecontrol trigger for #{project_name}\"")
-      end
-    end
-    
-    def nc_command(scm_spec)
-      if(windows?)
-        to_os_path("#{path(scm_spec)}/CVSROOT/nc.exe")
-      else
-        "nc"
+
+        # install trigger script
+        File.open(trigger_script_name, "w") do |io|
+          io.puts(trigger_script)
+        end
+        system("cvs -d#{cvsroot(scm_spec)} add #{trigger_script_name}")
+
+        checkoutlist = File.open("checkoutlist", File::WRONLY | File::APPEND) do |file|
+          file.puts(File.basename(trigger_script_name))
+        end
+
+        system("cvs commit -m \"Installed damagecontrol trigger for #{project_name}\"")
       end
     end
     
@@ -213,6 +187,33 @@ module DamageControl
     def checked_out?(directory, scm_spec)
       rootcvs = File.expand_path("#{directory}/CVS/Root")
       File.exists?(rootcvs)
+    end
+    
+    def trigger_script_name
+      "dctrigger.rb"
+    end
+    
+    def trigger_command(project_name, scm_spec, dc_url)
+      if(windows?)
+        to_os_path("#{path(scm_spec)}/CVSROOT/#{trigger_script_name}") + " #{dc_url} #{project_name}"
+      else
+        "ruby #{trigger_script_name} #{dc_url} #{project_name}"
+      end
+    end
+
+    def trigger_script
+      %{
+        require 'xmlrpc/client'
+  
+        url = ARGV[0]
+        project_name = ARGV[1]
+
+        puts "Triggering DamageControl build to \#{url} for project \#{project_name}"
+        client = XMLRPC::Client.new2(url)
+        build = client.proxy("build")
+        result = build.trig(project_name, Time.now.utc.strftime("%Y%m%d%H%M%S"))
+        puts result
+      }
     end
     
     def cvs(cmd, &proc)

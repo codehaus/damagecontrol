@@ -2,8 +2,8 @@ require 'test/unit'
 require 'ftools'
 require 'stringio'
 require 'fileutils'
-require 'socket'
 require 'damagecontrol/scm/CVS'
+require 'webrick'
 
 module DamageControl
   class CVSTest < Test::Unit::TestCase
@@ -15,11 +15,7 @@ module DamageControl
     end
     
     def teardown
-      if(@mock_server)
-        @mock_server.kill
-        # wait for max 2 secs. if mock server is still waiting, it's a failure
-        @mock_server.join(2) unless @mock_server.nil?
-       end
+      @httpd.shutdown unless @httpd.nil?
     end
     
     def test_modifiying_one_file_produce_correct_changeset
@@ -125,8 +121,13 @@ module DamageControl
     def test_does_not_handle_starteam_path
       assert(!@cvs.handles_spec?("starteam://username:password@server/project/view/folder"))
     end
+    
+    def got_request
+      @got_request = true
+    end
 
     def test_install_trigger
+      @got_request = false
       testrepo = File.expand_path("#{damagecontrol_home}/target/cvstestrepo")
       rm_rf(testrepo)
       testcheckout = File.expand_path("#{damagecontrol_home}/target/cvstestcheckout/CVSROOT")
@@ -141,21 +142,18 @@ module DamageControl
 
       create_repo(testrepo)
       @cvs.install_trigger(
-        testcheckout, \
-        project_name, \
-        spec, \
-        build_command, \
-        nag_email, \
-        "localhost", \
-        "4713", \
+        testcheckout,
+        project_name,
+        spec,
+        "http://localhost:4713/private/xmlrpc",
         nc_exe
       ) { |output|
         #puts output
       }
 
-      import_damagecontrolled(spec)      
+      import_damagecontrolled(spec)
       
-      assert(!@mock_server.alive?, "mock server didn't get incoming connection")
+      assert(@got_request, "mock server didn't get incoming connection")
     end
     
     def test_invalid_cvs_command_raises_error
@@ -189,17 +187,16 @@ module DamageControl
 
     def start_mock_server(test)
       Thread.abort_on_exception = true
-      @mock_server = Thread.new do
-        socket = TCPServer.new(4713).accept
-        payload = ""
-        socket.each do |line|
-          payload << line
-          if(line.chomp == "...")
-            break
-          end
-        end
-        socket.close
+      httpd = WEBrick::HTTPServer.new(
+        :Port => 4713
+      )
+
+      # For public unauthenticated XML-RPC connections like getting status
+      httpd.mount_proc("/private/xmlrpc") do |req, res|
+        test.got_request
       end
+
+      Thread.new { httpd.start }
     end
   end
 

@@ -252,7 +252,7 @@ Note: Inherited methods from class (({Object})) cannot be used as XML-RPC names,
 
 
 = History
-    $Id: client.rb,v 1.1 2004/05/17 14:41:24 tirsen Exp $
+    $Id: client.rb,v 1.2 2004/05/21 09:32:44 tirsen Exp $
 
 =end
 
@@ -326,7 +326,7 @@ module XMLRPC
         end
 
       else
-        raise "Wrong URI as parameter!"
+        raise "Wrong URI as parameter: #{uri}"
       end
  
       proxy_host, proxy_port = (proxy || "").split(":")

@@ -19,7 +19,7 @@ module DamageControl
     
     attr_accessor :last_build_request
 
-    def initialize(channel, build_history, builds_dir = "builds", scm = DefaultSCMRegistry.new)
+    def initialize(channel, build_history, builds_dir, scm = DefaultSCMRegistry.new)
       @channel = channel
       @builds_dir = builds_dir
       @scm = scm

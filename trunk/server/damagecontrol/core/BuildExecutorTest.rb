@@ -30,7 +30,7 @@ module DamageControl
     def setup
       create_hub
       @build_executor = BuildExecutor.new(hub, BuildHistoryRepository.new(hub), File.expand_path("#{damagecontrol_home}/testdata"))
-      @build = Build.new("damagecontrolled", {"build_command_line" => "echo Hello world from DamageControl!"})
+      @build = Build.new("damagecontrolled", Time.now, {"build_command_line" => "echo Hello world from DamageControl!"})
       @quiet_period = 10
     end
   
@@ -43,7 +43,7 @@ module DamageControl
     end
     
     def test_failing_build_sends_build_complete_event_with_successful_flag_set_to_false
-      @build = Build.new("damagecontrolled", { "build_command_line" => "bad_command"})
+      @build = Build.new("damagecontrolled", Time.now, { "build_command_line" => "bad_command"})
       @build_executor.schedule_build(@build)
       @build_executor.process_next_scheduled_build
       # what happens for bad_command is different on windows and linux
@@ -59,7 +59,7 @@ module DamageControl
     
     def test_succesful_ant_build
     
-      @build = Build.new("damagecontrolled", { "build_command_line" => "#{ant} compile"})
+      @build = Build.new("damagecontrolled", Time.now, { "build_command_line" => "#{ant} compile"})
       
       successful = nil
       hub.add_subscriber(Subscriber.new do |message|
@@ -77,6 +77,8 @@ module DamageControl
     end
     
     def test_checks_out_and_determines_changes_before_building
+      basedir = new_temp_dir("BuildExecutorTest")
+      
       mock_build_history = MockIt::Mock.new
       mock_build_history.__expect(:last_succesful_build) { |project_name|
         assert_equal("damagecontrolled", project_name)
@@ -87,19 +89,19 @@ module DamageControl
       mock_scm = MockIt::Mock.new
       mock_scm.__expect(:changes) { |scm_spec, dir, time_before, time_after|
         assert_equal("scm_spec", scm_spec)
-        assert_equal("#{damagecontrol_home}/builds/damagecontrolled", dir)
+        assert_equal("#{basedir}/damagecontrolled", dir)
         assert_equal(Time.utc(2004, 04, 02, 12, 00, 00), time_before)
         assert_equal(Time.utc(2004, 04, 02, 13, 00, 00), time_after)
       }
       mock_scm.__expect(:checkout) { |scm_spec, dir|
         assert_equal("scm_spec", scm_spec)
-        assert_equal("#{damagecontrol_home}/builds/damagecontrolled", dir)
+        assert_equal("#{basedir}/damagecontrolled", dir)
       }
       
-      FileUtils.mkdir_p("#{damagecontrol_home}/builds/damagecontrolled")
+      FileUtils.mkdir_p("#{basedir}/damagecontrolled")
       
-      @build_executor = BuildExecutor.new(hub, mock_build_history, "#{damagecontrol_home}/builds", mock_scm)
-      @build = Build.new("damagecontrolled",
+      @build_executor = BuildExecutor.new(hub, mock_build_history, basedir, mock_scm)
+      @build = Build.new("damagecontrolled", Time.now,
         { "scm_spec" => "scm_spec", "build_command_line" => "echo hello world"})
       @build.timestamp = Time.utc(2004, 04, 02, 13, 00, 00)
 

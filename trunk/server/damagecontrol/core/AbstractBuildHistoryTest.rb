@@ -9,14 +9,14 @@ module DamageControl
     end
     
     def setup
-      @apple1 = Build.new("apple", {"build_command_line" => "Apple1"})
+      @apple1 = Build.new("apple", Time.now, {"build_command_line" => "Apple1"})
       @apple1.status = Build::SUCCESSFUL
       @apple1.timestamp = "20040316225946"
 
-      @pear1 = Build.new("pear", {"build_command_line" => "Pear1"})
+      @pear1 = Build.new("pear", Time.now, {"build_command_line" => "Pear1"})
       @pear1.timestamp = "20040316225947"
       
-      @apple2 = Build.new("apple", {"build_command_line" => "Apple2"})
+      @apple2 = Build.new("apple", Time.now, {"build_command_line" => "Apple2"})
       @apple2.status = Build::FAILED
       @apple2.timestamp = "20040316225948"
 

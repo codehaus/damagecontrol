@@ -119,7 +119,7 @@ module DamageControl
 
     def on_recv_cmnd_join(msg)
       @current_channel=msg.to
-      logger.info("joined to #{@current_channel}")
+      logger.info("joined channel #{@current_channel}")
     end
     
     def connected?

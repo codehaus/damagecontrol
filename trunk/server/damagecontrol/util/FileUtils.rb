@@ -2,6 +2,10 @@ require 'fileutils'
 require 'ftools'
 
 module FileUtils
+
+  def new_temp_dir(identifier)
+    "#{damagecontrol_home}/target/temp_#{identifier}_#{Time.new.to_i}"
+  end
   
   def with_working_dir(dir)
     prev = Dir.pwd

@@ -15,8 +15,10 @@ require 'damagecontrol/core/HostVerifyingHandler'
 require 'damagecontrol/core/LogWriter'
 require 'damagecontrol/xmlrpc/Trigger'
 require 'damagecontrol/core/BuildHistoryRepository'
+require 'damagecontrol/core/ProjectConfigRepository'
 require 'damagecontrol/xmlrpc/StatusPublisher'
 require 'damagecontrol/xmlrpc/ConnectionTester'
+require 'damagecontrol/xmlrpc/ServerControl'
 require 'damagecontrol/core/HostVerifier'
 
 include DamageControl 
@@ -49,13 +51,17 @@ def start_simple_server(params = {})
 
   public_xmlrpc_servlet = XMLRPC::WEBrickServlet.new
   private_xmlrpc_servlet = XMLRPC::WEBrickServlet.new
-
-  DamageControl::XMLRPC::Trigger.new(private_xmlrpc_servlet, @hub)
-
-  @build_history_repository = BuildHistoryRepository.new(@hub, "build_history.yaml")
-  @build_history_repository.start
-  DamageControl::XMLRPC::StatusPublisher.new(public_xmlrpc_servlet, @build_history_repository)
   
+  project_directories = ProjectDirectories.new(rootdir)
+  @project_config_repository = ProjectConfigRepository.new(project_directories)
+  
+  DamageControl::XMLRPC::Trigger.new(private_xmlrpc_servlet, @hub, @project_config_repository)
+
+  @build_history_repository = BuildHistoryRepository.new(@hub, "#{rootdir}/build_history.yaml")
+  @build_history_repository.start
+  
+  DamageControl::XMLRPC::StatusPublisher.new(public_xmlrpc_servlet, @build_history_repository)
+  DamageControl::XMLRPC::ServerControl.new(private_xmlrpc_servlet)
   DamageControl::XMLRPC::ConnectionTester.new(public_xmlrpc_servlet)
   
   scheduler = BuildScheduler.new(@hub)

@@ -25,7 +25,7 @@ module DamageControl
     end
   
     def test_email_is_sent_upon_build_complete_event    
-      build = Build.new("project_name", {"nag_email" => "somelist@someproject.bar"})
+      build = Build.new("project_name", Time.now, {"nag_email" => "somelist@someproject.bar"})
       build.status = Build::FAILED
 
       @email_publisher.process_message(BuildCompleteEvent.new(build))
