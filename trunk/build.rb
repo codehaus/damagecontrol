@@ -112,7 +112,12 @@ class Project
   
   def version
     load 'server/damagecontrol/Version.rb'
-    DamageControl::VERSION
+    build_number = ENV["DAMAGECONTROL_BUILD_LABEL"]
+    if(build_number)
+      "#{DamageControl::VERSION}-build#{build_number}"
+    else
+      DamageControl::VERSION
+    end
   end
   
   def target_dir
