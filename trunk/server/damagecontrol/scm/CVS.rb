@@ -339,7 +339,7 @@ puts "executing #{cmd}"
           file = $1
         end
       end
-      logger.error("could not find path: #{entries[0]}") if 
+      logger.error("could not find path: #{entries[0]}") if file.nil?
       
       modifications = []
       
