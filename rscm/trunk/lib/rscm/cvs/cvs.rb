@@ -6,6 +6,11 @@ require 'rscm/cvs/cvs_log_parser'
 
 module RSCM
 
+  # RSCM implementation for CVS.
+  #
+  # You need the cvs executable on the PATH in order for it to work.
+  #
+  # NOTE: On Cygwin this has to be the win32 build of cvs and not the Cygwin one.
   class CVS < AbstractSCM
 
   public
@@ -63,6 +68,14 @@ module RSCM
       checked_out_files.sort!
     end
     
+    def checkout_commandline(to_identifier=nil)
+      "cvs checkout #{branch_option} #{to_option(to_identifier)} #{cvsmodule}"
+    end
+
+    def update_commandline(to_identifier=nil)
+      "cvs update #{branch_option} #{to_option(to_identifier)} -d -P -A"
+    end
+
     def commit(checkout_dir, message, &proc)
       cvs(checkout_dir, commit_command(message), &proc)
     end
@@ -193,7 +206,7 @@ module RSCM
     end
 
     def checkout_command(to_identifier, target_dir)
-      "checkout #{to_option(to_identifier)} -d #{target_dir} #{cvsmodule}"
+      "checkout #{branch_option} #{to_option(to_identifier)} -d #{target_dir} #{cvsmodule}"
     end
 
     def parse_log(checkout_dir, cmd, &proc)

@@ -7,9 +7,9 @@ module RSCM
 
   # RSCM implementation for Subversion.
   #
-  # NOTE: This class has been tested on Cygwin, Windows and Linux.
-  # On Cygwin/Windows - the win32 build of svn/svnadmin must be on the path,
-  # and *not* the cygwin binaries.
+  # You need the svn/svnadmin executable on the PATH in order for it to work.
+  #
+  # NOTE: On Cygwin these have to be the win32 builds of svn/svnadmin and not the Cygwin ones.
   class SVN < AbstractSCM
     include FileUtils
     include PathConverter
@@ -29,13 +29,13 @@ module RSCM
       svn(checkout_dir, "add #{relative_filename}")
     end
 
-    def checkout(checkout_dir, scm_to_time=nil, &line_proc)
+    def checkout(checkout_dir, to_identifier=nil, &line_proc)
       checkout_dir = PathConverter.filepath_to_nativepath(checkout_dir, false)
       mkdir_p(checkout_dir)
       checked_out_files = []
       path_regex = /^[A|D|U]\s+(.*)/
       if(checked_out?(checkout_dir))
-        svn(checkout_dir, update_command(scm_to_time)) do |line|
+        svn(checkout_dir, update_command(to_identifier)) do |line|
           if(line =~ path_regex)
             absolute_path = "#{checkout_dir}/#{$1}"
             relative_path = $1.chomp
@@ -45,7 +45,7 @@ module RSCM
           line_proc.call(line) if block_given?
         end
       else
-        svn(checkout_dir, checkout_command(scm_to_time, checkout_dir)) do |line|
+        svn(checkout_dir, checkout_command(to_identifier, checkout_dir)) do |line|
           if(line =~ path_regex)
             native_absolute_path = $1
             native_checkout_dir = $1
@@ -61,6 +61,14 @@ module RSCM
         end
       end
       checked_out_files.sort!
+    end
+
+    def checkout_commandline(to_identifier=nil)
+      "svn checkout #{revision_option(nil, to_identifier)}"
+    end
+
+    def update_commandline(to_identifier=nil)
+      "svn update #{revision_option(nil, to_identifier)} #{svnurl} #{checkout_dir}"
     end
 
     def uptodate?(checkout_dir)
@@ -149,16 +157,16 @@ module RSCM
       svn(dir, import_cmd, &line_proc)
     end
 
-    def changesets(checkout_dir, scm_from_time, scm_to_time=nil, files=nil, &line_proc)
+    def changesets(checkout_dir, from_identifier, to_identifier=nil, files=nil, &line_proc)
       checkout_dir = PathConverter.filepath_to_nativepath(checkout_dir, false)
       changesets = nil
-      command = "svn #{changes_command(scm_from_time, scm_to_time, files)}"
+      command = "svn #{changes_command(from_identifier, to_identifier, files)}"
       yield command if block_given?
 
       with_working_dir(checkout_dir) do
         IO.popen(command) do |stdout|
           parser = SVNLogParser.new(stdout, svnpath, checkout_dir)
-          changesets = parser.parse_changesets(scm_from_time, scm_to_time, &line_proc)
+          changesets = parser.parse_changesets(from_identifier, to_identifier, &line_proc)
         end
       end
       changesets
@@ -232,41 +240,53 @@ module RSCM
       result
     end
 
-    def checkout_command(scm_to_time, checkout_dir)
+    def checkout_command(to_identifier, checkout_dir)
       checkout_dir = "\"#{checkout_dir}\""
-      "checkout #{revision_option(nil, scm_to_time)} #{svnurl} #{checkout_dir}"
+      "checkout #{revision_option(nil, to_identifier)} #{svnurl} #{checkout_dir}"
     end
 
-    def update_command(scm_to_time)
-      "update  #{revision_option(nil, scm_to_time)}"
+    def update_command(to_identifier)
+      "update  #{revision_option(nil, to_identifier)}"
     end
     
-    def changes_command(scm_from_time, scm_to_time, files)
+    def changes_command(from_identifier, to_identifier, files)
       # http://svnbook.red-bean.com/svnbook-1.1/svn-book.html#svn-ch-3-sect-3.3
       # file_list = files.join('\n')
 # WEIRD cygwin bug garbles this!?!?!?!
-      "log --verbose #{revision_option(scm_from_time, scm_to_time)}"
+      "log --verbose #{revision_option(from_identifier, to_identifier)}"
     end
 
-    def revision_option(scm_from_time, scm_to_time)
-      from = svndate(scm_from_time)
-      to = svndate(scm_to_time)
+    def revision_option(from_identifier, to_identifier)
+      from = nil
+      if(from_identifier.is_a?(Time))
+        from = svndate(from_identifier)
+      else
+        from = from_identifier
+      end
+
+      to = nil
+      if(to_identifier.is_a?(Time))
+        to = svndate(to_identifier)
+      else
+        to = to_identifier
+      end
+
       revision_option = nil
       if(from && to.nil?)
-        revision_option = "--revision {\"#{from}\"}:HEAD"
+        revision_option = "--revision #{from}:HEAD"
       elsif(from.nil? && to)
-        revision_option = "--revision {\"#{to}\"}"
+        revision_option = "--revision #{to}"
       elsif(from.nil? && to.nil?)
         revision_option = ""
       elsif(from && to)
-        revision_option = "--revision {\"#{from}\"}:{\"#{to}\"}"
+        revision_option = "--revision #{from}:#{to}"
       end
       revision_option
     end
     
     def svndate(time)
       return nil unless time
-      time.utc.strftime("%Y-%m-%d %H:%M:%S +0000")
+      time.utc.strftime("\"{%Y-%m-%d %H:%M:%S +0000\"}")
     end
 
     def commit_command(message)

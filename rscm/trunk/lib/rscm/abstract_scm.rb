@@ -87,6 +87,16 @@ module RSCM
     def uninstall_trigger(trigger_command, trigger_files_checkout_dir)
     end
 
+    # The command line to run in order to check out a fresh working copy.
+    #
+    def checkout_commandline(to_identifier=nil)
+    end
+
+    # The command line to run in order to update a working copy.
+    #
+    def update_commandline(to_identifier=nil)
+    end
+
     def ==(other_scm)
       return false if self.class != other_scm.class
       self.instance_variables.each do |var|
