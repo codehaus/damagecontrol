@@ -21,8 +21,8 @@ include DamageControl
 
 Logging.quiet
 
-#buildRoot = File.expand_path("~/build") 
-buildRoot = File.expand_path(".") 
+buildRoot = File.expand_path("~/build") 
+#buildRoot = File.expand_path(".") 
 
  
 start_simple_server(
