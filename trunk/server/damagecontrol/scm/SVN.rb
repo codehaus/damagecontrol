@@ -267,7 +267,7 @@ module DamageControl
     
     def svndate(time)
       return nil unless time
-      time.utc.strftime("%Y-%m-%d %H:%M:%S")
+      time.utc.strftime("%Y-%m-%d %H:%M:%S +0000")
     end
 
     def commit_command(message)
