@@ -34,6 +34,7 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Locale;
 import java.util.Map;
+import java.util.TimeZone;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -44,14 +45,28 @@ import java.util.regex.Pattern;
  * @author Aslak Helles&oslash;y
  */
 public class StarTeam implements RSCM {
+
+    // Used to parse dates coming from Ruby
     // http://hedwig.sourceforge.net/xref/org/apache/james/util/RFC822Date.html
-    private static final DateFormat dx = new SimpleDateFormat("EE, d MMM yyyy HH:mm:ss zzzzz", Locale.US);
-    private static final DateFormat dy = new SimpleDateFormat("EE d MMM yyyy HH:mm:ss zzzzz", Locale.US);
-    private static final DateFormat dz = new SimpleDateFormat("d MMM yyyy HH:mm:ss zzzzz", Locale.US);
+    private static final DateFormat dx = new SimpleDateFormat("EE, d MMM yyyy HH:mm:ss zzzzz", Locale.UK);
+    private static final DateFormat dy = new SimpleDateFormat("EE d MMM yyyy HH:mm:ss zzzzz", Locale.UK);
+    private static final DateFormat dz = new SimpleDateFormat("d MMM yyyy HH:mm:ss zzzzz", Locale.UK);
+    // Used to parse dates coming from StarTeam
+    private static final DateFormat ISO8601_FORMAT = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'", Locale.UK);;
+    private static final TimeZone GMT = TimeZone.getTimeZone("GMT");
+
+    static {
+        dx.setTimeZone(GMT);
+        dy.setTimeZone(GMT);
+        dz.setTimeZone(GMT);
+        ISO8601_FORMAT.setTimeZone(GMT);
+    }
+
     private static final Pattern removingProcessesPattern = Pattern.compile("removing processed (.*) from UnmatchedFileMap");
+    // See abstract_scm.rb
+    private static final Date INFINITY = parseRfc822("1 Jan 2038 00:00:00 -0000");
 
     private boolean canLookupEmails = true;
-    private static final DateFormat ISO8601_FORMAT = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss", Locale.UK);;
     private final String userName;
     private final String password;
     private final String serverName;
@@ -62,6 +77,7 @@ public class StarTeam implements RSCM {
     private final String url;
 
     private Pattern checkingOutPattern;
+    private Pattern relativePathPattern;
     private Map checkedOutStarTeamFileToFileSystemFiles = new HashMap();
 
     public StarTeam(String userName, String password, String serverName, String serverPort, String projectName, String viewName, String folderName) {
@@ -74,13 +90,18 @@ public class StarTeam implements RSCM {
         this.folderName = folderName;
 
         this.url = userName + ":" + password + "@" + serverName + ":" + Integer.parseInt(serverPort) + "/" + projectName + "/" + viewName;
-        // compute regexp to match the checked out files.
-        String checkingOutPatternSpec = "Checking out: " + viewName;
+
+        String pathPrefixRegexp = viewName;
         if(folderName != null && !folderName.equals("")) {
-            checkingOutPatternSpec += "." + folderName;
+            pathPrefixRegexp += "." + folderName;
         }
-        checkingOutPatternSpec += ".(.*) \\-\\-> (.*)";
-        checkingOutPattern = Pattern.compile(checkingOutPatternSpec, Pattern.DOTALL);
+        pathPrefixRegexp += ".";
+
+        // compute regexp to match the relative paths for changesets.
+        relativePathPattern = Pattern.compile(pathPrefixRegexp + "(.*)", Pattern.DOTALL);
+
+        // compute regexp to match the checked out files.
+        checkingOutPattern = Pattern.compile("Checking out: " + pathPrefixRegexp + "(.*) \\-\\-> (.*)", Pattern.DOTALL);
     }
 
     public YamlDumpable getChangeSets(String fromSpecifier, String toSpecifier) {
@@ -113,11 +134,16 @@ public class StarTeam implements RSCM {
 
             View snapshotAtFrom = new View(view, ViewConfiguration.createFromTime(new OLEDate(from)));
 
-            if(to == null) {
-                to = new Date();
+            ViewConfiguration toConfig;
+            OLEDate toDate;
+            if(INFINITY.equals(to)) {
+                toDate = new OLEDate(new Date());
+                toConfig = ViewConfiguration.createTip();
+            } else {
+                toDate = new OLEDate(to);
+                toConfig = ViewConfiguration.createFromTime(toDate);
             }
-            OLEDate toDate = new OLEDate(to);
-            View snapshotAtTo = new View(view, ViewConfiguration.createFromTime(toDate));
+            View snapshotAtTo = new View(view, toConfig);
 
             // cache information for to
             Folder toRootFolder = snapshotAtTo.getRootFolder();
@@ -293,20 +319,33 @@ public class StarTeam implements RSCM {
 //        System.out.println(revision.getName());
 //        System.out.println("----");
 
-        String path = revision.getFullName();
+        String path = (revision.getParentFolderHierarchy() + revision.getName()).replace('\\', '/');
+        Matcher m = relativePathPattern.matcher(path);
+        if(m.matches()) {
+            path = m.group(1);
+        } else {
+            throw new RuntimeException(path + " doesn't match regexp " + relativePathPattern.pattern());
+        }
         String prevRev = "" + (revision.getContentVersion() - 1);
         String rev = "" + revision.getContentVersion();
         Date time = null;
-        final String timeString = revision.getModifiedTime().toISO8601String().substring(0, 19);
+        final String isoString = revision.getModifiedTime().toISO8601String();
+        if(path.equals("NGST Application/java/testsrc/com/dcx/NGST/gui/screens/miscfuncs/FCM/ChangeEnabledStateDisplayViewTest.java")) {
+            System.err.println(path + ":" + isoString);
+        }
         try {
-            time = ISO8601_FORMAT.parse(timeString);
+            time = ISO8601_FORMAT.parse(isoString);
+            if (path.equals("NGST Application/java/testsrc/com/dcx/NGST/gui/screens/miscfuncs/FCM/ChangeEnabledStateDisplayViewTest.java")) {
+                System.err.println("timeString = " + time + ":" + time.getTimezoneOffset());
+            }
 //            System.out.println(Change.format(time));
         } catch (ParseException e) {
-            throw new RuntimeException("Couldn't parse date: " + timeString, e);
+            throw new RuntimeException("Couldn't parse date: " + isoString, e);
         }
         Change change = new Change(user.getName(),
                 revision.getComment(),
-                path, prevRev,
+                path,
+                prevRev,
                 rev,
                 status,
                 time);
@@ -333,6 +372,9 @@ public class StarTeam implements RSCM {
     }
 
     private static Date parseRfc822(String rfcdate) {
+        if(rfcdate.equals("")) {
+            return null;
+        }
         try {
             return dx.parse(rfcdate);
         } catch (ParseException e) {

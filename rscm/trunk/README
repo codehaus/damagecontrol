@@ -12,6 +12,11 @@ which is described in AbstractSCM.
 * API support for several high level operations such as checkout, get changesets, check for uptodate etc.
 * RSCM objects are easily serializable to YAML.
 
+=== Wish:
+
+Integrate with CVSSpam so that all supported SCMs (not only CVS) can benefit from its awesome coloured diff capabilities.
+This would provide a very nice alternative to SCM web front-ends.
+
 == RSS Server
 
 RSCM can generate RSS feeds for all supported SCMs. The RSS feeds will have one item per changeset.

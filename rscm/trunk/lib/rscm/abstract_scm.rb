@@ -2,6 +2,18 @@ require 'fileutils'
 require 'rscm/changes'
 require 'xmlrpc/utils'
 
+class Time
+  class << self
+    def epoch
+      Time.at(0)
+    end
+
+    def infinity
+      Time.utc(2038)
+    end
+  end
+end
+
 module RSCM
   # This class defines the RSCM API. The documentation of the various methods
   # uses CVS' terminology.
@@ -64,13 +76,13 @@ module RSCM
     # This method will yield the relative file name of each checked out file, and also return
     # them in an array. Only files, not directories, will be yielded/returned.
     #
-    def checkout(checkout_dir, to_identifier=nil) # :yield: file
+    def checkout(checkout_dir, to_identifier=Time.infinity) # :yield: file
     end
     
     # Returns a ChangeSets object for the period specified by +from_identifier+
     # and +to_identifier+. See AbstractSCM for details about the parameters.
     #
-    def changesets(checkout_dir, from_identifier, to_identifier=nil, files=nil)
+    def changesets(checkout_dir, from_identifier, to_identifier=Time.infinity, files=nil)
     end
 
     # Whether the working copy in +checkout_dir+ is uptodate with the repository.
@@ -95,12 +107,12 @@ module RSCM
 
     # The command line to run in order to check out a fresh working copy.
     #
-    def checkout_commandline(to_identifier=nil)
+    def checkout_commandline(to_identifier=Time.infinity)
     end
 
     # The command line to run in order to update a working copy.
     #
-    def update_commandline(to_identifier=nil)
+    def update_commandline(to_identifier=Time.infinity)
     end
 
     def ==(other_scm)

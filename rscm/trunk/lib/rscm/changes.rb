@@ -96,7 +96,8 @@ module RSCM
           item.author = changeset.developer
           item.title = changeset.message
           item.link = change_linker.changeset_url(changeset, true)
-          item.description = message_linker.highlight(changeset.message).gsub(/\n/, "<br/>\n") << "<p/>\n"
+          item.description = "<b>#{changeset.developer}</b><br/>\n"
+          item.description << message_linker.highlight(changeset.message).gsub(/\n/, "<br/>\n") << "<p/>\n"
           changeset.each do |change|
             item.description << change_linker.change_url(change, true) << "<br/>\n"
           end

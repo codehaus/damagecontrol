@@ -5,6 +5,7 @@ import java.io.Writer;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Collections;
 
 /**
  * @author Aslak Helles&oslash;y
@@ -17,6 +18,7 @@ public class ChangeSets implements YamlDumpable {
     }
 
     public void dumpYaml(Writer out) throws IOException {
+        Collections.sort(changeSets);
         out.write("--- !ruby/object:RSCM::ChangeSets \n");
         out.write("changesets: \n");
         for (Iterator iterator = changeSets.iterator(); iterator.hasNext();) {

@@ -5,11 +5,12 @@ import java.io.Writer;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Collections;
 
 /**
  * @author Aslak Helles&oslash;y
  */
-public class ChangeSet {
+public class ChangeSet implements Comparable {
     private List changes = new ArrayList();
     private Change myChange;
 
@@ -25,6 +26,7 @@ public class ChangeSet {
     }
 
     public void write(Writer out) throws IOException {
+        Collections.sort(changes);
         out.write("  - !ruby/object:RSCM::ChangeSet \n");
         out.write("    changes: \n");
         for (Iterator iterator = changes.iterator(); iterator.hasNext();) {
@@ -44,5 +46,11 @@ public class ChangeSet {
 
     public boolean canContain(Change change) {
         return myChange.isSimilarWithinOneMinute(change);
+    }
+
+    public int compareTo(Object o) {
+        ChangeSet other = (ChangeSet) o;
+        // sort in rev. order.
+        return - myChange.getTime().compareTo(other.myChange.getTime());
     }
 }

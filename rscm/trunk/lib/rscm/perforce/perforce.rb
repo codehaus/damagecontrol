@@ -402,15 +402,3 @@ module Kernel
   end
 
 end
-
-class Time
-  class << self
-    def epoch
-      Time.at(0)
-    end
-
-    def infinity
-      Time.utc(2038)
-    end
-  end
-end

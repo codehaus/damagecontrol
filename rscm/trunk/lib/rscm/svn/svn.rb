@@ -29,7 +29,7 @@ module RSCM
       svn(checkout_dir, "add #{relative_filename}")
     end
 
-    def checkout(checkout_dir, to_identifier=nil, &line_proc)
+    def checkout(checkout_dir, to_identifier=Time.infinity, &line_proc)
       checkout_dir = PathConverter.filepath_to_nativepath(checkout_dir, false)
       mkdir_p(checkout_dir)
       checked_out_files = []
@@ -63,11 +63,11 @@ module RSCM
       checked_out_files.sort!
     end
 
-    def checkout_commandline(to_identifier=nil)
+    def checkout_commandline(to_identifier=Time.infinity)
       "svn checkout #{revision_option(nil, to_identifier)}"
     end
 
-    def update_commandline(to_identifier=nil)
+    def update_commandline(to_identifier=Time.infinity)
       "svn update #{revision_option(nil, to_identifier)} #{svnurl} #{checkout_dir}"
     end
 
@@ -157,7 +157,7 @@ module RSCM
       svn(dir, import_cmd, &line_proc)
     end
 
-    def changesets(checkout_dir, from_identifier, to_identifier=nil, files=nil, &line_proc)
+    def changesets(checkout_dir, from_identifier, to_identifier=Time.infinity, files=nil, &line_proc)
       checkout_dir = PathConverter.filepath_to_nativepath(checkout_dir, false)
       changesets = nil
       command = "svn #{changes_command(from_identifier, to_identifier, files)}"

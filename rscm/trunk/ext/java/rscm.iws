@@ -102,7 +102,7 @@
         <option name="myCondition" value="" />
         <option name="myLogMessage" value="" />
       </breakpoint>
-      <breakpoint url="file://$PROJECT_DIR$/src/main/org/rubyforge/rscm/starteam/StarTeam.java" line="201">
+      <breakpoint url="file://$PROJECT_DIR$/src/main/org/rubyforge/rscm/starteam/StarTeam.java" line="227">
         <option name="ENABLED" value="true" />
         <option name="SUSPEND_VM" value="true" />
         <option name="LOG_ENABLED" value="false" />
@@ -115,7 +115,7 @@
         <option name="myCondition" value="" />
         <option name="myLogMessage" value="" />
       </breakpoint>
-      <breakpoint url="file://$PROJECT_DIR$/src/main/org/rubyforge/rscm/starteam/StarTeam.java" line="208">
+      <breakpoint url="file://$PROJECT_DIR$/src/main/org/rubyforge/rscm/starteam/StarTeam.java" line="234">
         <option name="ENABLED" value="true" />
         <option name="SUSPEND_VM" value="true" />
         <option name="LOG_ENABLED" value="false" />
@@ -155,27 +155,25 @@
   </component>
   <component name="FileEditorManager" split-orientation="vertical" split-proportion="0.5">
     <first-group selected-file="file://$PROJECT_DIR$/src/main/org/rubyforge/rscm/starteam/StarTeam.java">
-      <entry file="file://$PROJECT_DIR$/src/main/org/rubyforge/rscm/ChangeSets.java" pinned="false">
+      <entry file="file://$PROJECT_DIR$/src/main/org/rubyforge/rscm/ChangeSet.java" pinned="false">
         <provider selected="true" editor-type-id="text-editor">
-          <state line="18" column="19" selection-start="402" selection-end="402" vertical-scroll-proportion="0.36823106">
+          <state line="52" column="30" selection-start="1549" selection-end="1549" vertical-scroll-proportion="1.0637786">
             <folding>
               <element signature="imports" expanded="true" />
             </folding>
           </state>
         </provider>
       </entry>
-      <entry file="file://$PROJECT_DIR$/src/test/org/rubyforge/rscm/StringCommandInvokerTest.java" pinned="false">
+      <entry file="jar://C:/Program Files/Borland/StarTeam SDK 6.0/Lib/starteam60.jar!/com/starbase/util/Sortable.class" pinned="false">
         <provider selected="true" editor-type-id="text-editor">
-          <state line="24" column="73" selection-start="773" selection-end="773" vertical-scroll-proportion="0.5">
-            <folding>
-              <element signature="imports" expanded="true" />
-            </folding>
+          <state line="5" column="17" selection-start="159" selection-end="159" vertical-scroll-proportion="0.08182912">
+            <folding />
           </state>
         </provider>
       </entry>
       <entry file="file://$PROJECT_DIR$/src/test/org/rubyforge/rscm/starteam/StarTeamTest.java" pinned="false">
         <provider selected="true" editor-type-id="text-editor">
-          <state line="20" column="37" selection-start="685" selection-end="685" vertical-scroll-proportion="0.41666666">
+          <state line="29" column="83" selection-start="1055" selection-end="1080" vertical-scroll-proportion="0.6041667">
             <folding>
               <element signature="imports" expanded="true" />
             </folding>
@@ -223,10 +221,17 @@
       </entry>
       <entry file="file://$PROJECT_DIR$/src/main/org/rubyforge/rscm/starteam/StarTeam.java" pinned="false">
         <provider selected="true" editor-type-id="text-editor">
-          <state line="213" column="0" selection-start="9127" selection-end="9127" vertical-scroll-proportion="0.33333334">
+          <state line="326" column="102" selection-start="13556" selection-end="13556" vertical-scroll-proportion="0.47916666">
             <folding>
               <element signature="imports" expanded="true" />
             </folding>
+          </state>
+        </provider>
+      </entry>
+      <entry file="file://$PROJECT_DIR$/src/main/org/rubyforge/rscm/Change.java" pinned="false">
+        <provider selected="true" editor-type-id="text-editor">
+          <state line="92" column="20" selection-start="2903" selection-end="2903" vertical-scroll-proportion="1.7083334">
+            <folding />
           </state>
         </provider>
       </entry>
@@ -576,27 +581,6 @@
     </buildFile>
   </component>
   <component name="editorHistoryManager">
-    <entry file="jar://C:/apache-ant-1.6.2/lib/ant-starteam.jar!/org/apache/tools/ant/taskdefs/optional/starteam/TreeBasedTask.class">
-      <provider selected="true" editor-type-id="text-editor">
-        <state line="13" column="56" selection-start="419" selection-end="431" vertical-scroll-proportion="0.15962441">
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="jar://C:/apache-ant-1.6.2/lib/ant-starteam.jar!/org/apache/tools/ant/taskdefs/optional/starteam/StarTeamCheckout.class">
-      <provider selected="true" editor-type-id="text-editor">
-        <state line="12" column="42" selection-start="381" selection-end="381" vertical-scroll-proportion="0.1248">
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="jar://C:/Documents and Settings/ahelleso/.maven/repository/ant/jars/ant-1.6.jar!/org/apache/tools/ant/BuildListener.class">
-      <provider selected="true" editor-type-id="text-editor">
-        <state line="7" column="17" selection-start="195" selection-end="195" vertical-scroll-proportion="0.1632">
-          <folding />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/src/main/org/rubyforge/rscm/StringCommandInvoker.java">
       <provider selected="true" editor-type-id="text-editor">
         <state line="18" column="54" selection-start="629" selection-end="629" vertical-scroll-proportion="0.3885246">
@@ -609,15 +593,6 @@
     <entry file="file://$PROJECT_DIR$/src/main/org/rubyforge/rscm/Main.java">
       <provider selected="true" editor-type-id="text-editor">
         <state line="23" column="38" selection-start="890" selection-end="890" vertical-scroll-proportion="0.7294776">
-          <folding>
-            <element signature="imports" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/main/org/rubyforge/rscm/ChangeSets.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state line="18" column="19" selection-start="402" selection-end="402" vertical-scroll-proportion="0.36823106">
           <folding>
             <element signature="imports" expanded="true" />
           </folding>
@@ -679,21 +654,53 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/src/main/org/rubyforge/rscm/starteam/StarTeam.java">
+    <entry file="file://$PROJECT_DIR$/src/test/org/rubyforge/rscm/starteam/StarTeamTest.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state line="213" column="0" selection-start="9127" selection-end="9127" vertical-scroll-proportion="0.33333334">
+        <state line="29" column="83" selection-start="1055" selection-end="1080" vertical-scroll-proportion="0.6041667">
           <folding>
             <element signature="imports" expanded="true" />
           </folding>
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/src/test/org/rubyforge/rscm/starteam/StarTeamTest.java">
+    <entry file="file://$PROJECT_DIR$/src/main/org/rubyforge/rscm/starteam/StarTeam.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state line="20" column="37" selection-start="685" selection-end="685" vertical-scroll-proportion="0.41666666">
+        <state line="326" column="102" selection-start="13556" selection-end="13556" vertical-scroll-proportion="0.47916666">
           <folding>
             <element signature="imports" expanded="true" />
           </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/main/org/rubyforge/rscm/ChangeSets.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="24" column="17" selection-start="701" selection-end="701" vertical-scroll-proportion="0.4839109">
+          <folding>
+            <element signature="imports" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="jar://C:/Program Files/Borland/StarTeam SDK 6.0/Lib/starteam60.jar!/com/starbase/util/Sortable.class">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="5" column="17" selection-start="159" selection-end="159" vertical-scroll-proportion="0.08182912">
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/main/org/rubyforge/rscm/ChangeSet.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="52" column="30" selection-start="1549" selection-end="1549" vertical-scroll-proportion="1.0637786">
+          <folding>
+            <element signature="imports" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/main/org/rubyforge/rscm/Change.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="92" column="20" selection-start="2903" selection-end="2903" vertical-scroll-proportion="1.7083334">
+          <folding />
         </state>
       </provider>
     </entry>

@@ -38,7 +38,7 @@ module RSCM
 
     # The extra simulate parameter is not in accordance with the AbstractSCM API,
     # but it's optional and is only being used from within this class (uptodate? method).
-    def checkout(checkout_dir, to_identifier=nil, simulate=false)
+    def checkout(checkout_dir, to_identifier=Time.infinity, simulate=false)
       checked_out_files = []
       if(checked_out?(checkout_dir))
         path_regex = /^[U|P] (.*)/
@@ -68,11 +68,11 @@ module RSCM
       checked_out_files.sort!
     end
     
-    def checkout_commandline(to_identifier=nil)
+    def checkout_commandline(to_identifier=Time.infinity)
       "cvs checkout #{branch_option} #{to_option(to_identifier)} #{cvsmodule}"
     end
 
-    def update_commandline(to_identifier=nil)
+    def update_commandline(to_identifier=Time.infinity)
       "cvs update #{branch_option} #{to_option(to_identifier)} -d -P -A"
     end
 
@@ -94,7 +94,7 @@ module RSCM
       files.empty?
     end
 
-    def changesets(checkout_dir, from_identifier, to_identifier=nil, files=nil)
+    def changesets(checkout_dir, from_identifier, to_identifier=Time.infinity, files=nil)
       begin
         parse_log(checkout_dir, new_changes_command(from_identifier, to_identifier, files))
       rescue => e

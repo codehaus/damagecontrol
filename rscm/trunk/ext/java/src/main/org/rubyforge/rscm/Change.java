@@ -15,7 +15,7 @@ import java.util.TimeZone;
 /**
  * @author Aslak Helles&oslash;y
  */
-public class Change {
+public class Change implements Comparable {
     private final String developer;
     private final String message;
     private final String path;
@@ -25,6 +25,9 @@ public class Change {
     private final Date time;
     private static final DateFormat YAML_FORMAT = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.UK);
     private static final TimeZone UTC = TimeZone.getTimeZone("UTC");
+    static {
+        YAML_FORMAT.setTimeZone(UTC);
+    }
 
     public Change(String developer, String message, String path, String previous_revision, String revision, String status, Date time) {
         this.developer = developer;
@@ -95,5 +98,10 @@ public class Change {
         return developer.equals(change.getDeveloper()) &&
                 message.equals(change.getMessage()) &&
                 Math.abs(time.getTime() - change.getTime().getTime()) < 60 * 1000;
+    }
+
+    public int compareTo(Object o) {
+        Change other = (Change) o;
+        return path.compareTo(other.path);
     }
 }
