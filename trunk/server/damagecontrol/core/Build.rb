@@ -94,7 +94,7 @@ module DamageControl
     end
 
     def timestamp_for_rss
-      timestamp_as_time.utc.strftime("%a, %d %b %Y %H:%M:%S %Z")
+      timestamp_as_time.strftime("%a, %d %b %Y %H:%M:%S %Z")
     end
     
     def timestamp_for_humans
