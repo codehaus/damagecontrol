@@ -14,6 +14,23 @@ module DamageControl
     attr_accessor :svnurl
     attr_accessor :svnpath
 
+    # TODO: refactor. This is ugly! Should go to the generic tests
+    def add_or_edit_and_commit_file(checkout_dir, relative_filename, content, &line_proc)
+      existed = false
+      with_working_dir(checkout_dir) do
+        File.mkpath(File.dirname(relative_filename))
+        existed = File.exist?(relative_filename)
+        File.open(relative_filename, "w") do |file|
+          file.puts(content)
+        end
+      end
+      svn(checkout_dir, "add #{relative_filename}", &line_proc) unless(existed)
+
+      message = existed ? "editing" : "adding"
+
+      commit(checkout_dir, "#{message} #{relative_filename}", &line_proc)
+    end
+
     def checkout(checkout_dir, time = nil, &line_proc)
       if(checked_out?(checkout_dir))
         svn(checkout_dir, update_command(time), &line_proc)
@@ -133,8 +150,8 @@ module DamageControl
     # triggers don't work with cygwin svn (svn bug)
     attr_accessor :native_windows
   
-    def initialize(basedir, svnpath)
-      self.svnrootdir = "#{basedir}/svnroot"
+    def initialize(svnrootdir, svnpath)
+      self.svnrootdir = svnrootdir
       self.svnurl = "#{filepath_to_nativeurl(svnrootdir)}/#{svnpath}"
       self.svnpath = svnpath
     end
@@ -145,8 +162,11 @@ module DamageControl
     end
 
     def import(dir, &line_proc)
-      cmd = "import #{filepath_to_nativepath(dir, true)} #{svnurl} -m \"initial import\""
-      svn(dir, cmd, &line_proc)
+#      mkdir_cmd = "mkdir #{filepath_to_nativepath(dir, true)} #{svnurl} -m \"creating directories\""
+#      svn(dir, import_cmd, &line_proc)
+
+      import_cmd = "import #{filepath_to_nativepath(dir, true)} #{svnurl} -m \"initial import\""
+      svn(dir, import_cmd, &line_proc)
     end
 
     def can_install_trigger?
@@ -189,22 +209,6 @@ module DamageControl
       end
     end
     
-    # TODO: refactor. This is ugly! Should go to the generic tests
-    def add_or_edit_and_commit_file(checkout_dir, relative_filename, content, &line_proc)
-      existed = false
-      with_working_dir(checkout_dir) do
-        File.mkpath(File.dirname(relative_filename))
-        existed = File.exist?(relative_filename)
-        File.open(relative_filename, "w") do |file|
-          file.puts(content)
-        end
-      end
-      svn(checkout_dir, "add #{relative_filename}", &line_proc) unless(existed)
-
-      message = existed ? "editing" : "adding"
-
-      commit(checkout_dir, "#{message} #{relative_filename}", &line_proc)
-    end
 
   private
 

@@ -1,10 +1,11 @@
-# HEY! It's better to run a local IRC server (JoinMe!) and set the DC_TEST_IRC_HOST to localhost (see E2EStartServerForked.rb)
+# HEY! It's better to run a local IRC server (there is one called Join Me!) and set the DC_TEST_IRC_HOST to localhost (see E2EStartServerForked.rb)
 # Works like a charm. Aslak.
 ONLINE=true
 
 require 'test/unit'
 
 require 'xmlrpc/client'
+require 'pebbles/Pathutils'
 
 require 'damagecontrol/core/Build'
 require 'damagecontrol/core/BuildExecutor'
@@ -70,7 +71,8 @@ class IRCDriver
 
   def setup
     @irc_listener = IRCListener.new
-    irc_listener.connect("irc.codehaus.org", "testsuite")
+    irc_host = ENV["DC_TEST_IRC_HOST"] || "irc.codehaus.org"
+    irc_listener.connect(irc_host, "testsuite")
     wait_for(10) { irc_listener.connected? }
     assert("could not connect to irc", irc_listener.connected?)
     irc_listener.join_channel("#dce2e")
@@ -257,21 +259,25 @@ class XMLRPCDriver < Driver
     @status = client.proxy("status")
   end
   
+  def last_completed_build_status
+    last_completed_build = @status.last_completed_build(@project_name)
+    last_completed_build ? last_completed_build.status : "not completed"
+  end
+  
   def build_status?(status)
     begin
-      last_completed_build = @status.last_completed_build(@project_name)
-      last_completed_build && last_completed_build.status == status
+      last_completed_build_status == status
     rescue ::XMLRPC::FaultException => e
       flunk(e.faultString)
     end
   end
   
   def assert_build_successful
-    assert(build_status?(Build::SUCCESSFUL), "build was not successful")
+    assert(build_status?(Build::SUCCESSFUL), "build was not successful, it was #{last_completed_build_status}")
   end
   
   def assert_build_failed
-    assert(build_status?(Build::FAILED), "build did not fail")
+    assert(build_status?(Build::FAILED), "build did not fail, it was #{last_completed_build_status}")
   end
   
   def wait_for_successful_build
@@ -291,6 +297,7 @@ end
 
 class End2EndTest < Test::Unit::TestCase
 
+  include Pebbles::Pathutils
   include FileUtils
   include Utils
   
@@ -302,11 +309,6 @@ class End2EndTest < Test::Unit::TestCase
   attr_reader :server
   attr_reader :xmlrpc
   
-  def setup
-    @basedir = new_temp_dir("e2e")
-    File.mkpath(basedir)
-  end
-  
   def teardown
     @server.teardown
     @irc.teardown if @irc
@@ -314,60 +316,88 @@ class End2EndTest < Test::Unit::TestCase
     @xmlrpc.teardown if @xmlrpc
   end
   
+  def setup
+    @basedir                    = new_temp_dir("e2etest")
+    @repo_dir                   = "#{@basedir}/repository"
+    relative_project_root       = "e2e"
+    @relative_project_path      = "#{relative_project_root}/testproject"
+    @import_root_dir            = "#{@basedir}/#{relative_project_root}"
+    @import_base_dir            = "#{@basedir}/#{@relative_project_path}"
+    @user_checkout_dir         = "#{@basedir}/user_checkout"
+    @trigger_files_checkout_dir = "#{@basedir}/trigger_files_checkout"
+    @server_work_dir            = "#{@basedir}/server_work"
+    File.mkpath(basedir)
+  end
+  
   def test_damagecontrol_works_with_cvs
-    cvs = LocalCVS.new(@basedir, "e2e_testproject")
-    test_build_and_log_and_irc(cvs, false)
+    @project_name = "CVS_TestingProject"
+
+    central_cvs = LocalCVS.new(@repo_dir, @relative_project_path)
+    import_sources(central_cvs)
+
+    remote_cvs = CVS.new
+    rootdir = filepath_to_nativepath(@repo_dir, false)
+    remote_cvs.cvsroot = ":local:#{rootdir}"
+    remote_cvs.cvsmodule = "#{@relative_project_path}"
+
+    test_build_and_log_and_irc(remote_cvs, false)
   end
 
   def test_damagecontrol_works_with_svn
-    svn = LocalSVN.new(@basedir, "e2e_testproject")
-    test_build_and_log_and_irc(svn, true)
+    @project_name = "SVN_TestingProject"
+
+    central_svn = LocalSVN.new(@repo_dir, @relative_project_path)
+    import_sources(central_svn)
+
+    remote_svn = SVN.new
+    remote_svn.svnurl = filepath_to_nativeurl(@repo_dir)
+    remote_svn.svnpath = "#{@relative_project_path}"
+    test_build_and_log_and_irc(remote_svn, true)
   end
   
-  def test_build_and_log_and_irc(scm, polling)
-    # prepare local scm
-    scm.create
-    importdir = "#{@basedir}/e2e_testproject"
-    File.mkpath(importdir)
-    scm.import(importdir)
-    
-    trigger_files_checkout_dir = "#{@basedir}/trigger_installation"
-    
-    project_name = "TestingProject_#{scm.class.name.gsub(/\:/, '_')}"
-    scm.install_trigger(damagecontrol_home, project_name, trigger_files_checkout_dir, privateurl)
+  def import_sources(central_scm)
+    central_scm.create
+    mkdir_p(@import_base_dir)
+    central_scm.import(@import_root_dir)
+        
+    central_scm.install_trigger(damagecontrol_home, @project_name, @trigger_files_checkout_dir, privateurl)
+  end
+  
+  def test_build_and_log_and_irc(remote_scm, polling)
 
-    @server = DamageControlServerDriver.new("#{basedir}/serverroot")
+    @server = DamageControlServerDriver.new(@server_work_dir)
     @server.setup
     @irc = if(ONLINE) then IRCDriver.new else OfflineIRCDriver.new end
     @irc.setup
-    @xmlrpc = XMLRPCDriver.new(project_name, @server.publicurl)
+    @xmlrpc = XMLRPCDriver.new(@project_name, @server.publicurl)
 
-    server.setup_project_config(project_name, scm, execute_script_commandline("build"), polling)
+    server.setup_project_config(@project_name, remote_scm, execute_script_commandline("build"), polling)
     
     # add build.bat file and commit it (will trigger build)
-    checkout_dir = "#{@basedir}/checkout_dir"
-    scm.checkout(checkout_dir)
-    scm.add_or_edit_and_commit_file(checkout_dir, script_file("build"), 'echo "Hello world from DamageControl" > buildresult.txt')
+    remote_scm.checkout(@user_checkout_dir)
+    remote_scm.add_or_edit_and_commit_file(@user_checkout_dir, script_file("build"), 'echo "Hello world from DamageControl" > buildresult.txt')
 
     wait_less_time_than_default_quiet_period
-    assert_not_built_yet(project_name)
+    assert_not_built_yet unless polling
     
     wait_for_build_to_succeed
-    assert_build_produced_correct_output(project_name)
-    irc.assert_build_successful_on_channel(project_name)
-    assert_log_output_written_out(project_name)
+    assert_build_produced_correct_output
+    wait_for(10) do
+      irc.assert_build_successful_on_channel(@project_name)
+    end
+    assert_log_output_written_out
     
     irc.reset_log
     
     # update the buld file to something bogus, which should fail the build
-    scm.add_or_edit_and_commit_file(checkout_dir, script_file("build"), 'this_will_not_work')
+    remote_scm.add_or_edit_and_commit_file(@user_checkout_dir, script_file("build"), 'this_will_not_work')
 
     wait_for_build_to_fail
-    irc.assert_build_failed_and_changes_on_channel(username, project_name)
+    irc.assert_build_failed_and_changes_on_channel(username, @project_name)
   end
   
-  def assert_log_output_written_out(project_name)
-    assert_equal(1, Dir["#{basedir}/serverroot/#{project_name}/log/*.log"].size)
+  def assert_log_output_written_out
+    assert_equal(1, Dir["#{@server_work_dir}/#{@project_name}/log/*.log"].size)
   end
   
   def assert_file_content(expected_content, file, message)
@@ -396,19 +426,18 @@ class End2EndTest < Test::Unit::TestCase
     "sh #{script_file(name)}"
   end
   
-  def build_result(project_name)
-    "#{basedir}/serverroot/#{project_name}/checkout/buildresult.txt"
+  def build_result
+    "#{@server_work_dir}/#{@project_name}/checkout/buildresult.txt"
   end
   
-  def assert_not_built_yet(project_name)
-    br = build_result(project_name)
+  def assert_not_built_yet
+    br = build_result
     assert(!File.exists?(br), "build executed before quiet period elapsed. Shouldn't exist yet: #{br}")
   end
   
-  def assert_build_produced_correct_output(project_name)
-    expected_content =
-              'Hello world from DamageControl'
-    assert_file_content(expected_content, build_result(project_name), "build not executed")
+  def assert_build_produced_correct_output
+    expected_content = 'Hello world from DamageControl'
+    assert_file_content(expected_content, build_result, "build not executed")
   end
 end
 

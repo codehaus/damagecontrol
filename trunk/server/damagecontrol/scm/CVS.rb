@@ -20,9 +20,31 @@ module DamageControl
     attr_accessor :rsh_client
     attr_accessor :cvs_executable
     
+    # TODO: refactor. This is ugly!
+    def add_or_edit_and_commit_file(checkout_dir, relative_filename, content)
+      existed = false
+      with_working_dir(checkout_dir) do
+        File.mkpath(File.dirname(relative_filename))
+        existed = File.exist?(relative_filename)
+        File.open(relative_filename, "w") do |file|
+          file.puts(content)
+        end
+      end
+      cvs(checkout_dir, "add #{relative_filename}") unless(existed)
+
+      message = existed ? "editing" : "adding"
+
+      cvs(checkout_dir, "com -m \"#{message} #{relative_filename}\"")
+    end
+
     def cvs_executable
       return "cvs" if !defined?(@cvs_executable) || @cvs_executable.nil?
       @cvs_executable
+    end
+
+    def import(dir)
+      modulename = File.basename(dir)
+      cvs(dir, "import -m \"initial import\" #{modulename} VENDOR START")
     end
 
     def changesets(checkout_dir, from_time, to_time, &proc)
@@ -83,7 +105,12 @@ module DamageControl
       if(checked_out?(checkout_dir))
         cvs(checkout_dir, update_command(time), &proc)
       else
-        cvs(checkout_dir, checkout_command(time), &proc)
+        # This is a workaround for the fact that -d . doesn't work - must be an existing sub folder.
+        mkdir_p(checkout_dir) unless File.exist?(checkout_dir)
+        target_dir = File.basename(checkout_dir)
+        run_checkout_command_dir = File.dirname(checkout_dir)
+        # -D is sticky, but subsequent updates will reset stickiness with -A
+        cvs(run_checkout_command_dir, checkout_command(nil, target_dir), &proc)
       end
     end
     
@@ -114,6 +141,9 @@ module DamageControl
     # @block &proc a block that can handle the output (should typically log to file)
     #
     def install_trigger(damagecontrol_install_dir, project_name, trigger_files_checkout_dir, trigger_xml_rpc_url, &proc)
+      raise "project_name can't be null or empty" if (project_name.nil? || project_name == "")
+      raise "cvsmodule can't be null or empty" if (cvsmodule.nil? || cvsmodule == "")
+
       cvsroot_cvs = create_cvsroot_cvs
       cvsroot_cvs.checkout(trigger_files_checkout_dir, &proc)
       with_working_dir(trigger_files_checkout_dir) do
@@ -232,11 +262,11 @@ module DamageControl
     end
     
     def update_command(time)
-      "update #{branch_option}#{time_option(time)} -d -P"
+      "update #{branch_option}#{time_option(time)} -d -P -A"
     end
     
-    def checkout_command(time)
-      "checkout #{branch_option}#{time_option(time)} -d . #{cvsmodule}"
+    def checkout_command(time, target_dir)
+      "checkout #{branch_option}#{time_option(time)} -d #{target_dir} #{cvsmodule}"
     end
     
     def cvs_cmd_with_password(cmd, password)
@@ -344,28 +374,6 @@ module DamageControl
       cvsroot_dir = filepath_to_nativepath(cvsroot_dir, true)
       self.cvsroot = ":local:#{cvsroot_dir}"
       self.cvsmodule = cvsmodule
-    end
-
-    def import(dir)
-      modulename = File.basename(dir)
-      cvs(dir, "import -m \"initial import\" #{modulename} VENDOR START")
-    end
-
-    # TODO: refactor. This is ugly!
-    def add_or_edit_and_commit_file(checkout_dir, relative_filename, content)
-      existed = false
-      with_working_dir(checkout_dir) do
-        File.mkpath(File.dirname(relative_filename))
-        existed = File.exist?(relative_filename)
-        File.open(relative_filename, "w") do |file|
-          file.puts(content)
-        end
-      end
-      cvs(checkout_dir, "add #{relative_filename}") unless(existed)
-
-      message = existed ? "editing" : "adding"
-
-      cvs(checkout_dir, "com -m \"#{message} #{relative_filename}\"")
     end
   end
 end
