@@ -47,8 +47,8 @@ module DamageControl
 			cmnd_privmsg(@current_server, @current_channel, message)
 		end
 	
-		def connect(server)
-			self.open(server,['damagecontrol','DamageControl'],'dcontrol')
+		def connect(server, handle)
+			self.open(server,['damagecontrol','DamageControl'], handle)
 		end
 
 	end
@@ -56,22 +56,32 @@ module DamageControl
 	class IRCPublisher < AsyncComponent
 	
 		attr_accessor :irc
+		attr_accessor :handle
+		attr_reader :channel
+		attr_reader :server
 	
 		def initialize(hub, server, channel)
 			super(hub)
 			@irc = IRCConnection.new()
 			@server = server
 			@channel = channel
+			@handle = 'dcontrol'
 		end
 	
 		def process_message(message)
 			if message.is_a?(BuildCompleteEvent)
 				if @irc.connected? && @irc.in_channel?
-					@irc.send_message_to_channel("BUILD COMPLETE, project: #{message.build.project_name} label: #{message.build.label}")
-					consume_message(message)
+					build = message.build
+					if build.successful?
+						message = "BUILD SUCCESSFUL, project: #{build.project_name} label: #{build.label}"
+					else
+						message = "BUILD FAILED, project: #{build.project_name} error: #{build.error_message}"
+					end
+					@irc.send_message_to_channel(message)
 				else
-					@irc.connect(@server) unless @irc.connected?
-					@irc.join_channel(@channel) if @irc.connected? && !@irc.in_channel?
+					@irc.connect(server) unless @irc.connected?
+					@irc.join_channel(channel, handle) if @irc.connected? && !@irc.in_channel?
+					raise "not in channel yet"
 				end
 			end
 		end
