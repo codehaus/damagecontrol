@@ -1,0 +1,51 @@
+<div>
+<table class="pane">
+  <tr><td class="pane-header" colspan="2">
+    Build Queue
+  </td></tr>
+  <tr>
+    <th class="pane">Project</th>
+    <th class="pane">Timestamp</th>
+  </tr>
+  <%
+    if build_queue.empty? then
+  %>
+      <tr>
+        <td class="pane" colspan="2">No builds in the queue.</td>
+      </tr>
+  <% else %>
+    <%
+      build_queue.each do |build|
+    %>
+      <tr>
+        <td class="pane"><%= build.project_name %></td>
+        <td class="pane"><%= build.timestamp_for_humans %></td>
+      </tr>
+    <% end %>
+  <% end %>
+</table>
+</div>
+
+<div>
+<table class="pane">
+  <tr><td class="pane-header" colspan="2">
+    Build Executor Status
+  </td></tr>
+  <tr>
+    <th class="pane"></th>
+    <th class="pane">Status</th>
+  </tr>
+  <%
+    i = 0
+    build_executors.each do |build_executor|
+      i += 1
+  %>
+  <tr>
+    <td class="pane">#<%= i %></td>
+    <td class="pane"><%= build_executor.status_message %></td>
+  </tr>
+  <% end %>
+</table>
+</div>
+
+
