@@ -3,16 +3,11 @@ package com.thoughtworks.damagecontrol.buildmonitor;
 import junit.framework.TestCase;
 
 import java.io.IOException;
-import java.io.InputStream;
-import java.io.StringBufferInputStream;
-import java.net.MalformedURLException;
 import java.net.URL;
-import java.net.URLConnection;
-import java.net.URLStreamHandler;
 
 /**
  * @author Aslak Helles&oslash;y
- * @version $Revision: 1.1 $
+ * @version $Revision: 1.2 $
  */
 public class URLPumperTestCase extends TestCase {
     public void testWriteToFileGetsPickedUpGradually() throws IOException {
