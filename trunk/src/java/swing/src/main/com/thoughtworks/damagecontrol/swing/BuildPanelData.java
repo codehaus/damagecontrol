@@ -30,7 +30,6 @@ import java.awt.event.ItemListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.text.DateFormat;
-import java.text.FieldPosition;
 import java.text.SimpleDateFormat;
 import java.util.Arrays;
 import java.util.Date;
@@ -39,7 +38,7 @@ import java.util.Map;
 
 /**
  * @author Aslak Helles&oslash;y
- * @version $Revision: 1.4 $
+ * @version $Revision: 1.5 $
  */
 public class BuildPanelData implements BuildConstants {
     private JPanel buildPanel;

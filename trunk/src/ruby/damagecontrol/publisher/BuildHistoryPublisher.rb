@@ -21,7 +21,7 @@ module DamageControl
           @builds = YAML::load(file.read)
           file.close
         end
-        @filename = filename
+        @filename = expanded
       end
     end
 
