@@ -3,6 +3,7 @@ require 'pebbles/mockit'
 require 'pebbles/Space'
 require 'damagecontrol/core/BuildEvents'
 require 'damagecontrol/core/Build'
+require 'damagecontrol/scm/Changes'
 require 'damagecontrol/publisher/EmailPublisher'
 require 'ftools'
 
@@ -32,9 +33,19 @@ module DamageControl
       build.status = Build::FAILED
       build.url =  "http://moradi.com/public/project/cheese?action=build_details&dc_creation_time=19710228234500"
       build.dc_start_time = Time.utc(1971,2,28,23,45,0,0)
+      change1 = Change.new("a/file", "aslak", nil, nil, Time.new.utc)
+      build.changesets.add(change1)
 
       @email_publisher.on_message(BuildCompleteEvent.new(build))
-      assert_equal("[cheese] BUILD FAILED|<a href=\"http://moradi.com/public/project/cheese?action=build_details&dc_creation_time=19710228234500\">[cheese] BUILD FAILED</a>|noreply@somewhere.foo|somelist@someproject.bar", @email_publisher.mail_content)
+      assert_equal(
+        "[cheese] BUILD FAILED|" +
+        # This is the body of the mail
+        "\r\naslak broke the build <br>\r\n\r\n" +
+        "<a href=\"http://moradi.com/public/project/cheese?action=build_details&dc_creation_time=19710228234500\">[cheese] BUILD FAILED</a><br>" +
+
+        # End mail body
+        "|noreply@somewhere.foo|somelist@someproject.bar", 
+        @email_publisher.mail_content)
     end
     
     def test_nothing_is_sent_unless_build_complete_event

@@ -21,6 +21,7 @@ module DamageControl
     def initialize(channel, build_history_repository, config = {})
       super
       channel.add_consumer(self)
+      @build_history_repository = build_history_repository
       template_dir = "#{File.expand_path(File.dirname(__FILE__))}/../template"
       subject_template_file = config[:SubjectTemplate] || required_config(:SubjectTemplate)
       @subject_template = File.new("#{template_dir}/#{subject_template_file}").read
@@ -30,9 +31,6 @@ module DamageControl
       @always_mail = config[:SendEmailOnAllBuilds] || false
       @mail_server = config[:MailServerHost] || "localhost"
       @port = config[:MailServerPort] || 25
-      
-      # TODO: backwards compatability, remove on release 1.0
-      raise "EmailPublisher refactored, now needs BuildHistoryRepository, create with: EmailPublisher.new(hub, build_history_repository, ...config etc...)" if build_history_repository.is_a? Hash
     end
     
     def required_config(key)
@@ -73,9 +71,13 @@ module DamageControl
         puts e.backtrace.join("\n")
       end
     end
-  end
-end
+    
+    def stdout?
+      File.exist?(@build_history_repository.stdout_file(build.project_name, build.dc_creation_time))
+    end
 
-if __FILE__ == $0
-  ep = DamageControl::EmailPublisher.new(nil, "short_text_build_result.erb", "short_text_build_result.erb")
+    def stderr?
+      File.exist?(@build_history_repository.stdout_file(build.project_name, build.dc_creation_time))
+    end
+  end
 end
