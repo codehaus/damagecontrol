@@ -42,6 +42,17 @@ module DamageControl
       assert_equal("src/ruby/damagecontrol/BuildExecutorTest.rb", changes[0].path)
       assert_match(/linux-windows galore/, changes[2].message)
     end
+    
+    def test_sets_previous_revision_to_one_before_the_current
+      change = @parser.parse_change(CHANGE_ENTRY)
+      assert_equal("1.20", change.revision)
+      assert_equal("1.19", change.previous_revision)
+    end
+    
+    def test_can_determine_previous_revisions_from_tricky_input
+      assert_equal("2.2.1.1", @parser.determine_previous_revision("2.2.1.2"))
+      assert_equal(nil, @parser.determine_previous_revision("2.2.1.1"))
+    end
 
     def test_parse_change
       change = @parser.parse_change(CHANGE_ENTRY)

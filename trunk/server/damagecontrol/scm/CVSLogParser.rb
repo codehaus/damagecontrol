@@ -104,11 +104,26 @@ module DamageControl
       change = Change.new
          
       change.revision = extract_match(change_entry[0], /revision (.*)/)
+      change.previous_revision = determine_previous_revision(change.revision)
       change.time = parse_cvs_time(extract_required_match(change_entry[1], /date: (.*?)(;|$)/))
       change.developer = extract_match(change_entry[1], /author: (.*?);/)
       change.message = change_entry[2..-1].join("\n")
          
       change
+    end
+    
+    def determine_previous_revision(revision)
+      if revision =~ /(.*)\.(.*)/
+        big_version_number = $1
+        small_version_number = $2.to_i
+        if small_version_number == 1
+          nil
+        else
+          "#{big_version_number}.#{small_version_number - 1}"
+        end
+      else
+        nil
+      end
     end
     
     def parse_cvs_time(time)
