@@ -37,7 +37,7 @@ start_simple_server(
 
 FilePublisher.new(@hub, "#{buildRoot}/report", HTMLTemplate.new).start 
 GraphPublisher.new(@hub, "#{buildRoot}/report", @build_history_repository).start 
-#IRCPublisher.new(@hub, "irc.codehaus.org", "\#damagecontrol", ShortTextTemplate.new).start
+IRCPublisher.new(@hub, "irc.codehaus.org", "\#damagecontrol", ShortTextTemplate.new).start
 EmailPublisher.new(@hub, ShortTextTemplate.new, HTMLTemplate.new, "dcontrol@builds.codehaus.org").start
 #JIRAPublisher.new(@hub, ShortTextTemplate.new, "jira.codehaus.org").start
 SelfUpgrader.new(@hub).start
