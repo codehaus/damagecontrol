@@ -2,11 +2,16 @@
 <title><% project_name %> dashboard</title>
 <body>
 
+<h1><%= project_name %></h1>
 <table>
-<tr><td>Project Name</td><td><%= project_name %></td></tr>
-<tr><td>CVSROOT</td><td><%= cvsroot %></td></tr>
-<tr><td>Last completed build status</td><td><%= last_status %><br/></td></tr>
-<tr><td>Current build status</td><td><%= current_status %></td></tr>
+  <tr class="dashboard">
+    <td class="dashboard">Last completed build</td>
+    <td class="dashboard"><img src="<%= self.get_status_image(:last_completed_build, project_name) %>"/> <%= last_status %></td>
+  </tr>
+  <tr class="dashboard">
+    <td class="dashboard">Current build</td>
+    <td class="dashboard"><img src="<%= self.get_status_image(:current_build, project_name) %>"/> <%= last_status %></td>
+  </tr>
 </table>
 
 </body></html>

@@ -2,9 +2,8 @@ require 'damagecontrol/web/AbstractAdminServlet'
 
 module DamageControl
   class ProjectServlet < AbstractAdminServlet
-    def initialize(build_history_repository, project_config_repository, trigger, type)
-      super(type)
-      @build_history_repository = build_history_repository
+    def initialize(build_history_repository, project_config_repository, trigger, type, build_scheduler)
+      super(type, build_scheduler, build_history_repository)
       @project_config_repository = project_config_repository
       @trigger = trigger
     end
@@ -56,9 +55,9 @@ module DamageControl
     end
     
     def dashboard
-      last_status = build_status(@build_history_repository.last_completed_build(project_name))
-      current_status = build_status(@build_history_repository.current_build(project_name))
-      cvsroot = request.query['cvsroot']
+      last_status = build_status(build_history_repository.last_completed_build(project_name))
+      current_status = build_status(build_history_repository.current_build(project_name))
+
       render("project_dashboard.erb", binding)
     end
     

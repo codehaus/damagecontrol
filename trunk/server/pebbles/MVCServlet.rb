@@ -12,6 +12,7 @@ module Pebbles
     end
     
     def redirect(url)
+puts "REDIRECTING TO #{url}"
       response["Location"] = url
       response.status = WEBrick::HTTPStatus::Found.code
     end

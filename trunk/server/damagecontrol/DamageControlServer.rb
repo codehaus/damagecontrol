@@ -86,7 +86,7 @@ module DamageControl
     end
     
     def rootdir
-      params[:RootDir] || damagecontrol_home
+      params[:RootDir] || "#{damagecontrol_home}/work"
     end
     
     def checkoutdir
@@ -147,7 +147,7 @@ module DamageControl
       httpd.mount("/public/xmlrpc", public_xmlrpc_servlet)
       
       httpd.mount("/public/dashboard", DashboardServlet.new(build_history_repository, project_config_repository, build_scheduler, :public))
-      httpd.mount("/public/project", ProjectServlet.new(build_history_repository, nil, nil, :public))
+      httpd.mount("/public/project", ProjectServlet.new(build_history_repository, nil, nil, :public, build_scheduler))
       
       httpd.mount("/public/images", WEBrick::HTTPServlet::FileHandler, "#{webdir}/images")
       httpd.mount("/public/css", WEBrick::HTTPServlet::FileHandler, "#{webdir}/css")
@@ -161,7 +161,7 @@ module DamageControl
       httpd.mount("/private/xmlrpc", private_xmlrpc_servlet)
 
       httpd.mount("/private/dashboard", DashboardServlet.new(build_history_repository, project_config_repository, build_scheduler, :private))
-      httpd.mount("/private/project", ProjectServlet.new(build_history_repository, project_config_repository, trigger, :private))
+      httpd.mount("/private/project", ProjectServlet.new(build_history_repository, project_config_repository, trigger, :private, build_scheduler))
       
       httpd.mount("/private/images", WEBrick::HTTPServlet::FileHandler, "#{webdir}/images")
       httpd.mount("/private/css", WEBrick::HTTPServlet::FileHandler, "#{webdir}/css")

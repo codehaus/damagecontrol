@@ -5,64 +5,56 @@
 </head>
 <body>
 
-	<%
-	
-		projects = project_config_repository.project_names
-		
-	%>
-	<table class="dashboard">
-		<%
+  <%
+    projects = project_config_repository.project_names
+  %>
+  <table class="dashboard">
+    <%
 
-		i = -1
-		project_count = projects.length
-		projects.each do |project|
+    i = -1
+    project_count = projects.length
+    projects.each do |project|
 
-			i += 1
-			cells_per_row = 4
-			start_row = i % cells_per_row == 0
-			end_row = i == project_count || i % cells_per_row == (cells_per_row - 1)
-			href = "project?project_name=#{project}"
+      i += 1
+      cells_per_row = 4
+      start_row = i % cells_per_row == 0
+      end_row = i == project_count || i % cells_per_row == (cells_per_row - 1)
+      href = "project?project_name=#{project}"
       
-      color = "grey"
-      pulse = ""
-      if !build_history_repository.last_completed_build(project).nil?
-        color = if build_history_repository.last_completed_build(project).successful? then "green" else "red" end
-        pulse = "-pulse" if build_scheduler.project_building?(project)
-      end
-			image = "images/#{color}#{pulse}-32.gif"
-		%>
+      image = self.get_status_image(:current_build, project)
+    %>
 
-			<% if start_row then %>
-			<tr class="dashboard">
-			<% end %>
+      <% if start_row then %>
+      <tr class="dashboard">
+      <% end %>
 
-			<td class="dashboard">
-			<img src="<%= image %>" /> <a href="<%= href %>"><%= project %></a> &nbsp; &nbsp; &nbsp;
-			</td>
+      <td class="dashboard">
+        <img src="<%= image %>"/> <a href="<%= href %>"><%= project %></a> &nbsp; &nbsp; &nbsp;
+      </td>
 
-			<% if end_row then %>
-			</tr>
-			<% end %>
+      <% if end_row then %>
+      </tr>
+      <% end %>
 
-		<%
-		end
-		%>
-		<% if false then %>
-		<tr class="dashboard">
-			<td class="dashboard">
-			<img src="images/red-pulse-32.gif" />&nbsp;<a href="project">project1</a>
-			</td>
-			<td class="dashboard">
-			<img src="images/red-32.gif" />&nbsp;<a href="project">project1</a>
-			</td>
-			<td class="dashboard">
-			<img src="images/green-pulse-32.gif" />&nbsp;<a href="project">project1</a>
-			</td>
-			<td class="dashboard">
-			<img src="images/green-32.gif" />&nbsp;<a href="project">project1</a>
-			</td>
-		</tr>
-		<% end %>
-	</table>
+    <%
+    end
+    %>
+    <% if false then %>
+    <tr class="dashboard">
+      <td class="dashboard">
+      <img src="images/red-pulse-32.gif" />&nbsp;<a href="project">project1</a>
+      </td>
+      <td class="dashboard">
+      <img src="images/red-32.gif" />&nbsp;<a href="project">project1</a>
+      </td>
+      <td class="dashboard">
+      <img src="images/green-pulse-32.gif" />&nbsp;<a href="project">project1</a>
+      </td>
+      <td class="dashboard">
+      <img src="images/green-32.gif" />&nbsp;<a href="project">project1</a>
+      </td>
+    </tr>
+    <% end %>
+  </table>
 </body>
 </html>
