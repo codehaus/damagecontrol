@@ -76,6 +76,7 @@ else
     s.add_dependency('needle', '1.2.0')
     s.add_dependency('jabber4r', '0.7.0')
     s.add_dependency('ruby-growl', '1.0.0')
+
 #    s.add_dependency('rgl')
     #s.requirements << ""
  
