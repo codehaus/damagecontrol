@@ -3,10 +3,13 @@ require 'net/smtp'
 require 'damagecontrol/core/Build'
 require 'damagecontrol/core/BuildEvents'
 require 'damagecontrol/core/AsyncComponent'
+require 'damagecontrol/util/Logging'
 
 module DamageControl
 
   class EmailPublisher < AsyncComponent
+
+    include Logging
 
     attr_accessor :subject_template
     attr_accessor :body_template
