@@ -348,7 +348,7 @@ module DamageControl
 
     def import(dir)
       modulename = File.basename(dir)
-      cvs(dir, "-d#{cvsroot} import -m \"initial import\" #{modulename} VENDOR START")
+      cvs(dir, "import -m \"initial import\" #{modulename} VENDOR START")
     end
 
     # TODO: refactor. This is ugly!
