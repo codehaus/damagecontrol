@@ -116,12 +116,7 @@ EOF
     
     def << (change)
       @changes << change
-      
-      # TODO: These may go away one day (AH)
-#      change.revision = revision if revision
-#      change.developer = developer if developer
-#      change.message = message if message
-#      change.time = time if time
+      self.time = change.time if self.time.nil? || self.time < change.time unless change.time.nil?
     end
 
     def [] (change)
@@ -136,9 +131,10 @@ EOF
       @changes.length
     end
 
-    def time=(time)
-      raise "time must be a Time object" unless time.is_a?(Time)
-      @time = time
+    def time=(t)
+      raise "time must be a Time object" unless t.is_a?(Time)
+      raise "can't set time to an inferiour value than the previous value" if @time && (t < @time)
+      @time = t
     end
     
     def ==(other)

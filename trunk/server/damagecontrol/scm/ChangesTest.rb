@@ -78,9 +78,9 @@ module DamageControl
 
     def test_format
 allsets = <<EOF
-MAIN:jon:20040705120002
+MAIN:jon:20040705120004
 jon
-05 July 2004 12:00:02 UTC (2 minutes ago)
+05 July 2004 12:00:04 UTC (1 minute ago)
 tjo bing
 ----
 path/one 1.1
@@ -100,9 +100,9 @@ hipp hurraX
 ----
 path/four 1.4
 
-MAIN:aslak:20040705120010
+MAIN:aslak:20040705120014
 aslak
-05 July 2004 12:00:10 UTC (1 minute ago)
+05 July 2004 12:00:14 UTC (1 minute ago)
 hipp hurra
 ----
 path/five 1.5
@@ -148,7 +148,7 @@ EOF
       end
       assert_equal(4, changesets.length)
 
-      assert_equal(@change1.time, changesets[0].time)
+      assert_equal(@change2.time, changesets[0].time)
       assert_equal(@change7.time, changesets[-1].time)
     end
     
@@ -157,6 +157,14 @@ EOF
         YAML::load(io)
       end
       assert_equal("rinkrank", changesets[0][1].developer)
+    end
+    
+    def test_reports_timestamp_of_latest_change
+      changeset = ChangeSet.new
+      changeset << Change.new(nil, nil, nil, nil, Time.utc(2004))
+      changeset << Change.new(nil, nil, nil, nil, Time.utc(2005))
+      changeset << Change.new(nil, nil, nil, nil, Time.utc(2003))
+      assert_equal(Time.utc(2005), changeset.time)
     end
 
   end
