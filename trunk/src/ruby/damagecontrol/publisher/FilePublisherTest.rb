@@ -4,7 +4,6 @@ require 'damagecontrol/BuildEvents'
 require 'damagecontrol/Build'
 require 'damagecontrol/Hub'
 require 'damagecontrol/publisher/FilePublisher'
-require 'damagecontrol/template/MockTemplate'
 require 'ftools'
 
 module DamageControl

@@ -4,15 +4,14 @@ require 'damagecontrol/publisher/IRCPublisher'
 require 'damagecontrol/Hub'
 require 'damagecontrol/Build'
 require 'damagecontrol/FileUtils'
-require 'damagecontrol/template/MockTemplate'
+require 'damagecontrol/template/ShortTextTemplate'
 
 module DamageControl
 
   class IRCPublisherTest < Test::Unit::TestCase
   
     def setup
-      @mock_template = MockTemplate.new
-      @publisher = IRCPublisher.new(Hub.new, "server", "channel", @mock_template)
+      @publisher = IRCPublisher.new(Hub.new, "server", "channel", ShortTextTemplate.new)
       @irc_mock = MockIt::Mock.new
       @publisher.irc = @irc_mock
     end
@@ -29,13 +28,13 @@ module DamageControl
     def test_sends_message_on_build_complete
       setup_irc_connected
       @irc_mock.__expect(:send_message_to_channel) {|message| 
-        assert_equal(message, @mock_template.generate(nil))}
+        assert_equal(message, "[project_name] BUILD SUCCESSFUL ")}
       
-      evt = BuildCompleteEvent.new(Build.new("project_name"))
+      b = Build.new("project_name")
+      b.status = Build::SUCCESSFUL
+      evt = BuildCompleteEvent.new(b)
       @publisher.enq_message(evt)
       @publisher.process_messages
-      
-      assert(@publisher.consumed_message?(evt))
     end
     
     def test_formats_changeset_according_to_changeset
@@ -62,9 +61,12 @@ module DamageControl
         assert_match(/project/, message)
       }
       @irc_mock.__expect(:send_message_to_channel) {|message| 
-        assert_match(/jtirsen/, message)
         assert_match(/STARTED/, message)
         assert_match(/project/, message)
+      }
+      @irc_mock.__expect(:send_message_to_channel) {|message| 
+        assert_match(/jtirsen/, message)
+        assert_match(/file\.txt/, message)
       }
       
       @publisher.send_message_on_build_request = true
