@@ -38,11 +38,17 @@ module DamageControl
       assert(@publisher.consumed_message?(evt))
     end
     
-    def test_sends_message_on_build_complete
+    def test_sends_message_on_build_requested_and_started
       setup_irc_connected
+      @irc_mock.__expect(:send_message_to_channel) {|message| 
+        assert_equal(message, "BUILD REQUESTED project") }
       @irc_mock.__expect(:send_message_to_channel) {|message| 
         assert_equal(message, "BUILD STARTED project") }
       
+      @publisher.send_message_on_build_request = true
+      
+      evt = BuildRequestEvent.new(Build.new("project"))
+      @publisher.enq_message(evt)
       evt = BuildStartedEvent.new(Build.new("project"))
       @publisher.enq_message(evt)
       @publisher.process_messages

@@ -16,6 +16,7 @@ module DamageControl
     attr_accessor :handle
     attr_reader :channel
     attr_reader :server
+    attr_accessor :send_message_on_build_request
   
     def initialize(channel, server, irc_channel, template)
       super(channel)
@@ -45,7 +46,7 @@ module DamageControl
       end
       
       if @irc.connected? && !@irc.in_channel?
-        logger.info("join channel #{@server_channel}")
+        logger.info("joining channel #{@server_channel}")
         @irc.join_channel(@irc_channel)
         wait_until { @irc.in_channel? }
       end
@@ -53,16 +54,17 @@ module DamageControl
   
     def process_message(message)
       ensure_in_channel
+      
+      if send_message_on_build_request && message.is_a?(BuildRequestEvent)
+        @irc.send_message_to_channel("BUILD REQUESTED #{message.build.project_name}")
+      end
+      
       if message.is_a?(BuildStartedEvent)
-        content = "BUILD STARTED #{message.build.project_name}"
-        logger.info("sending irc message #{content}")
-        @irc.send_message_to_channel(content)
+        @irc.send_message_to_channel("BUILD STARTED #{message.build.project_name}")
       end
       
       if message.is_a?(BuildCompleteEvent)
-        content = @template.generate(message.build)
-        logger.info("sending irc message #{content}")
-        @irc.send_message_to_channel(content)
+        @irc.send_message_to_channel(@template.generate(message.build))
       end
     end
   end
@@ -70,12 +72,17 @@ module DamageControl
   # Simplification on top of Rica, supports one channel at the same time only
   class IRCConnection < Rica::MessageProcessor
     
+    include Logging
+    
     def on_link_established(msg)
       @current_server=msg.server
       @current_channel=nil
+      
+      logger.info("connected to #{@current_server}")
     end
 
     def on_link_closed(msg)
+      logger.info("link closed to #{@current_server}")
       @current_server=nil
       @current_channel=nil
     end
@@ -88,6 +95,7 @@ module DamageControl
 
     def on_recv_cmnd_join(msg)
       @current_channel=msg.to
+      logger.info("joined to #{@current_channel}")
     end
     
     def connected?
@@ -99,6 +107,7 @@ module DamageControl
     end
     
     def send_message_to_channel(message)
+      logger.info("sending irc message #{message}")
       cmnd_privmsg(@current_server, @current_channel, message)
     end
   
