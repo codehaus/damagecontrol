@@ -15,9 +15,9 @@ require 'damagecontrol/publisher/EmailPublisher'
 
 include DamageControl
 
-buildRoot = File.expand_path("/var/build") 
+buildRoot = File.expand_path("~/build") 
  
-start_simple_server("#{buildRoot}/checkout", 4711, ["127.0.0.1", "66.216.68.111"])
+start_simple_server("#{buildRoot}/checkout", 4711, ["127.0.0.1", "66.216.68.111", "81.5.134.59" ])
 
 LogWriter.new(@hub, "#{buildRoot}/log")
 FilePublisher.new(@hub, "#{buildRoot}/report", HTMLTemplate.new).start 
