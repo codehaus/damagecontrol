@@ -27,6 +27,10 @@ module DamageControl
           @jabber.send_message_to_recipient(recipient, content)
         }
       end
+
+      if message.is_a?(UserMessage)
+        @irc.send_message_to_channel(message.message)
+      end
     end
   end
   

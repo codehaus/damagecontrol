@@ -70,6 +70,10 @@ module DamageControl
       if message.is_a?(BuildCompleteEvent)
         @irc.send_message_to_channel(@template.generate(message.build))
       end
+
+      if message.is_a?(UserMessage)
+        @irc.send_message_to_channel(message.message)
+      end
     end
   end
 

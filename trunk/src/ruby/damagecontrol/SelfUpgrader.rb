@@ -1,4 +1,5 @@
 require 'damagecontrol/Build'
+require 'damagecontrol/BuildEvents'
 
 module DamageControl
 
@@ -16,6 +17,7 @@ module DamageControl
     end
     
     def do_exit
+      @hub.publish_message(UserMessage.new("SHUTTING DOWN FOR SELF UPGRADE"))
       # let the publishers get a chance to publish before we die
       sleep(5)
       exit
