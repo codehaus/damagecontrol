@@ -45,8 +45,19 @@ puts result
         "ruby"
       else
         "/home/services/dcontrol/ruby/bin/ruby"
-#        "ruby"
+        "ruby"
       end
+    end
+
+    # Works with ViewCVS (which works with CVS and SVN) and Fisheye (works with CVS and soon SVN)
+    def web_url_to_change(change)
+      view_cvs_url = config_map["view_cvs_url"]
+      return "root/#{config_map['project_name']}/checkout/#{mod}/#{change.path}" if view_cvs_url.nil? || view_cvs_url == "" 
+      
+      view_cvs_url_patched = "#{view_cvs_url}/" if(view_cvs_url && view_cvs_url[-1..-1] != "/")
+      url = "#{view_cvs_url_patched}#{change.path}"
+      url << "?r1=#{change.revision}&r2=#{change.previous_revision}" if(change.previous_revision)
+      url
     end
     
   end

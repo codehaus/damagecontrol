@@ -13,6 +13,10 @@ module DamageControl
       @svnprefix = config_map["svnprefix"] || required_config_param("svnprefix")
     end
   
+    def web_url_to_change(change)
+      view_cvs_url_to_change(change)
+    end
+
     def checkout(time = nil, &proc)
       if(checked_out?)
         svn(working_dir, update_command(time), &proc)
