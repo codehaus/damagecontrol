@@ -20,11 +20,5 @@ module Pebbles
       end
     end
   
-  private
-
-    def cygwin?
-      system("cygpath C:\\\\")
-      $? == 0
-    end
   end
 end

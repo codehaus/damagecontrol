@@ -114,14 +114,10 @@ module DamageControl
 
     def create(&line_proc)
       native_path = filepath_to_nativepath(svnrootdir, true)
-puts "#########################################################"
-puts native_path
-puts "GRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRR"
       svnadmin(svnrootdir, "create #{native_path}", &line_proc)
     end
 
     def import(dir, &line_proc)
-      basename = File.basename(dir)
       cmd = "import #{filepath_to_nativepath(dir, true)} #{svnurl} -m \"initial import\""
       svn(dir, cmd, &line_proc)
     end
