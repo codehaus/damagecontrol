@@ -88,10 +88,12 @@ module DamageControl
         cvs(checkout_command(scm_spec, directory), &proc)
         # Now just move the directory. Fix for http://jira.codehaus.org/secure/ViewIssue.jspa?key=DC-44
         mod_directory = to_os_path(File.expand_path(mod(scm_spec)))
-        begin
-          File.move(mod_directory, directory)
-        rescue
-          File.rename(mod_directory, directory)
+        if (mod_directory != directory)
+          begin
+            File.move(mod_directory, directory)
+          rescue
+            File.rename(mod_directory, directory)
+          end
         end
       end
     end
@@ -183,10 +185,12 @@ module DamageControl
   
     def cvs(cmd, &proc)
       cmd = "cvs -q #{cmd} 2>&1"
+      puts "executing #{cmd}"
       io = IO.foreach("|#{cmd}") do |progress|
         if block_given? then yield progress else puts progress end
       end
       raise SCMError.new("#{cmd} failed") if $? != 0
+      puts "executed #{cmd}"
     end
     
   end
