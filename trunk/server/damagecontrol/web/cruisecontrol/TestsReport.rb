@@ -12,10 +12,6 @@ module DamageControl
     end
     
     def content
-puts xml_log_file
-puts xml_log_file
-puts xml_log_file
-puts xml_log_file
       xslt(xml_log_file, stylesheet_file(stylesheet), "#{xml_log_file}.html")
       File.new("#{xml_log_file}.html").read
     end

@@ -161,7 +161,6 @@ class Driver
   end
   
   def system(cmd)
-    puts "system(#{cmd})"
     result = super(cmd)
     assert($? == 0, "#{cmd} failed with code #{$?.to_s}")
     result

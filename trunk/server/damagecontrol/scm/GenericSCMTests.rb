@@ -27,10 +27,7 @@ module DamageControl
       sleep(1)
       after_import = Time.new.utc
       files = scm.checkout(checkout_dir, nil) { |line| logger.info(line) }
-      files.each{|f| puts f}
       changesets = scm.changesets(checkout_dir, before_import, after_import, files)
-#      assert_equal(4, changesets[0].length)
-#      assert_equal("src/java/com/thoughtworks/damagecontrolled/Thingy.java", changesets[0][2].path)
       
       # modify file and commit it
       sleep(1)

@@ -79,7 +79,6 @@ module DamageControl
         bs.load(build_dir, false)
       end
       custom_ser_dur = (Time.new.utc - custom_ser_start) / n
-      puts custom_ser_dur
 
       yaml = "#{build_dir}/build.yaml"
       File.open(yaml, "w") do |io|
@@ -90,7 +89,6 @@ module DamageControl
         YAML::load(File.open(yaml).read)
       end
       yaml_ser_dur = (Time.new.utc - yaml_ser_start) / n
-      puts yaml_ser_dur
       
       puts "custom serialisation is #{yaml_ser_dur / custom_ser_dur} times faster than yaml"
     end

@@ -199,8 +199,6 @@ EOF
       assert_equal("server/damagecontrol/scm/CVS.rb", @parser.parse_path(@parser.split_entries(LOG_FROM_05_07_2004_19_41)[0]))
       changesets = @parser.parse_changesets
          
-      #puts changesets.format(CHANGESET_TEXT_FORMAT, Time.new.utc)
-     
       assert_equal(10, changesets.length)
       expected_change = Change.new
       expected_change.path = "server/damagecontrol/scm/CVS.rb"

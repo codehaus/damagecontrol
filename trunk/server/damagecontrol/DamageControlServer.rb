@@ -366,7 +366,6 @@ module DamageControl
     end
     
     def init_logging
-      puts log4r_config_file.tainted?
       if File.exists?(log4r_config_file)
         Logging.init_logging(log4r_config_file, { 
             'rootdir' => rootdir,
@@ -400,7 +399,6 @@ module DamageControl
 
     def wait_for_shutdown
       @threads.each {|thread| thread.join }
-      puts 
     end
     
     def shutdown

@@ -168,7 +168,7 @@ module DamageControl
       mock_scm = new_mock
       mock_scm.__expect(:changesets) {ChangeSets.new}
       mock_scm.__expect(:checkout) {}
-      mock_scm.__expect(:label) {23}
+      mock_scm.__expect(:label) {"23"}
 
       mock_build_history = new_mock
       mock_build_history.__expect(:last_successful_build) { |project_name|
@@ -176,6 +176,9 @@ module DamageControl
         b = Build.new("damagecontrolled")
         b
       }
+      prev = Build.new
+      prev.label = "23.2"
+      mock_build_history.__expect(:prev){prev}
 
       mock_hub = new_mock
       mock_hub.__setup(:put) {|message|}
@@ -191,7 +194,7 @@ module DamageControl
       @build.scm = mock_scm
       @build_executor.on_message(@build)
       assert_equal(Build::FAILED, @build.status)
-      assert_equal(23, @build.label)
+      assert_equal("23.3", @build.label)
     end
     
     def test_checks_out_and_determines_changeset_before_building      
@@ -206,6 +209,9 @@ module DamageControl
         b.scm_commit_time = last_build_time
         b
       }
+      prev = Build.new
+      prev.label = "39"
+      mock_build_history.__expect(:prev){prev}
 
       mock_scm = new_mock.__setup(:working_dir) { checkoutdir }
       mock_scm.__expect(:changesets) {|checkout_dir, from_time, to_time|
@@ -215,7 +221,7 @@ module DamageControl
         cs = ChangeSets.new; cs.add(Change.new(nil,nil,nil,nil,Time.new.utc)); cs
       }
       mock_scm.__expect(:checkout) {}
-      mock_scm.__expect(:label) { 39 }
+      mock_scm.__expect(:label) { "39" }
 
       mock_hub = new_mock
       mock_hub.__expect(:put) {|message| 
@@ -236,7 +242,7 @@ module DamageControl
       mock_hub.__expect(:put) {|message| 
         assert(message.is_a?(BuildStateChangedEvent))
         assert_equal(Build::BUILDING, message.build.status)
-        assert_equal(39, message.build.label)
+        assert_equal("39.1", message.build.label)
       }
       mock_hub.__expect(:put) {|message| assert(message.is_a?(BuildProgressEvent), message)}
       mock_hub.__expect(:put) {|message| assert(message.is_a?(BuildProgressEvent), message)}

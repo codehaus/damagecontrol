@@ -15,7 +15,6 @@ module DamageControl
   protected
     
     def content_type
-puts "LALALALALALALA"
       "text/plain"
     end
     

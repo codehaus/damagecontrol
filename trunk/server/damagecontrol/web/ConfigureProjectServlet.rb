@@ -84,24 +84,18 @@ module DamageControl
     def find_cirular_dependencies(name, projects)
       project = ""
       if @checked_projects
-        puts "list of checked projects exists"
         @checked_projects << name
       else
-        puts "making new list of checked projects"
         @checked_projects = [ name ]
       end
       if projects then
         #puts "there are dependent projects"
         projects.each { |project|
-          #puts "one project is called #{project}"
           return "There are circular dependencies: Project <b>#{name}</b> depends on <b>#{project}</b>" if name == project
           if !@checked_projects.include?(project)
             subproject_config = project_config_repository.project_config(project)
-            #puts "recursing to check project #{project}"
             sub_circular = find_cirular_dependencies(name, subproject_config['dependent_projects'])
             return sub_circular if sub_circular
-          else
-            #puts "project #{project} was already checked"
           end
         }
         return nil

@@ -68,7 +68,7 @@ module DamageControl
           # convert space separated string to array
           smtp.sendmail( mail, from, to.split )
         end
-      rescue => e
+      rescue Exception => e
         puts "Couldn't send mail:" + e.message
         puts e.backtrace.join("\n")
       end
