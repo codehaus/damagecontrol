@@ -74,10 +74,10 @@ module DamageControl
       end
     end
     
-    def modify_project_config(project_name, config)
-      config["project_name"] = project_name
+    def modify_project_config(project_name, config_map)
+      config_map["project_name"] = project_name
       File.open(project_directories.project_config_file(project_name), File::CREAT|File::WRONLY|File::TRUNC) do |io|
-        io.puts(config.to_yaml)
+        io.puts(config_map.to_yaml)
       end
     end
     

@@ -1,12 +1,94 @@
 <html>
 <head>
 <title>Example Design</title>
+<link type="text/css" rel="stylesheet" href="css/style.css">
 </head>
-<body onLoad="distributeCvsrootFields();showScm(scm)">
+<!--body onLoad="distributeCvsrootFields();showScm(<%= project_config['scm_type'] %>)"-->
+<body>
 <script><!--
 
+/*
+TODO:
+
+o Do NOT disable  unix_groups. SCM and DC box may not be the same. May need unix groups if DC=unix and SCM=win
+  display only if DC is running on a unix box (find out in startup script).
+o Include SCM images in distro for firewalled installations.
+o TW logo and link to homepage.
+o Optionally only allow trigging/polling for projects with SCM in a certain place (codehaus)
+  this can allow other projects to try out DC. option to disallow completely.
+o remove SCM settings from the readonly view
+o broader fields (css path must be fixed too)
+o display windows/unix icon according to path
+o make sure SCM radio is checked
+o make sure SCM is expanded if check checked
+o make all javascript perfectly runnable without server
+o migrate over all existing projects at the haus:
+  - BEFORE COMMIT OF NEW STUFF
+  - create conf files in old deployed web admin if possible (alt: manually)
+  - make sure build can be trigged from old deployed web admin
+  - make sure unistall_trigger also comments out old socket triggers with #disabled by DC on (date)
+  - AFTER COMMIT OF NEW STUFF (support for socket trigger is now gone!)
+  - reconfigure all projects in web admin. this should:
+    - update conf files
+    - comment out old triggers
+    - enable new triggers (installing the ruby script)
+  - update doco and announce on hausmates
+
+o Trigger settings:
+  - xmlrpc: nothing more to specify, since the server should know.
+  - socket: reenable, but with xmlrpc like protocol
+  - email: email address, pop server, user and pass
+  - polling: poll interval (minutes)
+  
+o build command settings:
+  - ant/maven/generic (show icon)
+  - ant/maven: relative path to clover. enable clover coverage monitoring if specified.
+  - ant/maven: parse output for test count/duration
+  - ant/maven: goals/targets (full ant/maven command line)
+
+o general help in popups a la confluence
+o on save, always update trigger. try to uninstall/install.
+
+o Help text:
+  - Project name: Used to identify this project. Will be used in links and reports
+  - Build command: What kind of build to run. Specifying Ant/Maven will enable some extra diagnostics such as test metrics.
+      Note that DC will execute this command from the root folder of DC's working copy of the project indicated by SCM settings.
+      Link to environment variables doc page.
+      
+      This can be a good way to specify additional params such as ftp passwords
+      
+  - Tagging: BUILD_${DAMAGECONTROL_LABEL}
+  - Artifacts: URLs to where artifacts go. Ex: http://some.where/blah/blah-${DAMAGECONTROL_LABEL}.jar
+      DC will not deploy anything here, but you can have your own build process do it for you.
+      DC will display the link on the project status page.
+      
+  - Unix groups: (Only if DC or the SCM is running on a unix box). The groups DC must be a member of in order to build. In addition to this you may have to talk to your local unix admin.
+      The reason this must be specified is that on some unix systems group permissions must be explicitly set for new shells
+      (using newgrp) in case the system user DC is running as is member of more groups than the OS supports. On Linux this is
+      usually 32. Setting this value should solve this problem.
+  - Source control: where the project's source code is stored.
+  - Nudge mechanism: How DC will be nudged to build your project.
+  - Nag email: where DC should send email when build fail
+  - email-on-success: whether DC should send email upon success.
+  - tagging
+  - IRC channel:
+  - Yahoo!
+  - Jabber
+  - SMS
+  - JIRA ID/URL/user/pass (DC will create issue and assign to 1st violating user. Not recommended in conj. with email+jira-email as this is too much noise)
+  - All of these sensitive settings SHOULD be hidden for people w/o access to any of the unix groups. (chgrp/chmod on project.conf by DC)
+
+o User settings:
+  - Name
+  - Email
+  - Yahoo!
+  - Jabber
+  - Tel
+  - Mob
+
+*/
+
 oldScmDiv = null
-scm = "<%= project_config['scm_type'] %>"
 function showScm(scm) {
 	if(oldScmDiv) {
 		oldScmDiv.style.display = 'none';
@@ -14,44 +96,70 @@ function showScm(scm) {
 	newScmDiv = document.getElementById(scm)
 	newScmDiv.style.display = 'block';
 	oldScmDiv = newScmDiv
+	
+	// update the hidden field
+	document.getElementById('scm_type').value = scm
 }
 scm_spec = null
 
 ////////// CVS functions //////////
 
+cvs_port   = new RegExp("^:(.*):(.*)@(.*):([0-9]*):([a-zA-Z]?.*)")
+cvs_noport = new RegExp("^:(.*):(.*)@(.*):([a-zA-Z]?.*)")
+cvs_local  = new RegExp("^:(local):(.*)")
+
 function distributeCvsrootFields() {
-    cvsroot = document.getElementById('cvsroot').value
-	if(cvsroot != "") {
-		regexp = new RegExp(":(.*):(.*)@(.*):(.*)")
-		protocolIndex = 1
+	cvsroot = document.getElementById('cvsroot').value
+
+	protocolIndex = 1
+	userIndex     = -1
+	serverIndex   = -1
+	portIndex     = -1
+	pathIndex     = -1
+	if(tokens = cvs_port.exec(cvsroot)) {
+		userIndex = 2
+		serverIndex = 3
+		portIndex = 4
+		pathIndex = 5
+	} else if(tokens = cvs_noport.exec(cvsroot)) {
 		userIndex = 2
 		serverIndex = 3
 		pathIndex = 4
-		if(!regexp.exec(cvsroot)) {
-			regexp = new RegExp(":(local):(.*):(.*)")
-			userIndex = -1
-			serverIndex = -1
+	} else if(tokens = cvs_local.exec(cvsroot)) {
+		pathIndex = 2
+	}
+	if(pathIndex != -1) {
+		document.getElementById('cvsprotocol').selectedIndex = findIndex(tokens[protocolIndex])
+
+		if(userIndex != -1) {
+			document.getElementById('cvsuser').value = tokens[userIndex]
+			document.getElementById('cvsserver').value = tokens[serverIndex]
+		} else {
+			document.getElementById('cvsuser').value = ""
+			document.getElementById('cvsserver').value = ""
 		}
-		tokens = regexp.exec(cvsroot)
-		if(tokens) {
-			document.getElementById('cvsprotocol').selectedIndex = findIndex(tokens[protocolIndex])
-			if(userIndex != -1) {
-				document.getElementById('cvsuser').value = tokens[userIndex]
-				document.getElementById('cvsserver').value = tokens[serverIndex]
-			} else {
-				document.getElementById('cvsuser').value = ""
-				document.getElementById('cvsserver').value = ""
-			}
-			document.getElementById('cvsrepodir').value = tokens[pathIndex]
+
+		if(portIndex != -1) {
+			document.getElementById('cvsport').value = tokens[portIndex]
+		} else {
+			document.getElementById('cvsport').value = ""
 		}
+
+		document.getElementById('cvsrepodir').value = tokens[pathIndex]
 	} else {
-		document.getElementById('cvsprotocol').selectedIndex = 0
-		document.getElementById('cvsuser').value = ""
-		document.getElementById('cvsserver').value = ""
-		document.getElementById('cvsport').value = ""
-		document.getElementById('cvsrepodir').value = ""
+		// didn't match
+		clearCvsFields()
+		// TODO: make CVSROOT yellow and blank all the others. Also disable submit.
 	}
 	enableOrDisableCvsFieldsAndUpdateScmSpec()
+}
+
+function clearCvsFields() {
+	document.getElementById('cvsprotocol').selectedIndex = 0
+	document.getElementById('cvsuser').value = ""
+	document.getElementById('cvsserver').value = ""
+	document.getElementById('cvsport').value = ""
+	document.getElementById('cvsrepodir').value = ""
 }
 
 function findIndex(protocol) {
@@ -82,18 +190,29 @@ function updateCvsRootField() {
 }
 
 function enableOrDisableCvsFieldsAndUpdateScmSpec() {
-	if(document.getElementById('cvsprotocol').value != "local") {
-		document.getElementById('cvsuser').disabled = false
-		document.getElementById('cvsserver').disabled = false
-		document.getElementById('cvsport').disabled = false
-	} else {
+	if(document.getElementById('cvsprotocol').value == "local") {
 		document.getElementById('cvsuser').disabled = true
+		document.getElementById('cvspassword').disabled = true
 		document.getElementById('cvsserver').disabled = true
 		document.getElementById('cvsport').disabled = true
+	} else if(document.getElementById('cvsprotocol').value == "ext") {
+		document.getElementById('cvsuser').disabled = false
+		document.getElementById('cvspassword').disabled = true
+		document.getElementById('cvsserver').disabled = false
+		document.getElementById('cvsport').disabled = false
+	} else if(document.getElementById('cvsprotocol').value == "pserver") {
+		document.getElementById('cvsuser').disabled = false
+		document.getElementById('cvspassword').disabled = false
+		document.getElementById('cvsserver').disabled = false
+		document.getElementById('cvsport').disabled = false
 	}
-
-	// TODO: chenge this when we go away from scm_spec
-	document.getElementById('scm_spec').value = document.getElementById('cvsroot').value + ":" + document.getElementById('cvsmodule').value
+	// disable unix_groups if the path is a windows path
+	windows_path = new RegExp("^[a-zA-Z].*")
+	if(windows_path.exec(document.getElementById('cvsrepodir').value))  {
+		document.getElementById('unix_groups').disabled = true
+	} else {
+		document.getElementById('unix_groups').disabled = false
+	}
 }
 
 ////////// Subversion functions //////////
@@ -103,7 +222,7 @@ function enableOrDisableCvsFieldsAndUpdateScmSpec() {
 <form>
 <table>
 <tr>
-  <td>Project name</td>
+  <td class="config_cell">Project name</td>
   <td><input name="project_name" type="text" value="<%= project_name %>"/></td>
 </tr>
 <tr>
@@ -111,10 +230,26 @@ function enableOrDisableCvsFieldsAndUpdateScmSpec() {
   <td><input name="build_command_line" type="text" value="<%= project_config['build_command_line'] %>"/></td>
 </tr>
 <tr>
+  <td>Build trigger mechanism</td>
+  <td>
+		<select id="trigger">
+			<option value="none">None</option>
+			<option value="xmlrpc" selected>XMLRPC trigger</option>
+			<option value="socket">Socket trigger</option>
+			<option value="email">Email trigger</option>
+			<option value="polling">Polling</option>
+		</select>
+  </td>
+</tr>
+<tr>
+  <td>Unix groups</td>
+  <td><input name="unix_groups" id="unix_groups" type="text" value="<%= project_config['unix_groups'] %>"/></td>
+</tr>
+<tr>
   <td>Source control</td>
   <td>
-    CVS <input id="cvsradio" type="radio" value="cvs" name="scm" onClick="showScm('cvs')"/>
-    Subversion <input id="svnradio" type="radio" value="svn" name="scm" onClick="showScm('svn')"/>
+    <input id="cvsradio" type="radio" value="cvs" name="scm" onClick="showScm('cvs')"/> CVS
+    <input id="svnradio" type="radio" value="svn" name="scm" onClick="showScm('svn')"/> Subversion 
   </td>
 </tr>
 </table>
@@ -123,17 +258,27 @@ function enableOrDisableCvsFieldsAndUpdateScmSpec() {
 <img src="http://www.wincvs.org/cvs.png"/>
 	<table>
 		<tr>
-			<td>CVSROOT</td>
-			<td><input id="cvsroot" onKeyUp="distributeCvsrootFields()" type="text" value="<%= project_config['cvsroot'] %>"></td>
+			<td class="config_cell">CVSROOT</td>
+			<td><input name="cvsroot" id="cvsroot" onKeyUp="distributeCvsrootFields()" type="text" value="<%= project_config['cvsroot'] %>"></td>
 		</tr>
 		<tr>
 			<td>Protocol</td>
-			<td><select id="cvsprotocol" onchange="updateCvsRootField()">
+			<td>
+				<select id="cvsprotocol" onchange="updateCvsRootField()">
 					<option value=""></option>
 					<option value="ext" selected>Secure shell (:ext:)</option>
 					<option value="pserver">Password server (:pserver:)</option>
 					<option value="local">Locally mounted folder (:local:)</option>
-				</select></td>
+				</select>
+			</td>
+		</tr>
+		<tr>
+			<td>User name</td>
+			<td><input id="cvsuser" onKeyUp="updateCvsRootField()" type="text"></td>
+		</tr>
+		<tr>
+			<td>Password</td>
+			<td><input name="cvspassword" id="cvspassword" onKeyUp="updateCvsRootField()" type="text"></td>
 		</tr>
 		<tr>
 			<td>Server</td>
@@ -148,12 +293,8 @@ function enableOrDisableCvsFieldsAndUpdateScmSpec() {
 			<td><input id="cvsrepodir" onKeyUp="updateCvsRootField()" type="text"></td>
 		</tr>
 		<tr>
-			<td>User name</td>
-			<td><input id="cvsuser" onKeyUp="updateCvsRootField()" type="text"></td>
-		</tr>
-		<tr>
 			<td>Module</td>
-			<td><input id="cvsmodule" onKeyUp="updateCvsRootField()" type="text" value="<%= project_config['cvsmodule'] %>"></td>
+			<td><input name="cvsmodule" id="cvsmodule" onKeyUp="updateCvsRootField()" type="text" value="<%= project_config['cvsmodule'] %>"></td>
 		</tr>
 	</table>
 
@@ -163,15 +304,14 @@ function enableOrDisableCvsFieldsAndUpdateScmSpec() {
 <img src="http://subversion.tigris.org/subversion_logo-200x173.png" height="62" width="54"/> (doesn't work yet)
 	<table>
 		<tr>
-			<td>URL</td>
-			<td><input id="svnurl" type="text" value="<%= project_config['svnurl'] %>"></td>
+			<td class="config_cell">URL</td>
+			<td><input name="svnurl" id="svnurl" type="text" value="<%= project_config['svnurl'] %>"></td>
 		</tr>
 	</table>
 </div>
-
-  <input name="scm_spec" type="hidden" id="scm_spec"/>
-    <input name="action" type="hidden" value="<%= action %>" />
-    <input type="submit" value="Save"/>
+  <input name="scm_type" type="hidden" id="scm_type"/>
+  <input name="action" type="hidden" value="<%= action %>" />
+  <input type="submit" value="Save"/>
 </form>
 
 </body>

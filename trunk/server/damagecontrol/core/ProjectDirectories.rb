@@ -14,8 +14,7 @@ module DamageControl
     end
     
     def checkout_dir(project_name)
-      # append the name of the project to the end, hack that makes it a lot easier for poor cvs
-      "#{project_dir(project_name)}/checkout/#{project_name}"
+      "#{project_dir(project_name)}/checkout"
     end
     
     def log_dir(project_name)

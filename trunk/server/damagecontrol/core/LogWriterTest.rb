@@ -1,8 +1,9 @@
 require 'test/unit'
 require 'damagecontrol/core/LogWriter'
 require 'damagecontrol/core/Build'
-require 'damagecontrol/util/FileUtils'
 require 'damagecontrol/core/Hub'
+require 'damagecontrol/core/ProjectDirectories'
+require 'damagecontrol/util/FileUtils'
 
 module DamageControl
 
@@ -11,8 +12,9 @@ module DamageControl
     
     def setup
       @hub = Hub.new
-
-      @writer = LogWriter.new(@hub, "#{damagecontrol_home}/target/logwritertest")
+      @basedir = new_temp_dir
+      @project_directories = ProjectDirectories.new(@basedir)
+      @writer = LogWriter.new(@hub, @project_directories)
       
       @build = Build.new("project_name")
 
@@ -30,7 +32,7 @@ module DamageControl
       assert(@writer.log_file(@build).closed?)
 
       assert_file_content("hello\n", 
-        "#{damagecontrol_home}/target/logwritertest/project_name/19770614002000.log")
+        "#{@basedir}/project_name/log/19770614002000.log")
       
     end
     

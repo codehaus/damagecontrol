@@ -16,6 +16,11 @@ text-decoration: underline;}
 
 img {
 vertical-align: middle;}
+}
+
+.config_cell {
+width: 240px;
+}
 
 .top-panel {
 float: top;

@@ -12,7 +12,6 @@ buildRoot = File.expand_path("~/build")
 
 server = DamageControlServer.new(
   :RootDir => buildRoot,
-  :SocketTriggerPort => 4711, 
   :HttpPort => 4712,
   :HttpsPort => 4713,
   :AllowIPs => [ "127.0.0.1", "64.7.141.17" ])

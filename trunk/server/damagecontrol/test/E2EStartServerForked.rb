@@ -4,7 +4,6 @@ include DamageControl
 
 server = DamageControlServer.new(
   :RootDir => ARGV[0],
-  :SocketTriggerPort => 14711, 
   :HttpPort => 14712,
   :HttpsPort => 14713,
   :AllowIPs => ["127.0.0.1" ])

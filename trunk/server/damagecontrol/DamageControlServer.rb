@@ -7,7 +7,6 @@ require 'damagecontrol/Version'
 require 'damagecontrol/core/Hub'
 require 'damagecontrol/core/BuildExecutor'
 require 'damagecontrol/core/BuildScheduler'
-require 'damagecontrol/core/SocketTrigger'
 require 'damagecontrol/core/HostVerifyingHandler'
 require 'damagecontrol/core/LogWriter'
 require 'damagecontrol/xmlrpc/Trigger'
@@ -21,6 +20,41 @@ require 'damagecontrol/web/ProjectServlet'
 require 'damagecontrol/web/DashboardServlet'
 
 module DamageControl
+
+  class WarningServer
+    def start
+      @t = Thread.new do
+        begin
+          @server = TCPServer.new(4711)          
+          while (socket = @server.accept)
+            socket.print("WARNING WARNING WARNING WARNING\r\n")
+            socket.print("DamageControl does not support trigging over port 4711 anymore\r\n")
+            socket.print("DamageControlled projects are now configured\r\n")
+            socket.print("via http://builds.codehaus.org/private/dashboard\r\n")
+            socket.print("Contact Jon or Aslak on #codehaus on irc.codehaus.org or\r\n")
+            socket.print("jon@tirsen.com or aslak@thoughtworks.net\r\n")
+            socket.print("to get a password so you can reconfigure your project.\r\n")
+            socket.print("Sorry for the inconvenience.\r\n")
+          end
+        rescue => e
+        ensure
+          puts "Stopped SocketTrigger listening on port #{port}"
+        end
+      end
+    end
+    
+    def shutdown
+      begin
+        @server.shutdown
+      rescue => e
+      end
+      begin
+        @t.kill
+      rescue => e
+      end
+    end
+  end
+
   class DamageControlServer
     include FileUtils
     include Logging
@@ -31,6 +65,7 @@ module DamageControl
     def initialize(params={})
       @params = params
       @components = []
+      @project_directories = ProjectDirectories.new(rootdir)
     end
     
     def startup_time
@@ -65,10 +100,6 @@ module DamageControl
       params[:AllowIPs] || nil
     end
     
-    def socket_trigger_port
-      params[:SocketTriggerPort] || 4711
-    end
-    
     def http_port 
       params[:HttpPort] || 4712
     end
@@ -80,7 +111,7 @@ module DamageControl
     def init_config_services
       component(:hub, Hub.new)
       
-      component(:project_directories, ProjectDirectories.new(rootdir))
+      component(:project_directories, @project_directories)
       component(:project_config_repository, ProjectConfigRepository.new(project_directories))
       component(:build_history_repository, BuildHistoryRepository.new(hub, "#{rootdir}/build_history.yaml"))
     end
@@ -88,16 +119,12 @@ module DamageControl
     def init_components
       init_config_services
       
-      component(:log_writer, LogWriter.new(hub, logdir))
-      
+      component(:warning_server, WarningServer.new())
+      component(:log_writer, LogWriter.new(hub, @project_directories))
       component(:host_verifier, if allow_ips.nil? then OpenHostVerifier.new else HostVerifier.new(allow_ips) end)
       
-      component(:socket_trigger, SocketTrigger.new(@hub, socket_trigger_port, host_verifier))
-      
       init_build_scheduler
-      
       init_webserver
-      
       init_custom_components
     end
     

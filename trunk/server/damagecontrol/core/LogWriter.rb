@@ -8,9 +8,9 @@ module DamageControl
     
     include Logging
   
-    def initialize(channel, logs_base_dir)
+    def initialize(channel, project_directories)
       @log_files = {}
-      @logs_base_dir = logs_base_dir
+      @project_directories = project_directories
 
       channel.add_subscriber(self)
     end
@@ -43,7 +43,8 @@ module DamageControl
     end
     
     def log_file_name(build)
-      "#{@logs_base_dir}/#{build.project_name}/#{build.timestamp}.log"
+      log_dir = @project_directories.log_dir(build.project_name)
+      "#{log_dir}/#{build.timestamp}.log"
     end
 
     def log_file(build)

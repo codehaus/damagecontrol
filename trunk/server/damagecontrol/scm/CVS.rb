@@ -1,4 +1,3 @@
-require 'damagecontrol/scm/SCM'
 require 'damagecontrol/util/FileUtils'
 require 'damagecontrol/core/BuildBootstrapper'
 require 'damagecontrol/util/Logging'
@@ -6,74 +5,52 @@ require 'ftools'
 
 module DamageControl
 
-  # Handles parsing of CVS specs, checkouts and installation of triggers script
+  # Handles parsing of CVS roots, checkouts and installation of trigger scripts
   #
-  # format of scm_spec is cvsroot:module
-  # examples
-  # :local:/cvsroot/damagecontrol:damagecontrol
-  # :pserver:anonymous@cvs.codehaus.org:/cvsroot/damagecontrol:damagecontrol
-  # if pserver is used, the user is assumed to already be authenticated with cvs login
-  # prior to starting damagecontrol
-  class CVS < SCM
+  # If pserver is used, the user is assumed to already be authenticated with cvs login
+  # prior to starting damagecontrol. (TODO: fix that!) 
+  class CVS
   
     include FileUtils
     include Logging
+    
+    attr_reader :cvsroot
+    
+    def initialize(cvsroot, mod, working_dir_root)
+      @cvsroot, @mod = cvsroot, mod
+      @working_dir_root = to_os_path(File.expand_path(working_dir_root)) unless working_dir_root.nil?
+    end
   
-    def handles_spec?(scm_spec)
-      parse_spec(scm_spec)
+    def protocol
+      parse_cvsroot[0]
+    end
+
+    def user
+      parse_cvsroot[1]
+    end
+
+    def host
+      parse_cvsroot[2]
+    end
+
+    def path
+      parse_cvsroot[3]
+    end
+
+    def mod
+      @mod
     end
     
-    # parses the spec into tokens
-    # [protocol, user, host, path, module]
-    #
-    def parse_spec(scm_spec)
-      md = case
-        when scm_spec =~ /^:local:/   then /^:(local):(.*):(.*)$/.match(scm_spec)
-        when scm_spec =~ /^:ext:/     then /^:(ext):(.*)@(.*):(.*):(.*)$/.match(scm_spec)
-        when scm_spec =~ /^:pserver:/ then /^:(pserver):(.*)@(.*):(.*):(.*)$/.match(scm_spec)
-      end
-      result = case
-        when scm_spec =~ /^:local:/   then [md[1], nil, nil, md[2], md[3]]
-        when scm_spec =~ /^:ext:/     then md[1..5]
-        when scm_spec =~ /^:pserver:/ then md[1..5]
-      end
-    end
-
-    def branch(scm_spec)
-      # TODO: add support for branches in the scm_spec
-      "MAIN"
-    end
-
-    def cvsroot(scm_spec)
-      /(.*):[A-Za-z]/.match(scm_spec)[1]
+    def working_dir
+      File.join(@working_dir_root, mod)
     end
     
-    def protocol(scm_spec)
-      parse_spec(scm_spec)[0]
-    end
-
-    def user(scm_spec)
-      parse_spec(scm_spec)[1]
-    end
-
-    def host(scm_spec)
-      parse_spec(scm_spec)[2]
-    end
-
-    def path(scm_spec)
-      parse_spec(scm_spec)[3]
-    end
-
-    def mod(scm_spec)
-      parse_spec(scm_spec)[4]
-    end
-    
-    def changes(spec, checkoutdirectory, time_before, time_after)
-      with_working_dir(checkoutdirectory) do
+    def changes(time_before, time_after)
+      with_working_dir(working_dir) do
         cvs_with_io(changes_command(time_before, time_after)) do |io|
           parser = CVSLogParser.new
-          parser.cvspath = path(spec)
-          parser.cvsmodule = mod(spec)
+          parser.cvspath = path
+          parser.cvsmodule = mod
           parser.parse_log(io)
         end
       end
@@ -88,8 +65,8 @@ module DamageControl
       time.utc.strftime("%Y-%m-%d %H:%M:%S UTC")
     end
     
-    def commit(directory, message, &proc)
-      with_working_dir(directory) do
+    def commit(message, &proc)
+      with_working_dir(working_dir) do
         cvs(commit_command(message), &proc)
       end
     end
@@ -98,38 +75,26 @@ module DamageControl
       "commit -m \"#{message}\""
     end
 
-    def checkout_command(scm_spec, directory)
-      "-d#{cvsroot(scm_spec)} checkout #{mod(scm_spec)}"
+    def checkout_command
+      "-d#{@cvsroot} checkout #{mod}"
     end
 
-    def update_command(scm_spec)
-      "-d#{cvsroot(scm_spec)} update -d -P"
+    def update_command
+      "-d#{@cvsroot} update -d -P"
     end
     
-    def is_local_connection_method(scm_spec)
-      scm_spec =~ /^:local:/
+    def is_local_connection_method
+      @cvsroot =~ /^:local:/
     end
     
-    def checkout(scm_spec, directory, &proc)
-      scm_spec = to_os_path(scm_spec) if is_local_connection_method(scm_spec)
-      directory = to_os_path(File.expand_path(directory))
-      if(checked_out?(directory, scm_spec))
-        with_working_dir(directory) do
-          cvs(update_command(scm_spec), &proc)
+    def checkout(&proc)
+      if(checked_out?)
+        with_working_dir(working_dir) do
+          cvs(update_command, &proc)
         end
       else
-        topdir = to_os_path(File.expand_path(directory + "/.."))
-        with_working_dir(topdir) do
-          cvs(checkout_command(scm_spec, directory), &proc)
-          # Now just move the directory. Fix for http://jira.codehaus.org/secure/ViewIssue.jspa?key=DC-44
-          mod_directory = to_os_path(File.expand_path(mod(scm_spec)))
-          if (mod_directory != directory)
-            begin
-              File.move(mod_directory, directory)
-            rescue NotImplementedError
-              File.rename(mod_directory, directory)
-            end
-          end
+        with_working_dir(@working_dir_root) do
+          cvs(checkout_command, &proc)
         end
       end
     end
@@ -139,34 +104,30 @@ module DamageControl
     # control server will be notified over a socket and start
     # building
     #
-    # @param directory where to temporarily check out during install
     # @param project_name a human readable name for the module
-    # @param scm_spec full SCM spec (example: :local:/cvsroot/picocontainer:pico)
     # @param dc_url where the dc server is running
     #
     # @block &proc a block that can handle the output (should typically log to file)
     #
     def install_trigger(
-      directory, \
       project_name, \
-      scm_spec, \
       dc_url="http://localhost:4712/private/xmlrpc", \
       &proc
     )
-      directory = File.expand_path(directory)
-      checkout("#{cvsroot(scm_spec)}:CVSROOT", directory, &proc)
-      with_working_dir(directory) do
+      cvsroot_cvs = CVS.new(@cvsroot, "CVSROOT", @working_dir_root)
+      cvsroot_cvs.checkout(&proc)
+      with_working_dir(cvsroot_cvs.working_dir) do
         # install trigger command
         File.open("loginfo", File::WRONLY | File::APPEND) do |file|
-          trigger_command = trigger_command(project_name, scm_spec, dc_url)
-          file.puts("#{mod(scm_spec)} #{trigger_command}")
+          trigger_command = trigger_command(project_name, dc_url)
+          file.puts("#{mod} #{trigger_command}")
         end
 
         # install trigger script
         File.open(trigger_script_name, "w") do |io|
           io.puts(trigger_script)
         end
-        system("cvs -d#{cvsroot(scm_spec)} add #{trigger_script_name}")
+        system("cvs -d#{@cvsroot} add #{trigger_script_name}")
 
         checkoutlist = File.open("checkoutlist", File::WRONLY | File::APPEND) do |file|
           file.puts(File.basename(trigger_script_name))
@@ -176,36 +137,79 @@ module DamageControl
       end
     end
     
-    def conf_script(scm_spec, conf_file_name)
-      to_os_path("#{path(scm_spec)}/CVSROOT/#{conf_file_name}")
+    def trigger_script
+%{require 'xmlrpc/client'
+
+url = ARGV[0]
+project_name = ARGV[1]
+
+puts "Nudging DamageControl on \#{url} to build project \#{project_name}"
+client = XMLRPC::Client.new2(url)
+build = client.proxy("build")
+result = build.trig(project_name, Time.now.utc.strftime("%Y%m%d%H%M%S"))
+puts result
+}
+    end
+
+    def trigger_installed?(project_name)
+      cvsroot_cvs = CVS.new(@cvsroot, "CVSROOT", @working_dir_root)
+      cvsroot_cvs.checkout
+      loginfo_file = File.new(File.join(cvsroot_cvs.working_dir, "loginfo"))
+      loginfo_content = loginfo_file.read
+      loginfo_file.close
+      trigger_in_string?(loginfo_content, project_name)
+    end
+
+    def uninstall_trigger(project_name)
+      cvsroot_cvs = CVS.new(@cvsroot, "CVSROOT", @working_dir_root)
+      cvsroot_cvs.checkout
+      loginfo_file = File.new(File.join(cvsroot_cvs.working_dir, "loginfo"))
+      loginfo_content = loginfo_file.read
+      loginfo_file.close
+      modified_loginfo = disable_trigger_from_string(loginfo_content, project_name, Time.new.utc)
+      loginfo_file = File.new(File.join(cvsroot_cvs.working_dir, "loginfo"), "w")
+      loginfo_file.write(modified_loginfo)
+      loginfo_file.close
+      with_working_dir(cvsroot_cvs.working_dir) do
+        system("cvs commit -m \"Disabled DamageControl nudger for #{project_name}\"")
+      end
+    end
+
+    def trigger_in_string?(loginfo_content, project_name)
+      disable_trigger_from_string(loginfo_content, project_name, Time.new.utc) != loginfo_content
     end
     
-    def checked_out?(directory, scm_spec)
-      rootcvs = File.expand_path("#{directory}/CVS/Root")
+    def disable_trigger_from_string(loginfo_content, project_name, date)
+      modified = ""
+      loginfo_content.each_line do |line|
+        # TODO: couldn't find out how to express this with a single regexp
+        matches = (Regexp.new(".* ruby.*dctrigger.rb http.* #{project_name}$") =~ line) && line[0..0] != "#"
+        if(matches)
+          formatted_date = date.strftime("%B %d, %Y")
+          modified << "# Disabled by DamageControl on #{formatted_date}\n"
+          modified << "##{line}"
+        else
+          modified << line
+        end
+      end
+      modified
+    end
+    
+    def conf_script(conf_file_name)
+      to_os_path("#{path}/CVSROOT/#{conf_file_name}")
+    end
+    
+    def checked_out?
+      rootcvs = File.expand_path("#{@working_dir_root}/CVS/Root")
       File.exists?(rootcvs)
     end
-    
+        
     def trigger_script_name
       "dctrigger.rb"
     end
     
-    def trigger_command(project_name, scm_spec, dc_url)
-      "ruby " + to_os_path("#{path(scm_spec)}/CVSROOT/#{trigger_script_name}") + " #{dc_url} #{project_name}"
-    end
-
-    def trigger_script
-      %{
-        require 'xmlrpc/client'
-  
-        url = ARGV[0]
-        project_name = ARGV[1]
-
-        puts "Triggering DamageControl build to \#{url} for project \#{project_name}"
-        client = XMLRPC::Client.new2(url)
-        build = client.proxy("build")
-        result = build.trig(project_name, Time.now.utc.strftime("%Y%m%d%H%M%S"))
-        puts result
-      }
+    def trigger_command(project_name, dc_url)
+      "ruby " + to_os_path("#{path}/CVSROOT/#{trigger_script_name}") + " #{dc_url} #{project_name}"
     end
     
     def cvs(cmd, &proc)
@@ -224,11 +228,29 @@ module DamageControl
       io = IO.popen("#{cmd}") do |io|
         ret = yield io
       end
-      raise SCMError.new("#{cmd} failed with code #{$?.to_s}") if $? != 0
+      raise Exception.new("'#{cmd}' in directory '#{Dir.pwd}' failed with code #{$?.to_s}") if $? != 0
       logger.debug "executed #{cmd}"
       ret
     end
-    
+
+  private
+
+    # parses the cvsroot into tokens
+    # [protocol, user, host, path]
+    #
+    def parse_cvsroot
+      md = case
+        when @cvsroot =~ /^:local:/   then /^:(local):(.*)/.match(@cvsroot)
+        when @cvsroot =~ /^:ext:/     then /^:(ext):(.*)@(.*):(.*)/.match(@cvsroot)
+        when @cvsroot =~ /^:pserver:/ then /^:(pserver):(.*)@(.*):(.*)/.match(@cvsroot)
+      end
+      result = case
+        when @cvsroot =~ /^:local:/   then [md[1], nil, nil, md[2]]
+        when @cvsroot =~ /^:ext:/     then md[1..4]
+        when @cvsroot =~ /^:pserver:/ then md[1..4]
+      end
+    end
+
   end
   
   class CVSLogParser

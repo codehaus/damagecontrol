@@ -37,12 +37,19 @@ module DamageControl
       render("configure.erb", binding)
     end
     
+    KEYS = ["build_command_line", "project_name", "unix_groups", "scm_type", "cvsroot", "cvsmodule", "cvspassword", "svnurl"]
+    
     def store_configuration
       assert_private
       @project_config_repository.new_project(project_name) unless @project_config_repository.project_exists?(project_name)
       project_config = @project_config_repository.project_config(project_name)
-      project_config["build_command_line"] = request.query['build_command_line']
-      project_config["scm_spec"] = request.query['scm_spec']
+      
+      # copy the key/values from the request over to the project_config
+      # request.each do |key, value| won't work - it takes too much.
+      KEYS.each do |key|
+        project_config[key] = request.query[key]
+      end
+
       @project_config_repository.modify_project_config(project_name, project_config)
       
       dashboard_redirect

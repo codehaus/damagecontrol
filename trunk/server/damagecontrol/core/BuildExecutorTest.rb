@@ -32,7 +32,9 @@ module DamageControl
       create_hub
       @basedir = new_temp_dir("BuildExecutorTest")
       @build_executor = BuildExecutor.new(hub, BuildHistoryRepository.new(hub), ProjectDirectories.new(@basedir))
-      @build = Build.new("damagecontrolled", Time.now, {"build_command_line" => "echo Hello world from DamageControl!"})
+      @build = Build.new("damagecontrolled", Time.now, {
+        "build_command_line" => "echo Hello world from DamageControl!"
+        })
       @quiet_period = 10
     end
     
@@ -63,7 +65,7 @@ module DamageControl
       assert_equal(Build::FAILED, messages_from_hub[-1].build.status)
     end
     
-    def test_checks_out_and_determines_changes_before_building      
+    def test_checks_out_before_building      
       checkoutdir = "#{@basedir}/damagecontrolled/checkout/damagecontrolled"
       
       mock_build_history = MockIt::Mock.new
@@ -73,21 +75,10 @@ module DamageControl
         b.timestamp = Time.utc(2004, 04, 02, 12, 00, 00)
         b
       }
-      mock_scm = MockIt::Mock.new
-      mock_scm.__expect(:changes) { |scm_spec, dir, time_before, time_after|
-        assert_equal("scm_spec", scm_spec)
-        assert_equal(checkoutdir, dir)
-        assert_equal(Time.utc(2004, 04, 02, 12, 00, 00), time_before)
-        assert_equal(Time.utc(2004, 04, 02, 13, 00, 00), time_after)
-      }
-      mock_scm.__expect(:checkout) { |scm_spec, dir|
-        assert_equal("scm_spec", scm_spec)
-        assert_equal(checkoutdir, dir)
-      }
       
       FileUtils.mkdir_p(checkoutdir)
       
-      @build_executor = BuildExecutor.new(hub, mock_build_history, ProjectDirectories.new(@basedir), mock_scm)
+      @build_executor = BuildExecutor.new(hub, mock_build_history, ProjectDirectories.new(@basedir))
       @build = Build.new("damagecontrolled", Time.now,
         { "scm_spec" => "scm_spec", "build_command_line" => "echo hello world"})
       @build.timestamp = Time.utc(2004, 04, 02, 13, 00, 00)
@@ -99,7 +90,6 @@ module DamageControl
       assert_equal(Build::SUCCESSFUL, @build.status)
       
       mock_build_history.__verify
-      mock_scm.__verify
     end
     
     private

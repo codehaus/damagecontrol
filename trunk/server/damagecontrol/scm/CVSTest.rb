@@ -10,33 +10,30 @@ module DamageControl
     include ::FileUtils
     include FileUtils
   
-    def setup
-      @cvs = CVS.new
-    end
-    
     def test_modifiying_one_file_produce_correct_changeset
       # create a couple of temp directories and clean them up
-      testrepo = File.expand_path("#{damagecontrol_home}/target/cvstestrepo")
+      basedir = new_temp_dir
+      testrepo = File.expand_path("#{basedir}/repo")
       rm_rf(testrepo)
-      testcheckout = File.expand_path("#{damagecontrol_home}/target/cvstestcheckout")
+      testcheckout = File.expand_path("#{basedir}/work")
       rm_rf(testcheckout)
       
       # create cvs repo and import test project, check it out afterwards
-      spec = ":local:#{testrepo}:damagecontrolled"
+      cvs = CVS.new(":local:#{testrepo}", "damagecontrolled", testcheckout)
       create_repo(testrepo)
-      import_damagecontrolled(spec)
-      @cvs.checkout(spec, testcheckout)
+      import_damagecontrolled(cvs)
+      cvs.checkout
       
       # modify file and commit it
-      change_file("#{testcheckout}/build.xml")
+      change_file("#{cvs.working_dir}/build.xml")
       time_before = Time.now.utc
       sleep(1)
-      @cvs.commit(testcheckout, "changed something")
+      cvs.commit("changed something")
       sleep(1)
       time_after = Time.now.utc
       
       # check that we now have one more change
-      changes = @cvs.changes(spec, testcheckout, time_before, time_after)
+      changes = cvs.changes(time_before, time_after)
       assert_equal(1, changes.length)
       mod = changes[0]
       assert_equal("build.xml", mod.path)
@@ -46,9 +43,9 @@ module DamageControl
     def test_can_build_a_cvs_rdiff_command_for_retrieving_the_changes_between_two_dates
       time_before = Time.gm(2004,01,01,12,00,00) 
       time_after = Time.gm(2004,01,01,13,00,00)
-      spec = ":local:repo:module"
+      cvs = CVS.new(":local:repo", "module", nil)
       assert_equal("log -d\"2004-01-01 12:00:00 UTC<=2004-01-01 13:00:00 UTC\"",
-        @cvs.changes_command(time_before, time_after))
+        cvs.changes_command(time_before, time_after))
     end
     
     def change_file(file)
@@ -57,96 +54,127 @@ module DamageControl
       end
     end
     
-    def test_parse_local_unix_spec
+    def test_parse_local_unix_cvsroot
       protocol = "local"
       path     = "/cvsroot/damagecontrol"
       mod      = "damagecontrol"
 
-      spec     = ":#{protocol}:#{path}:#{mod}"
+      cvs      = CVS.new(":#{protocol}:#{path}", "#{mod}", nil)
 
-      assert_equal([protocol, nil, nil, path, mod], @cvs.parse_spec(spec))
-      assert_equal(":local:/cvsroot/damagecontrol", @cvs.cvsroot(spec))
+      assert_equal(protocol, cvs.protocol)
+      assert_equal(nil,      cvs.user)
+      assert_equal(nil,      cvs.host)
+      assert_equal(path,     cvs.path)
+      assert_equal(mod,      cvs.mod)
     end
 
-    def test_parse_local_windows_spec
+    def test_parse_local_windows_cvsroot
       protocol = "local"
       path     = "C:\\pling\\plong"
       mod      = "damagecontrol"
 
-      spec     = ":#{protocol}:#{path}:#{mod}"
+      cvs      = CVS.new(":#{protocol}:#{path}", "#{mod}", nil)
 
-      assert_equal([protocol, nil, nil, path, mod], @cvs.parse_spec(spec))
-      assert_equal(":local:C:\\pling\\plong", @cvs.cvsroot(spec))
+      assert_equal(protocol, cvs.protocol)
+      assert_equal(nil,      cvs.user)
+      assert_equal(nil,      cvs.host)
+      assert_equal(path,     cvs.path)
+      assert_equal(mod,      cvs.mod)
     end
     
-    def test_tokens
-      spec = ":pserver:anonymous@cvs.codehaus.org:/cvsroot/damagecontrol:damagecontrol"
-      assert_equal("pserver",                @cvs.protocol(spec))
-      assert_equal("anonymous",              @cvs.user(spec))
-      assert_equal("cvs.codehaus.org",       @cvs.host(spec))
-      assert_equal("/cvsroot/damagecontrol", @cvs.path(spec))
-      assert_equal("damagecontrol",          @cvs.mod(spec))
-    end
-    
-    def test_parse_pserver_spec
+    def test_parse_pserver_unix_cvsroot
       protocol = "pserver"
       user     = "anonymous"
-      host     = "cvs.codehaus.org"
+      host     = "beaver.codehaus.org"
       path     = "/cvsroot/damagecontrol"
       mod      = "damagecontrol"
 
-      spec     = ":#{protocol}:#{user}@#{host}:#{path}:#{mod}"
+      cvs      = CVS.new(":#{protocol}:#{user}@#{host}:#{path}", "#{mod}", nil)
 
-      assert_equal([protocol, user, host, path, mod], @cvs.parse_spec(spec))
-      assert_equal(":pserver:anonymous@cvs.codehaus.org:/cvsroot/damagecontrol", @cvs.cvsroot(spec))
+      assert_equal(protocol, cvs.protocol)
+      assert_equal(user,     cvs.user)
+      assert_equal(host,     cvs.host)
+      assert_equal(path,     cvs.path)
+      assert_equal(mod,      cvs.mod)
     end
-    
+
     def test_checkout_command
-      root = to_os_path("/some/where")
+      cvs = CVS.new(":pserver:anonymous@cvs.codehaus.org:/cvsroot/damagecontrol", "damagecontrol", nil)
       assert_equal(
         "-d:pserver:anonymous@cvs.codehaus.org:/cvsroot/damagecontrol checkout damagecontrol", \
-        @cvs.checkout_command(":pserver:anonymous@cvs.codehaus.org:/cvsroot/damagecontrol:damagecontrol", "/some/where"))
+        cvs.checkout_command)
     end
     
     def test_update_command
+      cvs = CVS.new(":pserver:anonymous@cvs.codehaus.org:/cvsroot/damagecontrol", "damagecontrol", nil)
       assert_equal(
         "-d:pserver:anonymous@cvs.codehaus.org:/cvsroot/damagecontrol update -d -P", \
-        @cvs.update_command(":pserver:anonymous@cvs.codehaus.org:/cvsroot/damagecontrol:damagecontrol"))
+        cvs.update_command)
     end
     
-    def test_does_not_handle_starteam_path
-      assert(!@cvs.handles_spec?("starteam://username:password@server/project/view/folder"))
+LOGINFO_WITH_TWO_TRIGGERS = <<-EOF
+# or
+#DEFAULT (echo ""; id; echo %{sVv}; date; cat) >> $CVSROOT/CVSROOT/commitlog
+pf ruby dctrigger.rb http://localhost:4713/private/xmlrpc pizzaface
+p ruby dctrigger.rb http://localhost:4713/private/xmlrpc pizza
+#b ruby dctrigger.rb http://localhost:4713/private/xmlrpc bongo
+EOF
+
+LOGINFO_WITH_ONE_TRIGGER = <<-EOF
+# or
+#DEFAULT (echo ""; id; echo %{sVv}; date; cat) >> $CVSROOT/CVSROOT/commitlog
+pf ruby dctrigger.rb http://localhost:4713/private/xmlrpc pizzaface
+# Disabled by DamageControl on June 27, 2004
+#p ruby dctrigger.rb http://localhost:4713/private/xmlrpc pizza
+#b ruby dctrigger.rb http://localhost:4713/private/xmlrpc bongo
+EOF
+
+    def test_trigger_installed_should_detect_active_trigger_lines
+      cvs = CVS.new(nil, nil, nil)
+      assert(cvs.trigger_in_string?(LOGINFO_WITH_TWO_TRIGGERS, "pizza"))
+      assert(!cvs.trigger_in_string?(LOGINFO_WITH_TWO_TRIGGERS, "somethingelse"))
+      assert(!cvs.trigger_in_string?(LOGINFO_WITH_TWO_TRIGGERS, "bongo"))
     end
     
-    def test_install_trigger
+    def test_trigger_uninstall_should_uninstall_correct_line
+      cvs = CVS.new(nil, nil, nil)
+      uninstalled = cvs.disable_trigger_from_string(LOGINFO_WITH_TWO_TRIGGERS, "pizza", Time.utc(2004, 6, 27, 0, 0, 0, 0))
+      assert_equal(LOGINFO_WITH_ONE_TRIGGER, uninstalled)
+    end
+    
+    def test_install_uninstall_install_should_add_four_lines_to_loginfo
       basedir = new_temp_dir
-      testrepo = File.expand_path("#{basedir}/cvstestrepo")
+
+      testrepo = File.expand_path("#{basedir}/repo")
       rm_rf(testrepo)
-      testcheckout = File.expand_path("#{basedir}/cvstestcheckout/CVSROOT")
-      rm_rf(testcheckout)
-      
-      project_name = "DamageControlled"
-      spec = ":local:#{testrepo}:damagecontrolled"
-      system("cvs init #{testrepo}")
-      build_command = "echo hello"
-      nag_email = "maillist@project.bar"
-
       create_repo(testrepo)
-      @cvs.install_trigger(
-        testcheckout,
-        project_name,
-        spec,
-        "http://localhost:4713/private/xmlrpc"
-      ) { |output|
-        puts output
-      }
 
-      assert_match(/damagecontrolled ruby (.*)dctrigger.rb http:\/\/localhost:4713\/private\/xmlrpc DamageControlled/, File.new("#{testcheckout}/loginfo").read)
+      working_dir = File.expand_path("#{basedir}/work")
+      rm_rf(working_dir)
+
+      project_name = "OftenModified"
+      cvs = CVS.new(":local:#{testrepo}", "often", working_dir)
+      
+      assert(!cvs.trigger_installed?(project_name))
+      cvs.install_trigger(
+        project_name,
+        "http://localhost:4713/private/xmlrpc"
+      )
+      assert(cvs.trigger_installed?(project_name))
+      cvs.uninstall_trigger(project_name)
+      assert(!cvs.trigger_installed?(project_name))
+      cvs.install_trigger(
+        project_name,
+        "http://localhost:4713/private/xmlrpc"
+      )
+      assert(cvs.trigger_installed?(project_name))
+
     end
     
     def test_invalid_cvs_command_raises_error
-      assert_raises(SCMError, "invalid cvs command did not raise error") do
-        @cvs.cvs("invalid_command") { |line| }
+      cvs = CVS.new(nil, nil, nil)
+      assert_raises(Exception, "invalid cvs command did not raise error") do
+        cvs.cvs("invalid_command") { |line| }
       end
     end
 
@@ -158,9 +186,9 @@ module DamageControl
       end
     end
     
-    def import_damagecontrolled(spec)
+    def import_damagecontrolled(cvs)
       with_working_dir("#{damagecontrol_home}/testdata/damagecontrolled") do
-        cmd = "cvs -d#{@cvs.cvsroot(spec)} -q import -m \"\" #{@cvs.mod(spec)} dc-vendor dc-release"
+        cmd = "cvs -d#{cvs.cvsroot} -q import -m \"\" #{cvs.mod} dc-vendor dc-release"
         system(cmd)
       end
     end
@@ -185,14 +213,12 @@ module DamageControl
       end
     end
     
-    
     def test_parse_modifications
       modifications = @parser.parse_modifications(LOG_ENTRY)
       assert_equal(4, modifications.length)
       assert_equal("/cvsroot/damagecontrol/damagecontrol/src/ruby/damagecontrol/BuildExecutorTest.rb", modifications[0].path)
       assert_match(/linux-windows galore/, modifications[2].message)
     end
-    
 
     def test_parse_modification
       modification = @parser.parse_modification(MODIFICATION_ENTRY)
