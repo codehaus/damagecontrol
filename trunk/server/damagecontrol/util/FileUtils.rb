@@ -56,6 +56,7 @@ module FileUtils
   end
   
   def ensure_trailing_slash(url)
+    return nil if url.nil?
     if(url && url[-1..-1] != "/")
       "#{url}/"
     else
