@@ -51,6 +51,15 @@ module DamageControl
         cvs.cvs(".", "invalid_command") { |line| }
       end
     end
+		
+		
+		def test_spaces_in_pserver_login
+			#this could fail
+			cvsroot = ":pserver:arno nym@localhost:/var/cvsroot"
+			cvs = create_cvs(cvsroot, "testdata");
+			cvs.cvspassword = 'anoncvs'
+			cvs.cvs(".", "login")
+		end
 
   private
 

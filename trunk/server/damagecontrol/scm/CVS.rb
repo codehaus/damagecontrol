@@ -242,14 +242,14 @@ module DamageControl
     end
     
     def cvs(dir, cmd)
-      logged_command_line = "cvs -d#{cvsroot_with_password(hidden_password)} #{cmd}"
+      logged_command_line = "cvs \"-d#{cvsroot_with_password(hidden_password)}\" #{cmd}"
       if block_given?
         yield logged_command_line
       else 
         logger.debug(logged_command_line) 
       end
 
-      execed_command_line = "cvs -d#{cvsroot_with_password(cvspassword)} #{cmd}"
+      execed_command_line = "cvs \"-d#{cvsroot_with_password(cvspassword)}\" #{cmd}"
 
       cmd_with_io(dir, execed_command_line, environment) do |io|
         io.each_line do |progress|
