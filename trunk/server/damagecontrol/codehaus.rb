@@ -28,8 +28,8 @@ def server.init_custom_components
   require 'damagecontrol/template/ShortTextTemplate'
   component(:irc_publisher, IRCPublisher.new(hub, "irc.codehaus.org", '#damagecontrol', ShortTextTemplate.new))
   
-  require 'damagecontrol/publisher/GraphPublisher'
-  component(:graph_publisher, GraphPublisher.new(hub, project_directories, build_history_repository))
+ # require 'damagecontrol/publisher/GraphPublisher'
+ # component(:graph_publisher, GraphPublisher.new(hub, project_directories, build_history_repository))
   
   require 'damagecontrol/publisher/EmailPublisher'
   require 'damagecontrol/template/HTMLTemplate'
