@@ -2,6 +2,7 @@ require 'test/unit'
 require 'rscm/tempdir'
 require 'rscm/diff_parser'
 require 'rscm/diff_htmlizer'
+require 'rscm/file_ext.rb'
 
 module RSCM
   class DiffHtmlizerTest < Test::Unit::TestCase
@@ -24,7 +25,7 @@ module RSCM
         end
       end
       expected = File.open(File.dirname(__FILE__) + "/test.html")
-      assert_equal(expected.read, File.open(html_file).read)
+      assert_equal(expected.read_fix_nl, File.open(html_file).read_fix_nl)
     end
   end
 end

@@ -6,9 +6,6 @@ require 'rake/packagetask'
 require 'rake/gempackagetask'
 require 'rake/contrib/rubyforgepublisher'
 
-require File.dirname(__FILE__) + '/config/environment'
-require 'code_statistics'
-
 PKG_BUILD     = ENV['PKG_BUILD'] ? '.' + ENV['PKG_BUILD'] : ''
 PKG_NAME      = 'rscm'
 PKG_VERSION   = '0.1.0' + PKG_BUILD
