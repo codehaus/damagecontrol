@@ -9,13 +9,12 @@ class ScmController < ApplicationController
     project = load_project
 
     # We'll check out asynch (takes time!)
-#    Thread.new do
+    Thread.new do
       project.checkout
-#    end
+    end
 
     # Doing a redirect since this *should* be called via HTTP POST. TODO: verify METHOD
-#    redirect_to :action => "checkout_status", :id => project.name
-    render_text("HALLO")
+    redirect_to :action => "checkout_status", :id => project.name
   end
 
   # Shows the status page with the JS magic that

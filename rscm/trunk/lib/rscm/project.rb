@@ -48,14 +48,11 @@ module RSCM
     # Checks out files to project's checkout directory.
     # Writes the checked out files to +checkout_list_file+.
     def checkout
-$stderr.puts "CHECKING OUT... #{Thread.current} #{Dir.pwd}"
       File.open(checkout_list_file, "w") do |f|
         scm.checkout(Directories.checkout_dir(name)) do |file_name|
-$stderr.puts file_name
           f << file_name << "\n"
         end
       end
-$stderr.puts "CHECKED OUT..."
     end
   end
 end

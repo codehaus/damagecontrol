@@ -27,6 +27,23 @@ RSCM ships with a web interface based on Rails (which you have to install separa
   
 Please refer to the Rails doco for further details. (TODO: improve this part of the doco).
 
+=== IMPORTANT WINDOWS NOTE
+
+If you intend to run the RSCM server on Windows, you should run a Cygwin build of Ruby. This is because
+the win32 build of windows will block the web server while accessing the SCM - multi threading mised with
+external processes doesn't work well on the win32 ruby.
+
+We recommend that you just download and unpack the Cygwin Ruby from http://ftp.ruby-lang.org/pub/ruby/binaries/cygwin/
+As of this writing you should get the latest 1.8 distro. There is no need to install Cygwin separately, just
+make sure your path *starts* with:
+
+  <rscm>\bin;<cygwin ruby>\usr\local\bin
+  
+If you're using CVS or Subversion with RSCM, these should be native win32 binaries and *not* Cygwin binaries.
+
+Finally, you may also have to install rubygems from http://rubyforge.org/projects/rubygems
+since this is currently not included in the Cygwin build of Ruby.
+
 == RSS Server
 
 RSCM can generate RSS feeds for all supported SCMs. The RSS feeds will have one item per changeset.
@@ -191,19 +208,21 @@ on the Source Control tab in the web interface.
 * SCM classes should have a no-arg constructor and be serialisable with YAML
 * SCM classes should be inexpensive to instantiate (should not access SCM in constructor)
 
-= Building
-This section is for developers who are new to ruby development and do not already know how to build and install gems.
+= Building RSCM
+This section is for developers who are new to ruby development and do not already know how to build and install Ruby gems.
 
-You need to install rubygems http://rubygems.rubyforge.org/ 
+You need to install rubygems from http://rubyforge.org/projects/rubygems
 Afterwards you need to install rake and rails
 
-gem install rake
-gem install rails
+  gem install rake
+  gem install rails
 
 Now change to the RSCM root directory and type
 
-rake
+  rake
 
 This will create a gem for RSCM. To install this gem, you have to change to the pgk directory and type
 
-sudo gem install rscm
+  sudo gem install rscm
+  
+Now you can use RSCM in other Ruby apps.
