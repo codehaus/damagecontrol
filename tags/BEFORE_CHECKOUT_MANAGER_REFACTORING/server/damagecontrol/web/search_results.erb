@@ -1,0 +1,18 @@
+<html>
+<head>
+<title><%= project_name %> search results</title>
+<link type="text/css" rel="stylesheet" href="css/style.css">
+</head>
+<body>
+
+<table class="main-table">
+
+<tr><td>
+
+<%= builds_table(:header_text => "Search results", :base_url => "project", :empty_text => "No matching builds were found", :builds => builds, :prefix_with_project_name => true) %>
+
+</td></tr>
+
+</table>
+
+</body></html>

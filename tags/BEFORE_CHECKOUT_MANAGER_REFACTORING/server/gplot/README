@@ -1,0 +1,33 @@
+$Id: README,v 1.1 2004/05/17 14:41:10 tirsen Exp $
+
+				    README
+		    http://rgnuplot.sourceforge.net/
+    
+SUMMARY
+
+Ruby Gnuplot is a pipe-based interface to the ever popular gnuplot
+(www.gnuplot.org) package. Through this interface every capability of gnuplot
+is useable from within Ruby. The design of this software was very much
+inspired by the Python Gnuplot effort that is currently being worked on by
+Michael Haggerty.
+
+The goals of this package are as follows (in order of my priorities):
+
+1. Provide a general object oriented interface for scientific plotting that
+completely hides the details of the underlying implementation. ie. The fact
+that this uses gnuplot should be hidden from the user.
+
+2. Provide sufficient documentation so that this software is useable and
+extendable by other individuals in the scientific community.
+      
+3. Work with the Python Gnuplot community to maintain consistency between the
+implementations as much as possible. </ol>
+
+For more information about this package please visit the web site at
+http://rgnuplot.sourceforge.net/
+
+ACKNOWLEDGEMENTS
+
+I would like to that Michael Haggerty for his initial implementation of the
+Python Gnuplot wrapper that this draws from heavily. His software is very well
+documented and designed and is a joy to work with.

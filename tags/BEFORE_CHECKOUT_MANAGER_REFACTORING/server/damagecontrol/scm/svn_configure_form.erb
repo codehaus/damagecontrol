@@ -1,0 +1,19 @@
+<img src="images/svnlogo64.png"/>
+<table width="100%">
+  <tr>
+    <td class="config_cell">Url</td>
+    <td width="75%"><input class="setting-input" name="svnurl" id="svnurl" type="text" value="<%= svnurl %>"></td>
+  </tr>
+  <tr>
+    <td class="config_cell">Directory</td>
+    <td><input class="setting-input" name="svnpath" id="svnpath" type="text" value="<%= svnpath %>"></td>
+  </tr>
+  <tr>
+    <td>&nbsp;</td>
+    <td class="setting-description">
+      This is the relative path from the start of the repository to the end of the URL. Example:
+      if your URL is svn://your.server/path/to/repository/path/within/repository then this value
+      should be path/within/repository
+    </td>
+  </tr>
+</table>

@@ -1,0 +1,35 @@
+<html>
+<head>
+<title><%= project_name %> trigger installation</title>
+<link type="text/css" rel="stylesheet" href="css/style.css">
+</head>
+<body>
+  <% if error.nil? then %>
+  
+    <p>
+      Trigger was successfully installed into your source control system.
+    </p>
+    
+    <p>
+      This is the command that is used to trig a build:
+      <pre>
+        <%= scm.trigger_command(damagecontrol_install_dir, project_name, @trig_xmlrpc_url).inspect %>
+      </pre>
+    </p>
+    
+    <p>
+      The trigger installation mechanism can sometimes malfunction in tricky situations, double-check by
+      inspecting the content of your loginfo file:
+      <a href="root/<%= project_name %>/checkout/CVSROOT/loginfo">here</a> and verify that it has been committed.
+    </p>
+    
+  <% else %>
+  
+    Could not install trigger:
+    <pre>
+    <%= format_exception(error) %>
+    </pre>
+    
+  <% end %>
+</body>
+</html>

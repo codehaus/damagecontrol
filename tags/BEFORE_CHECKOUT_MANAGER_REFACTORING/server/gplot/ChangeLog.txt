@@ -1,0 +1,24 @@
+Version 0.5
+
+-- PlotItem has been renamed to DataSet and all of the subclasses have been
+renamed as well.
+
+-- There's a fairly fundamental change in the way that DataSets are created
+from an object. In the past, there was a giant switch statement that was used
+to map a class to its associated data type. Now, using Ruby's mechanism to add
+methods to existing classes, you need to define a gpds (GnuPlot DataSet)
+method to return a DataSet instance of the appropriate type.
+
+In order to facilitate this, when the Gnuplot file is loaded, Array, Matrix,
+String, and NArray will have the gpds method added.  This method returns a new
+instance of the Gnuplot::DataSet object that is initialized with the receiver.
+
+
+-- PlotBase has been removed and Plot is now the base class.  Splot now
+derives from Plot.
+
+-- Beginnings of some unit tests (bad coder for not doing this earlier).
+
+-- Demos have been broken out into their own files.
+
+
