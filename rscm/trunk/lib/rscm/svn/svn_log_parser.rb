@@ -32,7 +32,7 @@ module RSCM
     end
   end
   
-  class SVNLogEntryParser < RSCM::Parser
+  class SVNLogEntryParser < Parser
 
     def initialize(path, checkout_dir)
       super(/^------------------------------------------------------------------------/)

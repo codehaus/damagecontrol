@@ -123,6 +123,13 @@ module RSCM
       end
     end
 
+    def test_should_allow_creation_with_empty_constructor
+      scm = create_scm(new_temp_dir, ".")
+      scm2 = scm.class.new
+      assert_same(scm.class, scm2.class)
+    end
+  private
+
     def new_temp_dir
       identifier = identifier.to_s
       identifier.gsub!(/\(|:|\)/, '_')

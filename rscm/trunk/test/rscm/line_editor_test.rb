@@ -7,7 +7,7 @@ require 'rscm/line_editor'
 module RSCM
   class LineEditorTest < Test::Unit::TestCase
 
-    include RSCM::LineEditor
+    include LineEditor
     include FileUtils
 
 ORIGINAL_FILE = <<-EOF

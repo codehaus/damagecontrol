@@ -1,6 +1,6 @@
 = RSCM - Ruby Source Control Management
 
-RSCM is a Ruby library for various SCM systems. RSCM provides an intuitive API
+RSCM is a Ruby library for various Source Control Management (SCM) systems. RSCM provides an intuitive API
 which is described in AbstractSCM.
 
 RSCM is currently used inside DamageControl. Let us know if you use it for something else.

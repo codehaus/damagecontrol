@@ -1,4 +1,5 @@
 require 'rscm/changes'
+require 'rscm/abstract_scm'
 require 'rscm/tracker'
 require 'rscm/scm_web'
 require 'rscm/cvs/cvs'

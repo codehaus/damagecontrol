@@ -12,13 +12,12 @@ module RSCM
   # and *not* the cygwin binaries.
   class SVN < AbstractSCM
     include FileUtils
-    include RSCM::PathConverter
-    include RSCM::LineEditor
+    include PathConverter
     
     attr_accessor :svnurl
     attr_accessor :svnpath
 
-    def initialize(svnurl, svnpath="")
+    def initialize(svnurl=nil, svnpath="")
       @svnurl, @svnpath = svnurl, svnpath
     end
 
@@ -31,7 +30,7 @@ module RSCM
     end
 
     def checkout(checkout_dir, scm_to_time=nil, &line_proc)
-      checkout_dir = filepath_to_nativepath(checkout_dir, false)
+      checkout_dir = PathConverter.filepath_to_nativepath(checkout_dir, false)
       mkdir_p(checkout_dir)
       checked_out_files = []
       path_regex = /^[A|D|U]\s+(.*)/
@@ -50,8 +49,8 @@ module RSCM
           if(line =~ path_regex)
             native_absolute_path = $1
             native_checkout_dir = $1
-            absolute_path = nativepath_to_filepath($1)
-            native_checkout_dir = filepath_to_nativepath(checkout_dir, false)
+            absolute_path = PathConverter.nativepath_to_filepath($1)
+            native_checkout_dir = PathConverter.filepath_to_nativepath(checkout_dir, false)
             if(File.exist?(absolute_path) && !File.directory?(absolute_path))
               relative_path = native_absolute_path[native_checkout_dir.length+1..-1].chomp
               relative_path = relative_path.gsub(/\\/, "/") if WINDOWS
@@ -122,8 +121,8 @@ module RSCM
     end
 
     def create(&line_proc)      
-      native_path = filepath_to_nativepath(svnrootdir, true)
-      mkdir_p(nativepath_to_filepath(native_path))
+      native_path = PathConverter.filepath_to_nativepath(svnrootdir, true)
+      mkdir_p(PathConverter.nativepath_to_filepath(native_path))
       svnadmin(svnrootdir, "create #{native_path}", &line_proc)
     end
 
@@ -141,7 +140,7 @@ module RSCM
     
     def trigger_installed?(trigger_command, trigger_files_checkout_dir)
       return false unless File.exist?(post_commit_file)
-      not_already_commented = comment_out(File.new(post_commit_file), /#{Regexp.escape(trigger_command)}/, "# ", "")
+      not_already_commented = LineEditor.comment_out(File.new(post_commit_file), /#{Regexp.escape(trigger_command)}/, "# ", "")
       not_already_commented
     end
     
@@ -151,7 +150,7 @@ module RSCM
     end
 
     def changesets(checkout_dir, scm_from_time, scm_to_time=nil, files=nil, &line_proc)
-      checkout_dir = filepath_to_nativepath(checkout_dir, false)
+      checkout_dir = PathConverter.filepath_to_nativepath(checkout_dir, false)
       changesets = nil
       command = "svn #{changes_command(scm_from_time, scm_to_time, files)}"
       yield command if block_given?

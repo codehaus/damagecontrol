@@ -1,9 +1,11 @@
 require 'rss/maker'
+require 'xmlrpc/utils'
 
 module RSCM
 
   class ChangeSets
     include Enumerable
+    include XMLRPC::Marshallable
 
     attr_reader :changesets
 
@@ -77,11 +79,13 @@ module RSCM
         rss.channel.title = title
         rss.channel.link = link
         rss.channel.description = description
+        rss.channel.generator = "RSCM - Ruby Source Control Management"
 
         changesets.each do |changeset|
           item = rss.items.new_item
           
           item.pubDate = changeset.time
+          item.author = changeset.developer
           item.title = changeset.message
           item.link = change_linker.changeset_url(changeset, true)
           item.description = message_linker.highlight(changeset.message).gsub(/\n/, "<br/>\n") << "<p/>\n"
@@ -97,6 +101,7 @@ module RSCM
 
   class ChangeSet
     include Enumerable
+    include XMLRPC::Marshallable
 
     attr_reader :changes
     attr_accessor :revision
@@ -164,6 +169,7 @@ module RSCM
   end
 
   class Change
+    include XMLRPC::Marshallable
 
     MODIFIED = "MODIFIED"
     DELETED = "DELETED"

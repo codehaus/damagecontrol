@@ -2,12 +2,12 @@ require 'rubygems'
 require 'rake'
 require 'rake/testtask'
 
-require 'server/damagecontrol/Version'
+#require 'damagecontrol/Version'
 
 $VERBOSE = nil
 
-DC_BUILD_NUMBER = ENV['DAMAGECONTROL_BUILD_LABEL'] || ENV['build'] || ENV['build_number'] || DamageControl::BUILD
-DC_RELEASE_NAME = DamageControl::RELEASE
+DC_BUILD_NUMBER = ENV['DAMAGECONTROL_BUILD_LABEL'] || ENV['build'] || ENV['build_number']
+DC_RELEASE_NAME = '0.4-alpha'
 DC_VERSION = "#{DC_RELEASE_NAME}-#{DC_BUILD_NUMBER}"
 DC_DIST_NAME = "damagecontrol-#{DC_VERSION}"
 DC_TARGET_DIR = ENV['target_dir'] || "target"
@@ -81,17 +81,20 @@ task :fix_permissions do
   end
 end
 
+test_file_pattern = ENV["TEST_FILES"] ? ENV["TEST_FILES"] : 'lib/damagecontrol/**/*est.rb'
+fl = FileList.new(test_file_pattern)
+
 desc "Run Unit Tests"
 Rake::TestTask.new :unit_test do |t|
-  t.libs << "server"
-  t.pattern = "server/damagecontrol/test/AllTests.rb"
+  t.libs << "test"
+  t.test_files = fl
   t.verbose = true
 end
 
 desc "Run Integration Tests"
 Rake::TestTask.new :integration_test do |t|
-  t.libs << "server"
-  t.pattern = "server/damagecontrol/test/End2EndTest.rb"
+  t.libs << "test"
+  t.pattern = "damagecontrol/test/End2EndTest.rb"
   t.verbose = true
 end
 

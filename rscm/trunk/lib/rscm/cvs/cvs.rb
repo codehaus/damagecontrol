@@ -8,16 +8,13 @@ module RSCM
 
   class CVS < AbstractSCM
 
-    include RSCM::PathConverter
-    include RSCM::LineEditor
-
   public
     attr_accessor :cvsroot
     attr_accessor :cvsmodule
     attr_accessor :cvsbranch
     attr_accessor :cvspassword
     
-    def initialize(cvsroot, cvsmodule, cvsbranch=nil, cvspassword=nil)
+    def initialize(cvsroot=nil, cvsmodule=nil, cvsbranch=nil, cvspassword=nil)
       @cvsroot, @cvsmodule, @cvsbranch, @cvspassword = cvsroot, cvsmodule, cvsbranch, cvspassword
     end
 
@@ -126,7 +123,7 @@ module RSCM
         return false if !File.exist?(loginfo)
 
         # returns true if commented out. doesn't modify the file.
-        in_local_copy = comment_out(File.new(loginfo), regex, "# ", "")
+        in_local_copy = LineEditor.comment_out(File.new(loginfo), regex, "# ", "")
         # Also verify that loginfo has been committed back to the repo
         entries = File.join(trigger_files_checkout_dir, "CVS", "Entries")
         committed = File.mtime(entries) >= File.mtime(loginfo)
@@ -336,7 +333,7 @@ module RSCM
 
   # Convenience factory method used in testing
   def CVS.local(cvsroot_dir, cvsmodule)
-    cvsroot_dir = RSCM::PathConverter.filepath_to_nativepath(cvsroot_dir, true)
+    cvsroot_dir = PathConverter.filepath_to_nativepath(cvsroot_dir, true)
     CVS.new(":local:#{cvsroot_dir}", cvsmodule)
   end
 end

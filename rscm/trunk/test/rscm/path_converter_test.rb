@@ -3,8 +3,7 @@ require 'rscm/path_converter'
 
 module RSCM
   class PathConverterTest < Test::Unit::TestCase
-
-    include RSCM::PathConverter
+    include PathConverter
 
     def test_should_convert_os_path_to_native_path
       p1 = nil
