@@ -67,34 +67,6 @@ module WEBrick
 end
 
 module DamageControl
-  # Backwards compatibility for old DC configs. This will go away one day.
-
-  class Jira < RSCM::Tracker::JIRA
-  end
-  class RubyForgeTracker < RSCM::Tracker::RubyForge
-  end
-  class Scarab < RSCM::Tracker::Scarab
-  end
-  class SourceForgeTracker < RSCM::Tracker::SourceForge
-  end
-  class Bugzilla < RSCM::Tracker::Bugzilla
-  end
-  class CVS < RSCM::CVS
-  end
-  class SVN < RSCM::SVN
-  end
-  class ChangeSets < RSCM::ChangeSets
-  end
-  class ChangeSet < RSCM::ChangeSet
-  end
-  class Change < RSCM::Change
-  end
-
-
-  # UPGRADE: Migration of old timestamps in build_history.yaml to new ones
-  class Build
-    attr_accessor :timestamp, :start_time, :end_time
-  end
 
   class DamageControlServer
     include FileUtils
@@ -173,6 +145,12 @@ module DamageControl
       component(:project_directories, ProjectDirectories.new(rootdir))
       component(:project_config_repository, ProjectConfigRepository.new(project_directories, public_web_url))
       component(:build_history_repository, BuildHistoryRepository.new(hub, project_directories, BuildSerializer.new(web_url)))
+
+      # Let's keep this, but empty/modify method bodies as necessary between releases.
+      project_config_repository.upgrade_all
+# THIS SEEMS TO TOTALLY MESS UP THE YAMLs - either a yaml bug or we're not opening/closing changesets.yaml files properly.
+# Grab some yamls from BuildSerializerTest - stick in a DC installation and try it out to debug this. (AH)
+# build_history_repository.upgrade_all
     end
     
     def init_components

@@ -26,6 +26,17 @@ module DamageControl
     include FileUtils
     include Logging
 
+    # TODO: delete in a later release (plus the BWC stash at the bottom)
+    # This will upgrade the old yamls to use new RSCM class names
+    def upgrade_all
+      @project_directories.project_names.each do |project_name|
+        history = history(project_name, true)
+        history.each do |build|
+          register(build)
+        end
+      end
+    end
+
     def initialize(channel, project_directories, build_serializer)
       super
       channel.add_consumer(self)
@@ -112,6 +123,7 @@ module DamageControl
       File.new(@project_directories.rss_file(project_name)).read
     end
     
+    # TODO: figure out whether to keep this in BHR or here!!!
     def project_config(project_name)
       config_map = File.open(@project_directories.project_config_file(project_name)) do |io|
         YAML::load(io)

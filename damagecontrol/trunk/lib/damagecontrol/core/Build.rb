@@ -26,7 +26,7 @@ module DamageControl
     attr_accessor :config
     attr_accessor :changesets
     attr_accessor :label
-    # This can go - it is redundant to what goes in stderr log. and it is never accessed
+    # error_message can go - it is redundant to what goes in stderr log. and it is never accessed
     attr_accessor :error_message
     attr_accessor :status
 
@@ -95,18 +95,27 @@ module DamageControl
     end
 
     # Populates an RSS item
-    # Also see the native RSS support in RSCM::ChangeSets which is somewhat similar.
+    # Also see the native RSS support in RSCM::ChangeSets which is somewhat similar, but with slightly
+    # different content.
     def populate(rss_item, message_linker, change_linker)
       label_text = if successful? then "##{label} " else "" end
       title = "#{project_name}: Build #{label_text}#{status}"
 
       rss_item.pubDate = dc_creation_time
-      rss_item.author = changesets.developers
+      rss_item.author = changesets.developers.join(", ")
       rss_item.title = title
-      rss_item.link = url # YUK - pass in instead
-      rss_item.description = message_linker.highlight(changeset.message).gsub(/\n/, "<br/>\n") << "<p/>\n"
-      changeset.each do |change|
-        rss_item.description << change_linker.change_url(change, true) << "<br/>\n"
+      rss_item.link = url # YUK - pass in to this method instead
+      
+      if(!changesets.empty?)
+        changesets.each do |changeset|
+          rss_item.description = message_linker.highlight(changeset.message).gsub(/\n/, "<br/>\n") << "<p/>\n"
+          changeset.each do |change|
+            rss_item.description << change_linker.change_url(change, true) << "<br/>\n"
+          end
+          rss_item.description << "-----------------------------<p/>" # dang! what's the HTML vertical bar again....
+        end
+      else
+        rss_item.description << "No changes in this build (since the last build)"
       end
     end
 

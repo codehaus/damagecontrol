@@ -30,6 +30,15 @@ module DamageControl
     include FileUtils
     include Logging
     
+    # TODO: delete in a later release (plus the BWC stash at the bottom)
+    # This will upgrade the old yamls to use new RSCM class names
+    def upgrade_all
+      project_names.each do |project_name|
+        conf = project_config(project_name)
+        modify_project_config(project_name, conf)
+      end
+    end
+
     def initialize(project_directories, public_web_url)
       @project_directories = project_directories
       @public_web_url = public_web_url
@@ -54,10 +63,10 @@ module DamageControl
       @project_directories.project_names
     end
     
-    # DEPRECATED - use BHR
+    # TODO: figure out whether to keep this in BHR or here!!! (prolly here)
     def project_config(project_name)
       config_map = File.open(@project_directories.project_config_file(project_name)) do |io|
-        parse_project_config(io.gets(nil))
+        YAML::load(io)
       end
       config_map["project_name"] = project_name
       config_map
@@ -137,12 +146,44 @@ module DamageControl
       upgrade_removed_key(old_key, config_map)
     end
 
-    def parse_project_config(config_content)
-      config = YAML::load(config_content)
-      raise InvalidProjectConfiguration.new(config_content) unless config.is_a? Hash
-      config
-    end
-    
   end
   
+  # Backwards compatibility for old DC configs. 
+
+  module BWC
+    def class
+      super.superclass
+    end
+  end
+  class Jira < RSCM::Tracker::JIRA
+    include BWC
+  end
+  class RubyForgeTracker < RSCM::Tracker::RubyForge
+    include BWC
+  end
+  class Scarab < RSCM::Tracker::Scarab
+    include BWC
+  end
+  class SourceForgeTracker < RSCM::Tracker::SourceForge
+    include BWC
+  end
+  class Bugzilla < RSCM::Tracker::Bugzilla
+    include BWC
+  end
+  class CVS < RSCM::CVS
+    include BWC
+  end
+  class SVN < RSCM::SVN
+    include BWC
+  end
+  class ChangeSets < RSCM::ChangeSets
+    include BWC
+  end
+  class ChangeSet < RSCM::ChangeSet
+    include BWC
+  end
+  class Change < RSCM::Change
+    include BWC
+  end
+
 end
