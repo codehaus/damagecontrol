@@ -15,9 +15,11 @@ module DamageControl
   
     attr_accessor :port
     
-    def initialize(channel, port=4711)
+    def initialize(channel, port=4711, allowed_client_hostnames=["localhost"], allowed_client_ips=["127.0.0.1"] )
       @channel = channel
       @port = port
+      @allowed_client_hostnames = allowed_client_hostnames
+      @allowed_client_ips = allowed_client_ips
     end
     
     # Creates a trigger command that is compatible with the create_build
@@ -53,10 +55,16 @@ module DamageControl
           
           while (session = @server.accept)
             begin
-              payload = session.gets
-              do_accept(payload)
-              session.print("DamageControl got your message\r\n")
-              session.print("http://damagecontrol.codehaus.org/\r\n")
+              client_hostname = client.addr[2]
+              client_ip = client.addr[3]
+              if(allowed?(client_hostname, client_ip))
+                payload = session.gets
+                do_accept(payload)
+                session.print("DamageControl got your message\r\n")
+                session.print("http://damagecontrol.codehaus.org/\r\n")
+              else
+                session.print("Connections are not allowed from #{client_ip}")
+              end
             ensure
               session.close
             end
@@ -72,7 +80,10 @@ module DamageControl
         end
       }
     end
-
+    
+    def allowed?(client_hostname, client_ip)
+      !@allowed_client_hostnames.index(client_hostname).nil? || !@allowed_client_ips.index(client_ip).nil?
+    end
   end
 end
 

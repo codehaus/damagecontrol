@@ -4,6 +4,7 @@ require 'damagecontrol/SocketTrigger'
 require 'damagecontrol/Hub'
 require 'damagecontrol/Build'
 require 'damagecontrol/FileUtils'
+require 'damagecontrol/HubTestHelper'
 
 require 'socket'
 
@@ -56,6 +57,18 @@ module DamageControl
 
     def TODO_test_resets_modification_set_on_succesful_build
       
+    end
+    
+    def test_accepts_local_ip
+      assert(@s.allowed?("blah", "127.0.0.1"))
+    end
+
+    def test_accepts_local_host
+      assert(@s.allowed?("localhost", "128.0.0.1"))
+    end
+
+    def test_rejects_other
+      assert(!@s.allowed?("blah", "128.0.0.1"))
     end
 
   private
