@@ -94,7 +94,7 @@ module DamageControl
          "#{hours} hour#{plural? hours} ago"
       elsif (duration > 60)
          minutes = duration / 60
-         "#{minutes} minutes#{plural? minutes} ago"
+         "#{minutes} minute#{plural? minutes} ago"
       else
          "less than a minute ago"
       end
