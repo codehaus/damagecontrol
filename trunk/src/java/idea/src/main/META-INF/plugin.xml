@@ -1,0 +1,14 @@
+<idea-plugin>
+    <name>DamageControl</name>
+    <description>DamageControl IDEA Plugin</description>
+    <version>1.0-alpha-1-SNAPSHOT</version>
+    <vendor>ThoughtWorks</vendor>
+    <idea-version min="3.0" max="4.0"/>
+
+    <application-components>
+        <component>
+            <implementation-class>com.thoughtworks.damagecontrol.idea.IDEAPlugin</implementation-class>
+        </component>
+    </application-components>
+</idea-plugin>
+
