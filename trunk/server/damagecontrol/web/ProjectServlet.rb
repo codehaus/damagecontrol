@@ -3,6 +3,25 @@ require 'damagecontrol/scm/SCMFactory'
 require 'damagecontrol/util/FileUtils'
 
 module DamageControl
+  class Tab
+    attr_reader :id
+    attr_reader :title
+    attr_reader :content
+    attr_reader :icon
+    
+    def initialize(id, title, content, icon=nil)
+      @id = id
+      @title = title
+      @content = content
+      @icon = icon
+    end
+    
+    def ==(other_tab)
+      return false unless other_tab.is_a? Tab
+      id == other_tab.id
+    end
+  end
+  
   class ProjectServlet < AbstractAdminServlet
     include FileUtils
   
@@ -47,7 +66,7 @@ module DamageControl
     end
     
     def build_details
-      if selected_build then
+      if selected_build
         render("build_details.erb", binding)
       else
         render("never_built.erb", binding)
@@ -55,9 +74,38 @@ module DamageControl
     end
     
   protected
-  
-    def tasks
+
+    def tabs
+      tabs = []
+      if selected_build
+        tabs +=
+          [
+            Tab.new("changes", "Changes", changes(:changesets => selected_build.changesets))
+          ]
+      end
+      if selected_build.log_file && File.exists?(selected_build.log_file)
+        tabs +=
+          [
+            Tab.new("console", "Console Output", "<pre>#{File.read(selected_build.log_file)}</pre>", "icons/console_network.png")
+          ]
+      end
+      tabs
+    end
     
+    def selected_tab
+      id = selected_tab_id
+      tabs.find {|t| id == t.id }
+    end
+    
+    def selected_tab_id
+      request.query["tab"] || default_tab_id
+    end
+    
+    def default_tab_id
+      "changes"
+    end
+    
+    def tasks    
       result = super
       unless project_name.nil?
         if(private?)
@@ -67,7 +115,6 @@ module DamageControl
               task(:icon => "icons/wrench.png", :name => "Configure", :url => "configure?project_name=#{project_name}&action=configure"),
               task(:icon => "icons/gears_run.png", :name => "Trig build now", :url => "?project_name=#{project_name}&action=trig_build"),
               task(:icon => "icons/gear_connection.png", :name => "Install trigger", :url => "install_trigger?project_name=#{project_name}"),
-              task(:icon => "icons/console_network.png", :name => "Console output", :url => "log?project_name=#{project_name}&timestamp=#{selected_build.timestamp}")
             ]
         end
         result +=
@@ -111,6 +158,11 @@ module DamageControl
       erb("components/search_form.erb", binding)
     end
     
+    def changes(params)
+      changesets = params[:changesets] || required_param(:changesets)
+      erb("components/changes.erb", binding)
+    end
+    
     def navigation
       builds_table(
           :header_text => "Build history", 
@@ -122,14 +174,6 @@ module DamageControl
   
   private
   
-    def has_report_snippet?(build)
-      File.exists?(project_config_repository.report_snippet_file(project_name, build.timestamp_as_s))
-    end
-  
-    def report_snippet(build)
-      File.read(project_config_repository.report_snippet_file(project_name, build.timestamp_as_s))
-    end
-    
     def build_description(build)
       label = "##{build.label}"; 
       label = build.status if label == "#"

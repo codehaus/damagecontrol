@@ -5,6 +5,11 @@ require 'pebbles/mockit'
 require 'test/unit'
 
 module DamageControl
+  class TabTest < Test::Unit::TestCase
+    def test_can_read_content
+    end
+  end
+  
   class ProjectServletTest < Test::Unit::TestCase
     include FileUtils
     include Pebbles::MVCServletTesting

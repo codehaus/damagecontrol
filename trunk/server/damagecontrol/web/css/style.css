@@ -34,11 +34,13 @@ td {
 
 #main-panel {
   width: 70%;
+  padding-left: 5px;
 }
 
 #side-panel {
   padding-right: 1em;
   width: 30%;
+  border-right: 1px solid #7f7f7f;
 }
 
 #footer {
@@ -87,6 +89,27 @@ a.tip:hover span {
 img {
   vertical-align: middle;
   border: 0;
+}
+
+table.tab {
+  border-collapse: collapse;
+}
+
+td.selected_tab {
+  vertical-align: middle;
+  border: 1px #7f7f7f solid;
+  background: #ffffff;
+}
+
+td.tab_filler {
+  background: #ffffff;
+  border-bottom: 1px #7f7f7f solid;
+}
+
+td.tab {
+  vertical-align: middle;
+  border: 1px #7f7f7f solid;
+  background: #f0f0f0;
 }
 
 div.dashboard {

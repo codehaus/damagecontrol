@@ -1,0 +1,39 @@
+<table class="pane">
+
+  <tr><td class="pane-header" colspan="3">
+    Changes
+  </td></tr>
+  <% if(changesets.length == 0)then %>
+    <tr>
+      <td colspan="3">
+        <%= no_changes_in_this_build %>
+      </td>
+    </tr>
+  <% else %>
+    <%
+    changesets.each do |changeset|
+    %>
+
+      <tr class="pane">
+        <td colspan="3" class="changeset"><%= changeset.developer %> : <%= quote_message(changeset.message) %></td>
+      </tr>
+      <%
+      changeset.each do |change|
+      %>
+      <tr>
+        <td><image src="<%= file_icon(change) %>"/></td>
+        <td><%= change.revision %></td>
+        <td>
+          <% if scm_url(change) then %>
+            <a href="<%= scm_url(change) %>"><%= change.path %></a>
+          <% else %>
+            <%= change.path %>
+          <% end %>
+        </td>
+      </tr>
+      <% end %>
+
+    <% end %>
+  <% end %>
+  
+</table>
