@@ -1,4 +1,3 @@
-require 'test/unit'
 require 'damagecontrol/Hub'
 require 'damagecontrol/FilePoller'
 require 'damagecontrol/BuildCompleteEvent'

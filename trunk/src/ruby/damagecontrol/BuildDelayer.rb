@@ -11,6 +11,8 @@ module DamageControl
 	class BuildDelayer
 		attr_accessor :quiet_period
 		attr_accessor :clock
+		
+		include TimerMixin
 	
 		def initialize(receiver)
 			@clock = Clock.new

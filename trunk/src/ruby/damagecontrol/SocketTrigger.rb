@@ -17,12 +17,12 @@ module DamageControl
 			@hub.publish_message(BuildRequestEvent.new(@project))
 		end
 		
-		def start_listening
+		def start
 			Thread.new() {
 				puts "Starting server"
 				$stdout.flush
 				
-				@server = TCPServer.new(10000)
+				@server = TCPServer.new(4711)
 				puts "Server started"				
 				$stdout.flush
 				

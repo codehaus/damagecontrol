@@ -10,4 +10,6 @@ REM
 REM (*)
 REM DEFAULT damagecontrol.bat name_of_the_project %{sVv}
 
+ECHO "Calling into DamageControl"
+
 ECHO BUILD %* | C:\cygwin\bin\nc localhost 4711

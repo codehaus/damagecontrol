@@ -13,6 +13,7 @@ module DamageControl
 		
 		def receive_message(message)
 			if message.is_a? BuildRequestEvent
+				puts "building #{message.project.name}"
 				@current_project = message.project
 				@current_project.build {|progress|
 					progress.each_line {|line|

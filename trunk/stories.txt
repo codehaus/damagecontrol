@@ -1,6 +1,6 @@
 PLANNED
 
-Start process every (say) 10 minutes.
+Complete full circle using CVS and simple build.
 
 Start process (a build) on (any) incoming request on socket.
 
@@ -56,3 +56,6 @@ Save history of build times.
 Integrate with intra-project dependency managing builder to trigger downstream builds.Start process (a build) on (any) incoming request on socket.
 
 FIXED
+
+Start process every (say) 10 minutes.
+
