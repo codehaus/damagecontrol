@@ -19,7 +19,7 @@ module DamageControl
     end
   
     def test_file_is_written_in_correct_location_upon_build_complete_event    
-      build = Build.new("project_name", ":local:/foo/bar:zap", nil)
+      build = Build.new("project_name")
       build.timestamp = "19770614002000"
       
       @template.__return(:file_type, "html")

@@ -14,7 +14,8 @@ module DamageControl
 
       @writer = LogWriter.new(@hub, "#{damagecontrol_home}/target/logwritertest")
       
-      @build = Build.new("project_name", ":local:/foo/bar:zap", nil)
+      @build = Build.new("project_name")
+
       @build.label = "a_label"
       @build.timestamp = "19770614002000"
     end

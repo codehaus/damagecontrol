@@ -20,45 +20,21 @@ module DamageControl
       @project_name = "picocontainer"
       @scm_spec = ":local:/cvsroot/picocontainer:pico"
       @build_command_line = "echo damagecontrol rocks"
+      @nag_email = "damagecontrol@codehaus.org"
     end
     
     def test_fires_build_request_on_socket_accept
-
-      @s.do_accept(cvs_trigger_command)
       
-    end
-        
-    def test_fires_build_request_on_socket_accept
-      
-      tc = cvs_trigger_command
+      build = @s.do_accept(cvs_build_spec)
 
-      io = IO.popen(tc) do |io|
-        io.each_line do |output|
-          build = @s.do_accept(output)
-          
-          assert_got_message(BuildRequestEvent)
-          build = messages_from_hub[0].build
-          assert_equal(@project_name,       build.project_name)
-          assert_equal(@scm_spec,           build.scm_spec)
-          assert_equal(@build_command_line, build.build_command_line)
-        end
-      end
-      
-      assert_equal("0", $?.to_s)
-    end
-
-    def TODO_test_uses_modification_from_request_payload
+      assert_got_message(BuildRequestEvent)
+      build = messages_from_hub[0].build
+      assert_equal(@project_name,       build.project_name)
+      assert_equal(@scm_spec,           build.scm_spec)
+      assert_equal(@build_command_line, build.build_command_line)
       
     end
 
-    def TODO_test_includes_all_modifications_since_last_succesful_build
-      
-    end
-
-    def TODO_test_resets_modification_set_on_succesful_build
-      
-    end
-    
     def test_accepts_local_ip
       assert(@s.allowed?("blah", "127.0.0.1"))
     end
@@ -73,15 +49,16 @@ module DamageControl
 
   private
   
-    def cvs_trigger_command
+    def cvs_build_spec
       nc_command = cat_command # behaves like ncat without the network
       dc_host = ""
       dc_port = ""
       
-      tc = @s.trigger_command(
+      tc = BuildBootstrapper.build_spec(
         @project_name, \
         @scm_spec, \
         @build_command_line, \
+        @nag_email, \
         nc_command, \
         dc_host, \
         dc_port)

@@ -10,7 +10,7 @@ module DamageControl
     def test_successful_build_data
       cc_log_file = "#{damagecontrol_home}/testdata/log20030929145347.xml"
       reader = CruiseControlLogParser.new
-      build = Build.new("dxbranch", ":local:/foo:bar", "dummy command line")
+      build = Build.new("dxbranch")
       reader.parse(cc_log_file, build)
 
       assert_equal('dxbranch', build.project_name)

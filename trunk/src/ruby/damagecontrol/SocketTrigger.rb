@@ -1,6 +1,8 @@
 require 'socket'
+require 'yaml'
 require 'damagecontrol/BuildEvents'
 require 'damagecontrol/Build'
+require 'damagecontrol/BuildBootstrapper'
 
 module DamageControl
 
@@ -20,29 +22,12 @@ module DamageControl
       @port = port
       @allowed_client_hostnames = allowed_client_hostnames
       @allowed_client_ips = allowed_client_ips
+      
+      @build_bootstrapper = BuildBootstrapper.new
     end
     
-    # Creates a trigger command that is compatible with the create_build
-    # method. This method is used to create a command string that can
-    # be installed in various SCM's trigger mechanisms.
-    #
-    # @param project_name a logical name for the project (no spaces please)
-    # @param path full SCM spec (example: :local:/cvsroot/picocontainer:pico)
-    # @param build_command_line command line that will run the build
-    # @param host where the dc server is running
-    # @param port where the dc server is listening
-    # @param replace_string what to replace "/" with (needed for CVS on windows)
-    def trigger_command(project_name, spec, build_command_line, nc_command, dc_host, dc_port, path_sep="/")
-      "echo #{project_name},#{spec.gsub('/', path_sep)},#{build_command_line}|#{nc_command} #{dc_host} #{dc_port}"
-    end
-
-    def create_build(build_spec)
-      project_name, scm_spec, build_command_line = build_spec.split(",")
-      Build.new(project_name.chomp, scm_spec.chomp, build_command_line.chomp)
-    end
-
     def do_accept(payload)
-      build = create_build(payload)
+      build = @build_bootstrapper.create_build(payload)
       @channel.publish_message(BuildRequestEvent.new(build))
     end
     
@@ -58,8 +43,8 @@ module DamageControl
               client_hostname = socket.peeraddr[2]
               client_ip = socket.peeraddr[3]
               if(allowed?(client_hostname, client_ip))
-                payload = socket.gets
-		begin
+                payload = socket.gets(nil)
+                begin
                   do_accept(payload)
                   socket.print("DamageControl on #{@server.addr[2]}/#{@server.addr[3]} got your message (#{client_hostname} / #{client_ip})\r\n")
                   socket.print("http://damagecontrol.codehaus.org/\r\n")

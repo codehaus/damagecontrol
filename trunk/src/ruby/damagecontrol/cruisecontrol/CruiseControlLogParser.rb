@@ -35,10 +35,6 @@ module DamageControl
         if res.start_element? and res[0] == 'property'
           build.label              = res[1]['value'] if res[1]['name'] == 'label'
           build.timestamp          = res[1]['value'] if res[1]['name'] == 'cctimestamp'
-
-          build.project_name       = res[1]['value'] if res[1]['name'] == 'projectname'
-          build.scm_spec           = res[1]['value'] if res[1]['name'] == 'scm_spec'
-          build.build_command_line = res[1]['value'] if res[1]['name'] == 'build_command_line'
         end
                 
         return if res.end_element? and res[0] == 'info'

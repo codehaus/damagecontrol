@@ -17,6 +17,7 @@ require 'damagecontrol/BuildExecutorTest'
 
 require 'damagecontrol/publisher/IRCPublisherTest'
 require 'damagecontrol/publisher/FilePublisherTest'
+require 'damagecontrol/publisher/EmailPublisherTest'
 
 require 'damagecontrol/template/HTMLTemplateTest'
 

@@ -15,18 +15,16 @@ module DamageControl
   class Build
 
     attr_accessor :project_name
-    attr_accessor :scm_spec
-    attr_accessor :build_command_line
+    attr_accessor :config
     attr_accessor :timestamp
     attr_accessor :modification_set
     attr_accessor :label
     attr_accessor :error_message
     attr_accessor :successful
     
-    def initialize(project_name = nil, scm_spec = nil, build_command_line = nil)
+    def initialize(project_name = nil, config={})
       @project_name = project_name
-      @scm_spec = scm_spec
-      @build_command_line = build_command_line
+      @config = config
       
       @modification_set = []
       @timestamp = Build.format_timestamp(Time.now)
@@ -36,5 +34,12 @@ module DamageControl
       time.strftime("%Y%m%d%H%M%S")
     end
     
+    def scm_spec
+      config["scm_spec"]
+    end
+
+    def build_command_line
+      config["build_command_line"]
+    end
   end
 end

@@ -108,6 +108,7 @@ module DamageControl
       project_name, \
       spec, \
       build_command_line, \
+      nag_email, \
       dc_host="localhost", \
       dc_port="4711", \
       nc_exe_file="nc", \
@@ -117,7 +118,7 @@ module DamageControl
       checkout("#{cvsroot(spec)}:CVSROOT", directory, &proc)
       Dir.chdir("#{directory}")
       File.open("#{directory}/loginfo", File::WRONLY | File::APPEND) do |file|
-        script = SocketTrigger.new(nil,nil,nil).trigger_command(project_name, spec, build_command_line, nc_command(spec), dc_host, dc_port)
+        script = SocketTrigger.new(nil,nil,nil).trigger_command(project_name, spec, build_command_line, nag_email, nc_command(spec), dc_host, dc_port)
         file.puts("#{mod(spec)} #{script}")
       end
 

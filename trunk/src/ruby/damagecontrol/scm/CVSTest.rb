@@ -92,6 +92,7 @@ module DamageControl
         project_name, \
         spec, \
         build_command, \
+        "maillist@project.bar", \
         "localhost", \
         "4713", \
         nc_exe

@@ -14,16 +14,15 @@ module DamageControl
     def setup
       create_hub
       @build_executor = BuildExecutor.new(hub, File.expand_path("#{damagecontrol_home}/testdata"))
-      @build = Build.new("damagecontrolled")
-      @build.build_command_line = "echo Hello world from DamageControl!"
+      @build = Build.new("damagecontrolled", {"build_command_line" => "echo Hello world from DamageControl!"})
     end
   
     def test_executes_process_and_sends_build_complete_on_build_request
       hub.publish_message(BuildRequestEvent.new(@build))
       @build_executor.force_tick
       assert_message_types([BuildRequestEvent, BuildProgressEvent, BuildCompleteEvent])
-      assert_equal(BuildProgressEvent.new(@build, "Hello world from DamageControl!\n"), messages_from_hub[1])
-      assert_equal("Hello world from DamageControl!\n", messages_from_hub[1].output)
+      assert_equal(BuildProgressEvent.new(@build, "Hello world from DamageControl! \n"), messages_from_hub[1])
+      assert_equal("Hello world from DamageControl! \n", messages_from_hub[1].output)
       assert_equal(BuildCompleteEvent.new(@build), messages_from_hub[2])
     end
     
@@ -44,10 +43,9 @@ module DamageControl
     
     def test_build_failed
     
-      build = Build.new( \
-        "damagecontrolled", \
-        ":local:/foo/bar:zap", \
-        "#{ant} compile")
+      build = Build.new(
+        "damagecontrolled",
+        { "scm_spec" => ":local:/foo/bar:zap", "build_command_line" => "#{ant} compile"})
       
       successful = nil
       @hub.add_subscriber(Subscriber.new do |message|
