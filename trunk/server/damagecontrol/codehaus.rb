@@ -32,7 +32,7 @@ end
 def server.init_custom_components
   
   require 'damagecontrol/publisher/IRCPublisher'
-  component(:irc_publisher, IRCPublisher.new(hub, server, "irc.codehaus.org", '#damagecontrol', "short_html_build_result.erb"))
+  component(:irc_publisher, IRCPublisher.new(hub, self, "irc.codehaus.org", '#damagecontrol', "short_html_build_result.erb"))
   
  # require 'damagecontrol/publisher/GraphPublisher'
  # component(:graph_publisher, GraphPublisher.new(hub, project_directories, build_history_repository))
