@@ -1,10 +1,12 @@
 require 'test/unit'
 require 'rscm'
 require 'rscm/generic_scm_tests'
+require 'rscm/distributed_scm_tests'
 
 module RSCM
   class MonotoneTest < Test::Unit::TestCase
     include GenericSCMTests
+    include DistributedSCMTests
 
     def create_scm(repository_root_dir, path)
       mt = Monotone.new(

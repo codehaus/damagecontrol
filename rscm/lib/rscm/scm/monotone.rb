@@ -34,6 +34,10 @@ module RSCM
       "Monotone"
     end
 
+    def distributed?
+      true
+    end
+
     def add(checkout_dir, relative_filename)
       with_working_dir(checkout_dir) do
         monotone("add #{relative_filename}")
