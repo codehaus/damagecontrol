@@ -52,7 +52,7 @@ module DamageControl
     def content
       changesets = selected_build.changesets
       no_changes_in_this_build =
-        %{No changes in this build (this could happen because the build was manually trigged,
+        %{No changes in this build (this could happen because the build was manually trigged, the changes have not yet been determined,
 the working directory has been cleaned out, or because there has been no successful builds for this project yet)}
       erb("components/changes.erb", binding)
     end
@@ -61,7 +61,7 @@ the working directory has been cleaned out, or because there has been no success
       m = html_quote(message)
       jira_url = ensure_trailing_slash(project_config["jira_url"])
       if(jira_url)
-        m.gsub(/([A-Z]+-[0-9]+)/, "<a href=\"#{jira_url}browse/\\1\">\\1</a>")
+        m.gsub(/\s([A-Z]+-[0-9]+)/, "<a href=\"#{jira_url}browse/\\1\">\\1</a>")
       else
         m
       end

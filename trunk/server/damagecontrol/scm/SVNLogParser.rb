@@ -14,14 +14,18 @@ module DamageControl
     # we need to pass in dates, since the log may contain changes outside the desired dates.
     # this is because the svn log command strangely includes the first changeset before the start date.
     # this is probably an svn bug, or at least a very odd feature.
-    def parse_changesets(start_date, end_date, &line_proc)
+    def parse_changesets(start_date=nil, end_date=nil, &line_proc)
       # skip over the first ------
       @changeset_parser.parse(@io, true, &line_proc)
       changesets = ChangeSets.new
       while(!@io.eof?)
         changeset = @changeset_parser.parse(@io, &line_proc)
-        if(changeset && start_date < changeset.time && changeset.time <= end_date)
-          changesets.add(changeset)
+        if(changeset)
+          after_required = start_date.nil? || start_date < changeset.time
+          before_required = end_date.nil? || changeset.time <= end_date
+          if(after_required && before_required)
+            changesets.add(changeset)
+          end
         end
       end
       changesets
@@ -65,7 +69,8 @@ module DamageControl
       @changeset = ChangeSet.new
       @changeset.message = ""
       revision, developer, time, the_rest = line.split("|")
-      @changeset.revision = revision.strip unless revision.nil?
+      # we don't want the r
+      @changeset.revision = revision.strip[1..-1] unless revision.nil?
       @changeset.developer = developer.strip unless developer.nil?
       @changeset.time = parse_time(time.strip) unless time.nil?
     end

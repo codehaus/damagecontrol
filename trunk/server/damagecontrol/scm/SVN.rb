@@ -63,31 +63,34 @@ module DamageControl
         parser = SVNLogParser.new(io, svnpath)
         parser.parse_changesets(from_time, to_time, &line_proc)
       end
+    end
 
+    def local_revision(checkout_dir)
+      local_revision = nil
+      svn(checkout_dir, "info") do |line|
+        if(line =~ /Revision: (\d)*/)
+          return $1.to_i
+        end
+      end
+    end
+
+    def head_revision(checkout_dir)
+      cmd_with_io(checkout_dir, "svn log -r HEAD") do |io|
+        parser = SVNLogParser.new(io, svnpath)
+        last_changeset = parser.parse_changesets[0]
+        last_changeset.revision.to_i
+      end
     end
 
     def uptodate?(checkout_dir, start_time, end_time)
-      # TODO
-      # 1) svn info -> local revision
-      # 2) svn log -r HEAD -> remote rev
-      # 3) compare revs
-    
       if(!checked_out?(checkout_dir))
         # might as well check it out if it isn't checked out
+        # TODO: is this the right place to do that? prolly not.
         checkout(checkout_dir)
         false
+      else
+        local_revision(checkout_dir) == head_revision(checkout_dir)
       end
-
-      uptodate = true
-      svn(checkout_dir, "status --show-updates") do |io|
-        io.each_line { |line|
-          if(line =~ /\*/)
-            # we get stars if we're not uptodate
-            uptodate = false
-          end
-        }
-      end
-      uptodate
     end
 
   private
@@ -143,10 +146,6 @@ module DamageControl
       raise "can't automatically install trigger for Subversion, you need to install it manually"
     end
   end
-
-  ##################################################################################
-  # This is only used during testing
-  ##################################################################################
 
   class LocalSVN < SVN
     attr_accessor :svnrootdir
