@@ -126,7 +126,7 @@ module DamageControl
         checkout if checkout?
         execute
       rescue Exception => e
-        message = e.message + e.backtrace.join("\n")
+        message = e.message + "\n" + e.backtrace.join("\n")
         current_build.error_message = message
         current_build.status = Build::FAILED
         report_progress("Build failed due to: #{message}")
