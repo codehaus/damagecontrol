@@ -22,9 +22,8 @@ class End2EndTest < Test::Unit::TestCase
 	end
 	
 	def setup
-		@basedir = "../.."
-		Dir.mkdir("#{@basedir}/target")
-		@tempdir = File.expand_path("#{@basedir}/target/temp_e2e_#{Time.new.to_i}")
+		@basedir = File.expand_path("../..")
+		@tempdir = "#{@basedir}/target/temp_e2e_#{Time.new.to_i}"
 		mkdirs(@tempdir)
 		Dir.chdir(@tempdir)
 		@cvsrootdir = "#{@tempdir}/repository"
@@ -34,11 +33,11 @@ class End2EndTest < Test::Unit::TestCase
 	
 	def teardown
 		Dir.chdir(@tempdir)
-		begin
-			delete(@project)
-			delete(@cvsrootdir)
-		rescue
-		end
+		#begin
+		#	delete(@project)
+		#	delete(@cvsrootdir)
+		#rescue
+		#end
 	end
 
 	def create_repository()
@@ -66,19 +65,31 @@ class End2EndTest < Test::Unit::TestCase
 		system("cvs -d#{@cvsroot} import -m 'message' #{project} VENDOR START")
 	end
 	
-	def install_damagecontrol()
+	def install_damagecontrol
 		Dir.chdir(@tempdir)
 		system("cvs -d#{@cvsroot} co CVSROOT")
-		copy("#{@basedir}/src/cvsx/damagecontrol.bat", "CVSROOT/damagecontrol.bat")
+		Dir.chdir("CVSROOT")
+		copy("#{trigger_script}", script_file("damagecontrol"))
 		system("cvs -d#{@cvsroot} add damagecontrol.bat")
-		File.open("CVSROOT/loginfo", File::WRONLY | File::TRUNC) do |file|
+		File.open("checkoutlist", File::WRONLY | File::APPEND) do |file|
+			file.puts
+			file.puts(script_file('damagecontrol'))
+		end
+		system("cvs com -m 'message'")
+	end
+
+	def activate_damagecontrol
+		Dir.chdir(@tempdir)
+		Dir.chdir("CVSROOT")
+		File.open("loginfo", File::WRONLY | File::APPEND) do |file|
+			file.puts
 			file.puts("DEFAULT #{trigger_script} #{@project} %{sVv}")
 		end
-		system("cvs com -m 'message' CVSROOT")
+		system("cvs com -m 'message'")
 	end
 	
 	def trigger_script
-		script_file("${basedir}/src/script/damagecontrol")
+		script_file("#{@basedir}/src/script/damagecontrol")
 	end
 
 	def checkout(project)
@@ -103,14 +114,14 @@ class End2EndTest < Test::Unit::TestCase
 		start_damagecontrol(script_file("build"))
 		create_cvsmodule("e2eproject")
 		install_damagecontrol()
-		checkout("e2eproject")
+		activate_damagecontrol()
 
 		# add build.bat file and commit it (will trigger build)
+		checkout("e2eproject")
 		File.open("e2eproject/build.bat", "w") do |file|
 			file.puts('echo "Hello world from DamageControl"')
 			file.puts('echo "Hello world from DamageControl" > buildresult.txt')
 		end
-		# will trigger a build
 		add_file("e2eproject", "build.bat")
 		
 		# wait for build to complete
