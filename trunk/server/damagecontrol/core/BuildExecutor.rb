@@ -100,6 +100,15 @@ module DamageControl
       @scheduled_build_slot.set(build)
     end
     
+    def status_message
+      status = ""
+      if busy? then
+        status = "Building #{scheduled_build.project_name}"
+      else
+        status = "Idle"
+      end
+    end
+    
     def busy?
       !@scheduled_build_slot.empty?
     end

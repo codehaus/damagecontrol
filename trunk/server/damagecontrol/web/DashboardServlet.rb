@@ -30,15 +30,6 @@ module DamageControl
       erb("components/build_queue.erb", binding)
     end
     
-    def build_executor_status_message(build_executor)
-      status = ""
-      if build_executor.busy? then
-        status = "Building #{build_executor.scheduled_build.project_name}"
-      else
-        status = "Idle"
-      end
-    end
-    
     def build_executor_status
       build_executors = build_scheduler.executors
       erb("components/build_executor_status.erb", binding)

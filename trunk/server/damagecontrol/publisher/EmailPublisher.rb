@@ -15,15 +15,24 @@ module DamageControl
     attr_accessor :port
     attr_accessor :always_mail
     
-    def initialize(channel, subject_template, body_template, from, always_mail=false, mail_server="localhost", port=25)
+    def initialize(channel, build_history_repository, config = {})
       super(channel)
       template_dir = "#{File.expand_path(File.dirname(__FILE__))}/../template"
-      @subject_template = File.new("#{template_dir}/#{subject_template}").read
-      @body_template = File.new("#{template_dir}/#{body_template}").read
-      @from = from
-      @always_mail = always_mail
-      @mail_server = mail_server
-      @port = port
+      subject_template_file = config[:SubjectTemplate] || required_config(:SubjectTemplate)
+      @subject_template = File.new("#{template_dir}/#{subject_template_file}").read
+      body_template_file = config[:BodyTemplate] || required_config(:BodyTemplate)
+      @body_template = File.new("#{template_dir}/#{body_template_file}").read
+      @from = config[:FromEmail] || required_config(:FromEmail)
+      @always_mail = config[:SendEmailOnAllBuilds] || false
+      @mail_server = config[:MailServerHost] || "localhost"
+      @port = config[:MailServerPort] || 25
+      
+      # TODO: backwards compatability, remove on release 1.0
+      raise "EmailPublisher refactored, now needs BuildHistoryRepository, create with: EmailPublisher.new(hub, build_history_repository, ...config etc...)" if build_history_repository.is_a? Hash
+    end
+    
+    def required_config(key)
+      raise "required config parameter #{key}"
     end
   
     def process_message(message)

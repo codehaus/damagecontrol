@@ -31,7 +31,11 @@ def server.init_custom_components
   #component(:irc_publisher, IRCPublisher.new(hub, "some.irc.server", '#somechannel', "short_text_build_result_with_link.erb"))
   
   #require 'damagecontrol/publisher/EmailPublisher'
-  #component(:email_publisher, EmailPublisher.new(hub, "short_text_build_result.erb", "short_html_build_result.erb", "dcontrol@builds.codehaus.org"))
+  #component(:email_publisher, EmailPublisher.new(hub, build_history_repository,
+  #  :SubjectTemplate => "short_text_build_result.erb", 
+  #  :BodyTemplate => "short_html_build_result.erb", 
+  #  :MailServerHost => "localhost",
+  #  :MailServerPort => 25)
   
 end
 
