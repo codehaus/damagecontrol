@@ -106,10 +106,6 @@ module DamageControl
       mock_server.join(2)
       assert(!mock_server.alive?, "mock server didn't get incoming connection")
       mock_server.kill
-            
-      @cvs.checkout(spec, testcheckout) {|output|
-        puts "HALLO" + output
-      }
     end
 
   private

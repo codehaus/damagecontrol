@@ -16,7 +16,7 @@ require 'damagecontrol/publisher/EmailPublisher'
  
 include DamageControl 
  
-buildRoot = File.expand_path("~/public_html/builds") 
+buildRoot = File.expand_path("/var/build") 
  
 hub = Hub.new 
 BuildExecutor.new(hub, "#{buildRoot}/checkouts").start
