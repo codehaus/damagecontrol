@@ -1,8 +1,8 @@
 $:<<'../../lib'
 
 require 'test/unit'
-require 'ftools'
 require 'fileutils'
+require 'ftools'
 require 'damagecontrol/Build'
 require 'damagecontrol/SocketTrigger'
 require 'damagecontrol/BuildExecutor'
