@@ -19,9 +19,9 @@ include DamageControl
 buildRoot = File.expand_path("/var/build") 
  
 hub = Hub.new 
-BuildExecutor.new(hub, "#{buildRoot}/checkouts").start
-LogWriter.new(hub, "#{buildRoot}/logs")
-FilePublisher.new(hub, "#{buildRoot}/reports", HTMLTemplate.new).start 
+BuildExecutor.new(hub, "#{buildRoot}/checkout").start
+LogWriter.new(hub, "#{buildRoot}/log")
+FilePublisher.new(hub, "#{buildRoot}/report", HTMLTemplate.new).start 
 IRCPublisher.new(hub, "irc.codehaus.org", "\#damagecontrol", ShortTextTemplate.new).start
 EmailPublisher.new(hub, ShortTextTemplate.new, HTMLTemplate.new, "dcontrol@builds.codehaus.org").start
 SelfUpgrader.new(hub).start
