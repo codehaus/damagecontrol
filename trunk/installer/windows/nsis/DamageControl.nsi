@@ -82,6 +82,11 @@
 
 Section "" ; empty string makes it hidden, so would starting with -
 
+  
+  ; Set the DAMAGECONTROL_HOME and DAMAGECONTROL_WORK environment variables
+  WriteRegStr HKLM "SYSTEM\ControlSet001\Control\Session Manager\Environment" "DAMAGECONTROL_HOME" "$INSTDIR"
+  WriteRegStr HKLM "SYSTEM\ControlSet001\Control\Session Manager\Environment" "DAMAGECONTROL_WORK" "$PROFILE\.damagecontrol"
+
   ;Create uninstaller
   SetOutPath "$INSTDIR" 
   WriteUninstaller "$INSTDIR\Uninstall.exe"
@@ -97,6 +102,14 @@ Section "" ; empty string makes it hidden, so would starting with -
   WriteRegStr HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\${DISTNAME}" "Contact" "irc:irc.codehaus.org#damagecontrol"
   WriteRegDWORD HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\${DISTNAME}" "NoModify" 1
   WriteRegDWORD HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\${DISTNAME}" "NoRepair" 1
+
+SectionEnd
+
+Section "Working Directory" SecWork
+  
+  SetOutPath $PROFILE\.damagecontrol
+  File ${ROOTDIR}\bin\damagecontrol.cmd
+  File ${ROOTDIR}\bin\server.rb
 
 SectionEnd
 
@@ -121,9 +134,9 @@ Section "DamageControl Server" SecServer
   !insertmacro MUI_STARTMENU_WRITE_BEGIN Application
     
     CreateDirectory "$SMPROGRAMS\$STARTMENU_FOLDER"
-    CreateShortCut "$SMPROGRAMS\$STARTMENU_FOLDER\Start DamageControl Server.lnk" "$INSTDIR\bin\server.cmd"
-    CreateShortCut "$SMPROGRAMS\$STARTMENU_FOLDER\Stop DamageControl Server.lnk" "$INSTDIR\bin\shutdownserver.cmd" "--url http://localhost:4712/private/xmlrpc"
-    CreateShortCut "$SMPROGRAMS\$STARTMENU_FOLDER\Modify DamageControl settings.lnk" "$WINDIR\notepad.exe" "$INSTDIR\bin\server.rb"
+    CreateShortCut "$SMPROGRAMS\$STARTMENU_FOLDER\Start DamageControl Server.lnk" "%DAMAGECONTROL_WORK%\damagecontrol.cmd" "%DAMAGECONTROL_WORK%\server.rb"
+    CreateShortCut "$SMPROGRAMS\$STARTMENU_FOLDER\Stop DamageControl Server.lnk" "%DAMAGECONTROL_WORK%\damagecontrol.cmd" "%DAMAGECONTROL_HOME%\bin\shutdownserver.rb --url http://localhost:4712/private/xmlrpc"
+    CreateShortCut "$SMPROGRAMS\$STARTMENU_FOLDER\Modify DamageControl settings.lnk" "$WINDIR\notepad.exe" "%DAMAGECONTROL_WORK%\server.rb"
     CreateShortCut "$SMPROGRAMS\$STARTMENU_FOLDER\DamageControl Dashboard.lnk" "http://localhost:4712/private/dashboard"
     CreateShortCut "$SMPROGRAMS\$STARTMENU_FOLDER\DamageControl Website.lnk" "http://damagecontrol.codehaus.org"
     CreateShortCut "$SMPROGRAMS\$STARTMENU_FOLDER\Uninstall DamageControl.lnk" "$INSTDIR\Uninstall.exe"
@@ -202,12 +215,14 @@ FunctionEnd
 ;Descriptions
 
   ;Language strings
+  LangString DESC_SecWork ${LANG_ENGLISH} "(WARNING! Don't select this if you are upgrading). The DamageControl startup scripts. Will be installed in .damagecontrol under your home directory."
   LangString DESC_SecServer ${LANG_ENGLISH} "The DamageControl server. Runs and monitors builds for multiple projects."
   LangString DESC_SecDCTray ${LANG_ENGLISH} "DamageControl systray monitor. Require Microsoft .NET Framework 1.1. The systray can be installed separately, doesn't require the server or a Ruby distribution."
   LangString DESC_SecRuby ${LANG_ENGLISH} "Ruby distribution tuned for DamageControl. It is recommended to use this Ruby distribution unless you really know what you are doing. DamageControl requires a Cygwin build of Ruby (it has to support fork)."
 
   ;Assign language strings to sections
   !insertmacro MUI_FUNCTION_DESCRIPTION_BEGIN
+    !insertmacro MUI_DESCRIPTION_TEXT ${SecWork} $(DESC_SecWork)
     !insertmacro MUI_DESCRIPTION_TEXT ${SecServer} $(DESC_SecServer)
     !insertmacro MUI_DESCRIPTION_TEXT ${SecDCTray} $(DESC_SecDCTray)
     !insertmacro MUI_DESCRIPTION_TEXT ${SecRuby} $(DESC_SecRuby)

@@ -86,6 +86,10 @@ module DamageControl
       true
     end
 
+    def uptodate?
+      true
+    end
+
     def trigger_installed?(project_name)
       false
     end

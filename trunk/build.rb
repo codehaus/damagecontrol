@@ -147,7 +147,6 @@ class Project
     copy_dir("bin", "#{dist_dir}/bin")
     copy_dir("server", "#{dist_dir}/server")
     generate_version_info("#{dist_dir}/server/damagecontrol/Version.rb")
-    generate_startup_scripts
   end
 
   def generate_version_info(file)
@@ -165,56 +164,6 @@ end
 })
   end
 
-  def generate_startup_scripts
-    {
-      "dctrigger" => "bin/dctrigger.rb",
-      "server" => "bin/server.rb",
-      "codehaus" => "bin/codehaus.rb",
-      "ccbridge" => "bin/ccbridge.rb",
-      "newproject" => "server/damagecontrol/tool/admin/newproject.rb",
-      "requestbuild" => "server/damagecontrol/tool/admin/requestbuild.rb",
-      "shutdownserver" => "server/damagecontrol/tool/admin/shutdownserver.rb"
-    }.each{|s, t| generate_startup_script("#{dist_dir}/bin/#{s}", t) }
-  end
-  
-  def generate_startup_script(script, target)
-    win_target = target.gsub(/\//, "\\")
-
-    write_file("#{script}.cmd",
-%{@echo off
-set DAMAGECONTROL_WORK=%USERPROFILE%\\.damagecontrol
-
-echo **************************************************
-echo DamageControl's working files will be stored under
-echo %DAMAGECONTROL_WORK%
-echo This can be changed in 
-echo %~dp0server.cmd
-echo **************************************************
-
-mkdir %DAMAGECONTROL_WORK%
-
-set DAMAGECONTROL_HOME=%~dp0..
-cd %DAMAGECONTROL_HOME%
-set RUBY_HOME=%DAMAGECONTROL_HOME%\\ruby
-set PATH=%~dp0;%RUBY_HOME%\\bin;%PATH%
-set CMD=ruby -I "%DAMAGECONTROL_HOME%\\server" "#{target}" %1 %2 %3 %4 %5 %6 %7 %8 %9
-echo %CMD%
-%CMD%
-pause
-}.gsub(/\n/, "\r\n"))
-
-    write_file(script,
-%{\#!/bin/sh
-DAMAGECONTROL_WORK=~/.damagecontrol
-DAMAGECONTROL_HOME=`dirname $0`/..
-cd $DAMAGECONTROL_HOME
-export DAMAGECONTROL_HOME=`pwd`
-exec ruby -I"$DAMAGECONTROL_HOME/server" "#{target}" $*
-})
-
-    system("chmod +x #{script}") unless windows?
-  end
-  
   def windows?
     require 'rbconfig.rb'
     !Config::CONFIG["host"].index("mswin32").nil?

@@ -67,6 +67,11 @@ module DamageControl
     end
 
     def uptodate?(checkout_dir, start_time, end_time)
+      # TODO
+      # 1) svn info -> local revision
+      # 2) svn log -r HEAD -> remote rev
+      # 3) compare revs
+    
       if(!checked_out?(checkout_dir))
         # might as well check it out if it isn't checked out
         checkout(checkout_dir)
