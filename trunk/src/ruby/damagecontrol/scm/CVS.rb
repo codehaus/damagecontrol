@@ -68,6 +68,22 @@ module DamageControl
       parse_spec(scm_spec)[4]
     end
     
+    def changes(spec, checkoutdirectory, time_before, time_after)
+      with_working_directory(checkoutdirectory) do
+        cvs_with_io(changes_command(time_before, time_after)) do |io|
+          CVSLogParser.new.parse_log(io)
+        end
+      end
+    end
+    
+    def changes_command(time_before, time_after)
+      "log -d\"#{cvsdate(time_before)}<#{cvsdate(time_after)}\""
+    end
+    
+    def cvsdate(time)
+      time.strftime("%Y-%m-%d %H:%M:%S")
+    end
+    
     def commit(directory, message, &proc)
       Dir.chdir(directory)
       cvs(commit_command(message), &proc)
@@ -89,25 +105,36 @@ module DamageControl
       scm_spec =~ /^:local:/
     end
     
+    def with_working_directory(directory)
+      File.makedirs(directory) unless File.exists?(directory)
+      lastdir = Dir.pwd
+      begin
+        Dir.chdir(directory)
+        yield
+      ensure
+        Dir.chdir(lastdir)
+      end
+    end
+    
     def checkout(scm_spec, directory, &proc)
       scm_spec = to_os_path(scm_spec) if is_local_connection_method(scm_spec)
       directory = to_os_path(File.expand_path(directory))
       if(checked_out?(directory, scm_spec))
-        File.makedirs(directory) unless File.exists?(directory)
-        Dir.chdir(directory)
-        cvs(update_command(scm_spec), &proc)
+        with_working_directory(directory) do
+          cvs(update_command(scm_spec), &proc)
+        end
       else
         topdir = to_os_path(File.expand_path(directory + "/.."))
-        File.makedirs(topdir) unless File.exists?(topdir)
-        Dir.chdir(topdir)
-        cvs(checkout_command(scm_spec, directory), &proc)
-        # Now just move the directory. Fix for http://jira.codehaus.org/secure/ViewIssue.jspa?key=DC-44
-        mod_directory = to_os_path(File.expand_path(mod(scm_spec)))
-        if (mod_directory != directory)
-          begin
-            File.move(mod_directory, directory)
-          rescue NotImplementedError
-            File.rename(mod_directory, directory)
+        with_working_directory(topdir) do
+          cvs(checkout_command(scm_spec, directory), &proc)
+          # Now just move the directory. Fix for http://jira.codehaus.org/secure/ViewIssue.jspa?key=DC-44
+          mod_directory = to_os_path(File.expand_path(mod(scm_spec)))
+          if (mod_directory != directory)
+            begin
+              File.move(mod_directory, directory)
+            rescue NotImplementedError
+              File.rename(mod_directory, directory)
+            end
           end
         end
       end
@@ -193,15 +220,25 @@ module DamageControl
       rootcvs = File.expand_path("#{directory}/CVS/Root")
       File.exists?(rootcvs)
     end
-  
+    
     def cvs(cmd, &proc)
+      cvs_with_io(cmd) do |io|
+        io.each_line do |progress|
+          if block_given? then yield progress else logger.debug(progress) end
+        end
+      end
+    end
+  
+    def cvs_with_io(cmd, &proc)
       cmd = "cvs -q #{cmd} 2>&1"
       logger.debug "executing #{cmd}"
-      io = IO.foreach("|#{cmd}") do |progress|
-        if block_given? then yield progress else logger.debug(progress) end
+      ret = nil
+      io = IO.popen("#{cmd}") do |io|
+        ret = yield io
       end
       raise SCMError.new("#{cmd} failed with code #{$?.to_s}") if $? != 0
       logger.debug "executed #{cmd}"
+      ret
     end
     
   end
@@ -224,24 +261,36 @@ module DamageControl
       return nil
     end
     
-    def parse_modifications(log_entry)
-      file = nil
+    def split_entries(log_entry)
+      entries = [""]
       log_entry.each_line do |line|
+        if line=~/----*/
+          entries << ""
+        else
+          entries[entries.length-1] << line
+        end
+      end
+      entries
+    end
+    
+    def parse_modifications(log_entry)
+      entries = split_entries(log_entry)
+
+      file = nil
+      entries[0].each_line do |line|
         if line =~ /RCS file: (.*),v/
           file = $1
         end
-        break if line=~/----*/
       end
+      
       modifications = []
-      modification_entry = ""
-      log_entry.each_line do |line|
-        modification_entry<<line
-        if line=~/----*/
-          modification = parse_modification(modification_entry)
-          modification.path = file
-          modifications<<modification
-        end
+      
+      entries[1..entries.length].each do |entry|
+        modification = parse_modification(entry)
+        modification.path = file
+        modifications<<modification
       end
+      
       modifications
     end
     
@@ -249,6 +298,8 @@ module DamageControl
       modification = Modification.new
       modification.message = ""
       modification_entry.each_line do |line|
+        raise "I've been given crappy input: #{modification_entry}" if line=~/-------*/
+      
         if line=~/revision (.*)/
           modification.revision = $1
         elsif line=~/date: (.*);  author: (.*);  state: (.*);  lines: (.*)/

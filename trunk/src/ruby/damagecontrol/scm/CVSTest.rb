@@ -22,6 +22,49 @@ module DamageControl
        end
     end
     
+    def test_modifiying_one_file_produce_correct_changeset
+      # create a couple of temp directories and clean them up
+      testrepo = File.expand_path("#{damagecontrol_home}/target/cvstestrepo")
+      rm_rf(testrepo)
+      testcheckout = File.expand_path("#{damagecontrol_home}/target/cvstestcheckout")
+      rm_rf(testcheckout)
+      
+      # create cvs repo and import test project, check it out afterwards
+      spec = ":local:#{testrepo}:damagecontrolled"
+      create_repo(testrepo)
+      import_damagecontrolled(spec)
+      @cvs.checkout(spec, testcheckout)
+      
+      # modify file and commit it
+      change_file("#{testcheckout}/build.xml")
+      time_before = Time.now
+      sleep(1)
+      @cvs.commit(testcheckout, "changed something")
+      sleep(1)
+      time_after = Time.now
+      
+      # check that this was the correct
+      changes = @cvs.changes(spec, testcheckout, time_before, time_after)
+      assert_equal(1, changes.length)
+      mod = changes[0]
+      assert(mod.path =~ /build\.xml/)
+      assert_equal("changed something\n", mod.message)
+    end
+    
+    def test_can_build_a_cvs_rdiff_command_for_retrieving_the_changes_between_two_dates
+      time_before = Time.gm(2004,01,01,12,00,00) 
+      time_after = Time.gm(2004,01,01,13,00,00)
+      spec = ":local:repo:module"
+      assert_equal("log -d\"2004-01-01 12:00:00<2004-01-01 13:00:00\"",
+        @cvs.changes_command(time_before, time_after))
+    end
+    
+    def change_file(file)
+      File.open(file, "w+") do |io|
+      	io.puts("changed\n")
+      end
+    end
+    
     def test_parse_local_unix_spec
       protocol = "local"
       path     = "/cvsroot/damagecontrol"
@@ -112,7 +155,7 @@ module DamageControl
         #puts output
       }
 
-      import_damagecontrolled(testcheckout, spec)      
+      import_damagecontrolled(spec)      
       
       assert(!@mock_server.alive?, "mock server didn't get incoming connection")
     end
@@ -139,7 +182,7 @@ module DamageControl
       system("cvs -d:local:#{dir} init")
     end
     
-    def import_damagecontrolled(testcheckout, spec)
+    def import_damagecontrolled(spec)
       Dir.chdir("#{damagecontrol_home}/testdata/damagecontrolled")
       cmd = "cvs -d#{@cvs.cvsroot(spec)} -q import -m \"\" #{@cvs.mod(spec)} dc-vendor dc-release"
       system(cmd)
@@ -189,6 +232,7 @@ module DamageControl
       modifications = @parser.parse_modifications(LOG_ENTRY)
       assert_equal(4, modifications.length)
       assert_equal("/cvsroot/damagecontrol/damagecontrol/src/ruby/damagecontrol/BuildExecutorTest.rb", modifications[0].path)
+      assert_equal("    linux/windows galore\n", modifications[2].message)
     end
     
 
@@ -197,6 +241,13 @@ module DamageControl
       assert_equal("1.20", modification.revision)
       assert_equal("2003/11/09 17:53:37", modification.time)
       assert_equal("tirsen", modification.developer)
+      assert_equal("    Quiet period is configurable for each project\n", modification.message)
+    end
+    
+    def test_split_entries
+      entries = @parser.split_entries(LOG_ENTRY)
+      assert_equal(5, entries.length)
+      assert_equal(MODIFICATION_ENTRY, entries[1])
     end
 
     MODIFICATION_ENTRY = <<-EOF
