@@ -43,7 +43,7 @@ module DamageControl
 
     def build_request_at_time(time)
       build = Build.new("project", { "quiet_period" => "#{@quiet_period}" })
-      build.timestamp = 0
+      build.timestamp = time
       hub.publish_message(BuildRequestEvent.new(build))
     end
 
