@@ -84,7 +84,7 @@ class End2EndTest < Test::Unit::TestCase
   def start_damagecontrol
     if(@@damagecontrol_started == false) then
       load("#{damagecontrol_home}/src/samples/simple.rb")
-      start_simple_server(buildsdir)
+      start_simple_server(buildsdir, 4713)
       @@damagecontrol_started = true
     end
   end
@@ -106,7 +106,7 @@ class End2EndTest < Test::Unit::TestCase
           build_command_line,
                         "e2eproject-dev@codehaus.org",
                         "localhost",
-                        "4711",
+                        "4713",
                         nc_exe_location)
   end
 	
