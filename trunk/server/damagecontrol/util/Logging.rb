@@ -64,6 +64,7 @@ module DamageControl
     def format_backtrace(backtrace)
       "\n\t" + backtrace.join("\n\t")
     end
+    module_function :format_backtrace
     
     def format_exception(e)
       e.class.name + ": " + e.message + format_backtrace(e.backtrace)
