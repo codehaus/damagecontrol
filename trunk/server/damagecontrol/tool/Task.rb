@@ -1,4 +1,4 @@
-require 'damagecontrol/simple'
+require 'damagecontrol/DamageControlServer'
 require 'getoptlong'
 
 def symbol(string)
