@@ -84,7 +84,7 @@ module DamageControl
       m = html_quote(message)
       jira_url = ensure_trailing_slash(project_config["jira_url"])
       if(jira_url)
-        m.gsub(/([A-Z]+-[0-9]+)/, "<a href=\"#{jira_url}/browse/\\1\">\\1</a>")
+        m.gsub(/([A-Z]+-[0-9]+)/, "<a href=\"#{jira_url}browse/\\1\">\\1</a>")
       else
         m
       end
