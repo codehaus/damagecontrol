@@ -1,6 +1,7 @@
 require 'rscm/logging'
 require 'rscm/time_ext'
 require 'damagecontrol/project'
+require 'damagecontrol/publisher/base'
 
 module DamageControl
   # Polls all projects in intervals.
@@ -19,9 +20,12 @@ module DamageControl
     # If a block is passed, the project and the changesets will be yielded to the block
     # for each new changesets object.
     def poll
+      Log.info "Starting polling cycle"
       Project.find_all.each do |project|
+        Log.info "Polling #{project.name}"
         begin
           if(project.scm_exists?)
+            Log.info "Polling #{project.name}"
             project.poll do |changesets|
               if(changesets.empty?)
                 Log.info "No changesets for #{project.name}"
@@ -29,11 +33,13 @@ module DamageControl
                 @proc.call(project, changesets)
               end
             end
+          else
+            Log.info "Not polling #{project.name} since its scm doesn't exist"
           end
         rescue => e
-          $stderr.puts "Error polling #{project.name}"
-          $stderr.puts e.message
-          $stderr.puts "  " + e.backtrace.join("  \n")
+          Log.error "Error polling #{project.name}"
+          Log.error  e.message
+          Log.error "  " + e.backtrace.join("  \n")
         end
       end
     end

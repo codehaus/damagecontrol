@@ -26,14 +26,15 @@ class Class
     $attr_anns ||= {}
     $attr_anns.merge!(anns)
     def self.method_missing(sym, *args) #:nodoc:
-      @@anns[sym] || {}
+      @@anns[self][sym] || {}
     end
   end
 
   alias old_attr_reader attr_reader #:nodoc:
   def attr_reader(*syms) #:nodoc:
+    @@anns[self] ||= {}
     syms.each do |sym|
-      @@anns[sym] = $attr_anns.dup if $attr_anns
+      @@anns[self][sym] = $attr_anns.dup if $attr_anns
     end
     $attr_anns = nil
     old_attr_reader(*syms)
