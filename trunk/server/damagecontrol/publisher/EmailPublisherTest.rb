@@ -40,7 +40,7 @@ module DamageControl
       assert_equal(
         "[cheese] BUILD FAILED|" +
         # This is the body of the mail
-        "\r\naslak broke the build <br>\r\n\r\n" +
+        "aslak broke the build <br>" +
         "<a href=\"http://moradi.com/public/project/cheese?action=build_details&dc_creation_time=19710228234500\">[cheese] BUILD FAILED</a><br>" +
 
         # End mail body
