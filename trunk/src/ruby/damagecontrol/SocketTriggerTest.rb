@@ -17,7 +17,7 @@ module DamageControl
       @s = SocketTrigger.new(@hub, "/usr/local/builds")
       @project_name = "picocontainer"
       @scm_spec = ":local:/cvsroot/picocontainer:pico"
-      @build_command_line = "\"echo damagecontrol rocks\""
+      @build_command_line = "echo damagecontrol rocks"
     end
 
     def test_fires_build_request_on_socket_accept
