@@ -11,6 +11,7 @@ module DamageControl
   class IRCPublisher < AsyncComponent
 
     include Logging
+    inlude SimpleERB
   
     attr_reader :channel
     attr_reader :irc_server
@@ -27,9 +28,11 @@ module DamageControl
       @template = template
       @handle = 'dcontrol'
       @send_message_on_build_request = true
-
-      template_dir = "#{File.expand_path(File.dirname(__FILE__))}/../template"
-      @template = File.new("#{template_dir}/#{template}").read
+      @template = template
+    end
+    
+    def template_dir
+      "#{File.expand_path(File.dirname(__FILE__))}/../template"
     end
     
     def start
@@ -80,7 +83,7 @@ module DamageControl
       if message.is_a?(BuildCompleteEvent)
         build = message.build
         dc_url = @dc_server.dc_url
-        msg = ERB.new(@template).result(binding)
+        msg = erb(@template, binding)
         @irc.send_message_to_channel(msg)
       end
 
