@@ -30,6 +30,16 @@ module DamageControl
       end
     end
 
+    # checks out (or updates) path to directory
+    def changes(spec, directory, time_before, time_after)
+      scm = find_scm(path)
+      if scm
+        scm.changes(spec, directory, time_before, time_after)
+      else
+        super(path, directory, &proc)
+      end
+    end
+
     def mod(spec)
       scm = find_scm(spec)
       if scm

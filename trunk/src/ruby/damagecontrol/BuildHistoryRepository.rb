@@ -24,6 +24,10 @@ module DamageControl
         @filename = expanded
       end
     end
+    
+    def last_succesful_build(project_name)
+      build_history(project_name).reverse.find {|build| build.status == Build::SUCCESSFUL}
+    end
 
     def process_message(message)
       if message.is_a?(BuildEvent) && !message.is_a?(BuildProgressEvent)
@@ -38,6 +42,7 @@ module DamageControl
         @builds[build.project_name]=build_array
       end
       build_array << build unless build_array.index(build)
+      build_array.sort! {|b1, b2| b1.timestamp_as_time <=> b2.timestamp_as_time }
       if(@filename != nil)
         out = File.new(@filename, "w")
         YAML::dump(@builds, out)
@@ -52,8 +57,8 @@ module DamageControl
     def get_build_list_map(project_name=nil, number_of_builds=nil)
       result_map = nil
       if(project_name != nil)
-        if(@builds[project_name] != nil)
-          result_map = {project_name => @builds[project_name]}
+        if(build_history(project_name) != [])
+          result_map = {project_name => build_history(project_name)}
         else
           return Hash.new
         end
@@ -73,6 +78,11 @@ module DamageControl
         return result_map
       end
     end
+    
+    def build_history(project_name)
+      return [] unless @builds.has_key?(project_name)
+      @builds[project_name]
+   	end
 
     def get_project_names()
       @builds.keys

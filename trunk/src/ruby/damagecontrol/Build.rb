@@ -1,3 +1,4 @@
+
 require 'damagecontrol/scm/DefaultSCMRegistry'
 require 'damagecontrol/BuildEvents'
 require 'xmlrpc/utils'
@@ -58,6 +59,10 @@ module DamageControl
       Build.timestamp_to_i(timestamp)
     end
     
+    def timestamp_as_time
+      Build.timestamp_to_time(timestamp)
+    end
+    
     def Build.format_timestamp(time)
       if time.is_a?(Numeric) then format_timestamp(Time.at(time).utc)
       elsif time.is_a?(Time) then time.utc.strftime("%Y%m%d%H%M%S")
@@ -65,7 +70,7 @@ module DamageControl
       else raise "can't format as timestamp #{time}" end
     end
     
-    def Build.timestamp_to_i(timestamp_as_string)
+    def Build.timestamp_to_time(timestamp_as_string)
       Time.utc(
         timestamp_as_string[0..3], # year 
         timestamp_as_string[4..5], # month
@@ -73,7 +78,11 @@ module DamageControl
         timestamp_as_string[8..9], # hour
         timestamp_as_string[10..11], # minute
         timestamp_as_string[12..13] # second
-      ).to_i
+      )
+    end
+    
+    def Build.timestamp_to_i(timestamp_as_string)
+      timestamp_to_time(timestamp_as_string).to_i
     end
     
     def scm_spec
@@ -86,6 +95,14 @@ module DamageControl
 
     def quiet_period
       if config["quiet_period"].nil? then nil else config["quiet_period"].to_i end
+    end
+
+    def ==(o)
+      return false unless o.is_a? Build
+      project_name == o.project_name &&
+      status == o.status &&
+      config == o.config &&
+      timestamp == o.timestamp
     end
   end
 end

@@ -19,12 +19,13 @@ module DamageControl
     
     attr_accessor :last_build_request
 
-    def initialize(channel, builds_dir = "builds", scm = DefaultSCMRegistry.new)
+    def initialize(channel, build_history, builds_dir = "builds", scm = DefaultSCMRegistry.new)
       @channel = channel
       @builds_dir = builds_dir
       @scm = scm
       @filesystem = FileSystem.new
       @scheduled_build_slot = Slot.new
+      @build_history = build_history
     end
     
     def checkout
@@ -71,7 +72,25 @@ module DamageControl
       !@scheduled_build_slot.empty?
     end
     
+    def determine_changeset
+      begin
+        # this won't work the first build, so I just skip it (it's kind of pointless anyway)
+        return unless File.exists?(project_base_dir)
+      
+        last_successful_build = @build_history.last_succesful_build(current_build.project_name)
+        return if last_successful_build.nil?
+        time_before = last_successful_build.timestamp_as_time
+        
+        time_after = current_build.timestamp_as_time
+        current_build.modification_set = 
+          @scm.changes(current_build.scm_spec, project_base_dir, time_before, time_after)
+      rescue
+        logger.error "could not determine changeset #{$!}"
+      end
+    end
+    
     def build_started
+      determine_changeset    
       current_build.start_time = Time.now.to_i
       @channel.publish_message(BuildStartedEvent.new(current_build))
     end

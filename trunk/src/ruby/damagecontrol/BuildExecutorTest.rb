@@ -1,10 +1,13 @@
 require 'test/unit'
 require 'mockit'
 
+require 'FileUtils'
+
 require 'damagecontrol/Build'
 require 'damagecontrol/Hub'
 require 'damagecontrol/BuildExecutor'
 require 'damagecontrol/HubTestHelper'
+require 'damagecontrol/BuildHistoryRepository'
 
 module DamageControl
 
@@ -25,7 +28,7 @@ module DamageControl
   
     def setup
       create_hub
-      @build_executor = BuildExecutor.new(hub, File.expand_path("#{damagecontrol_home}/testdata"))
+      @build_executor = BuildExecutor.new(hub, BuildHistoryRepository.new(hub), File.expand_path("#{damagecontrol_home}/testdata"))
       @build = Build.new("damagecontrolled", {"build_command_line" => "echo Hello world from DamageControl!"})
       @quiet_period = 10
     end
@@ -72,23 +75,29 @@ module DamageControl
       
     end
     
-    def test_determines_changes_and_checks_out
-#      mock_build_history = MockIt::Mock.new
-#      mock_build_history.__expect(:last_succesful_build) { |project_name|
-#        assert_equal("damagecontrolled", project_name)
-#        Time.new(2004, 04, 02, 12, 00, 00)
-#      }
+    def test_determines_changes_and_checks_out_before_building
+      mock_build_history = MockIt::Mock.new
+      mock_build_history.__expect(:last_succesful_build) { |project_name|
+        assert_equal("damagecontrolled", project_name)
+        b = Build.new("damagecontrolled")
+        b.timestamp = Time.gm(2004, 04, 02, 12, 00, 00)
+        b
+      }
       mock_scm = MockIt::Mock.new
-#      mock_scm.__expect(:changes) { |dir, scm_spec, time_before, time_after|
-#        assert_equal("scm_spec", scm_spec)
-#        assert_equal("bulds/damagecontrolled", dir)
-#      }
+      mock_scm.__expect(:changes) { |scm_spec, dir, time_before, time_after|
+        assert_equal("scm_spec", scm_spec)
+        assert_equal("#{damagecontrol_home}/builds/damagecontrolled", dir)
+        assert_equal(Time.gm(2004, 04, 02, 12, 00, 00), time_before)
+        assert_equal(Time.gm(2004, 04, 02, 13, 00, 00), time_after)
+      }
       mock_scm.__expect(:checkout) { |scm_spec, dir|
         assert_equal("scm_spec", scm_spec)
-        assert_equal("builds/damagecontrolled", dir)
+        assert_equal("#{damagecontrol_home}/builds/damagecontrolled", dir)
       }
       
-      @build_executor = BuildExecutor.new(hub, "builds", mock_scm)
+      ::FileUtils.mkpath("#{damagecontrol_home}/builds/damagecontrolled")
+      
+      @build_executor = BuildExecutor.new(hub, mock_build_history, "#{damagecontrol_home}/builds", mock_scm)
       @build = Build.new("damagecontrolled",
         { "scm_spec" => "scm_spec", "build_command_line" => "echo hello world"})
       @build.timestamp = Time.gm(2004, 04, 02, 13, 00, 00)
@@ -99,6 +108,7 @@ module DamageControl
       assert_equal(nil, @build.error_message)
       assert_equal(Build::SUCCESSFUL, @build.status)
       
+      mock_build_history.__verify
       mock_scm.__verify
     end
     

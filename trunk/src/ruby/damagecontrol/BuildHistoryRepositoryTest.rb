@@ -10,6 +10,26 @@ require 'damagecontrol/AbstractBuildHistoryTest'
 module DamageControl
 
   class BuildHistoryRepositoryTest < AbstractBuildHistoryTest
+  
+  	def test_can_get_last_succesful_build_of_a_project
+  	  assert_equal(nil, @bhp.last_succesful_build("project_name"))
+
+  	  build1 = Build.new("project_name")
+  	  build1.timestamp = Time.utc(2004, 04, 02, 12, 00, 00)
+  	  build1.status = Build::SUCCESSFUL
+  	  build2 = Build.new("project_name")
+  	  build2.timestamp = Time.utc(2004, 04, 02, 13, 00, 00) # one hour later
+  	  build2.status = Build::SUCCESSFUL
+  	  failed_build = Build.new("project_name")
+  	  failed_build.timestamp = Time.utc(2004, 04, 02, 14, 00, 00) # one hour later
+  	  failed_build.status = Build::FAILED
+  	  @bhp.register(build2)
+  	  @bhp.register(build1)
+  	  @bhp.register(failed_build)
+  	  assert_equal([build1, build2, failed_build], @bhp.build_history("project_name"))
+  	  
+  	  assert_equal(build2, @bhp.last_succesful_build("project_name"))
+  	end
     
     # Not really a unit test, more a YAML experiment
     def test_build_can_be_saved_as_yaml

@@ -5,16 +5,6 @@ require 'damagecontrol/BuildHistoryRepository'
 
 module DamageControl
 
-  # add eq? methods to DamageControl::Build so we can compare builds
-  class Build
-    def ==(o)
-      project_name == o.project_name &&
-      status == o.status &&
-      config == o.config &&
-      timestamp == o.timestamp
-    end
-  end
-
   class AbstractBuildHistoryTest < Test::Unit::TestCase
     
     def test_dummy

@@ -14,7 +14,7 @@ module DamageControl
 
     def setup
       create_hub
-      @executor = BuildExecutor.new(hub)
+      @executor = BuildExecutor.new(hub, BuildHistoryRepository.new(hub))
       @scheduler = BuildScheduler.new(hub)
       @scheduler.default_quiet_period = 0
       @scheduler.add_executor(@executor)

@@ -17,6 +17,11 @@ module DamageControl
       raise "can't check out #{spec}"
     end
 
+    # checks out (or updates) path to directory
+    def changes(spec, directory, time_before, time_after)
+      raise "can't check out #{spec}"
+    end
+
     # the local directory (CVS module)
     # we might need to change this to something
     # more SCM generic

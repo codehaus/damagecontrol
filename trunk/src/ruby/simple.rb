@@ -35,13 +35,13 @@ def start_simple_server(params = {})
 
   XMLRPCTrigger.new(query_servlet, @hub)
 
-  bhp = BuildHistoryRepository.new(@hub, "build_history.yaml")
-  bhp.start
-  XMLRPCStatusPublisher.new(query_servlet, bhp)
+  build_history_repository = BuildHistoryRepository.new(@hub, "build_history.yaml")
+  build_history_repository.start
+  XMLRPCStatusPublisher.new(query_servlet, build_history_repository)
   
   scheduler = BuildScheduler.new(@hub)
   # Only use one build executor (don't allow parallel builds)
-  scheduler.add_executor(BuildExecutor.new(@hub, buildsdir))
+  scheduler.add_executor(BuildExecutor.new(@hub, build_history_repository, buildsdir))
   scheduler.start
 
   # For unsecure XML-RPC connections like getting status
