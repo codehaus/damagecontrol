@@ -59,9 +59,13 @@ module DamageControl
               client_ip = socket.peeraddr[3]
               if(allowed?(client_hostname, client_ip))
                 payload = socket.gets
-                do_accept(payload)
-                socket.print("DamageControl on #{@server.addr[2]}/#{@server.addr[3]} got your message (#{client_hostname} / #{client_ip})\r\n")
-                socket.print("http://damagecontrol.codehaus.org/\r\n")
+		begin
+                  do_accept(payload)
+                  socket.print("DamageControl on #{@server.addr[2]}/#{@server.addr[3]} got your message (#{client_hostname} / #{client_ip})\r\n")
+                  socket.print("http://damagecontrol.codehaus.org/\r\n")
+                rescue
+                  socket.print("Wrong format")
+                end
               else
                 socket.print("This DamageControl server doesn't allow connections from #{client_hostname} / #{client_ip}\r\n")
               end

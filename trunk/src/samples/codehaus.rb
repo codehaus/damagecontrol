@@ -1,3 +1,5 @@
+#!/usr/bin/env ruby
+
 $damagecontrol_home = File::expand_path('../..') 
 $:<<"#{$damagecontrol_home}/src/ruby" 
  
@@ -13,7 +15,8 @@ require 'damagecontrol/publisher/FilePublisher'
  
 include DamageControl 
  
-buildRoot = File.expand_path("/www/damagecontrol.codehaus.org") 
+buildRoot = File.expand_path("~/public_html/builds") 
+port = 4711
  
 hub = Hub.new 
 BuildExecutor.new(hub, "#{buildRoot}/builds").start 
@@ -22,7 +25,7 @@ FilePublisher.new(hub, "#{buildRoot}/reports", HTMLTemplate.new).start
 IRCPublisher.new(hub, "irc.codehaus.org", "\#damagecontrol", ShortTextTemplate.new).start 
 SelfUpgrader.new(hub)
 # Only accept connections from the same host or from hogshead.codehaus.org 
-st = SocketTrigger.new(hub, 4713, ["127.0.0.1", "66.216.68.111"]).start 
+st = SocketTrigger.new(hub, port, ["127.0.0.1", "66.216.68.111"]).start 
 
 # wait until ctrl-c 
 st.join 
