@@ -10,10 +10,6 @@ module DamageControl
 	# Simplification on top of Rica, supports one channel at the same time only
 	class IRCConnection < Rica::MessageProcessor
 		
-		def default_action(msg)
-			puts(msg.string("%T %s %t:%f %C %a"))
-		end
-	
 		def on_link_established(msg)
 			@current_server=msg.server
 			@current_channel=nil
