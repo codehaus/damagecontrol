@@ -4,7 +4,7 @@ require 'rscm/generic_scm_tests'
 require 'rscm/starteam/starteam'
 
 module RSCM
-  class MookyTest < Test::Unit::TestCase
+  class StarTeamTest < Test::Unit::TestCase
 #    include GenericSCMTests
 
     def create_scm(repository_root_dir, path)
