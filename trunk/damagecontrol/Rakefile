@@ -70,7 +70,7 @@ else
 
     #### Dependencies and requirements.
 
-    s.add_dependency('rscm', '0.2.0')
+    s.add_dependency('rscm', '>= 0.2.1.1404')
     s.add_dependency('rails', '>= 0.10.1')
     s.add_dependency('log4r', '1.0.5')
     s.add_dependency('needle', '1.2.0')
