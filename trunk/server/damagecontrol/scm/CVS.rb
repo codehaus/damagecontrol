@@ -90,14 +90,15 @@ module DamageControl
     def uptodate?(checkout_dir, start_time, end_time)
       if(!checked_out?(checkout_dir))
         # might as well check it out if it isn't checked out
-        checkout(checkout_dir)
+        checkout(checkout_dir, nil)
         false
       end
 
       changesets = changesets(
         checkout_dir,
         start_time,
-        end_time
+        end_time,
+        nil
       )
       changesets.empty?
     end
