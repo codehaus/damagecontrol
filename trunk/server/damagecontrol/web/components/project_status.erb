@@ -1,3 +1,11 @@
+<table id="projectstatus" class="pane">
+<tr>
+    <th>&nbsp;</th>
+    <th>Project</th>
+    <th>Last Successful Build</th>
+    <th>&nbsp;</th>
+</tr>
+
 <%
 projects = project_config_repository.project_names
 projects.each do |project|
@@ -7,8 +15,22 @@ projects.each do |project|
   last_successful_build = build_history_repository.last_successful_build(project)
   label = ""
   label = " (##{last_successful_build.label})" if(last_successful_build)
+  ago = (last_successful_build ? last_successful_build.time_since_for_humans : "Never built")
 %>
-  <img width="32" height="32" src="<%= image %>" />&nbsp;<a href="<%= href %>"><%= project %><%= label %></a><br/>
+<tr>
+    <td><img width="24" height="24" src="<%= image %>" /></td>
+    <td><a href="<%= href %>"><%= project %><%= label %></a></td>
+    <td><%= ago %></td>
+    <% if private? %>
+    <td align="center" style="border-left: 1px solid #7f7f7f; color: #7f7f7f;"> <a href="configure?project_name=<%=project%>&action=configur
+e" title="Configure <%=project%>"><img src="icons/wrench.png" width="24" height="24"/></a>
+        | <a href="project?project_name=<%=project%>&action=trig_build" title="Trigger build for <%=project%>"><img src="icons/gears_run.png
+" width="24" height="24"/></a></td>
+    <% else %>
+       <td>&nbsp;</td>
+    <% end %>
+</tr>
 <%
 end
 %>
+</table>

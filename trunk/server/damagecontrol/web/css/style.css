@@ -170,3 +170,17 @@ th.pane {
   border: 1px #7f7f7f solid;
   font-weight: bold;
 }
+
+#projectstatus th {
+  font-weight: bold;
+  background-color: #bbbbbb;
+}
+
+#projectstatus tr {
+  border: 1px solid #7f7f7f;
+}
+#projectstatus td {
+  padding: 2px 4px 2px 4px;
+  vertical-align: middle;
+}
+

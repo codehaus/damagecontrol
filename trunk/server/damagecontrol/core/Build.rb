@@ -83,6 +83,26 @@ module DamageControl
     def timestamp_for_humans
       timestamp_as_time.strftime("%d %b %Y %H:%M:%S")
     end
+
+    def time_since_for_humans
+      duration = (Time.new.utc - timestamp_as_time).to_i
+      if (duration > 86400)
+         days = duration / 86400
+         "#{days} day#{plural? days} ago"
+      elsif (duration > 3600)
+         hours = duration / 3600
+         "#{hours} hour#{plural? hours} ago"
+      elsif (duration > 60)
+         minutes = duration / 60
+         "#{minutes} hour#{plural? minutes} ago"
+      else
+         "less than a minute ago"
+      end
+    end
+
+    def plural?(num)
+      num == 1 ? "" : "s"
+    end
     
     def Build.format_timestamp(time)
       if time.is_a?(Numeric) then format_timestamp(Time.at(time).utc)
