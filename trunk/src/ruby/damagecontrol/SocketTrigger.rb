@@ -7,10 +7,13 @@ require 'socket'
 module DamageControl
 
 	class SocketTrigger
+	
+		attr_accessor :port
 		
 		def initialize(hub, project)
 			@hub = hub
 			@project = project
+			@port = 4711
 		end
 		
 		def do_accept()
@@ -22,7 +25,7 @@ module DamageControl
 				puts "Starting server"
 				$stdout.flush
 				
-				@server = TCPServer.new(4711)
+				@server = TCPServer.new(port)
 				puts "Server started"				
 				$stdout.flush
 				

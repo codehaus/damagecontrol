@@ -12,7 +12,7 @@ module DamageControl
 	
 		def test_new_log_sends_build_complete_event
 			create_hub
-			@ccpoller = CruiseControlLogPoller.new(".", @hub)
+			@ccpoller = CruiseControlLogPoller.new(@hub, ".")
 			@ccpoller.new_file(damagecontrol_file("testdata/log20030929145347.xml"))
 			assert_message_types("DamageControl::BuildCompleteEvent")
 			assert_equal('dxbranch', messages[0].project.name)

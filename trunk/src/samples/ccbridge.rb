@@ -11,7 +11,7 @@ require 'damagecontrol/IRCPublisher'
 include DamageControl
 
 hub = Hub.new
-CruiseControlLogPoller.new(logdir, hub).start
+CruiseControlLogPoller.new(hub, logdir).start
 IRCPublisher.new(hub, server, channel).start
 
 # sleep until ctrl-c

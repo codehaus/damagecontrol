@@ -1,6 +1,7 @@
 $:<<"../../lib/rica"
 
 require 'rica'
+require 'damagecontrol\Timer'
 
 module DamageControl
 
@@ -60,6 +61,8 @@ module DamageControl
 			end
 	
 		end
+		
+		attr_accessor :irc
 	
 		def initialize(hub, server, channel)
 			super()
@@ -101,6 +104,23 @@ module DamageControl
 			enq_message(message)
 		end
 
+	end
+	
+	require 'mock'
+	require 'test/unit'
+	
+	class IRCPublisherTest < Test::Unit::TestCase
+		def test_if_connected_and_in_channel_sends_message_on_build_complete
+			hub = Hub.new
+			publisher = IRCPublisher.new(hub, "server", "channel")
+			irc = Mock.new
+			publisher.irc = irc
+			
+			irc.__next(:is_connected?) {|| true}
+			irc.__next(:connect) {|server|}
+			irc.connect("server")
+			irc.__verify
+		end
 	end
 
 end

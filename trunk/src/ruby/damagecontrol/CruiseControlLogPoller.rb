@@ -9,7 +9,7 @@ module DamageControl
 	end
 	
 	class CruiseControlLogPoller < FilePoller
-		def initialize(dir, hub)
+		def initialize(hub, dir)
 			super(dir)
 			@hub = hub
 		end
