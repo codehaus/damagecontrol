@@ -5,6 +5,7 @@ require 'damagecontrol/Hub'
 
 include DamageControl
 
+Dir.mkdir("../../target")
 Dir.chdir("../../target")
 
 cvsroot=":local:C:/Projects/damagecontrol/target/repository"
