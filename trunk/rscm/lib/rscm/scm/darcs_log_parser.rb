@@ -8,15 +8,15 @@ module RSCM
     def parse_changesets(io, from_identifier=Time.epoch, to_identifier=Time.infinity)
       changesets = ChangeSets.new
 
-      doc = REXML::Document.new io
+      doc = REXML::Document.new(io)
 
       path_revisions = {}
-      doc.elements.each("//patch") { |element|
+      doc.elements.each("//patch") do |element|
         changeset = parse_changeset(element.to_s, path_revisions)
         if ((from_identifier <= changeset.time) && (changeset.time <= to_identifier))
           changesets.add(changeset)
         end
-      }
+      end
 
       changesets.each do |changeset|
         changeset.each do |change|
@@ -31,9 +31,9 @@ module RSCM
     def parse_changeset(changeset_io, path_revisions)
       changeset = ChangeSet.new
 
-      doc = REXML::Document.new changeset_io
+      doc = REXML::Document.new(changeset_io)
 
-      doc.elements.each("patch") { |element|
+      doc.elements.each("patch") do |element|
         changeset.revision = element.attributes['hash']
         changeset.developer = element.attributes['author']
         changeset.time = Time.parse(element.attributes['local_date'])
@@ -48,7 +48,7 @@ module RSCM
         element.elements["summary"].elements.each("modify_file") { |file|
           add_changes(changeset, file.text.strip, Change::MODIFIED, path_revisions)
         }
-      }
+      end
 
       changeset
     end

@@ -53,5 +53,16 @@ module RSCM
       assert_equal({:boo => "boo", :pip => "pip"}, Subclass.send("foo"))
       assert_nil(Whatever.send("no_annotation"))
     end
+    
+    def test_should_get_annotations
+      assert_equal({:boo => "huba luba", :pip => "pip pip"}, Whatever.new.anns("foo"))
+    end
+    
+  end
+end
+
+class Object
+  def anns(attr_name)
+    self.class.send(attr_name)
   end
 end
