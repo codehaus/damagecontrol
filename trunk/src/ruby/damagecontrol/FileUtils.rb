@@ -5,6 +5,7 @@ module DamageControl
     def with_working_dir(dir)
       prev = Dir.pwd
       begin
+        File.mkpath(dir)
         Dir.chdir(dir)
         yield
       ensure
