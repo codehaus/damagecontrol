@@ -162,13 +162,13 @@ module DamageControl
       params[:HttpsPort] || 4713
     end
     
-    def trig_xmlrpc_url
-      params[:TrigXmlrpcUrl] || "http://#{get_ip}:#{http_port}/private/xmlrpc"
-    end
-    
     def web_url
       url = params[:ExternalWebUrl] || "http://#{get_ip}:#{http_port}/"
       ensure_trailing_slash(url)
+    end
+		
+    def trig_xmlrpc_url
+			params[:TrigXmlrpcUrl] || "#{web_url}private/xmlrpc"
     end
     
     def public_web_url
