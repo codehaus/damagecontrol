@@ -66,6 +66,10 @@ module DamageControl
       @timestamp = Build.format_timestamp(time)
     end
     
+    def timestamp_as_s
+      Build.format_timestamp(timestamp)
+    end
+    
     def timestamp_as_i
       Build.timestamp_to_i(timestamp)
     end
