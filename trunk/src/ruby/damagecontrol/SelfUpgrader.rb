@@ -20,7 +20,7 @@ module DamageControl
       channel.publish_message(UserMessage.new("SHUTTING DOWN FOR SELF UPGRADE"))
       # let the publishers get a chance to publish before we die
       sleep(5)
-      exit
+      exit!
     end
   end
     
