@@ -1,4 +1,5 @@
 require 'damagecontrol/web/Report'
+require 'damagecontrol/scm/Changes'
 require 'damagecontrol/util/FileUtils'
 
 module DamageControl
@@ -61,7 +62,9 @@ the working directory has been cleaned out, or because there has been no success
       m = html_quote(message)
       jira_url = ensure_trailing_slash(project_config["jira_url"])
       if(jira_url)
-        m.gsub(/\s([A-Z]+-[0-9]+)/, "<a href=\"#{jira_url}browse/\\1\">\\1</a>")
+        m.gsub!(/^([A-Z]+-[0-9]+)/, "<a href=\"#{jira_url}browse/\\1\">\\1</a>")
+        m.gsub!(/(.*[\s])+([A-Z]+-[0-9]+)/, "\\1<a href=\"#{jira_url}browse/\\2\">\\2</a>")
+        m
       else
         m
       end
