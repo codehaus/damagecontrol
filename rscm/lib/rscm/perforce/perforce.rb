@@ -43,8 +43,8 @@ module RSCM
       end
     end
 
-    def checkout(checkout_dir)
-      client(checkout_dir).checkout
+    def checkout(checkout_dir, to_identifier = nil, &proc)
+      client(checkout_dir).checkout(to_identifier, &proc)
     end
 
     def add(checkout_dir, relative_filename)
@@ -55,8 +55,8 @@ module RSCM
       client(checkout_dir).submit(message, &proc)
     end
 
-    def changesets(checkout_dir, from_time, to_time = nil, files = nil)
-      client(checkout_dir).changesets(from_time, to_time, files)
+    def changesets(checkout_dir, from_identifier, to_identifier = nil, files = nil)
+      client(checkout_dir).changesets(from_identifier, to_identifier, files)
     end
 
     def uptodate?(checkout_dir, from_identifier)
@@ -129,10 +129,9 @@ module RSCM
       end
 
       def start
-        if !running?
-          launch
-          assert_running
-        end
+        shutdown if running?
+        launch
+        assert_running
       end
 
       def assert_running
@@ -150,7 +149,7 @@ module RSCM
       end
 
       def shutdown
-        system("p4 -p 1666 admin stop")
+        `p4 -p 1666 admin stop`
       end
 
       def running?
@@ -234,8 +233,9 @@ module RSCM
   class P4Client
     DATE_FORMAT = "%Y/%m/%d:%H:%M:%S"
     STATUS = { "add" => Change::ADDED, "edit" => Change::MODIFIED, "delete" => Change::DELETED }
+    PERFORCE_EPOCH = Time.utc(1970, 1, 1, 6, 0, 1)  #perforce doesn't like Time.utc(1970)
 
-    attr_accessor :name
+    attr_accessor :name, :rootdir
 
     def initialize(name, rootdir)
       @name = name
@@ -243,6 +243,7 @@ module RSCM
     end
 
     def contains?(file)
+      file = File.expand_path(file)
       file =~ /^#{@rootdir}/
     end
 
@@ -250,14 +251,13 @@ module RSCM
       p4("sync -n").empty?
     end
 
-    def changesets(from_time, to_time, files)
-      from_time = if from_time.nil? then Time.epoch else from_time end
-      to_time = if to_time.nil? then Time.infinity else to_time end
-      changesets = changelists(from_time, to_time).collect {|changelist| to_changeset(changelist)}
+    def changesets(from_identifier, to_identifier, files)
+      changesets = changelists(from_identifier, to_identifier).collect {|changelist| to_changeset(changelist)}
       ChangeSets.new(changesets)
     end
 
     def edit(file)
+      file = File.expand_path(file)
       p4("edit #{file}")
     end
 
@@ -277,9 +277,10 @@ module RSCM
       end
     end
 
-    def checkout
+    def checkout(to_identifier)
+      cmd = to_identifier.nil? ? "sync" : "sync //...@#{to_identifier}"
       checked_out_files = []
-      p4("sync").collect do |output| 
+      p4(cmd).collect do |output|
         puts "output: '#{output}'"
         if(output =~ /.* - (added as|updating|deleted as) #{@rootdir}[\/|\\](.*)/)
           path = $2.gsub(/\\/, "/")
@@ -297,10 +298,8 @@ module RSCM
       p4("add #{absolute_path}")
     end
 
-    def changelists(from_time, to_time)
-      from = from_time.strftime(DATE_FORMAT)
-      to = to_time.strftime(DATE_FORMAT)
-      p4changes(from, to).collect do |line|
+    def changelists(from_identifier, to_identifier)
+      p4changes(from_identifier, to_identifier).collect do |line|
         if line =~ /^Change (\d+) /
           log = p4describe($1)
           P4Changelist.new(log) unless log == ""
@@ -328,8 +327,16 @@ module RSCM
       p4("describe -s #{chnum}")
     end
 
-    def p4changes(from, to)
-      p4("changes //...@#{from},#{to}")
+    def p4changes(from_identifier, to_identifier)
+      if from_identifier.nil? || from_identifier.is_a?(Time)
+        from_identifier = PERFORCE_EPOCH if from_identifier.nil? || from_identifier < PERFORCE_EPOCH
+        to_identifier = Time.infinity if to_identifier.nil?
+        from = from_identifier.strftime(DATE_FORMAT)
+        to = to_identifier.strftime(DATE_FORMAT)
+        p4("changes //...@#{from},#{to}")
+      else
+        p4("changes //...@#{from_identifier},#{from_identifier}")
+      end
     end
 
     def p4(cmd)
