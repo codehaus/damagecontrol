@@ -75,21 +75,13 @@ module DamageControl
 
     def test_format
 allsets = <<EOF
-MAIN:aslak:20040705120010
-aslak
-05 July 2004 12:00:10 UTC (1 minute ago)
-hipp hurra
+MAIN:jon:20040705120002
+jon
+05 July 2004 12:00:02 UTC (2 minutes ago)
+tjo bing
 ----
-path/five 1.5
-path/six 1.6
-path/seven 1.7
-
-MAIN:aslak:20040705120008
-aslak
-05 July 2004 12:00:08 UTC (1 minute ago)
-hipp hurraX
-----
-path/four 1.4
+path/one 1.1
+path/two 1.2
 
 MAIN:jon:20040705120006
 jon
@@ -98,13 +90,21 @@ hipp hurra
 ----
 path/three 1.3
 
-MAIN:jon:20040705120002
-jon
-05 July 2004 12:00:02 UTC (2 minutes ago)
-tjo bing
+MAIN:aslak:20040705120008
+aslak
+05 July 2004 12:00:08 UTC (1 minute ago)
+hipp hurraX
 ----
-path/one 1.1
-path/two 1.2
+path/four 1.4
+
+MAIN:aslak:20040705120010
+aslak
+05 July 2004 12:00:10 UTC (1 minute ago)
+hipp hurra
+----
+path/five 1.5
+path/six 1.6
+path/seven 1.7
 
 EOF
 
@@ -125,9 +125,9 @@ EOF
       changesets.add(@change1)
       changesets.add(@change4)
       description = changesets.to_rss_description
-      assert_equal("aslak", description.get_text("p[1]/strong").value)      
-      assert_equal("jon", description.get_text("p[2]/strong").value)
-      assert_equal("Added path/one", description.get_text("p[2]/ul/li").value)
+      assert_equal("jon", description.get_text("p[1]/strong").value)
+      assert_equal("Added path/one", description.get_text("p[1]/ul/li").value)
+      assert_equal("aslak", description.get_text("p[2]/strong").value)      
     end
     
     def test_should_sort_by_time

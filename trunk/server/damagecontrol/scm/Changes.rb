@@ -36,7 +36,9 @@ EOF
     # Iterates over changesets in reverse order of creation
     # This is because we want to have the most recent at the top
     def each(&block)
-      @changesets.reverse.each(&block)
+      # Umm - seems to go into infinite loop!?!?!
+      # @changesets.reverse.each(&block)
+      @changesets.each(&block)
     end
     
     def length
