@@ -130,7 +130,7 @@ module DamageControl
       if(svnurl =~ /file:\/\/\//)
         svnurl["file:///".length..-(svnpath.length)-2]
       else
-        svnurl["file://".length..-(svnpath.length)-2]
+        svnurl["file:/".length..-(svnpath.length)-2]
       end
     end
 
