@@ -25,7 +25,7 @@ FilePublisher.new(hub, "#{buildRoot}/reports", HTMLTemplate.new).start
 IRCPublisher.new(hub, "irc.codehaus.org", "\#damagecontrol", ShortTextTemplate.new).start
 EmailPublisher.new(hub, ShortTextTemplate.new, "damagecontrol@codehaus.org").start
 SelfUpgrader.new(hub)
-st = SocketTrigger.new(hub, 4713, ["127.0.0.1", "66.216.68.111"]).start 
+st = SocketTrigger.new(hub, 4711, ["127.0.0.1", "66.216.68.111"]).start 
 
 # wait until ctrl-c 
 st.join 
