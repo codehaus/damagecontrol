@@ -1,8 +1,6 @@
-package damagecontrol.testtest;
+package damagecontrol;
 
-import damagecontrol.testtest.SimpleWriteToFileNotifier;
-import damagecontrol.listeners.WriteToFileNotifierTest;
-import damagecontrol.listeners.WriteToFileNotifier;
+import damagecontrol.WriteToFileNotifier;
 import damagecontrol.Builder;
 
 public class SimpleWriteToFileNotifierTest extends WriteToFileNotifierTest {

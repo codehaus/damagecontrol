@@ -5,12 +5,11 @@ import EDU.oswego.cs.dl.util.concurrent.Latch;
 /**
  * 
  * @author Aslak Helles&oslash;y
- * @version $Revision: 1.1 $
+ * @version $Revision: 1.2 $
  */
 public class QuietPeriodSchedulerTest extends AbstractSchedulerTest {
     private static final int POLL_INTERVAL_MILLIS = 100;
     private static final int QUIET_INTERVAL_MILLIS = 300;
-    private static final int BUILD_TIME_MILLIS = 400;
     private static final int BUILD_REQUEST_START_TIME = 1223234;;
     private QuietPeriodScheduler scheduler;
     private FakeClock clock;
@@ -55,6 +54,10 @@ public class QuietPeriodSchedulerTest extends AbstractSchedulerTest {
 
     protected void tearDown() throws Exception {
         scheduler.stop();
+        if (scheduler.buildThread != null) {
+            scheduler.buildThread.join(1000);
+            assertFalse(scheduler.buildThread.isAlive());
+        }
     }
 
     protected Scheduler createScheduler() {

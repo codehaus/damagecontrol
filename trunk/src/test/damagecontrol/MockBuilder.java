@@ -5,7 +5,7 @@ import EDU.oswego.cs.dl.util.concurrent.Latch;
 /**
  *
  * @author Aslak Helles&oslash;y
- * @version $Revision: 1.3 $
+ * @version $Revision: 1.4 $
  */
 public class MockBuilder extends AbstractBuilder {
     private boolean wasBuilt;
@@ -13,11 +13,11 @@ public class MockBuilder extends AbstractBuilder {
     private String output;
 
     public MockBuilder() {
-        super(null, null);
+        super("MockBuilder", new DirectScheduler());
     }
 
     public MockBuilder(String output) {
-        super(null, null);
+        this();
         this.output = output;
     }
 

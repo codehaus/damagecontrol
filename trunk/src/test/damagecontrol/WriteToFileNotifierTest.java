@@ -1,4 +1,4 @@
-package damagecontrol.listeners;
+package damagecontrol;
 
 import junit.framework.TestCase;
 
@@ -6,7 +6,7 @@ import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
 
-import damagecontrol.listeners.WriteToFileNotifier;
+import damagecontrol.WriteToFileNotifier;
 import damagecontrol.MockBuilder;
 import damagecontrol.Builder;
 
@@ -17,7 +17,6 @@ public abstract class WriteToFileNotifierTest extends TestCase {
         super.setUp();
         tempFile = File.createTempFile("damagecontrol", ".tmp");
         tempFile.delete();
-        System.out.println(tempFile.toURL());
     }
 
     protected void tearDown() throws Exception {

@@ -19,7 +19,7 @@ import java.util.HashMap;
  * queue will push it back in the queue, allowing other builds to be handled before.
  *
  * @author Aslak Helles&oslash;y
- * @version $Revision: 1.1 $
+ * @version $Revision: 1.2 $
  */
 public class QuietPeriodScheduler implements Scheduler {
     /**
@@ -41,51 +41,52 @@ public class QuietPeriodScheduler implements Scheduler {
     public void registerBuilder(String builderName, Builder builder) {
         
     }
-
-    private Runnable builder = new Runnable() {
-        public void run() {
-            while (true) {
-                synchronized(lock) {
-                    try {
-                        if (builderQueue.isEmpty()) {
-                            // Wait forever (until we're notified)
-                            System.out.println("Waiting forever");
-                            lock.wait();
-                        }else{
-                            // grab the first builder in the queue and see if it has been
-                            // idle (not requested) long enough (for the quiet period)
-                            Builder firstBuilderInQueue = (Builder) builderQueue.get(0);
-                            long lastBuildRequestTime = ((Long) buildRequestTimes.get(firstBuilderInQueue)).longValue();
-                            long elapsedTime = System.currentTimeMillis() - lastBuildRequestTime;
-                            System.out.println("Elapsed time for " + firstBuilderInQueue + ":" + elapsedTime);
-                            if(elapsedTime > quietPerionMilliseconds) {
-                                System.out.println("Building " + firstBuilderInQueue);
-                                currentlyRunningBuilder = firstBuilderInQueue;
-                                builderQueue.remove(0);
-                                currentlyRunningBuilder.build();
-                                currentlyRunningBuilder = null;
-                            } else {
-                                System.out.println("Waiting polltime");
-                                lock.wait(pollIntervalMilliseconds);
-                            }
-                        }
-                    } catch (InterruptedException e) {
-                        // shouldn't happen
-                    } finally {
-                        currentlyRunningBuilder = null;
-                    }
-                }
-            }
-        }
-    };
-
-    private Thread buildThread = new Thread(builder);
+    Thread buildThread;
     private Map buildRequestTimes = new HashMap();
 
     public QuietPeriodScheduler(Clock clock, long pollIntervalMilliseconds, long quietPerionMilliseconds) {
         this.clock = clock;
         this.pollIntervalMilliseconds = pollIntervalMilliseconds;
         this.quietPerionMilliseconds = quietPerionMilliseconds;
+    }
+
+    public void execute() {
+        start();
+    }
+
+    public void start() {
+        buildThread = new Thread(new Runnable() {
+            public void run() {
+                while (!Thread.currentThread().isInterrupted()) {
+                    synchronized(lock) {
+                        try {
+                            if (builderQueue.isEmpty()) {
+                                // Wait forever (until we're notified)
+                                lock.wait();
+                            }else{
+                                // grab the first builder in the queue and see if it has been
+                                // idle (not requested) long enough (for the quiet period)
+                                Builder firstBuilderInQueue = (Builder) builderQueue.get(0);
+                                long lastBuildRequestTime = ((Long) buildRequestTimes.get(firstBuilderInQueue)).longValue();
+                                long elapsedTime = System.currentTimeMillis() - lastBuildRequestTime;
+                                if(elapsedTime > quietPerionMilliseconds) {
+                                    currentlyRunningBuilder = firstBuilderInQueue;
+                                    builderQueue.remove(0);
+                                    currentlyRunningBuilder.build();
+                                    currentlyRunningBuilder = null;
+                                } else {
+                                    lock.wait(pollIntervalMilliseconds);
+                                }
+                            }
+                        } catch (InterruptedException e) {
+                            // shouldn't happen
+                        } finally {
+                            currentlyRunningBuilder = null;
+                        }
+                    }
+                }
+            }
+        });
         buildThread.start();
     }
 
@@ -103,7 +104,11 @@ public class QuietPeriodScheduler implements Scheduler {
         }
     }
 
-    public void stop() {
+    public void stop() throws InterruptedException {
+        if (buildThread != null) {
+            buildThread.interrupt();
+            buildThread.join(1000);
+        }
     }
 
 }

@@ -1,4 +1,4 @@
-package damagecontrol.testtest;
+package damagecontrol;
 
 import damagecontrol.AbstractBuilder;
 import damagecontrol.Scheduler;
@@ -6,7 +6,7 @@ import damagecontrol.BuildEvent;
 
 /**
  * @author Aslak Helles&oslash;y
- * @version $Revision: 1.1 $
+ * @version $Revision: 1.2 $
  */
 public class NullBuilder extends AbstractBuilder {
     public static final String SUCCESS_MESSAGE = "Build Successful";

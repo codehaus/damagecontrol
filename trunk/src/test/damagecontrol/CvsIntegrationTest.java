@@ -1,11 +1,12 @@
-package damagecontrol.scm.cvsx;
+package damagecontrol;
 
 import org.apache.tools.ant.*;
+import org.apache.tools.ant.BuildEvent;
+import org.apache.tools.ant.BuildListener;
 
 import java.io.File;
 
 import junit.framework.TestCase;
-import damagecontrol.testtest.NullBuilder;
 
 /**
  * This class tests interoperation with CVS. It uses Ant to set up
@@ -18,7 +19,7 @@ import damagecontrol.testtest.NullBuilder;
  * DamageControl.
  *
  * @author Aslak Helles&oslash;y
- * @version $Revision: 1.1 $
+ * @version $Revision: 1.2 $
  */
 public class CvsIntegrationTest extends TestCase {
 

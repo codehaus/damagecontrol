@@ -1,4 +1,4 @@
-package damagecontrol.triggers;
+package damagecontrol;
 
 import junit.framework.TestCase;
 
@@ -11,7 +11,7 @@ import java.io.OutputStreamWriter;
 import java.io.PrintWriter;
 import java.net.Socket;
 
-import damagecontrol.triggers.SocketTrigger;
+import damagecontrol.SocketTrigger;
 import damagecontrol.Scheduler;
 import damagecontrol.DirectScheduler;
 import damagecontrol.Builder;
@@ -21,7 +21,7 @@ import damagecontrol.MockBuilder;
  *
  * @author Aslak Helles&oslash;y
  * @author Jon Tirs&eacute;n
- * @version $Revision: 1.4 $
+ * @version $Revision: 1.5 $
  */
 public class SocketTriggerTest extends TestCase {
     private SocketTrigger socketTrigger;
@@ -30,7 +30,6 @@ public class SocketTriggerTest extends TestCase {
     protected void setUp() throws Exception {
         Scheduler scheduler = new DirectScheduler() {
             public void requestBuild(String builderName) {
-                System.out.println("BUILD REQUESTED");
                 buildRequestCount++;
             }
         };

@@ -1,6 +1,6 @@
-package damagecontrol.testtest;
+package damagecontrol;
 
-import damagecontrol.listeners.WriteToFileNotifier;
+import damagecontrol.WriteToFileNotifier;
 import damagecontrol.Builder;
 import damagecontrol.BuildEvent;
 

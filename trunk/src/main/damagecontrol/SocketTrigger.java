@@ -1,8 +1,9 @@
-package damagecontrol.triggers;
+package damagecontrol;
 
 import damagecontrol.Scheduler;
 import damagecontrol.Builder;
 import damagecontrol.NoSuchBuilderException;
+import damagecontrol.SocketTrigger;
 
 import java.net.ServerSocket;
 import java.net.Socket;
@@ -26,7 +27,7 @@ import java.util.StringTokenizer;
  * <P>
  * @author Aslak Helles&oslash;y
  * @author Jon Tirs&eacute;n
- * @version $Revision: 1.4 $
+ * @version $Revision: 1.5 $
  */
 public class SocketTrigger {
     public static final String BUILD = "BUILD";
@@ -50,15 +51,17 @@ public class SocketTrigger {
     }
 
     public void execute() throws IOException {
+        start();
+    }
+
+    public void start() throws IOException {
         serverSocket = new ServerSocket(port);
 
         listenerThread = new Thread(new Runnable() {
             public void run() {
                 try {
                     while (!Thread.currentThread().isInterrupted()) {
-                        System.out.println("LISTENING");
                         Socket socket = serverSocket.accept();
-                        System.out.println("ACCEPTED");
                         try {
 
                             OutputStream outputStream = socket.getOutputStream();
@@ -67,7 +70,6 @@ public class SocketTrigger {
                             InputStream inputStream = socket.getInputStream();
                             BufferedReader in = new BufferedReader(new InputStreamReader(inputStream));
                             String commandLine = in.readLine();
-                            System.out.println("COMMAND LINE:" + commandLine);
                             StringTokenizer commandTokenizer = new StringTokenizer(commandLine);
                             String command = commandTokenizer.nextToken();
                             if(BUILD.equals(command)) {
@@ -109,7 +111,6 @@ public class SocketTrigger {
         try {
             SocketTrigger socketTrigger = new SocketTrigger.WithScheduler(new Scheduler() {
                 public void requestBuild(String builderName) {
-                    System.out.println("Build requested for " + builderName);
                 }
 
                 public void registerBuilder(String name, Builder builder) {
@@ -125,7 +126,6 @@ public class SocketTrigger {
                     e.printStackTrace();
                 }
             }
-            System.out.println("DamageControl SocketTrigger exiting...");
         } catch (IOException e) {
             e.printStackTrace();
         }

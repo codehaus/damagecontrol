@@ -1,7 +1,7 @@
-package damagecontrol.listeners;
+package damagecontrol;
 
-import damagecontrol.listeners.WriteRSSNotifier;
-import damagecontrol.listeners.WriteToFileNotifier;
+import damagecontrol.WriteRSSNotifier;
+import damagecontrol.WriteToFileNotifier;
 import damagecontrol.Builder;
 
 public class WriteRSSNotifierTest extends WriteToFileNotifierTest {
