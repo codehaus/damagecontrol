@@ -31,20 +31,15 @@ module DamageControl
     # @param port where the dc server is listening
     # @param replace_string what to replace "/" with (needed for CVS on windows)
     def BuildBootstrapper.trigger_command(project_name, conf_file, nc_command, dc_host, dc_port)
-#      "#{cat_command} #{conf_file} | #{nc_command} #{dc_host} #{dc_port}"
-      puts nc_command
-      puts dc_host
-      puts dc_port
-      puts "#{nc_command} #{dc_host} #{dc_port} < #{conf_file}"
       "#{nc_command} #{dc_host} #{dc_port} < #{conf_file}"
     end
 
     def BuildBootstrapper.build_spec(project_name, scm_spec, build_command_line, nag_email, path_sep="/")
       {
         "project_name" => project_name,
-        "scm_spec" => scm_spec.gsub('/', path_sep),
-        "build_command_line" => build_command_line,
-          "nag_email" => nag_email
+       "scm_spec" => scm_spec.gsub('/', path_sep),
+       "build_command_line" => build_command_line,
+       "nag_email" => nag_email
       }.to_yaml << "\n...\n"
     end
 end

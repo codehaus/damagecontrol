@@ -1,11 +1,13 @@
 require 'test/unit'
 require 'ftools'
+require 'fileutils'
 require 'socket'
 require 'damagecontrol/scm/CVS'
 require 'damagecontrol/FileUtils'
 
 module DamageControl
   class CVSTest < Test::Unit::TestCase
+    include ::FileUtils
     include FileUtils
   
     def setup
@@ -83,7 +85,9 @@ module DamageControl
 
     def test_install_trigger
       testrepo = File.expand_path("#{damagecontrol_home}/target/cvstestrepo")
+      rm_rf(testrepo)
       testcheckout = File.expand_path("#{damagecontrol_home}/target/cvstestcheckout/CVSROOT")
+      rm_rf(testcheckout)
       
       project_name = "DamageControlled"
       spec = ":local:#{testrepo}:damagecontrolled"

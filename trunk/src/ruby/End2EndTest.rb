@@ -27,7 +27,7 @@ class End2EndTest < Test::Unit::TestCase
       File.mkpath(@tempdir)
   end
         
-	def setup
+  def setup
     Dir.chdir(@tempdir)
     
     @cvsrootdir = "#{@tempdir}/repository"
@@ -39,99 +39,111 @@ class End2EndTest < Test::Unit::TestCase
     @svn_url = "file:///#{@svn_repo_dir}";
     @svn_wc_checkout_dir = "#{@tempdir}/wc";
     @svn_wc_usage_dir = "#{@svn_wc_checkout_dir}/repo"
-	end
+  end
 	
-	def Xteardown
-		Dir.chdir(@tempdir)
-		rmdir(@project)
-		rmdir(@cvsrootdir)
+  def Xteardown
+    Dir.chdir(@tempdir)
+    rmdir(@project)
+    rmdir(@cvsrootdir)
     rmdir(@svn_repo_dir)
-	end
+  end
 
-	def create_cvs_repository()
-		system("cvs -d#{@cvsroot} init")
-	end
+  def create_cvs_repository()
+    system("cvs -d#{@cvsroot} init")
+  end
 		
-	class SysOutProgressReporter
-		def initialize(hub)
-			hub.add_subscriber(self)
-		end
-		
-		def receive_message(message)
-			if !message.is_a?(BuildEvent)
-				return
-			end
-			
-			name = message.build.project_name
-			if message.is_a?(BuildRequestEvent)
-				puts "[#{name}] BUILD STARTING"
-			end
-			
-			if message.is_a?(BuildProgressEvent)
-				puts "[#{name}] [#{message.build.project_name}] #{message.output}"
-			end
-
-			if message.is_a?(BuildCompleteEvent)
-				puts "BUILD COMPLETE [#{message.build.project_name}]"
-			end
-		end
-	end
+  class SysOutProgressReporter
+    def initialize(hub)
+      hub.add_subscriber(self)
+    end
+    
+    def receive_message(message)
+      if !message.is_a?(BuildEvent)
+        return
+      end
+      
+      name = message.build.project_name
+      if message.is_a?(BuildRequestEvent)
+        puts "[#{name}] BUILD STARTING"
+      end
+      
+      if message.is_a?(BuildProgressEvent)
+        puts "[#{name}] [#{message.build.project_name}] #{message.output}"
+      end
+      
+      if message.is_a?(BuildCompleteEvent)
+        puts "BUILD COMPLETE [#{message.build.project_name}]"
+      end
+    end
+  end
+  
+  def buildsdir
+    "#{@tempdir}/builds"
+  end
 	
-	def buildsdir
-		"#{@tempdir}/builds"
-	end
-	
-	def start_damagecontrol
+  def start_damagecontrol
     if(@@damagecontrol_started == false) then
       load("#{damagecontrol_home}/src/samples/simple.rb")
       start_simple_server(buildsdir)
       @@damagecontrol_started = true
     end
-	end
+  end
         
 	
-	def create_cvsmodule(project)
-		Dir.chdir(@tempdir)
-		File.mkpath(@project)
-		Dir.chdir(@project)
-		system("cvs -d#{@cvsroot} import -m 'message' #{project} VENDOR START")
-	end
-	
-	def install_damagecontrol_into_cvs(build_command_line)
-    cvs = CVS.new
-    cvs.install_trigger(
-          "#{@tempdir}/install_trigger_cvs_tmp",
-          @project,
-          "#{@cvsroot}:#{@project}",
-          build_command_line,
-          "e2eproject-dev@codehaus.org",
-          "localhost",
-          "4711",
-          nc_exe_location)
+  def create_cvsmodule(project)
+    Dir.chdir(@tempdir)
+    File.mkpath(@project)
+    Dir.chdir(@project)
+    system("cvs -d#{@cvsroot} import -m 'message' #{project} VENDOR START")
   end
 	
-	def checkout_cvs_project(project)
-		Dir.chdir(@tempdir)
-		rmdir(project)
-		system("cvs -d#{@cvsroot} co #{project}")
-	end
+  def install_damagecontrol_into_cvs(build_command_line)
+    cvs = CVS.new
+    cvs.install_trigger(
+                        "#{@tempdir}/install_trigger_cvs_tmp",
+          @project,
+                        "#{@cvsroot}:#{@project}",
+          build_command_line,
+                        "e2eproject-dev@codehaus.org",
+                        "localhost",
+                        "4711",
+                        nc_exe_location)
+  end
 	
-	def add_file_to_cvs_project(project, file)
-		Dir.chdir("#{@tempdir}/#{project}")
-		system("cvs add #{file}")
-		system("cvs com -m 'comment'")
-	end
+  def checkout_cvs_project(project)
+    Dir.chdir(@tempdir)
+    rmdir(project)
+    system("cvs -d#{@cvsroot} co #{project}")
+  end
 	
-	def script_file(file)
-		"#{file}.bat"
-	end
+  def add_file_to_cvs_project(project, file)
+    Dir.chdir("#{@tempdir}/#{project}")
+    system("cvs add #{file}")
+    system("cvs com -m 'comment'")
+  end
+	
+  def script_file(file)
+    if windows?
+      "#{file}.bat"
+    else
+      "#{file}.sh"
+    end
+  end
 
-	def nc_file
-		"nc.exe"
-	end
+  def nc_file
+    if windows?
+      "nc.exe"
+    else
+      "nc"
+    end
+  end
   
   def nc_exe_location
-    "#{@basedir}/bin/#{nc_file}"
+    if windows?
+      "#{@basedir}/bin/#{nc_file}"
+    else
+      nil
+    end
   end
 	
 	def assert_file_content(expected_content, file, message)
@@ -162,24 +174,38 @@ class End2EndTest < Test::Unit::TestCase
 			file.puts(content)
 		end
   end
+
+  def execute_script_commandline(name)
+    if windows?
+      script_file("build")
+    else
+      "sh #{script_file(name)}"
+    end
+  end
   
-	def test_builds_on_cvs_add
-		create_cvs_repository
-		create_cvsmodule("e2eproject")
-		install_damagecontrol_into_cvs("build.bat")
+  def test_builds_on_cvs_add
+    create_cvs_repository
+    create_cvsmodule("e2eproject")
+    install_damagecontrol_into_cvs(execute_script_commandline("build"))
     
     start_damagecontrol
     
     # add build.bat file and commit it (will trigger build)
-		checkout_cvs_project("e2eproject")
-    create_file("e2eproject/build.bat", 'echo "Hello world from DamageControl" > buildresult.txt')
-		add_file_to_cvs_project("e2eproject", "build.bat")
-  
-		wait_for_build_to_complete
-		assert_file_content('"Hello world from DamageControl" ', 
+    checkout_cvs_project("e2eproject")
+    create_file("e2eproject/#{script_file('build')}", 'echo "Hello world from DamageControl" > buildresult.txt')
+    add_file_to_cvs_project("e2eproject", script_file("build"))
+    
+    wait_for_build_to_complete
+    expected_content =
+            if windows?
+              '"Hello world from DamageControl" '
+            else
+              'Hello world from DamageControl'
+            end
+    assert_file_content(expected_content,
 			"#{buildsdir}/e2eproject/buildresult.txt", 
 			"build not executed")
-	end
+  end
   
   def TODO_test_builds_on_svn_add
       create_svn_repository

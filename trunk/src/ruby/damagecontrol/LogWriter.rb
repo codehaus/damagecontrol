@@ -6,28 +6,32 @@ module DamageControl
   class LogWriter
   
     def initialize(channel, logs_base_dir)
-      @log_files = {}      
-      channel.add_subscriber(self)
+      @log_files = {}
       @logs_base_dir = logs_base_dir
+
+      channel.add_subscriber(self)
     end
     
     def receive_message(message)
       
-      if message.is_a? BuildProgressEvent
-        puts("[#{message.build.project_name}]:" + message.output)
-        begin
-          log_file(message.build).puts(message.output)
-          log_file(message.build).flush
+      if message.is_a? BuildEvent
+        build = message.build
+
+        if message.is_a? BuildProgressEvent
+          puts("[#{build.project_name}]:" + message.output)
+          begin
+            log_file(build).puts(message.output)
+            log_file(build).flush
         rescue => e
           puts "BuildProgressEvent: Couldn't write to file #{log_file_name(build)}:#{e.message}"
         end
       end
 
       if message.is_a? BuildCompleteEvent
-        puts("[#{message.build.project_name}]: BUILD COMPLETE")
+        puts("[#{build.project_name}]: BUILD COMPLETE")
         begin
-          log_file(message.build).flush
-          log_file(message.build).close
+          log_file(build).flush
+          log_file(build).close
         rescue => e
           puts "BuildCompleteEvent: Couldn't write to file #{log_file_name(build)}:#{e.message}"
         end

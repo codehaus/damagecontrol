@@ -144,6 +144,7 @@ module DamageControl
       # install trigger command
       File.open("#{directory}/loginfo", File::WRONLY | File::APPEND) do |file|
         conf_file = conf_script(scm_spec, BuildBootstrapper.conf_file(project_name))
+        puts "conf_file = #{conf_file}"
         trigger_command = BuildBootstrapper.trigger_command(project_name, conf_file, nc_command(scm_spec), dc_host, dc_port)
         file.puts("#{mod(scm_spec)} #{trigger_command}")
       end
@@ -184,11 +185,7 @@ module DamageControl
     end
     
     def conf_script(scm_spec, conf_file_name)
-      if(windows?)
-        to_os_path("#{path(scm_spec)}/CVSROOT/#{conf_file_name}")
-      else
-        "cat"
-      end
+      to_os_path("#{path(scm_spec)}/CVSROOT/#{conf_file_name}")
     end
     
     def checked_out?(directory, scm_spec)

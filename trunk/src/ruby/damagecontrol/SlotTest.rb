@@ -1,3 +1,5 @@
+require 'Slot'
+
 module DamageControl
 
   class SlotTest < Test::Unit::TestCase
