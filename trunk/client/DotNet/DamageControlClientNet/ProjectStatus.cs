@@ -4,34 +4,37 @@ namespace ThoughtWorks.DamageControl.DamageControlClientNet
 {
 	public enum BuildStatus
 	{
-		Unknown, Success, Failure, Nothing, Working
-	}
+		Idle, Successful, Failed, Queued, Building, Killed, DeterminingChangesets, CheckingOut
+}
 
 	public class ProjectStatus
 	{
 		string projectName;
+		
+		BuildStatus lastCompletedBuildStatus;
+		string lastCompletedBuildUrl;
+		DateTime lastCompletedBuildDate;
+		string lastCompletedBuildLabel;
+
 		BuildStatus currentBuildStatus;
-		BuildStatus buildStatus;
-		string buildStatusUrl;
-		DateTime lastBuildDate;
-		string lastBuildLabel;
+
 		public ProjectStatus()
 		{
 			this.projectName = null;
-			this.currentBuildStatus = BuildStatus.Unknown;
-			this.buildStatusUrl = "";
-			this.lastBuildDate = DateTime.MinValue;
-			this.lastBuildLabel = "Unknown - never polled";
+			this.currentBuildStatus = BuildStatus.Idle;
+			this.lastCompletedBuildUrl = "";
+			this.lastCompletedBuildDate = DateTime.MinValue;
+			this.lastCompletedBuildLabel = "Unknown - never polled";
 		}
 
-		public ProjectStatus(string projectName, BuildStatus currentBuildStatus, BuildStatus buildStatus, string buildStatusUrl, DateTime lastBuildDate, string lastBuildLabel)
+		public ProjectStatus(string projectName, BuildStatus currentBuildStatus, BuildStatus lastCompletedBuildStatus, string lastCompletedBuildUrl, DateTime lastCompletedBuildDate, string lastCompletedBuildLabel)
 		{
 			this.projectName = projectName;
 			this.currentBuildStatus = currentBuildStatus;
-			this.buildStatus = buildStatus;
-			this.buildStatusUrl = buildStatusUrl;
-			this.lastBuildDate = lastBuildDate;
-			this.lastBuildLabel = lastBuildLabel;
+			this.lastCompletedBuildStatus = lastCompletedBuildStatus;
+			this.lastCompletedBuildUrl = lastCompletedBuildUrl;
+			this.lastCompletedBuildDate = lastCompletedBuildDate;
+			this.lastCompletedBuildLabel = lastCompletedBuildLabel;
 		}
 
 		public string Name
@@ -46,7 +49,7 @@ namespace ThoughtWorks.DamageControl.DamageControlClientNet
 		{
 			get 
 			{
-				return buildStatusUrl;
+				return lastCompletedBuildUrl;
 			}
 		}
 
@@ -54,7 +57,7 @@ namespace ThoughtWorks.DamageControl.DamageControlClientNet
 		{
 			get
 			{
-				return lastBuildDate;
+				return lastCompletedBuildDate;
 			}
 		}
 
@@ -62,7 +65,7 @@ namespace ThoughtWorks.DamageControl.DamageControlClientNet
 		{
 			get
 			{
-				return buildStatus;
+				return lastCompletedBuildStatus;
 			}
 		}
 
@@ -78,7 +81,7 @@ namespace ThoughtWorks.DamageControl.DamageControlClientNet
 		{
 			get
 			{
-				return lastBuildLabel;
+				return lastCompletedBuildLabel;
 			}
 		}
 	}

@@ -3,6 +3,7 @@ using System.IO;
 using System.Diagnostics;
 using System.Windows.Forms;
 using System.Collections;
+using DamageControlClientNet;
 using Nwc.XmlRpc;
 using ThoughtWorks.DamageControl.DamageControlClientNet;
 
@@ -12,7 +13,7 @@ namespace ThoughtWorks.DamageControl.WindowsTray
 	/// Displays user settings for the DamageControl monitor, allowing
 	/// changes to be made.
 	/// </summary>
-	public class SettingsForm : Form
+	public class SettingsForm : Form, ProjectVisitor
 	{
 		#region Gui control declarations
 
@@ -62,6 +63,7 @@ namespace ThoughtWorks.DamageControl.WindowsTray
 		public SettingsForm(Settings settings, SystemTrayMonitor m)
 		{
 			_settings = settings;
+			settings.accept(this);
 			this.monitor = m;
 
 			InitializeComponent();
@@ -96,11 +98,11 @@ namespace ThoughtWorks.DamageControl.WindowsTray
 			foreach (Project p in this._settings.Projects)
 			{
 				int imageindex = 0;
-				if (p.ProjectStatus.BuildStatus.Equals(BuildStatus.Success))
+				if (p.ProjectStatus.BuildStatus.Equals(BuildStatus.Successful))
 				{
 					imageindex = 1;
 				} 
-				else if (p.ProjectStatus.BuildStatus.Equals(BuildStatus.Failure)) 
+				else if (p.ProjectStatus.BuildStatus.Equals(BuildStatus.Failed)) 
 				{
 					imageindex = 2;
 				}
@@ -679,14 +681,16 @@ namespace ThoughtWorks.DamageControl.WindowsTray
 			if (sender is ProjectForm)
 			{
 				ProjectForm pf = (ProjectForm) sender;
-				if (pf.Project!=null) 
+				Project project = pf.Project;
+
+				if (project != null) 
 				{
-					if (!this._settings.Projects.Contains(pf.Project)) 
+					if (!_settings.Projects.Contains(project)) 
 					{
-						pf.Project.OnPolled +=new PolledEventHandler(Project_OnPolled);
-						this._settings.Projects.Add(pf.Project);
-						pf.Project.OnPolled += new PolledEventHandler(this.monitor.Project_OnPolled);
-						pf.Project.OnBuildOccurred += new BuildOccurredEventHandler(this.monitor.Project_OnBuildOccurred);
+						project.OnPolled += new PolledEventHandler(Project_OnPolled);
+
+						_settings.Projects.Add(project);
+						monitor.visitProject(project);
 					}
 					UpdateProjectList();
 				}
@@ -735,6 +739,11 @@ namespace ThoughtWorks.DamageControl.WindowsTray
 		{
 			ProxyForm pf = new ProxyForm(this._settings);
 			pf.Show();
+		}
+
+		public void visitProject(Project project)
+		{
+			project.OnPolled += new PolledEventHandler(Project_OnPolled);
 		}
 	}
 	public class ProjectMenuItem : MenuItem 

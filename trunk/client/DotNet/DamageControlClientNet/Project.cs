@@ -1,20 +1,23 @@
 using System;
-using System.Threading;
 using System.Collections;
 using System.Diagnostics;
 using System.Net;
+using System.Threading;
 using Nwc.XmlRpc;
-using System.Xml.Serialization;
 
 namespace ThoughtWorks.DamageControl.DamageControlClientNet
 {
+
 	#region Public delegates
 
 	public delegate void BuildOccurredEventHandler(object sauce, BuildOccurredEventArgs e);
+
 	public delegate void PolledEventHandler(object sauce, PolledEventArgs e);
+
 	public delegate void ErrorEventHandler(object sauce, ErrorEventArgs e);
 
 	#endregion
+
 	/// <summary>
 	/// Encapsulates all project information for the DamageControl Project.  This class
 	/// is designed to work with Xml serialisation, for persisting user settings.
@@ -24,15 +27,16 @@ namespace ThoughtWorks.DamageControl.DamageControlClientNet
 	public class Project
 	{
 		#region member variables
+
 		private string installationurl;
 		private string username;
 		private string password;
 		private string projectname;
 		private int pollinginterval;
-		static readonly Hashtable _statusMappings = new Hashtable();
-		private ProjectStatus _currentProjectStatus = new ProjectStatus("unknown", BuildStatus.Unknown, BuildStatus.Unknown, "", DateTime.MinValue, "0");
+		private static readonly Hashtable _statusMappings = new Hashtable();
+		private ProjectStatus _currentProjectStatus = new ProjectStatus("unknown", BuildStatus.Idle, BuildStatus.Idle, "", DateTime.MinValue, "0");
 		private Thread thread;
-		private CredentialCache credcache;
+
 		#endregion
 
 		#region delegates and handlers
@@ -40,31 +44,31 @@ namespace ThoughtWorks.DamageControl.DamageControlClientNet
 		public event PolledEventHandler OnPolled;
 		public event BuildOccurredEventHandler OnBuildOccurred;
 		public event ErrorEventHandler OnError;
-		
 
 		#endregion
 
 		#region initialization and constructors
+
 		static Project()
 		{
-			_statusMappings["IDLE"] = BuildStatus.Nothing;
-			_statusMappings["SUCCESSFUL"] = BuildStatus.Success;
-			_statusMappings["FAILED"] = BuildStatus.Failure;
-			_statusMappings["QUEUED"] = BuildStatus.Working;
-			_statusMappings["BUILDING"] = BuildStatus.Working;
-			_statusMappings["CHECKING OUT"] = BuildStatus.Working;
+			_statusMappings["IDLE"] = BuildStatus.Idle;
+			_statusMappings["SUCCESSFUL"] = BuildStatus.Successful;
+			_statusMappings["FAILED"] = BuildStatus.Failed;
+			_statusMappings["QUEUED"] = BuildStatus.Queued;
+			_statusMappings["BUILDING"] = BuildStatus.Building;
+			_statusMappings["KILLED"] = BuildStatus.Killed;
+			_statusMappings["DETERMINING CHANGESETS"] = BuildStatus.DeterminingChangesets;
+			_statusMappings["CHECKING OUT"] = BuildStatus.CheckingOut;
 		}
 
 		public Project()
 		{
-		    //Console.WriteLine("new Project");
-			this.installationurl = "http://192.168.0.2/";
+			this.installationurl = "http://localhost:4712/";
 			this.pollinginterval = 10000;
-			this.projectname = "";
+			this.projectname = "ray";
 			this.thread = new Thread(new ThreadStart(DoPolling));
 			thread.Start();
 			thread.Suspend();
-			this.credcache = new CredentialCache();
 		}
 
 		public Project(String url, String project)
@@ -75,25 +79,26 @@ namespace ThoughtWorks.DamageControl.DamageControlClientNet
 			this.thread = new Thread(new ThreadStart(DoPolling));
 			thread.Start();
 			thread.Suspend();
-			this.credcache = new CredentialCache();
 		}
+
 		#endregion
 
 		#region polling control
-		public void StartPolling() 
+
+		public void StartPolling()
 		{
-		    Console.WriteLine("Starting polling on project " + this.projectname);
-			if ((pollinginterval > 0)&&(!thread.IsAlive)) 
+			Console.WriteLine("Starting polling on project " + this.projectname);
+			if ((pollinginterval > 0) && (!thread.IsAlive))
 			{
 				this.thread.Resume();
 			}
 			else
 			{
-			     //this.thread.Start();
-			     if (thread.IsAlive)
-			         Console.WriteLine("Thread is still alive");
-			     if (pollinginterval <= 0)
-			         Console.WriteLine("Interval is too short");
+				//this.thread.Start();
+				if (thread.IsAlive)
+					Console.WriteLine("Thread is still alive");
+				if (pollinginterval <= 0)
+					Console.WriteLine("Interval is too short");
 			}
 		}
 
@@ -101,6 +106,7 @@ namespace ThoughtWorks.DamageControl.DamageControlClientNet
 		{
 			this.thread.Suspend();
 		}
+
 		#endregion
 
 		#region Properties
@@ -110,30 +116,18 @@ namespace ThoughtWorks.DamageControl.DamageControlClientNet
 		/// </summary>
 		public string WebUrl
 		{
-			get
-			{
-				return _currentProjectStatus.BuildStatusUrl;
-			}
+			get { return _currentProjectStatus.BuildStatusUrl; }
 		}
 
 		public string InstallationUrl
 		{
-			get
-			{
-				return this.installationurl;
-			}
-			set 
-			{
-				this.installationurl = value;
-			}
+			get { return this.installationurl; }
+			set { this.installationurl = value; }
 		}
 
 		public string Username
 		{
-			get
-			{
-				return this.username;
-			}
+			get { return this.username; }
 			set
 			{
 				this.username = value;
@@ -143,7 +137,7 @@ namespace ThoughtWorks.DamageControl.DamageControlClientNet
 
 		private void UpdateCredentials()
 		{
-			if ((this.username!=null)&&(this.password!=null)) 
+			if ((this.username != null) && (this.password != null))
 			{
 				RequestSettings settings = RequestSettings.getInstance();
 				settings.Credentials = new NetworkCredential(this.username, this.password);
@@ -152,10 +146,7 @@ namespace ThoughtWorks.DamageControl.DamageControlClientNet
 
 		public string Password
 		{
-			get
-			{
-				return this.password;
-			}
+			get { return this.password; }
 			set
 			{
 				this.password = value;
@@ -166,31 +157,23 @@ namespace ThoughtWorks.DamageControl.DamageControlClientNet
 
 		public string Projectname
 		{
-			get 
-			{
-				return this.projectname;
-			}
-			set 
-			{
-				this.projectname = value;
-			}
+			get { return this.projectname; }
+			set { this.projectname = value; }
 		}
 
-		public int Interval 
+		public int Interval
 		{
-			get 
+			get { return this.pollinginterval; }
+			set
 			{
-				return this.pollinginterval;
-			}
-			set 
-			{
-			    bool wasalive = false;
-			    if (thread.IsAlive) {
-			         wasalive = true;
-			         thread.Suspend();
-			    }
+				bool wasalive = false;
+				if (thread.IsAlive)
+				{
+					wasalive = true;
+					thread.Suspend();
+				}
 				this.pollinginterval = value;
-				if ((pollinginterval>0)&&(wasalive))
+				if ((pollinginterval > 0) && (wasalive))
 				{
 					thread.Resume();
 				}
@@ -199,36 +182,32 @@ namespace ThoughtWorks.DamageControl.DamageControlClientNet
 
 		public ProjectStatus ProjectStatus
 		{
-			get
-			{
-				return _currentProjectStatus;
-			}
+			get { return _currentProjectStatus; }
 		}
 
 		#endregion
 
 		#region Build transition detection
 
-		bool HasBuildOccurred(ProjectStatus newProjectStatus)
+		private bool HasBuildOccurred(ProjectStatus newProjectStatus)
 		{
 			// If last build date is DateTime.MinValue (struct's default value),
 			// then the remote status has not yet been recorded.
-			if (_currentProjectStatus.LastBuildDate==DateTime.MinValue)
+			if (_currentProjectStatus.LastBuildDate == DateTime.MinValue)
 				return false;
 
 			// compare dates
-			return (newProjectStatus.LastBuildDate!=_currentProjectStatus.LastBuildDate);
+			return (newProjectStatus.LastBuildDate != _currentProjectStatus.LastBuildDate);
 		}
-
 
 		#endregion
 
 		#region Build transitions
 
-		BuildTransition GetBuildTransition(ProjectStatus projectStatus)
+		private BuildTransition GetBuildTransition(ProjectStatus projectStatus)
 		{
-			bool wasOk = _currentProjectStatus.BuildStatus==BuildStatus.Success;
-			bool isOk = projectStatus.BuildStatus==BuildStatus.Success;
+			bool wasOk = _currentProjectStatus.BuildStatus == BuildStatus.Successful;
+			bool isOk = projectStatus.BuildStatus == BuildStatus.Successful;
 
 			if (wasOk && isOk)
 				return BuildTransition.StillSuccessful;
@@ -242,45 +221,37 @@ namespace ThoughtWorks.DamageControl.DamageControlClientNet
 			throw new Exception("The universe has gone crazy.");
 		}
 
-
 		#endregion
 
 		#region polling
+
 		private void Poll()
 		{
-		    Console.WriteLine("Polling on project " + this.projectname);
+			Console.WriteLine("Polling on project " + this.projectname);
 			try
 			{
 				ProjectStatus latestProjectStatus = GetRemoteProjectStatus();
-				if (this.OnPolled!=null) 
+				bool hasBuildOccurred = HasBuildOccurred(latestProjectStatus);
+				BuildTransition transition = GetBuildTransition(latestProjectStatus);
+
+				_currentProjectStatus = latestProjectStatus;
+				OnPolled(this, new PolledEventArgs(latestProjectStatus));
+
+				if (hasBuildOccurred)
 				{
-					OnPolled(this, new PolledEventArgs(latestProjectStatus));
-				} 
-				else 
-				{
+					Console.WriteLine("OnBuildOccurred");
+					OnBuildOccurred(this, new BuildOccurredEventArgs(latestProjectStatus, transition));
 				}
-				if (HasBuildOccurred(latestProjectStatus))
-				{
-					if (this.OnBuildOccurred!=null) 
-					{
-						Console.WriteLine("OnBuildOccurred");
-						OnBuildOccurred(this, new BuildOccurredEventArgs(latestProjectStatus, GetBuildTransition(latestProjectStatus)));
-					}
-				}
-				this._currentProjectStatus = latestProjectStatus;
-			} 
-			catch (Exception e) 
+			}
+			catch (Exception e)
 			{
-				if (this.OnError!=null) 
-				{
-					OnError(this, new ErrorEventArgs(e));
-				}
+				OnError(this, new ErrorEventArgs(e));
 			}
 		}
 
 		private void DoPolling()
 		{
-			while (true) 
+			while (true)
 			{
 				Poll();
 				Thread.Sleep(this.pollinginterval);
@@ -290,17 +261,18 @@ namespace ThoughtWorks.DamageControl.DamageControlClientNet
 		#endregion
 
 		#region damagecontrol communication
-		Hashtable CallDamageControlServer(string methodName)
+
+		private Hashtable CallDamageControlServer(string methodName)
 		{
-		    UpdateCredentials();
+			UpdateCredentials();
 			XmlRpcRequest client = new XmlRpcRequest();
 			client.MethodName = methodName;
 			client.Params.Add(this.projectname);
-			
+
 			string url = this.installationurl + "public/xmlrpc";
 			//Console.WriteLine("Calling " + url);
 			XmlRpcResponse response = client.Send(url);
-			if (response.IsFault) 
+			if (response.IsFault)
 			{
 				throw new Exception(response.FaultString);
 			}
@@ -309,7 +281,7 @@ namespace ThoughtWorks.DamageControl.DamageControlClientNet
 				throw new Exception(string.Format("Project '{0}' does not exist", this.projectname));
 			}
 
-						Hashtable ret = response.Value as Hashtable;
+			Hashtable ret = response.Value as Hashtable;
 			if (ret == null)
 			{
 				throw new Exception("XMLRPC connection not compatible");
@@ -322,10 +294,10 @@ namespace ThoughtWorks.DamageControl.DamageControlClientNet
 			XmlRpcRequest client = new XmlRpcRequest();
 			client.MethodName = "build.request";
 			client.Params.Add(this.projectname);
-			
+
 			string url = this.installationurl + "private/xmlrpc";
 			XmlRpcResponse response = client.Send(url);
-			if (response.IsFault) 
+			if (response.IsFault)
 			{
 				Console.WriteLine(response.FaultString);
 			}
@@ -333,61 +305,49 @@ namespace ThoughtWorks.DamageControl.DamageControlClientNet
 
 		private ProjectStatus GetRemoteProjectStatus()
 		{
-			Hashtable buildStatusRaw = CallDamageControlServer("status.last_completed_build");
-			DumpHashtable("last", buildStatusRaw);
-			BuildStatus buildStatus = ToBuildStatus((string) buildStatusRaw["status"]);
-			string label = buildStatusRaw["label"] == null ? "none" : buildStatusRaw["label"].ToString();
-			string url = (string) buildStatusRaw["url"];
-			DateTime lastBuildDate = TimestampToDate((string) buildStatusRaw["timestamp"]);
+			Hashtable lastCompletedBuildStatusRaw = CallDamageControlServer("status.last_completed_build");
+			DumpHashtable("last", lastCompletedBuildStatusRaw);
+			BuildStatus lastCompletedBuildStatus = ToBuildStatus((string) lastCompletedBuildStatusRaw["status"]);
+			string lastCompletedBuildLabel = lastCompletedBuildStatusRaw["label"] == null ? "none" : lastCompletedBuildStatusRaw["label"].ToString();
+			string lastCompletedBuildUrl = (string) lastCompletedBuildStatusRaw["url"];
+			DateTime lastCompletedBuildDate = (DateTime) lastCompletedBuildStatusRaw["dc_start_time"];
 
 			Hashtable currentBuildStatusRaw = CallDamageControlServer("status.current_build");
 			DumpHashtable("current", currentBuildStatusRaw);
 			BuildStatus currentBuildStatus = ToBuildStatus((string) currentBuildStatusRaw["status"]);
 
-			return new ProjectStatus(this.projectname, currentBuildStatus, buildStatus, url, lastBuildDate, label);
+			return new ProjectStatus(this.projectname, currentBuildStatus, lastCompletedBuildStatus, lastCompletedBuildUrl, lastCompletedBuildDate, lastCompletedBuildLabel);
 		}
 
-		DateTime TimestampToDate(string timestamp) 
-		{
-			try 
-			{
-				return DateTime.ParseExact(timestamp, "yyyyMMddHHmmss", null);
-			}
-			catch (Exception e)
-			{
-				Debug.WriteLine("could not parse date '" + timestamp + "': " + e);
-				return DateTime.Today;
-			}
-		}
-
-		void DumpHashtable(string name, Hashtable table)
+		private void DumpHashtable(string name, Hashtable table)
 		{
 			Debug.WriteLine("============== " + name);
-			foreach(Object key in table.Keys) 
+			foreach (Object key in table.Keys)
 			{
 				Debug.WriteLine(string.Format("{0} = {1}", key, table[key]));
 			}
 			Debug.WriteLine("");
 		}
 
-		static BuildStatus ToBuildStatus(string damagecontrolStatus) 
+		private static BuildStatus ToBuildStatus(string damagecontrolStatus)
 		{
-			if(damagecontrolStatus == null)
+			if (damagecontrolStatus == null)
 			{
-				return BuildStatus.Unknown;
+				return BuildStatus.Idle;
 			}
 			object resultingStatus = _statusMappings[damagecontrolStatus];
-			if(resultingStatus == null)
+			if (resultingStatus == null)
 			{
-				return BuildStatus.Unknown;
+				return BuildStatus.Idle;
 			}
 			return (BuildStatus) resultingStatus;
 		}
+
 		#endregion
 
 		public string TestConnection()
 		{
-			try 
+			try
 			{
 				/*
 				DamageControlTest test = new DamageControlTest();
@@ -426,27 +386,27 @@ namespace ThoughtWorks.DamageControl.DamageControlClientNet
 					//ShowError(response.FaultString);
 					return "Cannot ping, " + response.FaultString;
 				}
-				
+
 				// trying a simple echo
 				client = new XmlRpcRequest();
 				client.MethodName = "test.echo";
 				client.Params.Add("This is a test from DamageControl Monitor");
 				response = client.Send(url);
-				if (response.IsFault) 
+				if (response.IsFault)
 				{
 					return "Cannot echo: " + response.FaultString;
 				}
-				if ((string) response.Value != "This is a test from DamageControl Monitor") 
+				if ((string) response.Value != "This is a test from DamageControl Monitor")
 				{
 					return "Cannot echo: XMLRPC connection is not compatible";
 				}
-				
+
 				// checking whether that project exists
 				client = new XmlRpcRequest();
 				client.MethodName = "status.current_build";
 				client.Params.Add(this.projectname);
 				response = client.Send(url);
-				if (response.IsFault) 
+				if (response.IsFault)
 				{
 					return "Cannot get status: " + response.FaultString;
 				}
@@ -464,13 +424,12 @@ namespace ThoughtWorks.DamageControl.DamageControlClientNet
 		}
 	}
 
-
 	#region Event argument classes
 
 	public class BuildOccurredEventArgs : EventArgs
 	{
-		ProjectStatus _projectStatus;
-		BuildTransition _transition;
+		private ProjectStatus _projectStatus;
+		private BuildTransition _transition;
 
 		public BuildOccurredEventArgs(ProjectStatus newProjectStatus, BuildTransition transition)
 		{
@@ -480,32 +439,23 @@ namespace ThoughtWorks.DamageControl.DamageControlClientNet
 
 		public ProjectStatus ProjectStatus
 		{
-			get
-			{
-				return _projectStatus;
-			}
+			get { return _projectStatus; }
 		}
 
 		public BuildTransition BuildTransition
 		{
-			get
-			{
-				return _transition;
-			}
+			get { return _transition; }
 		}
 
 		public BuildTransitionAttribute BuildTransitionInfo
 		{
-			get
-			{
-				return BuildTransitionUtil.GetBuildTransitionAttribute(_transition);
-			}
+			get { return BuildTransitionUtil.GetBuildTransitionAttribute(_transition); }
 		}
 	}
 
 	public class PolledEventArgs : EventArgs
 	{
-		ProjectStatus _projectStatus;
+		private ProjectStatus _projectStatus;
 
 		public PolledEventArgs(ProjectStatus projectStatus)
 		{
@@ -514,16 +464,13 @@ namespace ThoughtWorks.DamageControl.DamageControlClientNet
 
 		public ProjectStatus ProjectStatus
 		{
-			get
-			{
-				return _projectStatus;
-			}
+			get { return _projectStatus; }
 		}
 	}
 
 	public class ErrorEventArgs : EventArgs
 	{
-		Exception _exception;
+		private Exception _exception;
 
 		public ErrorEventArgs(Exception exception)
 		{
@@ -532,13 +479,9 @@ namespace ThoughtWorks.DamageControl.DamageControlClientNet
 
 		public Exception Exception
 		{
-			get
-			{
-				return _exception;
-			}
+			get { return _exception; }
 		}
 	}
-
 
 	#endregion
 }

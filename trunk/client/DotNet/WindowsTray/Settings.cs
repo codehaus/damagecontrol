@@ -2,6 +2,7 @@ using System;
 using System.Net;
 using System.Collections;
 using System.Xml.Serialization;
+using DamageControlClientNet;
 using ThoughtWorks.DamageControl.DamageControlClientNet;
 using Nwc.XmlRpc;
 
@@ -90,6 +91,14 @@ namespace ThoughtWorks.DamageControl.WindowsTray
 			defaults.ProxyPort = 0;
 
 			return defaults;
+		}
+
+		public void accept(ProjectVisitor visitor)
+		{
+			foreach (Project project in Projects)
+			{
+				visitor.visitProject(project);
+			}
 		}
 	}
 

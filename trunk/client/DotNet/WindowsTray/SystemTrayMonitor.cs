@@ -1,12 +1,12 @@
 using System;
 using System.Collections;
 using System.ComponentModel;
-using System.Diagnostics;
 using System.Drawing;
 using System.IO;
 using System.Reflection;
 using System.Runtime.Remoting;
 using System.Windows.Forms;
+using DamageControlClientNet;
 using ThoughtWorks.DamageControl.DamageControlClientNet;
 
 namespace ThoughtWorks.DamageControl.WindowsTray
@@ -17,20 +17,20 @@ namespace ThoughtWorks.DamageControl.WindowsTray
 	/// including system tray icons (the default, and most basic), popup balloon messages, and
 	/// Microsoft Agent characters with text-to-speech support.
 	/// </summary>
-	public class SystemTrayMonitor : Form
+	public class SystemTrayMonitor : Form, ProjectVisitor
 	{
 		#region Field declarations
 
-		IContainer components;
-		ContextMenu contextMenu;
-		NotifyIconEx trayIcon;
-		Hashtable _icons = null;
+		private IContainer components;
+		private ContextMenu contextMenu;
+		private NotifyIconEx trayIcon;
+		private Hashtable _icons = null;
 
-		MenuItem mnuExit;
-		MenuItem mnuSettings;
-		SettingsForm settingsForm;
-		Settings settings;
-		Exception _audioException = null;
+		private MenuItem mnuExit;
+		private MenuItem mnuSettings;
+		private SettingsForm settingsForm;
+		private Settings settings;
+		private Exception _audioException = null;
 
 		#endregion
 
@@ -51,12 +51,13 @@ namespace ThoughtWorks.DamageControl.WindowsTray
 
 		#region Initialisation
 
-		void InitialiseSettings()
+		private void InitialiseSettings()
 		{
 			settings = SettingsManager.LoadSettings();
+			settings.accept(this);
 		}
 
-		void InitialiseMonitor()
+		private void InitialiseMonitor()
 		{
 			/*
 			statusMonitor.Settings = settings;
@@ -64,18 +65,18 @@ namespace ThoughtWorks.DamageControl.WindowsTray
 			*/
 		}
 
-		void InitialiseTrayIcon()
+		private void InitialiseTrayIcon()
 		{
-			trayIcon.Icon = GetStatusIcon(BuildStatus.Unknown);
+			trayIcon.Icon = GetStatusIcon(BuildStatus.Idle);
 		}
 
-		void DisplayStartupBalloon()
+		private void DisplayStartupBalloon()
 		{
 			if (settings.NotificationBalloon.ShowBalloon)
 				trayIcon.ShowBalloon("DamageControl Monitor", "Monitor started.", NotifyInfoFlags.Info, 1500);
 		}
 
-		private void CCTray_Load(object sender, System.EventArgs e)
+		private void CCTray_Load(object sender, EventArgs e)
 		{
 			// calling Hide on the window ensures the form's icon doesn't appear
 			// while ALT+TABbing between applications, even though it won't appear
@@ -83,11 +84,10 @@ namespace ThoughtWorks.DamageControl.WindowsTray
 			this.Hide();
 		}
 
-		void InitialiseSettingsForm()
+		private void InitialiseSettingsForm()
 		{
 			settingsForm = new SettingsForm(settings, this);
 		}
-
 
 		#endregion
 
@@ -97,7 +97,7 @@ namespace ThoughtWorks.DamageControl.WindowsTray
 		{
 			if (disposing)
 			{
-				if (components!=null) 
+				if (components != null)
 				{
 					components.Dispose();
 				}
@@ -126,9 +126,11 @@ namespace ThoughtWorks.DamageControl.WindowsTray
 			// 
 			// contextMenu
 			// 
-			this.contextMenu.MenuItems.AddRange(new System.Windows.Forms.MenuItem[] {
-																						this.mnuSettings,
-																						this.mnuExit});
+			this.contextMenu.MenuItems.AddRange(new System.Windows.Forms.MenuItem[]
+				{
+					this.mnuSettings,
+					this.mnuExit
+				});
 			this.contextMenu.Popup += new System.EventHandler(this.contextMenu_Popup);
 			// 
 			// mnuSettings
@@ -168,17 +170,16 @@ namespace ThoughtWorks.DamageControl.WindowsTray
 		/// The main entry point for the application.
 		/// </summary>
 		[STAThread]
-		static void Main(String[] args)
+		private static void Main(String[] args)
 		{
 			if (args.Length > 0)
 			{
 				SettingsManager.SettingsFileName = args[0];
 			}
-			
+
 			Application.EnableVisualStyles();
 			Application.Run(new SystemTrayMonitor());
 		}
-
 
 		#endregion
 
@@ -186,23 +187,17 @@ namespace ThoughtWorks.DamageControl.WindowsTray
 
 		public override ContextMenu ContextMenu
 		{
-			get
-			{
-				return this.contextMenu;
-			}
-			set
-			{
-				this.contextMenu = value;
-			}
+			get { return this.contextMenu; }
+			set { this.contextMenu = value; }
 		}
 
 
-		private void mnuExit_Click(object sender, System.EventArgs e)
+		private void mnuExit_Click(object sender, EventArgs e)
 		{
 			Exit();
 		}
 
-		void Exit()
+		private void Exit()
 		{
 			//statusMonitor.StopPolling();
 			this.Close();
@@ -210,10 +205,10 @@ namespace ThoughtWorks.DamageControl.WindowsTray
 			Environment.Exit(0);
 		}
 
-
 		#endregion
 
 		#region Monitor event handlers
+
 		/*
 		private void statusMonitor_Polled(object sauce, PolledEventArgs e)
 		{
@@ -259,23 +254,23 @@ namespace ThoughtWorks.DamageControl.WindowsTray
 			trayIcon.Icon = GetStatusIcon(BuildStatus.Unknown);
 		}
 		*/
+
 		#endregion
 
 		#region Balloon notification
 
-		void HandleBalloonNotification(string caption, string description, NotifyInfoFlags icon)
+		private void HandleBalloonNotification(string caption, string description, NotifyInfoFlags icon)
 		{
 			// show a balloon
 			if (settings.NotificationBalloon.ShowBalloon)
 				trayIcon.ShowBalloon(caption, description, icon, 5000);
 		}
 
-
 		#endregion
 
 		#region Playing of audio
 
-		void PlayBuildAudio(BuildTransition transition)
+		private void PlayBuildAudio(BuildTransition transition)
 		{
 			if (settings.Sounds.ShouldPlaySoundForTransition(transition))
 			{
@@ -286,7 +281,7 @@ namespace ThoughtWorks.DamageControl.WindowsTray
 				catch (Exception ex)
 				{
 					// only display the first exception with audio
-					if (_audioException==null)
+					if (_audioException == null)
 					{
 						MessageBox.Show(ex.Message, "Unable to initialise audio", MessageBoxButtons.OK, MessageBoxIcon.Error);
 						_audioException = ex;
@@ -295,7 +290,7 @@ namespace ThoughtWorks.DamageControl.WindowsTray
 			}
 		}
 
-		void PlayAudioFile(string fileName)
+		private void PlayAudioFile(string fileName)
 		{
 			Stream stream = new FileStream(fileName, FileMode.Open, FileAccess.Read, FileShare.Read);
 			byte[] bytes = new byte[stream.Length];
@@ -307,35 +302,36 @@ namespace ThoughtWorks.DamageControl.WindowsTray
 
 		#region Icons
 
-		Icon GetStatusIcon(ProjectStatus status)
+		private Icon GetStatusIcon(ProjectStatus status)
 		{
 			return GetStatusIcon(status.BuildStatus);
 		}
 
-		Icon GetStatusIcon(BuildStatus status)
+		private Icon GetStatusIcon(BuildStatus status)
 		{
-			if (_icons==null)
+			if (_icons == null)
 				LoadIcons();
 
 			if (!_icons.ContainsKey(status))
-				throw new Exception("Unsupported IntegrationStatus: " + status);
+				// TODO fix
+				return (Icon) _icons[BuildStatus.Idle];
 
-			return (Icon)_icons[status];
+			return (Icon) _icons[status];
 		}
 
-		void LoadIcons()
+		private void LoadIcons()
 		{
 			_icons = new Hashtable(3);
-			_icons[BuildStatus.Failure] = LoadIcon("ThoughtWorks.DamageControl.WindowsTray.Red.ico");
-			_icons[BuildStatus.Success] = LoadIcon("ThoughtWorks.DamageControl.WindowsTray.Green.ico");
-			_icons[BuildStatus.Unknown] = LoadIcon("ThoughtWorks.DamageControl.WindowsTray.Gray.ico");
+			_icons[BuildStatus.Failed] = LoadIcon("ThoughtWorks.DamageControl.WindowsTray.Red.ico");
+			_icons[BuildStatus.Successful] = LoadIcon("ThoughtWorks.DamageControl.WindowsTray.Green.ico");
+			_icons[BuildStatus.Idle] = LoadIcon("ThoughtWorks.DamageControl.WindowsTray.Gray.ico");
 		}
 
-		Icon LoadIcon(string name) 
+		private Icon LoadIcon(string name)
 		{
-			using(Stream iconStream = Assembly.GetCallingAssembly().GetManifestResourceStream(name))
+			using (Stream iconStream = Assembly.GetCallingAssembly().GetManifestResourceStream(name))
 			{
-				if(iconStream == null) 
+				if (iconStream == null)
 				{
 					throw new Exception("Can't find icon: " + name);
 				}
@@ -343,53 +339,51 @@ namespace ThoughtWorks.DamageControl.WindowsTray
 			}
 		}
 
-
 		#endregion
 
 		#region Presentation calculations
 
-		string CalculateTrayText(ProjectStatus projectStatus)
+		private string CalculateTrayText(ProjectStatus projectStatus)
 		{
 			object activity = projectStatus.BuildStatus;
 
-			return string.Format("Server: {0}\nProject: {1}\nLast Build: {2} ({3})", 
-				activity,
-				projectStatus.Name,
-				projectStatus.BuildStatus,
-				projectStatus.LastBuildLabel);
+			return string.Format("Server: {0}\nProject: {1}\nLast Build: {2} ({3})",
+			                     activity,
+			                     projectStatus.Name,
+			                     projectStatus.BuildStatus,
+			                     projectStatus.LastBuildLabel);
 		}
 
-		NotifyInfoFlags GetNotifyInfoFlag(ErrorLevel errorLevel)
+		private NotifyInfoFlags GetNotifyInfoFlag(ErrorLevel errorLevel)
 		{
-			if (errorLevel==ErrorLevel.Error)
+			if (errorLevel == ErrorLevel.Error)
 				return NotifyInfoFlags.Error;
-			else if (errorLevel==ErrorLevel.Info)
+			else if (errorLevel == ErrorLevel.Info)
 				return NotifyInfoFlags.Info;
-			else if (errorLevel==ErrorLevel.Warning)
+			else if (errorLevel == ErrorLevel.Warning)
 				return NotifyInfoFlags.Warning;
 			else
 				return NotifyInfoFlags.None;
 		}
 
-		string GetErrorMessage(Exception ex)
+		private string GetErrorMessage(Exception ex)
 		{
 			if (ex is RemotingException)
 				return "No Connection";
 			else
-				return ex.Message;	
+				return ex.Message;
 		}
-
 
 		#endregion
 
 		#region Launching web page
 
-		private void trayIcon_DoubleClick(object sender, System.EventArgs e)
+		private void trayIcon_DoubleClick(object sender, EventArgs e)
 		{
 			LaunchWebPage();
 		}
 
-		private void mnuLaunchWebPage_Click(object sender, System.EventArgs e)
+		private void mnuLaunchWebPage_Click(object sender, EventArgs e)
 		{
 			LaunchWebPage();
 		}
@@ -397,7 +391,7 @@ namespace ThoughtWorks.DamageControl.WindowsTray
 		// TODO keep tabs on browser process -- if it's still running (and still
 		// on the same server) bring it to the foreground.
 
-		void LaunchWebPage()
+		private void LaunchWebPage()
 		{
 			/*
 			if (statusMonitor.WebUrl==null || statusMonitor.WebUrl.Trim().Length==0)
@@ -407,7 +401,7 @@ namespace ThoughtWorks.DamageControl.WindowsTray
 			*/
 		}
 
-		void UnableToLaunchWebPage()
+		private void UnableToLaunchWebPage()
 		{
 			// TODO this messagebox appears in the background... bring it to the foreground somehow
 			MessageBox.Show(this, "The web page url isn't specified.", "Unable to launch web page", MessageBoxButtons.OK, MessageBoxIcon.Error);
@@ -417,9 +411,9 @@ namespace ThoughtWorks.DamageControl.WindowsTray
 
 		#region Settings
 
-		private void mnuSettings_Click(object sender, System.EventArgs e)
+		private void mnuSettings_Click(object sender, EventArgs e)
 		{
-			if ( settingsForm == null ) 
+			if (settingsForm == null)
 			{
 				// this happens if the user is trying to bring up the settings form before the monitor has been initialized properly
 				return;
@@ -431,7 +425,7 @@ namespace ThoughtWorks.DamageControl.WindowsTray
 
 		#region Forcing a build
 
-		void mnuForceBuild_Click(object sender, System.EventArgs e)
+		private void mnuForceBuild_Click(object sender, EventArgs e)
 		{
 			/*
 			try
@@ -449,7 +443,7 @@ namespace ThoughtWorks.DamageControl.WindowsTray
 
 		#region Context menu management
 
-		void contextMenu_Popup(object sender, System.EventArgs e)
+		private void contextMenu_Popup(object sender, EventArgs e)
 		{
 			/*
 			mnuForceBuild.Enabled = statusMonitor.ProjectStatus != null && statusMonitor.ProjectStatus.CurrentBuildStatus==BuildStatus.Nothing;
@@ -472,16 +466,16 @@ namespace ThoughtWorks.DamageControl.WindowsTray
 
 		public void Project_OnPolled(object sauce, PolledEventArgs e)
 		{
-			//HandleBalloonNotification("Polled",e.ProjectStatus.LastBuildLabel.ToString(),new NotifyInfoFlags());
+//			HandleBalloonNotification("Polled", e.ProjectStatus.LastBuildLabel.ToString(), new NotifyInfoFlags());
 			bool success = false;
 			bool failure = false;
 			foreach (Project p in settings.Projects)
 			{
-				if (p.ProjectStatus.BuildStatus.Equals(BuildStatus.Success)) 
+				if (p.ProjectStatus.BuildStatus.Equals(BuildStatus.Successful))
 				{
 					success = true;
 				}
-				if (p.ProjectStatus.BuildStatus.Equals(BuildStatus.Failure)) 
+				if (p.ProjectStatus.BuildStatus.Equals(BuildStatus.Failed))
 				{
 					failure = true;
 					break;
@@ -490,18 +484,24 @@ namespace ThoughtWorks.DamageControl.WindowsTray
 			if (failure)
 			{
 				trayIcon.Text = "At least one build failed";
-				trayIcon.Icon = GetStatusIcon(BuildStatus.Failure);
+				trayIcon.Icon = GetStatusIcon(BuildStatus.Failed);
 			}
-			else if (success) 
+			else if (success)
 			{
 				trayIcon.Text = "All builds succeeded.";
-				trayIcon.Icon = GetStatusIcon(BuildStatus.Success);
+				trayIcon.Icon = GetStatusIcon(BuildStatus.Successful);
 			}
-			else 
+			else
 			{
 				trayIcon.Text = "No Connection";
-				trayIcon.Icon = GetStatusIcon(BuildStatus.Unknown);
+				trayIcon.Icon = GetStatusIcon(BuildStatus.Idle);
 			}
+		}
+
+		public void visitProject(Project project)
+		{
+			project.OnPolled += new PolledEventHandler(Project_OnPolled);
+			project.OnBuildOccurred += new BuildOccurredEventHandler(Project_OnBuildOccurred);
 		}
 	}
 }
