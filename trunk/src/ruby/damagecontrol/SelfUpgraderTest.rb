@@ -1,8 +1,8 @@
 require 'test/unit'
 require 'damagecontrol/SelfUpgrader'
 require 'damagecontrol/HubTestHelper'
-require 'damagecontrol/BuildEvents'
 require 'damagecontrol/Build'
+require 'damagecontrol/BuildEvents'
 
 module DamageControl
 
