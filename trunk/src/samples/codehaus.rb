@@ -2,7 +2,8 @@
 
 $damagecontrol_home = File::expand_path('../..') 
 $:<<"#{$damagecontrol_home}/src/ruby" 
- 
+
+require 'simple' 
 require 'damagecontrol/Hub' 
 require 'damagecontrol/SocketTrigger' 
 require 'damagecontrol/BuildExecutor' 
@@ -17,7 +18,7 @@ require 'damagecontrol/publisher/JIRAPublisher'
 
 include DamageControl
 
-buildRoot = File.expand_path("~/build") 
+buildRoot = File.expand_path("/build") 
  
 start_simple_server("#{buildRoot}/checkout", 4711, ["127.0.0.1", "66.216.68.111", "81.5.134.59" ])
 
