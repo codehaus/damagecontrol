@@ -1,5 +1,5 @@
 server = "irc.codehaus.org"
-channel = "#builds"
+channel = "#damagecontrol"
 
 $damagecontrol_home = File::expand_path('../..')
 $:<<"#{$damagecontrol_home}/src/ruby"
