@@ -12,7 +12,7 @@ module DamageControl
       build_result = BuildResult.new( \
         "DamageControlled", \
         ":local:#{testrepo}:damagecontrolled", \
-        "ant", \
+        "ant clean compile", \
         ".", \
         File.expand_path("target/testbuild"))
       

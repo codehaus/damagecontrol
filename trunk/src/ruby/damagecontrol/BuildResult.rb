@@ -67,7 +67,10 @@ module DamageControl
     end
     
     def translate_command_to_ruby(build_command_line)
-      ant_commandline
+      tokens = build_command_line.split(" ")
+      if(tokens[0] == "ant")
+        ant_commandline(tokens[1..-1].join(" "))
+      end
     end
   end
 end
