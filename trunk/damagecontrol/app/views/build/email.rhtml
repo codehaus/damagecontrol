@@ -1,4 +1,18 @@
 <html>
-<h1><%= build.project.name %> Build <%= build.status_message %></h1>
-Broken by <%= build.changeset.developer %>
+<%
+message = nil
+if(@build.successful?)
+  message = "#{@build.project.name}: #{@build.status_message} build (by #{@build.changeset.developer})"
+else
+  message = "#{@build.project.name}: #{@build.changeset.developer} broke the build"
+end
+%>
+<h1><%= message %></h1>
+<h2>Changed files:</h2>
+<ul>
+<% @build.
+changeset.each do |change| %>
+  <li><%= change.path %></li>
+<% end %>
+</ul>
 </html>
