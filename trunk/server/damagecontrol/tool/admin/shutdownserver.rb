@@ -8,4 +8,4 @@ class ShutdownServerTask < XMLRPCClientTask
 end
 end
 
-ShutdownServerTask.new.run
+DamageControl::ShutdownServerTask.new.run

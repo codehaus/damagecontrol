@@ -11,4 +11,5 @@ class RequestBuildTask < XMLRPCClientTask
 end
 end
 
-RequestBuildTask.new.run
+DamageControl::RequestBuildTask.new.run
+
