@@ -19,6 +19,7 @@ module DamageControl
   #               artifacts/
   #
   class Build
+    attr_reader :time
   
     # Creates a new Build for a +project+'s +changeset+, created at +time+.
     def initialize(project_name, changeset_identifier, time)
@@ -30,9 +31,9 @@ module DamageControl
       Directories.changeset
     end
     
-    # Executes the +cmd+ command for this build and persists the command for future reference.
+    # Executes +command+ with the environment variables +env+ and persists the command for future reference.
     # This will prevent the same build from being executed in the future.
-    def execute(command)
+    def execute(command, env={})
       command_file = Directories.build_command_file(@project_name, @changeset_identifier, @time)
       raise BuildException.new("This build has already been executed and cannot be re-executed. It was executed with '#{File.open(command_file).read}'") if File.exist?(command_file)
       FileUtils.mkdir_p(File.dirname(command_file))
@@ -45,7 +46,7 @@ module DamageControl
 
       begin
         with_working_dir(checkout_dir) do
-          ENV['PKG_BUILD'] = "456"
+          env.each {|k,v| ENV[k]=v}
           IO.popen(command_line) do |io|
             File.open(pid_file, "w") do |pid_io|
               pid_io.write(pid)

@@ -17,8 +17,13 @@ REGISTRY = Needle::Registry.define do |b|
       b.persister.save_changesets(project, changesets)
       b.persister.save_diffs(project, changesets)
       b.persister.save_rss(project)
-      project.build(changesets.latest.identifier) do |build|
-        build.execute(project.build_command)
+      changeset = changesets.latest
+      project.build(changeset.identifier) do |build|
+        env = {
+          'PKG_BUILD' => changeset.identifier, # Rake standard
+          'DAMAGECONTROL_BUILD_LABEL' => changeset.identifier # For others
+        }
+        build.execute(project.build_command, env)
       end
     end
   end
