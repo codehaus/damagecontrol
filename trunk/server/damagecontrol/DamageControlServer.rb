@@ -97,7 +97,7 @@ module DamageControl
           if build.end_time && build.start_time
             build.duration = build.end_time - build.start_time 
           else
-            build.duration = nil
+            build.duration = 1
           end
           
           # remove old
