@@ -100,6 +100,15 @@ EOF
       end
     end
 
+    def test_parses_log_with_spaces_in_file_names
+      File.open(File.dirname(__FILE__) + "/svn-growl2.log") do |io|
+        parser = SubversionLogParser.new(io, "trunk", nil)
+        changesets = parser.parse_changesets
+        change = changesets[1][0]
+        assert_equal("Display Plugins/Bezel/English.lproj/GrowlBezelPrefs.nib/classes.nib", change.path)
+      end
+    end
+
 SVN_R_LOG_HEAD_DATA = <<-EOF
 ------------------------------------------------------------------------
 r48 | rinkrank | 2004-10-16 20:07:29 -0500 (Sat, 16 Oct 2004) | 1 line
