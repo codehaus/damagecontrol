@@ -193,7 +193,8 @@ module RSCM
       File.exists?(checkout_dir)
     end
 
-    # Whether triggers are supported by this SCM
+    # Whether triggers are supported by this SCM. A trigger is a command that can be executed
+    # upon a completed commit to the SCM.
     def supports_trigger?
       # The default implementation assumes no - override if it can be
       # determined programmatically.
