@@ -21,13 +21,15 @@ module DamageControl
     
     attr_accessor :last_build_request
 
-    def initialize(channel, build_history_repository, *args)
+    def initialize(name, channel, build_history_repository=nil, *args)
+      # TODO remove this, just warning people about refactorings
+      raise "NOTE: BuildExecutor has been refactored! You must now specify a name for the executor, like this: BuildExecutor.new('executor1', hub, build_history_repository)" if !name.is_a?(String) || build_history_repository.nil?
+      raise "NOTE: BuildExecutor has been refactored! It now takes three arguments, like this: BuildExecutor.new(name, hub, build_history_repository)" unless args.empty?
+      
       super
       @channel = channel
       @build_history_repository = build_history_repository
-      
-      # TODO remove this, just warning people about refactorings
-      raise "NOTE: BuildExecutor has been refactored! It now only takes two arguments, like this: BuildExecutor.new(hub, build_history_repository)" unless args.empty?
+      @name = name
     end
     
     def checkout?
@@ -131,9 +133,13 @@ module DamageControl
       end
     end
     
+    def executor_selector(build)
+      Regexp.new(build.config['executor_selector'] || '.*')
+    end
+    
     # overload to specify more clever scheduling mechanism, like some executors are reserved for some builds etc
     def can_execute?(build)
-      !busy?
+      !busy? && executor_selector(build) =~ (@name)
     end
     
     def busy?

@@ -60,7 +60,7 @@ module DamageControl
       mock_build_history = MockIt::Mock.new
       mock_build_history.__expect(:last_successful_build) {nil}
 
-      @build_executor = BuildExecutor.new(mock_hub, mock_build_history)
+      @build_executor = BuildExecutor.new('executor1', mock_hub, mock_build_history)
       @build_executor.start
       @build_executor.put(@build) 
 
@@ -100,7 +100,7 @@ module DamageControl
         b
       }
 
-      @build_executor = BuildExecutor.new(mock_hub, mock_build_history)
+      @build_executor = BuildExecutor.new('executor1', mock_hub, mock_build_history)
       @build_executor.on_message(@build)
 
       mock_scm.__verify
@@ -125,7 +125,7 @@ module DamageControl
       mock_hub = MockIt::Mock.new
       mock_hub.__setup(:publish_message) {|message|}
 
-      @build_executor = BuildExecutor.new(mock_hub, mock_build_history)
+      @build_executor = BuildExecutor.new('executor1', mock_hub, mock_build_history)
 
       @build = Build.new("damagecontrolled", Time.now, { "build_command_line" => "bad_command"})
       @build.scm = mock_scm
@@ -172,7 +172,7 @@ module DamageControl
       mock_hub.__expect(:publish_message) {|message| assert(message.is_a?(BuildProgressEvent))}
       mock_hub.__expect(:publish_message) {|message| assert(message.is_a?(BuildCompleteEvent))}
       
-      @build_executor = BuildExecutor.new(mock_hub, mock_build_history)
+      @build_executor = BuildExecutor.new('executor1', mock_hub, mock_build_history)
       @build = Build.new("damagecontrolled", Time.now,
         { "build_command_line" => "echo hello world"})
       @build.scm = mock_scm
@@ -186,6 +186,19 @@ module DamageControl
       mock_scm.__verify
       mock_hub.__verify
       mock_build_history.__verify
+    end
+    
+    def test_can_execute_builds_with_matching_executor_selector
+      e = BuildExecutor.new("executor1", Object.new, Object.new)
+      assert(e.can_execute?(@build))
+      @build.config["executor_selector"] = ".*"
+      assert(e.can_execute?(@build))
+      @build.config["executor_selector"] = ".*1"
+      assert(e.can_execute?(@build))
+      @build.config["executor_selector"] = "executor2"
+      assert(!e.can_execute?(@build))
+      @build.config["executor_selector"] = "n.*"
+      assert(!e.can_execute?(@build))
     end
     
     def ant
