@@ -88,6 +88,7 @@ module DamageControl
     end
 
     def uptodate?(checkout_dir, start_time, end_time)
+puts "CVS.uptodate?(#{checkout_dir}, #{start_time}, #{end_time})"
       if(!checked_out?(checkout_dir))
         # might as well check it out if it isn't checked out
         checkout(checkout_dir, nil)
@@ -100,6 +101,11 @@ module DamageControl
         end_time,
         nil
       )
+puts "----+"
+changesets.each do |cs|
+  puts cs
+end
+puts "----"
       changesets.empty?
     end
 

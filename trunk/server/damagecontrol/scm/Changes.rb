@@ -158,8 +158,6 @@ EOF
       time_difference = format_time.difference_as_text(time)
     end
     
-    def 
-    
     def to_s
       result = "#{revision} | #{developer} | #{time}\n"
       self.each do |change|
