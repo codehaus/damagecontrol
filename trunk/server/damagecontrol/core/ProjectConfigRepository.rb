@@ -40,6 +40,10 @@ module DamageControl
       modify_project_config(project_name, {})
     end
     
+    def project_names
+      project_directories.project_names
+    end
+    
     def parse_project_config(config_content)
       eof_stripped = ""
       config_content.each do |line|
