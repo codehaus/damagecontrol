@@ -45,13 +45,13 @@ module DamageControl
 			website_directory + File::SEPARATOR + filename
 		end
 	
-		def is_log_file (filename)
+		def log_file? (filename)
 			/^.*\.log/ =~ filename
 		end
 		
 		def foreach_log
 			Dir.foreach (@logs_directory) { |filename|
-				if is_log_file (filename)
+				if log_file? (filename)
 					name = filename[0, filename.rindex('.')]
 					yield(Log.new(name, log_file(filename)))
 				end

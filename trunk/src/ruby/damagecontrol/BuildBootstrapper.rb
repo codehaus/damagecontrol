@@ -5,11 +5,18 @@ module DamageControl
 	class BuildBootstrapper < AsyncComponent
 		def initialize(hub, basedir)
 			super(hub)
-			@basedir = basedir
+			@basedir = File.expand_path(basedir)
+			puts "My basedir is #{@basedir}"
 		end
 		
 		def bootstrap_build(build_spec)
 			command, project_name, scm_path, build_command_line = build_spec.split
+			
+			puts command
+			puts project_name
+			puts scm_path
+			puts "build_command_line #{build_command_line}"
+			
 			build = Build.new(project_name)
 			build.basedir = "#{@basedir}/#{project_name}"
 			build.build_command_line = build_command_line
