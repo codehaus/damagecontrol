@@ -54,6 +54,13 @@ module RSCM
       if (!checked_out?(checkout_dir))
         false
       else
+        with_working_dir(checkout_dir) do
+          monotone("heads") do |stdout|
+            stdout.each_line do |line|
+              next if (line =~ /^monotone:/)
+            end
+          end
+        end
       end
     end
 
@@ -72,6 +79,10 @@ puts "LINE: #{line}"
           end
         end
       end
+    end
+
+    def commit(checkout_dir, message)
+
     end
     
   private
