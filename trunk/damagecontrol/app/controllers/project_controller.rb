@@ -9,7 +9,9 @@ class ProjectController < ApplicationController
   # TODO: check if the various SCMs are installed and disable them with a warning if not.
   # Each SCM class should have an available? method
 
-  before_filter {  @navigation_name = "changesets_list" }
+  before_filter do
+    @navigation_name = "changesets_list"
+  end
 
   def index
     @projects = ::DamageControl::Project.find_all("#{BASEDIR}/projects")
@@ -67,6 +69,7 @@ class ProjectController < ApplicationController
     project.scm = find_selected("scms")
     project.tracker = find_selected("trackers")
     project.publishers = instantiate_array_from_hashes(@params["publishers"])
+    project.dir = "#{BASEDIR}/projects/#{project.name}"
 
     project.save
 

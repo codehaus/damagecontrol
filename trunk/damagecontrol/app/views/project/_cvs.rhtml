@@ -138,7 +138,7 @@ var cvs_mod_tip  = "<div class='tp1'>Note that you can't use trigged build if yo
   <tr>
     <td>Password</td>
     <td><%= tip(:txt => 'scm_password_tip') %></td>
-    <td width="75%"><%= text_or_input(@edit, :name => "scms[RSCM::Cvs][@password]", :onKeyUp => "updateCvsRootField()", :id => "cvspassword") %></td>
+    <td width="75%"><%= text_or_input(@edit, :type => "password", :name => "scms[RSCM::Cvs][@password]", :value => cvs.password, :onKeyUp => "updateCvsRootField()", :id => "cvspassword") %></td>
   </tr>
   <tr>
     <td>Server</td>
