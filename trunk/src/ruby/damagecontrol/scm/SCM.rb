@@ -1,5 +1,6 @@
 module DamageControl
     class SCM
+        # determine whether this SCM can handle a particular path
         def handles_path?(path)
                 false
         end
