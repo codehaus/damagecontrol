@@ -30,7 +30,7 @@ module DamageControl
     def on_message(message)
       if message.is_a? BuildCompleteEvent
         build = message.build
-        build_history = @build_history_repository.history(build.project_name, true)
+        build_history = @build_history_repository.history(build.project_name, false)
         xml_history_file = "#{@build_history_repository.project_dir(build.project_name)}/build/build_history.xml"
         mkdir_p(File.dirname(xml_history_file))
         File.open(xml_history_file, "w") do |f|

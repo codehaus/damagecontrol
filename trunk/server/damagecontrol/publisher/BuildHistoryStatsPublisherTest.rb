@@ -20,7 +20,7 @@ module DamageControl
       build_history_repository = new_mock
       build_history_repository.__expect(:history) do |project_name, with_changesets|
         assert_equal("myproject", project_name)
-        assert(with_changesets)
+        assert(!with_changesets)
         [b, b]
       end
       build_history_repository.__setup(:project_dir) do
