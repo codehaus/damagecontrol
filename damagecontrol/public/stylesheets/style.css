@@ -256,20 +256,20 @@ th.pane {
   font-size: 9px;
 }
 
-#foldertab {
+.foldertab {
   padding: 4px 0;
   margin-left: 0;
   border-bottom: 1px solid #090;
   font: bold 12px Verdana, sans-serif;
 }
 
-#foldertab li {
+.foldertab li {
   list-style: none;
   margin: 0;
   display: inline;
 }
 
-#foldertab li a {
+.foldertab li a {
   padding: 4px 0.5em;
   margin-left: 3px;
   border: 1px solid #090;
@@ -278,16 +278,16 @@ th.pane {
   text-decoration: none;
 }
 
-#foldertab li a:link { color: white; }
-#foldertab li a:visited { color: white; }
+.foldertab li a:link { color: white; }
+.foldertab li a:visited { color: white; }
 
-#foldertab li a:hover {
+.foldertab li a:hover {
   color: white;
   background: #6c0;
   border-color: #6c0;
 }
 
-#foldertab li a#current {
+.foldertab li a#current {
   background: white;
   border-bottom: 1px solid white;
   color: black;
@@ -311,4 +311,4 @@ th.pane {
   border:1px solid #ccc; 
   padding:5px; 
   margin-bottom: 15px; 
-}
+}

@@ -136,7 +136,7 @@ module ActionView
         option_tags = "\n"
         values.each do |value|
           option_attrs = {:value => value.class.name}
-          option_attrs[:selected] = "true" if value.selected?
+          option_attrs[:selected] = "selected" if value.selected?
           option_tag = content_tag("option", value.name, option_attrs)
           option_tags << option_tag << "\n"
         end
@@ -208,7 +208,7 @@ module ActionView
           end
         end
         # workaround for RoR bug. 'hash' form params must have at least one value.
-        r << "<tr><td></td><td><input type='hidden' name ='#{collection_name}[#{o.class.name}][__dummy]'></td></tr>" if o.instance_variables.empty?
+        r << "<tr><td></td><td><input type='hidden' name='#{collection_name}[#{o.class.name}][__dummy]' /></td></tr>" if o.instance_variables.empty?
 
         r << "</table>"
         r
@@ -225,6 +225,7 @@ module ActionView
       options[:src] = options.delete(:img) || "/images/16x16/about.png"
       options[:onmouseover] = "Tooltip.show(event,#{tip})"
       options[:onmouseout] = "Tooltip.hide()"
+      options[:alt] = " "
 
       tag("img", options)
     end
@@ -243,14 +244,25 @@ module ActionView
       js_format = "format('%yyyy%%mm%%dd%%hh%%nn%%ss%')"
       js_date = "new Date(#{t.year}, #{t.month - 1}, #{t.day}, #{t.hour}, #{t.min}, #{t.sec})"
       <<EOF
-<input type="hidden" id="#{options[:name]}" name="#{options[:name]}" value="">
+<input type="hidden" id="#{options[:name]}" name="#{options[:name]}" value="" />
 <div id="#{options[:name]}_calendar"></div>
 <script type="text/javascript">
+<!--
   document.getElementById('#{options[:name]}').value = #{js_date}.#{js_format}
-  function #{js_function}(calendar) {    if (calendar.dateClicked) {      document.getElementById('#{options[:name]}').value = calendar.date.#{js_format};
-    }  };  Calendar.setup(    {      flat         : "#{options[:name]}_calendar", // ID of the parent element      flatCallback : #{js_function},           // our callback function
-      showsTime    : true,
-      date         : #{js_date}    }  );</script>
+  function #{js_function}(calendar) {    
+    if (calendar.dateClicked) {      
+      document.getElementById('#{options[:name]}').value = calendar.date.#{js_format};
+    }  
+  };  
+  
+  Calendar.setup( {
+    flat         : "#{options[:name]}_calendar", // ID of the parent element      
+    flatCallback : #{js_function},           // our callback function
+    showsTime    : true,
+    date         : #{js_date}    
+  });
+-->
+</script>
 EOF
     end
   end

@@ -9,10 +9,7 @@ class ProjectController < ApplicationController
   # TODO: check if the various SCMs are installed and disable them with a warning if not.
   # Each SCM class should have an available? method
 
-  def initialize
-    super
-    @navigation_name = "changesets_list"
-  end
+  before_filter {  @navigation_name = "changesets_list" }
 
   def index
     @projects = ::DamageControl::Project.find_all("#{BASEDIR}/projects")
@@ -60,7 +57,7 @@ class ProjectController < ApplicationController
     begin
       Rscm.delete_project(project)
     rescue => e
-      return render_text("Couldn't connect to RSCM server. Please make sure it's running.<br>" + e.message)
+      return render_text("Couldn't connect to RSCM server. Please make sure it's running.<br/>" + e.message)
     end
     index
   end

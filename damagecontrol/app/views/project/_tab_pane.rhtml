@@ -1,15 +1,17 @@
-<script><!--
+<script type="text/javascript">
+<!--
 <%= tab_pane.name %> = [
 <% tab_pane.each do |o| %>
   "<%= o.class.name %>",
 <% end %> "" ];
---></script>
+-->
+</script>
 
-<ul id="foldertab">
+<ul class="foldertab">
   <% tab_pane.each do |o| %>
   <li>
-   	<a alt="<%= o.name %>" href="javascript:showElement('<%= o.class.name %>', <%= tab_pane.name %>)">
-   	  <img src="/images/publisher/<%= underscore(demodulize(o.class.name)) %>.png">
+   	<a title="<%= o.name %>" href="javascript:showElement('<%= o.class.name %>', <%= tab_pane.name %>)">
+   	  <img src="/images/publisher/<%= underscore(demodulize(o.class.name))%>.png" alt="" />
   	  </a>
   	  <%= text_or_checkbox(:name => "#{tab_pane.name}[#{o.class.name}][@enabled]", :value => o.enabled, :editable => @edit) %>
   </li>

@@ -1,25 +1,33 @@
-<html>
-  <head>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+<head>
     <title>DamageControl</title>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <meta http-equiv="Content-Language" content="en-us" />
+
     <script type="text/javascript" src="/javascripts/toggle_diff.js"></script>
     <script type="text/javascript" src="/javascripts/toggle_div.js"></script>
     <script type="text/javascript" src="/javascripts/dateFormat.js"></script>
     
-    <script type="text/javascript" src="/javascripts/jscalendar/calendar.js"></script>    <script type="text/javascript" src="/javascripts/jscalendar/lang/calendar-en.js"></script>    <script type="text/javascript" src="/javascripts/jscalendar/calendar-setup.js"></script>
-    <link type="text/css" rel="stylesheet" href="/javascripts/jscalendar/calendar-win2k-2.css">
+    <script type="text/javascript" src="/javascripts/jscalendar/calendar.js"></script>    
+    <script type="text/javascript" src="/javascripts/jscalendar/lang/calendar-en.js"></script>    
+    <script type="text/javascript" src="/javascripts/jscalendar/calendar-setup.js"></script>
+    <link type="text/css" rel="stylesheet" href="/javascripts/jscalendar/calendar-win2k-2.css" />
 
-    <link type="text/css" rel="stylesheet" href="/stylesheets/style.css">
-    <link type="text/css" rel="stylesheet" href="/stylesheets/diff.css">
-    <script>
-
-// http://developer.irt.org/script/1428.htm - add timezone
-function intercept(a) {
-  if(a.href.indexOf('?') == -1) a.href += '?'; else a.href += '&';
-  a.href += 'timezone=' + new Date().getTimezoneOffset() + '&tab=' + stickyTab
-}
+    <link type="text/css" rel="stylesheet" href="/stylesheets/style.css" />
+    <link type="text/css" rel="stylesheet" href="/stylesheets/diff.css" />
+    <script type="text/javascript">
+      <!-- 
+      // http://developer.irt.org/script/1428.htm - add timezone
+      function intercept(a) {
+        if(a.href.indexOf('?') == -1) a.href += '?'; else a.href += '&';
+        a.href += 'timezone=' + new Date().getTimezoneOffset() + '&tab=' + stickyTab
+      }
+      -->
     </script>
   </head>
-  <body onLoad="executeOnLoad()">
+  <body onload="executeOnLoad()">
 
 <table id="header" cellpadding="0" cellspacing="0" width="100%" border="0">
   <tr id="top-panel">
@@ -34,7 +42,7 @@ function intercept(a) {
   </tr>
 </table>
 
-<table id="main-table" width="100%" height="70%" border="0">
+<table id="main-table" width="100%" border="0" style="height:70%;">
 <tr>
 
 <td id="side-panel" width="20%">
@@ -46,7 +54,7 @@ function intercept(a) {
       if(href)
     %>
       <div class="task">
-        <%= content_tag("a", tag("img", :src => image), {:href => href}) %> <%= content_tag("a", name, {:href => href}) %>
+        <%= content_tag("a", tag("img", :src => image, :alt=>""), {:href => href}) %> <%= content_tag("a", name, {:href => href}) %>
       </div>
     <% else %>  
       <div class="task">
@@ -67,9 +75,9 @@ function intercept(a) {
 
 </tr>
 
-<tr><td id="footer" colspan="2" background="/images/footer.gif">
+<tr><td id="footer" colspan="2" style="background: white url(/images/footer.gif) repeat-x ">
 This stuff displays best in a Mozilla based browser. Try <a href="http://www.mozilla.org/products/firefox/">Firefox</a>.
-<br>
+<br/>
 </td></tr>
 
 </table>

@@ -12,7 +12,7 @@ var regX = /\n/gi;
 
 function addscroll() {
 	var checkout_list = window.frames['checkout_list']
-	checkout_list.document.body.innerHTML = "hippie\nyoyo<br>hippie<br>yoyo<br>hippie<br>yoyo<br>hippie<br>yoyo<br>".replace(regX, "<br>")
+	checkout_list.document.body.innerHTML = "hippie\nyoyo<br/>hippie<br/>yoyo<br/>hippie<br/>yoyo<br/>hippie<br/>yoyo<br/>".replace(regX, "<br/>")
 	checkout_list.scrollBy(0, 3000)
 }
 
