@@ -6,8 +6,9 @@ irc_channel = "#build"
 logdir = '/cruise/cruiselogs'
 website_baseurl = 'http://164.38.244.63:8080/cruisecontrol/buildresults'
 
-$damagecontrol_home = File::expand_path('../..') 
-$:<<"#{$damagecontrol_home}/server" 
+$damagecontrol_home = File::expand_path("#{File.dirname($0)}/../..")
+puts "@@@@@@@@@@@@@@@@@@@ #{$damagecontrol_home} #{$0}"
+$:.push("#{$damagecontrol_home}/server")
 
 require 'damagecontrol/simple' 
 require 'damagecontrol/core/Hub'
@@ -30,7 +31,7 @@ include DamageControl
 Logging.quiet
 
 start_simple_server(
-  :RootDir => ".",
+  :RootDir => $damagecontrol_home,
   :SocketTriggerPort => 4711,
   :HttpPort => 4712,
   :HttpsPort => 4713)

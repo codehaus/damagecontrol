@@ -3,8 +3,8 @@
 require 'xmlrpc/server'
 require 'webrick'
  
-$damagecontrol_home = File::expand_path('../..') 
-$:.push("#{$damagecontrol_home}/src/ruby")
+$damagecontrol_home = File::expand_path("#{File.dirname($0)}/../..") 
+$:.push("#{$damagecontrol_home}/server")
 
 require 'damagecontrol/Version'
 require 'damagecontrol/core/Hub'
@@ -26,20 +26,20 @@ include DamageControl
 Logging.quiet
 
 def startup_message
-  message = "Starting #{DamageControl::VERSION_TEXT} at #{Time.now}"
+  message = "Starting #{DamageControl::VERSION_TEXT} at #{Time.now}, root directory #{@rootdir}"
   puts message
   Logging.logger.info(message)
 end
 
 def start_simple_server(params = {})
-  rootdir = params[:RootDir] || File.expand_path(".")
+  @rootdir = File.expand_path(params[:RootDir] || ".")
   allow_ips = params[:AllowIPs] || nil 
   port = params[:SocketTriggerPort] || 4711
   http_port = params[:HttpPort] || 4712
   https_port = params[:HttpsPort] || 4713
 
-  logdir = "#{rootdir}/log"
-  checkoutdir = "#{rootdir}/checkout"
+  logdir = "#{@rootdir}/log"
+  checkoutdir = "#{@rootdir}/checkout"
   
   startup_message
 
@@ -52,12 +52,12 @@ def start_simple_server(params = {})
   public_xmlrpc_servlet = XMLRPC::WEBrickServlet.new
   private_xmlrpc_servlet = XMLRPC::WEBrickServlet.new
   
-  project_directories = ProjectDirectories.new(rootdir)
+  project_directories = ProjectDirectories.new(@rootdir)
   @project_config_repository = ProjectConfigRepository.new(project_directories)
   
   DamageControl::XMLRPC::Trigger.new(private_xmlrpc_servlet, @hub, @project_config_repository)
 
-  @build_history_repository = BuildHistoryRepository.new(@hub, "#{rootdir}/build_history.yaml")
+  @build_history_repository = BuildHistoryRepository.new(@hub, "#{@rootdir}/build_history.yaml")
   @build_history_repository.start
   
   DamageControl::XMLRPC::StatusPublisher.new(public_xmlrpc_servlet, @build_history_repository)
