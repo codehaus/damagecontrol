@@ -10,6 +10,7 @@ require 'damagecontrol/util/FileUtils'
 require 'damagecontrol/xmlrpc/ConnectionTester'
 require 'damagecontrol/util/Logging'
 require 'damagecontrol/publisher/IRCPublisher'
+require 'damagecontrol/scm/CVSTest'
 
 module DamageControl
 
@@ -215,42 +216,6 @@ class DamageControlServerDriver < Driver
   end
 end
 
-# Extension that allows local repo creation and import of files.
-# (This is not needed in the superclass, since it is not used by DC)
-class LocalCVS < CVS
-  def initialize(cvsrootdir, mod, working_dir_root)
-    super("cvsroot" => ":local:#{cvsrootdir}", "cvsmodule" => mod, "working_dir_root" => working_dir_root)
-    @cvsrootdir = cvsrootdir
-  end
-  
-  def create
-    File.mkpath(@cvsrootdir)
-    cvs("-d#{cvsroot} init")
-  end
-  
-  def import(dir)
-    with_working_dir(dir) do
-      modulename = File.basename(dir)
-      cvs("-d#{cvsroot} import -m \"initial import\" #{modulename} VENDOR START")
-    end    
-  end
-  
-  def add_file(relative_filename, content, is_new)
-    with_working_dir(working_dir) do
-      File.mkpath(File.dirname(relative_filename))
-      File.open(relative_filename, "w") do |file|
-        file.puts(content)
-      end
-      
-      if(is_new)
-        cvs("add #{relative_filename}")
-      end
-
-      cvs("com -m \"adding #{relative_filename}\"")
-    end
-  end
-end
-
 class End2EndTest < Test::Unit::TestCase
 
   include FileUtils
@@ -276,10 +241,8 @@ class End2EndTest < Test::Unit::TestCase
   end
   
   def test_damagecontrol_works_with_cvs
-    cvsrootdir = "#{@basedir}/cvsroot"
     mod = "testproject"
-    working_dir_root = "#{@basedir}/userwork"
-    cvs = LocalCVS.new(cvsrootdir, mod, working_dir_root)
+    cvs = LocalCVS.new(@basedir, mod)
     
     test_build_and_log_and_irc(cvs)
   end
@@ -327,11 +290,6 @@ class End2EndTest < Test::Unit::TestCase
   
   def assert_log_output_written_out
     assert_equal(1, Dir["#{basedir}/serverroot/TestingProject/log/*.log"].size)
-  end
-  
-  def username
-    return ENV["USERNAME"] if windows?
-    ENV["USER"]
   end
   
   def assert_file_content(expected_content, file, message)

@@ -16,7 +16,13 @@ module DamageControl
     
     def test_convert_changes_to_changesets_should_match_user_message_and_timestamp_
       changesets = ChangeSets.new
-      changesets << @change1 << @change2 << @change3 << @change4 << @change5 << @change6 << @change7
+      changesets.add(@change1)
+      changesets.add(@change2)
+      changesets.add(@change3)
+      changesets.add(@change4)
+      changesets.add(@change5)
+      changesets.add(@change6)
+      changesets.add(@change7)
 
       changeset_0 = ChangeSet.new
       changeset_0 << @change1
@@ -36,7 +42,10 @@ module DamageControl
       assert_equal(4, changesets.length)
 
       expected_changesets = ChangeSets.new
-      expected_changesets << changeset_0 << changeset_1 << changeset_2 << changeset_3
+      expected_changesets.add(changeset_0)
+      expected_changesets.add(changeset_1)
+      expected_changesets.add(changeset_2)
+      expected_changesets.add(changeset_3)
 
       assert_equal(expected_changesets, changesets)
     end
@@ -45,8 +54,10 @@ module DamageControl
       changesets = ChangeSets.new
       assert(0, changesets.length)
       
-      changesets << @change1 << @change2
-      changesets.push(@change3, @change4)
+      changesets.add(@change1)
+      changesets.add(@change2)
+      changesets.add(@change3)
+      changesets.add(@change4)
       assert(3, changesets.length)
       
       tjo_bing_changeset = changesets[0]
@@ -98,7 +109,13 @@ path/seven 1.7
 EOF
 
       changesets = ChangeSets.new
-      changesets << @change1 << @change2 << @change3 << @change4 << @change5 << @change6 << @change7
+      changesets.add(@change1)
+      changesets.add(@change2)
+      changesets.add(@change3)
+      changesets.add(@change4)
+      changesets.add(@change5)
+      changesets.add(@change6)
+      changesets.add(@change7)
       assert_equal(allsets, changesets.format(CHANGESET_TEXT_FORMAT, Time.utc(2004,7,5,12,2,2)))
     end
   end

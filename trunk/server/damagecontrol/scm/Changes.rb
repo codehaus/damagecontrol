@@ -40,9 +40,10 @@ EOF
       @changesets == other.changesets
     end
 
-    def << (change_or_changeset)
+    def add(change_or_changeset)
       if(change_or_changeset.is_a?(ChangeSet))
         @changesets << change_or_changeset
+        return change_or_changeset
       else
         changeset = @changesets.find { |a_changeset| a_changeset.can_contain?(change_or_changeset) }
         if(changeset.nil?)
@@ -50,9 +51,8 @@ EOF
           @changesets << changeset
         end
         changeset << change_or_changeset
+        return changeset
       end
-
-      self
     end
     
     def push(*change_or_changesets)
@@ -73,6 +73,7 @@ EOF
     include Pebbles::Matchable
 
     attr_reader :changes
+    attr_accessor :revision
 
     def initialize()
       @changes = []

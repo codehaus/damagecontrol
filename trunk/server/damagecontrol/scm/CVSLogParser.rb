@@ -76,7 +76,10 @@ module DamageControl
       entries[1..entries.length].each do |entry|
         change = parse_change(entry)
         change.path = parse_path(entries[0])
-        changesets << change
+        changeset = changesets.add(change)
+        # CVS doesn't have revision for changesets, use
+        # Fisheye-style revision
+        changeset.revision = "MAIN:#{change.developer}:#{change.time.utc.strftime('%Y%m%d%H%M%S')}" unless changeset.revision
       end
       nil
     end

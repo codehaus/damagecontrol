@@ -295,4 +295,42 @@ puts result
     end
 
   end
+
+
+  ##################################################################################
+  # This is only used during testing
+  ##################################################################################
+  class LocalCVS < CVS
+    def initialize(basedir, mod)
+      super("cvsroot" => ":local:#{basedir}/cvsroot}", "cvsmodule" => mod, "working_dir_root" => "#{basedir}/checkout")
+      @cvsrootdir = "#{basedir}/cvsroot}"
+    end
+
+    def create
+      File.mkpath(@cvsrootdir)
+      cvs("-d#{cvsroot} init")
+    end
+
+    def import(dir)
+      with_working_dir(dir) do
+        modulename = File.basename(dir)
+        cvs("-d#{cvsroot} import -m \"initial import\" #{modulename} VENDOR START")
+      end    
+    end
+
+    def add_file(relative_filename, content, is_new)
+      with_working_dir(working_dir) do
+        File.mkpath(File.dirname(relative_filename))
+        File.open(relative_filename, "w") do |file|
+          file.puts(content)
+        end
+
+        if(is_new)
+          cvs("add #{relative_filename}")
+        end
+
+        cvs("com -m \"adding #{relative_filename}\"")
+      end
+    end
+  end
 end

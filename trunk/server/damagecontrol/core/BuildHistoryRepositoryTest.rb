@@ -192,9 +192,9 @@ module DamageControl
       b = Build.new("test", Time.utc(2004, 01, 04, 12, 00, 00))
       c = Build.new("test", Time.utc(2004, 01, 05, 12, 00, 00))
       
-      b.changesets << Change.new("some/where", "aslak", "funny message")
-      b.changesets << Change.new("some/where/else", "aslak", "funny message again")
-      c.changesets << Change.new("some/path", "jon", "some other funny message")
+      b.changesets.add(Change.new("some/where", "aslak", "funny message"))
+      b.changesets.add(Change.new("some/where/else", "aslak", "funny message again"))
+      c.changesets.add(Change.new("some/path", "jon", "some other funny message"))
       
       @bhp.register(a)
       @bhp.register(b)
@@ -210,9 +210,9 @@ module DamageControl
       b = Build.new("test", Time.utc(2004, 01, 04, 12, 00, 00))
       c = Build.new("onlythisone", Time.utc(2004, 01, 05, 12, 00, 00))
       
-      b.changesets << Change.new("some/where", "aslak", "funny message")
-      b.changesets << Change.new("some/where/else", "aslak", "funny message again")
-      c.changesets << Change.new("some/path", "jon", "some other funny message")
+      b.changesets.add(Change.new("some/where", "aslak", "funny message"))
+      b.changesets.add(Change.new("some/where/else", "aslak", "funny message again"))
+      c.changesets.add(Change.new("some/path", "jon", "some other funny message"))
       
       @bhp.register(a)
       @bhp.register(b)

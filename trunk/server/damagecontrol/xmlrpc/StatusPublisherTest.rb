@@ -39,9 +39,8 @@ module XMLRPC
       xmlrpc_servlet = ::XMLRPC::WEBrickServlet.new
       StatusPublisher.new(xmlrpc_servlet, @bhp)
       # add some changes
-      @apple2.changesets << 
-        Change.new("path/one",   "jon",   "tjo bing",    "1.1", Time.utc(2004,7,5,12,0,2)) <<
-        Change.new("path/two",   "jon",   "tjo bing",    "1.2", Time.utc(2004,7,5,12,0,4))
+      @apple2.changesets.add(Change.new("path/one",   "jon",   "tjo bing",    "1.1", Time.utc(2004,7,5,12,0,2)))
+      @apple2.changesets.add(Change.new("path/two",   "jon",   "tjo bing",    "1.2", Time.utc(2004,7,5,12,0,4)))
 
       httpserver = WEBrick::HTTPServer.new(:Port => 4719)
       httpserver.mount("/test", xmlrpc_servlet)

@@ -2,61 +2,25 @@ require 'test/unit'
 require 'ftools'
 require 'stringio'
 require 'fileutils'
+require 'damagecontrol/scm/AbstractSCMTest'
 require 'damagecontrol/scm/CVS'
 require 'webrick'
 
 module DamageControl
-  class CVSTest < Test::Unit::TestCase
+  class CVSTest < AbstractSCMTest
     include ::FileUtils
     include FileUtils
   
-    def test_modifiying_one_file_produce_correct_changeset
-      # create a couple of temp directories and clean them up
-      basedir = new_temp_dir
-      testrepo = File.expand_path("#{basedir}/repo")
-      rm_rf(testrepo)
-      testcheckout = File.expand_path("#{basedir}/work")
-      rm_rf(testcheckout)
-      
-      # create cvs repo and import test project, check it out afterwards
-      cvs = create_cvs(":local:#{testrepo}", "damagecontrolled", testcheckout)
-      create_repo(testrepo)
-      import_damagecontrolled(cvs)
-      cvs.checkout
-      
-      # modify file and commit it
-      sleep(1)
-      time_before = Time.now.utc
-      sleep(1)
-      change_file("#{cvs.working_dir}/build.xml")
-      cvs.commit("changed something")
-      sleep(1)
-      time_after = Time.now.utc
-      
-      # check that we now have one more change
-      changesets = cvs.changesets(time_before, time_after)
-
-      assert_equal(1, changesets.length)
-      changeset = changesets[0]
-      assert_equal(1, changeset.length)
-
-      change = changeset[0]
-      assert_equal("build.xml", change.path)
-      assert_equal("changed something", change.message)
+    def create_scm
+      LocalCVS.new(new_temp_dir, "damagecontrolled")
     end
-    
+  
     def test_can_build_a_cvs_rdiff_command_for_retrieving_the_changes_between_two_dates
       time_before = Time.utc(2004,01,01,12,00,00) 
       time_after = Time.utc(2004,01,01,13,00,00)
       cvs = CVS.new({"cvsroot" => ":local:repo", "cvsmodule" => "module", "working_dir_root" => "."})
       assert_equal("log -N -S -d\"2004-01-01 12:00:00 UTC<=2004-01-01 13:00:00 UTC\"",
         cvs.changes_command(time_before, time_after))
-    end
-    
-    def change_file(file)
-      File.open(file, "w+") do |io|
-        io.puts("changed\n")
-      end
     end
     
     def create_cvs(cvsroot, cvsmodule, working_dir_root=new_temp_dir)
@@ -165,17 +129,10 @@ EOF
     end
     
     def test_install_uninstall_install_should_add_four_lines_to_loginfo
-      basedir = new_temp_dir
-
-      testrepo = File.expand_path("#{basedir}/repo")
-      rm_rf(testrepo)
-      create_repo(testrepo)
-
-      working_dir = File.expand_path("#{basedir}/work")
-      rm_rf(working_dir)
+      cvs = create_scm
+      cvs.create
 
       project_name = "OftenModified"
-      cvs = create_cvs(":local:#{testrepo}", "often", working_dir)
       
       assert(!cvs.trigger_installed?(project_name))
       cvs.install_trigger(

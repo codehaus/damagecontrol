@@ -31,7 +31,7 @@ module DamageControl
       @irc_mock.__verify
     end
     
-    def Xtest_sends_message_on_build_complete
+    def test_sends_message_on_build_complete
       setup_irc_connected
       @irc_mock.__expect(:send_message_to_channel) {|message| 
         expected = "<a href=\"http://moradi.com/public/project?action=build_details&project_name=cheese&timestamp=19710228234500\">[cheese] BUILD SUCCESSFUL</a>"
@@ -45,24 +45,7 @@ module DamageControl
       @publisher.enq_message(evt)
       @publisher.process_messages
     end
-    
-    def Xtest_formats_changeset_according_to_changeset
-      changeset = 
-        [
-          Change.new("file1.txt", "jtirsen", "change1"),
-          Change.new("file2.txt", "jtirsen", "change1"),
-          Change.new("file3.txt", "jtirsen", "change2"),
-          Change.new("file4.txt", "rinkrank", "change2"),
-        ]
-      expexted_format =
-      [
-        '"change1" by jtirsen: file1.txt, file2.txt',
-        '"change2" by jtirsen: file3.txt',
-        '"change2" by rinkrank: file4.txt',
-      ]
-      assert_equal(expexted_format, @publisher.format_changeset(changeset))
-    end
-    
+        
     def test_sends_message_on_build_requested_and_started
       now = Time.new.utc
       setup_irc_connected 
@@ -87,8 +70,8 @@ module DamageControl
       @publisher.send_message_on_build_request = true
       
       build = Build.new("project")
-      build.changesets << Change.new("file.txt", "jtirsen", "bad ass refactoring", "3.2", now)
-      build.changesets << Change.new("other_file.txt", "jtirsen", "bad ass refactoring", "5.1", now)
+      build.changesets.add(Change.new("file.txt", "jtirsen", "bad ass refactoring", "3.2", now))
+      build.changesets.add(Change.new("other_file.txt", "jtirsen", "bad ass refactoring", "5.1", now))
       @publisher.enq_message(BuildRequestEvent.new(build))
       @publisher.enq_message(BuildStartedEvent.new(build))
       @publisher.process_messages

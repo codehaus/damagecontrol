@@ -29,7 +29,7 @@ module DamageControl
       build.status = Build::FAILED
       change = Change.new()
       change.developer = "damagecontrol"
-      build.changesets << change
+      build.changesets.add(change)
       
       @jira_publisher.process_message(BuildCompleteEvent.new(build))
       assert_equal(

@@ -29,6 +29,11 @@ module FileUtils
     false
   end
     
+  def username
+    return ENV["USERNAME"] if windows?
+    ENV["USER"]
+  end
+  
   def script_file(file)
     return "#{file}.bat" if windows?
     "#{file}.sh"
