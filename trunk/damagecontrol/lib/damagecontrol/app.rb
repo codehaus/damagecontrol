@@ -13,14 +13,12 @@ REGISTRY = Needle::Registry.define do |b|
   end 
 
   b.poller do 
-    # Use a poller that persists the basic stuff
     DamageControl::Poller.new do |project, changesets|
       b.persister.save_changesets(project, changesets)
       b.persister.save_diffs(project, changesets)
       b.persister.save_rss(project)
       project.build(changesets.latest.identifier) do |build|
-        # TODO: execute the real thing
-        build.execute("hello!")
+        build.execute(project.build_command)
       end
     end
   end

@@ -50,6 +50,30 @@ module DamageControl
     end
     module_function :build_dir
     
+    # File where stdout for the build command is written
+    def stdout(project_name, changeset_identifier, time)
+      "#{build_dir(project_name, changeset_identifier, time)}/stdout.log"
+    end
+    module_function :stdout
+    
+    # File where stderr for the build command is written
+    def stderr(project_name, changeset_identifier, time)
+      "#{build_dir(project_name, changeset_identifier, time)}/stderr.log"
+    end
+    module_function :stderr
+    
+    # File where the exit code for the build command execution is stored
+    def build_exit_code_file(project_name, changeset_identifier, time)
+      "#{build_dir(project_name, changeset_identifier, time)}/exit_code"
+    end
+    module_function :build_exit_code_file
+    
+    # File where the pid for the build command execution is stored
+    def build_pid_file(project_name, changeset_identifier, time)
+      "#{build_dir(project_name, changeset_identifier, time)}/pid"
+    end
+    module_function :build_pid_file
+    
     # File containing the build command for a build created at time +time+
     def build_command_file(project_name, changeset_identifier, time)
       "#{build_dir(project_name, changeset_identifier, time)}/command"

@@ -1,5 +1,6 @@
 <script>
 var project_name_page_tip = "<div class='tp1'>The project name should not use space characters, as it will be used to create a folder on the server.</div>";
+var build_command_tip = "<div class='tp1'>The command-line that will execute the build.</div>";
 var project_description_tip = "<div class='tp1'>A short description of the project. Will be used in various notifications such as RSS.</div>";
 var project_home_page_tip = "<div class='tp1'>URL to the project's home page or documentation.</div>";
 </script>
@@ -16,6 +17,11 @@ var project_home_page_tip = "<div class='tp1'>URL to the project's home page or 
       <%= tag("input", :type => "hidden", :name => "DamageControl::Project[name]", :value => project.name) %>
     <% end %>
   </td>
+</tr>
+<tr>
+  <td>Build command</td>
+  <td><%= tip(:txt => 'build_command_tip') %></td>
+  <td><%= text_or_input(@edit, :name => "DamageControl::Project[build_command]", :value => project.build_command) %></td>
 </tr>
 <tr>
   <td>Project description</td>

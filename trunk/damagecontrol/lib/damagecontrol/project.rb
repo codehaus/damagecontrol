@@ -26,6 +26,8 @@ module DamageControl
     # How long to sleep between each changesets invocation for non-transactional SCMs  
     attr_accessor :quiet_period
 
+    attr_accessor :build_command
+
     # Loads the project with the given +name+.
     def Project.load(name)
       config_file = Directories.project_config_file(name)
