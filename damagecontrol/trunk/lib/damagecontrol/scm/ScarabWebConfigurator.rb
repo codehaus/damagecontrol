@@ -24,7 +24,7 @@ module DamageControl
     def configuration_keys
       [
         "scarab_url",
-        "module_key"
+        "scarab_module_key"
       ]
     end
   end

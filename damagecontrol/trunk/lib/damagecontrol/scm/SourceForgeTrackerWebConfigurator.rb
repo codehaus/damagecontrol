@@ -23,8 +23,8 @@ module DamageControl
   
     def configuration_keys
       [
-        "group_id",
-        "tracker_id"
+        "sf_group_id",
+        "sf_tracker_id"
       ]
     end
   end
