@@ -12,6 +12,9 @@ diff -u -r1.1 -r1.2
 -import org.picocontainer.lifecycle.Startable;
 +import org.picocontainer.Startable;
 
+-import org.boo.Fillable;
++import org.boo.foooooo.Fillable;
+
  import javax.swing.*;
  import javax.swing.table.DefaultTableModel;
 @@ -9,7 +9,7 @@

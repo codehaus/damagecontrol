@@ -7,6 +7,7 @@ which is described in AbstractSCM.
 
 * API support for several high level operations such as checkout, get changesets, check for uptodate etc.
 * Built-in admin server based on Rails (http://www.rubyonrails.org/)
+* Generation of colourised HTML diffs.
 * Generation of RSS feeds.
 * Generation of URL links to diffs for several popular SCM web front-ends.
 * Generation of URL links to bugs/issues for several popular bug/issue trackers.
@@ -15,10 +16,6 @@ which is described in AbstractSCM.
 * Uses UTC times according to the SCM server's clock, not the machine running RSCM.
 
 === Future plans
-
-Implement coloured diffs simliar to CVSSpam/SVN::Notify so that all supported SCMs 
-can benefit from coloured diffs in HTML capabilities. This would provide a very nice 
-alternative to SCM web front-ends, and could also be included in RSS feeds.
 
 Implement import/export functionality to allow migrating from one SCM to another while
 keeping the history. Great for migration from archaic SCMs!
