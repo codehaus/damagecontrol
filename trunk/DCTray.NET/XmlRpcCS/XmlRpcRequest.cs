@@ -7,18 +7,48 @@ namespace Nwc.XmlRpc
   using System.Net;
   using System.Text;
   using System.Reflection;
-  
+
+  /// <summary>Class supporting the request side of an XML-RPC transaction.</summary>
   public class XmlRpcRequest
   {
-    public String MethodName = null;
-    public ArrayList Params = null;
+    private String _methodName = null;
     private Encoding _encoding = new ASCIIEncoding();
+    private XmlRpcRequestSerializer _serializer = new XmlRpcRequestSerializer();
+    private XmlRpcResponseDeserializer _deserializer = new XmlRpcResponseDeserializer();
 
+    /// <summary><c>ArrayList</c> containing the parameters.</summary>
+    protected IList _params = null;
+
+    /// <summary>Instantiate an <c>XmlRpcRequest</c></summary>
     public XmlRpcRequest()
       {
-	Params = new ArrayList();
+	_params = new ArrayList();
       }
 
+    /// <summary>Instantiate an <c>XmlRpcRequest</c> for a specified method and parameters.</summary>
+    /// <param name="methodName"><c>String</c> designating the <i>object.method</i> on the server the request
+    /// should be directed to.</param>
+    /// <param name="parameters"><c>ArrayList</c> of XML-RPC type parameters to invoke the request with.</param>
+    public XmlRpcRequest(String methodName, IList parameters)
+      {
+	MethodName = methodName;
+	_params = parameters;
+      }
+
+    /// <summary><c>ArrayList</c> conntaining the parameters for the request.</summary>
+    public virtual IList Params
+      {
+	get { return _params; }
+      }
+
+    /// <summary><c>String</c> conntaining the method name, both object and method, that the request will be sent to.</summary>
+    public virtual String MethodName
+      {
+	get { return _methodName; }
+	set { _methodName = value; }
+      }
+
+    /// <summary><c>String</c> object name portion of the method name.</summary>
     public String MethodNameObject
       {
 	get {
@@ -31,6 +61,7 @@ namespace Nwc.XmlRpc
 	}
       }
 
+    /// <summary><c>String</c> method name portion of the object.method name.</summary>
     public String MethodNameMethod
       {
 	get {
@@ -43,57 +74,53 @@ namespace Nwc.XmlRpc
 	}
       }
 
+    /// <summary>Invoke this request on the server.</summary>
+    /// <param name="url"><c>String</c> The url of the XML-RPC server.</param>
+    /// <returns><c>Object</c> The value returned from the method invocation on the server.</returns>
+    /// <exception cref="XmlRpcException">If an exception generated on the server side.</exception>
+    public Object Invoke(String url)
+      {
+	XmlRpcResponse res = Send(url);
+
+	if (res.IsFault)
+	  throw new XmlRpcException(res.FaultCode, res.FaultString);
+	
+	return res.Value;
+      }
+
+    /// <summary>Send the request to the server.</summary>
+    /// <param name="url"><c>String</c> The url of the XML-RPC server.</param>
+    /// <returns><c>XmlRpcResponse</c> The response generated.</returns>
     public XmlRpcResponse Send(String url)
       {
 	HttpWebRequest request = (HttpWebRequest)WebRequest.Create(url);
+	if (request == null)
+	  throw new XmlRpcException(XmlRpcErrorCodes.TRANSPORT_ERROR,
+				    XmlRpcErrorCodes.TRANSPORT_ERROR_MSG +": Could not create request with " + url);
 	request.Method = "POST";
 	request.ContentType = "text/xml";
-	
+	request.AllowWriteStreamBuffering = true;
+
 	Stream stream = request.GetRequestStream();
 	XmlTextWriter xml = new XmlTextWriter(stream, _encoding);
-	XmlRpcRequestSerializer.Serialize(xml, this);
+	_serializer.Serialize(xml, this);
 	xml.Flush();
 	xml.Close();
 
 	HttpWebResponse response = (HttpWebResponse)request.GetResponse();
 	StreamReader input = new StreamReader(response.GetResponseStream());
 
-	XmlRpcResponse resp = XmlRpcResponseDeserializer.Parse(input);
+	XmlRpcResponse resp = (XmlRpcResponse)_deserializer.Deserialize(input);
 	input.Close();
 	response.Close();
 	return resp;
       }
 
-    public Object Invoke(Object target)
-      {
-	Type type = target.GetType();
-	MethodInfo method = type.GetMethod(MethodNameMethod);
-
-	if (method == null)
-	  throw new XmlRpcException(-2,"Method " + MethodNameMethod + " not found.");
-
-	if (XmlRpcExposedAttribute.IsExposed(target.GetType()) && 
-	    !XmlRpcExposedAttribute.IsExposed(method))
-	  throw new XmlRpcException(-3, "Method " + MethodNameMethod + " is not exposed.");
-
-	Object[] args = new Object[Params.Count];
-
-	for (int i = 0; i < Params.Count; i++)
-	  args[i] = Params[i];
-
-	return method.Invoke(target, args);
-      }
-
+    /// <summary>Produce <c>String</c> representation of the object.</summary>
+    /// <returns><c>String</c> representation of the object.</returns>
     override public String ToString()
       {
-	StringWriter strBuf = new StringWriter();
-	XmlTextWriter xml = new XmlTextWriter(strBuf);
-	xml.Formatting = Formatting.Indented;
-	xml.Indentation = 4;
-	XmlRpcRequestSerializer.Serialize(xml,this);
-	xml.Flush();
-	xml.Close();
-	return strBuf.ToString();
+	return _serializer.Serialize(this);
       }
   }
 }

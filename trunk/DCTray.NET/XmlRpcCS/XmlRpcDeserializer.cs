@@ -4,33 +4,60 @@ namespace Nwc.XmlRpc
   using System.Collections;
   using System.IO;
   using System.Xml;
-  using System.Diagnostics;
   using System.Globalization;
 
-  class XmlRpcDeserializer : XmlRpcXmlTokens
+  /// <summary>Parser context, we maintain contexts in a stack to avoiding recursion. </summary>
+  struct Context
+  {
+    public String Name;
+    public Object Container;
+  }
+
+  /// <summary>Basic XML-RPC data deserializer.</summary>
+  /// <remarks>Uses <c>XmlTextReader</c> to parse the XML data. This level of the class 
+  /// only handles the tokens common to both Requests and Responses. This class is not useful in and of itself
+  /// but is designed to be subclassed.</remarks>
+  public class XmlRpcDeserializer : XmlRpcXmlTokens
   {
     private static DateTimeFormatInfo _dateFormat = new DateTimeFormatInfo();
-    
-    protected String _text;
-    protected Object _value;
-    protected Object _name;
 
     private Object _container;
     private Stack _containerStack;
 
+    /// <summary>Protected reference to last text.</summary>
+    protected String _text;
+    /// <summary>Protected reference to last deserialized value.</summary>
+    protected Object _value;
+    /// <summary>Protected reference to last name field.</summary>
+    protected String _name;
+
+
+    /// <summary>Basic constructor.</summary>
     public XmlRpcDeserializer()
       {
-	_container = null;
-	_containerStack = new Stack();
+	Reset();
 	_dateFormat.FullDateTimePattern = ISO_DATETIME;
       }
 
-    public void ParseNode(XmlTextReader reader)
+    /// <summary>Static method that parses XML data into a response using the Singleton.</summary>
+    /// <param name="xmlData"><c>StreamReader</c> containing an XML-RPC response.</param>
+    /// <returns><c>Object</c> object resulting from the deserialization.</returns>
+    virtual public Object Deserialize(TextReader xmlData)
+      {
+	return null;
+      }
+
+    /// <summary>Protected method to parse a node in an XML-RPC XML stream.</summary>
+    /// <remarks>Method deals with elements common to all XML-RPC data, subclasses of 
+    /// this object deal with request/response spefic elements.</remarks>
+    /// <param name="reader"><c>XmlTextReader</c> of the in progress parsing data stream.</param>
+    protected void DeserializeNode(XmlTextReader reader)
       {
 	switch (reader.NodeType)
 	  {
 	  case XmlNodeType.Element:
-	    Logger.WriteEntry("Element " + reader.Name, EventLogEntryType.Information);
+	    if (Logger.Delegate != null)
+	      Logger.WriteEntry("START " + reader.Name, LogLevel.Information);
 	    switch (reader.Name)
 	      {
 	      case VALUE:
@@ -38,19 +65,18 @@ namespace Nwc.XmlRpc
 		_text = null;
 		break;
 	      case STRUCT:
-		if (_container != null)
-		  _containerStack.Push(_container);
+		PushContext();
 		_container = new Hashtable();
 		break;
 	      case ARRAY:
-		if (_container != null)
-		  _containerStack.Push(_container);
+		PushContext();
 		_container = new ArrayList();
 		break;
 	      }
 	    break;
 	  case XmlNodeType.EndElement:
-	    Logger.WriteEntry("End Element " + reader.Name, EventLogEntryType.Information);
+	    if (Logger.Delegate != null)
+	      Logger.WriteEntry("END " + reader.Name, LogLevel.Information);
 	    switch (reader.Name)
 	      {
 	      case BASE64:
@@ -74,7 +100,11 @@ namespace Nwc.XmlRpc
 		_value = Int32.Parse(_text);
 		break;
 	      case DATETIME:
-		_value = DateTime.ParseExact(_text, "F", _dateFormat);
+#if __MONO__
+		    _value = DateParse(_text);
+#else
+		    _value = DateTime.ParseExact(_text, "F", _dateFormat);
+#endif
 		break;
 	      case NAME:
 		_name = _text;
@@ -83,40 +113,82 @@ namespace Nwc.XmlRpc
 		if (_value == null)
 		  _value = _text; // some kits don't use <string> tag, they just do <value>
 
-		if ((_container != null) && (_container is ArrayList)) // in an array?  If so add value to it.
-		  ((ArrayList)_container).Add(_value);
+		if ((_container != null) && (_container is IList)) // in an array?  If so add value to it.
+		  ((IList)_container).Add(_value);
 		break;
 	      case MEMBER:
-		if ((_container != null) && (_container is Hashtable)) // in an struct?  If so add value to it.
-		((Hashtable)_container)[_name] = _value;
+		if ((_container != null) && (_container is IDictionary)) // in an struct?  If so add value to it.
+		((IDictionary)_container).Add(_name, _value);
 		break;
 	      case ARRAY:
 	      case STRUCT:
 		_value = _container;
-		_container = (_containerStack.Count == 0)? null : _containerStack.Pop();
+		PopContext();
 		break;
 	      }
 	    break;
 	  case XmlNodeType.Text:
-	    Logger.WriteEntry("Text " + reader.Value, EventLogEntryType.Information);
+	    if (Logger.Delegate != null)
+	      Logger.WriteEntry("Text " + reader.Value, LogLevel.Information);
 	    _text = reader.Value;
 	    break;
 	  default:
 	    break;
 	  }	
-
-	Logger.WriteEntry("Text now: " + _text, EventLogEntryType.Information);
-	Logger.WriteEntry("Value now: " + id(_value), EventLogEntryType.Information);
-	Logger.WriteEntry("Container now: " + id(_container), EventLogEntryType.Information);
       }
 
-    private String id(Object x)
+    /// <summary>Static method that parses XML in a <c>String</c> into a 
+    /// request using the Singleton.</summary>
+    /// <param name="xmlData"><c>String</c> containing an XML-RPC request.</param>
+    /// <returns><c>XmlRpcRequest</c> object resulting from the parse.</returns>
+    public Object Deserialize(String xmlData)
       {
-	if (x == null)
-	  return "null";
-
-	return x.GetType().Name + "[" + x.GetHashCode() + "]";
+	StringReader sr = new StringReader(xmlData);
+	return Deserialize(sr);
       }
+
+    /// <summary>Pop a Context of the stack, an Array or Struct has closed.</summary>
+    private void PopContext()
+      {
+	Context c = (Context)_containerStack.Pop();
+	_container = c.Container;
+	_name = c.Name;
+      }
+
+    /// <summary>Push a Context on the stack, an Array or Struct has opened.</summary>
+    private void PushContext()
+      {
+	Context context;
+
+	context.Container = _container;
+	context.Name = _name;
+
+	_containerStack.Push(context);
+      }
+
+    /// <summary>Reset the internal state of the deserializer.</summary>
+    protected void Reset()
+      {
+	_text = null;
+	_value = null;
+	_name = null;
+	_container = null;
+	_containerStack = new Stack();
+      }
+
+#if __MONO__
+    private DateTime DateParse(String str)
+      {
+	int year = Int32.Parse(str.Substring(0,4));
+	int month = Int32.Parse(str.Substring(4,2));
+	int day = Int32.Parse(str.Substring(6,2));
+	int hour = Int32.Parse(str.Substring(9,2));
+	int min = Int32.Parse(str.Substring(12,2));
+	int sec = Int32.Parse(str.Substring(15,2));
+	return new DateTime(year,month,day,hour,min,sec);
+      }
+#endif
+
   }
 }
 

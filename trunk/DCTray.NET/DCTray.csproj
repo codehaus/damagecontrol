@@ -109,6 +109,11 @@
                     AssemblyName = "System.Xml"
                     HintPath = "..\..\..\..\..\WINNT\Microsoft.NET\Framework\v1.1.4322\System.XML.dll"
                 />
+                <Reference
+                    Name = "System.Web.Services"
+                    AssemblyName = "System.Web.Services"
+                    HintPath = "..\..\..\WINDOWS\Microsoft.NET\Framework\v1.1.4322\System.Web.Services.dll"
+                />
             </References>
         </Build>
         <Files>
@@ -226,11 +231,11 @@
                 />
                 <File
                     RelPath = "Images\icon-open-file.gif"
-                    BuildAction = "Content"
+                    BuildAction = "EmbeddedResource"
                 />
                 <File
                     RelPath = "Images\icon-play.gif"
-                    BuildAction = "Content"
+                    BuildAction = "EmbeddedResource"
                 />
                 <File
                     RelPath = "XmlRpcCS\Logger.cs"
@@ -243,7 +248,22 @@
                     BuildAction = "Compile"
                 />
                 <File
+                    RelPath = "XmlRpcCS\XmlRpcBoxcarRequest.cs"
+                    SubType = "Code"
+                    BuildAction = "Compile"
+                />
+                <File
+                    RelPath = "XmlRpcCS\XmlRpcClientProxy.cs"
+                    SubType = "Code"
+                    BuildAction = "Compile"
+                />
+                <File
                     RelPath = "XmlRpcCS\XmlRpcDeserializer.cs"
+                    SubType = "Code"
+                    BuildAction = "Compile"
+                />
+                <File
+                    RelPath = "XmlRpcCS\XmlRpcErrorCodes.cs"
                     SubType = "Code"
                     BuildAction = "Compile"
                 />
@@ -269,6 +289,11 @@
                 />
                 <File
                     RelPath = "XmlRpcCS\XmlRpcRequestSerializer.cs"
+                    SubType = "Code"
+                    BuildAction = "Compile"
+                />
+                <File
+                    RelPath = "XmlRpcCS\XmlRpcResponder.cs"
                     SubType = "Code"
                     BuildAction = "Compile"
                 />

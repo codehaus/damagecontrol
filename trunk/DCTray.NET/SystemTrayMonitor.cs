@@ -255,6 +255,8 @@ namespace ThoughtWorks.DamageControl.DCTray
 
 		private void statusMonitor_Error(object sender, ErrorEventArgs e)
 		{
+			System.Diagnostics.Debug.WriteLine(e.Exception.ToString());
+
 			if (_exception==null && settings.ShowExceptions)
 			{
 				// set the exception before displaying the dialog, because the timer keeps polling and subsequent

@@ -640,11 +640,38 @@ namespace ThoughtWorks.DamageControl.DCTray
 		{
 			try 
 			{
+				/*
+				DamageControlTest test = new DamageControlTest();
+				test.Url = txtServerUrl.Text;
+
+				// trying a simple ping
+				string response = test.Ping();
+				if (response != "Response from DamageControl")
+				{
+					throw new Exception("Invalid response from server");
+				}
+
+				// trying a simple echo
+				response = test.Echo("This is a test from DCTray.NET");
+				if (response != "This is a test from DCTray.NET")
+				{
+					throw new Exception("Invalid response from server");
+				}
+
+				DamageControlStatus status = new DamageControlStatus();
+				status.Url = txtServerUrl.Text;
+
+				if(null == status.GetCurrentBuild(txtProjectName.Text))
+				{
+					throw new Exception(string.Format("Project '{0}' does not exist on the server (at this time)", txtProjectName.Text));
+				}
+				*/
+
 				// trying a simple ping
 				XmlRpcRequest client = new XmlRpcRequest();
 				client.MethodName = "test.ping";
 				XmlRpcResponse response = client.Send(txtServerUrl.Text);
-				if (response.IsFault) 
+				if (response.IsFault)
 				{
 					ShowError(response.FaultString);
 					return;
@@ -681,7 +708,6 @@ namespace ThoughtWorks.DamageControl.DCTray
 					ShowError(string.Format("Project '{0}' does not exist", txtProjectName.Text));
 					return;
 				}
-
 
 				MessageBox.Show(this, "Connection succesful", "Connection succesful", MessageBoxButtons.OK, MessageBoxIcon.Information);
 			}

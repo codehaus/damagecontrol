@@ -48,7 +48,7 @@ class IRCDriver
     sleep 10
     assert(irc_listener.connected?)
     irc_listener.join_channel("#dce2e")
-    sleep 2
+    sleep 3
     assert(irc_listener.in_channel?)
     irc_listener.send_message_to_channel("Hello, this is DamageControl's test-suite. I'm just here to check that DamageControl is performing its duties well.")
     sleep 1

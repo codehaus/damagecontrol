@@ -223,6 +223,10 @@ namespace ThoughtWorks.DamageControl.DCTray
 
 		static BuildStatus ToBuildStatus(string damagecontrolStatus) 
 		{
+			if(damagecontrolStatus == null) 
+			{
+				return BuildStatus.Unknown;
+			}
 			return (BuildStatus) _statusMappings[damagecontrolStatus];
 		}
 		
@@ -238,10 +242,12 @@ namespace ThoughtWorks.DamageControl.DCTray
 
 			currentBuildStatus = ToBuildStatus((string) currentBuildStatusRaw["status"]);
 			buildStatus = ToBuildStatus((string) buildStatusRaw["status"]);
+			string label = (string) buildStatusRaw["label"];
+			string url = (string) buildStatusRaw["url"];
 
 			DateTime lastBuildDate = TimestampToDate((string) buildStatusRaw["timestamp"]);
 
-			return new ProjectStatus(projectName, currentBuildStatus, buildStatus, "http://damagecontrol.codehaus.org", lastBuildDate, "666");
+			return new ProjectStatus(projectName, currentBuildStatus, buildStatus, url, lastBuildDate, label);
 		}
 
 		DateTime TimestampToDate(string timestamp) 
@@ -259,7 +265,7 @@ namespace ThoughtWorks.DamageControl.DCTray
 
 		void DumpHashtable(string name, Hashtable table)
 		{
-			System.Diagnostics.Debug.WriteLine(name);
+			System.Diagnostics.Debug.WriteLine("============== " + name);
 			foreach(Object key in table.Keys) 
 			{
 				System.Diagnostics.Debug.WriteLine(string.Format("{0} = {1}", key, table[key]));

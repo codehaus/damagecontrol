@@ -5,9 +5,12 @@ namespace Nwc.XmlRpc
   using System.IO;
   using System.Xml;
 
-  class XmlRpcResponseDeserializer : XmlRpcDeserializer
+  /// <summary>Class to deserialize XML data representing a response.</summary>
+  public class XmlRpcResponseDeserializer : XmlRpcDeserializer
   {
     static private XmlRpcResponseDeserializer _singleton;
+    /// <summary>A static singleton instance of this deserializer.</summary>
+    [Obsolete("This object is now thread safe, just use an instance.",false)]
     static public XmlRpcResponseDeserializer Singleton
       {
 	get
@@ -19,34 +22,42 @@ namespace Nwc.XmlRpc
 	  }
       }
 
-    public static XmlRpcResponse Parse(StreamReader xmlData)
+    /// <summary>Static method that parses XML data into a response using the Singleton.</summary>
+    /// <param name="xmlData"><c>StreamReader</c> containing an XML-RPC response.</param>
+    /// <returns><c>XmlRpcResponse</c> object resulting from the parse.</returns>
+    override public Object Deserialize(TextReader xmlData)
       {
 	XmlTextReader reader = new XmlTextReader(xmlData);
 	XmlRpcResponse response = new XmlRpcResponse();
 	bool done = false;
-
-	while (!done && reader.Read())
+	
+	lock(this)
 	  {
-	    Singleton.ParseNode(reader); // Parent parse...
-            switch (reader.NodeType)
+	    Reset();
+	    
+	    while (!done && reader.Read())
 	      {
-	      case XmlNodeType.EndElement:
-		switch (reader.Name)
+		DeserializeNode(reader); // Parent parse...
+		switch (reader.NodeType)
 		  {
-		  case FAULT:
-		    response.Value = Singleton._value;
-		    response.IsFault = true;
+		  case XmlNodeType.EndElement:
+		    switch (reader.Name)
+		      {
+		      case FAULT:
+			response.Value = _value;
+			response.IsFault = true;
+			break;
+		      case PARAM:
+			response.Value = _value;
+			_value = null;
+			_text = null;
+			break;
+		      }
 		    break;
-		  case PARAM:
-		    response.Value = Singleton._value;
-		    Singleton._value = null;
-		    Singleton._text = null;
+		  default:
 		    break;
-		  }
-		break;
-	      default:
-		break;
-	      }	
+		  }	
+	      }
 	  }
 	return response;
       }
