@@ -161,8 +161,6 @@ void Trigger::Process()
 			}
 
 			// Look for content between <string></string>
-			char * start_token = "<string>";
-			char * end_token = "</string>";
 			int message_start = -1;
 			for(int i = 10; i < bytes; i++) {
 				if(message_start == -1 && 'g' == buffer[i-2] && '>' == buffer[i-1]) {

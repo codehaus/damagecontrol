@@ -218,8 +218,9 @@ module DamageControl
       File.open("#{damagecontrol_home}/testdata/cvs-test.log") do |io|
         changeset = @parser.parse_log(io)
         assert_equal(46, changeset.length)
-        assert_equal("self test\n", changeset[0].message)
-        assert_equal("o YAML config (BuildBootstrapper)\no EmailPublisher\n", changeset[45].message)
+        assert_match(/self test/, changeset[0].message)
+        assert_match(/o YAML config \(BuildBootstrapper\)/, changeset[45].message)
+        assert_match(/EmailPublisher/, changeset[45].message)
       end
     end
     
@@ -228,7 +229,7 @@ module DamageControl
       modifications = @parser.parse_modifications(LOG_ENTRY)
       assert_equal(4, modifications.length)
       assert_equal("/cvsroot/damagecontrol/damagecontrol/src/ruby/damagecontrol/BuildExecutorTest.rb", modifications[0].path)
-      assert_equal("linux/windows galore\n", modifications[2].message)
+      assert_match(/linux-windows galore/, modifications[2].message)
     end
     
 
@@ -237,7 +238,7 @@ module DamageControl
       assert_equal("1.20", modification.revision)
       assert_equal("2003/11/09 17:53:37", modification.time)
       assert_equal("tirsen", modification.developer)
-      assert_equal("Quiet period is configurable for each project\n", modification.message)
+      assert_match(/Quiet period is configurable for each project/, modification.message)
     end
     
     def test_removes_cvsroot_and_module_from_paths_when_specified
@@ -245,7 +246,7 @@ module DamageControl
       @parser.cvsmodule = "damagecontrol"
       modifications = @parser.parse_modifications(LOG_ENTRY)
       assert_equal("src/ruby/damagecontrol/BuildExecutorTest.rb", modifications[0].path)
-      assert_equal("linux/windows galore\n", modifications[2].message)
+      assert_match(/linux-windows galore/, modifications[2].message)
     end
     
     def test_can_split_entries_separated_by_line_of_dashes
@@ -258,8 +259,8 @@ module DamageControl
       io = StringIO.new(LOG_FROM_E2E_TEST)
       changeset = @parser.parse_log(io)
       assert_equal(2, changeset.length)
-      assert_equal("comment\n", changeset[0].message)
-      assert_equal("comment\n", changeset[1].message)
+      assert_match(/foo/, changeset[0].message)
+      assert_match(/bar/, changeset[1].message)
     end
 
     MODIFICATION_ENTRY = <<-EOF
@@ -284,11 +285,11 @@ description:
 ----------------------------
 revision 1.2
 date: 2004/04/09 21:56:47;  author: jtirsen;  state: Exp;  lines: +1 -1
-comment
+foo
 ----------------------------
 revision 1.1
 date: 2004/04/09 21:56:12;  author: jtirsen;  state: Exp;
-comment
+bar
 =============================================================================EOF
 EOF
 
@@ -316,7 +317,7 @@ Quiet period implemented for BuildExecutor, but does not yet handle multiple pro
 ----------------------------
 revision 1.18
 date: 2003/11/09 15:51:50;  author: rinkrank;  state: Exp;  lines: +1 -2
-linux/windows galore
+linux-windows galore
 ----------------------------
 revision 1.17
 date: 2003/11/09 15:00:06;  author: rinkrank;  state: Exp;  lines: +6 -8

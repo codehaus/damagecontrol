@@ -29,7 +29,7 @@ module DamageControl
   <body>
     <div class="main">
       <h3 class="projectname">Test Project</h3>
-      Build Status: Knockout<br/>
+      Build Status: FAILED<br/>
       Build Duration: 4 seconds<br/>
     </div>
   </body>

@@ -71,7 +71,7 @@ module DamageControl
       @build_executor.schedule_build(@build)
       @build_executor.process_next_scheduled_build
 
-      assert(successful, "ant build should succeed (HINT: is ant really installed?)")
+      assert(successful, "ant build should succeed (HINT: is ant on your PATH?)")
       
     end
     

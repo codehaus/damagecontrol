@@ -10,7 +10,7 @@ module DamageControl
   <body>
     <div class="main">
       <h3 class="projectname">#{build.project_name}</h3>
-      Build Status: #{build.error_message}<br/>
+      Build Status: #{build.status}<br/>
       Build Duration: #{build.build_duration_seconds} seconds<br/>
     </div>
   </body>

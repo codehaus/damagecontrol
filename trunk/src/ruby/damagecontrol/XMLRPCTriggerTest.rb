@@ -33,6 +33,37 @@ module DamageControl
       assert_equal("damagecontrol", messages_from_hub[0].build.project_name)
     end
 
+    def test_call_on_request_build_requests_build
+      expected = <<-EOF
+---
+scm_spec: scm_spec
+build_command_line: build_command_line
+project_name: project_name
+nag_email: nag_email
+...
+      EOF
+
+      mock_file = MockIt::Mock.new
+      mock_file.__expect(:read) {
+        expected
+      }
+
+      t = XMLRPCTrigger.new(XMLRPC::WEBrickServlet.new, hub, "/foo")
+      def t.set_mock_file(mock_file)
+        @mock_file = mock_file
+      end
+      def t.project_file(project_name)
+        @mock_file
+      end
+      t.set_mock_file(mock_file)
+      
+      val = t.request_build("project_name", "2004-04-15T18:05:47")
+      assert(!val.nil?)
+      assert_message_types_from_hub([BuildRequestEvent])
+      assert(!messages_from_hub[0].build.nil?)
+      assert_equal("project_name", messages_from_hub[0].build.project_name)
+    end
+
   end
 
 end
