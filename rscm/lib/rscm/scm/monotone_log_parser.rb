@@ -18,7 +18,10 @@ module RSCM
       io.each_line do |line|
         if(line =~ /-----------------------------------------------------------------/)
           changeset = parse_changeset(StringIO.new(changeset_string), path_revisions)
-          changesets.add(changeset)
+          if((from_identifier <= changeset.time) && (changeset.time <= to_identifier))
+            changesets.add(changeset)
+          end
+
           changeset_string = ""
         else
           changeset_string << line
