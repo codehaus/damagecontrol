@@ -46,10 +46,9 @@ class Project
   end
   
   def installer
-#    fail("put a ruby distribution in #{File.expand_path('ruby')}") if !File.exists?("ruby")
+    fail("Define the RUBY_HOME variable to point to your ruby installation") if !ENV["RUBY_HOME"]
     fail("NSIS needs to be installed, download from http://nsis.sf.net (or not installed to default place: #{makensis_exe})") if !File.exists?(makensis_exe)
-    
-    system("#{makensis_exe} /DVERSION=#{version} installer/windows/nsis/DamageControl.nsi")
+    system("#{makensis_exe} /DVERSION=#{version} /DRUBY_HOME=#{ENV["RUBY_HOME"]} installer/windows/nsis/DamageControl.nsi")
   end
   
   def username

@@ -11,7 +11,6 @@
 ;General
 
   !define ROOTDIR "..\..\.."
-  !define RUBY_HOME "C:\ruby"
   
   ; VERSION needs to be defined on the command line with /DVERSION=1.2.3 option
   
@@ -78,12 +77,47 @@
 
 Section "DamageControl Server" SecServer
 
-  SetOutPath "$INSTDIR"
+  SetOutPath "$INSTDIR" 
   
   File /r "${ROOTDIR}\server"
   File /r "${ROOTDIR}\bin"
-  File /r "${RUBY_HOME}\bin"
   
+  ;Include a minimal ruby installation (to reduce the size of the installer)
+
+  SetOutPath $INSTDIR\ruby\bin
+  File /r ${RUBY_HOME}\bin\*.exe
+  File /r ${RUBY_HOME}\bin\*.dll
+
+  SetOutPath $INSTDIR\ruby\lib\ruby\1.8
+  File /r ${RUBY_HOME}\lib\ruby\1.8\*.rb
+  
+  SetOutPath $INSTDIR\ruby\lib\ruby\1.8\date
+  File /r ${RUBY_HOME}\lib\ruby\1.8\date\*.rb
+  
+  SetOutPath $INSTDIR\ruby\lib\ruby\1.8\net
+  File /r ${RUBY_HOME}\lib\ruby\1.8\net\*.rb
+  
+  SetOutPath $INSTDIR\ruby\lib\ruby\1.8\i386-mswin32
+  File /r ${RUBY_HOME}\lib\ruby\1.8\i386-mswin32\*.so
+  
+  SetOutPath $INSTDIR\ruby\lib\ruby\1.8\i386-mswin32\digest
+  File /r ${RUBY_HOME}\lib\ruby\1.8\i386-mswin32\digest\*.so
+  
+  SetOutPath $INSTDIR\ruby\lib\ruby\1.8\i386-mswin32\racc
+  File /r ${RUBY_HOME}\lib\ruby\1.8\i386-mswin32\racc\*.so
+  
+  SetOutPath $INSTDIR\ruby\lib\ruby\1.8\rexml
+  File /r ${RUBY_HOME}\lib\ruby\1.8\rexml\*.rb
+  
+  SetOutPath $INSTDIR\ruby\lib\ruby\1.8\rexml\parsers
+  File /r ${RUBY_HOME}\lib\ruby\1.8\rexml\parsers\*.rb
+  
+  SetOutPath $INSTDIR\ruby\lib\ruby\1.8\webrick
+  File /r ${RUBY_HOME}\lib\ruby\1.8\webrick\*.rb
+  
+  SetOutPath $INSTDIR\ruby\lib\ruby\1.8\webrick\httpservlet
+  File /r ${RUBY_HOME}\lib\ruby\1.8\webrick\httpservlet\*.rb
+    
   ;Store installation folder
   WriteRegStr HKCU "Software\Modern UI Test" "" $INSTDIR
 
