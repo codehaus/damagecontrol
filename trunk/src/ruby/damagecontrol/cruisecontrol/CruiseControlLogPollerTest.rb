@@ -14,7 +14,7 @@ module DamageControl
 			@dir = "test#{Time.new.to_i}"
 			File.mkpath(@dir)
 			create_hub
-			@log_file = damagecontrol_file("../testdata/log20030929145347.xml")
+			@log_file = damagecontrol_file("testdata/log20030929145347.xml")
 			@ccpoller = CruiseControlLogPoller.new(@hub, @dir)
 		end
 		
@@ -31,6 +31,7 @@ module DamageControl
 			assert_message_types("DamageControl::BuildCompleteEvent")
 			assert_equal('dxbranch', messages_from_hub[0].build.project_name)
 			assert_equal('build.698', messages_from_hub[0].build.label)
+			assert_equal('20030929145347', messages_from_hub[0].build.timestamp)
 			assert_equal(false, messages_from_hub[0].build.successful)
 			assert_equal("BUILD FAILED detected", messages_from_hub[0].build.error_message)
 		end

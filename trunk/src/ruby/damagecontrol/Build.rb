@@ -4,10 +4,9 @@ require 'damagecontrol/FileUtils'
 module DamageControl
 
 	class Build
-	
 		include FileUtils
 
-		attr_reader :project_name
+		attr_accessor :project_name
 		attr_accessor :website_directory
 		attr_accessor :logs_directory
 		attr_accessor :basedir
@@ -16,6 +15,7 @@ module DamageControl
 		attr_accessor :successful
 		attr_accessor :error_message
 		attr_accessor :scm_path
+		attr_accessor :timestamp
 	
 		def initialize (basedir, project_name, build_command_line)
 			@basedir = basedir
@@ -24,6 +24,11 @@ module DamageControl
 			
 			@website_directory = "website"
 			@logs_directory = "logs"
+			@timestamp = Build.format_timestamp(Time.now)
+		end
+		
+		def Build.format_timestamp(timestamp)
+			timestamp.strftime("%Y%m%d%H%M%S") 
 		end
 	
 		def open_website_file (filename, params="w")
@@ -82,8 +87,7 @@ module DamageControl
 		
 		def ==(other)
 			project_name == other.project_name \
-				&& website_directory == other.website_directory \
-				&& logs_directory == other.logs_directory
+				&& timestamp == other.timestamp \
 		end
 	
 	end

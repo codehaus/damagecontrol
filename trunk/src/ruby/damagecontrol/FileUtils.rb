@@ -22,7 +22,16 @@ module DamageControl
 		alias :rmdir :delete
 
 		def damagecontrol_home
-			File.expand_path($damagecontrol_home || "../..")
+			$damagecontrol_home = find_damagecontrol_home if $damagecontrol_home.nil?
+			$damagecontrol_home 
+		end
+		
+		def find_damagecontrol_home(path='.')
+			if File.exists?("#{path}/build.rb")
+				File.expand_path(path)
+			else
+				find_damagecontrol_home("#{path}/..")
+			end
 		end
 		
 		# returns file relative damagecontrol-home
