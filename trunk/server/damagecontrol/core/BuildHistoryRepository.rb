@@ -202,9 +202,19 @@ module DamageControl
     end
     
     def dump(history, project_name)
-      out = File.new(history_file(project_name), "w")
-      YAML::dump(history, out)
-      out.close
+      # safe writing of history file
+      file = history_file(project_name)
+      writing_file = "#{file}.writing"
+      old_file = "#{file}.old"
+      # writing on temporary file: prepare
+      File.open(writing_file, "w") do |io|
+        YAML::dump(history, io)
+      end
+      # move away old file as backup
+      File.delete(old_file) if File.exist?(old_file)
+      File.move(file, old_file) if File.exist?(file)
+      # rename = semi-atomic operation: commit!
+      File.move(writing_file, file)
     end
 
     def history_file(project_name)
