@@ -1,0 +1,308 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE book PUBLIC "-//OASIS//DTD DocBook XML V4.2//EN"
+"http://www.oasis-open.org/docbook/xml/4.2/docbookx.dtd">
+<book>
+  <title>DamageControl</title>
+
+  <bookinfo>
+    <date>11/09/2004</date>
+
+    <authorgroup>
+      <author>
+        <firstname>Aslak</firstname>
+
+        <surname>Hellesøy</surname>
+
+        <affiliation>
+          <orgname>ThoughtWorks Inc.</orgname>
+        </affiliation>
+      </author>
+
+      <author>
+        <firstname>Jon</firstname>
+
+        <surname>Tirsen</surname>
+
+        <affiliation>
+          <orgname>ThoughtWorks Inc.</orgname>
+        </affiliation>
+      </author>
+
+      <author>
+        <firstname>Lars</firstname>
+
+        <surname>Trieloff</surname>
+      </author>
+    </authorgroup>
+  </bookinfo>
+
+  <preface>
+    <title>What is DamageControl</title>
+
+    <para>DamageControl is a continous integration system that helps you to
+    keep feedback about build failures. If you are working on a project that
+    is supervised by DamageControl and one of your team members commits
+    changes to the Software Configuration Management System, DamageControl
+    will detect the changes to the codebase and attempt to build a integration
+    build of your project.</para>
+
+    <para>If this integration build succeeds, everything is OK. The green
+    light shows up and you can continue your work. If the recent changes have
+    broken the build, your project is damaged. DamageControl helps you to
+    <quote>control the damage before the damage controls you</quote>. The
+    first step is that the team members who have broken the build are
+    informed. There are different ways to do it, they can receive an EMail, an
+    instant message, an issue could be filed in the issue tracker or a status
+    monitor at their desktop could show a red light.</para>
+
+    <para>In the next step, the objected changes could be rolled back, so that
+    the project is in an consistant state again. The damager will repair the
+    damage and everyone else will continue to work.</para>
+
+    <para>What distinguishes DamageControl from other continuous integration
+    systems like CruiseControl or CruiseControl.NET?</para>
+
+    <itemizedlist>
+      <listitem>
+        <para>DamageControl is under heavy development. If you want to use
+        something rock solid and do not care for the newest features, stop
+        reading here.</para>
+      </listitem>
+
+      <listitem>
+        <para>DamageControl is platform agnostic. You can build your project
+        with Java, Ant, Ruby, .NET, Nant, Make or whatever tools you
+        like.</para>
+      </listitem>
+
+      <listitem>
+        <para>DamageControl is easy to use and offers simple, web-based
+        configuration. No need to edit XML files.</para>
+      </listitem>
+
+      <listitem>
+        <para>DamageControl is self-contained. It comes with an own runtime
+        and an embedded webserver.</para>
+      </listitem>
+
+      <listitem>
+        <para>DamageControl has many channels to notify users of successful or
+        failed builds. And it is very easy to create your own notification
+        channel.</para>
+      </listitem>
+
+      <listitem>
+        <para>DamageControl supports as many projects as you need and your
+        build server can handle. It is even possible to run multiple builds at
+        once.</para>
+      </listitem>
+
+      <listitem>
+        <para>DamageControl builds are triggered by CVS or Subversion on every
+        commit. It can install the triggers for you and supports polling, if
+        it is impossible to use triggers.</para>
+      </listitem>
+
+      <listitem>
+        <para>DamageControl integrates with tools like ViewCVS or Fisheye as
+        well as Jira, Bugzilla and Scarab.</para>
+      </listitem>
+    </itemizedlist>
+
+    <para>In this documentation you will find everything needed for running
+    and configuring DamageControl. Additionally you will find information
+    important if you would like to implement extensions to DamageControl to
+    make it fit your specific needs.</para>
+
+    <para>Before you decide that you do not need a program like DamageControl,
+    because it does not help you to create more shiny new code in shorter
+    time, consider the advantages of detecting problems early: The sooner a
+    problem is detected, the cheaper it is to fix it.</para>
+
+    <para>If you identify problems during requirements engineering, you can
+    talk with the customer and the problem is gone. If you identify problems
+    during the design phase, you have all opportunities to find a design that
+    will avoid those problems. If you occur problems during the
+    implementation, you can still fix bugs and create workarounds for other
+    issues. Trying to correct a problem in an already deployed system is very
+    hard and expensive.</para>
+
+    <para>So DamageControl helps you to identify problems early, to solve
+    identified problems and to produce high-quality-software cost-efficient
+    while keeping your schedules.</para>
+  </preface>
+
+  <chapter>
+    <title>User Manual</title>
+
+    <section>
+      <title>Installing DamageControl</title>
+
+      <section>
+        <title>Linux, UNIX, Mac OS X</title>
+
+        <para>To install DamageControl on a server with an UNIX-like operating
+        system, follow these steps.</para>
+
+        <procedure>
+          <step>
+            <para>Download Ruby, version 1.8.2_pre2 or later from the <ulink
+            url="http://www.ruby-lang.org/">Ruby Homepage</ulink>. In most
+            cases it is not required to install Ruby manually, as most Linux
+            distributions have prepared packages of Ruby available, which can
+            be installed using the distribution's packet manager.</para>
+          </step>
+
+          <step>
+            <para>Install a client for the SCM system you are using on the
+            build server. Supported version control systems are
+            currently:</para>
+
+            <itemizedlist>
+              <listitem>
+                <para><ulink
+                url="http://subversion.tigris.org/">Subversion</ulink></para>
+              </listitem>
+
+              <listitem>
+                <para>the <ulink url="http://www.cvshome.org/">Concurrent
+                Versioning System</ulink> (CVS)</para>
+              </listitem>
+            </itemizedlist>
+          </step>
+
+          <step>
+            <para>Download DamageControl from the <ulink
+            url="http://dist.codehaus.org/damagecontrol/distributions/">DamagControl
+            download page</ulink>. There is one distribution tarball for every
+            successful build and in most cases the latets build is the best
+            choice.</para>
+          </step>
+
+          <step>
+            <para>Unpack the tarball to a directory of your choice. Define a
+            environment variable <envar>DAMAGECONTROL_HOME</envar> which
+            points to the directory where you unpacked the archive.</para>
+          </step>
+        </procedure>
+
+        <para>Additionally it could be useful to install an Apache Web Server
+        to allow configuration of access privileges, a Mail server to send
+        notification messages per EMail, or an IRC server.</para>
+
+        <para>If you are using mail notifications, the optimal way to inform
+        your developers is using a mailing list. Everyone who is subscribed to
+        the mailing list will receive the notification, but DamageControl can
+        still send mails to individual developers.</para>
+
+        <section>
+          <title>Gentoo Linux</title>
+
+          <para></para>
+        </section>
+      </section>
+
+      <section>
+        <title>Windows</title>
+
+        <para></para>
+      </section>
+    </section>
+
+    <section>
+      <title>Configuring the DamageControl Server</title>
+
+      <para></para>
+    </section>
+
+    <section>
+      <title>Configuring DamageControl Projects</title>
+
+      <section>
+        <title>Creating Projects</title>
+
+        <para></para>
+      </section>
+
+      <section>
+        <title>DamageControl and Build Tools</title>
+
+        <para>Following environment variables are passed to an external build
+        process. You can use these variables to create build artifacts which
+        are specific to a certain build.</para>
+
+        <variablelist>
+          <varlistentry>
+            <term><envar>DAMAGECONTROL_CHANGES</envar></term>
+
+            <listitem>
+              <para>Contains the relative path of each modified file since
+              last successful build, separated by whitespaces</para>
+            </listitem>
+          </varlistentry>
+
+          <varlistentry>
+            <term><envar>DAMAGECONTROL_BUILD_LABEL</envar></term>
+
+            <listitem>
+              <para>Contains the build number as determined by
+              damagecontrol</para>
+            </listitem>
+          </varlistentry>
+        </variablelist>
+      </section>
+
+      <section>
+        <title>DamageControl and SCM Systems</title>
+
+        <para></para>
+      </section>
+
+      <section>
+        <title>DamageControl and Issue Trackers</title>
+
+        <para></para>
+      </section>
+    </section>
+
+    <section>
+      <title>DamageControl Notifications</title>
+
+      <section>
+        <title>EMail</title>
+
+        <para></para>
+      </section>
+
+      <section>
+        <title>IRC and Jabber</title>
+
+        <para></para>
+      </section>
+
+      <section>
+        <title>RSS</title>
+
+        <para></para>
+      </section>
+
+      <section>
+        <title>Windows System Tray</title>
+
+        <para></para>
+      </section>
+
+      <section>
+        <title>GNOME System Tray</title>
+
+        <para></para>
+      </section>
+    </section>
+  </chapter>
+
+  <chapter>
+    <title>Developer Handbook</title>
+
+    <para></para>
+  </chapter>
+</book>
