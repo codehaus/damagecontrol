@@ -23,13 +23,20 @@ module DamageControl
       @mod = config_map["cvsmodule"] || required_config_param("cvsmodule")
     end
     
-    # Works with ViewCVS (which works with CVS and SVN) and Fisheye (works with CVS and soon SVN)
+    # Works with ViewCVS
     def web_url_to_change(change)
-      view_cvs_url = config_map["view_cvs_url"]
-      return "root/#{config_map['project_name']}/checkout/#{mod}/#{change.path}" if view_cvs_url.nil? || view_cvs_url == "" 
+      # for backwards compatibility with old settings
+      if(config_map["view_cvs_url"])
+        config_map["cvs_web_url"] = config_map["view_cvs_url"] unless config_map["cvs_web_url"]
+      end
+      config_map.delete("view_cvs_url")
 
-      view_cvs_url_patched = ensure_trailing_slash(view_cvs_url)
-      url = "#{view_cvs_url_patched}#{change.path}"
+      cvs_web_url = config_map["cvs_web_url"]
+
+      return super if cvs_web_url.nil? || cvs_web_url == "" 
+
+      cvs_web_url_patched = ensure_trailing_slash(cvs_web_url)
+      url = "#{cvs_web_url_patched}#{change.path}"
       url << "?r1=#{change.previous_revision}&r2=#{change.revision}" if(change.previous_revision)
       url
     end

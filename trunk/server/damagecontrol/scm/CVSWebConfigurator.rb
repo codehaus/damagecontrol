@@ -32,6 +32,7 @@ module DamageControl
           "cvsroot", 
           "cvsmodule", 
           "cvspassword", 
+          "cvs_web_url"
         ]
       end
       

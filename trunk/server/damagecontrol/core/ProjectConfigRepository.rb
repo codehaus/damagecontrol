@@ -62,6 +62,11 @@ module DamageControl
     
     def modify_project_config(project_name, config_map)
       config_map["project_name"] = project_name
+      # remove empty pairs
+      config_map.each do |key, value|
+        config_map.delete(key) if value.nil? || value.to_s == ""
+      end
+      
       File.open(project_directories.project_config_file(project_name), File::CREAT|File::WRONLY|File::TRUNC) do |io|
         io.puts(config_map.to_yaml)
       end
