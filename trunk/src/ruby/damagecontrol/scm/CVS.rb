@@ -150,12 +150,10 @@ module DamageControl
     end
   
     def cvs(cmd, &proc)
-      cmd = "cvs #{cmd}"
+      cmd = "cvs #{cmd} 2>&1"
       puts cmd
-      io = IO.popen(cmd) do |io|
-        io.each_line do |progress|
-          if block_given? then yield progress else puts progress end
-        end
+      io = IO.foreach("|#{cmd}") do |progress|
+        if block_given? then yield progress else puts progress end
       end
     end
     
