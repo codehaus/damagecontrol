@@ -27,12 +27,12 @@ module DamageControl
       @quiet_period = 10
     end
   
-    def test_executes_process_and_sends_build_complete_on_build_request
+    def test_when_build_scheduled_executes_sends_start_process_and_complete
       @build_executor.schedule_build(@build)
       @build_executor.process_next_scheduled_build
-      assert_message_types_from_hub([BuildProgressEvent, BuildCompleteEvent])
-      assert_equal("Hello world from DamageControl!", messages_from_hub[0].output.chomp.chomp(" "))
-      assert_equal(BuildCompleteEvent.new(@build), messages_from_hub[1])
+      assert_message_types_from_hub([BuildStartedEvent, BuildProgressEvent, BuildCompleteEvent])
+      assert_equal("Hello world from DamageControl!", messages_from_hub[1].output.chomp.chomp(" "))
+      assert_equal(BuildCompleteEvent.new(@build), messages_from_hub[2])
     end
     
     def test_failing_build_sends_build_complete_event_with_successful_flag_set_to_false

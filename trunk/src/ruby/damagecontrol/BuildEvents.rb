@@ -27,6 +27,9 @@ module DamageControl
   class BuildRequestEvent < BuildEvent
   end
 
+  class BuildStartedEvent < BuildEvent
+  end
+
   class BuildCompleteEvent < BuildEvent
   end
 end

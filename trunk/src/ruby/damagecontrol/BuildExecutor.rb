@@ -29,7 +29,7 @@ module DamageControl
     end
     
     def checkout
-      @scm.checkout(current_build.scm_spec, project_base_dir) do |progress| 
+      @scm.checkout(scheduled_build.scm_spec, project_base_dir) do |progress| 
         report_progress(progress)
       end
     end
@@ -38,21 +38,18 @@ module DamageControl
       @filesystem.makedirs(project_base_dir)
       @filesystem.chdir(project_base_dir)
  
-      start_time = Time.now.to_i
-      IO.foreach("|#{current_build.build_command_line} 2>&1") do |line|
+      IO.foreach("|#{scheduled_build.build_command_line} 2>&1") do |line|
         report_progress(line)
       end
-      end_time = Time.now.to_i
-      current_build.successful = ($? == 0)
-      current_build.build_duration_seconds = (end_time - start_time)
+      scheduled_build.successful = ($? == 0)
     end
  
     def project_base_dir
-      "#{@builds_dir}/#{current_build.project_name}"
+      "#{@builds_dir}/#{scheduled_build.project_name}"
     end
     
     def checkout?
-      @checkout && !current_build.scm_spec.nil?
+      @checkout && !scheduled_build.scm_spec.nil?
     end
     
     def scheduled_build
@@ -67,18 +64,28 @@ module DamageControl
       !@scheduled_build_slot.empty?
     end
     
-    def build_done
-      @channel.publish_message(BuildCompleteEvent.new(current_build))
+    def build_started
+      scheduled_build.start_time = Time.now.to_i
+      @channel.publish_message(BuildStartedEvent.new(scheduled_build))
+    end
+    
+    def build_complete
+      scheduled_build.end_time = Time.now.to_i
+      @channel.publish_message(BuildCompleteEvent.new(scheduled_build))
+
+      # atomically frees the slot, we are now no longer busy
       @scheduled_build_slot.clear
     end
 
+    # will block until scheduled build becomes available
     def next_scheduled_build
       @scheduled_build_slot.get
     end
     
     def process_next_scheduled_build
-      @current_build = next_scheduled_build
+      next_scheduled_build
       begin
+      	build_started
         checkout if checkout?
         execute
       rescue Exception => e
@@ -86,7 +93,7 @@ module DamageControl
         report_progress("Build failed due to: #{stacktrace}")
         current_build.successful = false
       ensure
-        build_done
+        build_complete
       end
     end
     

@@ -1,5 +1,5 @@
 require 'test/unit'
-require 'mock_with_returns'
+require 'mockit'
 require 'damagecontrol/publisher/IRCPublisher'
 require 'damagecontrol/Hub'
 require 'damagecontrol/Build'
@@ -13,22 +13,41 @@ module DamageControl
     def setup
       @mock_template = MockTemplate.new
       @publisher = IRCPublisher.new(Hub.new, "server", "channel", @mock_template)
-      @irc_mock = Mock.new
+      @irc_mock = MockIt::Mock.new
       @publisher.irc = @irc_mock
-      @event = BuildCompleteEvent.new(nil)
+    end
+    
+    def setup_irc_connected
+      @irc_mock.__setup(:connected?) { true }
+      @irc_mock.__setup(:in_channel?) { true }
+    end
+    
+    def teardown
+      @irc_mock.__verify
     end
     
     def test_sends_message_on_build_complete
-      @irc_mock.__return(:connected?, true)
-      @irc_mock.__return(:in_channel?, true)
-      @irc_mock.__next(:send_message_to_channel) {|message| 
+      setup_irc_connected
+      @irc_mock.__expect(:send_message_to_channel) {|message| 
         assert_equal(message, @mock_template.generate(nil))}
       
-      @publisher.enq_message(@event)
+      evt = BuildCompleteEvent.new(nil)
+      @publisher.enq_message(evt)
       @publisher.process_messages
       
-      assert(@publisher.consumed_message?(@event))
-      @irc_mock.__verify
+      assert(@publisher.consumed_message?(evt))
+    end
+    
+    def test_sends_message_on_build_complete
+      setup_irc_connected
+      @irc_mock.__expect(:send_message_to_channel) {|message| 
+        assert_equal(message, "BUILD STARTED project") }
+      
+      evt = BuildStartedEvent.new(Build.new("project"))
+      @publisher.enq_message(evt)
+      @publisher.process_messages
+      
+      assert(@publisher.consumed_message?(evt))
     end
 
   end

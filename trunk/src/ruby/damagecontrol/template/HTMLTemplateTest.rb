@@ -10,7 +10,8 @@ module DamageControl
       build.timestamp = "20030929145347"
       build.error_message = "Knockout"
       build.successful = false
-      build.build_duration_seconds = 4
+      build.start_time = 1000
+      build.end_time = 1004
 
       htmlTemplate = HTMLTemplate.new
       assert_equal(expected, htmlTemplate.generate(build))
