@@ -25,8 +25,14 @@ module DamageControl
     def changesets(from_time, to_time, &proc)
       # exclude commits that occured on from_time
       from_time = from_time + 1
-      
-      cmd = changes_command(from_time, to_time)
+      begin
+        parse_log(new_changes_command(from_time, to_time), &proc)
+      rescue Pebbles::ProcessFailedException => e
+        parse_log(old_changes_command(from_time, to_time), &proc)
+      end
+    end
+
+    def parse_log(cmd, &proc)
       if block_given? then yield "#{cvs_cmd_without_password(cmd)}\n" else logger.debug("#{cvs_cmd_without_password(cmd)}\n") end
       cmd_with_io(working_dir, cvs_cmd_with_password(cmd, cvspassword), environment) do |stdout|
         parser = CVSLogParser.new(stdout)
@@ -164,11 +170,16 @@ module DamageControl
       modified
     end
     
-    def changes_command(from_time, to_time)
+    def new_changes_command(from_time, to_time)
       # https://www.cvshome.org/docs/manual/cvs-1.11.17/cvs_16.html#SEC144
       # -N => Suppress the header if no revisions are selected.
       # -S => Do not print the list of tags for this file.
       "log -N -S -d\"#{cvsdate(from_time)}<=#{cvsdate(to_time)}\""
+    end
+
+    def old_changes_command(from_time, to_time)
+      # Many servers don't support the new -S option
+      "log -N -d\"#{cvsdate(from_time)}<=#{cvsdate(to_time)}\""
     end
     
     def update_command(time)
