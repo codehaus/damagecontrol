@@ -1,0 +1,2256 @@
+--- 
+groovy-core: 
+  - !ruby/object:DamageControl::Build 
+    config: 
+      scm_spec: !ruby/sym ext:dcontrol@cvs.codehaus.org:/scm/cvs:groovy/groovy-core
+      build_command_line: maven dc -Dmaven.username=dcontrol
+      project_name: groovy-core
+      nag_email: groovy-scm@lists.codehaus.org
+    end_time: 1080921966
+    modification_set: []
+    project_name: groovy-core
+    start_time: 1080921455
+    status: SUCCESSFUL
+    timestamp: "20040402155730"
+  - !ruby/object:DamageControl::Build 
+    config: 
+      scm_spec: !ruby/sym ext:dcontrol@cvs.codehaus.org:/scm/cvs:groovy/groovy-core
+      build_command_line: maven dc -Dmaven.username=dcontrol
+      project_name: groovy-core
+      nag_email: groovy-scm@lists.codehaus.org
+    modification_set: []
+    project_name: groovy-core
+    status: QUEUED
+    timestamp: "20040404020107"
+  - !ruby/object:DamageControl::Build 
+    config: 
+      scm_spec: !ruby/sym ext:dcontrol@cvs.codehaus.org:/scm/cvs:groovy/groovy-core
+      build_command_line: maven dc -Dmaven.username=dcontrol
+      project_name: groovy-core
+      nag_email: groovy-scm@lists.codehaus.org
+    end_time: 1081044584
+    modification_set: []
+    project_name: groovy-core
+    start_time: 1081044073
+    status: SUCCESSFUL
+    timestamp: "20040404020108"
+  - !ruby/object:DamageControl::Build 
+    config: 
+      scm_spec: !ruby/sym ext:dcontrol@cvs.codehaus.org:/scm/cvs:groovy/groovy-core
+      build_command_line: maven dc -Dmaven.username=dcontrol
+      project_name: groovy-core
+      nag_email: groovy-scm@lists.codehaus.org
+    modification_set: []
+    project_name: groovy-core
+    status: QUEUED
+    timestamp: "20040404020108"
+  - !ruby/object:DamageControl::Build 
+    config: 
+      scm_spec: !ruby/sym ext:dcontrol@cvs.codehaus.org:/scm/cvs:groovy/groovy-core
+      build_command_line: maven dc -Dmaven.username=dcontrol
+      project_name: groovy-core
+      nag_email: groovy-scm@lists.codehaus.org
+    modification_set: []
+    project_name: groovy-core
+    status: QUEUED
+    timestamp: "20040407202219"
+  - !ruby/object:DamageControl::Build 
+    config: 
+      scm_spec: !ruby/sym ext:dcontrol@cvs.codehaus.org:/scm/cvs:groovy/groovy-core
+      build_command_line: maven dc -Dmaven.username=dcontrol
+      project_name: groovy-core
+      nag_email: groovy-scm@lists.codehaus.org
+    end_time: 1081369869
+    modification_set: []
+    project_name: groovy-core
+    start_time: 1081369345
+    status: SUCCESSFUL
+    timestamp: "20040407202220"
+  - !ruby/object:DamageControl::Build 
+    config: 
+      scm_spec: !ruby/sym ext:dcontrol@cvs.codehaus.org:/scm/cvs:groovy/groovy-core
+      build_command_line: maven dc -Dmaven.username=dcontrol
+      project_name: groovy-core
+      nag_email: groovy-scm@lists.codehaus.org
+    modification_set: []
+    project_name: groovy-core
+    status: QUEUED
+    timestamp: "20040408005117"
+  - !ruby/object:DamageControl::Build 
+    config: 
+      scm_spec: !ruby/sym ext:dcontrol@cvs.codehaus.org:/scm/cvs:groovy/groovy-core
+      build_command_line: maven dc -Dmaven.username=dcontrol
+      project_name: groovy-core
+      nag_email: groovy-scm@lists.codehaus.org
+    end_time: 1081385998
+    modification_set: []
+    project_name: groovy-core
+    start_time: 1081385482
+    status: SUCCESSFUL
+    timestamp: "20040408005117"
+  - !ruby/object:DamageControl::Build 
+    config: 
+      scm_spec: !ruby/sym ext:dcontrol@cvs.codehaus.org:/scm/cvs:groovy/groovy-core
+      build_command_line: maven dc -Dmaven.username=dcontrol
+      project_name: groovy-core
+      nag_email: groovy-scm@lists.codehaus.org
+    end_time: 1081399289
+    modification_set: []
+    project_name: groovy-core
+    start_time: 1081398771
+    status: SUCCESSFUL
+    timestamp: "20040408043246"
+  - !ruby/object:DamageControl::Build 
+    config: 
+      scm_spec: !ruby/sym ext:dcontrol@cvs.codehaus.org:/scm/cvs:groovy/groovy-core
+      build_command_line: maven dc -Dmaven.username=dcontrol
+      project_name: groovy-core
+      nag_email: groovy-scm@lists.codehaus.org
+    modification_set: []
+    project_name: groovy-core
+    status: QUEUED
+    timestamp: "20040408043327"
+  - !ruby/object:DamageControl::Build 
+    config: 
+      scm_spec: !ruby/sym ext:dcontrol@cvs.codehaus.org:/scm/cvs:groovy/groovy-core
+      build_command_line: maven dc -Dmaven.username=dcontrol
+      project_name: groovy-core
+      nag_email: groovy-scm@lists.codehaus.org
+    end_time: 1081399805
+    modification_set: []
+    project_name: groovy-core
+    start_time: 1081399290
+    status: SUCCESSFUL
+    timestamp: "20040408043528"
+  - !ruby/object:DamageControl::Build 
+    config: 
+      scm_spec: !ruby/sym ext:dcontrol@cvs.codehaus.org:/scm/cvs:groovy/groovy-core
+      build_command_line: maven dc -Dmaven.username=dcontrol
+      project_name: groovy-core
+      nag_email: groovy-scm@lists.codehaus.org
+    end_time: 1081421628
+    modification_set: []
+    project_name: groovy-core
+    start_time: 1081421089
+    status: SUCCESSFUL
+    timestamp: "20040408104444"
+  - !ruby/object:DamageControl::Build 
+    config: 
+      scm_spec: !ruby/sym ext:dcontrol@cvs.codehaus.org:/scm/cvs:groovy/groovy-core
+      build_command_line: maven dc -Dmaven.username=dcontrol
+      project_name: groovy-core
+      nag_email: groovy-scm@lists.codehaus.org
+    modification_set: []
+    project_name: groovy-core
+    status: QUEUED
+    timestamp: "20040409103732"
+  - !ruby/object:DamageControl::Build 
+    config: 
+      scm_spec: !ruby/sym ext:dcontrol@cvs.codehaus.org:/scm/cvs:groovy/groovy-core
+      build_command_line: maven dc -Dmaven.username=dcontrol
+      project_name: groovy-core
+      nag_email: groovy-scm@lists.codehaus.org
+    modification_set: []
+    project_name: groovy-core
+    status: QUEUED
+    timestamp: "20040409103733"
+  - !ruby/object:DamageControl::Build 
+    config: 
+      scm_spec: !ruby/sym ext:dcontrol@cvs.codehaus.org:/scm/cvs:groovy/groovy-core
+      build_command_line: maven dc -Dmaven.username=dcontrol
+      project_name: groovy-core
+      nag_email: groovy-scm@lists.codehaus.org
+    end_time: 1081507622
+    modification_set: []
+    project_name: groovy-core
+    start_time: 1081507058
+    status: SUCCESSFUL
+    timestamp: "20040409103733"
+  - !ruby/object:DamageControl::Build 
+    config: 
+      scm_spec: ":ext:dcontrol@cvs.codehaus.org:/scm/cvs:groovy/groovy-core"
+      build_command_line: maven dc -Dmaven.username=dcontrol
+      project_name: groovy-core
+      nag_email: groovy-scm@lists.codehaus.org
+    modification_set: []
+    project_name: groovy-core
+    status: QUEUED
+    timestamp: "20040410045303"
+  - !ruby/object:DamageControl::Build 
+    config: 
+      scm_spec: ":ext:dcontrol@cvs.codehaus.org:/scm/cvs:groovy/groovy-core"
+      build_command_line: maven dc -Dmaven.username=dcontrol
+      project_name: groovy-core
+      nag_email: groovy-scm@lists.codehaus.org
+    end_time: 1081573303
+    modification_set: 
+      - !ruby/object:DamageControl::Modification 
+        developer: cpoirier
+        message: >
+          Fixed bug in here doc processing that caused an OutOfMemoryError, and
+
+          uncommented a variable precedence test it was blocking.
+
+
+        path: src/test/groovy/bugs/VariablePrecedence.groovy
+        revision: "1.2"
+        time: 2004/04/10 04:50:27
+    project_name: groovy-core
+    start_time: 1081572789
+    status: SUCCESSFUL
+    timestamp: "20040410045304"
+ActiveMQ: 
+  - !ruby/object:DamageControl::Build 
+    config: 
+      scm_spec: !ruby/sym ext:dcontrol@localhost:/home/projects/activemq/scm:activemq
+      build_command_line: maven dc
+      project_name: ActiveMQ
+      nag_email: activemq-dev@lists.codehaus.org
+    end_time: 1080916370
+    modification_set: []
+    project_name: ActiveMQ
+    start_time: 1080916333
+    status: FAILED
+    timestamp: "20040402143208"
+  - !ruby/object:DamageControl::Build 
+    config: 
+      scm_spec: !ruby/sym ext:dcontrol@localhost:/home/projects/activemq/scm:activemq
+      build_command_line: maven dc
+      project_name: ActiveMQ
+      nag_email: activemq-dev@lists.codehaus.org
+    end_time: 1080916508
+    modification_set: []
+    project_name: ActiveMQ
+    start_time: 1080916471
+    status: FAILED
+    timestamp: "20040402143426"
+  - !ruby/object:DamageControl::Build 
+    config: 
+      scm_spec: !ruby/sym ext:dcontrol@localhost:/home/projects/activemq/scm:activemq
+      build_command_line: maven dc
+      project_name: ActiveMQ
+      nag_email: activemq-dev@lists.codehaus.org
+    end_time: 1080916864
+    modification_set: []
+    project_name: ActiveMQ
+    start_time: 1080916820
+    status: FAILED
+    timestamp: "20040402144015"
+  - !ruby/object:DamageControl::Build 
+    config: 
+      scm_spec: !ruby/sym ext:dcontrol@localhost:/home/projects/activemq/scm:activemq
+      build_command_line: maven dc
+      project_name: ActiveMQ
+      nag_email: activemq-dev@lists.codehaus.org
+    end_time: 1080918296
+    modification_set: []
+    project_name: ActiveMQ
+    start_time: 1080918254
+    status: FAILED
+    timestamp: "20040402150409"
+  - !ruby/object:DamageControl::Build 
+    config: 
+      scm_spec: !ruby/sym ext:dcontrol@localhost:/home/projects/activemq/scm:activemq
+      build_command_line: maven dc
+      project_name: ActiveMQ
+      nag_email: activemq-dev@lists.codehaus.org
+    modification_set: []
+    project_name: ActiveMQ
+    status: QUEUED
+    timestamp: "20040402150409"
+  - !ruby/object:DamageControl::Build 
+    config: 
+      scm_spec: !ruby/sym ext:dcontrol@localhost:/home/projects/activemq/scm:activemq
+      build_command_line: maven dc
+      project_name: ActiveMQ
+      nag_email: activemq-dev@lists.codehaus.org
+    modification_set: []
+    project_name: ActiveMQ
+    status: QUEUED
+    timestamp: "20040402150409"
+  - !ruby/object:DamageControl::Build 
+    config: 
+      scm_spec: !ruby/sym ext:dcontrol@localhost:/home/projects/activemq/scm:activemq
+      build_command_line: maven dc
+      project_name: ActiveMQ
+      nag_email: activemq-dev@lists.codehaus.org
+    end_time: 1080999341
+    modification_set: []
+    project_name: ActiveMQ
+    start_time: 1080999334
+    status: FAILED
+    timestamp: "20040403133529"
+  - !ruby/object:DamageControl::Build 
+    config: 
+      scm_spec: !ruby/sym ext:dcontrol@localhost:/home/projects/activemq/scm:activemq
+      build_command_line: maven dc
+      project_name: ActiveMQ
+      nag_email: activemq-dev@lists.codehaus.org
+    end_time: 1080999468
+    modification_set: []
+    project_name: ActiveMQ
+    start_time: 1080999462
+    status: FAILED
+    timestamp: "20040403133737"
+  - !ruby/object:DamageControl::Build 
+    config: 
+      scm_spec: !ruby/sym ext:dcontrol@localhost:/home/projects/activemq/scm:activemq
+      build_command_line: maven dc
+      project_name: ActiveMQ
+      nag_email: activemq-dev@lists.codehaus.org
+    end_time: 1080999505
+    modification_set: []
+    project_name: ActiveMQ
+    start_time: 1080999499
+    status: FAILED
+    timestamp: "20040403133814"
+  - !ruby/object:DamageControl::Build 
+    config: 
+      scm_spec: !ruby/sym ext:dcontrol@localhost:/home/projects/activemq/scm:activemq
+      build_command_line: maven dc
+      project_name: ActiveMQ
+      nag_email: activemq-dev@lists.codehaus.org
+    end_time: 1080999567
+    modification_set: []
+    project_name: ActiveMQ
+    start_time: 1080999526
+    status: FAILED
+    timestamp: "20040403133841"
+  - !ruby/object:DamageControl::Build 
+    config: 
+      scm_spec: !ruby/sym ext:dcontrol@localhost:/home/projects/activemq/scm:activemq
+      build_command_line: maven dc
+      project_name: ActiveMQ
+      nag_email: activemq-dev@lists.codehaus.org
+    end_time: 1080999574
+    modification_set: []
+    project_name: ActiveMQ
+    start_time: 1080999568
+    status: FAILED
+    timestamp: "20040403133900"
+  - !ruby/object:DamageControl::Build 
+    config: 
+      scm_spec: !ruby/sym ext:dcontrol@localhost:/home/projects/activemq/scm:activemq
+      build_command_line: maven dc
+      project_name: ActiveMQ
+      nag_email: activemq-dev@lists.codehaus.org
+    end_time: 1080999624
+    modification_set: []
+    project_name: ActiveMQ
+    start_time: 1080999583
+    status: FAILED
+    timestamp: "20040403133938"
+  - !ruby/object:DamageControl::Build 
+    config: 
+      scm_spec: !ruby/sym ext:dcontrol@localhost:/home/projects/activemq/scm:activemq
+      build_command_line: maven dc
+      project_name: ActiveMQ
+      nag_email: activemq-dev@lists.codehaus.org
+    modification_set: []
+    project_name: ActiveMQ
+    status: QUEUED
+    timestamp: "20040408102045"
+  - !ruby/object:DamageControl::Build 
+    config: 
+      scm_spec: !ruby/sym ext:dcontrol@localhost:/home/projects/activemq/scm:activemq
+      build_command_line: maven dc
+      project_name: ActiveMQ
+      nag_email: activemq-dev@lists.codehaus.org
+    end_time: 1081419655
+    modification_set: []
+    project_name: ActiveMQ
+    start_time: 1081419650
+    status: SUCCESSFUL
+    timestamp: "20040408102045"
+  - !ruby/object:DamageControl::Build 
+    config: 
+      scm_spec: !ruby/sym ext:dcontrol@localhost:/home/projects/activemq/scm:activemq
+      build_command_line: maven dc
+      project_name: ActiveMQ
+      nag_email: activemq-dev@lists.codehaus.org
+    end_time: 1081422641
+    modification_set: []
+    project_name: ActiveMQ
+    start_time: 1081422577
+    status: FAILED
+    timestamp: "20040408110932"
+  - !ruby/object:DamageControl::Build 
+    config: 
+      scm_spec: !ruby/sym ext:dcontrol@localhost:/home/projects/activemq/scm:activemq
+      build_command_line: maven dc
+      project_name: ActiveMQ
+      nag_email: activemq-dev@lists.codehaus.org
+    end_time: 1081423211
+    modification_set: []
+    project_name: ActiveMQ
+    start_time: 1081423150
+    status: FAILED
+    timestamp: "20040408111905"
+  - !ruby/object:DamageControl::Build 
+    config: 
+      scm_spec: !ruby/sym ext:dcontrol@localhost:/home/projects/activemq/scm:activemq
+      build_command_line: maven dc
+      project_name: ActiveMQ
+      nag_email: activemq-dev@lists.codehaus.org
+    modification_set: []
+    project_name: ActiveMQ
+    status: QUEUED
+    timestamp: "20040408132316"
+  - !ruby/object:DamageControl::Build 
+    config: 
+      scm_spec: !ruby/sym ext:dcontrol@localhost:/home/projects/activemq/scm:activemq
+      build_command_line: maven dc
+      project_name: ActiveMQ
+      nag_email: activemq-dev@lists.codehaus.org
+    end_time: 1081430662
+    modification_set: []
+    project_name: ActiveMQ
+    start_time: 1081430601
+    status: FAILED
+    timestamp: "20040408132316"
+  - !ruby/object:DamageControl::Build 
+    config: 
+      scm_spec: !ruby/sym ext:dcontrol@localhost:/home/projects/activemq/scm:activemq
+      build_command_line: maven dc
+      project_name: ActiveMQ
+      nag_email: activemq-dev@lists.codehaus.org
+    end_time: 1081447465
+    modification_set: []
+    project_name: ActiveMQ
+    start_time: 1081447279
+    status: FAILED
+    timestamp: "20040408180043"
+  - !ruby/object:DamageControl::Build 
+    config: 
+      scm_spec: !ruby/sym ext:dcontrol@localhost:/home/projects/activemq/scm:activemq
+      build_command_line: maven dc
+      project_name: ActiveMQ
+      nag_email: activemq-dev@lists.codehaus.org
+    end_time: 1081447693
+    modification_set: []
+    project_name: ActiveMQ
+    start_time: 1081447502
+    status: FAILED
+    timestamp: "20040408180442"
+  - !ruby/object:DamageControl::Build 
+    config: 
+      scm_spec: !ruby/sym ext:dcontrol@localhost:/home/projects/activemq/scm:activemq
+      build_command_line: maven dc
+      project_name: ActiveMQ
+      nag_email: activemq-dev@lists.codehaus.org
+    end_time: 1081447943
+    modification_set: []
+    project_name: ActiveMQ
+    start_time: 1081447767
+    status: SUCCESSFUL
+    timestamp: "20040408180922"
+  - !ruby/object:DamageControl::Build 
+    config: 
+      scm_spec: !ruby/sym ext:dcontrol@localhost:/home/projects/activemq/scm:activemq
+      build_command_line: maven dc
+      project_name: ActiveMQ
+      nag_email: activemq-dev@lists.codehaus.org
+    end_time: 1081448335
+    modification_set: []
+    project_name: ActiveMQ
+    start_time: 1081448157
+    status: SUCCESSFUL
+    timestamp: "20040408181552"
+  - !ruby/object:DamageControl::Build 
+    config: 
+      scm_spec: !ruby/sym ext:dcontrol@localhost:/home/projects/activemq/scm:activemq
+      build_command_line: maven dc
+      project_name: ActiveMQ
+      nag_email: activemq-dev@lists.codehaus.org
+    end_time: 1081450226
+    modification_set: []
+    project_name: ActiveMQ
+    start_time: 1081450048
+    status: SUCCESSFUL
+    timestamp: "20040408184723"
+  - !ruby/object:DamageControl::Build 
+    config: 
+      scm_spec: !ruby/sym ext:dcontrol@localhost:/home/projects/activemq/scm:activemq
+      build_command_line: maven dc
+      project_name: ActiveMQ
+      nag_email: activemq-dev@lists.codehaus.org
+    modification_set: []
+    project_name: ActiveMQ
+    status: QUEUED
+    timestamp: "20040408194536"
+  - !ruby/object:DamageControl::Build 
+    config: 
+      scm_spec: !ruby/sym ext:dcontrol@localhost:/home/projects/activemq/scm:activemq
+      build_command_line: maven dc
+      project_name: ActiveMQ
+      nag_email: activemq-dev@lists.codehaus.org
+    end_time: 1081453725
+    modification_set: []
+    project_name: ActiveMQ
+    start_time: 1081453545
+    status: SUCCESSFUL
+    timestamp: "20040408194540"
+  - !ruby/object:DamageControl::Build 
+    config: 
+      scm_spec: !ruby/sym ext:dcontrol@localhost:/home/projects/activemq/scm:activemq
+      build_command_line: maven dc
+      project_name: ActiveMQ
+      nag_email: activemq-dev@lists.codehaus.org
+    modification_set: []
+    project_name: ActiveMQ
+    status: QUEUED
+    timestamp: "20040408194540"
+damagecontrol: 
+  - !ruby/object:DamageControl::Build 
+    config: 
+      scm_spec: !ruby/sym ext:dcontrol@cvs.codehaus.org:/cvsroot/damagecontrol:damagecontrol
+      build_command_line: ruby build.rb
+      project_name: damagecontrol
+      jira_project_key: DC
+      nag_email: damagecontrol-dev@lists.codehaus.org
+    end_time: 1080917005
+    modification_set: []
+    project_name: damagecontrol
+    start_time: 1080916963
+    status: SUCCESSFUL
+    timestamp: "20040402144238"
+  - !ruby/object:DamageControl::Build 
+    config: 
+      scm_spec: !ruby/sym ext:dcontrol@cvs.codehaus.org:/cvsroot/damagecontrol:damagecontrol
+      build_command_line: ruby build.rb
+      project_name: damagecontrol
+      jira_project_key: DC
+      nag_email: damagecontrol-dev@lists.codehaus.org
+    modification_set: []
+    project_name: damagecontrol
+    status: QUEUED
+    timestamp: "20040402162735"
+  - !ruby/object:DamageControl::Build 
+    config: 
+      scm_spec: !ruby/sym ext:dcontrol@cvs.codehaus.org:/cvsroot/damagecontrol:damagecontrol
+      build_command_line: ruby build.rb
+      project_name: damagecontrol
+      jira_project_key: DC
+      nag_email: damagecontrol-dev@lists.codehaus.org
+    modification_set: []
+    project_name: damagecontrol
+    status: QUEUED
+    timestamp: "20040402162736"
+  - !ruby/object:DamageControl::Build 
+    config: 
+      scm_spec: !ruby/sym ext:dcontrol@cvs.codehaus.org:/cvsroot/damagecontrol:damagecontrol
+      build_command_line: ruby build.rb
+      project_name: damagecontrol
+      jira_project_key: DC
+      nag_email: damagecontrol-dev@lists.codehaus.org
+    modification_set: []
+    project_name: damagecontrol
+    status: QUEUED
+    timestamp: "20040402162736"
+  - !ruby/object:DamageControl::Build 
+    config: 
+      scm_spec: !ruby/sym ext:dcontrol@cvs.codehaus.org:/cvsroot/damagecontrol:damagecontrol
+      build_command_line: ruby build.rb
+      project_name: damagecontrol
+      jira_project_key: DC
+      nag_email: damagecontrol-dev@lists.codehaus.org
+    end_time: 1080923305
+    modification_set: []
+    project_name: damagecontrol
+    start_time: 1080923262
+    status: SUCCESSFUL
+    timestamp: "20040402162737"
+  - !ruby/object:DamageControl::Build 
+    config: 
+      scm_spec: !ruby/sym ext:dcontrol@cvs.codehaus.org:/cvsroot/damagecontrol:damagecontrol
+      build_command_line: ruby build.rb
+      project_name: damagecontrol
+      jira_project_key: DC
+      nag_email: damagecontrol-dev@lists.codehaus.org
+    modification_set: []
+    project_name: damagecontrol
+    status: QUEUED
+    timestamp: "20040402173924"
+  - !ruby/object:DamageControl::Build 
+    config: 
+      scm_spec: !ruby/sym ext:dcontrol@cvs.codehaus.org:/cvsroot/damagecontrol:damagecontrol
+      build_command_line: ruby build.rb
+      project_name: damagecontrol
+      jira_project_key: DC
+      nag_email: damagecontrol-dev@lists.codehaus.org
+    modification_set: []
+    project_name: damagecontrol
+    status: QUEUED
+    timestamp: "20040402173924"
+  - !ruby/object:DamageControl::Build 
+    config: 
+      scm_spec: !ruby/sym ext:dcontrol@cvs.codehaus.org:/cvsroot/damagecontrol:damagecontrol
+      build_command_line: ruby build.rb
+      project_name: damagecontrol
+      jira_project_key: DC
+      nag_email: damagecontrol-dev@lists.codehaus.org
+    end_time: 1080927573
+    modification_set: []
+    project_name: damagecontrol
+    start_time: 1080927570
+    status: FAILED
+    timestamp: "20040402173925"
+  - !ruby/object:DamageControl::Build 
+    config: 
+      scm_spec: !ruby/sym ext:dcontrol@cvs.codehaus.org:/cvsroot/damagecontrol:damagecontrol
+      build_command_line: ruby build.rb
+      project_name: damagecontrol
+      jira_project_key: DC
+      nag_email: damagecontrol-dev@lists.codehaus.org
+    end_time: 1080927714
+    modification_set: []
+    project_name: damagecontrol
+    start_time: 1080927672
+    status: SUCCESSFUL
+    timestamp: "20040402174107"
+  - !ruby/object:DamageControl::Build 
+    config: 
+      scm_spec: !ruby/sym ext:dcontrol@cvs.codehaus.org:/cvsroot/damagecontrol:damagecontrol
+      build_command_line: ruby build.rb
+      project_name: damagecontrol
+      jira_project_key: DC
+      nag_email: damagecontrol-dev@lists.codehaus.org
+    modification_set: []
+    project_name: damagecontrol
+    status: QUEUED
+    timestamp: "20040408172556"
+  - !ruby/object:DamageControl::Build 
+    config: 
+      scm_spec: !ruby/sym ext:dcontrol@cvs.codehaus.org:/cvsroot/damagecontrol:damagecontrol
+      build_command_line: ruby build.rb
+      project_name: damagecontrol
+      jira_project_key: DC
+      nag_email: damagecontrol-dev@lists.codehaus.org
+    end_time: 1081445205
+    modification_set: []
+    project_name: damagecontrol
+    start_time: 1081445161
+    status: SUCCESSFUL
+    timestamp: "20040408172556"
+  - !ruby/object:DamageControl::Build 
+    config: 
+      scm_spec: !ruby/sym ext:dcontrol@cvs.codehaus.org:/cvsroot/damagecontrol:damagecontrol
+      build_command_line: ruby build.rb
+      project_name: damagecontrol
+      jira_project_key: DC
+      nag_email: damagecontrol-dev@lists.codehaus.org
+    modification_set: []
+    project_name: damagecontrol
+    status: QUEUED
+    timestamp: "20040409174252"
+  - !ruby/object:DamageControl::Build 
+    config: 
+      scm_spec: !ruby/sym ext:dcontrol@cvs.codehaus.org:/cvsroot/damagecontrol:damagecontrol
+      build_command_line: ruby build.rb
+      project_name: damagecontrol
+      jira_project_key: DC
+      nag_email: damagecontrol-dev@lists.codehaus.org
+    end_time: 1081532621
+    modification_set: []
+    project_name: damagecontrol
+    start_time: 1081532578
+    status: SUCCESSFUL
+    timestamp: "20040409174253"
+  - !ruby/object:DamageControl::Build 
+    config: 
+      scm_spec: !ruby/sym ext:dcontrol@cvs.codehaus.org:/cvsroot/damagecontrol:damagecontrol
+      build_command_line: ruby build.rb
+      project_name: damagecontrol
+      jira_project_key: DC
+      nag_email: damagecontrol-dev@lists.codehaus.org
+    end_time: 1081535877
+    modification_set: 
+      - !ruby/object:DamageControl::Modification 
+        developer: rinkrank
+        message: "selftest\n"
+        path: "/cvsroot/damagecontrol/damagecontrol/.cvsignore"
+        revision: "1.28"
+        time: 2004/04/09 18:29:56
+      - !ruby/object:DamageControl::Modification 
+        developer: rinkrank
+        message: "selftest\n"
+        path: "/cvsroot/damagecontrol/damagecontrol/.cvsignore"
+        revision: "1.27"
+        time: 2004/04/09 18:21:12
+      - !ruby/object:DamageControl::Modification 
+        developer: rinkrank
+        message: "selftest\n"
+        path: "/cvsroot/damagecontrol/damagecontrol/.cvsignore"
+        revision: "1.26"
+        time: 2004/04/09 18:19:35
+      - !ruby/object:DamageControl::Modification 
+        developer: rinkrank
+        message: "selftest\n"
+        path: "/cvsroot/damagecontrol/damagecontrol/src/ruby/damagecontrol/SelfUpgraderTest.rb"
+        revision: "1.4"
+        time: 2004/04/09 18:34:25
+    project_name: damagecontrol
+    start_time: 1081535831
+    status: SUCCESSFUL
+    timestamp: "20040409183706"
+  - !ruby/object:DamageControl::Build 
+    config: 
+      scm_spec: !ruby/sym ext:dcontrol@cvs.codehaus.org:/cvsroot/damagecontrol:damagecontrol
+      build_command_line: ruby build.rb
+      project_name: damagecontrol
+      jira_project_key: DC
+      nag_email: damagecontrol-dev@lists.codehaus.org
+    end_time: 1081536073
+    modification_set: 
+      - !ruby/object:DamageControl::Modification 
+        developer: rinkrank
+        message: "debugging\n"
+        path: "/cvsroot/damagecontrol/damagecontrol/src/ruby/damagecontrol/SelfUpgrader.rb"
+        revision: "1.6"
+        time: 2004/04/09 18:38:14
+    project_name: damagecontrol
+    start_time: 1081536060
+    status: FAILED
+    timestamp: "20040409184055"
+  - !ruby/object:DamageControl::Build 
+    config: 
+      scm_spec: !ruby/sym ext:dcontrol@cvs.codehaus.org:/cvsroot/damagecontrol:damagecontrol
+      build_command_line: ruby build.rb
+      project_name: damagecontrol
+      jira_project_key: DC
+      nag_email: damagecontrol-dev@lists.codehaus.org
+    end_time: 1081536219
+    modification_set: 
+      - !ruby/object:DamageControl::Modification 
+        developer: rinkrank
+        message: "debugging\n"
+        path: "/cvsroot/damagecontrol/damagecontrol/src/ruby/damagecontrol/SelfUpgrader.rb"
+        revision: "1.7"
+        time: 2004/04/09 18:40:37
+      - !ruby/object:DamageControl::Modification 
+        developer: rinkrank
+        message: "debugging\n"
+        path: "/cvsroot/damagecontrol/damagecontrol/src/ruby/damagecontrol/SelfUpgrader.rb"
+        revision: "1.6"
+        time: 2004/04/09 18:38:14
+    project_name: damagecontrol
+    start_time: 1081536203
+    status: FAILED
+    timestamp: "20040409184318"
+  - !ruby/object:DamageControl::Build 
+    config: 
+      scm_spec: !ruby/sym ext:dcontrol@cvs.codehaus.org:/cvsroot/damagecontrol:damagecontrol
+      build_command_line: ruby build.rb
+      project_name: damagecontrol
+      jira_project_key: DC
+      nag_email: damagecontrol-dev@lists.codehaus.org
+    end_time: 1081536901
+    modification_set: 
+      - !ruby/object:DamageControl::Modification 
+        developer: rinkrank
+        message: "debugging\n"
+        path: "/cvsroot/damagecontrol/damagecontrol/src/ruby/damagecontrol/SelfUpgrader.rb"
+        revision: "1.8"
+        time: 2004/04/09 18:51:31
+      - !ruby/object:DamageControl::Modification 
+        developer: rinkrank
+        message: "debugging\n"
+        path: "/cvsroot/damagecontrol/damagecontrol/src/ruby/damagecontrol/SelfUpgrader.rb"
+        revision: "1.7"
+        time: 2004/04/09 18:40:37
+      - !ruby/object:DamageControl::Modification 
+        developer: rinkrank
+        message: "debugging\n"
+        path: "/cvsroot/damagecontrol/damagecontrol/src/ruby/damagecontrol/SelfUpgrader.rb"
+        revision: "1.6"
+        time: 2004/04/09 18:38:14
+      - !ruby/object:DamageControl::Modification 
+        developer: rinkrank
+        message: "debugging\n"
+        path: "/cvsroot/damagecontrol/damagecontrol/src/ruby/damagecontrol/SelfUpgraderTest.rb"
+        revision: "1.5"
+        time: 2004/04/09 18:51:31
+    project_name: damagecontrol
+    start_time: 1081536856
+    status: SUCCESSFUL
+    timestamp: "20040409185411"
+  - !ruby/object:DamageControl::Build 
+    config: 
+      scm_spec: !ruby/sym ext:dcontrol@cvs.codehaus.org:/cvsroot/damagecontrol:damagecontrol
+      build_command_line: ruby build.rb
+      project_name: damagecontrol
+      jira_project_key: DC
+      nag_email: damagecontrol-dev@lists.codehaus.org
+    end_time: 1081536997
+    modification_set: []
+    project_name: damagecontrol
+    start_time: 1081536952
+    status: SUCCESSFUL
+    timestamp: "20040409185547"
+  - !ruby/object:DamageControl::Build 
+    config: 
+      scm_spec: !ruby/sym ext:dcontrol@cvs.codehaus.org:/cvsroot/damagecontrol:damagecontrol
+      build_command_line: ruby build.rb
+      project_name: damagecontrol
+      jira_project_key: DC
+      nag_email: damagecontrol-dev@lists.codehaus.org
+    end_time: 1081537510
+    modification_set: 
+      - !ruby/object:DamageControl::Modification 
+        developer: rinkrank
+        message: "channel!!!!\n"
+        path: "/cvsroot/damagecontrol/damagecontrol/src/ruby/damagecontrol/SelfUpgrader.rb"
+        revision: "1.9"
+        time: 2004/04/09 19:01:37
+    project_name: damagecontrol
+    start_time: 1081537463
+    status: SUCCESSFUL
+    timestamp: "20040409190418"
+  - !ruby/object:DamageControl::Build 
+    config: 
+      scm_spec: !ruby/sym ext:dcontrol@cvs.codehaus.org:/cvsroot/damagecontrol:damagecontrol
+      build_command_line: ruby build.rb
+      project_name: damagecontrol
+      jira_project_key: DC
+      nag_email: damagecontrol-dev@lists.codehaus.org
+    end_time: 1081537616
+    modification_set: []
+    project_name: damagecontrol
+    start_time: 1081537590
+    status: FAILED
+    timestamp: "20040409190625"
+  - !ruby/object:DamageControl::Build 
+    config: 
+      scm_spec: !ruby/sym ext:dcontrol@cvs.codehaus.org:/cvsroot/damagecontrol:damagecontrol
+      build_command_line: ruby build.rb
+      project_name: damagecontrol
+      jira_project_key: DC
+      nag_email: damagecontrol-dev@lists.codehaus.org
+    end_time: 1081538162
+    modification_set: 
+      - !ruby/object:DamageControl::Modification 
+        developer: rinkrank
+        message: "debugging\n"
+        path: "/cvsroot/damagecontrol/damagecontrol/src/ruby/damagecontrol/SelfUpgrader.rb"
+        revision: "1.11"
+        time: 2004/04/09 19:12:28
+    project_name: damagecontrol
+    start_time: 1081538114
+    status: SUCCESSFUL
+    timestamp: "20040409191509"
+  - !ruby/object:DamageControl::Build 
+    config: 
+      scm_spec: !ruby/sym ext:dcontrol@cvs.codehaus.org:/cvsroot/damagecontrol:damagecontrol
+      build_command_line: ruby build.rb
+      project_name: damagecontrol
+      jira_project_key: DC
+      nag_email: damagecontrol-dev@lists.codehaus.org
+    modification_set: []
+    project_name: damagecontrol
+    status: QUEUED
+    timestamp: "20040409192051"
+  - !ruby/object:DamageControl::Build 
+    config: 
+      scm_spec: !ruby/sym ext:dcontrol@cvs.codehaus.org:/cvsroot/damagecontrol:damagecontrol
+      build_command_line: ruby build.rb
+      project_name: damagecontrol
+      jira_project_key: DC
+      nag_email: damagecontrol-dev@lists.codehaus.org
+    end_time: 1081538470
+    modification_set: 
+      - !ruby/object:DamageControl::Modification 
+        developer: tirsen
+        message: "Publish change set on IRC channel, and test for it in the e2e test\n"
+        path: "/cvsroot/damagecontrol/damagecontrol/src/ruby/End2EndTest.rb"
+        revision: "1.32"
+        time: 2004/04/09 19:18:11
+      - !ruby/object:DamageControl::Modification 
+        developer: tirsen
+        message: "Publish change set on IRC channel, and test for it in the e2e test\n"
+        path: "/cvsroot/damagecontrol/damagecontrol/src/ruby/start_damagecontrol_forked.rb"
+        revision: "1.6"
+        time: 2004/04/09 19:18:11
+      - !ruby/object:DamageControl::Modification 
+        developer: tirsen
+        message: "Publish change set on IRC channel, and test for it in the e2e test\n"
+        path: "/cvsroot/damagecontrol/damagecontrol/src/ruby/damagecontrol/BuildExecutor.rb"
+        revision: "1.35"
+        time: 2004/04/09 19:18:11
+      - !ruby/object:DamageControl::Modification 
+        developer: tirsen
+        message: "Publish change set on IRC channel, and test for it in the e2e test\n"
+        path: "/cvsroot/damagecontrol/damagecontrol/src/ruby/damagecontrol/publisher/IRCPublisher.rb"
+        revision: "1.21"
+        time: 2004/04/09 19:18:11
+      - !ruby/object:DamageControl::Modification 
+        message: "date: 2004/04/09 19:18:11;  author:\n\nRCS file: /cvsroot/damagecontrol/damagecontrol/src/ruby/damagecontrol/scm/CVSPollerTest.rb,v\nWorking file: src/ruby/damagecontrol/scm/CVSPollerTest.rb\nhead: 1.1\nbranch:\nlocks: strict\naccess list:\nsymbolic names:\n\tRELEASE_0_1: 1.1\nkeyword substitution: kv\ntotal revisions: 1;\tselected revisions: 0\ndescription:\n"
+        path: "/cvsroot/damagecontrol/damagecontrol/src/ruby/damagecontrol/publisher/IRCPublisherTest.rb"
+        revision: "1.12"
+    project_name: damagecontrol
+    start_time: 1081538457
+    status: FAILED
+    timestamp: "20040409192052"
+  - !ruby/object:DamageControl::Build 
+    config: 
+      scm_spec: !ruby/sym ext:dcontrol@cvs.codehaus.org:/cvsroot/damagecontrol:damagecontrol
+      build_command_line: ruby build.rb
+      project_name: damagecontrol
+      jira_project_key: DC
+      nag_email: damagecontrol-dev@lists.codehaus.org
+    end_time: 1081538769
+    modification_set: 
+      - !ruby/object:DamageControl::Modification 
+        developer: tirsen
+        message: "Publish change set on IRC channel, and test for it in the e2e test\n"
+        path: "/cvsroot/damagecontrol/damagecontrol/src/ruby/End2EndTest.rb"
+        revision: "1.32"
+        time: 2004/04/09 19:18:11
+      - !ruby/object:DamageControl::Modification 
+        developer: tirsen
+        message: "Publish change set on IRC channel, and test for it in the e2e test\n"
+        path: "/cvsroot/damagecontrol/damagecontrol/src/ruby/start_damagecontrol_forked.rb"
+        revision: "1.6"
+        time: 2004/04/09 19:18:11
+      - !ruby/object:DamageControl::Modification 
+        developer: tirsen
+        message: "Publish change set on IRC channel, and test for it in the e2e test\n"
+        path: "/cvsroot/damagecontrol/damagecontrol/src/ruby/damagecontrol/BuildExecutor.rb"
+        revision: "1.35"
+        time: 2004/04/09 19:18:11
+      - !ruby/object:DamageControl::Modification 
+        developer: tirsen
+        message: "Ooops, forgot to fix the unit test\n"
+        path: "/cvsroot/damagecontrol/damagecontrol/src/ruby/damagecontrol/BuildExecutorTest.rb"
+        revision: "1.40"
+        time: 2004/04/09 19:21:50
+      - !ruby/object:DamageControl::Modification 
+        developer: tirsen
+        message: "Publish change set on IRC channel, and test for it in the e2e test\n"
+        path: 
+        revision: "1.12"
+        time: 2004/04/09 19:18:11
+    project_name: damagecontrol
+    start_time: 1081538675
+    status: FAILED
+    timestamp: "20040409192430"
+  - !ruby/object:DamageControl::Build 
+    config: 
+      scm_spec: !ruby/sym ext:dcontrol@cvs.codehaus.org:/cvsroot/damagecontrol:damagecontrol
+      build_command_line: ruby build.rb
+      project_name: damagecontrol
+      jira_project_key: DC
+      nag_email: damagecontrol-dev@lists.codehaus.org
+    end_time: 1081539188
+    modification_set: 
+      - !ruby/object:DamageControl::Modification 
+        developer: tirsen
+        message: "Fixed stupid username thing\n"
+        path: "/cvsroot/damagecontrol/damagecontrol/src/ruby/End2EndTest.rb"
+        revision: "1.33"
+        time: 2004/04/09 19:29:57
+      - !ruby/object:DamageControl::Modification 
+        developer: tirsen
+        message: "Publish change set on IRC channel, and test for it in the e2e test\n"
+        path: "/cvsroot/damagecontrol/damagecontrol/src/ruby/End2EndTest.rb"
+        revision: "1.32"
+        time: 2004/04/09 19:18:11
+      - !ruby/object:DamageControl::Modification 
+        developer: tirsen
+        message: "Publish change set on IRC channel, and test for it in the e2e test\n"
+        path: "/cvsroot/damagecontrol/damagecontrol/src/ruby/start_damagecontrol_forked.rb"
+        revision: "1.6"
+        time: 2004/04/09 19:18:11
+      - !ruby/object:DamageControl::Modification 
+        developer: tirsen
+        message: "Publish change set on IRC channel, and test for it in the e2e test\n"
+        path: "/cvsroot/damagecontrol/damagecontrol/src/ruby/damagecontrol/BuildExecutor.rb"
+        revision: "1.35"
+        time: 2004/04/09 19:18:11
+      - !ruby/object:DamageControl::Modification 
+        developer: tirsen
+        message: "Ooops, forgot to fix the unit test\n"
+        path: "/cvsroot/damagecontrol/damagecontrol/src/ruby/damagecontrol/BuildExecutorTest.rb"
+        revision: "1.40"
+        time: 2004/04/09 19:21:50
+      - !ruby/object:DamageControl::Modification 
+        developer: tirsen
+        message: "Publish change set on IRC channel, and test for it in the e2e test\n"
+        path: "/cvsroot/damagecontrol/damagecontrol/src/ruby/damagecontrol/publisher/IRCPublisher.rb"
+        revision: "1.21"
+        time: 2004/04/09 19:18:11
+      - !ruby/object:DamageControl::Modification 
+        developer: tirsen
+        message: "Publish change set on IRC channel, and test for it in the e2e test\n"
+        path: "/cvsroot/damagecontrol/damagecontrol/src/ruby/damagecontrol/publisher/IRCPublisherTest.rb"
+        revision: "1.12"
+        time: 2004/04/09 19:18:11
+    project_name: damagecontrol
+    start_time: 1081539162
+    status: FAILED
+    timestamp: "20040409193237"
+  - !ruby/object:DamageControl::Build 
+    config: 
+      scm_spec: !ruby/sym ext:dcontrol@cvs.codehaus.org:/cvsroot/damagecontrol:damagecontrol
+      build_command_line: ruby build.rb
+      project_name: damagecontrol
+      jira_project_key: DC
+      nag_email: damagecontrol-dev@lists.codehaus.org
+    end_time: 1081539678
+    modification_set: 
+      - !ruby/object:DamageControl::Modification 
+        developer: tirsen
+        message: "Fixed stupid username thing\n"
+        path: "/cvsroot/damagecontrol/damagecontrol/src/ruby/End2EndTest.rb"
+        revision: "1.33"
+        time: 2004/04/09 19:29:57
+      - !ruby/object:DamageControl::Modification 
+        developer: tirsen
+        message: "Publish change set on IRC channel, and test for it in the e2e test\n"
+        path: "/cvsroot/damagecontrol/damagecontrol/src/ruby/End2EndTest.rb"
+        revision: "1.32"
+        time: 2004/04/09 19:18:11
+      - !ruby/object:DamageControl::Modification 
+        developer: tirsen
+        message: "Publish change set on IRC channel, and test for it in the e2e test\n"
+        path: "/cvsroot/damagecontrol/damagecontrol/src/ruby/start_damagecontrol_forked.rb"
+        revision: "1.6"
+        time: 2004/04/09 19:18:11
+      - !ruby/object:DamageControl::Modification 
+        developer: rinkrank
+        message: "better error reporting\n"
+        path: "/cvsroot/damagecontrol/damagecontrol/src/ruby/damagecontrol/BuildExecutor.rb"
+        revision: "1.36"
+        time: 2004/04/09 19:36:59
+      - !ruby/object:DamageControl::Modification 
+        developer: tirsen
+        message: "Publish change set on IRC channel, and test for it in the e2e test\n"
+        path: "/cvsroot/damagecontrol/damagecontrol/src/ruby/damagecontrol/BuildExecutor.rb"
+        revision: "1.35"
+        time: 2004/04/09 19:18:11
+      - !ruby/object:DamageControl::Modification 
+        developer: tirsen
+        message: "Ooops, forgot to fix the unit test\n"
+        path: "/cvsroot/damagecontrol/damagecontrol/src/ruby/damagecontrol/BuildExecutorTest.rb"
+        revision: "1.40"
+        time: 2004/04/09 19:21:50
+      - !ruby/object:DamageControl::Modification 
+        developer: rinkrank
+        message: "better error reporting\n"
+        path: "/cvsroot/damagecontrol/damagecontrol/src/ruby/damagecontrol/Timer.rb"
+        revision: "1.14"
+        time: 2004/04/09 19:36:59
+      - !ruby/object:DamageControl::Modification 
+        developer: tirsen
+        message: "Publish change set on IRC channel, and test for it in the e2e test\n"
+        path: "/cvsroot/damagecontrol/damagecontrol/src/ruby/damagecontrol/publisher/IRCPublisherTest.rb"
+        revision: "1.12"
+        time: 2004/04/09 19:18:11
+    project_name: damagecontrol
+    start_time: 1081539585
+    status: SUCCESSFUL
+    timestamp: "20040409193940"
+  - !ruby/object:DamageControl::Build 
+    config: 
+      scm_spec: !ruby/sym ext:dcontrol@cvs.codehaus.org:/cvsroot/damagecontrol:damagecontrol
+      build_command_line: ruby build.rb
+      project_name: damagecontrol
+      jira_project_key: DC
+      nag_email: damagecontrol-dev@lists.codehaus.org
+    modification_set: []
+    project_name: damagecontrol
+    status: QUEUED
+    timestamp: "20040409194227"
+  - !ruby/object:DamageControl::Build 
+    config: 
+      scm_spec: !ruby/sym ext:dcontrol@cvs.codehaus.org:/cvsroot/damagecontrol:damagecontrol
+      build_command_line: ruby build.rb
+      project_name: damagecontrol
+      jira_project_key: DC
+      nag_email: damagecontrol-dev@lists.codehaus.org
+    end_time: 1081539847
+    modification_set: 
+      - !ruby/object:DamageControl::Modification 
+        developer: tirsen
+        message: "Testing changesets\n"
+        path: "/cvsroot/damagecontrol/damagecontrol/src/ruby/damagecontrol/Build.rb"
+        revision: "1.29"
+        time: 2004/04/09 19:39:48
+      - !ruby/object:DamageControl::Modification 
+        developer: rinkrank
+        message: "better error reporting\n"
+        path: "/cvsroot/damagecontrol/damagecontrol/src/ruby/damagecontrol/SelfUpgraderTest.rb"
+        revision: "1.7"
+        time: 2004/04/09 19:39:47
+    project_name: damagecontrol
+    start_time: 1081539754
+    status: SUCCESSFUL
+    timestamp: "20040409194229"
+  - !ruby/object:DamageControl::Build 
+    config: 
+      scm_spec: !ruby/sym ext:dcontrol@cvs.codehaus.org:/cvsroot/damagecontrol:damagecontrol
+      build_command_line: ruby build.rb
+      project_name: damagecontrol
+      jira_project_key: DC
+      nag_email: damagecontrol-dev@lists.codehaus.org
+    end_time: 1081540064
+    modification_set: 
+      - !ruby/object:DamageControl::Modification 
+        developer: rinkrank
+        message: "more debug. sigh.\n"
+        path: "/cvsroot/damagecontrol/damagecontrol/src/ruby/damagecontrol/SelfUpgrader.rb"
+        revision: "1.12"
+        time: 2004/04/09 19:43:19
+    project_name: damagecontrol
+    start_time: 1081539965
+    status: SUCCESSFUL
+    timestamp: "20040409194600"
+  - !ruby/object:DamageControl::Build 
+    config: 
+      scm_spec: !ruby/sym ext:dcontrol@cvs.codehaus.org:/cvsroot/damagecontrol:damagecontrol
+      build_command_line: ruby build.rb
+      project_name: damagecontrol
+      jira_project_key: DC
+      nag_email: damagecontrol-dev@lists.codehaus.org
+    end_time: 1081540215
+    modification_set: []
+    project_name: damagecontrol
+    start_time: 1081540121
+    status: SUCCESSFUL
+    timestamp: "20040409194836"
+  - !ruby/object:DamageControl::Build 
+    config: 
+      scm_spec: !ruby/sym ext:dcontrol@cvs.codehaus.org:/cvsroot/damagecontrol:damagecontrol
+      build_command_line: ruby build.rb
+      project_name: damagecontrol
+      jira_project_key: DC
+      nag_email: damagecontrol-dev@lists.codehaus.org
+    end_time: 1081540670
+    modification_set: 
+      - !ruby/object:DamageControl::Modification 
+        developer: rinkrank
+        message: "not a BuildEvent\n"
+        path: "/cvsroot/damagecontrol/damagecontrol/src/ruby/damagecontrol/BuildEvents.rb"
+        revision: "1.6"
+        time: 2004/04/09 19:53:14
+      - !ruby/object:DamageControl::Modification 
+        developer: rinkrank
+        message: "not a BuildEvent\n"
+        path: "/cvsroot/damagecontrol/damagecontrol/src/ruby/damagecontrol/SelfUpgrader.rb"
+        revision: "1.14"
+        time: 2004/04/09 19:53:14
+    project_name: damagecontrol
+    start_time: 1081540568
+    status: SUCCESSFUL
+    timestamp: "20040409195603"
+  - !ruby/object:DamageControl::Build 
+    config: 
+      scm_spec: !ruby/sym ext:dcontrol@cvs.codehaus.org:/cvsroot/damagecontrol:damagecontrol
+      build_command_line: ruby build.rb
+      project_name: damagecontrol
+      jira_project_key: DC
+      nag_email: damagecontrol-dev@lists.codehaus.org
+    end_time: 1081541103
+    modification_set: 
+      - !ruby/object:DamageControl::Modification 
+        developer: rinkrank
+        message: "die die die die die die die die\n"
+        path: "/cvsroot/damagecontrol/damagecontrol/src/ruby/damagecontrol/SelfUpgrader.rb"
+        revision: "1.15"
+        time: 2004/04/09 20:00:43
+    project_name: damagecontrol
+    start_time: 1081541009
+    status: SUCCESSFUL
+    timestamp: "20040409200324"
+  - !ruby/object:DamageControl::Build 
+    config: 
+      scm_spec: !ruby/sym ext:dcontrol@cvs.codehaus.org:/cvsroot/damagecontrol:damagecontrol
+      build_command_line: ruby build.rb
+      project_name: damagecontrol
+      jira_project_key: DC
+      nag_email: damagecontrol-dev@lists.codehaus.org
+    end_time: 1081541279
+    modification_set: 
+      - !ruby/object:DamageControl::Modification 
+        developer: rinkrank
+        message: "die die die die die die die die\n"
+        path: "/cvsroot/damagecontrol/damagecontrol/src/ruby/damagecontrol/SelfUpgraderTest.rb"
+        revision: "1.8"
+        time: 2004/04/09 20:03:40
+    project_name: damagecontrol
+    start_time: 1081541185
+    status: SUCCESSFUL
+    timestamp: "20040409200620"
+  - !ruby/object:DamageControl::Build 
+    config: 
+      scm_spec: !ruby/sym ext:dcontrol@cvs.codehaus.org:/cvsroot/damagecontrol:damagecontrol
+      build_command_line: ruby build.rb
+      project_name: damagecontrol
+      jira_project_key: DC
+      nag_email: damagecontrol-dev@lists.codehaus.org
+    end_time: 1081541811
+    modification_set: 
+      - !ruby/object:DamageControl::Modification 
+        developer: rinkrank
+        message: "words\n"
+        path: "/cvsroot/damagecontrol/damagecontrol/src/ruby/damagecontrol/SelfUpgrader.rb"
+        revision: "1.16"
+        time: 2004/04/09 20:12:32
+      - !ruby/object:DamageControl::Modification 
+        developer: rinkrank
+        message: "words\n"
+        path: "/cvsroot/damagecontrol/damagecontrol/src/ruby/damagecontrol/SocketTrigger.rb"
+        revision: "1.47"
+        time: 2004/04/09 20:12:32
+    project_name: damagecontrol
+    start_time: 1081541717
+    status: SUCCESSFUL
+    timestamp: "20040409201512"
+  - !ruby/object:DamageControl::Build 
+    config: 
+      scm_spec: !ruby/sym ext:dcontrol@cvs.codehaus.org:/cvsroot/damagecontrol:damagecontrol
+      build_command_line: ruby build.rb
+      project_name: damagecontrol
+      jira_project_key: DC
+      nag_email: damagecontrol-dev@lists.codehaus.org
+    end_time: 1081544916
+    modification_set: 
+      - !ruby/object:DamageControl::Modification 
+        developer: rinkrank
+        message: "unindent to assert the parser is still working\n"
+        path: "/cvsroot/damagecontrol/damagecontrol/src/ruby/damagecontrol/scm/CVSTest.rb"
+        revision: "1.23"
+        time: 2004/04/09 21:04:46
+    project_name: damagecontrol
+    start_time: 1081544851
+    status: FAILED
+    timestamp: "20040409210726"
+  - !ruby/object:DamageControl::Build 
+    config: 
+      scm_spec: !ruby/sym ext:dcontrol@cvs.codehaus.org:/cvsroot/damagecontrol:damagecontrol
+      build_command_line: ruby build.rb
+      project_name: damagecontrol
+      jira_project_key: DC
+      nag_email: damagecontrol-dev@lists.codehaus.org
+    end_time: 1081545126
+    modification_set: 
+      - !ruby/object:DamageControl::Modification 
+        developer: rinkrank
+        message: "unindent to assert the parser is still working\n"
+        path: "/cvsroot/damagecontrol/damagecontrol/src/ruby/damagecontrol/scm/CVSTest.rb"
+        revision: "1.23"
+        time: 2004/04/09 21:04:46
+      - !ruby/object:DamageControl::Modification 
+        developer: rinkrank
+        message: "nothing\n"
+        path: "/cvsroot/damagecontrol/damagecontrol/src/samples/codehaus.rb"
+        revision: "1.50"
+        time: 2004/04/09 21:07:47
+    project_name: damagecontrol
+    start_time: 1081545032
+    status: SUCCESSFUL
+    timestamp: "20040409211027"
+  - !ruby/object:DamageControl::Build 
+    config: 
+      scm_spec: !ruby/sym ext:dcontrol@cvs.codehaus.org:/cvsroot/damagecontrol:damagecontrol
+      build_command_line: ruby build.rb
+      project_name: damagecontrol
+      jira_project_key: DC
+      nag_email: damagecontrol-dev@lists.codehaus.org
+    modification_set: []
+    project_name: damagecontrol
+    status: QUEUED
+    timestamp: "20040409212522"
+  - !ruby/object:DamageControl::Build 
+    config: 
+      scm_spec: !ruby/sym ext:dcontrol@cvs.codehaus.org:/cvsroot/damagecontrol:damagecontrol
+      build_command_line: ruby build.rb
+      project_name: damagecontrol
+      jira_project_key: DC
+      nag_email: damagecontrol-dev@lists.codehaus.org
+    end_time: 1081546022
+    modification_set: 
+      - !ruby/object:DamageControl::Modification 
+        developer: tirsen
+        message: "Different format for changesets in IRC\n"
+        path: "/cvsroot/damagecontrol/damagecontrol/src/ruby/damagecontrol/Build.rb"
+        revision: "1.30"
+        time: 2004/04/09 21:22:42
+      - !ruby/object:DamageControl::Modification 
+        developer: tirsen
+        message: "Different format for changesets in IRC\n"
+        path: "/cvsroot/damagecontrol/damagecontrol/src/ruby/damagecontrol/scm/CVS.rb"
+        revision: "1.41"
+        time: 2004/04/09 21:22:43
+    project_name: damagecontrol
+    start_time: 1081545928
+    status: SUCCESSFUL
+    timestamp: "20040409212523"
+  - !ruby/object:DamageControl::Build 
+    config: 
+      scm_spec: !ruby/sym ext:dcontrol@cvs.codehaus.org:/cvsroot/damagecontrol:damagecontrol
+      build_command_line: ruby build.rb
+      project_name: damagecontrol
+      jira_project_key: DC
+      nag_email: damagecontrol-dev@lists.codehaus.org
+    modification_set: []
+    project_name: damagecontrol
+    start_time: 1081546022
+    status: CHECKING OUT
+    timestamp: "20040409212543"
+  - !ruby/object:DamageControl::Build 
+    config: 
+      scm_spec: !ruby/sym ext:dcontrol@cvs.codehaus.org:/cvsroot/damagecontrol:damagecontrol
+      build_command_line: ruby build.rb
+      project_name: damagecontrol
+      jira_project_key: DC
+      nag_email: damagecontrol-dev@lists.codehaus.org
+    end_time: 1081550933
+    modification_set: 
+      - !ruby/object:DamageControl::Modification 
+        developer: tirsen
+        message: "fixed bug in parsing the cvs log\n"
+        path: "/cvsroot/damagecontrol/damagecontrol/src/ruby/End2EndTest.rb"
+        revision: "1.34"
+        time: 2004/04/09 22:44:34
+      - !ruby/object:DamageControl::Modification 
+        developer: tirsen
+        message: "fixed bug in parsing the cvs log\n"
+        path: "/cvsroot/damagecontrol/damagecontrol/src/ruby/damagecontrol/scm/CVS.rb"
+        revision: "1.43"
+        time: 2004/04/09 22:44:35
+      - !ruby/object:DamageControl::Modification 
+        developer: tirsen
+        message: "fixed bug in parsing the cvs log\n"
+        path: "/cvsroot/damagecontrol/damagecontrol/src/ruby/damagecontrol/scm/CVSTest.rb"
+        revision: "1.24"
+        time: 2004/04/09 22:44:35
+    project_name: damagecontrol
+    start_time: 1081550839
+    status: SUCCESSFUL
+    timestamp: "20040409224714"
+  - !ruby/object:DamageControl::Build 
+    config: 
+      scm_spec: !ruby/sym ext:dcontrol@cvs.codehaus.org:/cvsroot/damagecontrol:damagecontrol
+      build_command_line: ruby build.rb
+      project_name: damagecontrol
+      jira_project_key: DC
+      nag_email: damagecontrol-dev@lists.codehaus.org
+    end_time: 1081554081
+    modification_set: 
+      - !ruby/object:DamageControl::Modification 
+        developer: tirsen
+        message: "make paths in changeset relative to cvs module\n"
+        path: "/cvsroot/damagecontrol/damagecontrol/src/ruby/damagecontrol/BuildExecutor.rb"
+        revision: "1.37"
+        time: 2004/04/09 23:37:03
+      - !ruby/object:DamageControl::Modification 
+        developer: tirsen
+        message: "make paths in changeset relative to cvs module\n"
+        path: "/cvsroot/damagecontrol/damagecontrol/src/ruby/damagecontrol/scm/CVS.rb"
+        revision: "1.44"
+        time: 2004/04/09 23:37:03
+      - !ruby/object:DamageControl::Modification 
+        developer: tirsen
+        message: "make paths in changeset relative to cvs module\n"
+        path: "/cvsroot/damagecontrol/damagecontrol/src/ruby/damagecontrol/scm/CVSTest.rb"
+        revision: "1.25"
+        time: 2004/04/09 23:37:03
+    project_name: damagecontrol
+    start_time: 1081553987
+    status: SUCCESSFUL
+    timestamp: "20040409233942"
+messenger: 
+  - !ruby/object:DamageControl::Build 
+    config: 
+      scm_spec: !ruby/sym ext:dcontrol@localhost:/home/projects/messenger/scm:messenger
+      build_command_line: maven dc
+      project_name: messenger
+      nag_email: messenger-dev@lists.codehaus.org
+    end_time: 1080917398
+    modification_set: []
+    project_name: messenger
+    start_time: 1080917386
+    status: FAILED
+    timestamp: "20040402144941"
+  - !ruby/object:DamageControl::Build 
+    config: 
+      scm_spec: !ruby/sym ext:dcontrol@localhost:/home/projects/messenger/scm:messenger
+      build_command_line: maven dc
+      project_name: messenger
+      nag_email: messenger-dev@lists.codehaus.org
+    end_time: 1081446309
+    modification_set: []
+    project_name: messenger
+    start_time: 1081446295
+    status: SUCCESSFUL
+    timestamp: "20040408174450"
+  - !ruby/object:DamageControl::Build 
+    config: 
+      scm_spec: !ruby/sym ext:dcontrol@localhost:/home/projects/messenger/scm:messenger
+      build_command_line: maven dc
+      project_name: messenger
+      nag_email: messenger-dev@lists.codehaus.org
+    end_time: 1081446744
+    modification_set: []
+    project_name: messenger
+    start_time: 1081446731
+    status: SUCCESSFUL
+    timestamp: "20040408175206"
+  - !ruby/object:DamageControl::Build 
+    config: 
+      scm_spec: !ruby/sym ext:dcontrol@localhost:/home/projects/messenger/scm:messenger
+      build_command_line: maven dc
+      project_name: messenger
+      nag_email: messenger-dev@lists.codehaus.org
+    end_time: 1081446954
+    modification_set: []
+    project_name: messenger
+    start_time: 1081446940
+    status: SUCCESSFUL
+    timestamp: "20040408175535"
+  - !ruby/object:DamageControl::Build 
+    config: 
+      scm_spec: !ruby/sym ext:dcontrol@localhost:/home/projects/messenger/scm:messenger
+      build_command_line: maven dc
+      project_name: messenger
+      nag_email: messenger-dev@lists.codehaus.org
+    end_time: 1081447260
+    modification_set: []
+    project_name: messenger
+    start_time: 1081447245
+    status: FAILED
+    timestamp: "20040408180040"
+  - !ruby/object:DamageControl::Build 
+    config: 
+      scm_spec: !ruby/sym ext:dcontrol@localhost:/home/projects/messenger/scm:messenger
+      build_command_line: maven dc
+      project_name: messenger
+      nag_email: messenger-dev@lists.codehaus.org
+    end_time: 1081447502
+    modification_set: []
+    project_name: messenger
+    start_time: 1081447485
+    status: SUCCESSFUL
+    timestamp: "20040408180440"
+  - !ruby/object:DamageControl::Build 
+    config: 
+      scm_spec: !ruby/sym ext:dcontrol@localhost:/home/projects/messenger/scm:messenger
+      build_command_line: maven dc
+      project_name: messenger
+      nag_email: messenger-dev@lists.codehaus.org
+    end_time: 1081448376
+    modification_set: []
+    project_name: messenger
+    start_time: 1081448355
+    status: SUCCESSFUL
+    timestamp: "20040408181647"
+  - !ruby/object:DamageControl::Build 
+    config: 
+      scm_spec: !ruby/sym ext:dcontrol@localhost:/home/projects/messenger/scm:messenger
+      build_command_line: maven dc
+      project_name: messenger
+      nag_email: messenger-dev@lists.codehaus.org
+    end_time: 1081450250
+    modification_set: []
+    project_name: messenger
+    start_time: 1081450226
+    status: SUCCESSFUL
+    timestamp: "20040408184815"
+ActiveCluster: 
+  - !ruby/object:DamageControl::Build 
+    config: 
+      scm_spec: !ruby/sym ext:dcontrol@localhost:/home/projects/activecluster/scm:activecluster
+      build_command_line: maven dc
+      project_name: ActiveCluster
+      nag_email: activecluster-dev@lists.codehaus.org
+    end_time: 1080917859
+    modification_set: []
+    project_name: ActiveCluster
+    start_time: 1080917857
+    status: FAILED
+    timestamp: "20040402145732"
+  - !ruby/object:DamageControl::Build 
+    config: 
+      scm_spec: !ruby/sym ext:dcontrol@localhost:/home/projects/activecluster/scm:activecluster
+      build_command_line: maven dc
+      project_name: ActiveCluster
+      nag_email: activecluster-dev@lists.codehaus.org
+    end_time: 1080918069
+    modification_set: []
+    project_name: ActiveCluster
+    start_time: 1080918067
+    status: FAILED
+    timestamp: "20040402150102"
+  - !ruby/object:DamageControl::Build 
+    config: 
+      scm_spec: !ruby/sym ext:dcontrol@localhost:/home/projects/activecluster/scm:activecluster
+      build_command_line: maven dc
+      project_name: ActiveCluster
+      nag_email: activecluster-dev@lists.codehaus.org
+    modification_set: []
+    project_name: ActiveCluster
+    status: QUEUED
+    timestamp: "20040402150102"
+  - !ruby/object:DamageControl::Build 
+    config: 
+      scm_spec: !ruby/sym ext:dcontrol@localhost:/home/projects/activecluster/scm:activecluster
+      build_command_line: maven dc
+      project_name: ActiveCluster
+      nag_email: activecluster-dev@lists.codehaus.org
+    modification_set: []
+    project_name: ActiveCluster
+    status: QUEUED
+    timestamp: "20040402150102"
+  - !ruby/object:DamageControl::Build 
+    config: 
+      scm_spec: !ruby/sym ext:dcontrol@localhost:/home/projects/activecluster/scm:activecluster
+      build_command_line: maven dc
+      project_name: ActiveCluster
+      nag_email: activecluster-dev@lists.codehaus.org
+    modification_set: []
+    project_name: ActiveCluster
+    status: QUEUED
+    timestamp: "20040402150102"
+  - !ruby/object:DamageControl::Build 
+    config: 
+      scm_spec: !ruby/sym ext:dcontrol@localhost:/home/projects/activecluster/scm:activecluster
+      build_command_line: maven dc
+      project_name: ActiveCluster
+      nag_email: activecluster-dev@lists.codehaus.org
+    modification_set: []
+    project_name: ActiveCluster
+    status: QUEUED
+    timestamp: "20040402150102"
+  - !ruby/object:DamageControl::Build 
+    config: 
+      scm_spec: !ruby/sym ext:dcontrol@localhost:/home/projects/activecluster/scm:activecluster
+      build_command_line: maven dc
+      project_name: ActiveCluster
+      nag_email: activecluster-dev@lists.codehaus.org
+    modification_set: []
+    project_name: ActiveCluster
+    status: QUEUED
+    timestamp: "20040402150102"
+  - !ruby/object:DamageControl::Build 
+    config: 
+      scm_spec: !ruby/sym ext:dcontrol@localhost:/home/projects/activecluster/scm:activecluster
+      build_command_line: maven dc
+      project_name: ActiveCluster
+      nag_email: activecluster-dev@lists.codehaus.org
+    modification_set: []
+    project_name: ActiveCluster
+    status: QUEUED
+    timestamp: "20040402150102"
+  - !ruby/object:DamageControl::Build 
+    config: 
+      scm_spec: !ruby/sym ext:dcontrol@localhost:/home/projects/activecluster/scm:activecluster
+      build_command_line: maven dc
+      project_name: ActiveCluster
+      nag_email: activecluster-dev@lists.codehaus.org
+    modification_set: []
+    project_name: ActiveCluster
+    status: QUEUED
+    timestamp: "20040402150102"
+  - !ruby/object:DamageControl::Build 
+    config: 
+      scm_spec: !ruby/sym ext:dcontrol@localhost:/home/projects/activecluster/scm:activecluster
+      build_command_line: maven dc
+      project_name: ActiveCluster
+      nag_email: activecluster-dev@lists.codehaus.org
+    modification_set: []
+    project_name: ActiveCluster
+    status: QUEUED
+    timestamp: "20040402150102"
+  - !ruby/object:DamageControl::Build 
+    config: 
+      scm_spec: !ruby/sym ext:dcontrol@localhost:/home/projects/activecluster/scm:activecluster
+      build_command_line: maven dc
+      project_name: ActiveCluster
+      nag_email: activecluster-dev@lists.codehaus.org
+    modification_set: []
+    project_name: ActiveCluster
+    status: QUEUED
+    timestamp: "20040402150102"
+  - !ruby/object:DamageControl::Build 
+    config: 
+      scm_spec: !ruby/sym ext:dcontrol@localhost:/home/projects/activecluster/scm:activecluster
+      build_command_line: maven dc
+      project_name: ActiveCluster
+      nag_email: activecluster-dev@lists.codehaus.org
+    modification_set: []
+    project_name: ActiveCluster
+    status: QUEUED
+    timestamp: "20040402150102"
+  - !ruby/object:DamageControl::Build 
+    config: 
+      scm_spec: !ruby/sym ext:dcontrol@localhost:/home/projects/activecluster/scm:activecluster
+      build_command_line: maven dc
+      project_name: ActiveCluster
+      nag_email: activecluster-dev@lists.codehaus.org
+    end_time: 1080918092
+    modification_set: []
+    project_name: ActiveCluster
+    start_time: 1080918075
+    status: SUCCESSFUL
+    timestamp: "20040402150110"
+  - !ruby/object:DamageControl::Build 
+    config: 
+      scm_spec: !ruby/sym ext:dcontrol@localhost:/home/projects/activecluster/scm:activecluster
+      build_command_line: maven dc
+      project_name: ActiveCluster
+      nag_email: activecluster-dev@lists.codehaus.org
+    modification_set: []
+    project_name: ActiveCluster
+    status: QUEUED
+    timestamp: "20040402150110"
+  - !ruby/object:DamageControl::Build 
+    config: 
+      scm_spec: !ruby/sym ext:dcontrol@localhost:/home/projects/activecluster/scm:activecluster
+      build_command_line: maven dc
+      project_name: ActiveCluster
+      nag_email: activecluster-dev@lists.codehaus.org
+    modification_set: []
+    project_name: ActiveCluster
+    status: QUEUED
+    timestamp: "20040402150110"
+  - !ruby/object:DamageControl::Build 
+    config: 
+      scm_spec: !ruby/sym ext:dcontrol@localhost:/home/projects/activecluster/scm:activecluster
+      build_command_line: maven dc
+      project_name: ActiveCluster
+      nag_email: activecluster-dev@lists.codehaus.org
+    modification_set: []
+    project_name: ActiveCluster
+    status: QUEUED
+    timestamp: "20040402150110"
+  - !ruby/object:DamageControl::Build 
+    config: 
+      scm_spec: !ruby/sym ext:dcontrol@localhost:/home/projects/activecluster/scm:activecluster
+      build_command_line: maven dc
+      project_name: ActiveCluster
+      nag_email: activecluster-dev@lists.codehaus.org
+    end_time: 1081447278
+    modification_set: []
+    project_name: ActiveCluster
+    start_time: 1081447261
+    status: FAILED
+    timestamp: "20040408180041"
+  - !ruby/object:DamageControl::Build 
+    config: 
+      scm_spec: !ruby/sym ext:dcontrol@localhost:/home/projects/activecluster/scm:activecluster
+      build_command_line: maven dc
+      project_name: ActiveCluster
+      nag_email: activecluster-dev@lists.codehaus.org
+    end_time: 1081447481
+    modification_set: []
+    project_name: ActiveCluster
+    start_time: 1081447465
+    status: SUCCESSFUL
+    timestamp: "20040408180400"
+  - !ruby/object:DamageControl::Build 
+    config: 
+      scm_spec: !ruby/sym ext:dcontrol@localhost:/home/projects/activecluster/scm:activecluster
+      build_command_line: maven dc
+      project_name: ActiveCluster
+      nag_email: activecluster-dev@lists.codehaus.org
+    end_time: 1081448354
+    modification_set: []
+    project_name: ActiveCluster
+    start_time: 1081448335
+    status: SUCCESSFUL
+    timestamp: "20040408181615"
+  - !ruby/object:DamageControl::Build 
+    config: 
+      scm_spec: !ruby/sym ext:dcontrol@localhost:/home/projects/activecluster/scm:activecluster
+      build_command_line: maven dc
+      project_name: ActiveCluster
+      nag_email: activecluster-dev@lists.codehaus.org
+    end_time: 1081450270
+    modification_set: []
+    project_name: ActiveCluster
+    start_time: 1081450250
+    status: SUCCESSFUL
+    timestamp: "20040408184816"
+jmock: 
+  - !ruby/object:DamageControl::Build 
+    config: 
+      scm_spec: !ruby/sym ext:dcontrol@cvs.codehaus.org:/scm/cvs:jmock
+      build_command_line: sh damagecontrol.sh
+      project_name: jmock
+      nag_email: jmock-scm@lists.codehaus.org
+    end_time: 1081103958
+    modification_set: []
+    project_name: jmock
+    start_time: 1081103904
+    status: FAILED
+    timestamp: "20040404183819"
+  - !ruby/object:DamageControl::Build 
+    config: 
+      scm_spec: !ruby/sym ext:dcontrol@cvs.codehaus.org:/scm/cvs:jmock
+      build_command_line: sh damagecontrol.sh
+      project_name: jmock
+      nag_email: jmock-scm@lists.codehaus.org
+    end_time: 1081370588
+    modification_set: []
+    project_name: jmock
+    start_time: 1081370536
+    status: FAILED
+    timestamp: "20040407204211"
+  - !ruby/object:DamageControl::Build 
+    config: 
+      scm_spec: !ruby/sym ext:dcontrol@cvs.codehaus.org:/scm/cvs:jmock
+      build_command_line: sh damagecontrol.sh
+      project_name: jmock
+      nag_email: jmock-scm@lists.codehaus.org
+    modification_set: []
+    project_name: jmock
+    status: QUEUED
+    timestamp: "20040407210936"
+  - !ruby/object:DamageControl::Build 
+    config: 
+      scm_spec: !ruby/sym ext:dcontrol@cvs.codehaus.org:/scm/cvs:jmock
+      build_command_line: sh damagecontrol.sh
+      project_name: jmock
+      nag_email: jmock-scm@lists.codehaus.org
+    end_time: 1081372225
+    modification_set: []
+    project_name: jmock
+    start_time: 1081372182
+    status: FAILED
+    timestamp: "20040407210937"
+picocontainer: 
+  - !ruby/object:DamageControl::Build 
+    config: 
+      scm_spec: !ruby/sym ext:dcontrol@cvs.codehaus.org:/cvsroot/picocontainer:java
+      build_command_line: maven -Dgoals=binary:deploy generic
+      project_name: picocontainer
+      nag_email: picocontainer-scm@lists.codehaus.org
+    modification_set: []
+    project_name: picocontainer
+    status: IDLE
+    timestamp: "20040323162807"
+  - !ruby/object:DamageControl::Build 
+    config: 
+      scm_spec: !ruby/sym ext:dcontrol@cvs.codehaus.org:/cvsroot/picocontainer:java
+      build_command_line: maven -Dgoals=binary:deploy generic
+      project_name: picocontainer
+      nag_email: picocontainer-commits@lists.codehaus.org
+    modification_set: []
+    project_name: picocontainer
+    status: QUEUED
+    timestamp: "20040402150529"
+  - !ruby/object:DamageControl::Build 
+    config: 
+      scm_spec: !ruby/sym ext:dcontrol@cvs.codehaus.org:/cvsroot/picocontainer:java
+      build_command_line: maven -Dgoals=binary:deploy generic
+      project_name: picocontainer
+      nag_email: picocontainer-commits@lists.codehaus.org
+    end_time: 1080918662
+    modification_set: []
+    project_name: picocontainer
+    start_time: 1080918335
+    status: SUCCESSFUL
+    timestamp: "20040402150530"
+  - !ruby/object:DamageControl::Build 
+    config: 
+      scm_spec: !ruby/sym ext:dcontrol@cvs.codehaus.org:/cvsroot/picocontainer:java
+      build_command_line: maven -Dgoals=binary:deploy generic
+      project_name: picocontainer
+      nag_email: picocontainer-commits@lists.codehaus.org
+    end_time: 1081095254
+    modification_set: []
+    project_name: picocontainer
+    start_time: 1081095055
+    status: SUCCESSFUL
+    timestamp: "20040404161050"
+  - !ruby/object:DamageControl::Build 
+    config: 
+      scm_spec: !ruby/sym ext:dcontrol@cvs.codehaus.org:/cvsroot/picocontainer:java
+      build_command_line: maven -Dgoals=binary:deploy generic
+      project_name: picocontainer
+      nag_email: picocontainer-commits@lists.codehaus.org
+    end_time: 1081384967
+    modification_set: []
+    project_name: picocontainer
+    start_time: 1081384768
+    status: SUCCESSFUL
+    timestamp: "20040408003923"
+  - !ruby/object:DamageControl::Build 
+    config: 
+      scm_spec: !ruby/sym ext:dcontrol@cvs.codehaus.org:/cvsroot/picocontainer:java
+      build_command_line: maven -Dgoals=binary:deploy generic
+      project_name: picocontainer
+      nag_email: picocontainer-commits@lists.codehaus.org
+    modification_set: []
+    project_name: picocontainer
+    status: QUEUED
+    timestamp: "20040408005540"
+  - !ruby/object:DamageControl::Build 
+    config: 
+      scm_spec: !ruby/sym ext:dcontrol@cvs.codehaus.org:/cvsroot/picocontainer:java
+      build_command_line: maven -Dgoals=binary:deploy generic
+      project_name: picocontainer
+      nag_email: picocontainer-commits@lists.codehaus.org
+    end_time: 1081386024
+    modification_set: []
+    project_name: picocontainer
+    start_time: 1081385999
+    status: FAILED
+    timestamp: "20040408005541"
+  - !ruby/object:DamageControl::Build 
+    config: 
+      scm_spec: !ruby/sym ext:dcontrol@cvs.codehaus.org:/cvsroot/picocontainer:java
+      build_command_line: maven -Dgoals=binary:deploy generic
+      project_name: picocontainer
+      nag_email: picocontainer-commits@lists.codehaus.org
+    end_time: 1081387222
+    modification_set: []
+    project_name: picocontainer
+    start_time: 1081387037
+    status: SUCCESSFUL
+    timestamp: "20040408011712"
+  - !ruby/object:DamageControl::Build 
+    config: 
+      scm_spec: !ruby/sym ext:dcontrol@cvs.codehaus.org:/cvsroot/picocontainer:java
+      build_command_line: maven -Dgoals=binary:deploy generic
+      project_name: picocontainer
+      nag_email: picocontainer-commits@lists.codehaus.org
+    end_time: 1081387418
+    modification_set: []
+    project_name: picocontainer
+    start_time: 1081387222
+    status: SUCCESSFUL
+    timestamp: "20040408011729"
+  - !ruby/object:DamageControl::Build 
+    config: 
+      scm_spec: !ruby/sym ext:dcontrol@cvs.codehaus.org:/cvsroot/picocontainer:java
+      build_command_line: maven -Dgoals=binary:deploy generic
+      project_name: picocontainer
+      nag_email: picocontainer-commits@lists.codehaus.org
+    end_time: 1081417871
+    modification_set: []
+    project_name: picocontainer
+    start_time: 1081417632
+    status: SUCCESSFUL
+    timestamp: "20040408094707"
+  - !ruby/object:DamageControl::Build 
+    config: 
+      scm_spec: !ruby/sym ext:dcontrol@cvs.codehaus.org:/cvsroot/picocontainer:java
+      build_command_line: maven -Dgoals=binary:deploy generic
+      project_name: picocontainer
+      nag_email: picocontainer-commits@lists.codehaus.org
+    end_time: 1081418106
+    modification_set: []
+    project_name: picocontainer
+    start_time: 1081417871
+    status: SUCCESSFUL
+    timestamp: "20040408094721"
+  - !ruby/object:DamageControl::Build 
+    config: 
+      scm_spec: ":ext:dcontrol@cvs.codehaus.org:/cvsroot/picocontainer:java"
+      build_command_line: maven -Dgoals=binary:deploy generic
+      project_name: picocontainer
+      nag_email: picocontainer-commits@lists.codehaus.org
+    end_time: 1081594172
+    modification_set: 
+      - !ruby/object:DamageControl::Modification 
+        developer: rinkrank
+        message: "check to avoid division by zero\n"
+        path: type3msg/src/java/org/nanocontainer/type3msg/RoundRobinMulticastingProxy.java
+        revision: "1.5"
+        time: 2004/04/10 10:43:03
+    project_name: picocontainer
+    start_time: 1081593943
+    status: SUCCESSFUL
+    timestamp: "20040410104538"
+  - !ruby/object:DamageControl::Build 
+    config: 
+      scm_spec: ":ext:dcontrol@cvs.codehaus.org:/cvsroot/picocontainer:java"
+      build_command_line: maven -Dgoals=binary:deploy generic
+      project_name: picocontainer
+      nag_email: picocontainer-commits@lists.codehaus.org
+    end_time: 1081594621
+    modification_set: 
+      - !ruby/object:DamageControl::Modification 
+        developer: rinkrank
+        message: "nothing\n"
+        path: README.txt
+        revision: "1.2"
+        time: 2004/04/10 10:50:46
+    project_name: picocontainer
+    start_time: 1081594405
+    status: SUCCESSFUL
+    timestamp: "20040410105320"
+drools: 
+  - !ruby/object:DamageControl::Build 
+    config: 
+      scm_spec: !ruby/sym ext:dcontrol@cvs.codehaus.org:/scm/cvs:drools
+      build_command_line: "./build.sh clean site"
+      project_name: drools
+      nag_email: drools-interest@lists.codehaus.org
+    end_time: 1080944889
+    modification_set: []
+    project_name: drools
+    start_time: 1080944851
+    status: SUCCESSFUL
+    timestamp: "20040402222726"
+  - !ruby/object:DamageControl::Build 
+    config: 
+      scm_spec: !ruby/sym ext:dcontrol@cvs.codehaus.org:/scm/cvs:drools
+      build_command_line: "./build.sh clean site"
+      project_name: drools
+      nag_email: drools-interest@lists.codehaus.org
+    end_time: 1080944936
+    modification_set: []
+    project_name: drools
+    start_time: 1080944897
+    status: SUCCESSFUL
+    timestamp: "20040402222812"
+  - !ruby/object:DamageControl::Build 
+    config: 
+      scm_spec: !ruby/sym ext:dcontrol@cvs.codehaus.org:/scm/cvs:drools
+      build_command_line: "./build.sh clean site"
+      project_name: drools
+      nag_email: drools-interest@lists.codehaus.org
+    end_time: 1080945112
+    modification_set: []
+    project_name: drools
+    start_time: 1080945074
+    status: SUCCESSFUL
+    timestamp: "20040402223109"
+  - !ruby/object:DamageControl::Build 
+    config: 
+      scm_spec: !ruby/sym ext:dcontrol@cvs.codehaus.org:/scm/cvs:drools
+      build_command_line: "./build.sh clean site"
+      project_name: drools
+      nag_email: drools-interest@lists.codehaus.org
+    end_time: 1080945295
+    modification_set: []
+    project_name: drools
+    start_time: 1080945255
+    status: SUCCESSFUL
+    timestamp: "20040402223410"
+  - !ruby/object:DamageControl::Build 
+    config: 
+      scm_spec: !ruby/sym ext:dcontrol@cvs.codehaus.org:/scm/cvs:drools
+      build_command_line: "./build.sh clean site"
+      project_name: drools
+      nag_email: drools-interest@lists.codehaus.org
+    end_time: 1080945346
+    modification_set: []
+    project_name: drools
+    start_time: 1080945298
+    status: SUCCESSFUL
+    timestamp: "20040402223453"
+  - !ruby/object:DamageControl::Build 
+    config: 
+      scm_spec: !ruby/sym ext:dcontrol@cvs.codehaus.org:/scm/cvs:drools
+      build_command_line: "./build.sh clean site"
+      project_name: drools
+      nag_email: drools-interest@lists.codehaus.org
+    end_time: 1080945555
+    modification_set: []
+    project_name: drools
+    start_time: 1080945510
+    status: SUCCESSFUL
+    timestamp: "20040402223825"
+  - !ruby/object:DamageControl::Build 
+    config: 
+      scm_spec: !ruby/sym ext:dcontrol@cvs.codehaus.org:/scm/cvs:drools
+      build_command_line: "./build.sh clean site"
+      project_name: drools
+      nag_email: drools-interest@lists.codehaus.org
+    end_time: 1080945608
+    modification_set: []
+    project_name: drools
+    start_time: 1080945570
+    status: SUCCESSFUL
+    timestamp: "20040402223925"
+  - !ruby/object:DamageControl::Build 
+    config: 
+      scm_spec: !ruby/sym ext:dcontrol@cvs.codehaus.org:/scm/cvs:drools
+      build_command_line: "./build.sh clean site"
+      project_name: drools
+      nag_email: drools-interest@lists.codehaus.org
+    end_time: 1080945666
+    modification_set: []
+    project_name: drools
+    start_time: 1080945627
+    status: SUCCESSFUL
+    timestamp: "20040402224022"
+  - !ruby/object:DamageControl::Build 
+    config: 
+      scm_spec: !ruby/sym ext:dcontrol@cvs.codehaus.org:/scm/cvs:drools
+      build_command_line: "./build.sh clean site"
+      project_name: drools
+      nag_email: drools-interest@lists.codehaus.org
+    end_time: 1080945736
+    modification_set: []
+    project_name: drools
+    start_time: 1080945698
+    status: SUCCESSFUL
+    timestamp: "20040402224133"
+  - !ruby/object:DamageControl::Build 
+    config: 
+      scm_spec: !ruby/sym ext:dcontrol@cvs.codehaus.org:/scm/cvs:drools
+      build_command_line: "./build.sh clean site"
+      project_name: drools
+      nag_email: drools-interest@lists.codehaus.org
+    end_time: 1080945807
+    modification_set: []
+    project_name: drools
+    start_time: 1080945770
+    status: SUCCESSFUL
+    timestamp: "20040402224245"
+  - !ruby/object:DamageControl::Build 
+    config: 
+      scm_spec: !ruby/sym ext:dcontrol@cvs.codehaus.org:/scm/cvs:drools
+      build_command_line: "./build.sh clean site"
+      project_name: drools
+      nag_email: drools-interest@lists.codehaus.org
+    end_time: 1080945969
+    modification_set: []
+    project_name: drools
+    start_time: 1080945926
+    status: SUCCESSFUL
+    timestamp: "20040402224521"
+  - !ruby/object:DamageControl::Build 
+    config: 
+      scm_spec: !ruby/sym ext:dcontrol@cvs.codehaus.org:/scm/cvs:drools
+      build_command_line: "./build.sh clean site"
+      project_name: drools
+      nag_email: drools-interest@lists.codehaus.org
+    end_time: 1080946130
+    modification_set: []
+    project_name: drools
+    start_time: 1080946091
+    status: SUCCESSFUL
+    timestamp: "20040402224806"
+  - !ruby/object:DamageControl::Build 
+    config: 
+      scm_spec: !ruby/sym ext:dcontrol@cvs.codehaus.org:/scm/cvs:drools
+      build_command_line: "./build.sh clean site"
+      project_name: drools
+      nag_email: drools-interest@lists.codehaus.org
+    end_time: 1080946448
+    modification_set: []
+    project_name: drools
+    start_time: 1080946410
+    status: SUCCESSFUL
+    timestamp: "20040402225325"
+  - !ruby/object:DamageControl::Build 
+    config: 
+      scm_spec: !ruby/sym ext:dcontrol@cvs.codehaus.org:/scm/cvs:drools
+      build_command_line: "./build.sh clean site"
+      project_name: drools
+      nag_email: drools-interest@lists.codehaus.org
+    end_time: 1080947058
+    modification_set: []
+    project_name: drools
+    start_time: 1080947019
+    status: SUCCESSFUL
+    timestamp: "20040402230334"
+  - !ruby/object:DamageControl::Build 
+    config: 
+      scm_spec: !ruby/sym ext:dcontrol@cvs.codehaus.org:/scm/cvs:drools
+      build_command_line: "./build.sh clean site"
+      project_name: drools
+      nag_email: drools-interest@lists.codehaus.org
+    modification_set: []
+    project_name: drools
+    status: QUEUED
+    timestamp: "20040402230703"
+  - !ruby/object:DamageControl::Build 
+    config: 
+      scm_spec: !ruby/sym ext:dcontrol@cvs.codehaus.org:/scm/cvs:drools
+      build_command_line: "./build.sh clean site"
+      project_name: drools
+      nag_email: drools-interest@lists.codehaus.org
+    end_time: 1080947270
+    modification_set: []
+    project_name: drools
+    start_time: 1080947229
+    status: SUCCESSFUL
+    timestamp: "20040402230704"
+  - !ruby/object:DamageControl::Build 
+    config: 
+      scm_spec: !ruby/sym ext:dcontrol@cvs.codehaus.org:/scm/cvs:drools
+      build_command_line: "./build.sh clean site"
+      project_name: drools
+      nag_email: drools-interest@lists.codehaus.org
+    end_time: 1080947403
+    modification_set: []
+    project_name: drools
+    start_time: 1080947358
+    status: SUCCESSFUL
+    timestamp: "20040402230913"
+  - !ruby/object:DamageControl::Build 
+    config: 
+      scm_spec: !ruby/sym ext:dcontrol@cvs.codehaus.org:/scm/cvs:drools
+      build_command_line: "./build.sh clean site"
+      project_name: drools
+      nag_email: drools-interest@lists.codehaus.org
+    end_time: 1080947503
+    modification_set: []
+    project_name: drools
+    start_time: 1080947465
+    status: SUCCESSFUL
+    timestamp: "20040402231100"
+  - !ruby/object:DamageControl::Build 
+    config: 
+      scm_spec: !ruby/sym ext:dcontrol@cvs.codehaus.org:/scm/cvs:drools
+      build_command_line: "./build.sh clean site"
+      project_name: drools
+      nag_email: drools-interest@lists.codehaus.org
+    end_time: 1081046197
+    modification_set: []
+    project_name: drools
+    start_time: 1081046159
+    status: SUCCESSFUL
+    timestamp: "20040404023554"
+  - !ruby/object:DamageControl::Build 
+    config: 
+      scm_spec: !ruby/sym ext:dcontrol@cvs.codehaus.org:/scm/cvs:drools
+      build_command_line: "./build.sh clean site"
+      project_name: drools
+      nag_email: drools-interest@lists.codehaus.org
+    modification_set: []
+    project_name: drools
+    status: QUEUED
+    timestamp: "20040404025829"
+  - !ruby/object:DamageControl::Build 
+    config: 
+      scm_spec: !ruby/sym ext:dcontrol@cvs.codehaus.org:/scm/cvs:drools
+      build_command_line: "./build.sh clean site"
+      project_name: drools
+      nag_email: drools-interest@lists.codehaus.org
+    modification_set: []
+    project_name: drools
+    status: QUEUED
+    timestamp: "20040404025829"
+  - !ruby/object:DamageControl::Build 
+    config: 
+      scm_spec: !ruby/sym ext:dcontrol@cvs.codehaus.org:/scm/cvs:drools
+      build_command_line: "./build.sh clean site"
+      project_name: drools
+      nag_email: drools-interest@lists.codehaus.org
+    end_time: 1081047554
+    modification_set: []
+    project_name: drools
+    start_time: 1081047515
+    status: SUCCESSFUL
+    timestamp: "20040404025830"
+  - !ruby/object:DamageControl::Build 
+    config: 
+      scm_spec: !ruby/sym ext:dcontrol@cvs.codehaus.org:/scm/cvs:drools
+      build_command_line: "./build.sh clean site"
+      project_name: drools
+      nag_email: drools-interest@lists.codehaus.org
+    modification_set: []
+    project_name: drools
+    status: QUEUED
+    timestamp: "20040404025830"
+  - !ruby/object:DamageControl::Build 
+    config: 
+      scm_spec: !ruby/sym ext:dcontrol@cvs.codehaus.org:/scm/cvs:drools
+      build_command_line: "./build.sh clean site"
+      project_name: drools
+      nag_email: drools-interest@lists.codehaus.org
+    end_time: 1081048510
+    modification_set: []
+    project_name: drools
+    start_time: 1081048469
+    status: SUCCESSFUL
+    timestamp: "20040404031424"
+  - !ruby/object:DamageControl::Build 
+    config: 
+      scm_spec: !ruby/sym ext:dcontrol@cvs.codehaus.org:/scm/cvs:drools
+      build_command_line: "./build.sh clean site"
+      project_name: drools
+      nag_email: drools-interest@lists.codehaus.org
+    end_time: 1081048659
+    modification_set: []
+    project_name: drools
+    start_time: 1081048621
+    status: SUCCESSFUL
+    timestamp: "20040404031656"
+  - !ruby/object:DamageControl::Build 
+    config: 
+      scm_spec: !ruby/sym ext:dcontrol@cvs.codehaus.org:/scm/cvs:drools
+      build_command_line: "./build.sh clean site"
+      project_name: drools
+      nag_email: drools-interest@lists.codehaus.org
+    end_time: 1081049067
+    modification_set: []
+    project_name: drools
+    start_time: 1081049027
+    status: SUCCESSFUL
+    timestamp: "20040404032342"
+  - !ruby/object:DamageControl::Build 
+    config: 
+      scm_spec: !ruby/sym ext:dcontrol@cvs.codehaus.org:/scm/cvs:drools
+      build_command_line: "./build.sh clean site"
+      project_name: drools
+      nag_email: drools-interest@lists.codehaus.org
+    end_time: 1081111685
+    modification_set: []
+    project_name: drools
+    start_time: 1081111627
+    status: SUCCESSFUL
+    timestamp: "20040404204702"
+  - !ruby/object:DamageControl::Build 
+    config: 
+      scm_spec: !ruby/sym ext:dcontrol@cvs.codehaus.org:/scm/cvs:drools
+      build_command_line: "./build.sh clean site"
+      project_name: drools
+      nag_email: drools-interest@lists.codehaus.org
+    end_time: 1081111768
+    modification_set: []
+    project_name: drools
+    start_time: 1081111712
+    status: SUCCESSFUL
+    timestamp: "20040404204827"
+  - !ruby/object:DamageControl::Build 
+    config: 
+      scm_spec: !ruby/sym ext:dcontrol@cvs.codehaus.org:/scm/cvs:drools
+      build_command_line: "./build.sh clean site"
+      project_name: drools
+      nag_email: drools-interest@lists.codehaus.org
+    modification_set: []
+    project_name: drools
+    status: QUEUED
+    timestamp: "20040407194302"
+  - !ruby/object:DamageControl::Build 
+    config: 
+      scm_spec: !ruby/sym ext:dcontrol@cvs.codehaus.org:/scm/cvs:drools
+      build_command_line: "./build.sh clean site"
+      project_name: drools
+      nag_email: drools-interest@lists.codehaus.org
+    end_time: 1081367048
+    modification_set: []
+    project_name: drools
+    start_time: 1081366988
+    status: SUCCESSFUL
+    timestamp: "20040407194303"
+  - !ruby/object:DamageControl::Build 
+    config: 
+      scm_spec: !ruby/sym ext:dcontrol@cvs.codehaus.org:/scm/cvs:drools
+      build_command_line: "./build.sh clean site"
+      project_name: drools
+      nag_email: drools-interest@lists.codehaus.org
+    modification_set: []
+    project_name: drools
+    status: QUEUED
+    timestamp: "20040407194303"
+  - !ruby/object:DamageControl::Build 
+    config: 
+      scm_spec: !ruby/sym ext:dcontrol@cvs.codehaus.org:/scm/cvs:drools
+      build_command_line: "./build.sh clean site"
+      project_name: drools
+      nag_email: drools-interest@lists.codehaus.org
+    end_time: 1081367149
+    modification_set: []
+    project_name: drools
+    start_time: 1081367103
+    status: SUCCESSFUL
+    timestamp: "20040407194458"

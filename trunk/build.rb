@@ -5,15 +5,11 @@ $VERBOSE = nil
 class Project
   def initialize
     $damagecontrol_home = File::expand_path(".")
-    
-    $:<<'lib'
-    $:<<'lib/rica'
-    $:<<'src/ruby'
   end
   
   def run_test(test)
-    Dir.chdir("#{$damagecontrol_home}/src/ruby")
-    system("ruby -I#{$damagecontrol_home}/lib #{test}") || fail
+    Dir.chdir("#{$damagecontrol_home}/server")
+    system("ruby -I. #{test}") || fail
     fail if ($? != 0)
   end
 
@@ -23,11 +19,11 @@ class Project
   end
 
   def unit_test
-    run_test("AllTests.rb")
+    run_test("damagecontrol/test/AllTests.rb")
   end
 
   def integration_test
-    run_test("End2EndTest.rb")
+    run_test("damagecontrol/test/End2EndTest.rb")
   end
   
   def all
