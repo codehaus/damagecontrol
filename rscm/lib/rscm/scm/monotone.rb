@@ -104,7 +104,6 @@ module RSCM
     end
 
     def changesets(checkout_dir, from_identifier, to_identifier=Time.infinity)
-puts "FROM: #{from_identifier}"
       checkout(checkout_dir, to_identifier)
       to_identifier = Time.infinity if to_identifier.nil?
       with_working_dir(checkout_dir) do
@@ -128,10 +127,11 @@ puts "FROM: #{from_identifier}"
 
     # Checks out silently. Called by superclass' checkout.
     def checkout_silent(checkout_dir, to_identifier)
+      selector = expand_selector(to_identifier)
       checkout_dir = PathConverter.filepath_to_nativepath(checkout_dir, false)
       if checked_out?(checkout_dir)
         with_working_dir(checkout_dir) do
-          monotone("update")
+          monotone("update #{selector}")
         end
       else
         monotone("checkout #{checkout_dir}", @branch, @key) do |stdout|
@@ -151,6 +151,19 @@ puts "FROM: #{from_identifier}"
     end
 
   private
+  
+    # See http://www.venge.net/monotone/monotone.html#Selectors
+    # Also see docs for expand_selector in the same document
+    # Dates are formatted with strftime-style %F, which is of style 2005-28-02,
+    # which is too coarse grained. Dates are therefore not supported.
+    def expand_selector(identifier)
+      if(identifier.is_a?(Time))
+        Log.warn("Time selectors are not supported for Monotone")
+        ""
+      else
+        "i:#{identifier}"
+      end
+    end
   
     def monotone(monotone_cmd, branch=nil, key=nil)
       branch_opt = branch ? "--branch=\"#{branch}\"" : ""
