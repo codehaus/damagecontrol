@@ -1,4 +1,6 @@
-<html><body>
+<html>
+<title><% project_name %> dashboard</title>
+<body>
 
 <table>
 <tr><td>Project Name</td><td><%= project_name %></td></tr>
@@ -6,13 +8,5 @@
 <tr><td>Last completed build status</td><td><%= last_status %><br/></td></tr>
 <tr><td>Current build status</td><td><%= current_status %></td></tr>
 </table>
-
-<% if private? then %>
-Tasks:
-<ul>
-<li><a href="?project_name=<%= project_name %>&action=configure">Configure</a></li>
-<li><a href="?project_name=<%= project_name %>&action=trig_build">Trig build now</a></li>
-</ul>
-<% end %>
 
 </body></html>

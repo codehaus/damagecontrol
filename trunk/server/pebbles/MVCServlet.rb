@@ -1,9 +1,29 @@
+require 'erb'
+require 'pebbles/RiteMesh'
+
 module Pebbles
-  class MVCServlet
-    attr_accessor :templatedir
+  class SimpleServlet
+    def get_instance(config, *options)
+      self
+    end
     
-    def initialize
-      self.templatedir = "."
+    def html_quote(text)
+      text.gsub(/</, "&lt;")
+    end
+    
+    def redirect(url)
+      response["Location"] = url
+      response.status = WEBrick::HTTPStatus::Found.code
+    end
+  end
+
+  class MVCServlet < SimpleServlet
+    attr_reader :templatedir
+    
+    include RiteMesh
+    
+    def templatedir
+      "."
     end
     
     def get_instance(config, *options)
@@ -42,12 +62,7 @@ module Pebbles
       params_enc = params.collect {|key, value| "#{key}=#{value}" }.join("&")
       redirect("#{request.path}?action_name=#{action_name}&#{params_enc}")
     end
-    
-    def redirect(url)
-      response["Location"] = url
-      response.status = WEBrick::HTTPStatus::Found.code
-    end
-    
+        
     def request
       Thread.current["request"]
     end
@@ -57,9 +72,23 @@ module Pebbles
     end
     
     def erb(template, binding)
-      response["Content-Type"] = "text/html"
       template = File.new("#{templatedir}/#{template}").read.untaint
-      response.body = ERB.new(template).result(binding)
+      ERB.new(template).result(binding)
+    end
+    
+    def render(erb_template, binding)
+      response.body = erb(erb_template, binding)
+      unless ritemesh_template.nil?
+        ritemesh_template_content = File.new("#{templatedir}/#{ritemesh_template}").read.untaint
+        response.body = mesh(response.body, ritemesh_template_content, binding)
+      end
+    end
+    
+    protected
+    
+    def ritemesh_template
+      # disabled by default
+      nil
     end
   end
 end

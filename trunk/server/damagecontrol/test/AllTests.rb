@@ -37,3 +37,5 @@ require 'damagecontrol/cruisecontrol/CruiseControlLogPollerTest'
 require 'damagecontrol/cruisecontrol/CruiseControlLogParserTest'
 
 require 'damagecontrol/test/IntegrationTests'
+
+require 'pebbles/RiteMeshTest'

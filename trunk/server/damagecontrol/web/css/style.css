@@ -16,3 +16,29 @@ text-decoration: underline;}
 
 img {
 vertical-align: middle;}
+
+.top-panel {
+float: top;
+border-bottom: 1px #7f7f7f solid;
+padding-bottom: 3px;
+margin-bottom: 3pt;}
+
+.task-panel {
+float: left;
+width: 200px;
+margin-right: -1px;
+padding: 3px;
+border: 1pt #7f7f7f solid;}
+
+.main-panel {
+margin-left: 220px;}
+
+.task-header {
+display: block;
+border-bottom: 1px #7f7f7f solid;
+font-weight: bold;
+font-size: 1.1em;}
+
+.footer {
+font-size: 0.8em;
+text-align: center}
