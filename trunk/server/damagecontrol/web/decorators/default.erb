@@ -1,6 +1,5 @@
 <html>
 <head>
-<link rel="stylesheet" href="../css/style.css" type="text/css">
 <link rel="stylesheet" href="css/style.css" type="text/css">
 <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
 
@@ -38,15 +37,10 @@
 sidepanes = self.sidepanes
 if(sidepanes && sidepanes.length > 0)
 %>
-  <div id="side-panel">
-  
+  <div id="side-panel">  
     <% sidepanes.each do |sidepane| %>
       <div class="side-panel-entry"><%= sidepane %></div>
-    <% end %>
-    
-    <div class="side-panel-entry">
-    </div>
-  
+    <% end %>  
   </div>
 <% end %>
 
