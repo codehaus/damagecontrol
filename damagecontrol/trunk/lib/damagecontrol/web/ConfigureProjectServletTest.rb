@@ -33,9 +33,9 @@ module DamageControl
       end
       assert(project_config_repository.project_exists?("myprojectname"))
       project_config = project_config_repository.project_config("myprojectname")
-      assert_equal(CVS, project_config['scm'].class)
+      assert_equal(RSCM::CVS, project_config['scm'].class)
       assert_equal("mycvsroot", project_config['scm'].cvsroot)
-      assert_equal(Bugzilla, project_config['tracking'].class)
+      assert_equal(RSCM::Tracker::Bugzilla, project_config['tracking'].class)
       assert_equal("http://www.bugzilla.org/", project_config['tracking'].bugzilla_url)
     end
     

@@ -1,7 +1,0 @@
-*.log
-*.ipr
-*.iml
-*.iws
-.project
-target
-dctray

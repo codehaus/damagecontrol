@@ -8,7 +8,7 @@ module DamageControl
   public
   
     def tracking_class
-      Bugzilla
+      RSCM::Tracker::Bugzilla
     end
     
     def tracking_display_name

@@ -1,9 +1,0 @@
-*.iml
-*.ipr
-*.log
-*.iws
-.project
-target
-dctray
-work
-ruby

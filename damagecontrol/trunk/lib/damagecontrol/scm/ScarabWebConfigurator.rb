@@ -8,7 +8,7 @@ module DamageControl
   public
   
     def tracking_class
-      Scarab
+      RSCM::Tracker::Scarab
     end
     
     def tracking_display_name

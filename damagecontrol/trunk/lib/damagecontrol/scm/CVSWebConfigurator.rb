@@ -34,8 +34,7 @@ module DamageControl
         "cvsroot", 
         "cvsmodule", 
         "cvspassword",
-        "cvsbranch",
-        "rsh_client"
+        "cvsbranch"
       ]
     end
   end

@@ -22,6 +22,10 @@ module DamageControl
       "#{project_dir(project_name)}/checkout"
     end
 
+    def trigger_checkout_dir(project_name)
+      "#{project_dir(project_name)}/trigger_checkout"
+    end
+
     def stdout_file(project_name, dc_creation_time)
       "#{build_dir(project_name, dc_creation_time)}/stdout.log"
     end
