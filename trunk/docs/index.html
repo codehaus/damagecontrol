@@ -7,8 +7,20 @@
  title="" alt="" style="width: 99px; height: 106px;"><br>
 </h1>
 <h1>Introduction</h1>
-DamageControl is an extensible and platform neutral Continuous
-Integration system.<br>
+DamageControl is an extensible and platform neutral <a
+ href="http://martinfowler.com/articles/continuousIntegration.html">Continuous
+Integration</a> system.<br>
+It builds on the ideas and experiences from CruiseControl, and aims to
+take it a step further by being:
+<ul>
+  <li>Easier to install and configure</li>
+  <li>Easier to extend</li>
+  <li>Platform agnostic (I.e. work for non-java environments)</li>
+  <li>Event driven</li>
+  <li>Multiple notification schemes (IRC, RSS, HTML, mail, JIRA...)</li>
+  <li>Smarter SCM integration (automatic rollbacks of checkins causing
+build failures etc.)</li>
+</ul>
 <h1>Architecture</h1>
 DamageControl is a system built around the principles of an event
 driven architecture (EDA) and implemented in Ruby. At the core of the
@@ -19,17 +31,24 @@ components in the system. The entire system is loosely coupled.<br>
 Currently you'll have to get it via CVS. It is a moving target, and
 nothing is stable or final.<br>
 <br>
-cvs -d :pserver:anonymous@cvs.codehaus.org:/cvsroot/damagecontrol login
+<code>cvs -d :pserver:anonymous@cvs.codehaus.org:/cvsroot/damagecontrol
+login</code>
+<br>
 <br>
 (just press the enter key)<br>
 <br>
-cvs -z3 -d :pserver:anonymous@cvs.codehaus.org:/cvsroot/damagecontrol
-co damagecontrol <br>
+<code>cvs -z3 -d
+:pserver:anonymous@cvs.codehaus.org:/cvsroot/damagecontrol
+co damagecontrol </code><br>
+<h1>JIRA issue tracker</h1>
+The requirements, progress and bugs are tracked in <a
+ href="http://jira.codehaus.org/secure/BrowseProject.jspa?id=10260">DamageControl
+JIRA</a>.
 <h1>Installation</h1>
 There is no installation manual (yet). Hang out on our mailing list to
 know more:<br>
 <a href="http://lists.codehaus.org/mailman/listinfo/damagecontrol-dev">damagecontrol-dev</a><a
- href="http://lists.codehaus.org/mailman/listinfo/damagecontrol-uesr"><br>
+ href="http://lists.codehaus.org/mailman/listinfo/damagecontrol-user"><br>
 damagecontrol-user</a><br>
 <br>
 <br>
