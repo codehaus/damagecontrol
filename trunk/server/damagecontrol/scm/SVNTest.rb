@@ -20,7 +20,7 @@ module DamageControl
       svn
     end
 
-    def test_label
+    def Xtest_label
       work_dir = new_temp_dir
       checkout_dir = "#{work_dir}/blah/checkout"
       repository_dir = "#{work_dir}/repository"

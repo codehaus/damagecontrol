@@ -39,6 +39,7 @@ def shutdown_server(message)
   client = ::XMLRPC::Client.new2 "http://localhost:4712/private/xmlrpc"
   #info client.proxy("control").shutdown_with_message_and_time(message, 10) # FIXME log this
 rescue XMLRPC::FaultException => e
+  # Do we really want to fail? This would happen if the server is already down.
   raise e.faultString
 end
 

@@ -1,4 +1,5 @@
 require 'timeout'
+require 'fileutils'
 
 module Pebbles   
 
@@ -15,14 +16,14 @@ module Pebbles
   end
 
   class Process2
+    include FileUtils
 
-    def initialize(cmd, stderr_file=nil, env={}, timeout=nil)
-      @cmd, @stderr_file, @env, @timeout = cmd, stderr_file, env, timeout
+    def initialize(cmd, dir=".", stderr_file=nil, env={}, timeout=nil)
+      @cmd, @dir, @stderr_file, @env, @timeout = cmd, dir, stderr_file, env, timeout
       @cmd2 = stderr_file ? "#{@cmd} 2> \"#{@stderr_file}\"" : @cmd
       
       niceness = ENV['DC_NICE']
       @cmd2 = "nice --adjustment=#{niceness} #{@cmd2}" if niceness
-puts @cmd2
     end
     
     def execute(&proc)
@@ -31,20 +32,6 @@ puts @cmd2
     
   private
   
-    def Process2.win32_processes
-      processes = []
-      IO.popen("tasklist") do |stdout|
-        stdout.each do |line|
-          if(line =~ /(.+)\s+([0-9]+) [a-zA-Z]+\s+[0-9]+\s+/)
-            image = $1.strip
-            pid = $2.to_i
-            processes << Win32Process.new(pid, image)
-          end
-        end
-      end
-      processes
-    end
-    
     def win32?
       RUBY_PLATFORM == "i386-mswin32"
     end
@@ -56,12 +43,21 @@ puts @cmd2
           pr = IO::pipe
 
           pid = fork do
-            pr[0].close
-            STDOUT.reopen(pr[1])
-            pr[1].close
+            prev = Dir.pwd
+            begin
+              mkdir_p(@dir)
+              Dir.chdir(@dir)
 
-            @env.each {|key, val| ENV[key] = val}
-            exec(@cmd2)
+              pr[0].close
+              STDOUT.reopen(pr[1])
+              pr[1].close
+
+              @env.each {|key, val| ENV[key] = val}
+              exec(@cmd2)
+            ensure
+              # I don't think we ever get here.
+              Dir.chdir(prev)
+            end
           end
           pr[1].close
           process = PosixProcess.new(pid)
@@ -111,17 +107,29 @@ puts @cmd2
       end
     end
 
+    def Process2.win32_processes
+      processes = []
+      IO.popen("tasklist") do |stdout|
+        stdout.each do |line|
+          if(line =~ /(.+)\s+([0-9]+) [a-zA-Z]+\s+[0-9]+\s+/)
+            image = $1.strip
+            pid = $2.to_i
+            processes << Win32Process.new(pid, image)
+          end
+        end
+      end
+      processes
+    end
+    
   end
 
   class PosixProcess
-    @@instances = []
     attr_writer :running
 
     def initialize(pid)
       @pid = pid
       @running = true
       @killed = false
-      @@instances << self
     end
     
     def kill
@@ -142,8 +150,7 @@ puts @cmd2
     end
   end
   
-  class Win32Process
-    @@instances = []
+  class Win32Process 
   
     attr_reader :pid, :image
     attr_writer :running
@@ -152,7 +159,6 @@ puts @cmd2
       @pid, @image = pid, image
       @running = false
       @killed = false
-      @@instances << self
     end
     
     def ==(p)

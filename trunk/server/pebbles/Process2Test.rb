@@ -16,7 +16,7 @@ module Pebbles
 
     def test_should_return_127_for_unknown_command_with_redirected_stderr
       # it will be 1 if we're using nice, 127 otherwise. just checking against 0.
-      assert(0 != Process2.new("mooky", "stderr.log").execute)
+      assert(0 != Process2.new("mooky", ".", "stderr.log").execute)
     end
 
     def test_should_return_1_for_unknown_command_without_redirected_stderr
@@ -40,7 +40,7 @@ module Pebbles
     
     def test_should_kill_on_timeout_and_return_nil_exit_code
       timeout(3) do
-        ret = Process2.new(blocking_command, nil, {}, 2).execute do |stdout, process|
+        ret = Process2.new(blocking_command, ".", nil, {}, 2).execute do |stdout, process|
           #puts stdout.read
         end
         assert_nil(ret)
@@ -104,7 +104,7 @@ module Pebbles
       mooky_env = RUBY_PLATFORM == "i386-mswin32" ? "%MOOKY%" : "$MOOKY"
       (1..5).each do |n|
         threads << Thread.new do
-          Process2.new("echo mooky is #{mooky_env}", nil, {"MOOKY" => "#{n}"}, 6).execute do |stdout, process|
+          Process2.new("echo mooky is #{mooky_env}", ".", nil, {"MOOKY" => "#{n}"}, 6).execute do |stdout, process|
             t = rand(5)
             puts "#{n} sleeping #{t}"
             sleep(t)

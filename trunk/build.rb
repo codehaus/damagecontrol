@@ -300,6 +300,7 @@ end
       message = "DamageControl is restarting (self upgrade)"
       info(client.proxy("control").shutdown_with_message_and_time(message, 10))
     rescue XMLRPC::FaultException => e
+      # Do we really want to fail? This would happen if the server is already down.
       fail(e.faultString)
     end
   end

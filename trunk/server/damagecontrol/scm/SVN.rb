@@ -65,8 +65,12 @@ module DamageControl
         checkout(checkout_dir, end_time)
         false
       else
-        logger.info("uptodate? #{local_revision(checkout_dir)},#{head_revision(checkout_dir)} (#{svnurl})")
-        local_revision(checkout_dir) == head_revision(checkout_dir)
+        lr = local_revision(checkout_dir)
+        hr = head_revision(checkout_dir)
+
+        logger.info("uptodate? #{lr},#{hr} (#{svnurl})")
+        
+        lr == hr
       end
     end
 
