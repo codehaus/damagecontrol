@@ -3,11 +3,13 @@ require 'damagecontrol/scm/Changes'
 require 'pebbles/Matchable'
 require 'xmlrpc/utils'
 require 'rexml/document'
+require 'cl/xmlserial'
 
 module DamageControl
 
   class Build
     include XMLRPC::Marshallable
+    include XmlSerialization
     include Pebbles::Matchable
 
     IDLE = "IDLE"

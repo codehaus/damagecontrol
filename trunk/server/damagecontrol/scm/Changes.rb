@@ -1,6 +1,7 @@
 require 'erb'
 require 'rexml/document'
 require 'xmlrpc/utils'
+require 'cl/xmlserial'
 require 'pebbles/TimeUtils'
 require 'pebbles/Matchable'
 
@@ -16,18 +17,9 @@ MAIN:<%= developer %>:<%= time.utc.strftime("%Y%m%d%H%M%S") %>
 <%= change.path %> <%= change.revision %><% end %>
 EOF
 
-  # Represents an entry in the SCM. The path is relative from the root of the SCM.
-  # The timestamp should in UTC be according to the SCM's clock.
-  class Entry
-    attr_reader :path, :timestamp
-  
-    def initialize(path, timestamp)
-      @path, @timestamp = path, timestamp
-    end
-  end
-
   class ChangeSets
     include XMLRPC::Marshallable
+    include XmlSerialization
     include Pebbles::Matchable
     include Enumerable
 
@@ -104,6 +96,7 @@ EOF
 
   class ChangeSet
     include XMLRPC::Marshallable
+    include XmlSerialization
     include Pebbles::Matchable
     include Enumerable
 
@@ -182,9 +175,9 @@ EOF
     end
   end
 
-  # TODO: use Entry instead of path and time
   class Change
     include XMLRPC::Marshallable
+    include XmlSerialization
     include Pebbles::Matchable
     
     MODIFIED = "MODIFIED"

@@ -1,0 +1,446 @@
+
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+"DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+<html><head>
+  <title>File: Readme</title>
+  <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1" />
+  <link rel=StyleSheet href="rdoc-style.css" type="text/css" media="screen" />
+  <script type="text/javascript" language="JavaScript">
+  <!--
+  function popCode(url) {
+    window.open(url, "Code", 
+          "resizable=yes,scrollbars=yes,toolbar=no,status=no,height=150,width=400")
+  }
+  //-->
+  </script>
+</head>
+
+<body bgcolor="white">
+<table summary="Information on file" width="100%">
+ <tr class="title-row">
+ <td><table summary="layout" width="100%"><tr>
+   <td class="big-title-font" colspan="2">Readme</td>
+   <td align="right"><table summary="layout" cellspacing="0" cellpadding="2">
+         <tr>
+           <td  class="small-title-font">Path:</td>
+           <td class="small-title-font">Readme</td>
+         </tr>
+         <tr>
+           <td class="small-title-font">Created:</td>
+           <td class="small-title-font">Thu May 16 22:26:59 CDT 2002</td>
+         </tr>
+         <tr>
+           <td class="small-title-font">Modified:</td>
+           <td class="small-title-font">Thu May 16 22:26:58 CDT 2002</td>
+         </tr>
+        </table>
+    </td></tr></table></td>
+  </tr>
+</table>
+  <!-- banner header -->
+
+<div class="description"><h1>Xml Serialization for Ruby</h1>
+<table>
+<tr><td valign="top">Download 1.0.pre3:</td><td><a
+href="http://prdownloads.sourceforge.net/clxmlserial/clxmlserial.1.0.pre3.zip">prdownloads.sourceforge.net/clxmlserial/clxmlserial.1.0.pre3.zip</a>
+
+</td></tr>
+<tr><td valign="top">REXML (&gt;=1.2.5)*:</td><td><a
+href="http://www.germane-software.com/~ser/Software/rexml">www.germane-software.com/~ser/Software/rexml</a>
+
+</td></tr>
+<tr><td valign="top">Home Page:</td><td><a href="http://clabs.org/clxmlserial.htm">clabs.org/clxmlserial.htm</a>
+
+</td></tr>
+<tr><td valign="top">ViewCVS:</td><td><a
+href="http://cvs.sourceforge.net/cgi-bin/viewcvs.cgi/clxmlserial/xmls">cvs.sourceforge.net/cgi-bin/viewcvs.cgi/clxmlserial/xmls</a>/
+
+</td></tr>
+<tr><td valign="top">Anon CVS:</td><td><a
+href="http://sourceforge.net/cvs/?group_id=51071">sourceforge.net/cvs/?group_id=51071</a>
+
+</td></tr>
+</table>
+<p>
+* not tested with any version &gt; 1.2.7.
+</p>
+<p>
+please review the Security Issues section before using.
+</p>
+<h3>Overview</h3>
+<p>
+Xml Serialization allows classes to be marshalled to and from XML.
+</p>
+<p>
+It consists of a module (<tt>XmlSerialization</tt>) and modified standard
+classes which add <tt>to_xml</tt> and <tt>from_xml</tt> methods.
+<tt>to_xml</tt> is an instance method which returns an XML element
+containing the data from each instance variable in the including class.
+<tt>from_xml</tt> is a singleton/class method which accepts an XML element
+and creates an instance of the class with the data in the element.
+</p>
+<p>
+Currently, REXML is used for XML parsing. It's possible later versions
+could plug-in other XML processors.
+</p>
+<p>
+This project is still in a pre-release state, though functional. Feel free
+to give me feedback (code contributions are of course always welcome).
+</p>
+<h3><a href="License.html">License</a></h3>
+<p>
+Copyright (c) 2002, Chris Morris (<a
+href="mailto:clxmlserial@clabs.org">clxmlserial@clabs.org</a>). BSD
+license.
+</p>
+<h3>Install</h3>
+<pre>
+  % ruby install.rb
+</pre>
+<h3>Usage</h3>
+<p>
+See the examples directory for a sample. Unit tests are also included in
+SITE/1.6/cl/xmlserial/xmlserialtest.rb. Here's a quick sample:
+</p>
+<pre>
+  require 'cl/xmlserial'
+
+  class MyClass
+    include XmlSerialization
+</pre>
+<pre>
+    attr_accessor :attr
+
+    def initialize
+      attr = 0
+    end
+  end
+</pre>
+<pre>
+  doc = REXML::Document.new(File.open(&quot;class.xml&quot;))
+  c = MyClass.from_xml(doc.root)
+  c.attr = 60
+  f = File.new(&quot;class.xml&quot;, File::CREAT|File::TRUNC|File::RDWR)
+  c.to_xml.write(f, -1)
+  f.close
+</pre>
+<p>
+yields either:
+</p>
+<pre>
+  &lt;MyClass&gt;
+    &lt;attr&gt;
+      &lt;Fixnum&gt;60&lt;/Fixnum&gt;
+    &lt;/attr&gt;
+  &lt;/MyClass&gt;
+</pre>
+<p>
+or:
+</p>
+<pre>
+  &lt;MyClass&gt;
+    &lt;attr&gt;60&lt;/attr&gt;
+  &lt;/MyClass&gt;
+</pre>
+<p>
+The <tt>XmlSerialization</tt> module includes a singleton configuration
+class (<tt>XmlSerialConf</tt>.<tt>instance</tt> aliased <tt>XSConf</tt> )
+with an <tt>outputTypeElements</tt> setting. Setting this to false gives
+more concise XML (the latter example above). In order to ensure the data is
+read in correctly, the instance variables should be initialized in the
+class's initialize method.
+</p>
+<p>
+Attempts to correctly grok Strings and Numerics will be made for
+uninitialized instance vars, so the latter example above will read in 60 as
+a Fixnum, even if @attr is not initialized. If the value is neither a valid
+Integer or Float, then it's read in as a String.
+</p>
+<p>
+All forms of Ruby Numeric notation are supported as well. So this:
+</p>
+<pre>
+  &lt;Array&gt;-5.4,5.a,4e5,0xaabb,123_456&lt;/Array&gt;
+</pre>
+<p>
+is read in as:
+</p>
+<pre>
+  [-5.4, &quot;5.a&quot;, 400000.0, 43707, 123456]
+</pre>
+<p>
+Arrays and Hashes also work with <tt>outputTypeElements</tt> set to false,
+assuming the items/keys/values are all of type String or Numeric. In that
+case, a CSV string is output. For example:
+</p>
+<pre>
+  c = MyClass.new
+  c.attr = ['a', 5]
+</pre>
+<p>
+becomes
+</p>
+<pre>
+  &lt;MyClass&gt;
+    &lt;attr&gt;a,5&lt;/attr&gt;
+  &lt;/MyClass&gt;
+</pre>
+<p>
+and
+</p>
+<pre>
+  c = MyClass.new
+  c.attr = { 'a' =&gt; 5, 'b' =&gt; 6 }
+</pre>
+<p>
+becomes
+</p>
+<pre>
+  &lt;MyClass&gt;
+    &lt;attr&gt;a=5,b=6&lt;/attr&gt;
+  &lt;/MyClass&gt;
+</pre>
+<p>
+If any of the items/keys/values are neither a String or Numeric, then type
+elements are automagically used:
+</p>
+<pre>
+  c = MyClass.new
+  c.attr = ['a', ['b', 'c']]
+</pre>
+<p>
+becomes
+</p>
+<pre>
+  &lt;MyClass&gt; &lt;attr&gt; &lt;Array&gt; &lt;String&gt;a&lt;/String&gt; &lt;Array&gt; &lt;String&gt;b&lt;/String&gt;
+  &lt;String&gt;c&lt;/String&gt; &lt;/Array&gt; &lt;/Array&gt; &lt;/attr&gt; &lt;/MyClass&gt;
+</pre>
+<p>
+As of 1.0.pre3, Xml Serialization can be used with classes that do not have
+a default/parameterless constructor. Set the
+<tt>XSConf</tt>.<tt>bypassInitialize</tt> attribute to true to have
+<tt>from_xml</tt> ignore the initialize method of the class. False is the
+default setting.
+</p>
+<p>
+Also changed in 1.0.pre3, attribute accessors are no longer required.
+<tt>instance_eval</tt> is used to set attributes directly.
+</p>
+<p>
+Currently, the following standard classes are supported:
+</p>
+<ul>
+<li><tt>String</tt>
+
+</li>
+<li><tt>Fixnum</tt>
+
+</li>
+<li><tt>Array</tt>
+
+</li>
+<li><tt>Hash</tt>
+
+</li>
+<li><tt>Time</tt> (time format can be set in
+<tt>XSConf</tt>.<tt>timeFormat</tt>)
+
+</li>
+<li><tt>Integer</tt> (<tt>Fixnum</tt>, <tt>Bignum</tt>)
+
+</li>
+<li><tt>Float</tt>
+
+</li>
+<li><tt>TrueClass</tt>
+
+</li>
+<li><tt>FalseClass</tt>
+
+</li>
+</ul>
+<h3>Security Issues</h3>
+<p>
+1.0.pre3 switched from requiring attribute accessors for deserialization to
+calling <tt>instance_eval</tt>. This is more convenient, but has a
+potential security hole.
+</p>
+<p>
+If the $<tt>SAFE</tt> level is set to 1, all strings read in from a file
+are marked tainted, and cannot be passed to <tt>instance_eval</tt>.
+However, because REXML passes all strings through
+<tt>Array</tt>.<tt>pack</tt> and <tt>Array</tt>.<tt>unpack</tt> calls to
+support various xml encodings, the string's taintedness is lost, and the
+<tt>instance_eval</tt> calls are allowed.
+</p>
+<p>
+Beyond that, a $<tt>SAFE</tt> level of 3 or more will simply not allow
+calls to <tt>instance_eval</tt>, so the current release won't work under
+those conditions.
+</p>
+<p>
+In 1.0.pre4, I plan to re-add the original code that uses <tt>send</tt> and
+requires writer accessor methods, in addition to the <tt>instance_eval</tt>
+code, and add a <tt>XSConf</tt> switch to control this. The default setting
+will be required accessor methods to play it safe with the potential
+security hole.
+</p>
+<p>
+I've been discussing this issue with Sean Russell, author of REXML, and
+it's possible that REXML will be changed to retain the string's taintedness
+through the encoding process. In this case, the security hole should be
+closed, and the option to not use <tt>instance_eval</tt> will be necessary
+at any $<tt>SAFE</tt> level.
+</p>
+<h3>Guts Overview</h3>
+<p>
+The Object class has a few methods appended to it, the main one being
+<tt>to_xml</tt>. Its primary role is to setup the base XML element node,
+including a type element if required. Then it calls
+<tt>instance_data_to_xml</tt> which must be overridden in descendant
+classes.
+</p>
+<p>
+The supported standard classes all have <tt>instance_data_to_xml</tt>
+methods appended to them. For custom classes, the module
+<tt>XmlSerialization</tt> has a <tt>instance_data_to_xml</tt> method that
+loops through each instance variable in the including class, calling
+<tt>to_xml</tt> on each of them.
+</p>
+<p>
+<tt>from_xml</tt> is a singleton method (class method) appended to each
+supported standard class as well as a singleton method in the
+<tt>XmlSerialization</tt> module. It creates a new instance of the class
+based on the XML element passed to it.
+</p>
+<h3>Contributors</h3>
+<ul>
+<li>Harry Ohlsen
+
+<ul>
+<li>Support for classes in modules and inner classes
+
+</li>
+<li>Code to use eval instead of send for classes w/o accessors
+
+</li>
+<li>Code to workaround initialize method for instantiating classes with
+parameterized intializers
+
+</li>
+</ul>
+</li>
+<li>Stefan Mueller
+
+<ul>
+<li><tt>TrueClass</tt> and <tt>FalseClass</tt> support
+
+</li>
+</ul>
+</li>
+</ul>
+<h3>Thanks</h3>
+<ul>
+<li>matz for Ruby
+
+</li>
+<li>Sean Russell for REXML
+
+</li>
+<li>Dave Thomas for RDoc and general guruness
+
+</li>
+</ul>
+<h3>Change Log</h3>
+<h4>1.0.pre3</h4>
+<ul>
+<li>Support for classes in modules and inner classes
+
+</li>
+<li><tt>instance_eval</tt> used instead of send to set instance data. Accessor
+methods no longer required
+
+</li>
+<li><tt>XSConf</tt>.<tt>bypassInitialize</tt> option to deserialize classes
+without default/parameterless initialize methods
+
+</li>
+<li><tt>TrueClass</tt> and <tt>FalseClass</tt> support
+
+</li>
+</ul>
+<h3>To Do</h3>
+<h4>pre4</h4>
+<ul>
+<li>add back attribute accessor and a XSConf switch to support both options.
+Using <tt>instance_eval</tt> has a potential security hole that is not
+protected by $SAFE == 1 even when deserializing from an xml file. Using
+<tt>instance_eval</tt> is not an option in $SAFE &gt;= 3.
+
+</li>
+<li>xmlserial gets stuck in a loop if the elements in my tree have references
+to their parents. I had to delete the references before to_xmling the tree,
+and restore them afterwards. Marshal does not have this problem. [Stefan
+Mueller]
+
+<p>
+Hmmm ... this gets complicated fast. Basically, the xml will have to have
+an id system, so that a child instance can simply refer to an already
+serialized instance's id. Then, during deserialization this id system will
+tie back to Object#id.
+</p>
+<p>
+Problem here is now the xml is getting cluttered and I want to keep an
+option for uncluttered xml -- so, how to handle this properly.
+</p>
+</li>
+</ul>
+<h4>1.0</h4>
+<ul>
+<li>the example is nice, but due to it being solely complex arrays, there's no
+way to showcase the xml sans type elements.
+
+</li>
+<li>Add tests for no type element output on Arrays &amp; Hashes that include
+the delimiter in the item/key/value, and force type elements then.
+
+</li>
+<li>Install example dir. It's being ignored right now (dist, but not inst).
+
+</li>
+<li>Test with latest stable REXML.
+
+</li>
+</ul>
+<h4>1.0?</h4>
+<ul>
+<li>RegExp class. Other standard classes?
+
+</li>
+</ul>
+<h4>Future/Never</h4>
+<ul>
+<li>? Change type to be stored as attribute, not separate element (not sure how
+much this would buy in the case of an <tt>Array</tt> or <tt>Hash</tt>. If
+type info is moved to an attribute, then a placeholder node (+&lt;Item&gt;+
+or +&lt;Element&gt;+) must be created to hold the attribute ... that's
+actually <em>more</em> XML).
+
+</li>
+<li>Refactor to be able to test with mock xml parser, to force structure to be
+friendly to using other parsers
+
+</li>
+<li>Work with xml_pickle (Python) guys for interchangable xml.
+
+</li>
+<li>xml_pickle (Python) can deserialize an xml file into a class that isn't
+predefined ... it creates the class on the fly based on the data in the xml
+file. Cool feature.
+
+</li>
+</ul>
+</div>
+</body>

@@ -2,6 +2,7 @@ require 'damagecontrol/util/Logging'
 require 'damagecontrol/util/FileUtils'
 require 'damagecontrol/scm/Changes'
 require 'xmlrpc/utils'
+require 'cl/xmlserial'
 
 # Base class for SCM (Source Control Management systems). In order to
 # add support for a new SCM (let's say it's called Snoopy):
@@ -46,6 +47,7 @@ module DamageControl
     include FileUtils
     include Logging
     include XMLRPC::Marshallable
+    include XmlSerialization
     
   public
 

@@ -44,7 +44,9 @@ module DamageControl
       end
 
       if send_message_on_build_request && message.is_a?(CheckedOutEvent)
-        if(message.changesets_or_last_commit_time.is_a?(ChangeSets))
+        if(message.changesets_or_last_commit_time.nil?)
+          @irc.send_message_to_channel("[#{message.project_name}] No changes.")
+        elsif(message.changesets_or_last_commit_time.is_a?(ChangeSets))
           message.changesets_or_last_commit_time.each do |changeset|
             @irc.send_message_to_channel("[#{message.project_name}] (by #{changeset.developer} #{changeset.time_difference} ago) : #{changeset.message}")
             changeset.each do |change|
