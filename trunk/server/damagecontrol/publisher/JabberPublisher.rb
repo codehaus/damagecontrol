@@ -1,3 +1,4 @@
+require 'erb'
 require 'jabber4r/jabber4r'
 require 'damagecontrol/util/Timer'
 require 'damagecontrol/core/AsyncComponent'
@@ -11,18 +12,23 @@ module DamageControl
     attr_reader :channel
     attr_reader :recipients
   
-    def initialize(channel, publisherJabberAccountUser, publisherJabberAccountPassword, recipients, template)
+    def initialize(channel, dc_server, publisherJabberAccountUser, publisherJabberAccountPassword, recipients, template)
       super(channel)
+      @dc_server = dc_server
       @jabber = JabberConnection.new(publisherJabberAccountUser, publisherJabberAccountPassword)
       @recipients = recipients
-      @template = template
+
+      template_dir = "#{File.expand_path(File.dirname(__FILE__))}/../template"
+      @template = File.new("#{template_dir}/#{template}").read
     end
   
     def process_message(message)
       if message.is_a?(BuildCompleteEvent)
-        content = @template.generate(message.build)
+        build = message.build
+        dc_url = @dc_server.dc_url
+        msg = ERB.new(@template).result(binding)
         @recipients.each{|recipient|
-          @jabber.send_message_to_recipient(recipient, content)
+          @jabber.send_message_to_recipient(recipient, msg)
         }
       end
 

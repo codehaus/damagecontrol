@@ -34,7 +34,9 @@ module DamageControl
     def test_sends_message_on_build_complete
       setup_irc_connected
       @irc_mock.__expect(:send_message_to_channel) {|message| 
-        assert_equal(message, "<a href=\"http://moradi.com/public/project?action=build_details&project_name=cheese&timestamp=19710228234500\">[cheese] BUILD SUCCESSFUL</a>")}
+        expected = "<a href=\"http://moradi.com/public/project?action=build_details&project_name=cheese&timestamp=19710228234500\">[cheese] BUILD SUCCESSFUL</a>"
+        assert_equal(expected, message)
+      }
       
       b = Build.new("cheese")
       b.status = Build::SUCCESSFUL
