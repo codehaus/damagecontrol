@@ -156,7 +156,7 @@ module Plot
       plot.format "x \"%Y-%m-%d\""
       plot.data "style linespoints"
 
-      successful_builds_per_week_ds = successful_builds_per_period_array.gpds("title"=>"Successful builds", "xgrid"=>x_dates, "using"=>"1:2")
+      successful_builds_per_week_ds = successful_builds_per_period_array.gpds("with"=>"filledcurve x2 lt 15", "title"=>"Successful builds", "xgrid"=>x_dates, "using"=>"1:2")
       failed_builds_per_week_ds = failed_builds_per_period_array.gpds("title"=>"Failed builds", "xgrid"=>x_dates, "using"=>"1:2")
       total_builds_per_week_ds = total_builds_per_period_array.gpds("title"=>"Total builds", "xgrid"=>x_dates, "using"=>"1:2")
 
@@ -196,6 +196,6 @@ end
 end
 end
 
-#bhr = DamageControl::BuildHistoryRepository.new(nil, "build_history_sample.yaml")
-#r = DamageControl::Tool::Plot::BuildHistoryReportGenerator.new(bhr)
-#r.generate(".", ARGV[0])
+bhr = DamageControl::BuildHistoryRepository.new(nil, "build_history_sample.yaml")
+r = DamageControl::Tool::Plot::BuildHistoryReportGenerator.new(bhr)
+r.generate(".", ARGV[0])

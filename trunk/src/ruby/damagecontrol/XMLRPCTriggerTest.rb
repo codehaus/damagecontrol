@@ -3,12 +3,14 @@ require 'mockit'
 require 'xmlrpc/server' 
 require 'damagecontrol/HubTestHelper'
 require 'damagecontrol/XMLRPCTrigger'
+require 'damagecontrol/FileUtils'
 
 module DamageControl
 
   class XMLRPCTriggerTest < Test::Unit::TestCase
     
     include HubTestHelper
+    include DamageControl::FileUtils
 
     def setup
       create_hub
@@ -20,12 +22,12 @@ module DamageControl
         assert_equal(XMLRPCTrigger::INTERFACE, interface)
         assert(object.is_a?(XMLRPCTrigger))
       end
-      XMLRPCTrigger.new(rpc_servlet, hub)
+      XMLRPCTrigger.new(rpc_servlet, hub, "#{damagecontrol_home}/target/temp_xmlrpctrigger_#{Time.new.to_i}")
       rpc_servlet.__verify
     end
 
     def test_call_on_request_requests_build
-      t = XMLRPCTrigger.new(XMLRPC::WEBrickServlet.new, hub)
+      t = XMLRPCTrigger.new(XMLRPC::WEBrickServlet.new, hub, "#{damagecontrol_home}/target/temp_xmlrpctrigger_#{Time.new.to_i}")
       val = t.request("project_name: damagecontrol")
       assert(!val.nil?)
       assert_message_types_from_hub([BuildRequestEvent])

@@ -28,8 +28,7 @@ buildRoot = File.expand_path("~/build")
 
  
 start_simple_server(
-  :BuildsDir => "#{buildRoot}/checkout", 
-  :LogsDir => "#{buildRoot}/log", 
+  :RootDir => "#{buildRoot}", 
   :SocketTriggerPort => 4711, 
   :HttpPort => 4712,
   :HttpsPort => 4713,

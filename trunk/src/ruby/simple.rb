@@ -18,15 +18,17 @@ require 'damagecontrol/publisher/XMLRPCStatusPublisher'
 include DamageControl 
 
 def start_simple_server(params = {})
-  logsdir = params[:LogsDir] || File.expand_path("log")
-  buildsdir = params[:BuildsDir] || File.expand_path("build")
+  rootdir = params[:RootDir] || File.expand_path(".")
   allow_ips = params[:AllowIPs] || ["127.0.0.1"]
   port = params[:SocketTriggerPort] || 4711
   http_port = params[:HttpPort] || 4712
   https_port = params[:HttpsPort] || 4713
 
+  logdir = "#{rootdir}/log"
+  checkoutdir = "#{rootdir}/checkout"
+
   @hub = Hub.new
-  LogWriter.new(@hub, logsdir)
+  LogWriter.new(@hub, logdir)
 
   host_verifier = HostVerifier.new(allow_ips)
   @socket_trigger = SocketTrigger.new(@hub, port, host_verifier).start
@@ -41,7 +43,7 @@ def start_simple_server(params = {})
   
   scheduler = BuildScheduler.new(@hub)
   # Only use one build executor (don't allow parallel builds)
-  scheduler.add_executor(BuildExecutor.new(@hub, @build_history_repository, buildsdir))
+  scheduler.add_executor(BuildExecutor.new(@hub, @build_history_repository, checkoutdir))
   scheduler.start
 
   # For unsecure XML-RPC connections like getting status

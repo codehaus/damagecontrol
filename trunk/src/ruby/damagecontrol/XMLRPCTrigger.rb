@@ -11,7 +11,13 @@ module DamageControl
       meth 'string request_build(string,string)', 'Request a build, passing in project_name and scm_timestamp, returns status info', 'request_build'
     }
 
+    # TODO: we should separate the XML-RPC stuff from the dcroot stuff.
     def initialize(xmlrpc_server, channel, dcroot=ENV['DAMAGECONTROL_HOME'])
+      if(dcroot.nil?)
+        raise "dcroot not specified. specify it explicitly or define the DAMAGECONTROL_HOME env var."
+      end
+      File.mkpath(dcroot)
+    
       xmlrpc_server.add_handler(INTERFACE, self)
       @channel = channel
       @dcroot = dcroot
@@ -51,7 +57,11 @@ module DamageControl
     end
     
     def project_file(project_name)
-		File.new("#{@dcroot}/projects/#{project_name}/conf.yaml")
+      path = "#{@dcroot}/projects/#{project_name}/project.yaml"
+      if(!File.exists?(path))
+        raise "No DamageControl project definition has been created in #{path}"
+      end
+      File.new("#{path}")
     end
   end
 
