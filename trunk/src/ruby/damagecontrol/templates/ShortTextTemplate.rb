@@ -1,9 +1,13 @@
 module DamageControl
-
-  class ShortTextTemplate
+  class ShortTextTemplate  
     def generate(build)
       success_message = build.successful ? "successful" : "failed"
-      "Build of #{build.project_name} #{success_message} (http://www.codehaus.org/)"
+      htmlurl = "#{webpath(build)}/#{build.reports_path}/#{build.label}.html}"
+      "Build of #{build.project_name} #{build.label} #{success_message} (#{htmlurl})"
+    end
+
+    def webpath(build)
+      @webpath ? @webpath : "http://#{build.scm.host(build.scm_spec)"
     end
   end
 end

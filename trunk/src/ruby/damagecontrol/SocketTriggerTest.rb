@@ -39,7 +39,7 @@ module DamageControl
           assert_equal(@project_name,       build.project_name)
           assert_equal(@scm_spec,           build.scm_spec)
           assert_equal(@build_command_line, build.build_command_line)
-          assert_equal("/usr/local/builds/picocontainer/pico/MAIN/checkout", build.checkout_dir)
+          assert_equal("/usr/local/builds/picocontainer/pico/MAIN/checkout", build.absolute_checkout_path)
           assert_equal("/usr/local/builds/picocontainer/pico/MAIN/checkout/pico/src", build.absolute_build_path)
         end
       end

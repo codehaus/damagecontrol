@@ -19,7 +19,7 @@ module DamageControl
   
     def process_message(message)
       if message.is_a? BuildCompleteEvent
-        filepath = "#{message.build.reports_dir}/#{@template.file_name(message.build)}"
+        filepath = "#{message.build.absolute_reports_path}/#{@template.file_name(message.build)}"
         @filesystem.makedirs(File.dirname(filepath))
 
         content = @template.generate(message.build)

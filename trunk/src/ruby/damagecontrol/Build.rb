@@ -36,8 +36,8 @@ module DamageControl
       @label                    = Time.now.to_i.to_s
     end
     
-    def get_latest_sources
-      @scm.checkout(scm_spec, checkout_dir, &proc)
+    def checkout
+      @scm.checkout(scm_spec, absolute_checkout_path, &proc)
     end
 
     def execute(&proc)
@@ -50,30 +50,38 @@ module DamageControl
       end
     end
  
+    def absolute_checkout_path
+      "#{@global_checkout_root_dir}/#{branch_path}/checkout"
+    end
+
+    def reports_path
+      "#{branch_path}/reports"
+    end
+    
+    def absolute_reports_path
+      "#{@global_checkout_root_dir}/#{reports_path}"
+    end
+
+    def logs_path
+      "#{branch_path}/logs"
+    end
+
+    def log_file_path
+      "#{branch_path}/#{label}.log"
+    end
+    
+    def absolute_log_file_path
+      "#{@global_checkout_root_dir}/#{log_file_path}"
+    end
+
     def absolute_build_path
-      "#{checkout_dir}/#{@scm.mod(scm_spec)}/#{@build_path}"
+      "#{absolute_checkout_path}/#{@scm.mod(scm_spec)}/#{@build_path}"
     end
 
-    def checkout_dir
-      "#{branch_dir}/checkout"
-    end
 
-    def reports_dir
-      "#{branch_dir}/reports"
-    end
-    
-    def log_file
-      "#{logs_dir}/#{label}.log"
-    end
-    
-  private
-  
-    def logs_dir
-      "#{branch_dir}/logs"
-    end
-
-    def branch_dir
-      "#{@global_checkout_root_dir}/#{project_name}/#{@scm.mod(scm_spec)}/#{@scm.branch(scm_spec)}"
+    def branch_path
+#      "#{@global_checkout_root_dir}/#{project_name}/#{@scm.mod(scm_spec)}/#{@scm.branch(scm_spec)}"
+      "#{project_name}/#{@scm.mod(scm_spec)}/#{@scm.branch(scm_spec)}"
     end
   end
 end

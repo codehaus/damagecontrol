@@ -14,7 +14,7 @@ module DamageControl
     
     def receive_message(message)
       if message.is_a? BuildRequestEvent
-        message.build.execute { |progress|
+        message.build.checkout { |progress|
           @hub.publish_message(BuildProgressEvent.new(message.build, progress))
         }
         message.build.execute { |progress|

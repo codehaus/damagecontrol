@@ -48,5 +48,14 @@ module DamageControl
       end
     end
 
+    def host(spec)
+      scm = find_scm(spec)
+      if scm
+        scm.host(spec)
+      else
+        super(spec)
+      end
+    end
+
   end
 end

@@ -24,12 +24,12 @@ module DamageControl
     end
 
     def log_file(message)
-      file = @log_files[message.build.log_file]
+      file = @log_files[message.build.absolute_log_file_path]
       if(!file)
-        dir = File.dirname(message.build.log_file)
+        dir = File.dirname(message.build.absolute_log_file_path)
         File.makedirs(dir)
-        file = File.open(message.build.log_file, "w")
-        @log_files[message.build.log_file] = file
+        file = File.open(message.build.absolute_log_file_path, "w")
+        @log_files[message.build.absolute_log_file_path] = file
       end
       file
     end
