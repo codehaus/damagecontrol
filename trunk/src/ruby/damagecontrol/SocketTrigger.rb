@@ -73,6 +73,8 @@ module DamageControl
         begin
           socket.print("DamageControl server on #{get_ip} got message from #{client_ip}\r\n")
           socket.print("http://damagecontrol.codehaus.org/\r\n")
+          socket.print("http://builds.codehaus.org/\r\n")
+          socket.print("irc://irc.codehaus.org/damagecontrol/\r\n")
           process_payload(payload)
         rescue => e
           print_error(e)
