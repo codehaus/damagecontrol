@@ -183,7 +183,7 @@ puts result
       modified = ""
       loginfo_content.each_line do |line|
         # TODO: couldn't find out how to express this with a single regexp.
-        matches = (Regexp.new(".* ruby.*dctrigger.rb http.* #{project_name}$") =~ line) && line[0..0] != "#"
+        matches = (Regexp.new(".*ruby.*dctrigger.rb http.* #{project_name}$") =~ line) && line[0..0] != "#"
         # The old format - we want to match them to so they get deleted.
         matches = (Regexp.new("^cat .* | nc.*4711$") =~ line) && line[0..0] != "#" unless matches
         if(matches)
