@@ -1,11 +1,8 @@
 # some ruby distros include an old crappy REXML-version
 begin
-  require 'rexml/pullparser'
-rescue
-end
-begin
   require 'rexml/parsers/pullparser'
-rescue
+rescue LoadError
+  raise "some ruby distros include an older version of REXML, please remove RUBY_HOME/lib/site_ruby/1.8/rexml"
 end
 
 
@@ -15,9 +12,10 @@ module DamageControl
   # and calls callback methods (typesafe "SAX" events)
   # on a Build object
   class CruiseControlLogParser
+
     def parse(cc_log_file, build)
       File.open(cc_log_file) do |io|
-        parser = REXML::PullParser.new(io)
+        parser = REXML::Parsers::PullParser.new(io)
         parse_top_level(parser, build)
       end
 
@@ -28,7 +26,7 @@ module DamageControl
 
     def parse_top_level(parser, build)
       while parser.has_next?
-        res = parser.next
+        res = parser.pull
         handle_error(res)
                 
         parse_info(parser, build) if res.start_element? and res[0] == 'info'
@@ -38,7 +36,7 @@ module DamageControl
 
     def parse_info(parser, build)
       while parser.has_next?
-        res = parser.next
+        res = parser.pull
         handle_error(res)
                 
         if res.start_element? and res[0] == 'property'
