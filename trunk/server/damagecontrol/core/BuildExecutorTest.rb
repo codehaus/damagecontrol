@@ -176,6 +176,9 @@ module DamageControl
         b = Build.new("damagecontrolled")
         b
       }
+      t = Time.new.utc
+      mock_build_history.__expect(:last_commit_time){t}
+      
       prev = Build.new
       prev.label = "23.2"
       mock_build_history.__expect(:prev){prev}
@@ -195,6 +198,7 @@ module DamageControl
       @build_executor.on_message(@build)
       assert_equal(Build::FAILED, @build.status)
       assert_equal("23.3", @build.label)
+      assert_equal(t, @build.scm_commit_time)
     end
     
     def test_checks_out_and_determines_changeset_before_building      
