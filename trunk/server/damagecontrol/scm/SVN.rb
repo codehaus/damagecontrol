@@ -73,7 +73,7 @@ module DamageControl
     def local_revision(checkout_dir)
       local_revision = nil
       svn(checkout_dir, "info") do |line|
-        if(line =~ /Revision: (\d)*/)
+        if(line =~ /Revision: ([0-9]*)/)
           return $1.to_i
         end
       end
