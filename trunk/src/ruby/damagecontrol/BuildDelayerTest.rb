@@ -5,6 +5,7 @@ require 'damagecontrol/SocketTrigger'
 require 'damagecontrol/Hub'
 require 'damagecontrol/Project'
 require 'damagecontrol/BuildDelayer'
+require 'damagecontrol/Clock'
 
 module DamageControl
 

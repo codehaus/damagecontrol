@@ -22,7 +22,7 @@ module DamageControl
 					time = clock.current_time
 					while (!stopped && next_tick > time)
 						sleep( (next_tick - time)/1000 )
-						tick(clock.current_time)
+						force_tick
 					end
 				rescue
 					$stderr.print $!
@@ -58,6 +58,10 @@ module DamageControl
 		
 		def tick(time)
 			schedule_next_tick
+		end
+		
+		def force_tick
+			tick(clock.current_time)
 		end
 	end
 	

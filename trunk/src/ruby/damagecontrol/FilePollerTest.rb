@@ -46,7 +46,7 @@ module DamageControl
 		def test_new_file_calls_new_file
 			create_file("newfile")
 			@poller.tick(@poller.clock.current_time)
-			assert_equal(["newfile"], @poller.new_files)
+			assert_equal(["#{@dir}/newfile"], @poller.new_files)
 		end
 		
 		def create_file(filename)
@@ -58,13 +58,13 @@ module DamageControl
 		def test_two_newfiles_calls_new_file_for_each
 			create_file("newfile1")
 			@poller.tick(@poller.clock.current_time)
-			assert_equal(["newfile1"], @poller.new_files)
+			assert_equal(["#{@dir}/newfile1"], @poller.new_files)
 			@poller.new_files.clear
 			assert_equal([], @poller.new_files)
 
 			create_file("newfile2")
 			@poller.tick(@poller.clock.current_time)
-			assert_equal(["newfile2"], @poller.new_files)
+			assert_equal(["#{@dir}/newfile2"], @poller.new_files)
 		end
 	end
 

@@ -17,7 +17,7 @@ module DamageControl
 		
 		def tick(time)
 			Dir.foreach(dir_to_poll) do |filename|
-				new_file(filename) if is_new_file(filename)
+				new_file("#{dir_to_poll}/#{filename}") if is_new_file(filename)
 			end
 			determine_existing_files
 			schedule_next_tick

@@ -11,16 +11,6 @@ class End2EndTest < Test::Unit::TestCase
 	
 	include FileUtils
 
-	def copy(from, to)
-		from = File.expand_path(from)
-		to = File.expand_path(to)
-		File.open(from) do |from_file|
-			File.open(to, File::CREAT | File::WRONLY) do |to_file|
-				to_file.puts(from_file.gets(nil))
-			end
-		end
-	end
-	
 	def setup
 		@basedir = File.expand_path("../..")
 		@tempdir = "#{@basedir}/target/temp_e2e_#{Time.new.to_i}"
@@ -33,11 +23,11 @@ class End2EndTest < Test::Unit::TestCase
 	
 	def teardown
 		Dir.chdir(@tempdir)
-		#begin
-		#	delete(@project)
-		#	delete(@cvsrootdir)
-		#rescue
-		#end
+		begin
+			delete(@project)
+			delete(@cvsrootdir)
+		rescue
+		end
 	end
 
 	def create_repository()
