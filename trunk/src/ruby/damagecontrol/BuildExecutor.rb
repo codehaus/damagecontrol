@@ -37,7 +37,7 @@ module DamageControl
         output.each_line do |line|
           report_progress(line)
           did_read_ant_or_maven_build_failed = true if /FAILED/ =~ line
-          did_read_ruby_tests_failed = true if /Failure!!!/ =~ line
+          did_read_ruby_tests_failed = true if /Failure!!!/ =~ line || /Error!!!/ =~ line
         end
       end
       
