@@ -30,14 +30,10 @@ module RSCM
       # post 0.17, this can be "cd dir && cmd add ."
 
       files = Dir["#{dir}/*"]
-      dirs = files.find_all {|f| File.directory?(f)}
-      relative_dirs = dirs.collect{|p| p[dir.length+1..-1]}
-
-      add_cmd = "monotone --db=\"#{@db_file}\" add #{relative_dirs.join(' ')}"
-      commit_cmd = "monotone --db=\"#{@db_file}\" --branch=\"#{@branch}\" --key=\"#{@key}\" commit '#{message}'"
+      relative_paths_to_add = files.collect{|p| p[dir.length+1..-1]}
 
       with_working_dir(dir) do
-        monotone("add #{relative_dirs.join(' ')}")
+        monotone("add #{relative_paths_to_add.join(' ')}")
         monotone("commit '#{message}'", @branch, @key) do |io|
           io.puts(@passphrase)
           io.close_write
@@ -71,13 +67,35 @@ module RSCM
       if (checked_out?(checkout_dir))
         # update
       else
+        before = Dir["#{checkout_dir}/**/*"]
+puts "BEFORE:"
+puts before.join("\n")
+puts
         monotone("checkout #{checkout_dir}", @branch, @key) do |stdout|
           stdout.each_line do |line|
-# FIXME: nothing is coming out here....
-puts "LINE: #{line}"
+            # TODO: checkout prints nothing to stdout - may be fixed in a future monotone...
             yield line if block_given?
           end
         end
+        after = Dir["#{checkout_dir}/**/*"]
+puts "AFTER:"
+puts after.join("\n")
+puts
+        # ignore monotone administrative files
+        added = (after - before).delete_if{|path| path =~ /MT/}
+puts "ADDED TOTAL:"
+puts added.join("\n")
+puts
+        added_file_paths = added.find_all do |path|
+          File.file?(path)
+        end
+puts "ADDED FILES:"
+puts added_file_paths.join("\n")
+puts
+        added_file_paths.each do |path|
+          yield path
+        end
+        return added_file_paths
       end
     end
 
