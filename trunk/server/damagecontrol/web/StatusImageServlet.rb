@@ -1,4 +1,5 @@
 require 'pebbles/MVCServlet'
+require 'pebbles/TimeUtils'
 
 module DamageControl
   class StatusImageServlet < Pebbles::SimpleServlet
@@ -11,7 +12,7 @@ module DamageControl
     
     def service(req, res)
       super(req, res)
-      project_name = req.path_info || req.query['project_name'] || required_parameter('project_name')
+      project_name = req.path_info[1..-1] || req.query['project_name'] || required_parameter('project_name')
       path = status_image(project_name)
       st = File::stat(path)
       res['content-length'] = st.size
@@ -35,6 +36,7 @@ module DamageControl
       color = "grey"
       pulse = ""
       build = find_build(project_name)
+			
       if(build && build.completed?)
         color = if build.successful? then "green" else "red" end
         pulse = "-pulse" if @build_scheduler.project_building?(project_name)
@@ -48,6 +50,7 @@ module DamageControl
     protected
     
     def find_build(project_name)
+			puts "CurrentStatus:: #{@build_history_repository.current_build(project_name)}"
       @build_history_repository.current_build(project_name)
     end
   end
@@ -64,7 +67,7 @@ module DamageControl
     protected
     
     def find_build(project_name)
-      dc_creation_time = request.query["dc_creation_time"]
+      dc_creation_time = request.query["dc_creation_time"] || request.query["timestamp"]
       @build_history_repository.lookup(project_name, dc_creation_time)
     end
   end

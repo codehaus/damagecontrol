@@ -135,11 +135,6 @@ module DamageControl
       channel.add_element("title").add_text("DamageControl: #{project_name}")
       channel.add_element("description").add_text("Build results for #{project_name}")
       channel.add_element("link").add_text(html_url)
-puts project_name
-puts project_name
-puts project_name
-puts project_name
-puts project_name
       history(project_name).reverse.each do |build|
         if build.completed?
           channel.add(build.to_rss_item)
