@@ -22,6 +22,7 @@ module DamageControl
       def @jira_publisher.get_posted_script
         @script
       end
+      fail "blah"
     end
   
     def test_jira_issue_is_filed_upon_failing_build_complete_event    
