@@ -8,16 +8,29 @@ module DamageControl
   # This class tells the build to execute and reports
   # progress as events back to the channel
   #
-  class BuildExecutor < AsyncComponent
+  class BuildExecutor
+    
+    include TimerMixin
   
     attr_reader :current_build
     attr_reader :builds_dir
+    attr_writer :checkout
+    attr_accessor :quiet_period
+    
+    attr_accessor :last_build_request
 
-    def initialize(channel, builds_dir, scm = DefaultSCMRegistry.new)
-      super(channel)
+    def initialize(channel, builds_dir, scm = DefaultSCMRegistry.new, quiet_period=default_quiet_period)
+      @channel = channel
+      channel.add_subscriber(self)
       @builds_dir = builds_dir
       @scm = scm
       @filesystem = FileSystem.new
+      @checkout = true
+      @quiet_period = quiet_period
+    end
+    
+    def default_quiet_period
+      0
     end
     
     def checkout
@@ -34,12 +47,10 @@ module DamageControl
       did_read_ant_or_maven_build_failed = false
       did_read_ruby_tests_failed = false
       # some of the error messages are on stderr, which isn't available to popen
-      IO.popen(current_build.build_command_line + " 2>&1") do |output|
-        output.each_line do |line|
-          report_progress(line)
-          did_read_ant_or_maven_build_failed = true if /FAILED/ =~ line
-          did_read_ruby_tests_failed = true if /Failure!!!/ =~ line || /Error!!!/ =~ line
-        end
+      IO.foreach("|#{current_build.build_command_line} 2>&1") do |line|
+        report_progress(line)
+        did_read_ant_or_maven_build_failed = true if /FAILED/ =~ line
+        did_read_ruby_tests_failed = true if /Failure!!!/ =~ line || /Error!!!/ =~ line
       end
       
       current_build.successful = !(did_read_ant_or_maven_build_failed || did_read_ruby_tests_failed)
@@ -48,13 +59,27 @@ module DamageControl
     def project_base_dir
       "#{@builds_dir}/#{current_build.project_name}"
     end
+    
+    def checkout?
+      @checkout && !current_build.scm_spec.nil?
+    end
+    
+    def quiet_period_elapsed
+      !last_build_request.nil? && (clock.current_time - quiet_period) >= last_build_request
+    end
+    
+    def tick(time)
+        if quiet_period_elapsed
+          checkout if checkout?
+          execute
+          @channel.publish_message(BuildCompleteEvent.new(current_build))
+        end
+    end
 
-    def process_message(message)
+    def receive_message(message)
       if message.is_a? BuildRequestEvent
         @current_build = message.build
-        checkout unless current_build.scm_spec.nil?
-        execute
-        @channel.publish_message(BuildCompleteEvent.new(current_build))
+        @last_build_request = Build.timestamp_to_i(message.build.timestamp)
       end
     end
 

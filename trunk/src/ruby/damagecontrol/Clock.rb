@@ -48,14 +48,14 @@ module DamageControl
 			@time_changed = Latch.new
 		end
 		
-		def change_time (newtime)
+		def change_time(newtime)
 			@time = newtime
 			@time_changed.release()
 			@time_changed = Latch.new
 		end
 		
-		def add_time (amount)
-			change_time(@time + amount)
+		def advance(amount)
+			change_time(current_time + amount)
 		end
 
 		def wait_for_waiters (timeout=-1)
@@ -67,9 +67,9 @@ module DamageControl
 		end
 		
 		def wait_until (wait_until_time)
-			@has_waiters.release()
+			@has_waiters.release
 			while current_time < wait_until_time
-				@time_changed.wait()
+				@time_changed.wait
 			end
 		end
 		

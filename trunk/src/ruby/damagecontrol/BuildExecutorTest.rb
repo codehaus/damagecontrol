@@ -39,6 +39,36 @@ module DamageControl
         @proc.call(message)
       end
     end
+
+    def build_request_at_time(time)
+      build = Build.new
+      build.timestamp = 0
+      hub.publish_message(BuildRequestEvent.new(build))
+    end
+
+    
+    def test_waits_quiet_period_after_last_build_request_before_building
+      def @build_executor.checkout
+        # stub it
+      end
+      def @build_executor.execute
+        # stub it
+      end
+      quiet_period = 10
+      @build_executor.clock = FakeClock.new
+      @build_executor.quiet_period = quiet_period
+
+      @build_executor.clock.change_time(0)
+      build_request_at_time(0)
+      assert(!@build_executor.quiet_period_elapsed, "quiet period should not have elapsed yet")
+      @build_executor.force_tick
+      assert_message_types([BuildRequestEvent])
+      
+      @build_executor.clock.advance(quiet_period)
+      assert(@build_executor.quiet_period_elapsed)
+      @build_executor.force_tick
+      assert_message_types([BuildRequestEvent, BuildCompleteEvent])
+    end
     
     def test_build_failed
     
@@ -54,10 +84,10 @@ module DamageControl
         end
       end)
       
-      @build_executor.process_message(BuildRequestEvent.new(build))
+      @build_executor.receive_message(BuildRequestEvent.new(build))
       @build_executor.force_tick
 
-      assert(successful, "ant build should succeed, is ant installed?")
+      assert(successful, "ant build should succeed (HINT: is ant really installed?)")
       
     end
     
