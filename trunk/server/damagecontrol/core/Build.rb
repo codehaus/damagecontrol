@@ -98,7 +98,7 @@ module DamageControl
     def to_rss_item
       item = REXML::Element.new("item")
       label_text = if successful? then "##{label} " else "" end
-      title = "#{project_name}: Build #{label_text}#{status.downcase}"
+      title = "#{project_name}: Build #{label_text}#{status}"
       item.add_element("title").add_text(title)
       item.add_element("link").add_text(url)
       item.add_element("pubDate").add_text(dc_creation_time.to_rfc2822)
