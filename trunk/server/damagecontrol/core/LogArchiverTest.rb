@@ -20,27 +20,17 @@ module DamageControl
         "logs_to_archive" => [ "target/test-reports/*.xml", "ant-log.xml", "target/logs/*.log" ]
       })
       
-      archive_dir = "#{basedir}/project/archive/#{build_timestamp}"
-      
-      mock_project_config_repository = MockIt::Mock.new
-      mock_project_config_repository.__expect(:archive_dir) do |project_name, timestamp|
-        assert_equal("project", project_name)
-        assert_equal(build_timestamp, timestamp)
-        archive_dir
-      end
-      
+      build.archive_dir = "#{basedir}/project/archive/#{build_timestamp}"
       build.scm = NoSCM.new("checkout_dir" => "#{basedir}/checkout")
       
       mkdir_p("#{basedir}/checkout/target/test-reports")
       touch("#{basedir}/checkout/target/test-reports/TEST-com.thoughtworks.Test.xml")
       touch("#{basedir}/checkout/ant-log.xml")
       
-      LogArchiver.new(hub, mock_project_config_repository)
+      LogArchiver.new(hub)
       hub.publish_message(BuildCompleteEvent.new(build))
       
-      assert_equal(["#{archive_dir}/TEST-com.thoughtworks.Test.xml", "#{archive_dir}/ant-log.xml"], Dir["#{archive_dir}/*.xml"].sort)
-      
-      mock_project_config_repository.__verify
+      assert_equal(["#{build.archive_dir}/TEST-com.thoughtworks.Test.xml", "#{build.archive_dir}/ant-log.xml"], Dir["#{build.archive_dir}/*.xml"].sort)
     end
   end
 end
