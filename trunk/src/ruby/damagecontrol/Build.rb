@@ -21,6 +21,7 @@ module DamageControl
     # <year><month><day><hour><min><sec>
     # Always in timezone UTC
     attr_accessor :timestamp
+    attr_accessor :build_duration_seconds
     
     attr_accessor :config
     attr_accessor :modification_set

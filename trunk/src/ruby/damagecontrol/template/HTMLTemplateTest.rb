@@ -10,6 +10,7 @@ module DamageControl
       build.timestamp = "20030929145347"
       build.error_message = "Knockout"
       build.successful = false
+      build.build_duration_seconds = 4
 
       htmlTemplate = HTMLTemplate.new
       assert_equal(expected, htmlTemplate.generate(build))
@@ -26,7 +27,8 @@ module DamageControl
   <body>
     <div class="main">
       <h3 class="projectname">Test Project</h3>
-      Status: Knockout
+      Build Status: Knockout<br/>
+      Build Duration: 4 seconds<br/>
     </div>
   </body>
 </html>

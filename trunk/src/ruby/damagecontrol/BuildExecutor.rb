@@ -39,10 +39,13 @@ module DamageControl
       @filesystem.makedirs(project_base_dir)
       @filesystem.chdir(project_base_dir)
  
+      start_time = Time.now.to_i
       IO.foreach("|#{current_build.build_command_line} 2>&1") do |line|
         report_progress(line)
       end
+      end_time = Time.now.to_i
       current_build.successful = ($? == 0)
+      current_build.build_duration_seconds = (end_time - start_time)
     end
  
     def project_base_dir
