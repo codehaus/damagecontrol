@@ -24,7 +24,7 @@ module DamageControl
     attr_accessor :timestamp
     
     attr_accessor :config
-    attr_reader   :changesets
+    attr_accessor :changesets
     attr_accessor :label
     attr_accessor :error_message
     attr_accessor :status

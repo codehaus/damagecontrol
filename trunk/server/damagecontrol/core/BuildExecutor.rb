@@ -106,14 +106,18 @@ module DamageControl
     end
     
     def determine_changeset
+      if !current_build.changesets.empty?
+        logger.info("does not determine changeset for #{current_build.project_name} because other component (such as SCMPoller) has already determined it")
+        return
+      end
       if !checkout?
         logger.info("does not determine changeset for #{current_build.project_name} because scm not configured")
         return 
       end
-      # this won't work the first build, so I just skip it
-      # the first time a project is built it will have a changeset of every file in the repository
-      # this is almost useless information and there's no point in spending lots of time trying to code around it
       unless File.exists?(current_scm.working_dir)
+        # this won't work the first build, so I just skip it
+        # the first time a project is built it will have a changeset of every file in the repository
+        # this is almost useless information and there's no point in spending lots of time trying to code around it (not to mention executing it)
         logger.info("does not determine changeset for #{current_build.project_name} because project not yet checked out")
         return
       end
@@ -127,11 +131,7 @@ module DamageControl
         to_time = current_build.timestamp_as_time
         logger.info("determining change set for #{current_build.project_name}, from #{from_time} to #{to_time}")
         changesets = current_scm.changesets(from_time, to_time) {|p| report_progress(p)}
-        if(changesets)
-          changesets.each do |changeset|
-            current_build.changesets.add(changeset)
-          end
-        end
+        current_build.changesets = changesets if changesets
         logger.info("change set for #{current_build.project_name} is #{current_build.changesets.inspect}")
 
       rescue Exception => e

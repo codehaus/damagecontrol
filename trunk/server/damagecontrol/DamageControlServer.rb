@@ -8,6 +8,7 @@ require 'damagecontrol/Version'
 require 'damagecontrol/core/Hub'
 require 'damagecontrol/core/BuildExecutor'
 require 'damagecontrol/core/BuildScheduler'
+require 'damagecontrol/core/SCMPoller'
 require 'damagecontrol/core/HostVerifyingHandler'
 require 'damagecontrol/core/LogWriter'
 require 'damagecontrol/core/BuildHistoryRepository'
@@ -156,8 +157,10 @@ module DamageControl
       component(:warning_server, WarningServer.new())
       component(:log_writer, LogWriter.new(hub, project_directories))
       component(:host_verifier, if allow_ips.nil? then OpenHostVerifier.new else HostVerifier.new(allow_ips) end)
+      component(:scm_factory, SCMFactory.new)
       
       init_build_scheduler
+      init_scm_poller
       init_webserver
       init_custom_components
     end
@@ -240,6 +243,15 @@ module DamageControl
     def init_build_executors
       # Only use one build executor (don't allow parallel builds)
       build_scheduler.add_executor(BuildExecutor.new(hub, build_history_repository, project_directories))
+    end
+    
+    def polling_interval
+      params[:PollingInterval] || 10 # poll every ten seconds if not specified
+    end
+    
+    def init_scm_poller
+      component(:scm_poller, 
+        SCMPoller.new(hub, polling_interval, scm_factory, project_config_repository, build_history_repository, build_scheduler))
     end
     
     def init_custom_components
