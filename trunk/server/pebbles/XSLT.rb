@@ -4,7 +4,7 @@ module DamageControl
       cmd = "xsltproc #{options} '#{xsl}' '#{xml}' > '#{out}'"
       system(cmd)
       if($? != 0)
-        msg += "Error executing xsltproc"
+        msg = "Error executing xsltproc\n"
         msg += %{
 This could happen for the following reasons:
 o the xsl or xml was invalid
