@@ -227,7 +227,7 @@ module RSCM
           file.puts("#!/bin/sh") unless post_commit_exists 
           file.puts("#{trigger_command}\n" )
         end
-        system("chmod g+x #{post_commit_file}")
+        File.chmod(0744, post_commit_file)
       rescue
         raise "Didn't have permission to write to #{post_commit_file}. " +
               "Try to manually add the following line:\n\n#{trigger_command}\n\n" +

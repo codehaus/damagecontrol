@@ -118,20 +118,30 @@ module RSCM
     
     def test_trigger
       work_dir = RSCM.new_temp_dir("trigger")
-      path = "OftenModified"
-      checkout_dir = "#{work_dir}/#{path}/checkout"
+      checkout_dir = "#{work_dir}/checkout"
       repository_dir = "#{work_dir}/repository"
-      scm = create_scm(repository_dir, path)
+      trigger_proof = "#{work_dir}/trigger_proof"
+      scm = create_scm(repository_dir, "damagecontrolled")
       scm.create 
       
+      # Verify that install/uninstall works
+      trigger_command = "touch " + PathConverter.filepath_to_nativepath(trigger_proof, false)
       trigger_files_checkout_dir = File.expand_path("#{checkout_dir}/../trigger")
-      trigger_command = "bla bla"
       (1..3).each do
         assert(!scm.trigger_installed?(trigger_command, trigger_files_checkout_dir))
         scm.install_trigger(trigger_command, trigger_files_checkout_dir)
         assert(scm.trigger_installed?(trigger_command, trigger_files_checkout_dir))
         scm.uninstall_trigger(trigger_command, trigger_files_checkout_dir)
       end
+
+      # Verify that the trigger works
+      import_damagecontrolled(scm, "#{work_dir}/damagecontrolled")
+      scm.checkout(checkout_dir)
+      scm.install_trigger(trigger_command, trigger_files_checkout_dir)
+      assert(!File.exist?(trigger_proof))
+
+      add_or_edit_and_commit_file(scm, checkout_dir, "afile", "boo")
+      assert(File.exist?(trigger_proof))
     end
 
     def test_checkout_changeset_identifier

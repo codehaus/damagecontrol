@@ -84,25 +84,6 @@ module RSCM
       end
     end
 
-    def local_revision(checkout_dir)
-      local_revision = nil
-      rev_file = File.expand_path("#{checkout_dir}/MT/revision")
-      local_revision = File.open(rev_file).read.strip
-      local_revision
-    end
-    
-    def head_revision(checkout_dir)
-      # FIXME: this will grab last head if heads are not merged.
-      head_revision = nil
-      monotone("heads", @branch) do |stdout|
-        stdout.each_line do |line|
-          next if (line =~ /^monotone:/)
-          head_revision = line.split(" ")[0]
-        end
-      end
-      head_revision
-    end
-
     def changesets(checkout_dir, from_identifier, to_identifier=Time.infinity)
       checkout(checkout_dir, to_identifier)
       to_identifier = Time.infinity if to_identifier.nil?
@@ -121,6 +102,10 @@ module RSCM
           io.read
         end
       end
+    end
+
+    # http://www.venge.net/monotone/monotone.html#Hook-Reference
+    def install_trigger(trigger_command, install_dir)
     end
 
   protected
@@ -152,6 +137,25 @@ module RSCM
 
   private
   
+    def local_revision(checkout_dir)
+      local_revision = nil
+      rev_file = File.expand_path("#{checkout_dir}/MT/revision")
+      local_revision = File.open(rev_file).read.strip
+      local_revision
+    end
+    
+    def head_revision(checkout_dir)
+      # FIXME: this will grab last head if heads are not merged.
+      head_revision = nil
+      monotone("heads", @branch) do |stdout|
+        stdout.each_line do |line|
+          next if (line =~ /^monotone:/)
+          head_revision = line.split(" ")[0]
+        end
+      end
+      head_revision
+    end
+
     # See http://www.venge.net/monotone/monotone.html#Selectors
     # Also see docs for expand_selector in the same document
     # Dates are formatted with strftime-style %F, which is of style 2005-28-02,
