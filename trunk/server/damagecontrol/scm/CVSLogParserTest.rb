@@ -1,10 +1,8 @@
 require 'test/unit'
-require 'ftools'
 require 'stringio'
-require 'fileutils'
-require 'damagecontrol/scm/CVS'
 require 'damagecontrol/scm/Changes'
-require 'webrick'
+require 'damagecontrol/scm/CVSLogParser'
+require 'damagecontrol/util/FileUtils'
 
 module DamageControl
   class CVSLogParserTest < Test::Unit::TestCase
@@ -27,12 +25,12 @@ module DamageControl
       assert_equal(nil, @parser.read_log_entry(StringIO.new("============\n===========")))
     end
     
-    def test_parser_entire_log_into_changesets
+    def test_parses_entire_log_into_changesets
       File.open("#{damagecontrol_home}/testdata/cvs-test.log") do |io|
         changesets = @parser.parse_changesets_from_log(io)
         
         assert_equal(18, changesets.length)
-        assert_match(/o YAML config \(BuildBootstrapper\)/,             changesets[2].message)
+        assert_match(/o YAML config \(BuildBootstrapper\)/, changesets[2].message)
         assert_match(/removed some output/, changesets[17].message)
       end
     end

@@ -19,8 +19,15 @@ module DamageControl
           changeset.time = parse_time($3)
         elsif(line =~ /   (.) \/(.*)/)
           change = Change.new
-          change.status = STATES[$1]
-          change.path = $2
+          status = $1
+          path = $2
+          if(path =~ /(.*) \(from (.*)\)/)
+            change.path = $1
+            change.status = Change::MOVED
+          else
+            change.path = path
+            change.status = STATES[status]
+          end
           changeset << change
           state = PARSING_CHANGES
         elsif(state == PARSING_CHANGES)
@@ -30,6 +37,7 @@ module DamageControl
           if (changeset)
             changeset.message = message
             changesets.add(changeset)
+            state = nil
           end
         elsif(state == PARSING_MESSAGE)
           message << line
@@ -39,7 +47,7 @@ module DamageControl
     end
     
   private
-    STATES = {"M" => Change::MODIFIED}
+    STATES = {"M" => Change::MODIFIED, "A" => Change::ADDED, "D" => Change::DELETED}
   
     def parse_time(svn_time)
       if(svn_time =~ /(.*)-(.*)-(.*) (.*):(.*):(.*) (\+|\-)([0-9]*) (.*)/)
