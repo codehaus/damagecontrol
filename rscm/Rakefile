@@ -22,7 +22,7 @@ task :all => [:ant, :gem]
 # To run a specific test: rake test TEST=path/to/test
 fl = FileList.new('test/**/*_test.rb')
 fl.exclude('test/**/mooky*.rb')
-fl.exclude('test/**/monotone*.rb') # Incomplete/unsupported for now - reactivate when more complete!
+#fl.exclude('test/**/monotone*.rb') # Incomplete/unsupported for now - reactivate when more complete!
 fl.exclude('test/**/clearcase*.rb')    # Incomplete/unsupported for now - reactivate when more complete!
 fl.exclude('test/**/darcs*.rb')    # Incomplete/unsupported for now - reactivate when more complete!
 fl.exclude('test/**/perforce*.rb') # Incomplete/unsupported for now - reactivate when more complete!
