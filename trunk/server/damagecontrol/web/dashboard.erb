@@ -21,7 +21,7 @@
 			cells_per_row = 4
 			start_row = i % cells_per_row == 0
 			end_row = i == project_count || i % cells_per_row == (cells_per_row - 1)
-			href = "project_name?project=#{project}"
+			href = "project?project_name=#{project}"
       
 			image = "images/lastcompletedstatus?project_name=#{project}"
 		%>
