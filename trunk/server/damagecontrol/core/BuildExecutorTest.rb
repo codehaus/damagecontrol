@@ -67,21 +67,37 @@ module DamageControl
     
     def test_checks_out_before_building      
       checkoutdir = "#{@basedir}/damagecontrolled/checkout/damagecontrolled"
+      last_build_time = Time.utc(2004, 04, 02, 12, 00, 00)
+      current_build_time = Time.utc(2004, 04, 02, 13, 00, 00)
       
       mock_build_history = MockIt::Mock.new
       mock_build_history.__expect(:last_succesful_build) { |project_name|
         assert_equal("damagecontrolled", project_name)
         b = Build.new("damagecontrolled")
-        b.timestamp = Time.utc(2004, 04, 02, 12, 00, 00)
+        b.timestamp = last_build_time
         b
       }
+      mock_scm = MockIt::Mock.new
+      mock_scm.__setup(:working_dir) { checkoutdir }
+      mock_scm.__expect(:changes) {|from_time, to_time|
+        assert_equal(last_build_time, from_time)
+        assert_equal(current_build_time, to_time)
+      }
+      mock_scm.__expect(:checkout) {}
       
       FileUtils.mkdir_p(checkoutdir)
       
       @build_executor = BuildExecutor.new(hub, mock_build_history, ProjectDirectories.new(@basedir))
       @build = Build.new("damagecontrolled", Time.now,
-        { "scm_spec" => "scm_spec", "build_command_line" => "echo hello world"})
-      @build.timestamp = Time.utc(2004, 04, 02, 13, 00, 00)
+        { "build_command_line" => "echo hello world"})
+      def @build.scm=(scm)
+        @scm = scm
+      end
+      def @build.get_scm(dir)
+        @scm
+      end
+      @build.scm = mock_scm
+      @build.timestamp = current_build_time
 
       @build_executor.schedule_build(@build)
       @build_executor.process_next_scheduled_build
@@ -90,6 +106,7 @@ module DamageControl
       assert_equal(Build::SUCCESSFUL, @build.status)
       
       mock_build_history.__verify
+      mock_scm.__verify
     end
     
     private

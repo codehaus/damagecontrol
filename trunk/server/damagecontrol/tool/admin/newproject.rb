@@ -13,4 +13,4 @@ class NewProjectTask < ConfigTask
 end
 end
 
-DamageControl:: NewProjectTask.new.run
+DamageControl::NewProjectTask.new.run

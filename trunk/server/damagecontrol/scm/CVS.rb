@@ -45,9 +45,9 @@ module DamageControl
       File.join(@working_dir_root, mod)
     end
     
-    def changes(time_before, time_after)
+    def changes(from_time, to_time)
       with_working_dir(working_dir) do
-        cvs_with_io(changes_command(time_before, time_after)) do |io|
+        cvs_with_io(changes_command(from_time, to_time)) do |io|
           parser = CVSLogParser.new
           parser.cvspath = path
           parser.cvsmodule = mod
@@ -56,8 +56,8 @@ module DamageControl
       end
     end
     
-    def changes_command(time_before, time_after)
-      "log -d\"#{cvsdate(time_before)}<=#{cvsdate(time_after)}\""
+    def changes_command(from_time, to_time)
+      "log -d\"#{cvsdate(from_time)}<=#{cvsdate(to_time)}\""
     end
     
     def cvsdate(time)
@@ -223,13 +223,13 @@ puts result
     def cvs_with_io(cmd, &proc)
       cmd = "cvs -q #{cmd} 2>&1"
 
-      logger.debug "executing #{cmd}"
+      logger.debug("executing #{cmd}")
       ret = nil
       io = IO.popen("#{cmd}") do |io|
         ret = yield io
       end
       raise Exception.new("'#{cmd}' in directory '#{Dir.pwd}' failed with code #{$?.to_s}") if $? != 0
-      logger.debug "executed #{cmd}"
+      logger.debug("executed #{cmd}")
       ret
     end
 

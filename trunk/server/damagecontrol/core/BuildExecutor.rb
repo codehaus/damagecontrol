@@ -26,13 +26,14 @@ module DamageControl
     end
     
     def checkout?
-      !current_build.scm_spec.nil? && current_build.scm_spec != ""
+      !current_scm.nil? && !current_build.scm_spec.nil? && current_build.scm_spec != ""
     end
     
-    def checkout(scm)
+    def checkout
+      return if !checkout?
       current_build.status = Build::CHECKING_OUT
       
-      scm.checkout do |progress| 
+      current_scm.checkout do |progress| 
         report_progress(progress)
       end
     end
@@ -48,11 +49,10 @@ module DamageControl
       end
     end
 
-    def execute(scm)
+    def execute
       current_build.status = Build::BUILDING
 
-      working_dir = "."
-      working_dir = scm.working_dir unless scm.nil?
+      working_dir = if current_scm.nil? then "." else current_scm.working_dir end
       with_working_directory(working_dir) do
         # set up some environment variables the build can use
         ENV["DAMAGECONTROL_CHANGES"] = 
@@ -94,23 +94,21 @@ module DamageControl
       busy? && current_build.project_name == project_name
     end
     
-    def determine_changeset(scm)
-      # this won't work the first build, so I just skip it 
+    def determine_changeset
+      return if !checkout?
+      # this won't work the first build, so I just skip it
       # the first time a project is built it will have a changeset of every file in the repository
       # this is almost useless information and there's no point in spending lots of time trying to code around it
-      project_checkout_dir = @project_directories.checkout_dir(current_build.project_name)
-      return unless File.exists?(project_checkout_dir)
+      return unless File.exists?(current_scm.working_dir)
       
       begin
         last_successful_build = @build_history.last_succesful_build(current_build.project_name)
         # we have no record of when the last succesful build was made, don't determine the changeset
         # (might be a new project, see comment above)
         return if last_successful_build.nil?
-        time_before = last_successful_build.timestamp_as_time
-        
+        time_before = last_successful_build.timestamp_as_time        
         time_after = current_build.timestamp_as_time
-        
-        current_build.modification_set = scm.changes(time_before, time_after)
+        current_build.modification_set = current_scm.changes(time_before, time_after) unless current_scm.nil?
 
       rescue Exception => e
         msg = e.message + e.backtrace.join("\n")
@@ -136,18 +134,23 @@ module DamageControl
       @scheduled_build_slot.get
     end
     
+    def project_checkout_dir
+      @project_directories.checkout_dir(current_build.project_name)
+    end
+    
+    def current_scm
+      current_build.get_scm(project_checkout_dir)
+    end
+    
     def process_next_scheduled_build
       next_scheduled_build
       begin
         current_build.start_time = Time.now.to_i
         @channel.publish_message(BuildStartedEvent.new(current_build))
 
-        project_checkout_dir = @project_directories.checkout_dir(current_build.project_name)
-        scm = current_build.get_scm(project_checkout_dir)
-        determine_changeset(scm)
-
-        checkout(scm) unless scm.nil?
-        execute(scm)
+        determine_changeset
+        checkout
+        execute
       rescue Exception => e
         message = format_exception(e)
         logger.error("build failed: #{message}")

@@ -11,17 +11,19 @@ require 'damagecontrol/xmlrpc/ConnectionTester'
 require 'damagecontrol/util/Logging'
 require 'damagecontrol/publisher/IRCPublisher'
 
-include DamageControl
+module DamageControl
 
 # turn off debug logging
-Logging.quiet
+#Logging.quiet
 
-def wait_for(timeout=60, &proc)
-  0.upto(timeout) do
-    return if proc.call
-    sleep 1
+module Utils
+  def wait_for(timeout=60, &proc)
+    0.upto(timeout) do
+      return if proc.call
+      sleep 1
+    end
   end
-end  
+end
 
 class IRCListener < IRCConnection
   attr_reader :received_text
@@ -42,6 +44,7 @@ end
 
 class IRCDriver
 
+  include Utils
   include Test::Unit::Assertions
 
   attr_reader :irc_listener
@@ -90,6 +93,7 @@ class Driver
 
   include Test::Unit::Assertions
   include FileUtils
+  include Utils
 
   def initialize(basedir)
     @basedir = basedir
@@ -112,6 +116,7 @@ class Driver
 end
 
 class DamageControlServerDriver < Driver
+  include Utils
   include Test::Unit::Assertions
   
   def setup
@@ -131,7 +136,7 @@ class DamageControlServerDriver < Driver
       @server_startup_result = nil
       @server_startup_result = system("ruby -I#{damagecontrol_home}/server #{startup_script} #{basedir} #{timeout}")
     }
-    wait_for(10) { server_running? }
+    wait_for(15) { server_running? }
     assert_server_running
   end
   
@@ -182,10 +187,13 @@ class DamageControlServerDriver < Driver
   
   def server_running?
     begin
-      client = XMLRPC::Client.new2(publicurl)
+      client = ::XMLRPC::Client.new2(publicurl)
       control = client.proxy("test")
       control.ping == DamageControl::XMLRPC::ConnectionTester::PING_RESPONSE
-    rescue
+    rescue Timeout::Error => e
+      false
+    rescue Exception => e
+      puts Logging.format_exception(e)
       false
     end
   end
@@ -215,22 +223,13 @@ class LocalCVS < CVS
   
   def create
     File.mkpath(@cvsrootdir)
-    system("cvs -d#{cvsroot} init")
-    if($? != 0)
-      raise "Couldn't create local CVS repository. Error code: #{$?}"
-    end
+    cvs("-d#{cvsroot} init")
   end
   
   def import(dir)
     with_working_dir(dir) do
-      # find the name of the last folder
-      /.*\/(.*)/ =~ dir
-      modulename = $1
-      cmd = "cvs -d#{cvsroot} import -m 'initial import' #{modulename} VENDOR START"
-      system(cmd)
-      if($? != 0)
-        raise "Couldn't import #{dir}.\nError code: #{$?}.\nCommand: '#{cmd}'.\nDirectory: #{dir}"
-      end
+      modulename = File.basename(dir)
+      cvs("-d#{cvsroot} import -m \"initial import\" #{modulename} VENDOR START")
     end    
   end
   
@@ -242,18 +241,10 @@ class LocalCVS < CVS
       end
       
       if(is_new)
-        cmd = "cvs add #{relative_filename}"
-        system(cmd)
-        if($? != 0)
-          raise "Couldn't add #{relative_filename}.\nError code: #{$?}.\nCommand: '#{cmd}'.\nDirectory: #{working_dir}"
-        end
+        cvs("add #{relative_filename}")
       end
 
-      cmd = "cvs com -m \"adding #{relative_filename}\""
-      system(cmd)
-      if($? != 0)
-        raise "Couldn't add #{relative_filename}.\nError code: #{$?}.\nCommand: '#{cmd}'.\nDirectory: #{working_dir}"
-      end      
+      cvs("com -m \"adding #{relative_filename}\"")
     end
   end
 end
@@ -386,4 +377,6 @@ class End2EndTest < Test::Unit::TestCase
             end
     assert_file_content(expected_content, build_result, "build not executed")
   end
+end
+
 end
