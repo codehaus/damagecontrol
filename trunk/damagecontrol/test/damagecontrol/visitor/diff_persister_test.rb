@@ -38,9 +38,9 @@ module DamageControl
         dp = DiffPersister.new(scm, "mooky")
 
         changesets.accept(dp)
-        assert_equal(diff1, File.open("#{basedir}/mooky/changesets/20040705120004/path/one.diff").read)
-        assert_equal(diff2, File.open("#{basedir}/mooky/changesets/20040705120004/path/two.diff").read)
-        assert_equal(diff3, File.open("#{basedir}/mooky/changesets/20040705120006/path/three.diff").read)
+        assert_equal(diff1, File.open("#{basedir}/mooky/changesets/20040705120004/diffs/path/one.diff").read)
+        assert_equal(diff2, File.open("#{basedir}/mooky/changesets/20040705120004/diffs/path/two.diff").read)
+        assert_equal(diff3, File.open("#{basedir}/mooky/changesets/20040705120006/diffs/path/three.diff").read)
 
       end
 
