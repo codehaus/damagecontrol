@@ -141,10 +141,9 @@ class Project
     })
     write_file(script, %{
       \#!/bin/sh
-      export DAMAGECONTROL_HOME=%~dp0..
+      DAMAGECONTROL_HOME=`dirname $0`/..
       cd $DAMAGECONTROL_HOME
-      export RUBY_HOME="$DAMAGECONTROL_HOME/ruby"
-      export PATH="$RUBY_HOME/bin":$PATH
+      export DAMAGECONTROL_HOME=`pwd`
       ruby -I"$DAMAGECONTROL_HOME/server" "$DAMAGECONTROL_HOME/#{target}"
     })
     system("chmod +x #{script}") unless windows?
