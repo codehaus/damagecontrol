@@ -31,6 +31,7 @@ module DamageControl
         if(private?)
           result +=
             [
+              task(:icon => "icons/box_new.png", :name => "New project", :url => "project?action=configure"),
               task(:icon => "icons/wrench.png", :name => "Configure", :url => "?project_name=#{project_name}&action=configure"),
               task(:icon => "icons/gears_run.png", :name => "Trig build now", :url => "?project_name=#{project_name}&action=trig_build"),
               task(:icon => "icons/gear_connection.png", :name => "Install trigger", :url => "?project_name=#{project_name}&action=install_trigger")

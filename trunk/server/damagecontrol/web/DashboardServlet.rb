@@ -24,7 +24,7 @@ module DamageControl
       if private?
         result +=
           [
-            task(:name => "New project", :url => "project?action=configure")
+            task(:icon => "icons/box_new.png", :name => "New project", :url => "project?action=configure")
           ]
       end
       result
