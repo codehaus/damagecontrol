@@ -51,7 +51,13 @@ module DamageControl
       mock_hub = new_mock
       mock_hub.__expect(:put) {|message| 
         assert(message.is_a?(BuildStateChangedEvent))
-        assert_equal(Build::DETERMINING_CHANGESETS, message.build.status) 
+        assert_equal(Build::DETERMINING_CHANGESETS, message.build.status)
+        assert_nil(message.build.scm_commit_time)
+      }
+      mock_hub.__expect(:put) {|message| 
+        assert(message.is_a?(BuildStateChangedEvent))
+        assert_equal(Build::DETERMINING_CHANGESETS, message.build.status)
+        assert(message.build.scm_commit_time)
       }
       mock_hub.__expect(:put) {|message| assert(message.is_a?(BuildStartedEvent))}
       mock_hub.__expect(:put) {|message| 
@@ -95,7 +101,7 @@ module DamageControl
     
     def test_when_build_scheduled_executes_sends_start_process_and_complete
       mock_scm = new_mock
-      mock_scm.__expect(:changesets) {ChangeSets.new}
+      mock_scm.__expect(:changesets) {cs = ChangeSets.new; cs.add(Change.new(nil,nil,nil,nil,Time.new.utc)); cs}
       mock_scm.__expect(:checkout) {}
       mock_scm.__expect(:label) {}
 
@@ -103,6 +109,12 @@ module DamageControl
       mock_hub.__expect(:put) {|message| 
         assert(message.is_a?(BuildStateChangedEvent))
         assert_equal(Build::DETERMINING_CHANGESETS, message.build.status)
+        assert_nil(message.build.scm_commit_time)
+      }
+      mock_hub.__expect(:put) {|message| 
+        assert(message.is_a?(BuildStateChangedEvent))
+        assert_equal(Build::DETERMINING_CHANGESETS, message.build.status)
+        assert(message.build.scm_commit_time)
       }
       mock_hub.__expect(:put) {|message| assert(message.is_a?(BuildStartedEvent))}
       mock_hub.__expect(:put) {|message| 
@@ -198,7 +210,7 @@ module DamageControl
         assert_equal("some_dir", checkout_dir)
         assert_equal(last_build_time + 1, from_time)
         assert_equal(nil, to_time)
-        ChangeSets.new
+        cs = ChangeSets.new; cs.add(Change.new(nil,nil,nil,nil,Time.new.utc)); cs
       }
       mock_scm.__expect(:checkout) {}
       mock_scm.__expect(:label) {}
@@ -207,6 +219,12 @@ module DamageControl
       mock_hub.__expect(:put) {|message| 
         assert(message.is_a?(BuildStateChangedEvent))
         assert_equal(Build::DETERMINING_CHANGESETS, message.build.status)
+        assert(message.build.scm_commit_time)
+      }
+      mock_hub.__expect(:put) {|message| 
+        assert(message.is_a?(BuildStateChangedEvent))
+        assert_equal(Build::DETERMINING_CHANGESETS, message.build.status)
+        assert(message.build.scm_commit_time)
       }
       mock_hub.__expect(:put) {|message| assert(message.is_a?(BuildStartedEvent))}
       mock_hub.__expect(:put) {|message| 

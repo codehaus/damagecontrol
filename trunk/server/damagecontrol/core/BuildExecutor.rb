@@ -192,13 +192,13 @@ module DamageControl
         # Only store changesets if the previous commit time was known
         current_build.changesets = changesets if changesets && from_time
         
-        # Set last commit time
+        # Set last commit timeister
         changesets = changesets.sort do |a,b|
           a.time <=> b.time
         end
         current_build.scm_commit_time = changesets[-1] ? changesets[-1].time : nil
         logger.info("Done determining changesets for #{current_build.project_name}")
-
+        @channel.put(BuildStateChangedEvent.new(current_build))
       rescue Exception => e
         logger.error "could not determine changeset: #{format_exception(e)}"
       end
