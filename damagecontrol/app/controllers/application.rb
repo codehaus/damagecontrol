@@ -4,6 +4,7 @@
 require 'rubygems'
 require_gem 'rscm'
 require 'damagecontrol/project'
+require 'damagecontrol/build'
 require 'damagecontrol/tracker'
 require 'damagecontrol/scm_web'
 
@@ -140,4 +141,10 @@ end
 
 class DamageControl::Project
   include DamageControl::Web::Configuration
+end
+
+class DamageControl::Build
+  def small_image
+    exit_code == 0 ? "/images/green-16.gif" : "/images/red-16.gif"
+  end
 end

@@ -18,8 +18,10 @@
   <tr class="build-row">
     <td nowrap="nowrap">
       <%= link_to("#{changeset.identifier} (#{changeset.developer})", :action => "changesets", :id => @project.name, :params => {"changeset" => changeset.identifier}) %>
+    </td>
+    <td width="100%">
       <% @project.builds(changeset.identifier).each do |build| %>
-      <%= tag("img", :src => "/images/green-16.gif") %>
+      <%= tag("img", :src => build.small_image) %>
       <% end %>
     </td>
   </tr>

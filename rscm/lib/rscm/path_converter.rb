@@ -1,3 +1,4 @@
+require 'fileutils'
 require 'rscm/logging'
 
 WIN32 = RUBY_PLATFORM == "i386-mswin32"
@@ -20,7 +21,8 @@ def with_working_dir(dir)
   #
   prev = Dir.pwd
   begin
-    mkdir_p(dir)
+    Log.info "Making directory: '#{File.expand_path(dir)}'"
+    FileUtils.mkdir_p(dir)
     Dir.chdir(dir)
     Log.info "In directory: '#{File.expand_path(dir)}'"
     yield
