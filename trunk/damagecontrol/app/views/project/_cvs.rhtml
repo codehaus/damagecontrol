@@ -1,4 +1,5 @@
-<script>
+<script type="text/javascript">
+<!--
 cvs_port   = new RegExp("^:([^:]*):(.*)@([^:]*):([0-9]*):([a-zA-Z]?.*)")
 cvs_noport = new RegExp("^:([^:]*):(.*)@([^:]*):([a-zA-Z]?.*)")
 cvs_local  = new RegExp("^:(local):(.*)")
@@ -107,7 +108,7 @@ function enableOrDisableCvsFields() {
 var cvs_protocol_tip = "<div class='tp1'>If you specify :local: DamageControl can create the repository for you after you save (unless the repository already exists).</div>";
 // not displayed yet - not appropriate for rscm...
 var cvs_mod_tip  = "<div class='tp1'>Note that you can't use trigged build if you are using DC to build multiple branches for the same project, use polling instead.</div>";
-
+-->
 </script>
 
 <table width="100%">
@@ -123,7 +124,7 @@ var cvs_mod_tip  = "<div class='tp1'>Note that you can't use trigged build if yo
     <td>
       <select class="setting-input" id="cvsprotocol" onchange="updateCvsRootField()">
         <option value=""></option>
-        <option value="ext" selected>Secure shell (:ext:)</option>
+        <option value="ext" selected="selected">Secure shell (:ext:)</option>
         <option value="pserver">Password server (:pserver:)</option>
         <option value="local">Locally mounted folder (:local:)</option>
       </select>
@@ -163,8 +164,8 @@ var cvs_mod_tip  = "<div class='tp1'>Note that you can't use trigged build if yo
   <tr>
     <td>Branch</td>
     <td>&nbsp;</td>
-    <td width="75%"><%= text_or_input(@edit, :name => "scms[RSCM::Cvs][@branch]", :value => cvs.branch, :id => "cvsmodule") %></td>
+    <td width="75%"><%= text_or_input(@edit, :name => "scms[RSCM::Cvs][@branch]", :value => cvs.branch, :id => "cvsbranch") %></td>
   </tr>
 </table>
 
-<img src="/images/cvs.png"/>
+<img src="/images/cvs.png" alt=""/>

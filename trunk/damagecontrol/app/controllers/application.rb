@@ -16,8 +16,11 @@ BASEDIR = basedir unless defined? BASEDIR
 class ApplicationController < ActionController::Base
 
   layout 'default'
+  before_filter :init_sidebar_links
 
-  def initialize
+  protected
+
+  def init_sidebar_links
     @sidebar_links = [
       {
         :controller => "project", 
@@ -34,8 +37,6 @@ class ApplicationController < ActionController::Base
     project_name = @params["id"]
     @project = DamageControl::Project.load("#{BASEDIR}/projects/#{project_name}/project.yaml")
   end
-
-protected
 
   # Sets the links to display in the sidebar. Override this method in other controllers
   # To change what to display.

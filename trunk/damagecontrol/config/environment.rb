@@ -48,7 +48,7 @@ begin
   require 'damagecontrol/app'
   LOG_DIR = File.expand_path("#{basedir}/log")
   FileUtils.mkdir_p(LOG_DIR)
-  RAILS_DEFAULT_LOGGER = Logger.new("#{LOG_DIR}/#{RAILS_ENV}.log")
+  Log = RAILS_DEFAULT_LOGGER = Logger.new("#{LOG_DIR}/#{RAILS_ENV}.log")
 rescue StandardError => e
   RAILS_DEFAULT_LOGGER = Logger.new(STDERR)
   RAILS_DEFAULT_LOGGER.level = Logger::WARN

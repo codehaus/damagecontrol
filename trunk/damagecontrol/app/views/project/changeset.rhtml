@@ -1,4 +1,4 @@
-<ul id="foldertab">
+<ul class="foldertab">
   <li><a href="javascript:setTab('changesets')"><img src="/images/16x16/document_exchange.png"> Changesets</a></li>
   <% @changeset.builds.each do |build| %>
   <li><%= link_to(build.identifier, 
@@ -12,7 +12,7 @@
     <td colspan="3" class="changeset">
       <div class="changeset-message">
         <b><%= @changeset.developer %></b>
-        (<%= @changeset.time.to_human %> UTC)<br>
+        (<%= @changeset.time.to_human %> UTC)<br/>
         <%= @project.tracker.highlight(@changeset.message) %>
       </div>
     </td>
@@ -25,7 +25,7 @@
       <td width="5%"><%= change.revision %></td>
       <td width="90%">
         <a class="diff-toggle" href="#" onclick="toggleCode('<%= change.path %>');return false"><%= change.path %></a>
-        <br>
+        <br/>
         <div class="diff" id="<%= change.path %>">
         <%= change.html_diff %>
         </div>

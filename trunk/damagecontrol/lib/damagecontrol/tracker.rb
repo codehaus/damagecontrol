@@ -17,7 +17,7 @@ module DamageControl
       end
 
       def htmlize(str)
-        str.gsub(/\n/, "<br>")
+        str.gsub(/\n/, "<br/>")
       end
     end
 
@@ -71,7 +71,7 @@ module DamageControl
       ann :description => "Trac URL", :tip => "The URL of the Trac installation. This URL should include no trailing slash. Example: http://my.trac.home/cgi-bin/trac.cgi"
       attr_accessor :url
 
-      def initialize(url="http://trac.org/")
+      def initialize(url="http://www.edgewall.com/trac/")
         @url = url
       end
       
@@ -126,11 +126,11 @@ module DamageControl
       PATTERN = /#([0-9]+)/
     
       ann :description => "Project id"
-      ann :tip => "The id of the project (group_id). Example: <br><tt>http://sourceforge.net/tracker/index.php?func=detail&amp;aid=1051927&amp;group_id=<strong>7856</strong>&amp;atid=107856</tt>"
+      ann :tip => "The id of the project (group_id). Example: <br/><tt>http://sourceforge.net/tracker/index.php?func=detail&amp;aid=1051927&amp;group_id=<strong>7856</strong>&amp;atid=107856</tt>"
       attr_accessor :group_id
 
       ann :description => "Tracker id"
-      ann :tip => "The id of the tracker (aid). Example: <br><tt>http://sourceforge.net/tracker/index.php?func=detail&amp;aid=<strong>1051927</strong>&amp;group_id=7856&amp;atid=107856</tt>."
+      ann :tip => "The id of the tracker (aid). Example: <br/><tt>http://sourceforge.net/tracker/index.php?func=detail&amp;aid=<strong>1051927</strong>&amp;group_id=7856&amp;atid=107856</tt>."
       attr_accessor :tracker_id
 
       def initialize(group_id="", tracker_id="")
@@ -154,11 +154,11 @@ module DamageControl
       register self
 
       ann :description => "Project id"
-      ann :tip => "The id of the project (group_id). Example: <br><tt>http://rubyforge.org/tracker/index.php?func=detail&amp;aid=1120&amp;group_id=<strong>426</strong>&amp;atid=1698</tt>."
+      ann :tip => "The id of the project (group_id). Example: <br/><tt>http://rubyforge.org/tracker/index.php?func=detail&amp;aid=1120&amp;group_id=<strong>426</strong>&amp;atid=1698</tt>."
       attr_accessor :group_id
 
       ann :description => "Tracker id"
-      ann :tip => "The id of the tracker (aid). Example: <br><tt>http://rubyforge.org/tracker/index.php?func=detail&amp;aid=<strong>1120</strong>&amp;group_id=426&amp;atid=1698</tt>."
+      ann :tip => "The id of the tracker (aid). Example: <br/><tt>http://rubyforge.org/tracker/index.php?func=detail&amp;aid=<strong>1120</strong>&amp;group_id=426&amp;atid=1698</tt>."
       attr_accessor :tracker_id
 
       def name
