@@ -33,7 +33,8 @@ module DamageControl
       # temp hack that only works for Ant/Maven and Ruby tests. We need to get the return code!!!
       did_read_ant_or_maven_build_failed = false
       did_read_ruby_tests_failed = false
-      IO.popen(current_build.build_command_line) do |output|
+      # some of the error messages are on stderr, which isn't available to popen
+      IO.popen(current_build.build_command_line + " 2>&1") do |output|
         output.each_line do |line|
           report_progress(line)
           did_read_ant_or_maven_build_failed = true if /FAILED/ =~ line
