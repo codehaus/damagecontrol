@@ -1,6 +1,6 @@
 require 'test/unit'
 require 'rscm/path_converter'
-require 'rscm/cvs/cvs'
+require 'rscm'
 require 'rscm/generic_scm_tests'
 
 module RSCM

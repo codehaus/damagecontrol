@@ -1,9 +1,9 @@
 require 'test/unit'
 require 'stringio'
-require 'rscm/svn/svn_log_parser'
+require 'rscm'
 
 module RSCM
-  class SVNLogParserTest < Test::Unit::TestCase
+  class SubversionLogParserTest < Test::Unit::TestCase
   
 #    include FileUtils
 
@@ -52,7 +52,7 @@ EOF
     end
 
     def test_parses_entire_log_into_changesets
-      File.open(File.dirname(__FILE__) + "/proxytoys-svn.log") do |io|
+      File.open(File.dirname(__FILE__) + "/svn-proxytoys.log") do |io|
         parser = SVNLogParser.new(io, "trunk/proxytoys", nil)
 
         changesets = parser.parse_changesets
@@ -87,7 +87,7 @@ EOF
     end
 
     def test_parses_entire_log_into_changesets
-      File.open(File.dirname(__FILE__) + "/cargo-svn.log") do |io|
+      File.open(File.dirname(__FILE__) + "/svn-cargo.log") do |io|
         parser = SVNLogParser.new(io, "trunk/proxytoys", nil)
         changesets = parser.parse_changesets
         assert_equal(16, changesets.length)

@@ -11,8 +11,8 @@ module RSCM
   #
   # NOTE: On Cygwin this has to be the win32 build of cvs and not the Cygwin one.
   class Cvs < AbstractSCM
+    AbstractSCM.register(self)
 
-  public
     ann :description => "CVSROOT"
     attr_accessor :root
 

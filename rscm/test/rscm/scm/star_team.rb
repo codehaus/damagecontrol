@@ -1,7 +1,7 @@
 require 'test/unit'
 require 'fileutils'
+require 'rscm'
 require 'rscm/generic_scm_tests'
-require 'rscm/starteam/starteam'
 
 module RSCM
   class StarTeamTest < Test::Unit::TestCase

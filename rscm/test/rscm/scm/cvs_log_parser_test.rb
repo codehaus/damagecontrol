@@ -1,8 +1,7 @@
 require 'test/unit'
 require 'stringio'
 require 'fileutils'
-require 'rscm/changes'
-require 'rscm/cvs/cvs_log_parser'
+require 'rscm'
 
 module RSCM
   class CvsLogParserTest < Test::Unit::TestCase
