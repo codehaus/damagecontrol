@@ -47,6 +47,9 @@ module DamageControl
   class BuildCompleteEvent < BuildEvent
   end
 
+  class BuildStateChangedEvent < BuildEvent
+  end
+
   class UserMessage
     attr_reader :message
     

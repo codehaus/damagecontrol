@@ -55,6 +55,7 @@ require 'damagecontrol/publisher/BuildHistoryStatsPublisher'
 require 'damagecontrol/publisher/StatsXSLTPublisher'
 
 # patch webrick so that it displays files it doesn't recognize as text
+# TODO: add svg MIME type so IE can display generated SVGs - http://www.pinkjuice.com/svg/mime.xhtml
 module WEBrick
   module HTTPUtils
     def mime_type(filename, mime_tab)

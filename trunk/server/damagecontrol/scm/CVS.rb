@@ -233,10 +233,16 @@ module DamageControl
     end
     
     def parse_log(checkout_dir, cmd, &proc)
-      changesets = nil
+      logged_command_line = command_line(hidden_password, cmd)
+      if block_given?
+        yield logged_command_line
+      else 
+        logger.debug(logged_command_line) 
+      end
 
       execed_command_line = command_line(cvspassword, cmd)
-      cmd_with_io(checkout_dir, execed_command_line, environment) do |stdin, stdout|
+      changesets = nil
+      cmd_with_io(checkout_dir, execed_command_line, environment) do |stdout|
         parser = CVSLogParser.new(stdout)
         parser.cvspath = path
         parser.cvsmodule = cvsmodule
@@ -256,7 +262,7 @@ module DamageControl
       execed_command_line = command_line(cvspassword, cmd)
 
       # not specifying stderr - cmd_with_io will read it in a separate thread.
-      cmd_with_io(dir, execed_command_line, environment) do |stdin, stdout|
+      cmd_with_io(dir, execed_command_line, environment) do |stdout|
         stdout.each_line do |progress|
           if block_given? then yield progress else logger.debug(progress) end
         end

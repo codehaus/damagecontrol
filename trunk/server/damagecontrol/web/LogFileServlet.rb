@@ -12,9 +12,10 @@ module DamageControl
       res.body = open(path, "r")
     end
   
-    protected
+  protected
     
     def content_type
+puts "LALALALALALALA"
       "text/plain"
     end
     

@@ -238,8 +238,8 @@ module DamageControl
       bhr.register(b1)
       bhr.register(b2)
 
-      expected_rss = File.open("#{damagecontrol_home}/testdata/rss.xml").read
-      rss = bhr.to_rss("myproject")
+      expected_rss = File.open("#{damagecontrol_home}/testdata/rss.xml").read.chomp
+      rss = bhr.to_rss("myproject").chomp
       assert_equal(expected_rss, rss)
     end
   end

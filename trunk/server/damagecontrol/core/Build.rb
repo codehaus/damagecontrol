@@ -13,14 +13,14 @@ module DamageControl
     include XmlSerialization
     include Pebbles::Matchable
 
-    IDLE = "IDLE"
-    SUCCESSFUL = "SUCCESSFUL"
-    FAILED = "FAILED"
-    QUEUED = "QUEUED"
-    BUILDING = "BUILDING"
-    KILLED = "KILLED"
+    IDLE                   = "IDLE"
+    QUEUED                 = "QUEUED"
     DETERMINING_CHANGESETS = "DETERMINING CHANGESETS"
-    CHECKING_OUT = "CHECKING OUT"
+    CHECKING_OUT           = "CHECKING OUT"
+    BUILDING               = "BUILDING"
+    SUCCESSFUL             = "SUCCESSFUL"
+    FAILED                 = "FAILED"
+    KILLED                 = "KILLED"
 
     attr_accessor :project_name
     attr_accessor :config

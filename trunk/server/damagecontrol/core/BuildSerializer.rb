@@ -72,11 +72,9 @@ module DamageControl
       # http://builds.codehaus.org/damagecontrol/private/root/damagecontrol/build/20041130053221/changesets.yaml
       begin
         changesets_file = "#{build_dir}/changesets.yaml"
-puts "parsing #{changesets_file}"
         changesets = File.open(changesets_file) do |io|
           YAML::load(io)
         end
-puts "done parsing #{changesets_file}"
         changesets
       rescue Exception => e
         puts "Failed to parse changesets with YAML:"

@@ -49,10 +49,25 @@ module DamageControl
       @build.scm.checkout_dir = "."
 
       mock_hub = new_mock
+      mock_hub.__expect(:put) {|message| 
+        assert(message.is_a?(BuildStateChangedEvent))
+        assert_equal(Build::DETERMINING_CHANGESETS, message.build.status) 
+      }
       mock_hub.__expect(:put) {|message| assert(message.is_a?(BuildStartedEvent))}
+      mock_hub.__expect(:put) {|message| 
+        assert(message.is_a?(BuildStateChangedEvent))
+        assert_equal(Build::CHECKING_OUT, message.build.status)
+      }
+      mock_hub.__expect(:put) {|message| 
+        assert(message.is_a?(BuildStateChangedEvent))
+        assert_equal(Build::BUILDING, message.build.status)
+      }
       mock_hub.__expect(:put) {|message| assert(message.is_a?(BuildProgressEvent))}
       mock_hub.__expect(:put) {|message| assert(message.is_a?(BuildErrorEvent), "message was #{message}")}
-
+      mock_hub.__expect(:put) {|message| 
+        assert(message.is_a?(BuildStateChangedEvent))
+        assert_equal(Build::KILLED, message.build.status) 
+      }
       mock_hub.__expect(:put) {|message| 
         assert(message.is_a?(BuildCompleteEvent))
         assert_equal(Build::KILLED, message.build.status) 
@@ -80,12 +95,24 @@ module DamageControl
     
     def test_when_build_scheduled_executes_sends_start_process_and_complete
       mock_scm = new_mock
-      mock_scm.__expect(:changesets) {}
+      mock_scm.__expect(:changesets) {ChangeSets.new}
       mock_scm.__expect(:checkout) {}
       mock_scm.__expect(:label) {}
 
       mock_hub = new_mock
+      mock_hub.__expect(:put) {|message| 
+        assert(message.is_a?(BuildStateChangedEvent))
+        assert_equal(Build::DETERMINING_CHANGESETS, message.build.status)
+      }
       mock_hub.__expect(:put) {|message| assert(message.is_a?(BuildStartedEvent))}
+      mock_hub.__expect(:put) {|message| 
+        assert(message.is_a?(BuildStateChangedEvent))
+        assert_equal(Build::CHECKING_OUT, message.build.status)
+      }
+      mock_hub.__expect(:put) {|message| 
+        assert(message.is_a?(BuildStateChangedEvent))
+        assert_equal(Build::BUILDING, message.build.status)
+      }
       mock_hub.__expect(:put) {|message| 
         assert(message.is_a?(BuildProgressEvent))
         assert_equal("echo Hello world from DamageControl!", message.output.chomp.chomp(" "))
@@ -93,6 +120,10 @@ module DamageControl
       mock_hub.__expect(:put) {|message| 
         assert(message.is_a?(BuildProgressEvent))
         assert_equal("Hello world from DamageControl!", message.output.chomp.chomp(" "))
+      }
+      mock_hub.__expect(:put) {|message| 
+        assert(message.is_a?(BuildStateChangedEvent))
+        assert_equal(Build::SUCCESSFUL, message.build.status)
       }
       mock_hub.__expect(:put) {|message| assert(message.is_a?(BuildCompleteEvent))}
 
@@ -116,7 +147,7 @@ module DamageControl
     
     def test_failing_build_sends_build_complete_event_with_successful_flag_set_to_false
       mock_scm = new_mock
-      mock_scm.__expect(:changesets) {}
+      mock_scm.__expect(:changesets) {ChangeSets.new}
       mock_scm.__expect(:checkout) {}
 
       mock_build_history = new_mock
@@ -165,17 +196,34 @@ module DamageControl
       mock_scm = new_mock.__setup(:working_dir) { checkoutdir }
       mock_scm.__expect(:changesets) {|checkout_dir, from_time, to_time|
         assert_equal("some_dir", checkout_dir)
-        assert_equal(last_build_time, from_time)
-        assert_equal(current_build_time, to_time)
+        assert_equal(last_build_time + 1, from_time)
+        assert_equal(nil, to_time)
+        ChangeSets.new
       }
       mock_scm.__expect(:checkout) {}
       mock_scm.__expect(:label) {}
 
       mock_hub = new_mock
+      mock_hub.__expect(:put) {|message| 
+        assert(message.is_a?(BuildStateChangedEvent))
+        assert_equal(Build::DETERMINING_CHANGESETS, message.build.status)
+      }
       mock_hub.__expect(:put) {|message| assert(message.is_a?(BuildStartedEvent))}
-      mock_hub.__expect(:put) {|message| assert(message.is_a?(BuildProgressEvent))}
-      mock_hub.__expect(:put) {|message| assert(message.is_a?(BuildProgressEvent))}
-      mock_hub.__expect(:put) {|message| assert(message.is_a?(BuildCompleteEvent))}
+      mock_hub.__expect(:put) {|message| 
+        assert(message.is_a?(BuildStateChangedEvent))
+        assert_equal(Build::CHECKING_OUT, message.build.status)
+      }
+      mock_hub.__expect(:put) {|message| 
+        assert(message.is_a?(BuildStateChangedEvent))
+        assert_equal(Build::BUILDING, message.build.status)
+      }
+      mock_hub.__expect(:put) {|message| assert(message.is_a?(BuildProgressEvent), message)}
+      mock_hub.__expect(:put) {|message| assert(message.is_a?(BuildProgressEvent), message)}
+      mock_hub.__expect(:put) {|message| 
+        assert(message.is_a?(BuildStateChangedEvent))
+        assert_equal(Build::SUCCESSFUL, message.build.status)
+      }
+      mock_hub.__expect(:put) {|message| assert(message.is_a?(BuildCompleteEvent), message)}
       
       @build_executor = BuildExecutor.new(
         'executor1', 

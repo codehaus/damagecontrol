@@ -38,9 +38,12 @@ module DamageControl
       return if !checkout?
       
       current_build.status = Build::CHECKING_OUT
+      @channel.put(BuildStateChangedEvent.new(current_build))
       # we're not specifying scm_to_time since we don't know that time. we cannot safely
       # assume that it is the same time as *now* on the machine where this process (DC)
-      # is running. therefore, specify nil and get the latest.
+      # is running. therefore, specify nil and get the latest. In worst case we'll get
+      # some more changes than wanted in case someone committed files after the build request,
+      # but chances of this happening are rather slim, and if it happens it isn't a big problem.
       current_scm.checkout(checkout_dir, nil) do |progress|
         report_progress(progress)
       end
@@ -63,6 +66,7 @@ module DamageControl
 
     def execute
       current_build.status = Build::BUILDING
+      @channel.put(BuildStateChangedEvent.new(current_build))
 
       # set up some environment variables the build can use
       environment = { "DAMAGECONTROL_BUILD_LABEL" => current_build.potential_label.to_s }
@@ -82,6 +86,7 @@ module DamageControl
           threads.each{|t| t.join}
         end
         current_build.status = Build::SUCCESSFUL
+        @channel.put(BuildStateChangedEvent.new(current_build))
       rescue Exception => e
         logger.error("build failed: #{format_exception(e)}")
         report_error(format_exception(e))
@@ -90,6 +95,7 @@ module DamageControl
         else
           current_build.status = Build::FAILED
         end
+        @channel.put(BuildStateChangedEvent.new(current_build))
       end
 
       # set the label
@@ -160,6 +166,7 @@ module DamageControl
     
     def determine_changeset
       current_build.status = Build::DETERMINING_CHANGESETS
+      @channel.put(BuildStateChangedEvent.new(current_build))
       if !current_build.changesets.empty?
         logger.info("not determining changeset for #{current_build.project_name} because other component (such as SCMPoller) has already determined it")
         return
@@ -233,6 +240,7 @@ module DamageControl
         logger.error("build failed: #{message}")
         current_build.error_message = message
         current_build.status = Build::FAILED
+        @channel.put(BuildStateChangedEvent.new(current_build))
         report_error("Build failed due to: #{message}")
       ensure
         build_complete
