@@ -1,4 +1,5 @@
 require 'test/unit'
 require 'damagecontrol/dependency/AllTraverserTest'
 require 'damagecontrol/dependency/UpstreamDownstreamTraverserTest'
+require 'damagecontrol/WebsiteBuilderTest'
 require 'damagecontrol/CommandLineBuilderTest'
