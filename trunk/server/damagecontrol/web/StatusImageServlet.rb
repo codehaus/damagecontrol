@@ -6,6 +6,7 @@ module DamageControl
     def initialize(build_history_repository, build_scheduler)
       @build_history_repository = build_history_repository
       @build_scheduler = build_scheduler
+      @image_dir = File.expand_path("#{File.dirname(__FILE__)}/images")
     end
     
     def service(req, res)
@@ -38,11 +39,7 @@ module DamageControl
         color = if build.successful? then "green" else "red" end
         pulse = "-pulse" if @build_scheduler.project_building?(project_name)
       end
-      image = "#{imagedir}/#{color}#{pulse}-32.gif"
-    end
-    
-    def imagedir
-      "#{File.dirname(__FILE__)}/images"
+      image = "#{@image_dir}/#{color}#{pulse}-32.gif"
     end
     
   end

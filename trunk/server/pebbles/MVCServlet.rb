@@ -45,7 +45,6 @@ module Pebbles
   end
 
   class MVCServlet < SimpleServlet
-    attr_reader :templatedir
     
     include RiteMesh
     
@@ -77,24 +76,24 @@ module Pebbles
     end
         
     def erb(template, binding)
-      template = File.new("#{templatedir}/#{template}").read.untaint
+      raise "The constructor of #{self.class.name} should do: @template_dir = File.expand_path(File.dirname(__FILE__))" unless @template_dir
+      template_path = File.expand_path("#{template_dir}/#{template}")
+      template = File.new(template_path).read.untaint
       ERB.new(template).result(binding)
     end
     
     def render(erb_template, binding)
       response.body = erb(erb_template, binding)
       unless ritemesh_template.nil?
-        ritemesh_template_content = File.new("#{templatedir}/#{ritemesh_template}").read.untaint
+        ritemesh_template_content = File.new("#{template_dir}/#{ritemesh_template}").read.untaint
         response.body = mesh(response.body, ritemesh_template_content, binding)
       end
     end
     
-  protected
+#  protected
+    attr_reader :template_dir
     
-    def templatedir
-      "."
-    end
-    
+  
     def ritemesh_template
       # disabled by default
       nil

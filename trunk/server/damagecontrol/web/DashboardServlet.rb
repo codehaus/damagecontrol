@@ -5,10 +5,8 @@ module DamageControl
     def initialize(build_history_repository, project_config_repository, build_scheduler, type)
       super(type, build_scheduler, build_history_repository)
       @project_config_repository = project_config_repository
-    end
-    
-    def templatedir
-      File.dirname(__FILE__)
+      
+      @template_dir = File.expand_path(File.dirname(__FILE__))
     end
     
     def title

@@ -11,12 +11,9 @@ module DamageControl
       @nudge_xmlrpc_url = nudge_xmlrpc_url
 
       @scm_factory = SCMFactory.new
+      @template_dir = File.expand_path(File.dirname(__FILE__))
     end
 
-    def templatedir
-      File.dirname(__FILE__)
-    end
-  
     def title
       "Project"
     end
