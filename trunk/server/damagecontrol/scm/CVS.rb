@@ -37,7 +37,14 @@ module DamageControl
 
       cvs_web_url_patched = ensure_trailing_slash(cvs_web_url)
       url = "#{cvs_web_url_patched}#{change.path}"
-      url << "?r1=#{change.previous_revision}&r2=#{change.revision}" if(change.previous_revision)
+      
+      if(change.previous_revision)
+        # point to the viewcvs (rev) and fisheye (r) revisions (no diff view)
+        url << "?rev=#{change.revision}&r=#{change.revision}"
+      else
+        # point to the viewcvs and fisheye diffs (if we know the previous revision)
+        url << "?r1=#{change.previous_revision}&r2=#{change.revision}"
+      end
       url
     end
     
