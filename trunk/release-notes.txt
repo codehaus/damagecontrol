@@ -1,36 +1,41 @@
 The DamageControl Team (Jon Tirsen and Aslak Hellesoy) are proud to release DamageControl 0.2 prerelease (this prerelease is for Windows only).
 
-http://damagecontrol.codehaus.org/
+<a href="http://damagecontrol.codehaus.org/">http://damagecontrol.codehaus.org/</a>
 
 DamageControl is a Continuous Integration server with the follwoing main features:
 
-o Simple configuration. No XML. All web based configuration.
-o Supports building of Java/Ant/Ruby/.NET/C++/Cobol/whatever - DamageControl is platform agnostic.
-o Self contained - comes with its own web server and Ruby runtime. (DamageControl is written in Ruby).
-o Support for as many projects as your RAM and disks allow. In one single server.
-o Multi channel notification on build results. (Email, IRC, built-in Web pages, DCTray - windows system tray)
-o Supports parallel builds.
-o Builds are trigged by the SCM (CVS) upon commits. DamageControl can install SCM triggers automatically.
-o Pluggable API for cool extensions
+<ul>
+<li> Simple configuration. No XML. All web based configuration.
+<li> Supports building of Java/Ant/Ruby/.NET/C++/Cobol/whatever - DamageControl is platform agnostic.
+<li> Self contained - comes with its own web server and Ruby runtime. (DamageControl is written in Ruby).
+<li> Support for as many projects as your RAM and disks allow. In one single server.
+<li> Multi channel notification on build results. (Email, IRC, built-in Web pages, DCTray - windows system tray)
+<li> Supports parallel builds.
+<li> Builds are trigged by the SCM (CVS) upon commits. DamageControl can install SCM triggers automatically.
+<li> Pluggable API for cool extensions
+<li> Integration with <a href="http://viewcvs.sourceforge.net/">ViewCVS</a> and <a href="http://www.cenqua.com/fisheye/">Fisheye</a>
+</ul>
 
-You can look at a live deployment here: http://builds.codehaus.org/public/dashboard (Yes, DamageControl runs on Linux too)
-If you want to add a project, go here: http://builds.codehaus.org/private/dashboard (ask Jon or Aslak for username/password)
+You can look at a live deployment here: <a href="http://builds.codehaus.org/public/dashboard">http://builds.codehaus.org/public/dashboard</a> (Yes, DamageControl runs on Linux too)
+If you want to add a project, go here: <a href="http://builds.codehaus.org/private/dashboard">http://builds.codehaus.org/private/dashboard</a> (ask Jon or Aslak for username/password)
 N.B! Due to a misconfiguration of the Apache proxy on Codehaus, this doesn't work with IE yet. Use a real browser like Firfox or Opera.
 You can also monitor these Codehaus DamageControl server's activity on irc://irc.codehaus.org/damagecontrol
 
 Things that didn't go into this release, but will go into one of the upcoming releases:
 
-o Subversion support (nearly there!).
-o Perforce suport.
-o Support for poll based builds (in addition to trigged builds)
-o Better layout (once we grok div and css properly).
-o RPM packages for linux
-o More notification channels (RSS, Yahoo! messenger, Jabber, Eclipse plugin, IDEA plugin, Apple dock)
+<ul>
+<li> Subversion support (nearly there!).
+<li> Perforce suport.
+<li> Support for poll based builds (in addition to trigged builds)
+<li> Better layout (once we grok div and css properly).
+<li> RPM packages for linux
+<li> More notification channels (RSS, Yahoo! messenger, Jabber, Eclipse plugin, IDEA plugin, Apple dock)
+</ul>
 
-See http://jira.codehaus.org/secure/BrowseProject.jspa?id=10260 for a full list of bugs and feature requests. Feel free to register your own feature requests!
+See <a href="http://jira.codehaus.org/secure/BrowseProject.jspa?id=10260">DamageControl JIRA</a> for a full list of bugs and feature requests. Feel free to register your own feature requests!
 
 Want to get involved with the development? -> Get on the user mailing list.
 Got questions about how to use the damn thing? -> Get on the dev mailing list.
-More info about mailing lists here -> http://docs.codehaus.org/display/DESPOTS/Project+Mailing+Lists
+More info about mailing lists <a href="http://damagecontrol.codehaus.org/Mailing+lists">here</a>
 
 The DamageControl Team
