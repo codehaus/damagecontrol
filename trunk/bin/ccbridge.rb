@@ -1,7 +1,5 @@
 #!/usr/bin/env ruby
 
-# THIS IS OBSOLETE!!!!!! CAN WE DELETE IT???? (AH)
-
 irc_handle = 'rant'
 irc_server = '164.38.224.177'
 irc_channel = "#build"
