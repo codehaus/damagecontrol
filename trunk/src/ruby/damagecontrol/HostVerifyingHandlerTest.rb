@@ -21,7 +21,7 @@ module DamageControl
         handler.call(req, res)
         fail
       rescue WEBrick::HTTPStatus::Unauthorized => e
-        assert_match(e.message, /doesn't allow/)
+        assert_match(e.message, /doesn.t allow/)
         assert_match(e.message, /host.evil.com/)
         assert_match(e.message, /0.6.6.6/)
       end
