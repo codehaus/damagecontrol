@@ -1,0 +1,133 @@
+<project name="cvstest" default="complete-build-cycle">
+
+    <!--
+     ! This script is called from CvsIntegrationTest.
+     ! It sets up a temporary CVS repository, installs the
+     ! netcat trigger script in the CVS admin files,
+     ! commits a file, and then hopes for a build to
+     ! be trigged. It then verifies that the build was
+     ! actually trigged by looking for a file that
+     ! one of the configured build listeners is supposed to
+     ! write to disk.
+     !
+     ! Authors: Aslak Hellesoy and Jon Tirsen
+    -->
+    <property name="rootdir" value="${basedir}/../../../../.."/>
+    <property name="cvscheckoutdir" value="${rootdir}/target/cvscheckout"/>
+    <property name="cvsrootdir" value="${rootdir}/target/cvsroot"/>
+    <property name="cvsroot" value=":local:${cvsrootdir}"/>
+    <property name="output.file" value="${rootdir}/target/output.txt"/>
+    <property name="projecttobuild" value="dummyproject"/>
+    <property name="triggerscript" value="damagecontrol.bat"/>
+
+    <target name="create-test-cvsrepo" description="Creates a temporary CVS Repository">
+        <!-- Make a local repo -->
+        <mkdir dir="${cvsrootdir}"/>
+        <cvs
+            cvsRoot="${cvsroot}"
+            command="init"
+            />
+    </target>
+
+    <target name="install-dc-trigger-script" description="Installs the DC trigger script">
+
+        <!-- Check out the admin files -->
+        <cvs
+            cvsRoot="${cvsroot}"
+            package="CVSROOT"
+            dest="${cvscheckoutdir}"
+            />
+
+        <!-- Add the damagecontrol.bat trigger script -->
+        <copy
+            file="${rootdir}/src/cvsx/${triggerscript}"
+            todir="${cvscheckoutdir}/CVSROOT"
+            />
+        <cvs
+            cvsRoot="${cvsroot}"
+            command="add -m dc ${cvscheckoutdir}/CVSROOT/${triggerscript}"
+            />
+        <cvs
+            cvsRoot="${cvsroot}"
+            command="commit -m dc ${cvscheckoutdir}/CVSROOT/${triggerscript}"
+            />
+
+        <!-- Tell CVS to call the DC trigger script upon commit -->
+        <concat append="yes" destfile="${cvscheckoutdir}/CVSROOT/loginfo">DEFAULT ${triggerscript} ${projecttobuild} %{sVv}</concat>
+        <cvs
+            cvsRoot="${cvsroot}"
+            command="commit -m dc ${cvscheckoutdir}/CVSROOT/loginfo"
+            />
+    </target>
+
+    <target name="teardown-test-cvsrepo">
+        <delete dir="${cvsrootdir}"/>
+        <delete dir="${cvscheckoutdir}"/>
+        <delete dir="${output.file}"/>
+    </target>
+
+    <target name="commit-test-file">
+        <!-- Now that dc is installed, modify and commit a file. This should trigger a build -->
+        <concat append="yes" destfile="${cvscheckoutdir}/CVSROOT/checkoutlist">dummy</concat>
+        <cvs
+            cvsRoot="${cvsroot}"
+            command="commit -m dc ${cvscheckoutdir}/CVSROOT/checkoutlist"
+            />
+    </target>
+
+    <target name="start-dc-server">
+        <taskdef
+            name="pico"
+            classname="org.nanocontainer.ant.PicoContainerTask"
+            />
+
+        <!--
+         ! We're using picocontainer's Ant task (which is included in the
+         ! nanocontainer distribution) to assemble damagecontrol components
+         ! and start the damagecontrol server. The damagecontrol server
+         ! (the socket trigger) is started because the pico task will
+         ! call execute() on all components, and the socket trigger
+         ! class has an execute() method that starts the server
+         ! by listening on a socket.
+        -->
+        <pico>
+            <component classname="damagecontrol.triggers.SocketTrigger$WithScheduler"/>
+            <component classname="damagecontrol.DirectScheduler"/>
+            <component classname="damagecontrol.testtest.NullBuilder">
+                <constant value="${projecttobuild}"/>
+                <component/>
+                <constant type="java.lang.Boolean" value="true"/>
+            </component>
+            <component classname="damagecontrol.testtest.SimpleWriteToFileNotifier">
+                <component/>
+                <constant value="${output.file}"/>
+            </component>
+        </pico>
+    </target>
+
+    <target name="complete-build-cycle">
+        <antcall target="teardown-test-cvsrepo"/>
+        <parallel>
+            <sequential>
+                <antcall target="create-test-cvsrepo"/>
+                <antcall target="install-dc-trigger-script"/>
+            </sequential>
+            <antcall target="start-dc-server"/>
+        </parallel>
+        <antcall target="commit-test-file"/>
+
+        <waitfor maxwait="5" maxwaitunit="second">
+            <available file="${rootdir}/target/output.txt"/>
+        </waitfor>
+        <available file="${output.file}" property="output.available"/>
+        <fail unless="output.available">Output file was not created</fail>
+
+        <!--
+         ! Be even more paranoid and check the content of the output
+         ! The CvsIntegrationTest will intercept what we echo and compare it.
+        -->
+        <loadfile srcfile="${output.file}" property="output.content"/>
+        <echo level="error">OUTPUT:${output.content}</echo>
+    </target>
+
+</project>
