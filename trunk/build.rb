@@ -112,7 +112,7 @@ class Project
   
   def build_number
     require 'server/damagecontrol/Version.rb'
-    ENV["DAMAGECONTROL_BUILD_LABEL"] || DamageControl::BUILD_NUMBER
+    ENV["DAMAGECONTROL_BUILD_LABEL"] || DamageControl::BUILD
   end
   
   def release_name
