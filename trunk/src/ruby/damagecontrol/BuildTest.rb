@@ -7,7 +7,6 @@ module DamageControl
   class BuildTest < Test::Unit::TestCase
 
     def test_format_timestamp
-      fail
       jons_birth_as_string = "19770614001001"
       jons_birth_as_time = Time.mktime(1977, 6, 14, 00, 10, 01)
       assert_equal(jons_birth_as_string, Build.format_timestamp(jons_birth_as_time))

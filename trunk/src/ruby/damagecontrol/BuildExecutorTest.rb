@@ -76,7 +76,7 @@ module DamageControl
         { "scm_spec" => ":local:/foo/bar:zap", "build_command_line" => "#{ant} compile"})
       
       successful = nil
-      @hub.add_subscriber(Subscriber.new do |message|
+      hub.add_subscriber(Subscriber.new do |message|
         if (message.is_a?(BuildProgressEvent))
           puts message.output
           successful = true if(/BUILD SUCCESSFUL/ =~ message.output)
