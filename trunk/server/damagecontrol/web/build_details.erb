@@ -77,7 +77,7 @@ build = build_history_repository.lookup(project_name, request.query["timestamp"]
         <tr>
           <td><%= modification.developer %></td>
           <td>
-            <% if scm_url(modification) then %>
+            <% if scm_url(project_name, modification) then %>
               <a href="<%= scm_url(modification)  %>"><%= modification.path %></a>
             <% else %>
               <%= modification.path %>
