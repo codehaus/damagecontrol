@@ -2,8 +2,6 @@ require 'test/unit'
 require 'rscm/mockit'
 require 'rscm/changes'
 require 'damagecontrol/publisher/base'
-require 'damagecontrol/build'
-require 'damagecontrol/project'
 
 module DamageControl
   module Publisher

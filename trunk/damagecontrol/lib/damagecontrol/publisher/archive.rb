@@ -3,7 +3,7 @@ require 'damagecontrol/publisher/base'
 module DamageControl
   module Publisher
     class Execute < Base
-      register self
+      #register self
     
       def name
         "Execute"

@@ -20,7 +20,7 @@ module DamageControl
 
   module Publisher
     class Execute < Base
-      register self
+      #register self
     
       ann :description => "Command line"
       ann :tip => "Stdout and stderr for the command will be made available on the build page. Don't redirect streams."
