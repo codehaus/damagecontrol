@@ -11,7 +11,6 @@ module Pebbles
   class Space
     def initialize(*args)
       @in_queue = Queue.new
-      @consumers = []
       @shutdown = Object.new
     end
 
@@ -58,6 +57,7 @@ module Pebbles
   class MulticastSpace < Space
     def initialize(*args)
       super
+      @consumers = []
     end
 
     #
