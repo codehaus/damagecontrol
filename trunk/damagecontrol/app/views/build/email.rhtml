@@ -2,16 +2,15 @@
 <%
 message = nil
 if(@build.successful?)
-  message = "#{@build.project.name}: #{@build.status_message} build (by #{@build.changeset.developer})"
+  message = "#{@build.changeset.project.name}: #{@build.status_message} build (by #{@build.changeset.developer})"
 else
-  message = "#{@build.project.name}: #{@build.changeset.developer} broke the build"
+  message = "#{@build.changeset.project.name}: #{@build.changeset.developer} broke the build"
 end
 %>
 <h1><%= message %></h1>
 <h2>Changed files:</h2>
 <ul>
-<% @build.
-changeset.each do |change| %>
+<% @build.changeset.each do |change| %>
   <li><%= change.path %></li>
 <% end %>
 </ul>

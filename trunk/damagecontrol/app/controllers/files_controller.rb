@@ -1,5 +1,3 @@
-require 'damagecontrol/directories'
-
 class FilesController < ApplicationController
 
   def list

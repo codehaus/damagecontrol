@@ -1,6 +1,7 @@
 require 'stringio'
 require 'rscm/changes_fixture'
 require 'rscm/tempdir'
+require 'damagecontrol/project'
 require 'damagecontrol/visitor/diff_persister'
 
 module DamageControl
@@ -9,8 +10,8 @@ module DamageControl
       include RSCM::ChangesFixture
 
       class MockSCM
-        def initialize(checkout_dir, diffs)
-          @checkout_dir, @diffs = checkout_dir, diffs
+        def initialize(diffs)
+          @diffs = diffs
           @n = 0
         end
         
@@ -21,26 +22,26 @@ module DamageControl
       end
 
       def test_should_persist_diff_for_each_change
-        basedir = RSCM.new_temp_dir("differ")
-        ENV["DAMAGECONTROL_HOME"] = basedir
+        project_dir = RSCM.new_temp_dir("DiffPersisterTest")
+        project = ::DamageControl::Project.new
+        project.dir = project_dir
 
         setup_changes
-        changesets = RSCM::ChangeSets.new
-        changesets.add(@change1)
-        changesets.add(@change2)
-        changesets.add(@change3)
+        changeset = RSCM::ChangeSet.new
+        changeset << @change1
+        changeset << @change2
+        changeset.project = project
 
         diff1 = "This\ris\na\r\ndiff for 1"
         diff2 = "This\ris\na\r\ndiff for 2"
-        diff3 = "This\ris\na\r\ndiff for 3"
 
-        scm = MockSCM.new("#{basedir}/projects/mooky/checkout", [diff1, diff2, diff3])
-        dp = DiffPersister.new(scm, "mooky")
+        scm = MockSCM.new([diff1, diff2])
+        project.scm = scm
+        dp = DiffPersister.new
 
-        changesets.accept(dp)
-        assert_equal(diff1, File.open("#{basedir}/projects/mooky/changesets/20040705120004/diffs/path/one.diff").read)
-        assert_equal(diff2, File.open("#{basedir}/projects/mooky/changesets/20040705120004/diffs/path/two.diff").read)
-        assert_equal(diff3, File.open("#{basedir}/projects/mooky/changesets/20040705120006/diffs/path/three.diff").read)
+        changeset.accept(dp)
+        assert_equal(diff1, File.open("#{project_dir}/changesets/20040705120004/diffs/path/one.diff").read)
+        assert_equal(diff2, File.open("#{project_dir}/changesets/20040705120004/diffs/path/two.diff").read)
 
       end
 

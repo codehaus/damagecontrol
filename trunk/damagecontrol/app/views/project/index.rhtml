@@ -10,7 +10,7 @@
     <td align="left">
       <% 
         img = "/images/grey-16.gif"
-        build = project.latest_build
+        build = project.latest_changeset ? project.latest_changeset.latest_build : nil
         if(build)
           img = build.small_image
         end

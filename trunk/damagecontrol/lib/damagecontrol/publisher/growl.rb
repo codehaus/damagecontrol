@@ -31,9 +31,9 @@ module DamageControl
         end
         @hosts.split(%r{,\s*}).each do |host|
           begin
-            g = ::Growl.new(host, "DamageControl (#{build.project.name})", NOTIFICATION_TYPES)
+            g = ::Growl.new(host, "DamageControl (#{build.changeset.project.name})", NOTIFICATION_TYPES)
             # A bug in Ruby-Growl (or Growl) prevents the message from being sticky.
-            g.notify(NOTIFICATION_TYPES[index], build.project.name, message, 0, true)
+            g.notify(NOTIFICATION_TYPES[index], build.changeset.project.name, message, 0, true)
           rescue Exception => e
             Log.info("Growl publisher failed to notify #{host}: #{e.message}")
           end

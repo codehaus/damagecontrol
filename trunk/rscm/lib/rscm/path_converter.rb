@@ -9,7 +9,18 @@ WINDOWS = WIN32 || CYGWIN
 # used in threadfile.rb (which is now gone)
 def safer_popen(cmd, mode="r", expected_exit=0, &proc)
   Log.info "Executing command: '#{cmd}'"
-  ret = IO.popen(cmd, mode, &proc)
+  ret = IO.popen(cmd, mode) do |io|
+# TODO: we're referring to ourself, not the child. Fork? how to do this so it works on windows too?
+#    Log.info("Running child process #{cmd} with pid #{Process.pid}")
+#    at_exit do
+#      Log.info("Killing child process #{cmd} with pid #{Process.pid}")
+#      begin
+#        Process.kill("SIGHUP", Process.pid)
+#      rescue
+#      end
+#    end
+    proc.call(io)
+  end
   exit_code = $? >> 8
   raise "#{cmd} failed with code #{exit_code} in #{Dir.pwd}. Expected exit code: #{expected_exit}" if exit_code != expected_exit
   ret

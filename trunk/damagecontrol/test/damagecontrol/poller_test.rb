@@ -1,5 +1,6 @@
 require 'test/unit'
 require 'rscm/mockit'
+require 'rscm/tempdir'
 require 'damagecontrol/project'
 require 'damagecontrol/poller'
 
@@ -8,22 +9,23 @@ module DamageControl
     include MockIt
   
     def test_yields_project_and_changesets_for_each_project_with_changesets
-      p1 = Project.new; p1.name = "p2"
+      tmp = RSCM.new_temp_dir("DiffPersisterTest")
+
+      changesets1 = RSCM::ChangeSets.new
+      changesets1.add(RSCM::ChangeSet.new)
+      
+      p1 = Project.new("foo")
+      p1.dir = "#{tmp}/foo"
       p1.scm = new_mock
       p1.scm.__expect(:exists?) {true}
-      p1.scm.__expect(:changesets) {"some fake changesets"}
+      p1.scm.__expect(:changesets) {changesets1}
       p1.scm.__expect(:transactional?) {true}
+      p1.scm.__setup(:name) {"MockSCM1"}
 
-      p2 = Project.new; p2.name = "p1"
-      p2.scm = new_mock
-      p2.scm.__expect(:exists?) {true}
-      p2.scm.__expect(:changesets) {"some other fake changesets"}
-      p2.scm.__expect(:transactional?) {true}
-
-      projects = []
+      projects_ = []
       changesets_ = []
-      s = Poller.new do |project, changesets|
-        projects << project
+      s = Poller.new(nil) do |project, changesets|
+        projects_ << project
         changesets_ << changesets
       end
 
@@ -31,18 +33,16 @@ module DamageControl
         @projects = p
       end
 
-      def Project.find_all
+      def Project.find_all(projects_dir_ignore)
         @projects
       end
       
-      Project.projects = [p1, p2]
+      Project.projects = [p1]
 
       s.poll
       
-      assert_same(p1, projects[0])
-      assert_same(p2, projects[1])
-      assert_equal("some fake changesets", changesets_[0])
-      assert_equal("some other fake changesets", changesets_[1])
+      assert_same(p1, projects_[0])
+      assert_equal(changesets1, changesets_[0])
     end
   end
 end

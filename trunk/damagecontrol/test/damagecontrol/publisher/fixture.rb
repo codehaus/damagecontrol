@@ -21,6 +21,7 @@ module DamageControl
         changesets.add(@change5)
         changesets.add(@change6)
         changesets.add(@change7)
+        changesets.each{|changeset| changeset.project = project}
   
         build = new_mock
         build.__setup(:project) {project}

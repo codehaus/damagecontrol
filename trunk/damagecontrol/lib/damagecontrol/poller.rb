@@ -11,7 +11,8 @@ module DamageControl
     # Creates a new poller. Takes a block that will
     # receive |project, changesets| each time new
     # +changesets+ are found in a polled +project+
-    def initialize(sleeptime=60, &proc)
+    def initialize(projects_dir, sleeptime=60, &proc)
+      @projects_dir = projects_dir
       @sleeptime = sleeptime
       @proc = proc
     end
@@ -21,11 +22,9 @@ module DamageControl
     # for each new changesets object.
     def poll
       Log.info "Starting polling cycle"
-      Project.find_all.each do |project|
-        Log.info "Polling #{project.name}"
+      Project.find_all(@projects_dir).each do |project|
         begin
           if(project.scm_exists?)
-            Log.info "Polling #{project.name}"
             project.poll do |changesets|
               if(changesets.empty?)
                 Log.info "No changesets for #{project.name}"

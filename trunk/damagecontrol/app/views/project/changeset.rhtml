@@ -1,6 +1,6 @@
 <ul id="foldertab">
   <li><a href="javascript:setTab('changesets')"><img src="/images/16x16/document_exchange.png"> Changesets</a></li>
-  <% @project.builds(@changeset.identifier).each do |build| %>
+  <% @changeset.builds.each do |build| %>
   <li><%= link_to(build.identifier, 
           :controller => "build", :action => "status", :id => @project.name, :params => 
           {"changeset" => @changeset.identifier, "build" => build.identifier}) %></li>

@@ -1,5 +1,4 @@
 require 'rscm/changes'
-require 'damagecontrol/directories'
 
 module DamageControl
   module Visitor

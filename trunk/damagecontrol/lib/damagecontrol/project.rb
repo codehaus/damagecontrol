@@ -1,8 +1,6 @@
 require 'fileutils'
 require 'yaml'
 require 'rscm'
-require 'damagecontrol/build'
-require 'damagecontrol/directories'
 require 'damagecontrol/diff_parser'
 require 'damagecontrol/diff_htmlizer'
 require 'damagecontrol/scm_web'
@@ -43,14 +41,14 @@ module DamageControl
 
     attr_accessor :build_command
     attr_accessor :publishers
-
+    
     # Loads the project with the given +name+.
-    def Project.load(name)
-      config_file = Directories.project_config_file(name)
+    def Project.load(config_file)
       Log.info "Loading project from #{config_file}"
       project = File.open(config_file) do |io|
         YAML::load(io)
-      end
+      end      
+      project.dir = File.dirname(config_file)
 
       # Add new publishers that may have be defined after the project was YAMLed.
       project.publishers = [] if project.publishers.nil?
@@ -60,20 +58,14 @@ module DamageControl
         end
         project.publishers << publisher unless publisher_of_same_type
       end
-
       project
     end
 
     # Loads all projects
-    def Project.find_all
-      Directories.project_names.collect do |name|
-        Project.load(name)
+    def Project.find_all(projects_dir)
+      Dir["#{projects_dir}/*/project.yaml"].collect do |config_file| 
+        Project.load(config_file)
       end
-    end
-    
-    def start_time=(t)
-      t = Time.parse_ymdHMS(t) if t.is_a? String
-      @start_time = t
     end
     
     def initialize(name="")
@@ -85,6 +77,27 @@ module DamageControl
       # Default start time is 2 weeks ago
       @start_time = Time.now.utc - (3600*24*14)
       @quiet_period = DEFAULT_QUIET_PERIOD
+    end
+    
+    def start_time=(t)
+      t = Time.parse_ymdHMS(t) if t.is_a? String
+      @start_time = t
+    end
+
+    def dir=(d)
+      @dir = d
+    end
+
+    # The directory the project lives in. This is not serialised to yaml.
+    def dir
+      raise "dir not set" unless @dir
+      @dir
+    end
+    
+    def to_yaml_properties
+      props = instance_variables
+      props.delete("@dir")
+      props.sort!
     end
     
     # Tells all publishers to publish a build
@@ -114,30 +127,20 @@ module DamageControl
       end
     end
     
-    # Path to file containing pathnames of latest checked out files.
-    def checkout_list_file
-      Directories.checkout_list_file(name)
-    end
-    
     # Checks out files to project's checkout directory.
     # Writes the checked out files to +checkout_list_file+.
     # The +changeset_identifier+ parameter is a String or a Time
     # representing a changeset.
     def checkout(changeset_identifier)
-      File.open(checkout_list_file, "w") do |f|
-        scm.checkout(checkout_dir, changeset_identifier) do |file_name|
-          f << file_name << "\n"
-          f.flush
-        end
-      end
+      scm.checkout(checkout_dir, changeset_identifier)
     end
 
     # Polls SCM for new changesets and yields them to the given block.
     def poll
       start = Time.now
-      from = next_changeset_identifier || @start_time
+      from = next_changeset_identifier(changesets_dir) || @start_time
       
-      Log.info "Getting changesets for #{name} from #{from} (retrieved from #{checkout_dir})"
+      Log.info "Polling changesets for #{name}'s #{@scm.name} from #{from}"
       changesets = @scm.changesets(checkout_dir, from)
       if(!changesets.empty? && !@scm.transactional?)
         # We're dealing with a non-transactional SCM (like CVS/StarTeam/ClearCase,
@@ -158,6 +161,7 @@ module DamageControl
         end
         Log.info "Quiet period elapsed for #{name}"
       end
+      changesets.each{|changeset| changeset.project = self}
       Log.info "Got changesets for #{@name} in #{Time.now.difference_as_text(start)}"
       yield changesets
     end
@@ -166,7 +170,7 @@ module DamageControl
     # changeset. This is the identifier *following* the latest recorded changeset. 
     # This identifier is determined by looking at the directory names under 
     # +changesets_dir+. If there are none, this method returns nil.
-    def next_changeset_identifier(d=changesets_dir)
+    def next_changeset_identifier(d)
       # See String extension at top of this file.
       latest_identifier = DamageControl::Visitor::YamlPersister.new(d).latest_identifier
       latest_identifier ? latest_identifier + 1 : nil
@@ -174,7 +178,7 @@ module DamageControl
     
     # Where RSS is written.
     def changesets_rss_file
-      Directories.changesets_rss_file(name)
+      "#{dir}/changesets.xml"
     end
 
     def checked_out?
@@ -190,7 +194,7 @@ module DamageControl
     end
 
     def checkout_dir
-      Directories.checkout_dir(name)
+      "#{dir}/checkout"
     end
     
     def delete_working_copy
@@ -202,17 +206,28 @@ module DamageControl
     end
 
     def changesets_dir
-      Directories.changesets_dir(name)
+      "#{dir}/changesets"
     end
     
+    # Loads changesets and sets ourself as each changeset's project
     def changesets(changeset_identifier, prior)
-      changesets_persister.load_upto(changeset_identifier, prior)
+      changesets = changesets_persister.load_upto(changeset_identifier, prior)
+      # Establish child->parent (backwards) references
+      changesets.each do |changeset| 
+        changeset.project = self
+        changeset.each do |change|
+          change.changeset = changeset
+        end
+      end
+      changesets
+    end
+    
+    def latest_changeset
+      changeset(latest_changeset_identifier)
     end
 
     def changeset(changeset_identifier)
-      result = changesets(changeset_identifier, 1)[0]
-      raise "No changeset with id '#{changeset_identifier}' for project '#{name}'" unless result
-      result
+      changesets(changeset_identifier, 1)[0]
      end
 
     def changeset_identifiers
@@ -224,7 +239,7 @@ module DamageControl
     end
     
     def delete
-      File.delete(Directories.project_dir(name))
+      File.delete(dir)
     end
     
     def == (o)
@@ -235,45 +250,11 @@ module DamageControl
     def changesets_persister
       DamageControl::Visitor::YamlPersister.new(changesets_dir)
     end
-    
-    # Creates, persists and executes a Build for the changeset with the given 
-    # +changeset_identifier+.
-    # Should be called with a block of arity 1 that will receive the build.
-    def execute_build(changeset_identifier, build_reason)
-      scm.checkout(checkout_dir, changeset_identifier)
-      build = Build.new(name, changeset_identifier, Time.now.utc, build_reason)
-      yield build
-    end
-
-    # Returns an array of existing Build s for the given +changeset_identifier+.
-    def builds(changeset_identifier)
-      Directories.build_dirs(name, changeset_identifier).collect do |dir|
-        # The dir's basename will always be a Time
-        Build.new(name, changeset_identifier, File.basename(dir).to_identifier, "TODO: get from file")
-      end
-    end
-
-    # Returns the Build for the given +changeset_identifier+ and +build_time+
-    def build(changeset_identifier, build_time)
-      Build.new(name, changeset_identifier, build_time, "FIXME")
-    end
-
-    # Returns the latest build.
-    def latest_build
-      changeset_identifiers.reverse.each do |changeset_identifier|
-        builds = builds(changeset_identifier)
-        return builds[-1] unless builds.empty?
-      end
-      nil
-    end
-    
-    # Creates a duplicate of ourself, applying simple standard #{blah}
-    # transformations of all key,value pairs in +local_assigns+.
 
   private
 
     def project_config_file
-      Directories.project_config_file(name)
+      "#{dir}/project.yaml"
     end
 
   end
