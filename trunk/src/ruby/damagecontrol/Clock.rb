@@ -37,9 +37,4 @@ module DamageControl
 		
 	end
 	
-	# Chris: I think this is a better usage pattern?
-	class Ticker < Clock
-		
-	end
-	
 end

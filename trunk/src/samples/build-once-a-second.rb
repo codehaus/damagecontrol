@@ -25,7 +25,6 @@ WebsitePublisher.new(hub)
 #start new build every second
 timer = Timer.new {
 	hub.publish_message(BuildRequestEvent.new(project))
-	timer.start
 }
 timer.interval = seconds(1)
 timer.start

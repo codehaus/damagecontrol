@@ -1,4 +1,5 @@
 require 'damagecontrol/Clock'
+require 'damagecontrol/Latch'
 
 module DamageControl
 	
@@ -34,19 +35,6 @@ module DamageControl
 			while current_time < wait_until_time
 				@time_changed.wait()
 			end
-		end
-		
-	end
-	
-	# Chris: I think this is a better usage pattern?
-	class FakeTicker < Ticker
-	
-		def current_time
-			@current_time
-		end
-		
-		def set_time(time)
-			@current_time = time
 		end
 		
 	end

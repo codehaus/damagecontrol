@@ -1,8 +1,9 @@
 $:<<'../../lib'
 
-require 'test/unit'
+require 'damagecontrol/FilePollerTest'
 require 'damagecontrol/EqualityTest'
 require 'damagecontrol/CruiseControlBridgeTest'
+require 'damagecontrol/CruiseControlLogPollerTest'
 require 'damagecontrol/ProjectTest'
 require 'damagecontrol/HubTest'
 require 'damagecontrol/BuildDelayerTest'

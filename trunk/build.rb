@@ -1,18 +1,12 @@
 
-def mkdirs(dirs)
-	dir = ""
-	dirs.split("\\").each{|entry|
-		dir += entry
-		Dir.mkdir(dir) unless FileTest::exists?(dir)
-		dir += "/"
-	}
-end
-
 $:<<'src/ruby'
 $:<<'lib'
 
+require 'damagecontrol/FileUtils'
+include DamageControl::FileUtils
 require 'damagecontrol/CruiseControlBridge'
 bridge = DamageControl::CruiseControlBridge.new
+
 classpath = bridge.classpath
 class_target = "target/classes"
 java_source = "src/main"

@@ -2,21 +2,28 @@ require 'damagecontrol/Clock'
 
 module DamageControl
 
-	class Timer
+	module TimerMixin
 		attr_accessor :interval
+		attr_accessor :next_tick
 		attr_reader :error
+		attr_reader :stopped
 		attr_accessor :clock
 	
-		def initialize (&proc)
-			@clock = Clock.new
-			@proc = proc
+		def clock
+			@clock = Clock.new if @clock == nil
+			@clock
 		end
-		
+
 		def start
 			Thread.new {
 				begin
 					puts "starting #{self}"
-					run
+					first_tick(clock.current_time)
+					time = clock.current_time
+					while (!stopped && next_tick > time)
+						sleep( (next_tick - time)/1000 )
+						tick(clock.current_time)
+					end
 				rescue
 					$stderr.print $!
 					$stderr.print "\n"
@@ -29,10 +36,43 @@ module DamageControl
 			}
 		end
 		
-		def run
-			clock.wait_until(clock.current_time() + interval)
-			@proc.call
+		def interval
+			if @interval
+				@interval
+			else
+				1000
+			end
 		end
+		
+		def stop
+			@stopped = true
+		end
+		
+		def schedule_next_tick(interval=interval)
+			@next_tick=clock.current_time + interval
+		end
+
+		def first_tick(time)
+			schedule_next_tick
+		end
+		
+		def tick(time)
+			schedule_next_tick
+		end
+	end
+	
+	class Timer
+		include TimerMixin
+
+		def initialize (&proc)
+			@proc = proc
+		end
+		
+		def tick(time)
+			@proc.call unless @proc == nil
+			schedule_next_tick
+		end
+		
 	end
 	
 end

@@ -76,9 +76,6 @@ module DamageControl
 			delete("out")
 		end
 				
-		def is_special_filename(filename)
-			filename == '.' || filename == '..'
-		end
 	end
 	
 end

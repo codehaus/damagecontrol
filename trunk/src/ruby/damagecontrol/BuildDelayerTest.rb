@@ -17,58 +17,46 @@ module DamageControl
 
 		def setup
 			project = Project.new("foo")
-			@fakeClock = FakeTicker.new()
+			@fake_clock = FakeClock.new()
 
 			@b = BuildDelayer.new(self)
 			@b.quiet_period = 5000
-			@b.clock = @fakeClock
+			@b.clock = @fake_clock
 			
 			@msg = BuildRequestEvent.new(project)
 			
-			@fakeClock.set_time(2000)
+			@fake_clock.change_time(2000)
 			@b.receive_message(@msg)
 
 		end
 		
-		def test_delayer_registers_with_clock
-			clock = FakeClock.new()
-			b = BuildDelayer.new(self)
-			b.clock = clock
-			b.receive_message("")
-			assert(clock.receivers.index(b) >= 0)
+		def test_doesnt_fire_before_quiet_period
+			assert_nil( @received_message )
 		end
 
 		def test_fires_if_gone_past_safe_delay
 		
-			@fakeClock.do_tick(3000)
+			@b.tick(3000)
 			assert_nil( @received_message )
 
-			@fakeClock.do_tick(8000)
+			@b.tick(8000)
 			
 			assert_not_nil(@received_message)
 			assert_equal( @msg, @received_message )
 
 		end
 		
-		def test_unregisters_after_message_passed_on
-			
-			@fakeClock.do_tick(8000)
-			
-			assert_equal([], @fakeClock.receivers)
-
-		end
-		
 		def test_doesnt_fire_if_another_message_received
 		
-			@fakeClock.do_tick(4999)
+			@b.tick(4999)
 			assert_nil( @received_message )
 
 			@b.receive_message(@msg)
 
-			@fakeClock.do_tick(6000)
+			@b.tick(6000)
 			assert_nil( @received_message )
 
-			@fakeClock.do_tick(11000)
+			@b.tick(11000)
 			assert_not_nil(@received_message)
 			assert_equal( @msg, @received_message )
 		end

@@ -1,6 +1,7 @@
 require 'test/unit'
 require 'damagecontrol/Timer'
 require 'damagecontrol/FakeClock'
+require 'damagecontrol/Hub'
 
 module DamageControl
 
@@ -17,15 +18,13 @@ module DamageControl
 		
 		def test_trigger
 			@timer.interval = 10
-			@clock.change_time(0)
-			
-			@timer.start
-			@clock.wait_for_waiters
-			
 			@clock.change_time(5)
+			@timer.first_tick(@clock.current_time)
+			assert_equal(15, @timer.next_tick)
 			assert_nil(@hub.last_message)
 
-			@clock.change_time(11)
+			@clock.change_time(15)
+			@timer.tick(@clock.current_time)
 			@hub.wait_for_next_publication if @hub.last_message == nil
 			assert_equal("message", @hub.last_message)
 			
