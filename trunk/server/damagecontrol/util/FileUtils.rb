@@ -110,7 +110,11 @@ module FileUtils
           # see http://jira.codehaus.org/browse/DC-312
           err_thread = Thread.new do
             begin
+              logger.info("Reading (and discarding) stderr")
               stderr.read unless stderr.closed?
+              # This segfaults on Linux when the process is dead.
+              # ./server/damagecontrol/util/FileUtils.rb:114: [BUG] Segmentation fault
+              # ruby 1.8.2 (2004-11-06) [i686-linux]
             rescue
               # Some times we get a IOError: closed stream even if the stream is closed.
             end
