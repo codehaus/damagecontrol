@@ -32,10 +32,17 @@
             html_diff = ""
             dp = RSCM::DiffParser.new
             diff_file = RSCM::Directories.diff_file(@project.name, changeset, change)
-            File.open(diff_file) do |diffs_io|
-              diffs = dp.parse_diffs(diffs_io)
-              dh = RSCM::DiffHtmlizer.new(html_diff)
-              diffs.accept(dh)
+            if(File.exist?(diff_file))
+              File.open(diff_file) do |diffs_io|
+                diffs = dp.parse_diffs(diffs_io)
+                dh = RSCM::DiffHtmlizer.new(html_diff)
+                diffs.accept(dh)
+                if(html_diff == "")
+                  html_diff = "Diff was calculated, but was empty. (This may be a bug - new files are not handled yet)."
+                end
+              end
+            else
+              html_diff = "Diffs not calculated yet."
             end
           %>
           <div class="diff" id="<%= change.path %>">

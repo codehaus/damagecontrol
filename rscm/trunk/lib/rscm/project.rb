@@ -3,6 +3,7 @@ require 'drb'
 require 'rss/maker'
 require 'fileutils'
 require 'rscm/directories'
+require 'rscm/time_ext'
 require 'rscm/changes'
 require 'rscm/diff_parser'
 require 'rscm/diff_htmlizer'
@@ -88,11 +89,18 @@ module RSCM
     # been previously stored on disk), then changesets since +from_if_first_poll+
     # will be retrieved.
     def poll(from_if_first_poll=Time.epoch)
+      start = Time.now
+      all_start = start
+
       from = next_changeset_identifier || from_if_first_poll
       
 puts "Getting changesets for #{name} from #{from}"
       # TODO: Use a yield model here so we don't have to cache as much in memory.
       changesets = @scm.changesets(checkout_dir, from)
+
+puts "Got changesets for #{@name} in #{Time.now.difference_as_text(start)}"
+      start = Time.now
+
       if(changesets.empty?)
 puts "No changesets for #{name} from #{from}"
       else
@@ -100,12 +108,16 @@ puts "No changesets for #{name} from #{from}"
         # Save the changesets to disk as YAML
 puts "Saving changesets for #{@name}"
         changesets.accept(changesets_persister)
+puts "Saved changesets for #{@name} in #{Time.now.difference_as_text(start)}"
+      start = Time.now
 
         # Get the diff for each change and save them.
         # They may be turned into HTML on the fly later (quick)
 puts "Getting diffs for #{@name}"
         dp = RSCM::Visitor::DiffPersister.new(@scm, @name)
         changesets.accept(dp)
+puts "Saved diffs for #{@name} in #{Time.now.difference_as_text(start)}"
+      start = Time.now
 
         # Now we need to update the RSS. The RSS spec says max 15 items in a channel,
         # (http://www.chadfowler.com/ruby/rss/)
@@ -127,6 +139,8 @@ puts "Generating RSS for #{@name}"
             io.write(rss.to_rss)
           end
         end
+puts "Generated diffs for #{@name} in #{Time.now.difference_as_text(start)}"
+puts "Polled everyting from #{@name} in #{Time.now.difference_as_text(all_start)}"
 
       end
     end
