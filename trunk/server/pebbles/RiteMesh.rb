@@ -20,7 +20,7 @@ module Pebbles
         attributes[tag] = $1.chomp
         value = $2.chomp
       end
-      eval("#{tag} = %{#{value}}", binding)
+      eval("#{tag} = #{value.inspect}", binding)
     end
   end
     

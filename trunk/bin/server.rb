@@ -16,7 +16,7 @@ server = DamageControlServer.new(
   )
 
 def server.init_build_executors
-  build_scheduler.add_executor(BuildExecutor.new(hub, build_history_repository, project_directories))
+  build_scheduler.add_executor(BuildExecutor.new(hub, build_history_repository))
   # each BuildExecutor can execute one build in parallel to the others
   # to enable additional parallel builds (for multiple projects) uncomment lines below
   # you can have as many BuildExecutors as your machine can take
@@ -38,6 +38,24 @@ def server.init_custom_components
   #  :MailServerHost => "localhost",
   #  :MailServerPort => 25)
   
+end
+
+class MyReport < Report
+  def id
+    "my"
+  end
+  
+  def available?
+    selected_build.project_name == "damagecontrolled"
+  end
+  
+  def content
+    "Hello Mike and Ajit!\n#{selected_build.inspect}"
+  end
+end
+
+def server.report_classes
+  super + [ MyReport ]
 end
 
 server.start.wait_for_shutdown

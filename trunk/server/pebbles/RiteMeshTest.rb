@@ -1,4 +1,4 @@
-require 'erb'
+require 'test/unit'
 require 'pebbles/RiteMesh'
 
 module Pebbles
@@ -46,6 +46,21 @@ module Pebbles
     
     def test_body_attributes_are_preserved
       assert_equal('<body onLoad="false">blabodybla', mesh('<body onLoad="false">body</body>', '<body>bla<%=body%>bla'))
+    end
+    
+    def test_can_mesh_body_without_html_tags
+      page = "<body>aaa</body>"
+      assert_equal("aaa", mesh(page, "<%= body %>"))
+    end
+    
+    def test_can_mesh_body_with_unterminated_curly_brace
+      page = "<body>}</body>"
+      assert_equal("}", mesh(page, "<%= body %>"))
+    end
+    
+    def test_can_mesh_body_with_unterminated_single_quote
+      page = "<body>'</body>"
+      assert_equal("'", mesh(page, "<%= body %>"))
     end
     
   end

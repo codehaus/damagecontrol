@@ -35,7 +35,7 @@ require 'damagecontrol/scm/NoSCMWebConfigurator'
 
 require 'damagecontrol/web/ConsoleOutputReport'
 require 'damagecontrol/web/ChangesReport'
-require 'damagecontrol/web/cruisecontrol/TestResultReport'
+require 'damagecontrol/web/cruisecontrol/TestsReport'
 
 # patch webrick so that it displays files it doesn't recognize as text
 module WEBrick
@@ -250,7 +250,7 @@ module DamageControl
       [
         DamageControl::ChangesReport,
         DamageControl::ConsoleOutputReport,
-        DamageControl::TestResultReport
+        DamageControl::TestsReport
       ]
     end
 
