@@ -109,6 +109,7 @@ module RSCM
     # Gets the label for the working copy currently checked out in +checkout_dir+.
     #
     def label(checkout_dir)
+      # TODO: what do we need this for? If we need it, rename to revision?
     end
 
     # Open a file for edit - required by scms that checkout files in read-only mode e.g. perforce
@@ -164,8 +165,9 @@ module RSCM
       changesets.add(
         Change.new(
           "up/the/chimney",
+          Change::DELETED,
           "DamageControl",
-          "The #{name} SCM class in #{__FILE__} doesn't\n" +
+          "The #{name} SCM class doesn't\n" +
             "correctly implement the changesets method. This is\n" +
             "not a real changeset, but a hint to the developer to go and implement it.\n\n" +
             "Do It Now!",
@@ -181,7 +183,7 @@ module RSCM
     #
     def uptodate?(checkout_dir, from_identifier)
       # Suboptimal algorithm that works for all SCMs.
-      # Subclasses can override this to increase efficiency.
+      # Subclasses can override this to improve efficiency.
       
       changesets(checkout_dir, from_identifier).empty?
     end

@@ -8,6 +8,13 @@ module Test
       # assertion method that reports differences as diff.
       # useful when comparing big strings
       def assert_equal_with_diff(expected, actual)
+        diff(expected, actual) do |diff_io|
+          diff_string = diff_io.read
+          assert_equal("", diff_string, diff_string)
+        end
+      end
+      
+      def diff(expected, actual, &block)
         dir = RSCM.new_temp_dir("diff")
         
         expected_file = "#{dir}/expected"
@@ -17,8 +24,7 @@ module Test
 
         difftool = WINDOWS ? File.dirname(__FILE__) + "/../../bin/diff.exe" : "diff"
         IO.popen("#{difftool} #{RSCM::PathConverter.filepath_to_nativepath(expected_file, false)} #{RSCM::PathConverter.filepath_to_nativepath(actual_file, false)}") do |io|
-          diff = io.read
-          assert_equal("", diff, diff)
+          yield io
         end
       end
     end
@@ -26,7 +32,7 @@ module Test
 end
 
 module RSCM
-  class DiffPersisterTest < Test::Unit::TestCase
+  class DifftoolTest < Test::Unit::TestCase
     def test_diffing_fails_with_diff_when_different
       assert_raises(Test::Unit::AssertionFailedError) {
         assert_equal_with_diff("This is a\nmessage with\nsome text", "This is a\nmessage without\nsome text")
