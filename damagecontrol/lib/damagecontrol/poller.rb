@@ -1,3 +1,4 @@
+require 'rss/maker'
 require 'rscm/logging'
 require 'rscm/time_ext'
 require 'damagecontrol/project'

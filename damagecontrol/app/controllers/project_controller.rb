@@ -1,4 +1,5 @@
 require 'rscm'
+require 'damagecontrol/project'
 require 'damagecontrol/directories'
 require 'damagecontrol/diff_parser'
 require 'damagecontrol/diff_htmlizer'
@@ -72,8 +73,8 @@ class ProjectController < ApplicationController
   end
   
   def changesets_rss
-    project = RSCM::Project.load(@params["id"])
-    send_file(project.changesets_rss_file)
+    load
+    send_file(@project.changesets_rss_file)
   end
 
   def delete

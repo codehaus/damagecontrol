@@ -1,4 +1,5 @@
 require 'fileutils'
+require 'rscm/path_converter'
 require 'rscm/abstract_scm' # for the modified Time.to_s
 
 module DamageControl
@@ -59,7 +60,13 @@ module DamageControl
     module_function :project_dir
 
     def basedir
-      ENV['RSCM_BASE'] || "#{ENV['HOME']}/.rscm" || "#{ENV['HOMEDIR']}/.rscm"
+      if(ENV['RSCM_BASE'])
+        ENV['RSCM_BASE']
+      elsif(WINDOWS)
+        RSCM::PathConverter.nativepath_to_filepath("#{ENV['HOMEDRIVE']}#{ENV['HOMEPATH']}/.damagecontrol").gsub(/\\/, "/")
+      else
+        "#{ENV['HOME']}/.damagecontrol"
+      end
     end
     module_function :basedir
 
