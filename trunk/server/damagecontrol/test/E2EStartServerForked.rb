@@ -17,7 +17,7 @@ def server.init_custom_components
   require 'damagecontrol/publisher/IRCPublisher'
   require 'damagecontrol/template/ShortTextTemplate'
   component(:irc_publisher, IRCPublisher.new(hub, "irc.codehaus.org", '#dce2e', ShortTextTemplate.new))
-  irc_publisher.handle = "server"
+  irc_publisher.handle = "server2"
 end
 
 server.start.wait_for_shutdown

@@ -29,6 +29,11 @@ module Pebbles
     def get_instance(config, *options)
       self
     end
+
+    def dump_headers
+      puts "header:"
+      p request.header
+    end
     
     def content_type
       "text/html"
@@ -46,6 +51,9 @@ module Pebbles
     def service(req, res)
       Thread.current["request"] = req
       Thread.current["response"] = res
+
+      dump_headers
+
       action = req.query['action'] || "default_action"
       
       response["Content-Type"] = content_type

@@ -192,6 +192,8 @@ class DamageControlServerDriver < Driver
       control.ping == DamageControl::XMLRPC::ConnectionTester::PING_RESPONSE
     rescue Timeout::Error => e
       false
+    rescue Errno::ECONNREFUSED => e
+      false
     rescue Exception => e
       puts Logging.format_exception(e)
       false
