@@ -121,9 +121,9 @@ EOF
       @changes << change
       
       # TODO: These may go away one day (AH)
-      change.revision = revision if revision
-      change.developer = developer if developer
-      change.message = message if message
+#      change.revision = revision if revision
+#      change.developer = developer if developer
+#      change.message = message if message
 #      change.time = time if time
     end
 

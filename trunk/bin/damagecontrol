@@ -5,4 +5,4 @@ DAMAGECONTROL_WORK=~/.damagecontrol
 # TODO: Users have to define $DAMAGECONTROL_HOME (where DC was installed/unpacked)
 cd $DAMAGECONTROL_HOME
 export DAMAGECONTROL_HOME=`pwd`
-exec ruby -I"$DAMAGECONTROL_HOME/server" "bin/server.rb" $*
+exec ruby -I"$DAMAGECONTROL_HOME/server" $*
