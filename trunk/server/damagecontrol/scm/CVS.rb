@@ -285,6 +285,8 @@ puts "executing #{cmd}"
   
   class CVSLogParser
 
+    include Logging
+    
     def initialize
       @current_line = 0
       @log = ""
