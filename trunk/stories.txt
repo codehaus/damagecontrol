@@ -1,3 +1,5 @@
+Start process every (say) 10 minutes.
+
 Start process (a build) on (any) incoming request on socket.
 
 Turn archived build logs into nice little website.
