@@ -1,0 +1,66 @@
+<project name="rscm" basedir="." default="jar">
+
+    <property environment="ENV"/>
+
+    <target name="compile">
+        <fail unless="ENV.RSCM_STARTEAM">The RSCM_STARTEAM environment variable must be defined and point to the StarTeam SDK directory</fail>
+        <fail unless="ENV.ANT_HOME">The ANT_HOME environment variable must be defined and point to the Ant installation directory</fail>
+
+        <mkdir dir="target/classes"/>
+        <javac destdir="target/classes" debug="on" includeantruntime="true">
+            <src location="src/main"/>
+            <src location="src/test"/>
+            <classpath>
+                <fileset dir="${ENV.RSCM_STARTEAM}/Lib"/>
+            </classpath>
+        </javac>
+    </target>
+
+    <target name="jar" depends="compile">
+        <jar file="../rscm.jar">
+            <fileset dir="target/classes">
+                <exclude name="**/*Test.class"/>
+            </fileset>
+        </jar>
+    </target>
+
+    <target name="test" depends="compile">
+        <mkdir dir="target/testlogs"/>
+        <junit fork="yes" forkmode="once" printsummary="yes" failureproperty="tests.failed" includeantruntime="true">
+            <classpath>
+                <pathelement location="target/classes"/>
+                <fileset dir="${ENV.RSCM_STARTEAM}/Lib"/>
+                <fileset dir="${ENV.ANT_HOME}/lib">
+                    <include name="ant-starteam.jar"/>
+                </fileset>
+ 
+            </classpath>
+            <jvmarg value="-Djava.library.path=${ENV.RSCM_STARTEAM}/Lib"/>
+
+            <formatter type="xml"/>
+            <formatter type="plain"/>
+            <batchtest todir="target/testlogs">
+                <fileset dir="src/test">
+                    <include name="**/*Test.java"/>
+                    <exclude name="**/Abstract*.java"/>
+                </fileset>
+            </batchtest>
+        </junit>
+
+        <mkdir dir="target/testreport"/>
+        <junitreport todir="target/testreport">
+            <fileset dir="target/testlogs">
+                <include name="TEST-*.xml"/>
+            </fileset>
+            <report format="frames" todir="target/testreport" styledir="${ant.home}/etc"/>
+        </junitreport>
+    </target>
+
+    <target name="assert-tests-passed" depends="test">
+        <fail if="tests.failed">There were test failures</fail>
+    </target>
+
+    <target name="clean">
+        <delete dir="target"/>
+    </target>
+</project>

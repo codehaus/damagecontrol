@@ -1,0 +1,122 @@
+require 'rubygems'
+require 'rake'
+require 'rake/testtask'
+require 'rake/rdoctask'
+require 'rake/packagetask'
+require 'rake/gempackagetask'
+require 'rake/contrib/rubyforgepublisher'
+
+require File.dirname(__FILE__) + '/config/environment'
+require 'code_statistics'
+
+PKG_BUILD     = ENV['PKG_BUILD'] ? '.' + ENV['PKG_BUILD'] : ''
+PKG_NAME      = 'rscm'
+PKG_VERSION   = '0.1.0' + PKG_BUILD
+PKG_FILE_NAME = "#{PKG_NAME}-#{PKG_VERSION}"
+
+desc "Default Task"
+task :default => [ :all ]
+
+# Run the unit tests
+# To run a specific test: rake test TEST=path/to/test
+fl = FileList.new('test/**/*_test.rb')
+fl.exclude('test/**/mooky*.rb')
+fl.exclude('test/**/monotone*.rb') # Incomplete/unsupported for now - reactivate when more complete!
+fl.exclude('test/**/darcs*.rb')    # Incomplete/unsupported for now - reactivate when more complete!
+fl.exclude('test/**/perforce*.rb') # Incomplete/unsupported for now - reactivate when more complete!
+fl.exclude('test/**/starteam*.rb') # Too bloody hard to test without a StarTeam server license! Tested ad-hoc.
+Rake::TestTask.new { |t|
+  t.libs << "test" << "app/controllers"
+  t.test_files = fl
+  t.verbose = true
+}
+
+rd = Rake::RDocTask.new { |rdoc|
+  rdoc.rdoc_dir = 'doc'
+  rdoc.title    = 'RSCM - Ruby Source Control Management API'
+  rdoc.options << '--line-numbers' << '--inline-source'
+  rdoc.rdoc_files.include('README')
+  rdoc.rdoc_files.include('lib/**/*.rb')
+  rdoc.rdoc_files.include('docs/**/*.rd')
+}
+
+task :ant do |t|
+  if(!ENV['RSCM_STARTEAM'])
+    puts "WARNING - NOT BUILDING STARTEAM SUPPORT SINCE 'RSCM_STARTEAM' IS NOT DEFINED."
+  else
+    ant = RUBY_PLATFORM == "i386-mswin32" ? "ant.bat" : system("which ant.sh") ? "ant.sh" : "ant" 
+    IO.popen("#{ant} -f ext/java/build.xml clean jar") do |io|
+      io.each_line do |line|
+        puts line
+      end
+    end
+  end
+end
+
+task :all => [:ant, :gem]
+
+PKG_FILES = FileList[
+  '[A-Z]*',
+  'lib/**/*.rb', 
+  'test/**/*.rb',
+  'doc/**/*',
+  'ext/rscm.jar'
+]
+
+if ! defined?(Gem)
+  puts "Package Target requires RubyGEMs"
+else
+  spec = Gem::Specification.new do |s|
+    
+    #### Basic information.
+
+    s.name = 'rscm'
+    s.version = PKG_VERSION
+    s.summary = "RSCM - Ruby Source Control Management"
+    s.description = <<-EOF
+      RSCM is a Ruby library for various Source Control Management (SCM) systems.
+    EOF
+
+    #### Dependencies and requirements.
+
+    #s.add_dependency('log4r', '> 1.0.4')
+    #s.requirements << ""
+
+    #### Which files are to be included in this gem?  Everything!  (Except CVS directories.)
+
+    s.files = PKG_FILES.to_a
+
+    #### C code extensions.
+
+    #s.extensions << "ext/rmagic/extconf.rb"
+
+    #### Load-time details: library and application (you will need one or both).
+
+    s.require_path = 'lib'                         # Use these for libraries.
+    s.autorequire = 'rscm'
+
+    #s.bindir = "bin"                               # Use these for applications.
+    #s.executables = ["rscm"]
+    #s.default_executable = "rscm"
+
+    #### Documentation and testing.
+
+    s.has_rdoc = true
+    s.extra_rdoc_files = rd.rdoc_files.reject { |fn| fn =~ /\.rb$/ }.to_a
+    rd.options.each do |op|
+      s.rdoc_options << op
+    end
+
+    #### Author and project details.
+
+    s.author = "Aslak Hellesoy"
+    s.email = "dev@damagecontrol.codehaus.org"
+    s.homepage = "http://damagecontrol.codehaus.org/rscm"
+    s.rubyforge_project = "rscm"
+  end
+
+  Rake::GemPackageTask.new(spec) do |pkg|
+    pkg.need_zip = true
+    pkg.need_tar = true
+  end
+end
