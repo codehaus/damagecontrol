@@ -235,6 +235,7 @@ class Project
       home = "/home/services/dcontrol"
       mkdir_p("#{home}/damagecontrol.new")
       system("cp -a target/dist/* #{home}/damagecontrol.new")
+      system("rm -rf #{home}/damagecontrol.old") rescue
       system("mv #{home}/damagecontrol #{home}/damagecontrol.old") rescue
       system("mv #{home}/damagecontrol.new #{home}/damagecontrol")
     end
