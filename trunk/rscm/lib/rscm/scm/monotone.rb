@@ -1,3 +1,4 @@
+require 'rscm/line_editor'
 require 'fileutils'
 require 'rscm'
 
@@ -106,6 +107,20 @@ module RSCM
 
     # http://www.venge.net/monotone/monotone.html#Hook-Reference
     def install_trigger(trigger_command, install_dir)
+      if (WINDOWS)
+        install_win_trigger(trigger_comand, install_dir)
+      else
+        install_unix_trigger(trigger_command, install_dir)
+      end
+    end
+    
+    def trigger_installed?(trigger_command, install_dir)
+      File.exist?(@rcfile) if @rcfile
+    end
+
+    def uninstall_trigger(trigger_command, install_dir)
+      File.delete(@rcfile) if @rcfile
+      @rcfile = nil
     end
 
   protected
@@ -136,7 +151,35 @@ module RSCM
     end
 
   private
-  
+
+    def install_unix_trigger(trigger_command, install_dir)
+      if File.exist?(post_commit_file)
+        mode = File::APPEND|File::WRONLY
+      else
+        FileUtils.mkdir_p(install_dir + "/MT/")
+        mode = File::CREAT|File::WRONLY
+      end
+      begin
+        File.open(post_commit_file, mode) do |file|
+          file.puts("function note_commit(new_id, certs)")
+          execstr = ""
+          trigger_command.split.each { |s|
+            execstr += "\"#{s}\","
+          } 
+          execstr.chomp!(",")
+          file.puts("  execute(#{execstr})")
+          file.puts("end")
+        end
+      rescue
+        raise "Didn't have permission to write to #{post_commit_file}."
+      end
+    end
+
+    def post_commit_file
+      @rcfile = "/tmp/monotone-trigger.lua"
+      @rcfile
+    end
+
     def local_revision(checkout_dir)
       local_revision = nil
       rev_file = File.expand_path("#{checkout_dir}/MT/revision")
@@ -172,7 +215,8 @@ module RSCM
     def monotone(monotone_cmd, branch=nil, key=nil)
       branch_opt = branch ? "--branch=\"#{branch}\"" : ""
       key_opt = key ? "--key=\"#{key}\"" : ""
-      cmd = "monotone --db=\"#{@db_file}\" #{branch_opt} #{key_opt} #{monotone_cmd}"
+      rcfile_opt = @rcfile ? "--rcfile=\"#{@rcfile}\"" : ""
+      cmd = "monotone --db=\"#{@db_file}\" #{branch_opt} #{key_opt} #{rcfile_opt} #{monotone_cmd}"
       safer_popen(cmd, "r+") do |io|
         if(block_given?)
           return(yield(io))
