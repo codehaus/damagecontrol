@@ -2,6 +2,5 @@
 *.ipr
 *.iml
 *.iws
-target
 .project
-
+target
