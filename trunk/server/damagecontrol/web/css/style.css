@@ -4,6 +4,44 @@ body, table, form, input, td, th, p, textarea, select
   font-size: 11px;
 }
 
+td {
+  vertical-align: top;
+}
+
+#main-table {
+  padding: 0;
+}
+
+#top-panel {
+  padding-bottom: 3pt;
+  margin-bottom: 3pt;
+}
+
+#left-top-nav {
+  text-align: left;
+}
+
+#right-top-nav {
+  text-align: right;
+}
+
+#main-panel {
+  width: 70%;
+}
+
+#side-panel {
+  padding-right: 1em;
+  width: 30%;
+}
+
+#footer {
+  text-align: center;
+  font-size: 8pt;
+  margin-top: 10em;
+  width: 100%;
+  padding: 10px;
+}
+
 a.link {
   text-decoration: underline;
 }
@@ -39,61 +77,6 @@ a.tip:hover span {
   text-align: left
 }
 
-#top-panel {
-  padding-bottom: 3pt;
-  margin-bottom: 3pt;
-}
-
-#top-nav {
-  height: 16px;
-  border-top: 1px #7f7f7f solid;
-  border-bottom: 1px #7f7f7f solid;
-  padding-bottom: 3pt;
-  margin-bottom: 3pt;
-}
-
-#left-top-nav {
-  float: left;
-}
-
-#right-top-nav {
-  float: right;
-}
-
-div.tasks {
-  float:left;
-  width:26%;
-  background:#fff;
-  margin-right:15px;
-  padding-bottom:20px;
-  margin-right: -1px;
-  padding: 3px;
-  border: 1px #7f7f7f solid;
-  border-bottom: 2px #7f7f7f solid;
-  border-right: 2px #7f7f7f solid;
-}
-
-div.task {
-}
-
-#main-panel {
-  float: right;
-  width: 68%;
-}
-
-#footer {
-  text-align: center;
-  font-size: 8pt;
-  margin-top: 10em;
-  width: 100%
-  padding: 10px;
-  float: right;
-  /*
-  position: absolute;
-  bottom: 0;
-  */
-}
-
 img {
   vertical-align: middle;
   border: 0;
@@ -121,11 +104,16 @@ div.dashboard {
 .main-table {
 }
 
+table.dashboard {
+  width: 100%;
+}
+
 .pane  {
   margin-top: 0.5em;
 }
 
 table.pane {
+  width: 100%;
   background-color: #ffffff;
   border-collapse: collapse;
   border: 1px #7f7f7f solid;
@@ -140,7 +128,7 @@ td.pane {
 
 td.pane-header {
   border: 1px #7f7f7f solid;
-  background-color: #bbbbbb;
+  background-color: #f0f0f0;
   font-weight: bold;
 }
 

@@ -1,6 +1,7 @@
 <html>
 <head>
 <link rel="stylesheet" href="css/style.css" type="text/css">
+<link rel="stylesheet" href="css/cruisecontrol.css" type="text/css">
 <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
 
 <% if auto_refresh? %>
@@ -12,27 +13,28 @@
 
 <body>
 
-<div id="top-panel">
-<a href="http://damagecontrol.codehaus.org/"><img class="logo" src="images/damagecontrol-logo.png"/></a>
-</div>
+<table id="main-table" width="100%" border="0">
 
-<div id="top-nav">
-	<div id="left-top-nav">
-	<%= breadcrumbs %>
-	</div>
-	<div id="right-top-nav">
+<tr><td  id="top-panel" colspan="2">
+<a href="http://damagecontrol.codehaus.org/"><img class="logo" src="images/damagecontrol-logo.png"/></a>
+</td></tr>
+
+<tr>
+	<td id="left-top-nav">
+    <%= breadcrumbs %>
+	</td>
+	<td id="right-top-nav">
     <% if auto_refresh? %>
       <a href="<%= auto_refresh_url_prefix %>auto_refresh=false">Turn auto refresh off</a>
     <% else %>
       <a href="<%= auto_refresh_url_prefix %>auto_refresh=true">Turn auto refresh on</a>
     <% end %>
-	</div>
-</div>
+  </td>
+</tr>
 
-<div id="main-panel">
-<%= body %>
-</div>
+<tr>
 
+<td id="side-panel">
 <%
 tasks = self.tasks
 if(tasks && tasks.length > 0)
@@ -53,16 +55,20 @@ if(navigation)
   </div>
 <% end %>
 
-<% 
-# I just can't get the footer to layout properly :-( --jon 
-if false then
-%>
-<div id="footer">
+</td>
+
+<td id="main-panel">
+<%= body %>
+</td>
+
+
+<tr><td id="footer" colspan="2">
 This stuff displays best in a Mozilla based browser. Try <a href="http://www.mozilla.org/products/firefox/">Firefox</a>.
 <br>
 <%= html_quote(DamageControl::VERSION_TEXT) %>
-</div>
-<% end %>
+</td></tr>
+
+</table>
 
 </body>
 </html>
