@@ -48,10 +48,10 @@ module DamageControl
                   do_accept(payload)
                   socket.print("DamageControl server on #{@server.peeraddr[2]}/#{@server.peeraddr[3]} got message from #{client_hostname} / #{client_ip}\r\n")
                   socket.print("http://damagecontrol.codehaus.org/\r\n")
-                rescue e
+                rescue => e
                   socket.print("DamageControl exception:\n")
                   socket.print(e.message)
-                  socket.print("DamageControl config:\")
+                  socket.print("DamageControl config:\n")
                   socket.print(payload)
                 end
               else
