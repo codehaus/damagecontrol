@@ -11,7 +11,10 @@ module DamageControl
   class EmailPublisherTest < Test::Unit::TestCase
   
     def setup
-      @email_publisher = EmailPublisher.new(Hub.new, "short_text_build_result.erb", "short_html_build_result.erb", "noreply@somewhere.foo")
+      @email_publisher = EmailPublisher.new(Hub.new, nil,
+        :SubjectTemplate => "short_text_build_result.erb", 
+        :BodyTemplate => "short_html_build_result.erb",
+        :FromEmail => "noreply@somewhere.foo")
 
       def @email_publisher.sendmail(subject, body, from, to)
         @mail_content = "#{subject}|#{body}|#{from}|#{to}"
