@@ -20,7 +20,7 @@ module DamageControl
     
     def tasks
       result = {}
-      result["Checked out files..."] = "root/#{project_name}/checkout"
+      result["DamageControl's working copy"] = "root/#{project_name}/checkout"
       if(private?)
         result["Configure"] = "?project_name=#{project_name}&action=configure"
         result["Nudge build now"] = "?project_name=#{project_name}&action=trig_build"
