@@ -1,5 +1,7 @@
 #!/usr/bin/env ruby
 
+#TODO: This stuff doesn't actually work!!!
+
 irc_handle = 'rant'
 irc_server = '164.38.224.177'
 irc_channel = "#build"

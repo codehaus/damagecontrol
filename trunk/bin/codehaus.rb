@@ -33,16 +33,13 @@ end
 def server.init_custom_components
   
   require 'damagecontrol/publisher/IRCPublisher'
-  component(:irc_publisher, IRCPublisher.new(hub, self, "irc.codehaus.org", '#damagecontrol', "short_text_build_result_with_link.erb"))
+  component(:irc_publisher, IRCPublisher.new(hub, "irc.codehaus.org", '#damagecontrol', "short_text_build_result_with_link.erb"))
   
  # require 'damagecontrol/publisher/GraphPublisher'
  # component(:graph_publisher, GraphPublisher.new(hub, project_directories, build_history_repository))
   
   require 'damagecontrol/publisher/EmailPublisher'
-  component(:email_publisher, EmailPublisher.new(hub, self, "short_text_build_result.erb", "short_html_build_result.erb", "dcontrol@builds.codehaus.org"))
-  
-  #require 'damagecontrol/core/SelfUpgrader'
-  #component(:self_upgrader, SelfUpgrader.new(hub))
+  component(:email_publisher, EmailPublisher.new(hub, "short_text_build_result.erb", "short_html_build_result.erb", "dcontrol@builds.codehaus.org"))
   
 end
 

@@ -10,9 +10,8 @@ module DamageControl
 
     attr_reader :always_mail
     
-    def initialize(channel, dc_server, subject_template, body_template, from, always_mail=false, mail_server="localhost", port=25)
+    def initialize(channel, subject_template, body_template, from, always_mail=false, mail_server="localhost", port=25)
       super(channel)
-      @dc_server = dc_server
       template_dir = "#{File.expand_path(File.dirname(__FILE__))}/../template"
       @subject_template = File.new("#{template_dir}/#{subject_template}").read
       @body_template = File.new("#{template_dir}/#{body_template}").read
@@ -27,7 +26,6 @@ module DamageControl
         if((Build::FAILED == message.build.status) || always_mail)
           if(nag_email = message.build.config["nag_email"])
             build = message.build
-            dc_url = @dc_server.dc_url
             subject = ERB.new(@subject_template).result(binding)
             body    = ERB.new(@body_template).result(binding)
             sendmail(subject, body, @from, nag_email)

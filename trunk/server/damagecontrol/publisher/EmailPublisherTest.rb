@@ -8,16 +8,10 @@ require 'ftools'
 
 module DamageControl
 
-  class DcServerStub
-    def dc_url
-      "http://moradi.com/"
-    end
-  end
-
   class EmailPublisherTest < Test::Unit::TestCase
   
     def setup
-      @email_publisher = EmailPublisher.new(Hub.new, DcServerStub.new, "short_text_build_result.erb", "short_html_build_result.erb", "noreply@somewhere.foo")
+      @email_publisher = EmailPublisher.new(Hub.new, "short_text_build_result.erb", "short_html_build_result.erb", "noreply@somewhere.foo")
 
       def @email_publisher.sendmail(subject, body, from, to)
         @mail_content = "#{subject}|#{body}|#{from}|#{to}"
@@ -30,6 +24,7 @@ module DamageControl
     def test_email_is_sent_upon_build_complete_event    
       build = Build.new("cheese", Time.now, {"nag_email" => "somelist@someproject.bar"})
       build.status = Build::FAILED
+      build.url =  "http://moradi.com/public/project?action=build_details&project_name=cheese&timestamp=19710228234500"
       build.timestamp = Time.utc(1971,2,28,23,45,0,0)
 
       @email_publisher.process_message(BuildCompleteEvent.new(build))

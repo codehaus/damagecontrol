@@ -7,12 +7,6 @@ require 'damagecontrol/util/FileUtils'
 
 module DamageControl
 
-  class DcServerStub
-    def dc_url
-      "http://moradi.com/"
-    end
-  end
-
   class JabberPublisherTest < Test::Unit::TestCase
   
     def setup
@@ -20,11 +14,12 @@ module DamageControl
       b = Build.new("cheese")
       b.timestamp = Time.utc(1971,2,28,23,45,0,0)
       b.status = Build::SUCCESSFUL
+      b.url = "http://moradi.com/public/project?action=build_details&project_name=cheese&timestamp=19710228234500"
       @build_complete_event = BuildCompleteEvent.new(b)
     end
     
     def test_not_sending_message_to_empty_recipients_list_on_build_complete
-      @publisher = JabberPublisher.new(Hub.new, DcServerStub.new, "username", "password", emptyRecipientList = [], "short_html_build_result.erb")
+      @publisher = JabberPublisher.new(Hub.new, "username", "password", emptyRecipientList = [], "short_html_build_result.erb")
       @publisher.jabber = @jabber_mock
     
       @publisher.process_message(@build_complete_event)
@@ -33,7 +28,7 @@ module DamageControl
     end
 
     def test_sends_message_to_multiple_recipients_list_on_build_complete
-      @publisher = JabberPublisher.new(Hub.new, DcServerStub.new, "username", "password", recipientList = ["recipient1","recipient2"], "short_html_build_result.erb")
+      @publisher = JabberPublisher.new(Hub.new, "username", "password", recipientList = ["recipient1","recipient2"], "short_html_build_result.erb")
       @publisher.jabber = @jabber_mock
   
       expected = "<a href=\"http://moradi.com/public/project?action=build_details&project_name=cheese&timestamp=19710228234500\">[cheese] BUILD SUCCESSFUL</a>"

@@ -152,7 +152,7 @@ class DamageControlServerDriver < Driver
     new_project(project)
     
     pd = ProjectDirectories.new(basedir)
-    project_config_repo = ProjectConfigRepository.new(pd)
+    project_config_repo = ProjectConfigRepository.new(pd, "")
     project_config = project_config_repo.project_config(project)
 
     project_config["build_command_line"] = build_command_line

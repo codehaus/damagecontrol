@@ -131,8 +131,12 @@ module DamageControl
       params[:TrigXmlrpcUrl] || "http://#{get_ip}:#{http_port}/private/xmlrpc"
     end
     
-    def dc_url
-      params[:DamageControlUrl] || "http://#{get_ip}:#{http_port}/"
+    def web_url
+      params[:ExternalWebUrl] || "http://#{get_ip}:#{http_port}/"
+    end
+    
+    def public_web_url
+      params[:PublicWebUrl] || "#{web_url}/public"
     end
     
     def get_ip
@@ -143,7 +147,7 @@ module DamageControl
       component(:hub, Hub.new)
       
       component(:project_directories, @project_directories)
-      component(:project_config_repository, ProjectConfigRepository.new(project_directories))
+      component(:project_config_repository, ProjectConfigRepository.new(project_directories, public_web_url))
       component(:build_history_repository, BuildHistoryRepository.new(hub, @project_directories))
     end
     

@@ -20,9 +20,8 @@ module DamageControl
     attr_accessor :handle
     attr_accessor :send_message_on_build_request
   
-    def initialize(channel, dc_server, irc_server, irc_channel, template)
+    def initialize(channel, irc_server, irc_channel, template)
       super(channel)
-      @dc_server = dc_server
       @irc = IRCConnection.new
       @irc_server = irc_server
       @irc_channel = irc_channel
@@ -83,7 +82,6 @@ module DamageControl
       
       if message.is_a?(BuildCompleteEvent)
         build = message.build
-        dc_url = @dc_server.dc_url
         msg = erb(@template, binding)
         @irc.send_message_to_channel(msg)
       end

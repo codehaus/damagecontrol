@@ -10,7 +10,7 @@ module DamageControl
     include Pebbles::MVCServletTesting
 
     def test_install_trigger
-      project_config_repository = ProjectConfigRepository.new(ProjectDirectories.new(new_temp_dir))
+      project_config_repository = ProjectConfigRepository.new(ProjectDirectories.new(new_temp_dir), "")
       servlet = InstallTriggerServlet.new(project_config_repository, "")
       result = do_request("project_name" => "myprojectname") do
         servlet.default_action
@@ -21,7 +21,7 @@ module DamageControl
     end
 
     def test_do_install_trigger
-      project_config_repository = ProjectConfigRepository.new(ProjectDirectories.new(new_temp_dir))
+      project_config_repository = ProjectConfigRepository.new(ProjectDirectories.new(new_temp_dir), "")
       servlet = InstallTriggerServlet.new(project_config_repository, "")
       result = do_request("project_name" => "project") do
         servlet.do_install_trigger

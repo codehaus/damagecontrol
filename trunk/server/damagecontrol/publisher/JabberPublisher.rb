@@ -12,9 +12,8 @@ module DamageControl
     attr_reader :channel
     attr_reader :recipients
   
-    def initialize(channel, dc_server, publisherJabberAccountUser, publisherJabberAccountPassword, recipients, template)
+    def initialize(channel, publisherJabberAccountUser, publisherJabberAccountPassword, recipients, template)
       super(channel)
-      @dc_server = dc_server
       @jabber = JabberConnection.new(publisherJabberAccountUser, publisherJabberAccountPassword)
       @recipients = recipients
 
@@ -25,7 +24,6 @@ module DamageControl
     def process_message(message)
       if message.is_a?(BuildCompleteEvent)
         build = message.build
-        dc_url = @dc_server.dc_url
         msg = ERB.new(@template).result(binding)
         @recipients.each{|recipient|
           @jabber.send_message_to_recipient(recipient, msg)
