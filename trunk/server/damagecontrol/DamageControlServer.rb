@@ -144,10 +144,19 @@ module DamageControl
       init_custom_components
     end
     
+    def access_log
+      return $stderr unless params[:AccessLog]
+      File.open(params[:AccessLog], "w+")
+    end
+    
     def init_webserver
       component(:httpd, WEBrick::HTTPServer.new(
         :Port => http_port, 
-        :RequestHandler => HostVerifyingHandler.new(host_verifier)
+        :RequestHandler => HostVerifyingHandler.new(host_verifier),
+        :AccessLog => [
+          [ access_log, WEBrick::AccessLog::COMMON_LOG_FORMAT ],
+          [ access_log, WEBrick::AccessLog::REFERER_LOG_FORMAT ]
+        ]
       ))
       
       init_public_web
