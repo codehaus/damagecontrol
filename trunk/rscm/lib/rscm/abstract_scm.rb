@@ -50,7 +50,7 @@ module RSCM
     end
 
     # Load all sources under scm, so SCM classes can register themselves
-    Dir[File.dirname(__FILE__) + "/scm/*rb"].each do |src|
+    Dir[File.dirname(__FILE__) + "/scm/*.rb"].each do |src|
       load(src)
     end
 

@@ -5,8 +5,23 @@ module RSCM
   class Monotone < AbstractSCM
     register self
 
-    def initialize(db_file=nil, branch=nil, key=nil, passphrase=nil, keys_file=nil)
-      @db_file = File.expand_path(db_file) if db_file
+    ann :description => "Database file"
+    attr_reader :db_file
+
+    ann :description => "Branch"
+    attr_reader :branch
+
+    ann :description => "Key"
+    attr_reader :key
+
+    ann :description => "Passphrase"
+    attr_reader :passphrase
+
+    ann :description => "Keys file"
+    attr_reader :keys_file
+
+    def initialize(db_file="keys", branch="", key="", passphrase="", keys_file="")
+      @db_file = File.expand_path(db_file)
       @branch = branch
       @key = key
       @passphrase = passphrase
