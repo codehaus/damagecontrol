@@ -129,6 +129,14 @@ function configureAction() {
   <td class="setting-name">Child builds</td>
   <td><input class="setting-input" name="dependent_projects" id="dependent_projects" type="text" value="<%= dependent_projects %>"/></td>
 </tr>
+<% if circular_dependency != nil %>
+<tr>
+	<td>Warning</td>
+  <td class="setting-warning">
+  	<%=circular_dependency %>
+  </td>
+</tr>
+<% end %>
 <tr>
   <td>&nbsp;</td>
   <td class="setting-description">

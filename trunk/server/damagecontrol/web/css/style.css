@@ -169,6 +169,19 @@ pre.console {
   padding-top: 0;
 }
 
+.setting-warning {
+  font-size: 1em;
+  margin-top: 0;
+  padding-top: 0;
+	
+}
+
+.setting-warning:before {
+	content: "Warning: ";
+	color: red;
+	font-weight:bold;
+}
+
 .build-row {
   padding: 3px 4px 3px 4px;
 }
