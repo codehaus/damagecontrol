@@ -5,24 +5,32 @@ module RSCM
   class RssService
   
     def initialize(config)
-      dc = {
+      rscm = {
         :scm => SVN.new("svn://beaver.codehaus.org/damagecontrol/svn/rscm/trunk", "rscm/trunk"),
-        :tracker => Tracker::JIRA.new("http://jira.codehaus.org/"),
+        :tracker => Tracker::JIRA.new("http://jira.codehaus.org/", "DC"),
         :scm_web => SCMWeb::ViewCVS.new("http://cvs.damagecontrol.codehaus.org/")
       }
 
-      dc[:scm].checkout("dc")
-      changesets = dc[:scm].changesets("dc", nil)
-      puts changesets.to_rss(
-        "DamageControl Changesets", 
-        "http://damagecontrol.codehaus.org/", 
-        "This feed contains SCM changes for the DamageControl project", 
-        dc[:tracker], 
-        dc[:scm_web])
+      rscm[:scm].checkout("target/rscm-rss")
 
+      while(true)
+        changesets = rscm[:scm].changesets("target/rscm-rss", nil)
+puts "writing..."
+        File.open("target/rss.xml", "w") do |io|
+          io.puts changesets.to_rss(
+            "RSCM Changesets", 
+            "http://damagecontrol.codehaus.org/", 
+            "This feed contains SCM changes for the RSCM project (eating its own dogfood)", 
+            rscm[:tracker], 
+            rscm[:scm_web])
+        end
+        sleep(10)
+      end
     end
 
   end
 end
 
-RSCM::RssService.new(ARGV[0])
+#if(ARGV[0] == __FILE__)
+  RSCM::RssService.new(ARGV[0])
+#end

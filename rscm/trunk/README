@@ -3,43 +3,68 @@
 RSCM is a Ruby library for various Source Control Management (SCM) systems. RSCM provides an intuitive API
 which is described in AbstractSCM.
 
-RSCM is currently used inside DamageControl. Let us know if you use it for something else.
+= Feature overview
 
-RSCM also provides integration with issue traqcking systems and SCM web front-ends.
+* Generation of RSS feeds.
+* Generation of URL links to diffs for several popular SCM web front-ends.
+* Generation of URL links to bugs/issues for several popular bug/issue trackers.
+* Changeset emulation for SCMs that don't support it natively (like CVS and StarTeam)
+* API support for several high level operations such as checkout, get changesets, check for uptodate etc.
+* RSCM objects are easily serializable to YAML.
+
+== RSS Server
+
+RSCM can generate RSS feeds for all supported SCMs. The RSS feeds will have one item per changeset.
+Each RSS item's description contains the changeset's commit message, optionally with HTML links to
+issue/bug tracker issues (if detected in the changeset's commit message). The item's description
+will also contain a list of all the modified files, optionally with HTML links to a diff page
+in an SCM web front-end.
+
+A daemon-like utility for periodically generating RSS feeds (and writing to a disk) is underway.
+It will be customisable with a simple YAML file. It will also come with its ownb embedded web server
+(WEBrick) that can be used to serve the RSS, as well as configure the settings for the feeds.
 
 == Supported SCMs
 
 * CVS
-* Subversion
 * P4 (in progress)
+* StarTeam (in progress)
+* Subversion
 
-== Issue trackers
+== Supported Issue trackers
 
-RSCM can recognise bug/issue numbers from a number of popular issue tracking systems.
-It can convert a simple textual SCM commit message and convert issue numbers to html
-links that can be displayed on web pages, emails and other systems.
+RSCM can recognise bug/issue numbers (in commit messages) fom a number of popular issue 
+tracking systems. It can also convert a simple textual SCM commit message to include html
+links that can be displayed on web pages, emails and other systems. The built-in RSS generator
+uses this. Currently supported trackers are:
+
+* Bugzilla
+* JIRA
+* RubyForge
+* Scarab
+* SourceForge
+
+Planned:
+
+* Trac
 
 == SCM web front-ends
 
-RSCM can generate links to SCM web frontends such as Fisheye, Trac, ViewCVS and Chora.
+RSCM can generate html links to individual diff pages in SCM web frontends. These links can be 
+displayed on web pages, emails and other systems. The built-in RSS generator uses this.  
+Currently supported web front-ends are:
+
+* Fisheye
+* ViewCVS
+
+Planned:
+
+* Trac
+* Chora
+
 This way links to diffs can be easily created.
 
-== RSS 
-
-It is easy to make RSS feeds from RSCM's ChangeSets objects. RSCM provides an
-alternative to tools like CVSSpam and SVN::Notify that is portable across several
-SCMs.
-
-== YAML
-
-RSCM objects are easily serializable to YAML.
-
-== Changesets
-
-RSCM's ChangeSets support makes it possible to mimic atomic changesets for SCMs
-that don't aupport it natively (CVS, VSS).
-
-= Usage
+== API usage
 
 Here is an example of how to use RSCM to get a list of changes with Subversion:
 
