@@ -4,12 +4,8 @@ module DamageControl
   # is damagecontrol. This is to ensure self-upgrading
   # which will happen if the server is started in an
   # infinite loop script as in damagecontrol/src/samples/codehaus
-  class SelfUpgrader
-    def initialize(channel)
-      channel.add_subscriber(self)
-    end
-  
-    def receive_message(message)
+  class SelfUpgrader < AsyncComponent
+    def process_message(message)
       if message.is_a? BuildCompleteEvent        
         if(message.build.successful && message.build.project_name == "damagecontrol")
           do_exit

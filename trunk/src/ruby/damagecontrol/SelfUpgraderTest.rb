@@ -28,6 +28,7 @@ module DamageControl
       build = Build.new("damagecontrol")
       build.successful = true
       hub.publish_message(BuildCompleteEvent.new(build))
+      @su.force_tick
       assert(@su.did_exit?)
     end
 
@@ -35,6 +36,7 @@ module DamageControl
       build = Build.new("damagecontrol")
       build.successful = false
       hub.publish_message(BuildCompleteEvent.new(build))
+      @su.force_tick
       assert(!@su.did_exit?)
     end
 
@@ -42,6 +44,7 @@ module DamageControl
       build = Build.new("mustard")
       build.successful = false
       hub.publish_message(BuildCompleteEvent.new(build))
+      @su.force_tick
       assert(!@su.did_exit?)
     end
   end
