@@ -51,7 +51,7 @@ module DamageControl
     end
     
     def content
-      changesets = selected_build.changesets.reverse
+      changesets = selected_build.changesets
       no_changes_in_this_build =
         %{No changes in this build (this could happen because the build was manually trigged, the changes have not yet been determined,
 the working directory has been cleaned out, or because there has been no successful builds for this project yet)}

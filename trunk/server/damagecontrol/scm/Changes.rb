@@ -33,8 +33,10 @@ EOF
       @changesets[change]
     end
 
+    # Iterates over changesets in reverse order of creation
+    # This is because we want to have the most recent at the top
     def each(&block)
-      @changesets.each(&block)
+      @changesets.reverse.each(&block)
     end
     
     def length
