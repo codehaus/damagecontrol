@@ -1,0 +1,23 @@
+<html><body>
+
+<form>
+<input type="hidden" name="command" value="<%= command %>" />
+
+<table>
+<tr>
+  <td>Project Name</td>
+  <td><input name="project_name" type="text" value="<%= project_name %>"/></td>
+</tr>
+<tr>
+  <td>Build Command</td>
+  <td><input name="build_command" type="text" value="<%= project_config["build_command"] %>"/></td>
+</tr>
+<tr>
+  <td>SCM Spec</td>
+  <td><input name="scm_spec" type="text" value="<%= project_config["scm_spec"] %>"/></td>
+</tr>
+<table>
+<input name="submit" type="submit" value="Save"/>
+</form>
+
+</body></html>

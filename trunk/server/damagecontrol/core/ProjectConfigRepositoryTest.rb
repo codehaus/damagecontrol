@@ -15,7 +15,7 @@ module DamageControl
     end
     
     def teardown
-      rm_rf(basedir)
+#      rm_rf(basedir)
     end
   
     def test_can_add_new_project

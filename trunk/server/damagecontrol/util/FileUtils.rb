@@ -4,6 +4,7 @@ require 'ftools'
 module FileUtils
 
   def new_temp_dir(identifier)
+    identifier.gsub!(/:/, '_')
     "#{damagecontrol_home}/target/temp_#{identifier}_#{Time.new.to_i}"
   end
   

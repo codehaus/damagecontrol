@@ -1,0 +1,16 @@
+<html><body>
+
+<table>
+<tr><td>Project Name</td><td><%= project_name %></td></tr>
+<tr><td>CVSROOT</td><td><%= cvsroot %></td></tr>
+<tr><td>Last completed build status</td><td><%= last_status %><br/></td></tr>
+<tr><td>Current build status</td><td><%= current_status %></td></tr>
+</table>
+
+Tasks:
+<ul>
+<li><a href="?project_name=<%= project_name %>&command=configure">Configure</a></li>
+<li><a href="?project_name=<%= project_name %>&command=trig_build">Trig build now</a></li>
+</ul>
+
+</body></html>

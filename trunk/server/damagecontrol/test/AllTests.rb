@@ -27,6 +27,7 @@ require 'damagecontrol/core/ProjectConfigRepositoryTest'
 require 'damagecontrol/xmlrpc/StatusPublisherTest'
 require 'damagecontrol/publisher/JabberPublisherTest'
 require 'damagecontrol/publisher/JIRAPublisherTest'
+require 'damagecontrol/web/ConfigureProjectTest'
 
 require 'damagecontrol/template/HTMLTemplateTest'
 
