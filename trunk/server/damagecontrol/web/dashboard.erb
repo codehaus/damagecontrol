@@ -22,8 +22,13 @@
 			start_row = i % cells_per_row == 0
 			end_row = i == project_count || i % cells_per_row == (cells_per_row - 1)
 			href = "project?project_name=#{project}"
-			color = if build_history_repository.last_completed_build(project).successful? then "green" else "red" end
-			pulse = if build_scheduler.project_building?(project) then "-pulse" else "" end
+      
+      color = "grey"
+      pulse = ""
+      if !build_history_repository.last_completed_build(project).nil?
+        color = if build_history_repository.last_completed_build(project).successful? then "green" else "red" end
+        pulse = "-pulse" if build_scheduler.project_building?(project)
+      end
 			image = "images/#{color}#{pulse}-32.gif"
 		%>
 
