@@ -11,7 +11,7 @@ module DamageControl
     # test_modifiying_one_file_produces_correct_changeset
     # but shitty little windog doesn't like long file names. JEEEEEZ
     # this test is a bit big, it is because there is so much setup and i was lazy.
-    def Xtest_1
+    def test_1
       work_dir = new_temp_dir
       checkout_dir = "#{work_dir}/WeCanCallItWhatWeWant/checkout"
       repository_dir = "#{work_dir}/repository"
@@ -97,7 +97,7 @@ module DamageControl
     end
     
     # test_install_uninstall_install_trigger_should_work_as_many_times_as_we_like
-    def Xtest_3
+    def test_3
       work_dir = new_temp_dir
       path = "OftenModified"
       checkout_dir = "#{work_dir}/#{path}/checkout"
