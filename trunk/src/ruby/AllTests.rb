@@ -20,6 +20,7 @@ require 'damagecontrol/BuildSchedulerTest'
 require 'damagecontrol/publisher/IRCPublisherTest'
 require 'damagecontrol/publisher/FilePublisherTest'
 require 'damagecontrol/publisher/EmailPublisherTest'
+require 'damagecontrol/publisher/JIRAPublisherTest'
 
 require 'damagecontrol/template/HTMLTemplateTest'
 
