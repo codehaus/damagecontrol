@@ -98,7 +98,7 @@ module DamageControl
     end
     
     def search(criterion, required_project_name=nil)
-      criterion = Regexp.new(".*#{criterion}.*") unless criterion.is_a?(Regexp)
+      criterion = Regexp.new(criterion, Regexp::IGNORECASE) unless criterion.is_a?(Regexp)
       result = []
       project_names.each do |project_name|
         if(required_project_name == project_name || required_project_name.nil?)

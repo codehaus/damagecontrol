@@ -187,7 +187,7 @@ module DamageControl
       assert_equal([week_zero_one, week_zero_two, week_one_one, week_one_two, week_two_one], builds_per_january)
     end
     
-    def test_should_allow_searching_in_anything_except_project_name
+    def test_should_allow_searching_in_anything
       a = Build.new("test", Time.utc(2004, 01, 01, 12, 00, 00))
       b = Build.new("test", Time.utc(2004, 01, 04, 12, 00, 00))
       c = Build.new("test", Time.utc(2004, 01, 05, 12, 00, 00))
@@ -201,8 +201,8 @@ module DamageControl
       @bhp.register(c)
 
       assert_equal([b,c], @bhp.search("funny"))
-      assert_equal([c], @bhp.search("some/path"))
-      assert_equal([], @bhp.search("test"))
+      assert_equal([c], @bhp.search("Me/pAT"))
+      assert_equal([a,b,c], @bhp.search("test"))
     end
 
     def test_should_only_search_in_project_when_project_name_specified

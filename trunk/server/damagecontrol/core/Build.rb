@@ -115,9 +115,9 @@ module DamageControl
 
   private
     # don't allow search in these fields
-    def matches_ignores
-      ["@project_name"]
-    end
+#    def matches_ignores
+#      ["@project_name"]
+#    end
 
   end
 end
