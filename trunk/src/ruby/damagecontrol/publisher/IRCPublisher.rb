@@ -33,9 +33,13 @@ module DamageControl
           logger.info("sending irc message #{content}")
           @irc.send_message_to_channel(content)
         else
-          logger.info("connecting to #{server} and joining #{@server_channel}")
-          @irc.connect(server, handle) unless @irc.connected?
-          @irc.join_channel(@irc_channel) if @irc.connected? && !@irc.in_channel?
+          if !@irc.connected?
+            logger.info("connecting to #{server}")
+            @irc.connect(server, handle)
+          elsif !@irc.in_channel?
+            logger.info("join channel #{@server_channel}")
+            @irc.join_channel(@irc_channel)
+          end
           raise "not in channel yet"
         end
       end

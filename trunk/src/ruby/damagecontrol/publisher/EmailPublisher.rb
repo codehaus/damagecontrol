@@ -35,12 +35,12 @@ module DamageControl
       mail = "To: #{to}\r\n" +
              "From: #{from}\r\n" +
              "Subject: #{subject}\r\n" +
-             "Subject: #{subject}\r\n" +
              "MIME-Version: 1.0\r\n" +
              "Content-Type: text/html\r\n" 
              "\r\n" +
              body
       begin
+        logger.info("sending email to #{to} using SMTP server #{@server}")
         Net::SMTP.start(@server) do |smtp|
           smtp.sendmail( mail, from, to )
         end
