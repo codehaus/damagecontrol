@@ -106,9 +106,11 @@ module Pebbles
       private
       
         def cleanup
-          if(defined?(BasicSocket))
-            ObjectSpace.each_object(::BasicSocket) {|s| s.close unless s.closed? }
-          end
+          # Segmentation fault on Ruby v1.8.1
+          # !!!
+          #if(defined?(BasicSocket))
+          #  ObjectSpace.each_object(::BasicSocket) {|s| s.close unless s.closed? }
+          #end
         end
     
         def join_stdout_and_stderr?
