@@ -71,6 +71,7 @@ module DamageControl
       entries = split_entries(log_entry)
 
       path = parse_path(entries[0])
+      if path.nil? return []
       
       changes = []
       
@@ -84,13 +85,14 @@ module DamageControl
     end
     
     def parse_path(first_entry)
-      make_relative_to_module(extract_required_match(first_entry, /^RCS file: (.*?)(,v|$)/m))
+      make_relative_to_module(extract_match(first_entry, /^RCS file: (.*?)(,v|$)/m))
     end
     
     attr_accessor :cvspath
     attr_accessor :cvsmodule
     
     def make_relative_to_module(file)
+      return nil if file.nil?
       return file if cvspath.nil? || cvsmodule.nil?
       # clean away windows backslashes
       cvspath.gsub!(/\\/, "/")
