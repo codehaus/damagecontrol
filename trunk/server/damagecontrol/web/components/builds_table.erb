@@ -22,14 +22,14 @@
     builds = builds.reverse
     builds_to_display = builds[0..max_number_of_builds]
     builds_to_option_box = builds[max_number_of_builds..-1]
-    prefix = ""
-    prefix = "#{build.project_name} " if prefix_with_project_name
     i = -1
     builds_to_display.each do |build|
       i = i + 1
       color = if build.successful? then "green" else "red" end
       color = "grey" if !build.completed?
       image = "images/#{color}-16.gif"
+      prefix = ""
+      prefix = "#{build.project_name} " if prefix_with_project_name
   %>
   <tr class="build-row">
     <% if((i%2) == 0) %>
@@ -70,7 +70,11 @@
           <input type="hidden" name="project_name" value="<%= project_name %>" />
           <select name="timestamp" onchange="submit()">
           
-          <% builds_to_option_box.each do |build| %>
+          <%
+            builds_to_option_box.each do |build|
+            prefix = ""
+            prefix = "#{build.project_name} " if prefix_with_project_name
+          %>
             <option value="<%= build.timestamp_as_s %>"><%= prefix %><%= build_description(build) %></option>      
           <% end %>
           
