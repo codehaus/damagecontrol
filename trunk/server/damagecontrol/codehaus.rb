@@ -14,7 +14,7 @@ server = DamageControlServer.new(
   :RootDir => buildRoot,
   :HttpPort => 4712,
   :HttpsPort => 4713,
-  :AllowIPs => [ "127.0.0.1", "64.7.141.17" ],
+  :AllowIPs => [ "127.0.0.1", "64.7.141.17" ]
 #  :NudgeXmlrpcUrl => "http://64.7.141.17:4712/private/xmlrpc", # This is not needed on Codehaus.
   )
 
