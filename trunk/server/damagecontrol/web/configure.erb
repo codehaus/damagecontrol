@@ -195,9 +195,9 @@ function enableOrDisableCvsFieldsAndUpdateScmSpec() {
 	// disable unix_groups if the path is a windows path
 	windows_path = new RegExp("^[a-zA-Z].*")
 	if(windows_path.exec(document.getElementById('cvsrepodir').value))  {
-		document.getElementById('unix_groups').disabled = true
+//		document.getElementById('unix_groups').disabled = true
 	} else {
-		document.getElementById('unix_groups').disabled = false
+//		document.getElementById('unix_groups').disabled = false
 	}
 }
 
@@ -209,16 +209,16 @@ function enableOrDisableCvsFieldsAndUpdateScmSpec() {
 <table>
 <tr>
   <td class="config_cell">Project name</td>
-  <td><input name="project_name" type="text" value="<%= project_name %>"/></td>
+  <td><input class="scm_info" name="project_name" type="text" value="<%= project_name %>"/></td>
 </tr>
 <tr>
   <td>Build command</td>
-  <td><input name="build_command_line" type="text" value="<%= project_config['build_command_line'] %>"/></td>
+  <td><input class="scm_info" name="build_command_line" type="text" value="<%= project_config['build_command_line'] %>"/></td>
 </tr>
 <tr>
   <td>Build trigger mechanism</td>
   <td>
-		<select name="trigger" id="trigger">
+		<select class="scm_info" name="trigger" id="trigger">
 			<option value="none">Disabled</option>
 			<option value="xmlrpc" selected>Upon commit (XMLRPC)</option>
 			<!--option value="email">Email trigger</option>
@@ -228,11 +228,11 @@ function enableOrDisableCvsFieldsAndUpdateScmSpec() {
 </tr>
 <!--tr>
   <td>Unix groups</td>
-  <td><input name="unix_groups" id="unix_groups" type="text" value="<%= project_config['unix_groups'] %>"/></td>
+  <td><input class="scm_info" name="unix_groups" id="unix_groups" type="text" value="<%= project_config['unix_groups'] %>"/></td>
 </tr-->
 <tr>
   <td>Nag email</td>
-  <td><input name="nag_email" id="nag_email" type="text" value="<%= project_config['nag_email'] %>"/></td>
+  <td><input class="scm_info" name="nag_email" id="nag_email" type="text" value="<%= project_config['nag_email'] %>"/></td>
 </tr>
 <tr>
   <td>Source control</td>
@@ -248,12 +248,12 @@ function enableOrDisableCvsFieldsAndUpdateScmSpec() {
 	<table>
 		<tr>
 			<td class="config_cell">CVSROOT</td>
-			<td><input name="cvsroot" id="cvsroot" onKeyUp="distributeCvsrootFields()" type="text" value="<%= project_config['cvsroot'] %>"></td>
+			<td><input class="scm_info" name="cvsroot" id="cvsroot" onKeyUp="distributeCvsrootFields()" type="text" value="<%= project_config['cvsroot'] %>"></td>
 		</tr>
 		<tr>
 			<td>Protocol</td>
 			<td>
-				<select id="cvsprotocol" onchange="updateCvsRootField()">
+				<select class="scm_info" id="cvsprotocol" onchange="updateCvsRootField()">
 					<option value=""></option>
 					<option value="ext" selected>Secure shell (:ext:)</option>
 					<option value="pserver">Password server (:pserver:)</option>
@@ -263,27 +263,27 @@ function enableOrDisableCvsFieldsAndUpdateScmSpec() {
 		</tr>
 		<tr>
 			<td>User name</td>
-			<td><input id="cvsuser" onKeyUp="updateCvsRootField()" type="text"></td>
+			<td><input class="scm_info" id="cvsuser" onKeyUp="updateCvsRootField()" type="text"></td>
 		</tr>
 		<tr>
 			<td>Password</td>
-			<td><input name="cvspassword" id="cvspassword" onKeyUp="updateCvsRootField()" type="text"></td>
+			<td><input class="scm_info" name="cvspassword" id="cvspassword" onKeyUp="updateCvsRootField()" type="text"></td>
 		</tr>
 		<tr>
 			<td>Server</td>
-			<td><input id="cvsserver" onKeyUp="updateCvsRootField()" type="text"></td>
+			<td><input class="scm_info" id="cvsserver" onKeyUp="updateCvsRootField()" type="text"></td>
 		</tr>
 		<tr>
 			<td>Port</td>
-			<td><input id="cvsport" onKeyUp="updateCvsRootField()" type="text"></td>
+			<td><input class="scm_info" id="cvsport" onKeyUp="updateCvsRootField()" type="text"></td>
 		</tr>
 		<tr>
 			<td>Repository directory</td>
-			<td><input id="cvsrepodir" onKeyUp="updateCvsRootField()" type="text"></td>
+			<td><input class="scm_info" id="cvsrepodir" onKeyUp="updateCvsRootField()" type="text"></td>
 		</tr>
 		<tr>
 			<td>Module</td>
-			<td><input name="cvsmodule" id="cvsmodule" onKeyUp="updateCvsRootField()" type="text" value="<%= project_config['cvsmodule'] %>"></td>
+			<td><input class="scm_info" name="cvsmodule" id="cvsmodule" onKeyUp="updateCvsRootField()" type="text" value="<%= project_config['cvsmodule'] %>"></td>
 		</tr>
 	</table>
 
@@ -294,7 +294,7 @@ function enableOrDisableCvsFieldsAndUpdateScmSpec() {
 	<table>
 		<tr>
 			<td class="config_cell">URL</td>
-			<td><input name="svnurl" id="svnurl" type="text" value="<%= project_config['svnurl'] %>"></td>
+			<td><input class="scm_info" name="svnurl" id="svnurl" type="text" value="<%= project_config['svnurl'] %>"></td>
 		</tr>
 	</table>
 </div>

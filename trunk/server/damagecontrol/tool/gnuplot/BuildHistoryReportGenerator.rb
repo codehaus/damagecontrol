@@ -1,13 +1,8 @@
-if __FILE__ == $0
-  $damagecontrol_home = File::expand_path('#{File.dirname($0)}/../../../../..') 
-  
-  $:<<"#{$damagecontrol_home}/server"
-end
-
 require 'gplot/Gnuplot'
 require 'damagecontrol/core/Build'
 require 'damagecontrol/core/AsyncComponent'
 require 'damagecontrol/core/BuildHistoryRepository'
+require 'damagecontrol/core/ProjectDirectories'
 require 'pebbles/TimeUtils'
 
 module DamageControl
@@ -15,17 +10,19 @@ module Tool
 module Plot
 
   class BuildHistoryReportGenerator
+    TIME_FORMAT = "%Y/%m/%d"
+  
     def initialize(build_history_repository)
       @build_history_repository = build_history_repository
     end
 
     def generate(dir, project_name)
-      generate_build_duration_per_successful_build_by_date(dir, project_name, :week, "week")
-      generate_build_duration_per_successful_build_by_build(dir, project_name, :week, "week")
-      generate_builds_per_period_graph(dir, project_name, :week, "week")
+      generate_build_duration_by_date(dir, project_name, :week)
+      generate_build_duration_by_build(dir, project_name, :week)
+      generate_builds_per_period_graph(dir, project_name, :week)
     end
 
-    def generate_build_duration_per_successful_build_by_date(dir, project_name, period, period_name)
+    def generate_build_duration_by_date(dir, project_name, period)
       builds_per_period_map, x_dates, number_of_periods, first_period_number, first_period, last_period = generate_skeleton(project_name, period)
 
       build_durations_by_start_time = {}
@@ -42,36 +39,36 @@ module Plot
       x_dates = []
       build_duration_per_successful_build_array = []
       sorted_builds.each do |start_time_duration|
-        start_time = start_time_duration[0].utc.strftime("%y/%m/%d-%H:%M:%S")
+        start_time = start_time_duration[0].utc.strftime(TIME_FORMAT)
         x_dates << "#{start_time}"
         build_duration_per_successful_build_array << "#{start_time_duration[1]}"
       end
       
       # Run gnuplot
 
-      plot = Gnuplot::Plot.new()
-      plot.title "#{project_name} build durations (by date)" 
+      plot = Gnuplot::Plot.new("date.plot")
+      plot.title "#{project_name} build durations (by #{period.id2name})" 
       plot.xlabel "Date"
       plot.ylabel "Build duration (seconds)"
       plot.term "png small"
       plot.grid
-      plot.output "#{dir}/build_durations_per_#{period_name}_by_date.png"
+      plot.output "#{dir}/build_duration_by_#{period.id2name}.png"
 
       plot.xdata "time"
-      plot.timefmt "\"%y/%m/%d-%H:%M:%S\""
-      plotstart = first_period.strftime("%y/%m/%d-%H:%M:%S")
-      plotend = last_period.strftime("%y/%m/%d-%H:%M:%S")
-#      plot.xrange "\"#{plotstart}\"", "\"#{plotend}\""
+      plot.timefmt "\#{TIME_FORMAT}\""
+      plotstart = first_period.strftime(TIME_FORMAT)
+      plotend = last_period.strftime(TIME_FORMAT)
+      plot.xrange "\"#{plotstart}\"", "\"#{plotend}\""
       plot.yrange "0", ""
-      plot.format "x \"%Y-%m-%d\""
-      plot.data "style linespoints"
+      plot.format "x \"#{TIME_FORMAT}\""
+#      plot.data "style linespoints"
 
       build_duration_per_successful_build_ds = build_duration_per_successful_build_array.gpds("title"=>"Build duration for successful builds", "xgrid"=>x_dates, "using"=>"1:2")
 
       plot.draw(build_duration_per_successful_build_ds)
     end
 
-    def generate_build_duration_per_successful_build_by_build(dir, project_name, period, period_name)
+    def generate_build_duration_by_build(dir, project_name, period)
       builds_per_period_map, x_dates, number_of_periods, first_period_number, first_period, last_period = generate_skeleton(project_name, period)
 
       build_durations_by_start_time = {}
@@ -89,7 +86,7 @@ module Plot
       i = 0
       build_duration_per_successful_build_array = []
       sorted_builds.each do |start_time_duration|
-        start_time = start_time_duration[0].utc.strftime("%y/%m/%d-%H:%M:%S")
+        start_time = start_time_duration[0].utc.strftime(TIME_FORMAT)
         x_values << i.to_s
         build_duration_per_successful_build_array << "#{start_time_duration[1]}"
         i += 1
@@ -97,13 +94,13 @@ module Plot
       
       # Run gnuplot
 
-      plot = Gnuplot::Plot.new()
+      plot = Gnuplot::Plot.new("build.plot")
       plot.title "#{project_name} build durations (by build #)" 
       plot.xlabel "Build #"
       plot.ylabel "Build duration (seconds)"
       plot.term "png small"
       plot.grid
-      plot.output "#{dir}/build_durations_per_#{period_name}_by_build.png"
+      plot.output "#{dir}/build_duration_by_build.png"
 
       plot.yrange "0", ""
       plot.data "style linespoints"
@@ -113,7 +110,7 @@ module Plot
       plot.draw(build_duration_per_successful_build_ds)
     end
 
-    def generate_builds_per_period_graph(dir, project_name, period, period_name)
+    def generate_builds_per_period_graph(dir, project_name, period)
       builds_per_period_map, x_dates, number_of_periods, first_period_number, first_period, last_period = generate_skeleton(project_name, period)
 
       # Build the values for successful, failed and total
@@ -140,21 +137,21 @@ module Plot
 
       # Run gnuplot
 
-      plot = Gnuplot::Plot.new()
-      plot.title "#{project_name} build activity per #{period_name}" 
+      plot = Gnuplot::Plot.new("freq.plot")
+      plot.title "#{project_name} builds per #{period.id2name}" 
       plot.xlabel "Date"
       plot.ylabel "Number of builds"
       plot.term "png small"
       plot.grid
-      plot.output "#{dir}/builds_per_#{period_name}.png"
+      plot.output "#{dir}/builds_per_#{period.id2name}.png"
 
       plot.xdata "time"
-      plot.timefmt "\"%y/%m/%d\""
-      plotstart = first_period.strftime("%y/%m/%d")
-      plotend = last_period.strftime("%y/%m/%d")
-#      plot.xrange "\"#{plotstart}\"", "\"#{plotend}\""
+      plot.timefmt "\"#{TIME_FORMAT}\""
+      plotstart = first_period.strftime(TIME_FORMAT)
+      plotend = last_period.strftime(TIME_FORMAT)
+      plot.xrange "\"#{plotstart}\"", "\"#{plotend}\""
       plot.yrange "0", ""
-      plot.format "x \"%Y-%m-%d\""
+      plot.format "x \"#{TIME_FORMAT}\""
       plot.data "style linespoints"
 
       successful_builds_per_week_ds = successful_builds_per_period_array.gpds("with"=>"filledcurve x2 lt 15", "title"=>"Successful builds", "xgrid"=>x_dates, "using"=>"1:2")
@@ -187,7 +184,8 @@ module Plot
         x_dates[i] = Time.at(period_timestamp).utc.strftime("%y/%m/%d")
         i = i+1
       }
-      
+puts first_period
+puts last_period
       return builds_per_period_map, x_dates, number_of_periods, first_period_number, first_period, last_period
     end
 
@@ -198,7 +196,11 @@ end
 end
 
 if __FILE__ == $0
-  bhr = DamageControl::BuildHistoryRepository.new(nil, "build_history_sample.yaml")
+  require 'damagecontrol/util/FileUtils'
+  include FileUtils
+  root = File.expand_path("#{damagecontrol_home}/testdata/testroot")
+  pd = DamageControl::ProjectDirectories.new(root)
+  bhr = DamageControl::BuildHistoryRepository.new(nil, pd)
   r = DamageControl::Tool::Plot::BuildHistoryReportGenerator.new(bhr)
-  r.generate(".", ARGV[0])
+  r.generate(".", "picocontainer")
 end

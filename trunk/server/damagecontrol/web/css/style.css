@@ -18,8 +18,12 @@ img {
   vertical-align: middle;
 }
 
+.scm_info {
+  width: 480px;
+}
+
 .config_cell {
-  width: 240px;
+  width: 160px;
 }
 
 .top-panel {
