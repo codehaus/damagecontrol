@@ -33,7 +33,7 @@
     image = "images/#{color}-16.gif"
 %>
   <tr class="dashboard">
-    <td class="dashboard"><a href="log?project_name=<%= project_name %>&timestamp=<%= build.timestamp %>"><%= build.timestamp %></a></td>
+    <td class="dashboard"><a href="log?project_name=<%= project_name %>&timestamp=<%= build.timestamp %>"><%= build.timestamp_as_time %></a></td>
     <td class="dashboard"><img src="<%= image %>" />&nbsp;<%= build.status %></td>
     <td class="dashboard"><%= build.duration_formatted %></td>
   </tr>
