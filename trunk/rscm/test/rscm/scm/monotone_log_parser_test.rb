@@ -24,7 +24,7 @@ EOF
 
     def test_should_parse_CHANGESET_to_changeset
       parser = MonotoneLogParser.new
-      changeset = parser.parse_changeset(StringIO.new(CHANGESET))
+      changeset = parser.parse_changeset(StringIO.new(CHANGESET), {})
 
       assert_equal("a2c58e276439de7d9da549870e245776c592c7e8", changeset.revision)
       assert_equal("tester@test.net", changeset.developer)
