@@ -26,8 +26,12 @@ module DamageControl
       request.query['project_name']
     end
     
+    def project_exists?
+      @project_config_repository.project_exists?(project_name)
+    end
+    
     def project_config
-      return @project_config_repository.default_project_config unless @project_config_repository.project_exists?(project_name)
+      return @project_config_repository.default_project_config unless project_exists?
       @project_config_repository.project_config(project_name)
     end
     

@@ -47,7 +47,7 @@ module DamageControl
         
     def store_configuration
       assert_private
-      @project_config_repository.new_project(project_name) unless @project_config_repository.project_exists?(project_name)
+      @project_config_repository.new_project(project_name) unless project_exists?
       project_config = @project_config_repository.project_config(project_name)
       
       # copy the key/values from the request over to the project_config
@@ -88,7 +88,6 @@ module DamageControl
   
     KEYS = [
       "build_command_line", 
-      "project_name", 
       "trigger", 
       "nag_email", 
       "jira_url", 
