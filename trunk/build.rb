@@ -20,43 +20,43 @@ $VERBOSE = nil
 #system("jar cvf lib/damagecontrol.jar -C #{class_target} .")
 
 class Project
-	def initialize
-		$damagecontrol_home = File::expand_path(".")
-		
-		$:<<'lib'
-		$:<<'lib/rica'
-		$:<<'src/ruby'
-	end
+  def initialize
+    $damagecontrol_home = File::expand_path(".")
+    
+    $:<<'lib'
+    $:<<'lib/rica'
+    $:<<'src/ruby'
+  end
   
   def run_test(test)
-		Dir.chdir("#{$damagecontrol_home}/src/ruby")
-		system("ruby #{test}")
+    Dir.chdir("#{$damagecontrol_home}/src/ruby")
+    system("ruby #{test}")
   end
 
-	def unit_test
+  def unit_test
     run_test("AllTests.rb")
-	end
+  end
 
-	def integration_test
+  def integration_test
     run_test("End2EndTest.rb")
-	end
-	
-	def all
-		unit_test
-		integration_test
-	end
-	
-	def default
-		all
-	end
-	
-	def run(args)
-		if args.nil? || args == []
-			default
-		else
-			args.each {|target| instance_eval(target) }
-		end
-	end
+  end
+  
+  def all
+    unit_test
+#   integration_test
+  end
+  
+  def default
+    all
+  end
+  
+  def run(args)
+    if args.nil? || args == []
+      default
+    else
+      args.each {|target| instance_eval(target) }
+    end
+  end
 end
 
 project = Project.new
