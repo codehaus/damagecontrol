@@ -12,6 +12,7 @@ require 'damagecontrol/core/DependentBuildTrigger'
 require 'damagecontrol/core/SCMPoller'
 require 'damagecontrol/core/HostVerifyingHandler'
 require 'damagecontrol/core/LogWriter'
+require 'damagecontrol/core/LogArchiver'
 require 'damagecontrol/core/BuildHistoryRepository'
 require 'damagecontrol/core/ProjectConfigRepository'
 require 'damagecontrol/core/BuildNumberIncreaser'
@@ -19,6 +20,7 @@ require 'damagecontrol/core/HostVerifier'
 require 'damagecontrol/web/ProjectServlet'
 require 'damagecontrol/web/InstallTriggerServlet'
 require 'damagecontrol/web/ConfigureProjectServlet'
+require 'damagecontrol/web/SearchServlet'
 require 'damagecontrol/web/DashboardServlet'
 require 'damagecontrol/web/StatusImageServlet'
 require 'damagecontrol/web/LogFileServlet'
@@ -157,13 +159,13 @@ module DamageControl
       component(:project_directories, @project_directories)
       component(:project_config_repository, ProjectConfigRepository.new(project_directories, scm_factory, public_web_url))
       component(:build_history_repository, BuildHistoryRepository.new(hub, @project_directories))
+      component(:log_archiver, LogArchiver.new(hub, project_config_repository))
     end
     
     def init_components
       init_config_services
       
       component(:warning_server, WarningServer.new())
-      component(:log_writer, LogWriter.new(hub, project_directories))
       component(:host_verifier, if allow_ips.nil? then OpenHostVerifier.new else HostVerifier.new(allow_ips) end)
       
       init_build_scheduler
@@ -191,6 +193,7 @@ module DamageControl
       
       httpd.mount("/public/dashboard", DashboardServlet.new(:public, build_history_repository, project_config_repository, build_scheduler))
       httpd.mount("/public/project", ProjectServlet.new(:public, build_history_repository, project_config_repository, nil, build_scheduler))
+      httpd.mount("/private/search", SearchServlet.new(build_history_repository))
       httpd.mount("/public/log", LogFileServlet.new(project_directories))
       httpd.mount("/public/root", indexing_file_handler)
       
@@ -227,6 +230,7 @@ module DamageControl
       httpd.mount("/private/project", ProjectServlet.new(:private, build_history_repository, project_config_repository, trigger, build_scheduler))
       httpd.mount("/private/install_trigger", InstallTriggerServlet.new(project_config_repository, trig_xmlrpc_url))
       httpd.mount("/private/configure", ConfigureProjectServlet.new(project_config_repository, scm_configurator_classes))
+      httpd.mount("/private/search", SearchServlet.new(build_history_repository))
       httpd.mount("/private/log", LogFileServlet.new(project_directories))
       httpd.mount("/private/root", indexing_file_handler)
       
@@ -252,6 +256,7 @@ module DamageControl
     end
     
     def init_build_scheduler
+      component(:log_writer, LogWriter.new(hub))
       component(:build_number_increaser, BuildNumberIncreaser.new(hub, project_config_repository))
       component(:dependent_build_trigger, DependentBuildTrigger.new(hub, project_config_repository))
       component(:build_scheduler, BuildScheduler.new(hub))
