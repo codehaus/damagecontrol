@@ -1,0 +1,19 @@
+STORY: As a developer I would like to get an email when I check in a broken build.
+
+TEST: Break the test in damagecontrolled and check that an email arrives.
+Check out CVS project : :ext:tirsen@cvs.codehaus.org:/cvsroot/damagecontrol damagecontrolled
+Create file : damagecontrolled/src/java/com/thoughtworks/damagecontrolled/Thingy.java
+	package com.thoughtworks.damagecontrolled;
+
+	public class Thingy {
+		public String getBeer() {
+			return "Leffe";
+		}
+	}
+Commit CVS project : damagecontrolled
+	Testing DamageControl, breaking test to check for email
+Check for email
+	Subject: BUILD FAILED damagecontrolled
+	BUILD FAILED damagecontrolled
+
+

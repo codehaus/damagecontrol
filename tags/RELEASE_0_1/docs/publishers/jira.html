@@ -1,0 +1,51 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+<head>
+</head>
+<body>
+<h1>JIRAPublisher</h1>
+The JIRAPublisher component creates a new JIRA issue whenever a build
+fails. The new issue will be assigned to the person responsible for
+breaking the build. (If DamageControl can't figure out who broke the
+build, it will pick the first person in the set of committers as
+asignee).<br>
+<h1>Requirements</h1>
+JIRA 1.4 or later installed somewhere, with Jelly support enabled. See
+the JIRA documentation for details.<br>
+<h1>Configuration</h1>
+<h2>JIRA Configuration</h2>
+You should create a separate JIRA user for DamageControl. This will be
+the "reporter" user for new JIRA issues when a build fails.<br>
+It is recommended that the JIRA user is called "damagecontrol" and that
+the email be set to that of one of the DamageControl administrators.<br>
+<br>
+The damagecontrol JIRA user must also be granted privileges to create
+new issues for all JIRA projects that wish to let the JIRAPublisher
+post new issues for a particular project. The simplest way to do this
+is to make it part of all JIRA groups.<br>
+<h2>DamageControl Server Configuration</h2>
+Make sure you add the following line to the DamageControl server
+startup script:<br>
+<br>
+# The root URL of the JIRA installation<br>
+jira_host = "jira.codehaus.org"<br>
+JIRAPublisher.new(@hub, ShortTextTemplate.new, jira_host).start<br>
+<br>
+Further, you should define two environment variables prior to starting
+the DamageControl server:<br>
+JIRA_USER and JIRA_PASSWORD.<br>
+The values of these variables should be set to the user name and
+password of the damagecontrol JIRA user.<br>
+<h2>Individual DamageControl project configuration</h2>
+The project specific JIRA information should go into the DamageControl
+configuration file (someproject-damagecontrol.conf). Example:<br>
+<br>
+jira_project_key: DC<br>
+<br>
+The JIRAPublisher will only create new issues for projects with the
+jira_project_key defined in the config file.<br>
+<h2>Mailing list configuration</h2>
+The JIRA user (the email address) must be added as a member to mailing
+lists that restrict posting to list members.<br>
+</body>
+</html>

@@ -1,0 +1,7 @@
+STORY: The AcceptanceTestRunner must fail with a failing acceptance test.
+
+TEST: This test should fail.
+Check that this is the correct content:
+	A little bit of this.
+	A little bit of that.
+Break the test
