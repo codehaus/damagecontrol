@@ -1,0 +1,58 @@
+RSCM is a Ruby API for various Source Control Management systems.
+RSCM's API allows developers to administer and access SCMs through
+a simple object-oriented API.
+
+= Implementing support for a new SCM
+
+Let's write an RSCM implementation for the imaginary SCM called Mooky.
+Start by writing a test:
+
+  #link test/rscm/mooky/mooky_test.rb
+
+By including GenericSCMTests your test will automatically include the
+acceptance test suite for RSCM. As you will see later, this will be of great
+help when developing the Mooky class.
+
+Let's start implementing the Mooky class too:
+
+  link:README
+  #link lib/rscm/mooky/mooky.rb
+
+Try running this test:
+
+  rake test TEST_FILES=**/mooky_test.rb
+  
+Whoops - we got some failures! Let'see if we can get the test_basic method
+to get a little further before it fails. It failed because our checkout
+method returned nothing (nil).
+
+The Mooky SCM happens to have a command line utility to perform a checkout.
+From the command line a checkout with mooky would be done like this:
+
+  cd somewhere
+  mooky checkout --repo mooky://some/where/else
+
+This will print the following to standard out:
+
+  checkout build.xml
+  checkout project.xml
+  checkout src/java/com/thoughtworks/damagecontrolled/Thingy.java
+  checkout src/test/com/thoughtworks/damagecontrolled/ThingyTestCase.java
+  
+What we need to do is to execute these commands from Ruby. We also need to 
+parse the output from the mooky command to determine the files that were checked out,
+so that we can return an array with the right information.
+
+NOTE: If the SCM already has a 3rd party Ruby API (like Perforce), we would probably
+want to use that instead of the command line API.
+
+NOTE: If the SCM doesn't have a command line utility or a 3rd party Ruby API, but instead
+provides libraries (perhaps in C), then you should consider writing a Ruby C extension
+instead.
+
+= Implementation notes
+
+* SCM classes should have a no-arg constructor and be serialisable with YAML
+* SCM classes should be inexpensive to instantiate (should not access SCM in constructor)
+
+= Web interface
