@@ -3,14 +3,16 @@ require 'drb'
 require 'rss/maker'
 require 'fileutils'
 require 'rscm/logging'
-require 'rscm/directories'
 require 'rscm/time_ext'
 require 'rscm/changes'
-require 'rscm/diff_parser'
-require 'rscm/diff_htmlizer'
-require 'rscm/visitor/yaml_persister'
-require 'rscm/visitor/diff_persister'
-require 'rscm/visitor/rss_writer'
+require 'damagecontrol/tracker'
+require 'damagecontrol/scm_web'
+require 'damagecontrol/directories'
+require 'damagecontrol/diff_parser'
+require 'damagecontrol/diff_htmlizer'
+require 'damagecontrol/visitor/yaml_persister'
+require 'damagecontrol/visitor/diff_persister'
+require 'damagecontrol/visitor/rss_writer'
 
 class String
   # Turns a String into a new int or time, representing the next changeset id
@@ -25,7 +27,7 @@ class String
   end
 end
 
-module RSCM
+module DamageControl
   # Represents a project with associated SCM, Tracker and SCMWeb
   class Project
 
@@ -54,7 +56,8 @@ module RSCM
       end
     end
   
-    def initialize
+    def initialize(name=nil)
+      @name = name
       @scm = nil
       @tracker = Tracker::Null.new
       @scm_web = SCMWeb::Null.new
@@ -68,7 +71,7 @@ module RSCM
         YAML::dump(self, io)
       end
       
-      POLLER.add_project(self) if POLLER
+      REGISTRY.poller.add_project(self) if REGISTRY
 
     end
     
@@ -88,22 +91,20 @@ module RSCM
       end
     end
 
-    # Polls SCM for new changesets and yields them to the given block. and updates
-    # RSS and YAML files on disk. If this is the first poll (i.e. no changesets have
-    # been previously stored on disk), then changesets since +from_if_first_poll+
-    # will be retrieved.
+    # Polls SCM for new changesets and yields them to the given block.
     def poll(from_if_first_poll=Time.epoch)
       start = Time.now
-      all_start = start
-
       from = next_changeset_identifier || from_if_first_poll
       
       Log.info "Getting changesets for #{name} from #{from}"
       changesets = @scm.changesets(checkout_dir, from)
       if(!@scm.transactional?)
-        # We're dealing with a non-transactional SCM (like CVS/StarTeam/ClearCase),
-        # unlike Subversion/Monotone. Sleep a little, get the changesets again.
-        # When the changesets are not changing, we can consider the last commit done.
+        # We're dealing with a non-transactional SCM (like CVS/StarTeam/ClearCase,
+        # unlike Subversion/Monotone). Sleep a little, get the changesets again.
+        # When the changesets are not changing, we can consider the last commit done
+        # and the quiet period elapsed. This is not 100% failsafe, but will work
+        # under most circumstances. In the worst case, we'll miss some files in
+        # the changesets, but they will be part of the next changeset (on next poll).
         commit_in_progress = true
         while(commit_in_progress)
           @quiet_period ||= 5
@@ -125,7 +126,7 @@ module RSCM
     # +changesets_dir+. If there are none, this method returns nil.
     def next_changeset_identifier(d=changesets_dir)
       # See String extension at top of this file.
-      latest_id = RSCM::Visitor::YamlPersister.new(d).latest_id
+      latest_id = DamageControl::Visitor::YamlPersister.new(d).latest_id
       latest_id ? latest_id.to_s.next_changeset_id : nil
     end
     
@@ -187,11 +188,11 @@ module RSCM
       name == o.name
     end
 
-  private
-
     def changesets_persister
       RSCM::Visitor::YamlPersister.new(changesets_dir)
     end
+
+  private
 
     def project_config_file
       Directories.project_config_file(name)

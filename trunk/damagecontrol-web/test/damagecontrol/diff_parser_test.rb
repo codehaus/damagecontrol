@@ -1,12 +1,12 @@
 require 'test/unit'
 require 'rscm/tempdir'
-require 'rscm/diff_parser'
+require 'damagecontrol/diff_parser'
 
 # TODO: how do we make this work cross platform??
 # Play more with $/, $\ and such
 NL = "\r\n"
 
-module RSCM
+module DamageControl
   class DiffParserTest < Test::Unit::TestCase
     def test_should_parse_diff_to_object_model
       p = DiffParser.new

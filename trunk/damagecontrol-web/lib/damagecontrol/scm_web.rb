@@ -1,6 +1,6 @@
 require 'rscm/path_converter'
 
-module RSCM
+module DamageControl
   module SCMWeb
 
     class Null
@@ -21,7 +21,7 @@ module RSCM
       end
 
       def url
-        PathConverter.ensure_trailing_slash(baseurl)
+        RSCM::PathConverter.ensure_trailing_slash(baseurl)
       end
 
       def change_url(change, anchor=false)

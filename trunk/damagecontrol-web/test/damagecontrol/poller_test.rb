@@ -1,8 +1,11 @@
 require 'test/unit'
+require 'rubygems'
+require_gem 'rscm'
 require 'rscm/mockit'
-require 'rscm'
+require 'damagecontrol/project'
+require 'damagecontrol/poller'
 
-module RSCM
+module DamageControl
   class PollerTest < Test::Unit::TestCase
     include MockIt
   

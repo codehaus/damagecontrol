@@ -1,7 +1,7 @@
 require 'yaml'
 require 'rscm/changes'
 
-module RSCM
+module DamageControl
   module Visitor
     # Visitor that saves each ChangeSet in a folder with the name
     # of each ChangeSet's +id+.
@@ -39,7 +39,7 @@ module RSCM
         last_changeset_id = last_changeset_id.to_i
         last = ids.index(last_changeset_id)
 
-        changesets = ChangeSets.new
+        changesets = RSCM::ChangeSets.new
         if(last)
           first = last - prior + 1
           first = 0 if first < 0

@@ -1,11 +1,14 @@
-require 'rscm/changes_fixture'
-require 'rscm/visitor/diff_persister'
 require 'stringio'
+require 'rubygems'
+require_gem 'rscm'
+require 'rscm/changes_fixture'
 require 'rscm/tempdir'
+require 'damagecontrol/visitor/diff_persister'
 
-module RSCM
+module DamageControl
   module Visitor
-    class DifferTest < Test::Unit::TestCase
+    class DiffPersisterTest < Test::Unit::TestCase
+      include RSCM::ChangesFixture
 
       class MockSCM
         def initialize(checkout_dir, diffs)
@@ -20,9 +23,10 @@ module RSCM
       end
 
       def test_should_persist_diff_for_each_change
-        basedir = RSCM.new_temp_dir
+        basedir = RSCM.new_temp_dir("differ")
         ENV["RSCM_BASE"] = basedir
 
+        setup_changes
         changesets = RSCM::ChangeSets.new
         changesets.add(@change1)
         changesets.add(@change2)

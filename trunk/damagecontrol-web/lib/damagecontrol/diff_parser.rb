@@ -1,4 +1,4 @@
-module RSCM
+module DamageControl
 
   class DiffParser
 

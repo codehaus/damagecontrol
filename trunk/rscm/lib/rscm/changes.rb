@@ -1,5 +1,4 @@
 require 'xmlrpc/utils'
-require 'rscm/directories'
 require 'rscm/time_ext'
 
 module RSCM

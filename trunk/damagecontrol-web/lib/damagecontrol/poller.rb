@@ -1,7 +1,7 @@
 require 'rscm/logging'
 require 'rscm/time_ext'
 
-module RSCM
+module DamageControl
   # Polls all projects in intervals.
   class Poller
     attr_reader :projects
@@ -32,7 +32,7 @@ module RSCM
               
                 # Save the changesets to disk as YAML
                 Log.info "Saving changesets for #{project.name}"
-                changesets.accept(changesets_persister)
+                changesets.accept(project.changesets_persister)
                 Log.info "Saved changesets for #{project.name} in #{Time.now.difference_as_text(start)}"
                 start = Time.now
         
@@ -48,7 +48,7 @@ module RSCM
                 # (http://www.chadfowler.com/ruby/rss/)
                 # We'll get upto the latest 15 changesets and turn them into RSS.
                 Log.info "Generating RSS for #{project.name}"
-                last_changesets = changesets_persister.load_upto(changesets_persister.latest_id, 15)
+                last_15_changesets = project.changesets_persister.load_upto(changesets_persister.latest_id, 15)
                 RSS::Maker.make("2.0") do |rss|
                   FileUtils.mkdir_p(File.dirname(project.changesets_rss_file))
                   File.open(changesets_rss_file, "w") do |io|
@@ -60,12 +60,10 @@ module RSCM
                       project.tracker || Tracker::Null.new, 
                       project.scm_web || SCMWeb::Null.new        
                     )
-                    last_changesets.accept(rss_writer)
+                    last_15_changesets.accept(rss_writer)
                     io.write(rss.to_rss)
                   end
                 end
-                Log.info "Generated diffs for #{@name} in #{Time.now.difference_as_text(start)}"
-                Log.info "Polled everyting from #{@name} in #{Time.now.difference_as_text(all_start)}"
               end
             end
           end
@@ -93,7 +91,7 @@ module RSCM
       @t.kill if @t && @t.alive?
     end
 
-    # Adds all projects with rss enabled
+    # Adds all projects
     def add_all_projects
       Project.find_all.each do |project|
         add_project(project)

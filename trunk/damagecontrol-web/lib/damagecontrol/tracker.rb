@@ -1,6 +1,6 @@
 require 'rscm/path_converter'
 
-module RSCM
+module DamageControl
   module Tracker
 
     # Simple superclass so we can easily include mixins
@@ -33,7 +33,7 @@ module RSCM
       end
 
       def highlight(s)
-        url = PathConverter.ensure_trailing_slash(@url)
+        url = RSCM::PathConverter.ensure_trailing_slash(@url)
         if (url)
           htmlize(s.gsub(/#([0-9]+)/, "<a href=\"#{url}show_bug.cgi?id=\\1\">#\\1</a>"))
         else
@@ -54,7 +54,7 @@ module RSCM
       end
 
       def highlight(s)
-        url = PathConverter.ensure_trailing_slash(@url)
+        url = RSCM::PathConverter.ensure_trailing_slash(@url)
         if (url)
           htmlize(s.gsub(/#([0-9]+)/, "<a href=\"#{url}/ticket/\\1\">#\\1</a>"))
         else
@@ -76,11 +76,11 @@ module RSCM
       end
 
       def url
-        "#{PathConverter.ensure_trailing_slash(baseurl)}browse/#{project_id}"
+        "#{RSCM::PathConverter.ensure_trailing_slash(baseurl)}browse/#{project_id}"
       end
 
       def highlight(s)
-        url = PathConverter.ensure_trailing_slash(baseurl)
+        url = RSCM::PathConverter.ensure_trailing_slash(baseurl)
         if(url)
           htmlize(s.gsub(/([A-Z]+-[0-9]+)/, "<a href=\"#{url}browse/\\1\">\\1</a>"))
         else
@@ -146,7 +146,7 @@ module RSCM
       end
 
       def highlight(s)
-        url = PathConverter.ensure_trailing_slash(baseurl)
+        url = RSCM::PathConverter.ensure_trailing_slash(baseurl)
         if (url)
           htmlize(s.gsub(/(#{module_key}[0-9]+)/, "<a href=\"#{url}issues/id/\\1\">\\1</a>"))
         else
