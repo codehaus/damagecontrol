@@ -8,7 +8,7 @@ module RSCM
     include GenericSCMTests
 
     def create_scm(repository_root_dir, path)
-      LocalPerforce.new(repository_root_dir)
+      Perforce.new(repository_root_dir)
     end
   end
 end

@@ -1,4 +1,5 @@
 require 'damagecontrol/util/FileUtils'
+require 'pebbles/TimeUtils'
 
 module DamageControl
 

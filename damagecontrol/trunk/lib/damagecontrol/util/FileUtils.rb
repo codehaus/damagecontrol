@@ -66,7 +66,7 @@ module FileUtils
   end
     
   def find_damagecontrol_home(path='.')
-    if File.exists?("#{path}/build.rb")
+    if File.exists?("#{path}/Rakefile")
       File.expand_path(path)
     else
       find_damagecontrol_home("#{path}/..")

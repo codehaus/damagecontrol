@@ -1,4 +1,3 @@
-require 'parsedate'
 require 'rscm/parser'
 require 'rscm/changes'
 

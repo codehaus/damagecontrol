@@ -17,8 +17,15 @@ module RSCM
   class Perforce < AbstractSCM
     include FileUtils
 
-    def initialize
+    attr_accessor :depotpath
+
+    def initialize(repository_root_dir = nil)
       @clients = {}
+      @depotpath = repository_root_dir
+    end
+
+    def create
+      P4Daemon.new(@depotpath).start
     end
 
     def name
@@ -32,8 +39,8 @@ module RSCM
       end
     end
 
-    def checkout(checkout_dir, to_time=nil, simulate=false, &line_proc)
-      client(checkout_dir).checkout(to_time, simulate, &line_proc)
+    def checkout(checkout_dir, to_time=nil)
+      client(checkout_dir).checkout(to_time)
     end
 
     def add(checkout_dir, relative_filename)
@@ -68,7 +75,8 @@ module RSCM
       p4admin.uninstall_trigger(trigger_command)
     end
 
-    private
+  private
+
     def p4admin
       @p4admin ||= P4Admin.new
     end
@@ -107,6 +115,43 @@ module RSCM
     def list_files
       files = Dir["**/*"].delete_if{|f| File.directory?(f)}
       files.collect{|f| File.expand_path(f)}
+    end
+
+    class P4Daemon
+      include FileUtils
+
+      def initialize(depotpath)
+        @depotpath = depotpath
+      end
+
+      def start
+        if !running?
+          launch
+          assert_running
+        end
+      end
+
+      def assert_running
+        raise "p4d did not start properly" if timeout(10) { running? }
+      end
+
+      def launch
+        fork do
+          mkdir_p(@depotpath)
+          cd(@depotpath)
+          debug "starting p4 server"
+          exec("p4d")
+        end
+        at_exit { shutdown }
+      end
+
+      def shutdown
+        system("p4 -p 1666 admin stop")
+      end
+
+      def running?
+        !`p4 -p 1666 info`.empty?
+      end
     end
   end
 
@@ -208,14 +253,6 @@ module RSCM
       ChangeSets.new(changesets)
     end
 
-    def submit(comment)
-      IO.popen(p4cmd("submit -i"), "w+") do |io|
-        io.puts(submitspec(comment))
-        io.close_write
-        io.each_line {|progress| debug progress}
-      end
-    end
-
     def edit(file)
       p4("edit #{file}")
     end
@@ -228,24 +265,47 @@ module RSCM
       files.each {|file| add_file(file)}
     end
 
+    def submit(comment)
+      IO.popen(p4cmd("submit -i"), "w+") do |io|
+        io.puts(submitspec(comment))
+        io.close_write
+        io.each_line {|progress| debug progress}
+      end
+    end
+
+    def checkout(scm_to_time=nil)
+      checked_out_files = []
+      p4("sync").collect do |output| 
+        puts "output: '#{output}'"
+        if(output =~ /.* - (added as|updating|deleted as) #{@rootdir}[\/|\\](.*)/)
+          path = $2.gsub(/\\/, "/")
+          checked_out_files << path
+          yield path if block_given?
+        end
+      end
+      checked_out_files
+    end
+
+  private
+
     def add_file(absolute_path)
+      absolute_path = PathConverter.filepath_to_nativepath(absolute_path, true)
       p4("add #{absolute_path}")
     end
 
-    def checkout(scm_to_time=nil, simulate=false, &line_proc)
-      p4("sync").collect {|output| $2 if output =~ /.* - (added as|updating|deleted as) #{@rootdir}\/(.*)/}
-    end
-
-    private
     def changelists(from_time, to_time)
       from = from_time.strftime(DATE_FORMAT)
       to = to_time.strftime(DATE_FORMAT)
       p4changes(from, to).collect do |line|
-        P4Changelist.new(p4describe($1)) if line =~ /^Change (\d+) /
+        if line =~ /^Change (\d+) /
+          log = p4describe($1)
+          P4Changelist.new(log) unless log == ""
+        end
       end
     end
 
     def to_changeset(changelist)
+      return nil if changelist.nil? # Ugly, but it seems to be nil some times on windows.
       changes = changelist.files.collect do |filespec|
         change = Change.new(filespec.path, changelist.developer, changelist.message, filespec.revision, changelist.time)
         change.status = STATUS[filespec.status]
@@ -302,8 +362,12 @@ module RSCM
 
       def initialize(log)
         debug log
-        log =~ /^Change (\d+) by (.*) on (.*)$/
-        @number, @developer, @time = Integer($1), $2, Time.utc(*ParseDate.parsedate($3)[0..5])
+        if(log =~ /^Change (\d+) by (.*) on (.*)$/)
+#          @number, @developer, @time = $1.to_i, $2, Time.utc(*ParseDate.parsedate($3)[0..5])
+          @number, @developer, @time = $1.to_i, $2, Time.utc(*ParseDate.parsedate($3))
+        else
+          raise "Bad log format: '#{log}'"
+        end
 
         if log =~ /Change (.*)\n\n(.*)\n\nAffected/m
           @message = $2.strip.gsub(/\n\t/, "\n")
@@ -319,67 +383,11 @@ module RSCM
     end
   end
 
-  class LocalPerforce < Perforce
-    attr_accessor :depotpath
-
-    def initialize(repository_root_dir = nil)
-      super()
-      @depotpath = repository_root_dir
-    end
-
-    def create
-      P4Daemon.new(@depotpath).start
-    end
-
-    class P4Daemon
-      include FileUtils
-
-      def initialize(depotpath)
-        @depotpath = depotpath
-      end
-
-      def start
-        if !running?
-          launch
-          assert_running
-        end
-      end
-
-      def assert_running
-        raise "p4d did not start properly" if timeout(10) { running? }
-      end
-
-      def launch
-        fork do
-          mkdir_p(@depotpath)
-          cd(@depotpath)
-          debug "starting p4 server"
-          exec("p4d")
-        end
-        at_exit { shutdown }
-      end
-
-      def shutdown
-        system("p4 -p 1666 admin stop")
-      end
-
-      def running?
-        !`p4 -p 1666 info`.empty?
-      end
-    end
-
-  end
 end
 
 module Kernel
-  alias old_system system
-  def system(cmd)
-    puts "> system: #{cmd}"
-    result = old_system(cmd)
-    raise "#{cmd} failed with code #{$?.to_s}" unless $? == 0
-    result
-  end
 
+  # TODO: use Ruby's built-in timeout? (require 'timeout')
   def timeout(attempts=5, &proc)
     0.upto(attempts) do
       sleep 1
@@ -393,26 +401,6 @@ module Kernel
     puts msg
   end
 
-  def assert(is_true, msg)
-    raise msg unless is_true
-  end
-
-  def pause
-    puts "Enter to continue"
-    $stdin.getc
-    puts "unpausing"
-  end
-
-end
-
-class IO
-  class << self
-    alias old_popen popen
-    def popen(cmd, modestring = "r", &proc)
-      puts "> IO.popen: #{cmd}"
-      old_popen(cmd, modestring, &proc)
-    end
-  end
 end
 
 class Time

@@ -133,7 +133,7 @@ module RSCM
     end
 
     def time=(t)
-      raise "time must be a Time object" unless t.is_a?(Time)
+      raise "time must be a Time object - it was a #{t.class.name} with the string value #{t}" unless t.is_a?(Time)
       raise "can't set time to an inferiour value than the previous value" if @time && (t < @time)
       @time = t
     end

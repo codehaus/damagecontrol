@@ -3,6 +3,8 @@ require 'pebbles/mockit'
 require 'damagecontrol/publisher/IRCPublisher'
 require 'damagecontrol/core/Build'
 require 'damagecontrol/util/FileUtils'
+require 'rubygems'
+require_gem 'rscm'
 
 module DamageControl
 
@@ -64,8 +66,8 @@ module DamageControl
       
       build = Build.new("project")
       build.dc_creation_time = Time.utc(2004, 9, 3, 15, 0, 0)
-      build.changesets.add(Change.new("file.txt", "jtirsen", "bad ass refactoring", "3.2", now))
-      build.changesets.add(Change.new("other_file.txt", "jtirsen", "bad ass refactoring", "5.1", now))
+      build.changesets.add(RSCM::Change.new("file.txt", "jtirsen", "bad ass refactoring", "3.2", now))
+      build.changesets.add(RSCM::Change.new("other_file.txt", "jtirsen", "bad ass refactoring", "5.1", now))
       @publisher.on_message(BuildRequestEvent.new(build))
       @publisher.on_message(BuildStartedEvent.new(build))
     end

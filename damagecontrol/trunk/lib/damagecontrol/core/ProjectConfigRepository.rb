@@ -92,10 +92,8 @@ module DamageControl
     def create_build(project_name)
       build = Build.new(project_name, project_config(project_name), @public_web_url)
       build.dc_creation_time = Time.new.utc
-      ymdHMS = build.dc_creation_time.ymdHMS
       build.scm = create_scm(project_name)
       build.label = peek_next_build_label(project_name).to_s
-      build.archive_dir = @project_directories.archive_dir(project_name, ymdHMS)
       build
     end
     

@@ -5,6 +5,8 @@ require 'damagecontrol/core/Build'
 require 'damagecontrol/publisher/JIRAPublisher'
 require 'ftools'
 require 'cgi'
+require 'rubygems'
+require_gem 'rscm'
 
 module DamageControl
 
@@ -32,7 +34,7 @@ module DamageControl
     def test_jira_issue_is_filed_upon_failing_build_complete_event    
       build = Build.new("test_project", {"jira_project_key" => "DC"})
       build.status = Build::FAILED
-      change = Change.new("", "", "", "", Time.new.utc)
+      change = RSCM::Change.new("", "", "", "", Time.new.utc)
       change.developer = "damagecontrol"
       build.changesets.add(change)
       

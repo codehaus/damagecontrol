@@ -18,6 +18,7 @@ require 'damagecontrol/xmlrpc/Trigger'
 require 'damagecontrol/util/Logging'
 require 'rubygems'
 require_gem 'rscm'
+require 'win32/process' if(WIN32)
 
 module DamageControl
 
@@ -181,13 +182,20 @@ class DamageControlServerDriver < Driver
   end
   
   def start_damagecontrol_forked
-    @exit_status = nil
-    @pid = fork do
-      exec("ruby", "-I#{damagecontrol_home}/server", startup_script, basedir, timeout.to_s, ONLINE.to_s)
+    begin
+      @exit_status = nil
+      @pid = fork do
+        exec("ruby", "-I#{damagecontrol_home}/server", startup_script, basedir, timeout.to_s, ONLINE.to_s)
+      end
+      at_exit { forcibly_kill_server if server_running? }
+      wait_for(15) { server_running? }
+      assert_server_running
+    rescue NotImplementedError
+      msg = "You must install support for fork in order to run the test suite on Windows\n" +
+            "This is only required for the test suite - not required for DC itself\n" +
+            "Download win32utils-installer from http://rubyforge.org/projects/win32utils"
+      raise msg
     end
-    at_exit { forcibly_kill_server if server_running? }
-    wait_for(15) { server_running? }
-    assert_server_running
   end
   
   def bindir

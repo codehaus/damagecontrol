@@ -1,9 +1,9 @@
+WIN32 = RUBY_PLATFORM == "i386-mswin32"
+CYGWIN = RUBY_PLATFORM == "i386-cygwin"
+WINDOWS = WIN32 || CYGWIN
+
 module RSCM
   module PathConverter
-    WIN32 = RUBY_PLATFORM == "i386-mswin32"
-    CYGWIN = RUBY_PLATFORM == "i386-cygwin"
-    WINDOWS = WIN32 || CYGWIN
-
     def filepath_to_nativepath(path, escaped)
       path = File.expand_path(path)
       if(WIN32)
