@@ -51,3 +51,4 @@ end
 
 project = Project.new
 project.run(ARGV)
+
