@@ -1,23 +1,24 @@
-server = "irc.codehaus.org"
-channel = "#damagecontrol"
-
 $damagecontrol_home = File::expand_path('../..')
 $:<<"#{$damagecontrol_home}/src/ruby"
 
+require 'damagecontrol/Hub'
 require 'damagecontrol/SocketTrigger'
 require 'damagecontrol/BuildExecutor'
-require 'damagecontrol/IRCPublisher'
-require 'damagecontrol/BuildBootstrapper'
+require 'damagecontrol/LogWriter'
+require 'damagecontrol/template/ShortTextTemplate'
+require 'damagecontrol/template/HTMLTemplate'
+require 'damagecontrol/publisher/IRCPublisher'
+require 'damagecontrol/publisher/FilePublisher'
 
 include DamageControl
 
 hub = Hub.new
 
-# all the comps
-BuildExecutor.new(hub)
-BuildBootstrapper.new(hub, "foo").start
-IRCPublisher.new(hub, server, channel).start
-SocketTrigger.new(hub).start
+BuildExecutor.new(hub, "dc_builds")
+LogWriter.new(hub, "dc_logs")
+FilePublisher.new(hub, "dc_reports", HTMLTemplate.new).start
+IRCPublisher.new(hub, "irc.codehaus.org", "\#damagecontrol", ShortTextTemplate.new).start
+st = SocketTrigger.new(hub, "C:\\dc", 4713).start
 
-# sleep until ctrl-c
-sleep
+# wait until ctrl-c
+st.join

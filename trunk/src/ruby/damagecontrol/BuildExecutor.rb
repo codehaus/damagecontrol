@@ -27,6 +27,7 @@ module DamageControl
     end
 
     def execute
+      @filesystem.makedirs(project_base_dir)
       @filesystem.chdir(project_base_dir)
       current_build.successful = IO.popen(current_build.build_command_line) do |output|
         output.each_line do |line|
@@ -39,10 +40,6 @@ module DamageControl
       "#{@builds_dir}/#{current_build.project_name}"
     end
 
-    def report_progress(progress)
-      @channel.publish_message(BuildProgressEvent.new(current_build, progress))
-    end
-
     def receive_message(message)
       if message.is_a? BuildRequestEvent
         @current_build = message.build
@@ -51,6 +48,13 @@ module DamageControl
         @channel.publish_message(BuildCompleteEvent.new(current_build))
       end
     end
+
+  private
+
+    def report_progress(progress)
+      @channel.publish_message(BuildProgressEvent.new(current_build, progress))
+    end
+
   end
   
 end
