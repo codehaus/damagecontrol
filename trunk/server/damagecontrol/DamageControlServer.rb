@@ -180,7 +180,7 @@ module DamageControl
       httpd.mount("/public/xmlrpc", public_xmlrpc_servlet)
       
       httpd.mount("/public/dashboard", DashboardServlet.new(:public, build_history_repository, project_config_repository, build_scheduler))
-      httpd.mount("/public/project", ProjectServlet.new(:public, build_history_repository, project_config_repository, nil, build_scheduler, report_classes, public_web_url + "rss"))
+      httpd.mount("/public/project", ProjectServlet.new(:public, build_history_repository, project_config_repository, nil, build_scheduler, report_classes, public_web_url + "rss", trig_xmlrpc_url))
       httpd.mount("/public/search", SearchServlet.new(build_history_repository))
       httpd.mount("/public/log", LogFileServlet.new(project_directories))
       httpd.mount("/public/root", indexing_file_handler)
@@ -213,12 +213,12 @@ module DamageControl
       DamageControl::XMLRPC::StatusPublisher.new(private_xmlrpc_servlet, build_history_repository)
       DamageControl::XMLRPC::ConnectionTester.new(private_xmlrpc_servlet)
       DamageControl::XMLRPC::ServerControl.new(private_xmlrpc_servlet, hub)
-      component(:trigger, DamageControl::XMLRPC::Trigger.new(private_xmlrpc_servlet, @hub, project_config_repository, checkout_manager, public_web_url))
+      component(:trigger, DamageControl::XMLRPC::Trigger.new(private_xmlrpc_servlet, @hub, checkout_manager, public_web_url))
       # For private authenticated and encrypted (with eg an Apache proxy) XML-RPC connections like triggering a build
       httpd.mount("/private/xmlrpc", private_xmlrpc_servlet)
 
       httpd.mount("/private/dashboard", DashboardServlet.new(:private, build_history_repository, project_config_repository, build_scheduler))
-      httpd.mount("/private/project", ProjectServlet.new(:private, build_history_repository, project_config_repository, trigger, build_scheduler, report_classes, public_web_url + "rss"))
+      httpd.mount("/private/project", ProjectServlet.new(:private, build_history_repository, project_config_repository, trigger, build_scheduler, report_classes, public_web_url + "rss", trig_xmlrpc_url))
       httpd.mount("/private/install_trigger", InstallTriggerServlet.new(project_config_repository, trig_xmlrpc_url))
       httpd.mount("/private/configure", ConfigureProjectServlet.new(project_config_repository, scm_configurator_classes, trig_xmlrpc_url))
       httpd.mount("/private/search", SearchServlet.new(build_history_repository))
@@ -257,13 +257,13 @@ module DamageControl
     end
     
     def init_build_scheduler
-      component(:checkout_manager, CheckoutManager.new(hub, project_directories, project_config_repository, build_history_repository))
+      component(:checkout_manager, CheckoutManager.new(hub, project_directories, project_config_repository))
       component(:log_writer, LogWriter.new(hub))
       component(:log_merger, LogMerger.new(hub, project_directories))
       component(:artifact_archiver, ArtifactArchiver.new(hub, project_directories))
       component(:build_number_increaser, BuildNumberIncreaser.new(hub, project_config_repository))
-      component(:dependent_build_trigger, DependentBuildTrigger.new(hub, project_config_repository))
-      component(:build_scheduler, BuildScheduler.new(hub))
+      component(:dependent_build_trigger, DependentBuildTrigger.new(hub))
+      component(:build_scheduler, BuildScheduler.new(hub, project_config_repository))
       init_build_executors
     end
     
@@ -280,7 +280,7 @@ module DamageControl
 
       if(polling_interval > 0)
         component(:scm_poller, 
-          SCMPoller.new(hub, polling_interval, project_config_repository, build_scheduler, checkout_manager))
+          SCMPoller.new(hub, polling_interval, project_config_repository, build_scheduler))
       end
     end
     
