@@ -146,6 +146,7 @@ module DamageControl
     def upgrade_project_config(config_map)
       config_map["scm"] = create_scm_from_old_config(config_map) unless config_map["scm"]
       
+      upgrade_renamed_key("view_cvs_url", "scm_web_url", config_map)
       upgrade_renamed_key("cvs_web_url", "scm_web_url", config_map)
       upgrade_renamed_key("logs_to_archive", "logs_to_merge", config_map)
       
