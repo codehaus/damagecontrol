@@ -3,6 +3,15 @@
     <File name="./gui.glade" subtype="Code" buildaction="EmbedAsResource" dependson="" data="" />
     <File name="./Main.cs" subtype="Code" buildaction="Compile" dependson="" data="" />
     <File name="./AssemblyInfo.cs" subtype="Code" buildaction="Compile" dependson="" data="" />
+    <File name="./SettingsWindow.cs" subtype="Code" buildaction="Compile" dependson="" data="" />
+    <File name="./ProjectWindow.cs" subtype="Code" buildaction="Compile" dependson="" data="" />
+    <File name="./egg-sharp.dll" subtype="Code" buildaction="EmbedAsResource" dependson="" data="" />
+    <File name="./libegg.so" subtype="Code" buildaction="EmbedAsResource" dependson="" data="" />
+    <File name="./TrayIcon.cs" subtype="Code" buildaction="Compile" dependson="" data="" />
+    <File name="./gray-24.png" subtype="Code" buildaction="EmbedAsResource" dependson="" data="" />
+    <File name="./green-24.png" subtype="Code" buildaction="EmbedAsResource" dependson="" data="" />
+    <File name="./red-24.png" subtype="Code" buildaction="EmbedAsResource" dependson="" data="" />
+    <File name="./Settings.cs" subtype="Code" buildaction="Compile" dependson="" data="" />
   </Contents>
   <References>
     <Reference type="Gac" refto="gtk-sharp, Version=1.0.0.0, Culture=neutral, PublicKeyToken=35e10195dab3c99f" localcopy="True" />
@@ -13,6 +22,9 @@
     <Reference type="Gac" refto="glade-sharp, Version=1.0.0.0, Culture=neutral, PublicKeyToken=35e10195dab3c99f" localcopy="True" />
     <Reference type="Project" refto="DamageControlClientNet" localcopy="True" />
     <Reference type="Project" refto="XmlRpcCs" localcopy="True" />
+    <Reference type="Assembly" refto="./egg-sharp.dll" localcopy="True" />
+    <Reference type="Gac" refto="gconf-sharp, Version=1.0.0.0, Culture=neutral, PublicKeyToken=35e10195dab3c99f" localcopy="True" />
+    <Reference type="Gac" refto="gconf-sharp-peditors, Version=1.0.0.0, Culture=neutral, PublicKeyToken=35e10195dab3c99f" localcopy="True" />
   </References>
   <DeploymentInformation target="" script="" strategy="File" />
   <Configuration runwithwarnings="False" name="Debug">

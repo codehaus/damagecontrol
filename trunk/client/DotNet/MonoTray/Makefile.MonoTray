@@ -3,20 +3,35 @@
 
 SOURCES = \
 ./Main.cs \
-./AssemblyInfo.cs
+./AssemblyInfo.cs \
+./SettingsWindow.cs \
+./ProjectWindow.cs \
+./TrayIcon.cs \
+./Settings.cs
 
 RESOURCES = \
-./gui.glade
+./gui.glade \
+./egg-sharp.dll \
+./libegg.so \
+./gray-24.png \
+./green-24.png \
+./red-24.png
 
 RESOURCES_BUILD = $(foreach res,$(RESOURCES), $(addprefix -resource:,$(res)),$(notdir $(res)))
 
 PKG_REFERENCES = \
 gtk-sharp \
-glade-sharp
+glade-sharp \
+gconf-sharp
 
 PKG_REFERENCES_BUILD = $(addprefix -pkg:, $(PKG_REFERENCES))
 
 PKG_REFERENCES_CHECK = $(addsuffix .pkgcheck, $(PKG_REFERENCES))
+
+ASSEMBLY_REFERENCES = \
+"./egg-sharp.dll"
+
+ASSEMBLY_REFERENCES_BUILD = $(addprefix -r:, $(ASSEMBLY_REFERENCES))
 
 PROJECT_REFERENCES = \
 "../DamageControlClientNet/DamageControlClientNet.dll" \
@@ -29,7 +44,7 @@ MCS_OPTIONS =
 all: MonoTray.exe
 
 MonoTray.exe: $(SOURCES) $(RESOURCES)
-	mcs $(MCS_OPTIONS) -target:exe -out:"MonoTray.exe" $(RESOURCES_BUILD) $(PKG_REFERENCES_BUILD) $(PROJECT_REFERENCES_BUILD) $(SOURCES) \
+	mcs $(MCS_OPTIONS) -target:exe -out:"MonoTray.exe" $(RESOURCES_BUILD) $(PKG_REFERENCES_BUILD) $(ASSEMBLY_REFERENCES_BUILD) $(PROJECT_REFERENCES_BUILD) $(SOURCES) \
 	&& cp "MonoTray.exe" ../build/bin/.
 
 clean:
