@@ -50,7 +50,7 @@ nag_email: nag_email
         expected
       }
 
-      t = XMLRPCTrigger.new(XMLRPC::WEBrickServlet.new, hub, "/foo")
+      t = XMLRPCTrigger.new(XMLRPC::WEBrickServlet.new, hub, "#{damagecontrol_home}/target/temp_xmlrpctrigger_#{Time.new.to_i}")
       def t.set_mock_file(mock_file)
         @mock_file = mock_file
       end
