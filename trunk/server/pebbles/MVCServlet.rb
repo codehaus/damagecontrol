@@ -58,10 +58,7 @@ module Pebbles
     
     def erb(template, binding)
       response["Content-Type"] = "text/html"
-      template = ""
-      File.open("#{templatedir}/#{template}") do |io|
-        template = io.read.untaint
-      end
+      template = File.new("#{templatedir}/#{template}").read.untaint
       response.body = ERB.new(template).result(binding)
     end
   end
