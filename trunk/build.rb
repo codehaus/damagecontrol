@@ -121,12 +121,24 @@ class Project
     DamageControl::VERSION
   end
   
+  def target_dir
+    params["target_dir"] || "target"
+  end
+  
+  def dist_dir
+    params["dist_dir"] || "#{target_dir}/dist"
+  end
+  
+  def dist
+    dist_nodeps
+  end
+  
   def dist_nodeps
-    mkdir_p("target/dist")
-    cp("license.txt", "target/dist")
-    cp("release-notes.txt", "target/dist")
-    copy_dir("bin", "target/dist/bin")
-    copy_dir("server", "target/dist/server")
+    mkdir_p(dist_dir)
+    cp("license.txt", dist_dir)
+    cp("release-notes.txt", dist_dir)
+    copy_dir("bin", "#{dist_dir}/bin")
+    copy_dir("server", "#{dist_dir}/server")
     generate_startup_scripts
   end
   
@@ -139,7 +151,7 @@ class Project
       "newproject" => "server/damagecontrol/tool/admin/newproject.rb",
       "requestbuild" => "server/damagecontrol/tool/admin/requestbuild.rb",
       "shutdownserver" => "server/damagecontrol/tool/admin/shutdownserver.rb"
-    }.each{|s, t| generate_startup_script("target/dist/bin/#{s}", t) }
+    }.each{|s, t| generate_startup_script("#{dist_dir}/bin/#{s}", t) }
   end
   
   def generate_startup_script(script, target)
@@ -291,11 +303,18 @@ class Project
   
   def parse_args(args)
     self.targets = args.dup.delete_if {|t| t =~/-.*/}
+    validate_targets
     self.params = {}
     args.each do |t| 
       if(t =~/-D(.*)=(.*)/)
         params[$1] = $2.strip
       end
+    end
+  end
+  
+  def validate_targets
+    targets.each do |t| 
+      fail("no such target #{t}") unless self.respond_to?(t)
     end
   end
   
