@@ -26,5 +26,18 @@ module DamageControl
 		def is_special_filename(filename)
 			filename == '.' || filename == '..'
 		end
+		
+		def damagecontrol_home
+			if $damagecontrol_home.nil?
+				"../.."
+			else
+				$damagecontrol_home
+			end
+		end
+		
+		# returns file relative damagecontrol-home
+		def damagecontrol_file(filename)
+			"#{damagecontrol_home}/#{filename}"
+		end
 	end
 end

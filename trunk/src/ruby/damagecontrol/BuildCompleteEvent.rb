@@ -2,6 +2,7 @@ module DamageControl
 
 	class BuildCompleteEvent
 		attr_reader :project
+		attr_accessor :build
 
 		def initialize (project)
 			@project = project

@@ -37,9 +37,6 @@ module DamageControl
 				end
 			end
 	
-			#
-			# respond to join
-			#
 			def on_recv_cmnd_join(msg)
 				@current_channel=msg.to
 			end
@@ -103,6 +100,7 @@ module DamageControl
 		def receive_message(message)
 			enq_message(message)
 		end
+
 	end
 
 end
