@@ -151,8 +151,9 @@ module DamageControl
     def init_config_services
       component(:hub, Hub.new)
       
+      component(:scm_factory, SCMFactory.new)
       component(:project_directories, @project_directories)
-      component(:project_config_repository, ProjectConfigRepository.new(project_directories, public_web_url))
+      component(:project_config_repository, ProjectConfigRepository.new(project_directories, scm_factory, public_web_url))
       component(:build_history_repository, BuildHistoryRepository.new(hub, @project_directories))
     end
     
@@ -162,7 +163,6 @@ module DamageControl
       component(:warning_server, WarningServer.new())
       component(:log_writer, LogWriter.new(hub, project_directories))
       component(:host_verifier, if allow_ips.nil? then OpenHostVerifier.new else HostVerifier.new(allow_ips) end)
-      component(:scm_factory, SCMFactory.new)
       
       init_build_scheduler
       init_scm_poller

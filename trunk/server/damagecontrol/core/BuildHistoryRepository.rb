@@ -55,6 +55,10 @@ module DamageControl
       end
     end
     
+    def build_with_number(project_name, label)
+      history(project_name).find {|b| b.label.to_s == label.to_s }
+    end
+    
     def history(project_name)
       return [] unless @history.has_key?(project_name)
       result = @history[project_name]

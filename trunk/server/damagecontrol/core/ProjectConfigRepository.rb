@@ -25,11 +25,13 @@ module DamageControl
     include FileUtils
     
     attr_reader :project_directories
+    attr_reader :scm_factory
     attr_reader :public_web_url
     
-    def initialize(project_directories, public_web_url)
+    def initialize(project_directories, scm_factory, public_web_url)
       @project_directories = project_directories
       @public_web_url = public_web_url
+      @scm_factory = scm_factory
     end
     
     def project_exists?(project_name)
@@ -72,6 +74,10 @@ module DamageControl
       build = Build.new(project_name, timestamp, project_config(project_name))
       build.url = "#{public_web_url}/project?action=build_details&project_name=#{build.project_name}&timestamp=#{build.timestamp}"
       build
+    end
+    
+    def create_scm(project_name)
+      scm_factory.get_scm(project_config(project_name), checkout_dir(project_name))
     end
 
   private
