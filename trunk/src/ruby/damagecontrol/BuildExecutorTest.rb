@@ -45,7 +45,7 @@ module DamageControl
     def test_build_failed
     
       build = Build.new( \
-        "DamageControlled", \
+        "damagecontrolled", \
         ":local:/foo/bar:zap", \
         "#{ant} compile")
       
