@@ -172,6 +172,7 @@ module DamageControl
     def load(project_name)
       builds = nil
       filename = history_file(project_name)
+			logger.info("Loading project #{project_name} with history #{filename}")
       if(File.exist?(filename))
         file = File.new(filename)
         begin
@@ -185,7 +186,14 @@ module DamageControl
           rescue
           end
           upgrade_to_new_and_store_old(filename)
-          builds = []
+					backupfile = "#{filename}.old"
+					if (File.exists?(backupfile))
+						logger.info("Using backupfile #{backupfile} instead")
+						File.rename(backupfile, filename)
+						builds = load(project_name)
+					else
+          	builds = []
+					end
         end
       end
       builds
