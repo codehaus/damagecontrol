@@ -1,4 +1,4 @@
-The DamageControl Team (Jon Tirsen and Aslak Hellesoy) are proud to release DamageControl 0.2 prerelease (this prerelease is for Windows only).
+The DamageControl Team (Jon Tirsen and Aslak Hellesoy) are proud to release DamageControl 0.2 (this rerelease is for Windows only).
 
 <a href="http://damagecontrol.codehaus.org/">http://damagecontrol.codehaus.org/</a>
 
