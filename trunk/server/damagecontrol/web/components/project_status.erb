@@ -12,41 +12,19 @@
 project_statuses.each do |project|
 %>
 <tr>
-    <td rowspan="2"><img width="32" height="32" src="<%= project.image %>" /></td>
-    <td rowspan="2"><a href="<%= project.href %>"><%= project.name %><%= project.label %></a></td>
+    <td><img width="32" height="32" src="<%= project.image %>" /></td>
+    <td><a href="<%= project.href %>"><%= project.name %><%= project.label %></a></td>
     <td><%= project.time_since_last_success %></td>
     <td><%= project.last_duration %></td>
     <td><%= project.current_duration %></td>
     <% if private? %>
-    <td rowspan="2" align="center" style="border-left: 1px solid #bbb; color: #bbb;"> <a href="configure?project_name=<%= project.name %>&action=configur
+    <td align="center" style="border-left: 1px solid #bbb; color: #bbb;"> <a href="configure?project_name=<%= project.name %>&action=configur
 e" title="Configure <%= project.name %>"><img src="icons/wrench.png" width="24" height="24"/></a>
         | <a href="project?project_name=<%= project.name %>&action=trig_build" title="Trigger build for <%= project.name %>"><img src="icons/gears_run.png
 " width="24" height="24"/></a></td>
     <% else %>
        <td>&nbsp;</td>
     <% end %>
-</tr>
-<tr>
-    <td>&nbsp;</td>
-    <td>
-      <% if project.current_build then %>
-        <%= project.current_build.status %>
-      <% else %>
-        &nbsp;
-      <% end %>
-    </td>
-    <td>
-      <% if project.percentage_left != 0 then %>
-      <table class="progress-bar">
-        <tr>
-          <td width="<%= project.percentage_done %>" class="progress-bar-done">&nbsp;</td>
-          <td width="<%= project.percentage_left %>" class="progress-bar-left">&nbsp;</td>
-        </tr>
-      </table>
-      <% else %>
-      &nbsp;
-      <% end %>
-    </td>
 </tr>
 <%
 end
