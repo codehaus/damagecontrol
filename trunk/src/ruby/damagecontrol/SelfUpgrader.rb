@@ -18,6 +18,8 @@ module DamageControl
     end
     
     def do_exit
+      # let the publishers get a chance to publish before we die
+      sleep(5)
       exit
     end
   end
