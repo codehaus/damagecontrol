@@ -18,7 +18,9 @@ module DamageControl
     
     def content
       changesets = selected_build.changesets
-      no_changes_in_this_build = "No changes in this build"
+      no_changes_in_this_build =
+        %{No changes in this build (this could happen because the build was manually trigged,
+the working directory has been cleaned out, or because there has been no successful builds for this project yet)}
       erb("components/changes.erb", binding)
     end
     

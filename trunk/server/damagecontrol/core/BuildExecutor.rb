@@ -125,7 +125,7 @@ module DamageControl
     def status_message
       status = ""
       if busy? then
-        status = "Building #{scheduled_build.project_name}: #{scheduled_build.status}"
+        status = "Building <a href=\"project?project_name=#{scheduled_build.project_name}\">#{scheduled_build.project_name}</a>: #{scheduled_build.status}"
       else
         status = "Idle"
       end
@@ -163,8 +163,9 @@ module DamageControl
         # (might be a new project, see comment above)
         if last_successful_build.nil?
           logger.info("does not determine changesets because there were no last successful build")
+          return
         end
-        from_time = last_successful_build.timestamp_as_time        
+        from_time = last_successful_build.timestamp_as_time
         to_time = current_build.timestamp_as_time
         logger.info("determining change set for #{current_build.project_name}, from #{from_time} to #{to_time}")
         changesets = current_scm.changesets(from_time, to_time) {|p| report_progress(p)}

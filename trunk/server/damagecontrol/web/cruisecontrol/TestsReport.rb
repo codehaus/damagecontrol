@@ -26,11 +26,21 @@ module DamageControl
       
       def xslt(stylesheet_file)
         result = ""
-        cmd_with_io(Dir.pwd, "xsltproc #{stylesheet_file} #{selected_build.xml_log_file}") do |io|
-          io.each_line do |line|
-            #puts line
-            result += line
+        begin
+          cmd_with_io("#{damagecontrol_home}/bin", "xsltproc '#{stylesheet_file}' '#{selected_build.xml_log_file}'") do |io|
+            io.each_line do |line|
+              puts line
+              result += line
+            end
           end
+        rescue Pebbles::ProcessFailedException => e
+          logger.error(format_exception(e))
+          result += "Error executing XSLT process: #{e.message}\n"
+          result += %{
+This could happen for the following reasons:
+  xsltproc is not installed properly, or
+  might not be on the path, or
+  might be of a version that is incompatible with DamageControl.}
         end
         result
       end

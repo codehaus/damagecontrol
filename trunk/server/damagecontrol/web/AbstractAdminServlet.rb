@@ -143,7 +143,7 @@ module DamageControl
   private
     def build_url(build)
       return nil unless build
-      "?action=build_details&project_name=#{build.project_name}&timestamp=#{build.timestamp}"
+      "?project_name=#{build.project_name}&timestamp=#{build.timestamp}"
     end
     
     def build_status(build)
