@@ -13,20 +13,20 @@ module DamageControl
     
     def content
       xslt(stylesheet_file(stylesheet), selected_build.xml_log_file, "#{selected_build.xml_log_file}.html")
-      read "#{selected_build.xml_log_file}.html"
+      File.new("#{selected_build.xml_log_file}.html").read
     end
     
-    protected
-    
-      def stylesheet
-        raise "you have to implement #{stylesheet}"
-      end
-    
-    private
-      
-      def stylesheet_file(name)
-        File.expand_path("#{template_dir}/#{name}")
-      end
+  protected
+
+    def stylesheet
+      raise "you have to implement #{stylesheet}"
+    end
+
+  private
+
+    def stylesheet_file(name)
+      File.expand_path("#{template_dir}/#{name}")
+    end
       
   end
   
