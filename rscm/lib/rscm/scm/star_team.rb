@@ -18,7 +18,7 @@ module RSCM
   # * Apache Ant (http://ant.apache.org/)
   #
   class StarTeam < AbstractSCM
-    AbstractSCM.register(self)
+    register self
 
     ann :description => "User name"
     attr_accessor :user_name

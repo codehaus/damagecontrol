@@ -11,7 +11,7 @@ module RSCM
   #
   # NOTE: On Cygwin these have to be the win32 builds of svn/svnadmin and not the Cygwin ones.
   class Subversion < AbstractSCM
-    AbstractSCM.register(self)
+    register self
 
     include FileUtils
     include PathConverter

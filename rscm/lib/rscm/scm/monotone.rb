@@ -3,7 +3,7 @@ require 'fileutils'
 
 module RSCM
   class Monotone < AbstractSCM
-    AbstractSCM.register(self)
+    register self
 
     def initialize(db_file=nil, branch=nil, key=nil, passphrase=nil, keys_file=nil)
       @db_file = File.expand_path(db_file) if db_file

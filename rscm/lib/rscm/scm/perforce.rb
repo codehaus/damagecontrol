@@ -15,7 +15,7 @@ module RSCM
   # You need the p4/p4d executable on the PATH in order for it to work.
   #
   class Perforce < AbstractSCM
-    AbstractSCM.register(self)
+    register self
 
     include FileUtils
 
