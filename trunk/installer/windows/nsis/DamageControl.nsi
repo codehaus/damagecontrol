@@ -12,7 +12,6 @@
 
   !define ROOTDIR "..\..\.."
   !define DISTDIR "..\..\..\target\dist"
-  !define RUBY_HOME "C:\ruby"
   
   ; VERSION needs to be defined on the command line with /DVERSION=1.2.3 option
   

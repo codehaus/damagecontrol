@@ -1,0 +1,46 @@
+<img src="http://www.wincvs.org/cvs.png"/>
+<table>
+  <tr>
+    <td class="config_cell">CVSROOT</td>
+    <td><input class="scm_info" name="cvsroot" id="cvsroot" onKeyUp="distributeCvsrootFields()" type="text" value=<%= project_config['cvsroot'].inspect %>></td>
+  </tr>
+  <tr>
+    <td>Protocol</td>
+    <td>
+      <select class="scm_info" id="cvsprotocol" onchange="updateCvsRootField()">
+        <option value=""></option>
+        <option value="ext" selected>Secure shell (:ext:)</option>
+        <option value="pserver">Password server (:pserver:)</option>
+        <option value="local">Locally mounted folder (:local:)</option>
+      </select>
+    </td>
+  </tr>
+  <tr>
+    <td>User name</td>
+    <td><input class="scm_info" id="cvsuser" onKeyUp="updateCvsRootField()" type="text"></td>
+  </tr>
+  <tr>
+    <td>Password</td>
+    <td><input class="scm_info" name="cvspassword" id="cvspassword" onKeyUp="updateCvsRootField()" type="text"></td>
+  </tr>
+  <tr>
+    <td>Server</td>
+    <td><input class="scm_info" id="cvsserver" onKeyUp="updateCvsRootField()" type="text"></td>
+  </tr>
+  <tr>
+    <td>Port</td>
+    <td><input class="scm_info" id="cvsport" onKeyUp="updateCvsRootField()" type="text"></td>
+  </tr>
+  <tr>
+    <td>Repository directory</td>
+    <td><input class="scm_info" id="cvsrepodir" onKeyUp="updateCvsRootField()" type="text"></td>
+  </tr>
+  <tr>
+    <td>Module</td>
+    <td><input class="scm_info" name="cvsmodule" id="cvsmodule" onKeyUp="updateCvsRootField()" type="text" value="<%= project_config['cvsmodule'] %>"></td>
+  </tr>
+  <tr>
+    <td>ViewCVS base URL</td>
+    <td><input class="scm_info" name="view_cvs_url" id="view_cvs_url" type="text" value="<%= project_config['view_cvs_url'] %>"></td>
+  </tr>
+</table>

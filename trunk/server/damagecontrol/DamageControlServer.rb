@@ -21,6 +21,9 @@ require 'damagecontrol/xmlrpc/Trigger'
 require 'damagecontrol/xmlrpc/StatusPublisher'
 require 'damagecontrol/xmlrpc/ConnectionTester'
 require 'damagecontrol/xmlrpc/ServerControl'
+require 'damagecontrol/scm/CVSWebConfigurator'
+require 'damagecontrol/scm/SVNWebConfigurator'
+require 'damagecontrol/scm/NoSCMWebConfigurator'
 
 # patch webrick so that it displays files it doesn't recognize as text
 module WEBrick
@@ -175,7 +178,7 @@ module DamageControl
       httpd.mount("/public/xmlrpc", public_xmlrpc_servlet)
       
       httpd.mount("/public/dashboard", DashboardServlet.new(build_history_repository, project_config_repository, build_scheduler, :public))
-      httpd.mount("/public/project", ProjectServlet.new(build_history_repository, project_config_repository, nil, :public, build_scheduler, project_directories, nudge_xmlrpc_url))
+      httpd.mount("/public/project", ProjectServlet.new(build_history_repository, project_config_repository, nil, :public, build_scheduler, project_directories, nudge_xmlrpc_url, scm_configurator_classes))
       httpd.mount("/public/log", LogFileServlet.new(project_directories))
       httpd.mount("/public/root", WEBrick::HTTPServlet::FileHandler, rootdir, :FancyIndexing => true)
       
@@ -194,7 +197,7 @@ module DamageControl
       httpd.mount("/private/xmlrpc", private_xmlrpc_servlet)
 
       httpd.mount("/private/dashboard", DashboardServlet.new(build_history_repository, project_config_repository, build_scheduler, :private))
-      httpd.mount("/private/project", ProjectServlet.new(build_history_repository, project_config_repository, trigger, :private, build_scheduler, project_directories, nudge_xmlrpc_url))
+      httpd.mount("/private/project", ProjectServlet.new(build_history_repository, project_config_repository, trigger, :private, build_scheduler, project_directories, nudge_xmlrpc_url, scm_configurator_classes))
       httpd.mount("/private/log", LogFileServlet.new(project_directories))
       httpd.mount("/private/root", WEBrick::HTTPServlet::FileHandler, rootdir, :FancyIndexing => true)
       
@@ -203,6 +206,14 @@ module DamageControl
       httpd.mount("/private/images/lastcompletedstatus", LastCompletedImageServlet.new(build_history_repository, build_scheduler))
       httpd.mount("/private/images/timestampstatus", TimestampImageServlet.new(build_history_repository, build_scheduler))
       httpd.mount("/private/css", WEBrick::HTTPServlet::FileHandler, "#{webdir}/css")
+    end
+    
+    def scm_configurator_classes
+      [
+        DamageControl::NoSCMWebConfigurator,
+        DamageControl::CVSWebConfigurator,
+        DamageControl::SVNWebConfigurator
+      ]
     end
     
     def webdir

@@ -3,16 +3,15 @@ require 'damagecontrol/scm/SCMFactory'
 
 module DamageControl
   class ProjectServlet < AbstractAdminServlet
-    def initialize(build_history_repository, project_config_repository, trigger, type, build_scheduler, project_directories, trig_xmlrpc_url)
+    def initialize(build_history_repository, project_config_repository, trigger, type, build_scheduler, project_directories, trig_xmlrpc_url, scm_configurator_classes)
       super(type, build_scheduler, build_history_repository, project_config_repository)
       @trigger = trigger
       @project_directories = project_directories
       @trig_xmlrpc_url = trig_xmlrpc_url
-
       @scm_factory = SCMFactory.new
-      @template_dir = File.expand_path(File.dirname(__FILE__))
+      @scm_configurator_classes = scm_configurator_classes
     end
-
+    
     def title
       "Project"
     end
@@ -55,27 +54,20 @@ module DamageControl
       build_details
     end
     
+    def scm_configurators(project_config = project_config)
+      scm_configurator_classes.collect {|cls| cls.new(project_config)}
+    end
+    
+    def project_config
+      return {} unless @project_config_repository.project_exists?(project_name)
+      @project_config_repository.project_config(project_name)
+    end
+    
     def configure
       assert_private
       action = "store_configuration"
-      project_config = {}
-      project_config = @project_config_repository.project_config(project_name) if @project_config_repository.project_exists?(project_name)
       render("configure.erb", binding)
     end
-    
-    KEYS = [
-      "build_command_line", 
-      "project_name", 
-      "unix_groups",
-      "view_cvs_url",
-      "trigger", 
-      "nag_email", 
-      "scm_type", 
-      "cvsroot", 
-      "cvsmodule", 
-      "cvspassword", 
-      "svnurl"
-    ]
     
     def install_trigger
       # Uninstall the old trigger (if any)
@@ -98,6 +90,16 @@ module DamageControl
       render("trigger_installed.erb", binding)
     end
     
+    KEYS = [
+      "build_command_line", 
+      "project_name", 
+      "unix_groups",
+      "view_cvs_url",
+      "trigger", 
+      "nag_email", 
+      "scm_type"
+    ]
+    
     def store_configuration
       assert_private
       @project_config_repository.new_project(project_name) unless @project_config_repository.project_exists?(project_name)
@@ -107,6 +109,9 @@ module DamageControl
       # request.each do |key, value| won't work - it takes too much.
       KEYS.each do |key|
         project_config[key] = request.query[key]
+      end
+      scm_configurators(project_config).each do |scm_configurator|
+        scm_configurator.store_configuration_from_request(request)
       end
 
       @project_config_repository.modify_project_config(project_name, project_config)
@@ -174,6 +179,8 @@ module DamageControl
     end
 
   private
+  
+    attr_reader :scm_configurator_classes
     
     def dashboard_redirect
       action_redirect(:dashboard, { "project_name" => project_name })

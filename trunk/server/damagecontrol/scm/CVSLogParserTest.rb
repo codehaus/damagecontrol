@@ -10,24 +10,25 @@ module DamageControl
     include FileUtils
     
     def setup
-      @parser = CVSLogParser.new
+      @parser = CVSLogParser.new(nil)
       @parser.cvspath = "/scm/damagecontrol"
       @parser.cvsmodule = "damagecontrol"
     end
     
     def teardown
-      assert(!@parser.had_error?, "parser had errors")
+      assert(!@parser.had_error?, "parser had errors") unless @parser.nil?
     end
     
     def test_read_log_entry
-      assert_equal("blahblah\n", @parser.read_log_entry(StringIO.new("blahblah\n============\nubbaubba\n===========")))
-      assert_equal(nil, @parser.read_log_entry(StringIO.new("")))
-      assert_equal(nil, @parser.read_log_entry(StringIO.new("============\n===========")))
+      assert_equal("blahblah\n", CVSLogParser.new(StringIO.new("blahblah\n============\nubbaubba\n===========")).next_log_entry)
+      assert_equal(nil, CVSLogParser.new(StringIO.new("")).next_log_entry)
+      assert_equal(nil, CVSLogParser.new(StringIO.new("============\n===========")).next_log_entry)
     end
     
     def test_parses_entire_log_into_changesets
       File.open("#{damagecontrol_home}/testdata/cvs-test.log") do |io|
-        changesets = @parser.parse_changesets_from_log(io)
+        @parser = CVSLogParser.new(io)
+        changesets = @parser.parse_changesets
         
         assert_equal(18, changesets.length)
         assert_match(/o YAML config \(BuildBootstrapper\)/, changesets[2].message)
@@ -75,8 +76,8 @@ Quiet period is configurable for each project
 EOF
 
     def test_log_from_e2e_test
-      io = StringIO.new(LOG_FROM_E2E_TEST)
-      changesets = @parser.parse_changesets_from_log(io)
+      @parser = CVSLogParser.new(StringIO.new(LOG_FROM_E2E_TEST))
+      changesets = @parser.parse_changesets
       assert_equal(2, changesets.length)
       assert_match(/foo/, changesets[0].message)
       assert_match(/bar/, changesets[1].message)
@@ -160,9 +161,10 @@ description:
 EOF
 
     def test_can_parse_LOG_FROM_05_07_2004_19_41
+      @parser = CVSLogParser.new(StringIO.new(LOG_FROM_05_07_2004_19_41))
       assert_equal(11, @parser.split_entries(LOG_FROM_05_07_2004_19_41).size)
       assert_equal("server/damagecontrol/scm/CVS.rb", @parser.parse_path(@parser.split_entries(LOG_FROM_05_07_2004_19_41)[0]))
-      changesets = @parser.parse_changesets_from_log(StringIO.new(LOG_FROM_05_07_2004_19_41))
+      changesets = @parser.parse_changesets
          
       #puts changesets.format(CHANGESET_TEXT_FORMAT, Time.new.utc)
      
@@ -325,7 +327,8 @@ fixed broken url (NANO-8)
 EOF
 
     def test_can_parse_LOG_WITH_DELETIONS
-      changesets = @parser.parse_changesets_from_log(StringIO.new(LOG_WITH_DELETIONS))
+      @parser = CVSLogParser.new(StringIO.new(LOG_WITH_DELETIONS))
+      changesets = @parser.parse_changesets
       assert_equal(2, changesets.length)
 
       changeset_delete = changesets[0]
@@ -380,7 +383,8 @@ description:
 EOF
 
     def test_can_parse_LOG_WITH_MISSING_ENTRIES
-      changesets = @parser.parse_changesets_from_log(StringIO.new(LOG_WITH_MISSING_ENTRIES))
+      @parser = CVSLogParser.new(StringIO.new(LOG_WITH_MISSING_ENTRIES))
+      changesets = @parser.parse_changesets
       assert_equal(0, changesets.length)
     end
   end

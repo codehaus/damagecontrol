@@ -82,6 +82,11 @@ class Project
     exit!(1)
   end
 
+  def run_test
+    test = File.expand_path(params['test'] || "server/damagecontrol/test/AllTests.rb")
+    execute_ruby(test)
+  end
+
   def unit_test
     execute_ruby("damagecontrol/test/AllTests.rb")
   end
@@ -159,11 +164,20 @@ class Project
     installer_nodeps
   end
   
+  def ruby_home
+    params["ruby_home"] || ENV["RUBY_HOME"] || fail("Define the RUBY_HOME variable to point to your ruby installation")
+  end
+  
+  def cvs_executable
+    params["cvs_executable"] || "#{ENV['CVS_HOME']}/cvs.exe" || fail("Define the CVS_HOME variable to point to your CVS installation (can be TortoiseCVS)") 
+  end
+  
   def installer_nodeps
-    fail("Define the RUBY_HOME variable to point to your ruby installation") if !ENV["RUBY_HOME"]
-    fail("Define the CVS_HOME variable to point to your CVS installation (can be TortoiseCVS)") if !ENV["CVS_HOME"]
+    # call these to verify they are defined before starting to build installer
+    ruby_home
+    #cvs_executable
     fail("NSIS needs to be installed, download from http://nsis.sf.net (or not installed to default place: #{makensis_exe})") if !File.exists?(makensis_exe)
-    system("#{makensis_exe} /DVERSION=#{version} /DRUBY_HOME=#{ENV["RUBY_HOME"]} installer/windows/nsis/DamageControl.nsi")
+    system("#{makensis_exe} /DVERSION=#{version} /DRUBY_HOME=#{ruby_home} installer/windows/nsis/DamageControl.nsi")
   end
   
   def archive
@@ -259,7 +273,7 @@ class Project
     self.params = {}
     args.each do |t| 
       if(t =~/-D(.*)=(.*)/)
-        params[$1] = $2
+        params[$1] = $2.strip
       end
     end
   end

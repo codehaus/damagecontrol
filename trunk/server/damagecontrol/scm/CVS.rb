@@ -64,10 +64,10 @@ module DamageControl
         end
       end
 
-      parser = CVSLogParser.new
+      parser = CVSLogParser.new(StringIO.new(log))
       parser.cvspath = path
       parser.cvsmodule = mod
-      parser.parse_changesets_from_log(StringIO.new(log))
+      parser.parse_changesets
     end
     
     def changes_command(from_time, to_time)

@@ -30,8 +30,7 @@ module FileUtils
   end
     
   def username
-    return ENV["USERNAME"] if windows?
-    ENV["USER"]
+    ENV['USERNAME'] || ENV['USER']
   end
   
   def script_file(file)

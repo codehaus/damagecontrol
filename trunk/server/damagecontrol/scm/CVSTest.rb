@@ -1,11 +1,13 @@
 require 'test/unit'
-require 'damagecontrol/scm/AbstractSCMTest'
+require 'damagecontrol/scm/GenericSCMTests'
 require 'damagecontrol/scm/CVS'
 require 'webrick'
 
 module DamageControl
-  class CVSTest < AbstractSCMTest
-  
+  class CVSTest < Test::Unit::TestCase
+    
+    include GenericSCMTests
+    
     def create_scm
       LocalCVS.new(new_temp_dir, "damagecontrolled")
     end

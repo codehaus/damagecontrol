@@ -19,6 +19,10 @@ module DamageControl
     attr_reader :project_config_repository
     attr_reader :build_scheduler
 
+    def template_dir
+      File.expand_path(File.dirname(__FILE__))
+    end
+    
     def auto_refresh_rate
       10
     end

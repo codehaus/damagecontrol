@@ -1,23 +1,24 @@
 require 'damagecontrol/scm/AbstractSCM'
 require 'damagecontrol/scm/Changes'
 require 'damagecontrol/util/Logging'
+require 'damagecontrol/scm/AbstractLogParser'
+
 require 'ftools'
 
 module DamageControl
 
-  class CVSLogParser
+  class CVSLogParser < AbstractLogParser
 
     include Logging
     
-    def initialize
-      @current_line = 0
+    def initialize(io)
+      super(io)
       @log = ""
-      @had_error = false
     end
   
-    def parse_changesets_from_log(io)
+    def parse_changesets
       changesets = ChangeSets.new
-      while(log_entry = read_log_entry(io))
+      while(log_entry = next_log_entry)
         @log<<log_entry
         @log<<""
         begin
@@ -29,33 +30,8 @@ module DamageControl
       changesets
     end
     
-    def read_log_entry(io)
-      read_until_matching_line(io, /====*/)
-      
-      #log_entry = ""
-      #io.each_line do |line|
-      #  @current_line += 1
-      #  @log<<line
-      #  return log_entry if line=~/====*/
-      #  log_entry<<line
-      #end
-      #return nil
-      
-    end
-    
-    def read_until_matching_line(io, regexp)
-      return nil if io.eof?
-      result = ""
-      io.each_line do |line|
-        @current_line += 1
-        break if line=~regexp
-        result<<line
-      end
-      if result.strip == ""
-        read_until_matching_line(io, regexp) 
-      else
-        result
-      end
+    def next_log_entry
+      read_until_matching_line(/====*/)
     end
     
     def split_entries(log_entry)
@@ -97,10 +73,6 @@ module DamageControl
       return file if cvspath.nil? || cvsmodule.nil? || file.nil?
       cvspath = convert_all_slashes_to_forward_slashes(self.cvspath)
       convert_all_slashes_to_forward_slashes(file).gsub(/^#{cvspath}\/#{cvsmodule}\//, "")
-    end
-    
-    def convert_all_slashes_to_forward_slashes(file)
-      file.gsub(/\\/, "/")
     end
     
     def parse_change(change_entry)
@@ -158,15 +130,6 @@ module DamageControl
       end
     end
     
-    def error(msg)
-      @had_error=true
-      logger.error(msg + "\ncurrent line: #{@current_line}\ncvs log:\n#{@log}#{format_backtrace(caller)}")
-    end
-    
-    def had_error?
-      @had_error
-    end
-  
   private
   
     # The state field is "Exp" both for added and modified files. retards!

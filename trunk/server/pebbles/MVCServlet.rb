@@ -3,7 +3,26 @@ require 'uri'
 require 'pebbles/RiteMesh'
 
 module Pebbles
+  module SimpleERB
+    protected
+    
+    def file_content(file)
+      template_path = File.expand_path("#{template_dir}/#{file}")
+      template = File.new(template_path).read.untaint
+    end
+    
+    def erb(template, binding)
+      ERB.new(file_content(template)).result(binding)
+    end
+    
+    def template_dir
+      raise "you must overload template dir"
+    end
+  end
+
   class SimpleServlet
+    include SimpleERB
+  
     def get_instance(config, *options)
       self
     end
@@ -41,7 +60,6 @@ module Pebbles
     def content_type
       "text/html"
     end
-    
   end
 
   class MVCServlet < SimpleServlet
@@ -83,13 +101,6 @@ module Pebbles
       redirect("#{request.path}?action_name=#{action_name}&#{params_enc}")
     end
         
-    def erb(template, binding)
-      raise "The constructor of #{self.class.name} should do: @template_dir = File.expand_path(File.dirname(__FILE__))" unless @template_dir
-      template_path = File.expand_path("#{template_dir}/#{template}")
-      template = File.new(template_path).read.untaint
-      ERB.new(template).result(binding)
-    end
-    
     def render(erb_template, binding)
       response.body = erb(erb_template, binding)
       unless ritemesh_template.nil?
@@ -98,10 +109,6 @@ module Pebbles
       end
     end
     
-#  protected
-    attr_reader :template_dir
-    
-  
     def ritemesh_template
       # disabled by default
       nil

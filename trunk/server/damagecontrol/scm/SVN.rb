@@ -27,16 +27,17 @@ module DamageControl
 
     def changesets(from_time, to_time)
       log = ""
+      command = changes_command(from_time, to_time)
       yield command if block_given?
-      svn(working_dir, changes_command(from_time, to_time)) do |io|
+      svn(working_dir, command) do |io|
         io.each_line do |line|
           log << line
           yield line if block_given?
         end
       end
 
-      parser = SVNLogParser.new(@svnprefix)
-      parser.parse_changesets_from_log(StringIO.new(log))
+      parser = SVNLogParser.new(StringIO.new(log), @svnprefix)
+      parser.parse_changesets
     end
 
     def working_dir

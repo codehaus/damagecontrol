@@ -1,19 +1,15 @@
-require 'test/unit'
 require 'damagecontrol/util/FileUtils'
 
 module DamageControl
-  class AbstractSCMTest < Test::Unit::TestCase
-    include ::FileUtils
+  module GenericSCMTests
     include FileUtils
 
-    # Subclasses should override this method  
     def create_scm
-      nil
+      raise "including classes should implement this method"
     end
 
     def test_modifiying_one_file_produces_correct_changeset
       scm = create_scm
-      return unless scm
       scm.create
       scm.import("#{damagecontrol_home}/testdata/damagecontrolled")
       scm.checkout
@@ -36,8 +32,7 @@ module DamageControl
       assert_equal(2, changeset.length)
 
       assert_equal("changed something\n", changeset.message)
-# Why is username nil ? (FileUtils method) 
-#      assert_equal(username, changeset.developer)
+      assert_equal(username, changeset.developer)
       assert(changeset.developer)
       assert(changeset.revision)
 
