@@ -29,7 +29,6 @@ module DamageControl
         begin
           cmd_with_io("#{damagecontrol_home}/bin", "xsltproc '#{stylesheet_file}' '#{selected_build.xml_log_file}'") do |io|
             io.each_line do |line|
-              puts line
               result += line
             end
           end
