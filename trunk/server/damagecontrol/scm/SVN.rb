@@ -164,13 +164,17 @@ module DamageControl
 
       execute(command_line, dir) do |stdin, stdout, stderr, pid|
         begin
+          logger.debug("Reading stdout")
           stdout.each_line do |progress|
               if block_given? then yield progress else logger.debug(progress) end
           end
+          logger.debug("DONE Reading stdout")
         ensure
+          logger.debug("Reading stderr")
           stderr.each_line do |progress|
               if block_given? then yield progress else logger.debug(progress) end
           end
+          logger.debug("DONE Reading stderr")
         end
       end
     end
