@@ -18,7 +18,6 @@ module DamageControl
 			@current_server=msg.server
 			@current_channel=nil
 			puts(msg.string("%T %s Link Established"))
-			join_channel
 		end
 
 		def on_link_closed(msg)
