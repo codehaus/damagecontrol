@@ -75,7 +75,7 @@ module DamageControl
 
     def test_install_trigger
       testrepo = File.expand_path("#{damagecontrol_home}/target/cvstestrepo")
-      testcheckout = File.expand_path("#{damagecontrol_home}/target/cvstestcheckout")
+      testcheckout = File.expand_path("#{damagecontrol_home}/target/cvstestcheckout/CVSROOT")
       
       project_name = "DamageControlled"
       spec = ":local:#{testrepo}:damagecontrolled"

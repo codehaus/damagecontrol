@@ -114,22 +114,22 @@ module DamageControl
     )
       directory = File.expand_path(directory)
       checkout("#{cvsroot(spec)}:CVSROOT", directory, &proc)
-      Dir.chdir("#{directory}/CVSROOT")
-      File.open("#{directory}/CVSROOT/loginfo", File::WRONLY | File::APPEND) do |file|
+      Dir.chdir("#{directory}")
+      File.open("#{directory}/loginfo", File::WRONLY | File::APPEND) do |file|
         script = SocketTrigger.new(nil,nil,nil).trigger_command(project_name, spec, build_command_line, nc_command(spec), dc_host, dc_port)
         file.puts("#{mod(spec)} #{script}")
       end
 
       if(windows?)
         # install nc.exe
-        File.copy( "#{nc_exe_file}", "#{directory}/CVSROOT/nc.exe" )
+        File.copy( "#{nc_exe_file}", "#{directory}/nc.exe" )
         system("cvs -d#{cvsroot(spec)} add -kb nc.exe")
 
         # tell cvs to keep a non-,v file in the central repo
         File.open("checkoutlist", File::WRONLY | File::APPEND) do |file|
           file.puts("nc.exe")
         end
-        Dir.chdir("#{directory}/CVSROOT")
+        Dir.chdir("#{directory}")
         system("cvs commit -m \"added damagecontrol\"")
       end
     end
