@@ -1,6 +1,7 @@
 require 'fileutils'
 require 'rscm/tempdir'
 require 'rscm/path_converter'
+require 'rscm/difftool_test'
 
 module RSCM
 
@@ -173,51 +174,51 @@ module RSCM
       assert_same(scm.class, scm2.class)
     end
 
-    def test_diff
-      work_dir = RSCM.new_temp_dir("diff")
-      path = "diffing"
-      checkout_dir = "#{work_dir}/#{path}/checkout"
+    EXPECTED_DIFF = <<EOF
+-one two three
+-four five six
++one two three four
++five six
+EOF
+    
+    def test_diffs
+      work_dir = RSCM.new_temp_dir("diffs")
+      checkout_dir = "#{work_dir}/checkout"
       repository_dir = "#{work_dir}/repository"
       import_dir = "#{work_dir}/import/diffing"
-      scm = create_scm(repository_dir, path)
+      scm = create_scm(repository_dir, "diffing")
       scm.create
       
       mkdir_p(import_dir)
       File.open("#{import_dir}/afile.txt", "w") do |io|
         io.puts("one two three")
         io.puts("four five six")
-      end
-      File.open("#{import_dir}/afile.txt", "w") do |io|
-        io.puts("")
-      end
-      
+      end      
       scm.import(import_dir, "Imported a file to diff against")
       scm.checkout(checkout_dir)
+
+      sleep(1)
+      timestamp = Time.now.utc
+      sleep(1)
 
       scm.edit("#{checkout_dir}/afile.txt")
       File.open("#{checkout_dir}/afile.txt", "w") do |io|
         io.puts("one two three four")
         io.puts("five six")
       end
-      File.open("#{checkout_dir}/anotherfile.txt", "w") do |io|
-        io.puts("one quick brown")
-        io.puts("fox jumped over")
-      end
       scm.commit(checkout_dir, "Modified file to diff")
-
-      scm.edit("#{checkout_dir}/afile.txt")
-      File.open("#{checkout_dir}/afile.txt", "w") do |io|
-        io.puts("one to threee")
-        io.puts("hello")
-        io.puts("four five six")
-      end
-      File.open("#{checkout_dir}/anotherfile.txt", "w") do |io|
-        io.puts("one quick brown")
-        io.puts("fox jumped over the lazy dog")
-      end
-      scm.commit(checkout_dir, "Modified file to diff again")
+      changesets = scm.changesets(checkout_dir, timestamp)
       
-      changesets = scm.changesets(checkout_dir, Time.epoch)
+      got_diff = false
+      scm.diff(checkout_dir, changesets[0][0]) do |diff_io|
+        got_diff = true
+        diff_string = diff_io.read
+        assert_match(/^\-one two three/, diff_string)
+        assert_match(/^\-four five six/, diff_string)
+        assert_match(/^\+one two three four/, diff_string)
+        assert_match(/^\+five six/, diff_string)
+      end
+      assert(got_diff)
     end
 
   private
@@ -249,7 +250,7 @@ module RSCM
       File.open(absolute_path, "w") do |file|
         file.puts(content)
       end
-      scm.add(checkout_dir, relative_filename) unless(existed)
+      scm.add(checkout_dir, relative_filename) unless existed
 
       message = existed ? "editing" : "adding"
 

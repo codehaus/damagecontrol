@@ -128,6 +128,15 @@ module RSCM
       @rcfile = nil
     end
 
+    def diff(checkout_dir, change, &block)
+      checkout(checkout_dir, change.revision)
+      with_working_dir(checkout_dir) do
+        monotone("diff --revision=#{change.previous_revision} #{change.path}", @branch, @key) do |stdout|
+          yield stdout
+        end
+      end
+    end
+
   protected
 
     # Checks out silently. Called by superclass' checkout.
