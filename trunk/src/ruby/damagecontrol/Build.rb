@@ -1,7 +1,5 @@
-require 'damagecontrol/FileSystem'
 require 'damagecontrol/scm/DefaultSCMRegistry'
 require 'damagecontrol/BuildEvents'
-require 'damagecontrol/ant/ant'
 
 module DamageControl
 
