@@ -43,7 +43,7 @@ module DamageControl
     end
     
     def default_project_config(project_name)
-      {"project_name" => project_name, "scm" => DamageControl::NoSCM.new}
+      {"project_name" => project_name, "scm" => DamageControl::NoSCM.new, "tracking" => DamageControl::NoTracker.new}
     end
 
     def project_names
