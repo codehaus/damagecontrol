@@ -81,7 +81,7 @@ module DamageControl
     end
     
     def timestamp_for_humans
-      timestamp_as_time.strftime("%d %b %Y %H:%M:%S")
+      timestamp_as_time.localtime.strftime("%d %b %Y %H:%M:%S")
     end
 
     def time_since_for_humans
