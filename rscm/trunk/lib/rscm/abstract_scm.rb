@@ -201,6 +201,7 @@ module RSCM
     # of paths relative to +dir+
     # 
     def to_relative(dir, absolute_paths)
+      dir = File.expand_path(dir)
       absolute_paths.collect{|p| File.expand_path(p)[dir.length+1..-1]}
     end
 
