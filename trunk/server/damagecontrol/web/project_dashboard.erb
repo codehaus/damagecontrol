@@ -2,16 +2,16 @@
 <title><% project_name %> dashboard</title>
 <body>
 
-<h1><%= project_name %></h1>
+<h1><img src="	images/lastcompletedstatus?project_name=<%= project_name %>"/> <%= project_name %></h1>
 <table>
   <tr class="dashboard">
     <td class="dashboard_header">Last completed build</td>
-    <td class="dashboard"><img src="	images/lastcompletedstatus?project_name=<%= project_name %>"/> <%= last_status %></td>
+    <td class="dashboard"><%= last_status %></td>
   </tr>
 <% if(last_completed_build != current_build) %>
   <tr class="dashboard">
     <td class="dashboard_header">Current build</td>
-    <td class="dashboard"><img src="images/currentstatus?project_name=<%= project_name %>"/> <%= current_status %></td>
+    <td class="dashboard"><%= current_status %></td>
   </tr>
 <% end %>
   <tr class="dashboard">
