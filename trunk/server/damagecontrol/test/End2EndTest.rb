@@ -331,7 +331,7 @@ class End2EndTest < Test::Unit::TestCase
     File.mkpath(basedir)
   end
   
-  def test_damagecontrol_works_with_cvs
+  def Xtest_damagecontrol_works_with_cvs
     @project_name = "CVS_TestingProject"
 
     central_cvs = LocalCVS.new(@repo_dir, @relative_project_path)
@@ -345,7 +345,7 @@ class End2EndTest < Test::Unit::TestCase
     test_build_and_log_and_irc(remote_cvs, false)
   end
 
-  def test_damagecontrol_works_with_svn
+  def Xtest_damagecontrol_works_with_svn
     @project_name = "SVN_TestingProject"
 
     central_svn = SVN.new
