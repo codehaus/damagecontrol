@@ -15,19 +15,17 @@ module DamageControl
       erb("components/global_search_form.erb", binding)
     end
     
-    def sidepanes
+    def tasks
       result = super
       result +=
         [
           global_search_form
         ]
-      if private?
-        result +=
-          [
-            task(:icon => "icons/box_new.png", :name => "New project", :url => "project?action=configure")
-          ]
-      end
       result
+    end
+    
+    def navigation
+      ""
     end
   
     def default_action

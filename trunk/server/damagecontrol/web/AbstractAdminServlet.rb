@@ -44,8 +44,13 @@ module DamageControl
       ""
     end
     
-    def sidepanes
-      []
+    def tasks
+      result = []
+      if private?
+        result += [
+          task(:icon => "icons/box_new.png", :name => "New project", :url => "project?action=configure")
+        ]
+      end
     end
     
     def ritemesh_template
@@ -69,16 +74,6 @@ module DamageControl
     def scm_url(project_name, change)
       scm = SCMFactory.new.get_scm(project_config_repository.project_config(project_name), "/dev/null")
       scm.web_url_to_change(change)
-    end
-    
-    def builds_table(params)
-      header_text = params[:header_text] || "Builds"
-      empty_text = params[:empty_text] || "No builds"
-      css_class = params[:css_class] || "builds"
-      builds = params[:builds] || required_param(:builds)
-      selected_build = params[:selected_build] || nil
-      prefix_with_project_name = params[:prefix_with_project_name] == true || false
-      erb("components/builds_table.erb", binding)
     end
     
     def task(params)

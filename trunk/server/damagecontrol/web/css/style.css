@@ -4,11 +4,11 @@ body, table, form, input, td, th, p, textarea, select
   font-size: 11px;
 }
 
-a:link {
+a.link {
   text-decoration: underline;
 }
 
-a:hover {
+a.hover {
   text-decoration: underline;
 }
 
@@ -60,7 +60,7 @@ a.tip:hover span {
   float: right;
 }
 
-#side-panel {
+div.tasks {
   float:left;
   width:26%;
   background:#fff;
@@ -71,6 +71,9 @@ a.tip:hover span {
   border: 1px #7f7f7f solid;
   border-bottom: 2px #7f7f7f solid;
   border-right: 2px #7f7f7f solid;
+}
+
+div.task {
 }
 
 #main-panel {

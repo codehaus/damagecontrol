@@ -21,7 +21,7 @@ module DamageControl
       erb("components/search_form.erb", binding)
     end
     
-    def sidepanes
+    def tasks
       result = super
       unless project_name.nil?
         result +=
@@ -31,7 +31,6 @@ module DamageControl
         if(private?)
           result +=
             [
-              task(:icon => "icons/box_new.png", :name => "New project", :url => "project?action=configure"),
               task(:icon => "icons/wrench.png", :name => "Configure", :url => "?project_name=#{project_name}&action=configure"),
               task(:icon => "icons/gears_run.png", :name => "Trig build now", :url => "?project_name=#{project_name}&action=trig_build"),
               task(:icon => "icons/gear_connection.png", :name => "Install trigger", :url => "?project_name=#{project_name}&action=install_trigger")
@@ -40,17 +39,30 @@ module DamageControl
         result +=
           [
             task(:icon => "icons/folders.png", :name => "Working files", :url => "root/#{project_name}/checkout"),
-            builds_table(
-                :header_text => "Build history", 
-                :empty_text => "Never built", 
-                :css_class => "pane",
-                :selected_build => selected_build,
-                :builds => builds)
           ]
       end
       result
     end
+
+    def navigation
+      builds_table(
+          :header_text => "Build history", 
+          :empty_text => "Never built", 
+          :css_class => "pane",
+          :selected_build => selected_build,
+          :builds => builds)
+    end
   
+    def builds_table(params)
+      header_text = params[:header_text] || "Builds"
+      empty_text = params[:empty_text] || "No builds"
+      css_class = params[:css_class] || "builds"
+      builds = params[:builds] || required_param(:builds)
+      selected_build = params[:selected_build] || nil
+      prefix_with_project_name = params[:prefix_with_project_name] == true || false
+      erb("components/builds_table.erb", binding)
+    end
+    
     def default_action
       build_details
     end

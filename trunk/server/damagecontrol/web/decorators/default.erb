@@ -34,13 +34,22 @@
 </div>
 
 <%
-sidepanes = self.sidepanes
-if(sidepanes && sidepanes.length > 0)
+tasks = self.tasks
+if(tasks && tasks.length > 0)
 %>
-  <div id="side-panel">  
-    <% sidepanes.each do |sidepane| %>
-      <div class="side-panel-entry"><%= sidepane %></div>
+  <div id="tasks">  
+    <% tasks.each do |task| %>
+      <div class="task"><%= task %></div>
     <% end %>  
+  </div>
+<% end %>
+
+<%
+navigation = self.navigation
+if(navigation)
+%>
+  <div id="navigation">  
+    <%= navigation %>
   </div>
 <% end %>
 
