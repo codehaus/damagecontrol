@@ -1,6 +1,8 @@
+require 'rubygems'
 require 'drb'
-require 'rscm'
 require 'needle'
+require_gem 'rscm'
+require 'damagecontrol/poller'
 
 module DamageControl
   # The Server is an object that is bound as a Drb top-level
@@ -24,12 +26,12 @@ module DamageControl
 end
 
 REGISTRY = Needle::Registry.define do |b|
-  b.poller { RSCM::Poller.new }
+  b.poller { DamageControl::Poller.new }
 end
 
 REGISTRY.poller.start
 
 url = 'druby://localhost:9000'
-DRb.start_service(url, RSCM::Server.new)  
+DRb.start_service(url, DamageControl::Server.new)  
 puts "RSCM server running on #{url}"
 DRb.thread.join # Don't exit just yet!

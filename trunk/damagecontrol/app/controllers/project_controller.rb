@@ -1,6 +1,32 @@
 require 'rscm'
+require 'damagecontrol/directories'
+require 'damagecontrol/diff_parser'
+require 'damagecontrol/diff_htmlizer'
 
 class ProjectController < ApplicationController
+  SCMS = [
+# Uncomment this to see Mooky in action in the web interface!
+#    Mooky.new,
+    RSCM::CVS.new, 
+    RSCM::SVN.new, 
+    RSCM::StarTeam.new
+  ]
+
+  TRACKERS = [
+    DamageControl::Tracker::Null.new, 
+    DamageControl::Tracker::Bugzilla.new, 
+    DamageControl::Tracker::JIRA.new,
+    DamageControl::Tracker::RubyForge.new,
+    DamageControl::Tracker::SourceForge.new,
+    DamageControl::Tracker::Scarab.new,
+    DamageControl::Tracker::Trac.new
+  ]
+
+  SCM_WEBS = [
+#    SCMWeb::Null.new, 
+#    SCMWeb::ViewCVS.new, 
+#    SCMWeb::Fisheye.new
+  ]
 
   def initialize
     super
@@ -8,14 +34,14 @@ class ProjectController < ApplicationController
   end
 
   def index
-    @projects = RSCM::Project.find_all
+    @projects = DamageControl::Project.find_all
     @navigation_name = "null"
   end
 
   def new
-    @project = RSCM::Project.new
-    @scms = RSCM::SCMS.dup
-    @trackers = RSCM::TRACKERS.dup
+    @project = DamageControl::Project.new
+    @scms = SCMS.dup
+    @trackers = TRACKERS.dup
     @edit = true
     @new_project = true
     render_action("view")
@@ -66,11 +92,52 @@ class ProjectController < ApplicationController
   def changesets
     load
     last_changeset_id = @params["changeset"]
-    # Later, when we "mix in" DC, we may want to pass a different number than 1 here..
-    @changesets = @project.changesets(last_changeset_id, 1)
+    @changesets = @project.changesets(last_changeset_id, 1)    
+    @changesets.accept(HtmlDiffVisitor.new(@project))
   end
 
 protected
+
+  # Visitor that adds a method called +html_diff+ to each change
+  class HtmlDiffVisitor
+    def initialize(project)
+      @project = project
+    end
+    
+    def visit_changesets(changesets)
+    end
+
+    def visit_changeset(changeset)
+      @changeset = changeset
+    end
+
+    def visit_change(change)
+      def change.html_diff=(html)
+        @html = html
+      end
+
+      def change.html_diff
+        @html
+      end
+
+      html = ""
+      dp = DamageControl::DiffParser.new
+      diff_file = DamageControl::Directories.diff_file(@project.name, @changeset, change)
+      if(File.exist?(diff_file))
+        File.open(diff_file) do |diffs_io|
+          diffs = dp.parse_diffs(diffs_io)
+          dh = DamageControl::DiffHtmlizer.new(html)
+          diffs.accept(dh)
+          if(html == "")
+            html = "Diff was calculated, but was empty. (This may be a bug - new, moved and binary files and are not supported yet)."
+          end
+        end
+      else
+        html = "Diff not calculated yet."
+      end
+      change.html_diff = html
+    end
+  end
 
   def set_sidebar_links
     if(@project.exists?)
@@ -169,10 +236,10 @@ private
     end
 
     # Make a dupe of the scm/tracker lists and substitute with project's value
-    @scms = RSCM::SCMS.dup
+    @scms = SCMS.dup
     @scms.each_index {|i| @scms[i] = @project.scm if @scms[i].class == @project.scm.class}
 
-    @trackers = RSCM::TRACKERS.dup
+    @trackers = TRACKERS.dup
     @trackers.each_index {|i| @trackers[i] = @project.tracker if @trackers[i].class == @project.tracker.class}
 
     @linkable_changesets = @project.changesets(@project.latest_changeset_id, 10)
