@@ -47,6 +47,7 @@ class Project
   
   def installer
     fail("Define the RUBY_HOME variable to point to your ruby installation") if !ENV["RUBY_HOME"]
+    fail("Define the CVS_HOME variable to point to your CVS installation (can be TortoiseCVS)") if !ENV["CVS_HOME"]
     fail("NSIS needs to be installed, download from http://nsis.sf.net (or not installed to default place: #{makensis_exe})") if !File.exists?(makensis_exe)
     system("#{makensis_exe} /DVERSION=#{version} /DRUBY_HOME=#{ENV["RUBY_HOME"]} installer/windows/nsis/DamageControl.nsi")
   end

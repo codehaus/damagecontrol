@@ -1,5 +1,7 @@
 #!/usr/bin/env ruby
 
+# THIS IS OBSOLETE!!!!!! CAN WE DELETE IT???? (AH)
+
 irc_handle = 'rant'
 irc_server = '164.38.224.177'
 irc_channel = "#build"
@@ -7,7 +9,6 @@ logdir = '/cruise/cruiselogs'
 website_baseurl = 'http://164.38.244.63:8080/cruisecontrol/buildresults'
 
 $damagecontrol_home = File::expand_path("#{File.dirname($0)}/../..")
-puts "@@@@@@@@@@@@@@@@@@@ #{$damagecontrol_home} #{$0}"
 $:.push("#{$damagecontrol_home}/server")
 
 require 'damagecontrol/simple' 
@@ -16,7 +17,6 @@ require 'damagecontrol/core/SocketTrigger'
 require 'damagecontrol/core/BuildExecutor'
 require 'damagecontrol/core/LogWriter'
 require 'damagecontrol/core/SelfUpgrader'
-require 'damagecontrol/template/ShortTextTemplate'
 require 'damagecontrol/template/HTMLTemplate'
 require 'damagecontrol/publisher/IRCPublisher'
 require 'damagecontrol/publisher/FilePublisher'
@@ -36,7 +36,7 @@ start_simple_server(
   :HttpPort => 4712,
   :HttpsPort => 4713)
 
-irc = IRCPublisher.new(@hub, irc_server, irc_channel, ShortTextTemplate.new)
+irc = IRCPublisher.new(@hub, irc_server, irc_channel, "short_text_build_result.erb")
 irc.handle = irc_handle
 irc.start
 CruiseControlLogPoller.new(@hub, logdir, website_baseurl).start

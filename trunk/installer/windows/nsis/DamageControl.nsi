@@ -106,18 +106,17 @@ Section "DamageControl Server" SecServer
   SetOutPath $INSTDIR\ruby\lib\ruby\1.8\i386-mswin32\racc
   File /r ${RUBY_HOME}\lib\ruby\1.8\i386-mswin32\racc\*.so
   
-  SetOutPath $INSTDIR\ruby\lib\ruby\1.8\rexml
-  File /r ${RUBY_HOME}\lib\ruby\1.8\rexml\*.rb
-  
-  SetOutPath $INSTDIR\ruby\lib\ruby\1.8\rexml\parsers
-  File /r ${RUBY_HOME}\lib\ruby\1.8\rexml\parsers\*.rb
-  
   SetOutPath $INSTDIR\ruby\lib\ruby\1.8\webrick
   File /r ${RUBY_HOME}\lib\ruby\1.8\webrick\*.rb
   
   SetOutPath $INSTDIR\ruby\lib\ruby\1.8\webrick\httpservlet
   File /r ${RUBY_HOME}\lib\ruby\1.8\webrick\httpservlet\*.rb
     
+  ;Include CVS binaries
+  SetOutPath $INSTDIR\cvs\bin
+  File /r ${CVS_HOME}\bin\cvs.exe
+  File /r ${CVS_HOME}\bin\*_protocol.dll
+  
   ;Store installation folder
   WriteRegStr HKCU "Software\Modern UI Test" "" $INSTDIR
 
