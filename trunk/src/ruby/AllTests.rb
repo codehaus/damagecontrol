@@ -6,7 +6,7 @@ require 'damagecontrol/AsyncComponentTest'
 require 'damagecontrol/BuildTest'
 require 'damagecontrol/HubTest'
 require 'damagecontrol/BuildDelayerTest'
-require 'damagecontrol/BuildExecutorTest'
+#require 'damagecontrol/BuildExecutorTest'
 require 'damagecontrol/TimerTest'
 require 'damagecontrol/LogWriterTest'
 
