@@ -17,7 +17,8 @@ module DamageControl
     attr_reader :template
   
     def initialize(channel, template, username, password)
-      super(channel)
+      super
+      channel.add_consumer(self)
       @username = username
       @password = password
       @template = template

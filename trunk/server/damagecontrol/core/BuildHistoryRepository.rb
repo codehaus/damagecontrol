@@ -23,7 +23,8 @@ module DamageControl
     include Logging
 
     def initialize(channel, project_directories=nil)
-      super(channel)
+      super
+      channel.add_consumer(self)
       @project_directories = project_directories
       @history = {}
       

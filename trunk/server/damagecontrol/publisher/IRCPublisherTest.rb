@@ -13,7 +13,7 @@ module DamageControl
 
     def setup
       @hub = new_mock
-      @hub.__expect(:add_subscriber) do |subscriber|
+      @hub.__expect(:add_consumer) do |subscriber|
         assert(subscriber.is_a?(IRCPublisher))
       end
       @publisher = IRCPublisher.new(@hub, "server", "channel", "short_html_build_result.erb")

@@ -19,7 +19,8 @@ module DamageControl
     attr_accessor :always_mail
     
     def initialize(channel, build_history_repository, config = {})
-      super(channel)
+      super
+      channel.add_consumer(self)
       template_dir = "#{File.expand_path(File.dirname(__FILE__))}/../template"
       subject_template_file = config[:SubjectTemplate] || required_config(:SubjectTemplate)
       @subject_template = File.new("#{template_dir}/#{subject_template_file}").read

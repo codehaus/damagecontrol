@@ -21,7 +21,7 @@ module DamageControl
   
     def initialize(channel, irc_server, irc_channel, template)
       super
-      channel.add_subscriber(self)
+      channel.add_consumer(self)
       @irc = IRCConnection.new
       @irc_server = irc_server
       @irc_channel = irc_channel

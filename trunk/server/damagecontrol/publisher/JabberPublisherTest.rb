@@ -1,7 +1,7 @@
 require 'test/unit'
 require 'pebbles/mockit'
+require 'pebbles/Space'
 require 'damagecontrol/publisher/JabberPublisher'
-require 'damagecontrol/core/Hub'
 require 'damagecontrol/core/Build'
 require 'damagecontrol/util/FileUtils'
 
@@ -20,14 +20,26 @@ module DamageControl
     end
     
     def test_not_sending_message_to_empty_recipients_list_on_build_complete
-      @publisher = JabberPublisher.new(Hub.new, "username", "password", emptyRecipientList = [], "short_html_build_result.erb")
+      @publisher = JabberPublisher.new(
+        new_mock.__expect(:add_consumer), 
+        "username", 
+        "password", 
+        emptyRecipientList = [], 
+        "short_html_build_result.erb"
+      )
       @publisher.jabber = @jabber_mock
     
       @publisher.on_message(@build_complete_event)
     end
 
     def test_sends_message_to_multiple_recipients_list_on_build_complete
-      @publisher = JabberPublisher.new(Hub.new, "username", "password", recipientList = ["recipient1","recipient2"], "short_html_build_result.erb")
+      @publisher = JabberPublisher.new(
+        new_mock.__expect(:add_consumer), 
+        "username", 
+        "password", 
+        recipientList = ["recipient1","recipient2"], 
+        "short_html_build_result.erb"
+      )
       @publisher.jabber = @jabber_mock
   
       expected = "<a href=\"http://moradi.com/public/project?action=build_details&project_name=cheese&timestamp=19710228234500\">[cheese] BUILD SUCCESSFUL</a>"

@@ -15,8 +15,8 @@ module DamageControl
 
       scm = new_mock.__expect(:checkout) {time}
 
-      hub = new_mock.__expect(:add_subscriber) {|s| s.is_a?(CheckoutManager)}.
-                     __expect(:publish_message) {|e| e.is_a?(CheckedOutEvent)}
+      hub = new_mock.__expect(:add_consumer) {|s| s.is_a?(CheckoutManager)}.
+                     __expect(:put) {|e| e.is_a?(CheckedOutEvent)}
       project_directories = new_mock.__expect(:checkout_dir) {"somewhere"}
       project_config_repository = new_mock
       project_config_repository.__expect(:create_scm) {scm}

@@ -1,4 +1,3 @@
-require 'damagecontrol/core/Hub'
 require 'pebbles/mockit'
 require 'damagecontrol/core/BuildHistoryRepository'
 
@@ -7,6 +6,7 @@ module DamageControl
   class AbstractBuildHistoryTest < Test::Unit::TestCase
     
     include FileUtils
+    include MockIt
 
     def test_dummy
     end
@@ -23,7 +23,7 @@ module DamageControl
       @apple2.status = Build::FAILED
       @apple2.timestamp = "20040316225948"
 
-      @bhp = BuildHistoryRepository.new(Hub.new)
+      @bhp = BuildHistoryRepository.new(new_mock.__expect(:add_consumer))
       @bhp.register(@apple1)
       @bhp.register(@pear1)
       @bhp.register(@apple2)

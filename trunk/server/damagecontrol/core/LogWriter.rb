@@ -11,7 +11,7 @@ module DamageControl
   
     def initialize(channel)
       @open_files = {}
-      channel.add_subscriber(self)
+      channel.add_consumer(self)
     end
     
     def put(event)

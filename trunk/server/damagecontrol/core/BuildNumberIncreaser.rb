@@ -3,7 +3,7 @@ require 'damagecontrol/core/BuildEvents'
 module DamageControl
   class BuildNumberIncreaser
     def initialize(hub, project_config_repository)
-      hub.add_subscriber(self)
+      hub.add_consumer(self)
       @project_config_repository = project_config_repository
     end
     

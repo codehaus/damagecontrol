@@ -1,6 +1,5 @@
 require 'test/unit'
 require 'pebbles/mockit'
-
 require 'damagecontrol/core/Build'
 require 'damagecontrol/core/LogMerger'
 require 'damagecontrol/scm/NoSCM'
@@ -11,8 +10,8 @@ module DamageControl
     include MockIt
     
     def test_copies_away_logs_on_build_complete
-      hub = MockIt::Mock.new
-      hub.__expect(:add_subscriber) do |subscriber|
+      hub = new_mock
+      hub.__expect(:add_consumer) do |subscriber|
         assert(subscriber.is_a?(LogMerger))
       end
 
@@ -36,7 +35,6 @@ module DamageControl
       lm.put(BuildCompleteEvent.new(build))
       
       assert(File.exists?(build.xml_log_file))
-      hub.__verify
     end
   end
 end

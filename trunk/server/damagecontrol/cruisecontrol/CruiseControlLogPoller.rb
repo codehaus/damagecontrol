@@ -17,7 +17,7 @@ module DamageControl
       build = Build.new
       @ccparser.parse(file, build)
       evt = BuildCompleteEvent.new(build)
-      @channel.publish_message(evt)
+      @channel.put(evt)
     end
   end
 end

@@ -45,7 +45,7 @@ module DamageControl
     
     def test_build_is_sheduled_on_first_available_executor_only
       @project_config_repository.__expect(:create_build) {|project_name| @build}
-      only_available_executor = MockIt::Mock.new
+      only_available_executor = new_mock
       @scheduler.add_executor(only_available_executor)
     
       @mock_executor.__expect(:building_project?) { |project_name| assert_equal("project", project_name); false }

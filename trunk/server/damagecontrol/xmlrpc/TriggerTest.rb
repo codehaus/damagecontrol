@@ -35,7 +35,7 @@ module XMLRPC
         "foo"
       )
 
-      hub.__expect(:publish_message) do |message|
+      hub.__expect(:put) do |message|
         assert(message.is_a?(DoCheckoutEvent))
         assert(message.force_build)
         assert_equal("damagecontrol", message.project_name)

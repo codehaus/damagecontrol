@@ -32,7 +32,7 @@ module XMLRPC
     def request(project_name)
       begin
         message = DoCheckoutEvent.new(project_name, true)
-        @channel.publish_message(message)
+        @channel.put(message)
 
 <<-EOF
 Monitor build results at:

@@ -18,14 +18,15 @@ module DamageControl
     attr_reader :default_quiet_period
     attr_reader :build_queue
     
-    def initialize(multicast_space, project_config_repository, default_quiet_period=DEFAULT_QUIET_PERIOD, exception_logger=nil)
+    def initialize(channel, project_config_repository, default_quiet_period=DEFAULT_QUIET_PERIOD, exception_logger=nil)
       super
-      @channel = multicast_space
+      @channel = channel
+      @channel.add_consumer(self) unless @channel.nil?
+
       @project_config_repository = project_config_repository
       @default_quiet_period = default_quiet_period
       @exception_logger = exception_logger
 
-      @channel.add_consumer(self) unless @channel.nil?
       @executors = []
       @build_queue = []
     end

@@ -6,17 +6,18 @@ require 'damagecontrol/core/HostVerifyingHandler'
 module DamageControl
 
   class HostVerifyingHandlerTest < Test::Unit::TestCase
+    include MockIt
 
     def test_raises_unauthorized_error_on_disallowed_host
-      verifier = MockIt::Mock.new
+      verifier = new_mock
       verifier.__expect(:allowed?) {|host, ip| 
         assert_equal("host.evil.com", host)
         assert_equal("0.6.6.6", ip)
       }
-      req = MockIt::Mock.new
+      req = new_mock
       req.__setup(:peeraddr) { [nil, nil, "host.evil.com", "0.6.6.6"] }
       handler = HostVerifyingHandler.new(verifier)
-      res = MockIt::Mock.new
+      res = new_mock
       begin
         handler.call(req, res)
         fail
@@ -25,9 +26,6 @@ module DamageControl
         assert_match(/host.evil.com/, e.message)
         assert_match(/0.6.6.6/, e.message)
       end
-      verifier.__verify
-      req.__verify
-      res.__verify
     end
 
   end

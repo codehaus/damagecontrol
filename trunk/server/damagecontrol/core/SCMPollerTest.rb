@@ -36,7 +36,7 @@ module DamageControl
     end
     
     def test_should_request_build_without_checking_if_there_is_no_completed_build
-      hub = new_mock.__expect(:publish_message) {|m| m.is_a?(DoCheckoutEvent)}
+      hub = new_mock.__expect(:put) {|m| m.is_a?(DoCheckoutEvent)}
       
       build_history_repository = new_mock
       
@@ -93,7 +93,7 @@ module DamageControl
     end
     
     def test_should_poll_during_project_polling_interval
-      hub = new_mock.__expect(:publish_message) {|m| m.is_a?(DoCheckoutEvent)}
+      hub = new_mock.__expect(:put) {|m| m.is_a?(DoCheckoutEvent)}
       
       poller = SCMPoller.new(
         hub,
@@ -107,7 +107,7 @@ module DamageControl
     end
     
     def test_should_poll_during_default_polling_interval
-      hub = new_mock.__expect(:publish_message) {|m| m.is_a?(DoCheckoutEvent)}
+      hub = new_mock.__expect(:put) {|m| m.is_a?(DoCheckoutEvent)}
       
       poller = SCMPoller.new(
         hub,
@@ -124,7 +124,7 @@ module DamageControl
       last_commit = Time.new.utc
     
       poller = SCMPoller.new(
-        new_mock.__expect(:publish_message) {|m| m.is_a?(DoCheckoutEvent)},
+        new_mock.__expect(:put) {|m| m.is_a?(DoCheckoutEvent)},
         1,
         mock_project_config_repository(project_config_with_polling(last_commit), 10),
         mock_build_scheduler
@@ -137,7 +137,7 @@ module DamageControl
     def test_sends_build_request_when_changes_since_last_completed_build
       last_commit = Time.new.utc
             
-      hub = new_mock.__expect(:publish_message) {|m| m.is_a?(DoCheckoutEvent)}
+      hub = new_mock.__expect(:put) {|m| m.is_a?(DoCheckoutEvent)}
       poller = SCMPoller.new(
         hub, 
         1,

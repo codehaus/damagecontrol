@@ -7,6 +7,7 @@ require 'damagecontrol/util/FileUtils'
 module DamageControl
 
   class BuildTest < Test::Unit::TestCase
+    include MockIt
 
     def test_format_timestamp
       jons_birth_as_string = "19770615001001"
@@ -38,7 +39,7 @@ module DamageControl
       build.label = 42
       build.url = "http://builds.codehaus.org/something"
       build.status = Build::SUCCESSFUL
-      build.changesets = MockIt::Mock.new
+      build.changesets = new_mock
       build.changesets.__expect(:to_rss_description) {
         "Fixed bug 42"
       }

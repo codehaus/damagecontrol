@@ -31,7 +31,7 @@ module DamageControl
     end
 
     def test_executor_scheduler_and_logwriter_plays_along_nicely
-      hub.publish_message(BuildRequestEvent.new(@build))
+      hub.put(BuildRequestEvent.new(@build))
       @scheduler.force_tick
       @executor.process_next_scheduled_build
       assert(File.exists?("#{@basedir}/test/log"))

@@ -27,8 +27,8 @@ module DamageControl
       touch("#{basedir}/checkout/target/jars/2.jar")
       touch("#{basedir}/checkout/target/jars/3.jar")
       
-      hub = MockIt::Mock.new
-      hub.__expect(:add_subscriber) do |subscriber|
+      hub = new_mock
+      hub.__expect(:add_consumer) do |subscriber|
         assert(subscriber.is_a?(ArtifactArchiver))
       end
 

@@ -7,16 +7,13 @@ require 'damagecontrol/core/BuildExecutor'
 
 module DamageControl
   class BuildExecutorStatusTest < Test::Unit::TestCase
+    include MockIt
+
     def setup
-      @build_executor = MockIt::Mock.new
-      @build_history_repository = MockIt::Mock.new
+      @build_executor = new_mock
+      @build_history_repository = new_mock
       @status = BuildExecutorStatus.new(0, @build_executor, @build_history_repository)
       @build = Build.new("project")
-    end
-    
-    def teardown
-      @build_executor.__verify
-      @build_history_repository.__verify
     end
     
     def test_percentage_done_is_zero_with_no_last_build

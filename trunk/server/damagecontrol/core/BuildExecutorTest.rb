@@ -4,7 +4,6 @@ require 'pebbles/mockit'
 require 'fileutils'
 
 require 'damagecontrol/core/Build'
-require 'damagecontrol/core/Hub'
 require 'damagecontrol/core/BuildExecutor'
 require 'damagecontrol/core/BuildHistoryRepository'
 require 'damagecontrol/core/ProjectConfigRepository'
@@ -48,13 +47,13 @@ module DamageControl
       # this blocks forever
       @build.config["build_command_line"] = "cat"
       mock_hub = new_mock
-      mock_hub.__expect(:publish_message) {|message| assert(message.is_a?(BuildStartedEvent))}
-      mock_hub.__expect(:publish_message) {|message| assert(message.is_a?(BuildProgressEvent))}
-      mock_hub.__expect(:publish_message) {|message| assert(message.is_a?(BuildErrorEvent), "message was #{message}")}
+      mock_hub.__expect(:put) {|message| assert(message.is_a?(BuildStartedEvent))}
+      mock_hub.__expect(:put) {|message| assert(message.is_a?(BuildProgressEvent))}
+      mock_hub.__expect(:put) {|message| assert(message.is_a?(BuildErrorEvent), "message was #{message}")}
 
       @build.scm = new_mock.__expect(:label){"a_label"}
 
-      mock_hub.__expect(:publish_message) {|message| 
+      mock_hub.__expect(:put) {|message| 
         assert(message.is_a?(BuildCompleteEvent))
         assert_equal(Build::KILLED, message.build.status) 
       }
@@ -77,16 +76,16 @@ module DamageControl
     
     def test_when_build_scheduled_executes_sends_start_process_and_complete
       mock_hub = new_mock
-      mock_hub.__expect(:publish_message) {|message| assert(message.is_a?(BuildStartedEvent))}
-      mock_hub.__expect(:publish_message) {|message| 
+      mock_hub.__expect(:put) {|message| assert(message.is_a?(BuildStartedEvent))}
+      mock_hub.__expect(:put) {|message| 
         assert(message.is_a?(BuildProgressEvent))
         assert_equal("echo Hello world from DamageControl!", message.output.chomp.chomp(" "))
       }
-      mock_hub.__expect(:publish_message) {|message| 
+      mock_hub.__expect(:put) {|message| 
         assert(message.is_a?(BuildProgressEvent))
         assert_equal("Hello world from DamageControl!", message.output.chomp.chomp(" "))
       }
-      mock_hub.__expect(:publish_message) {|message| assert(message.is_a?(BuildCompleteEvent))}
+      mock_hub.__expect(:put) {|message| assert(message.is_a?(BuildCompleteEvent))}
 
       @build.scm = new_mock.__expect(:label) {"a_label"}
 
@@ -101,7 +100,7 @@ module DamageControl
     def test_failing_build_sends_build_complete_event_with_successful_flag_set_to_false
       
       mock_hub = new_mock
-      mock_hub.__setup(:publish_message) {|message|}
+      mock_hub.__setup(:put) {|message|}
 
       build_executor = BuildExecutor.new(
         'executor1', 
@@ -132,10 +131,10 @@ module DamageControl
       mock_scm.__expect(:label) {}
 
       mock_hub = new_mock
-      mock_hub.__expect(:publish_message) {|message| assert(message.is_a?(BuildStartedEvent))}
-      mock_hub.__expect(:publish_message) {|message| assert(message.is_a?(BuildProgressEvent))}
-      mock_hub.__expect(:publish_message) {|message| assert(message.is_a?(BuildProgressEvent))}
-      mock_hub.__expect(:publish_message) {|message| assert(message.is_a?(BuildCompleteEvent))}
+      mock_hub.__expect(:put) {|message| assert(message.is_a?(BuildStartedEvent))}
+      mock_hub.__expect(:put) {|message| assert(message.is_a?(BuildProgressEvent))}
+      mock_hub.__expect(:put) {|message| assert(message.is_a?(BuildProgressEvent))}
+      mock_hub.__expect(:put) {|message| assert(message.is_a?(BuildCompleteEvent))}
       
       build_executor = BuildExecutor.new(
         'executor1', 

@@ -11,7 +11,8 @@ module DamageControl
   class JIRAPublisher < Pebbles::Space
   
     def initialize(channel, template, jira_host, jira_user=ENV['JIRA_USER'], jira_password=ENV['JIRA_PASSWORD'])
-      super(channel)
+      super
+      channel.add_consumer(self)
       @jira_host = jira_host
       @jira_user = jira_user
       @jira_password = jira_password

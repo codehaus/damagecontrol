@@ -8,12 +8,13 @@ module DamageControl
   class FilePollerTest < Test::Unit::TestCase
 
     include FileUtils
+    include MockIt
 
     def setup
       @dir = new_temp_dir
       File.makedirs(@dir)
       
-      @file_handler = MockIt::Mock.new
+      @file_handler = new_mock
       @poller = FilePoller.new(@dir, @file_handler)
     end
 
@@ -23,7 +24,6 @@ module DamageControl
     
     def test_doesnt_trig_on_empty_directory
       @poller.tick
-      @file_handler.__verify
     end
     
     def test_new_file_calls_new_file
@@ -33,7 +33,6 @@ module DamageControl
     
       create_file("newfile")
       @poller.tick
-      @file_handler.__verify
     end
     
     def test_two_new_files_calls_new_file_for_each
@@ -47,7 +46,6 @@ module DamageControl
       create_file("newfile1")
       create_file("newfile2")
       @poller.tick
-      @file_handler.__verify
     end
 
   private

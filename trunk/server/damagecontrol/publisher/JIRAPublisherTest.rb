@@ -1,8 +1,8 @@
 require 'test/unit'
+require 'pebbles/mockit'
 require 'damagecontrol/scm/Changes'
 require 'damagecontrol/core/BuildEvents'
 require 'damagecontrol/core/Build'
-require 'damagecontrol/core/Hub'
 require 'damagecontrol/publisher/JIRAPublisher'
 require 'ftools'
 require 'cgi'
@@ -10,9 +10,16 @@ require 'cgi'
 module DamageControl
 
   class JIRAPublisherTest < Test::Unit::TestCase
+    include MockIt
   
     def setup
-      @jira_publisher = JIRAPublisher.new(Hub.new, "short_text_build_result.erb", "jira.codehaus.org", "rinkrank", "julenissen")
+      @jira_publisher = JIRAPublisher.new(
+        new_mock.__expect(:add_consumer), 
+        "short_text_build_result.erb", 
+        "jira.codehaus.org", 
+        "rinkrank", 
+        "julenissen"
+      )
 
       def @jira_publisher.post_script(script)
         @script = script

@@ -9,7 +9,7 @@ module DamageControl
     include Logging
     
     def initialize(hub, project_directories)
-      hub.add_subscriber(self)
+      hub.add_consumer(self)
       @project_directories = project_directories
     end
     

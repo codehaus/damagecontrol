@@ -9,7 +9,8 @@ module DamageControl
   class GraphPublisher < Pebbles::Space
   
     def initialize(channel, project_directories, build_history_repository)
-      super(channel)
+      super
+      channel.add_consumer(self)
       @project_directories = project_directories
       @bhrg = DamageControl::Tool::Plot::BuildHistoryReportGenerator.new(build_history_repository)
     end

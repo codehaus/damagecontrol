@@ -9,12 +9,10 @@ module DamageControl
   class ChangesReportTest < Test::Unit::TestCase
     include FileUtils
     include Pebbles::MVCServletTesting
+    include MockIt
     
-    def setup
-    end
-
     def mock_project_config_repository(project_config)
-      @project_config_repository = MockIt::Mock.new
+      @project_config_repository = new_mock
       @project_config_repository.__setup(:project_exists?) {|p| true }
       @project_config_repository.__setup(:project_config) {|p| project_config }
       @project_config_repository

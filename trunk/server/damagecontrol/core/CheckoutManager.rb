@@ -13,10 +13,10 @@ module DamageControl
   class CheckoutManager < Pebbles::Space
     include Logging
     
-    def initialize(hub, project_directories, project_config_repository, max_queue_size=10)
+    def initialize(channel, project_directories, project_config_repository, max_queue_size=10)
       super
-      hub.add_subscriber(self)
-      @hub = hub
+      channel.add_consumer(self)
+      @channel = channel
       @project_directories = project_directories
       @project_config_repository = project_config_repository
       @max_queue_size = max_queue_size
@@ -36,7 +36,7 @@ module DamageControl
     def on_message(event)
       if event.is_a?(DoCheckoutEvent)
         checked_out_event = CheckedOutEvent.new(event.project_name, checkout(event.project_name), event.force_build)
-        @hub.publish_message(checked_out_event)
+        @channel.put(checked_out_event)
       end
     end
 
@@ -65,7 +65,7 @@ module DamageControl
 
       # If first checkout: timestamp of last commit, otherwise, chagesets
       changesets_or_last_commit_time = scm.checkout(checkout_dir, scm_from_time, nil) do |line|
-        # TODO: it would be nice to get each update as a block arg, and then send ProjectCheckoutMessage to the hub.
+        # TODO: it would be nice to get each update as a block arg, and then send ProjectCheckoutMessage to the channel.
         # (It would not be associated with a build, but a project)
         logger.info(line)
       end

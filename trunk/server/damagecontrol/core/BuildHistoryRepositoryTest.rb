@@ -1,7 +1,6 @@
 require 'yaml'
 require 'test/unit' 
 require 'pebbles/mockit' 
-require 'damagecontrol/core/Hub'
 require 'damagecontrol/core/BuildHistoryRepository'
 require 'damagecontrol/core/AbstractBuildHistoryTest'
 require 'damagecontrol/scm/Changes'
@@ -9,6 +8,7 @@ require 'damagecontrol/scm/Changes'
 module DamageControl
 
   class BuildHistoryRepositoryTest < AbstractBuildHistoryTest
+    include MockIt
   
     def test_can_get_current_build
       assert_equal(nil, @bhp.current_build("project_name"))
@@ -116,7 +116,7 @@ module DamageControl
     end
     
     def test_init_with_pd_reads_yaml
-      mock_project_directories = MockIt::Mock.new
+      mock_project_directories = new_mock
       mock_project_directories.__expect(:project_names) {
         ["tea", "coffee"]
       }
@@ -128,12 +128,11 @@ module DamageControl
         assert_equal("coffee", project_name)
         "coffee.yaml"
       }
-      bhp = BuildHistoryRepository.new(Hub.new, mock_project_directories)
-      mock_project_directories.__verify
+      bhp = BuildHistoryRepository.new(new_mock.__expect(:add_consumer), mock_project_directories)
     end
     
     def test_register_with_pd_writes_yaml
-      mock_project_directories = MockIt::Mock.new
+      mock_project_directories = new_mock
       mock_project_directories.__expect(:project_names) {
         []
       }
@@ -148,11 +147,10 @@ module DamageControl
         assert_equal("apple", project_name)
         "#{tempdir}/apple.yaml"
       }
-      bhp = BuildHistoryRepository.new(Hub.new, mock_project_directories)
+      bhp = BuildHistoryRepository.new(new_mock.__expect(:add_consumer), mock_project_directories)
       bhp.register(@pear1) # should not save, build not complete
       bhp.register(@apple1)
 
-      mock_project_directories.__verify
       assert(File.exists?("#{tempdir}/pear.yaml"))
       assert(File.exists?("#{tempdir}/apple.yaml"))
 

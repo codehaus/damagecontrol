@@ -36,7 +36,7 @@ module XMLRPC
     def shutdown_with_message_and_time(message, time)
       logger.info("request to shut down server in #{time} seconds: #{message}")
       do_later(time) do
-        @channel.publish_message(UserMessage.new(message))
+        @channel.put(UserMessage.new(message))
         sleep 2
         exit
         sleep 2

@@ -9,10 +9,11 @@ module DamageControl
 
   class LogWriterTest < Test::Unit::TestCase
     include FileUtils
+    include MockIt
     
     def setup
-      @hub = MockIt::Mock.new
-      @hub.__expect(:add_subscriber) do |subscriber|
+      @hub = new_mock
+      @hub.__expect(:add_consumer) do |subscriber|
         assert(subscriber.is_a?(LogWriter))
       end
 

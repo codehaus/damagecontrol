@@ -10,9 +10,10 @@ module DamageControl
   class SearchServletTest < Test::Unit::TestCase
     include FileUtils
     include Pebbles::MVCServletTesting
+    include MockIt
 
     def test_search_project
-      build_history_repository = MockIt::Mock.new
+      build_history_repository = new_mock
       build_history_repository.__expect(:search) {|regexp, project_name|
         assert_equal(/search term/i, regexp)
         assert_equal("myprojectname", project_name)
@@ -25,7 +26,7 @@ module DamageControl
     end
 
     def test_global_search
-      build_history_repository = MockIt::Mock.new
+      build_history_repository = new_mock
       build_history_repository.__expect(:search) {|regexp, project_name|
         assert_equal(/search term/i, regexp)
         assert_equal(nil, project_name)

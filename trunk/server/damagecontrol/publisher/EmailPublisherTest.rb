@@ -1,16 +1,20 @@
 require 'test/unit'
+require 'pebbles/mockit'
+require 'pebbles/Space'
 require 'damagecontrol/core/BuildEvents'
 require 'damagecontrol/core/Build'
-require 'damagecontrol/core/Hub'
 require 'damagecontrol/publisher/EmailPublisher'
 require 'ftools'
 
 module DamageControl
 
   class EmailPublisherTest < Test::Unit::TestCase
+    include MockIt
   
     def setup
-      @email_publisher = EmailPublisher.new(Hub.new, nil,
+      @email_publisher = EmailPublisher.new(
+        new_mock.__expect(:add_consumer),
+        nil,
         :SubjectTemplate => "short_text_build_result.erb", 
         :BodyTemplate => "short_html_build_result.erb",
         :FromEmail => "noreply@somewhere.foo")

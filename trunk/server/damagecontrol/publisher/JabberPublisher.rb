@@ -12,7 +12,8 @@ module DamageControl
     attr_reader :recipients
   
     def initialize(channel, publisherJabberAccountUser, publisherJabberAccountPassword, recipients, template)
-      super(channel)
+      super
+      channel.add_consumer(self)
       @jabber = JabberConnection.new(publisherJabberAccountUser, publisherJabberAccountPassword)
       @recipients = recipients
 

@@ -21,16 +21,16 @@ module DamageControl
       mock_project_config_repository = new_mock
 
       hub = new_mock
-      hub.__expect(:add_subscriber) do |subscriber|
+      hub.__expect(:add_consumer) do |subscriber|
         assert(subscriber.is_a?(DependentBuildTrigger))
       end
       dbt = DependentBuildTrigger.new(hub)
 
-      hub.__expect(:publish_message) do |message|
+      hub.__expect(:put) do |message|
         assert(message.is_a?(DoCheckoutEvent))
         assert_equal("dep_project_1", message.project_name)
       end
-      hub.__expect(:publish_message) do |message|
+      hub.__expect(:put) do |message|
         assert(message.is_a?(DoCheckoutEvent))
         assert_equal("dep_project_2", message.project_name)
       end
@@ -44,7 +44,7 @@ module DamageControl
       build.status = Build::FAILED
 
       hub = new_mock
-      hub.__expect(:add_subscriber) do |subscriber|
+      hub.__expect(:add_consumer) do |subscriber|
         assert(subscriber.is_a?(DependentBuildTrigger))
       end
 

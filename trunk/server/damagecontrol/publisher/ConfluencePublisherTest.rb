@@ -1,5 +1,4 @@
 require 'test/unit'
-require 'mock_with_returns'
 require 'damagecontrol/publisher/ConfluencePublisher'
 
 # Authors: Zohar Melamed, Aslak Hellesoy

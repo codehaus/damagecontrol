@@ -6,8 +6,8 @@ require 'xmlrpc/server'
 require 'socket'
 require 'webrick'
  
+require 'pebbles/Space'
 require 'damagecontrol/Version'
-require 'damagecontrol/core/Hub'
 require 'damagecontrol/core/BuildExecutor'
 require 'damagecontrol/core/BuildScheduler'
 require 'damagecontrol/core/CheckoutManager'
@@ -131,7 +131,7 @@ module DamageControl
     end
     
     def init_config_services
-      component(:hub, Hub.new)
+      component(:hub, Pebbles::MulticastSpace.new)
       
       # TODO: It would be nice to merge all of these beasts into one class.
       # Most classes that depend on one of them generally depend on one or two others too.

@@ -32,17 +32,19 @@ module DamageControl
     end
     
     def on_message(build)
-      @current_build = build
-      begin
-        execute(build)
-      rescue Exception => e
-        message = format_exception(e)
-        logger.error("build failed: #{message}")
-        current_build.error_message = message
-        current_build.status = Build::FAILED
-        report_error("Build failed due to: #{message}")
-      ensure
-        build_complete(build)
+      if(build.is_a?(Build))
+        @current_build = build
+        begin
+          execute(build)
+        rescue Exception => e
+          message = format_exception(e)
+          logger.error("build failed: #{message}")
+          current_build.error_message = message
+          current_build.status = Build::FAILED
+          report_error("Build failed due to: #{message}")
+        ensure
+          build_complete(build)
+        end
       end
     end
     
@@ -91,7 +93,7 @@ module DamageControl
       build.start_time = Time.now.utc
       build.status = Build::BUILDING
       logger.info("Starting build of #{build.project_name}")
-      @channel.publish_message(BuildStartedEvent.new(build))
+      @channel.put(BuildStartedEvent.new(build))
 
       label = label(build)
       # set up some environment variables the build can use
@@ -147,7 +149,7 @@ module DamageControl
     def build_complete(build)
       logger.info("Build complete #{build.project_name}: #{build.status}")
       build.end_time = Time.now.utc
-      @channel.publish_message(BuildCompleteEvent.new(build))
+      @channel.put(BuildCompleteEvent.new(build))
 
       # atomically frees the slot, we are now no longer busy
       @current_build = nil
@@ -162,11 +164,11 @@ module DamageControl
     end
     
     def report_progress(progress)
-      @channel.publish_message(BuildProgressEvent.new(current_build, progress))
+      @channel.put(BuildProgressEvent.new(current_build, progress))
     end
 
     def report_error(message)
-      @channel.publish_message(BuildErrorEvent.new(current_build, message))
+      @channel.put(BuildErrorEvent.new(current_build, message))
     end
 
   end
