@@ -171,7 +171,7 @@ class Project
       DAMAGECONTROL_HOME=`dirname $0`/..
       cd $DAMAGECONTROL_HOME
       export DAMAGECONTROL_HOME=`pwd`
-      ruby -I"$DAMAGECONTROL_HOME/server" "#{target}" $*
+      exec ruby -I"$DAMAGECONTROL_HOME/server" "#{target}" $*
     })
     system("chmod +x #{script}") unless windows?
   end
