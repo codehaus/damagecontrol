@@ -10,7 +10,7 @@ module DamageControl
   class SelfUpgrader < AsyncComponent
     def process_message(message)
 @hub.publish_message(UserMessage.new(message.class.name))
-      if message.is_a? BuildCompleteEvent        
+      if message.is_a? BuildCompleteEvent
 @hub.publish_message(UserMessage.new(message.build.status))
 @hub.publish_message(UserMessage.new(message.build.project_name))
         if((Build::SUCCESSFUL == message.build.status) && message.build.project_name == "damagecontrol")
