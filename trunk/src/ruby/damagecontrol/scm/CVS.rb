@@ -1,13 +1,13 @@
 require 'damagecontrol/scm/SCM'
 require 'damagecontrol/FileUtils'
-require 'damagecontrol/SocketTrigger'
+require 'damagecontrol/BuildBootstrapper'
 require 'ftools'
 
 module DamageControl
 
   # Handles parsing of CVS specs, checkouts and installation of triggers script
   #
-  # format of spec is cvsroot:module
+  # format of scm_spec is cvsroot:module
   # examples
   # :local:/cvsroot/damagecontrol:damagecontrol
   # :pserver:anonymous@cvs.codehaus.org:/cvsroot/damagecontrol:damagecontrol
@@ -17,74 +17,74 @@ module DamageControl
   
     include FileUtils
   
-    def handles_spec?(spec)
-      parse_spec(spec)
+    def handles_spec?(scm_spec)
+      parse_spec(scm_spec)
     end
     
     # parses the spec into tokens
     # [protocol, user, host, path, module]
     #
-    def parse_spec(spec)
+    def parse_spec(scm_spec)
       md = case
-        when spec =~ /^:local:/   then /^:(local):(.*):(.*)$/.match(spec)
-        when spec =~ /^:ext:/     then /^:(ext):(.*)@(.*):(.*):(.*)$/.match(spec)
-        when spec =~ /^:pserver:/ then /^:(pserver):(.*)@(.*):(.*):(.*)$/.match(spec)
+        when scm_spec =~ /^:local:/   then /^:(local):(.*):(.*)$/.match(scm_spec)
+        when scm_spec =~ /^:ext:/     then /^:(ext):(.*)@(.*):(.*):(.*)$/.match(scm_spec)
+        when scm_spec =~ /^:pserver:/ then /^:(pserver):(.*)@(.*):(.*):(.*)$/.match(scm_spec)
       end
       result = case
-        when spec =~ /^:local:/   then [md[1], nil, nil, md[2], md[3]]
-        when spec =~ /^:ext:/     then md[1..5]
-        when spec =~ /^:pserver:/ then md[1..5]
+        when scm_spec =~ /^:local:/   then [md[1], nil, nil, md[2], md[3]]
+        when scm_spec =~ /^:ext:/     then md[1..5]
+        when scm_spec =~ /^:pserver:/ then md[1..5]
       end
     end
 
-    def branch(spec)
+    def branch(scm_spec)
       # TODO: add support for branches in the scm_spec
       "MAIN"
     end
 
-    def cvsroot(spec)
-      /(.*):[A-Za-z]/.match(spec)[1]
+    def cvsroot(scm_spec)
+      /(.*):[A-Za-z]/.match(scm_spec)[1]
     end
     
-    def protocol(spec)
-      parse_spec(spec)[0]
+    def protocol(scm_spec)
+      parse_spec(scm_spec)[0]
     end
 
-    def user(spec)
-      parse_spec(spec)[1]
+    def user(scm_spec)
+      parse_spec(scm_spec)[1]
     end
 
-    def host(spec)
-      parse_spec(spec)[2]
+    def host(scm_spec)
+      parse_spec(scm_spec)[2]
     end
 
-    def path(spec)
-      parse_spec(spec)[3]
+    def path(scm_spec)
+      parse_spec(scm_spec)[3]
     end
 
-    def mod(spec)
-      parse_spec(spec)[4]
+    def mod(scm_spec)
+      parse_spec(scm_spec)[4]
     end
 
-    def checkout_command(spec, directory)
+    def checkout_command(scm_spec, directory)
       os_directory = directory.gsub('/', path_separator)
-      "-d #{cvsroot(spec)} checkout -d #{os_directory} #{mod(spec)}"
+      "-d #{cvsroot(scm_spec)} checkout -d #{os_directory} #{mod(scm_spec)}"
     end
 
-    def update_command(spec)
-      "-d #{cvsroot(spec)} update -d -P"
+    def update_command(scm_spec)
+      "-d #{cvsroot(scm_spec)} update -d -P"
     end
     
-    def checkout(spec, directory, &proc)
-      spec = to_os_path(spec)
+    def checkout(scm_spec, directory, &proc)
+      scm_spec = to_os_path(scm_spec)
       directory = to_os_path(File.expand_path(directory))
       File.makedirs(directory)
-      if(checked_out?(directory, spec))
+      if(checked_out?(directory, scm_spec))
         Dir.chdir(directory)
-        cvs(update_command(spec), &proc)
+        cvs(update_command(scm_spec), &proc)
       else
         Dir.chdir(directory + "/..")
-        cvs(checkout_command(spec, directory), &proc)
+        cvs(checkout_command(scm_spec, directory), &proc)
       end
     end
 
@@ -95,7 +95,7 @@ module DamageControl
     #
     # @param directory where to temporarily check out during install
     # @param project_name a human readable name for the module
-    # @param spec full SCM spec (example: :local:/cvsroot/picocontainer:pico)
+    # @param scm_spec full SCM spec (example: :local:/cvsroot/picocontainer:pico)
     # @param build_command_line command line that will run the build
     # @param host where the dc server is running
     # @param port where the dc server is listening
@@ -106,26 +106,45 @@ module DamageControl
     def install_trigger(
       directory, \
       project_name, \
-      spec, \
+      scm_spec, \
       build_command_line, \
       nag_email, \
       dc_host="localhost", \
       dc_port="4711", \
-      nc_exe_file="nc", \
+      nc_exe_file=nil, \
       &proc
     )
       directory = File.expand_path(directory)
-      checkout("#{cvsroot(spec)}:CVSROOT", directory, &proc)
+      checkout("#{cvsroot(scm_spec)}:CVSROOT", directory, &proc)
       Dir.chdir("#{directory}")
-      File.open("#{directory}/loginfo", File::WRONLY | File::APPEND) do |file|
-        script = SocketTrigger.new(nil,nil,nil).trigger_command(project_name, spec, build_command_line, nag_email, nc_command(spec), dc_host, dc_port)
-        file.puts("#{mod(spec)} #{script}")
+
+      # install trigger command
+      loginfo = File.open("#{directory}/loginfo", File::WRONLY | File::APPEND) do |file|
+        conf_file = conf_script(scm_spec, BuildBootstrapper.conf_file(project_name))
+        trigger_command = BuildBootstrapper.trigger_command(project_name, conf_file, nc_command(scm_spec), dc_host, dc_port)
+        file.puts("#{mod(scm_spec)} #{trigger_command}")
       end
+
+      # install conf file
+      conf_file_name = BuildBootstrapper.conf_file(project_name)
+      conf_file = File.open(conf_file_name, "w")
+      build_spec = BuildBootstrapper.build_spec(project_name, scm_spec, build_command_line, nag_email)
+      conf_file.puts(build_spec)
+      conf_file.flush
+      conf_file.close
+      system("cvs -d#{cvsroot(scm_spec)} add #{conf_file_name}")
+
+      checkoutlist = File.open("checkoutlist", File::WRONLY | File::APPEND) do |file|
+        file.puts(File.basename(conf_file_name))
+      end
+
+      File.copy(nc_exe_file, "#{directory}/nc.exe" )
+      system("cvs -d#{cvsroot(scm_spec)} add -kb nc.exe")
 
       if(windows?)
         # install nc.exe
         File.copy(nc_exe_file, "#{directory}/nc.exe" )
-        system("cvs -d#{cvsroot(spec)} add -kb nc.exe")
+        system("cvs -d#{cvsroot(scm_spec)} add -kb nc.exe")
 
         # tell cvs to keep a non-,v file in the central repo
         File.open("checkoutlist", File::WRONLY | File::APPEND) do |file|
@@ -133,19 +152,27 @@ module DamageControl
         end
       end
       Dir.chdir("#{directory}")
-      system("cvs commit -m \"added damagecontrol\"")
+      system("cvs commit -m \"Installed damagecontrol trigger for #{project_name}\"")
     end
     
-    def nc_command(spec)
+    def nc_command(scm_spec)
       if(windows?)
-        to_os_path("#{path(spec)}/CVSROOT/nc.exe")
+        to_os_path("#{path(scm_spec)}/CVSROOT/nc.exe")
       else
         "nc"
       end
     end
     
-    def checked_out?(directory, spec)
-      rootcvs = File.expand_path("#{directory}/#{mod(spec)}/CVS/Root")
+    def conf_script(scm_spec, conf_file_name)
+      if(windows?)
+        to_os_path("#{path(scm_spec)}/CVSROOT/#{conf_file_name}")
+      else
+        "cat"
+      end
+    end
+    
+    def checked_out?(directory, scm_spec)
+      rootcvs = File.expand_path("#{directory}/#{mod(scm_spec)}/CVS/Root")
       File.exists?(rootcvs)
     end
   

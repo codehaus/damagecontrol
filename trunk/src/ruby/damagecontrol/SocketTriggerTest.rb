@@ -25,7 +25,11 @@ module DamageControl
     
     def test_fires_build_request_on_socket_accept
       
-      build = @s.do_accept(cvs_build_spec)
+      build = @s.do_accept(BuildBootstrapper.build_spec(
+        @project_name, \
+        @scm_spec, \
+        @build_command_line, \
+        @nag_email))
 
       assert_got_message(BuildRequestEvent)
       build = messages_from_hub[0].build
@@ -45,31 +49,6 @@ module DamageControl
 
     def test_rejects_other
       assert(!@s.allowed?("blah", "128.0.0.1"))
-    end
-
-  private
-  
-    def cvs_build_spec
-      nc_command = cat_command # behaves like ncat without the network
-      dc_host = ""
-      dc_port = ""
-      
-      tc = BuildBootstrapper.build_spec(
-        @project_name, \
-        @scm_spec, \
-        @build_command_line, \
-        @nag_email, \
-        nc_command, \
-        dc_host, \
-        dc_port)
-    end
-  
-    def cat_command
-      if(windows?)
-        File.expand_path("#{damagecontrol_home}/bin/cat.exe").gsub('/','\\')
-      else
-        "cat"
-      end
     end
 
   end

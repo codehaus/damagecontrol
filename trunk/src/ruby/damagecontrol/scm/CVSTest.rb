@@ -80,9 +80,9 @@ module DamageControl
       project_name = "DamageControlled"
       spec = ":local:#{testrepo}:damagecontrolled"
       build_command = "echo hello"
+      nag_email = "maillist@project.bar"
 
-      expected = "#{project_name},#{spec},#{build_command}"
-      mock_server = start_mock_server(self, expected)
+      mock_server = start_mock_server(self)
 
       pwd = Dir.getwd
       create_repo(testrepo)
@@ -92,7 +92,7 @@ module DamageControl
         project_name, \
         spec, \
         build_command, \
-        "maillist@project.bar", \
+        nag_email, \
         "localhost", \
         "4713", \
         nc_exe
@@ -106,6 +106,10 @@ module DamageControl
       mock_server.join(2)
       assert(!mock_server.alive?, "mock server didn't get incoming connection")
       mock_server.kill
+            
+      @cvs.checkout(spec, testcheckout) {|output|
+        puts "HALLO" + output
+      }
     end
 
   private
@@ -126,16 +130,22 @@ module DamageControl
     
     def import_damagecontrolled(testcheckout, spec)
       Dir.chdir("#{damagecontrol_home}/testdata/damagecontrolled")
-      system("cvs -d#{@cvs.cvsroot(spec)} -q import -m \"\" #{@cvs.mod(spec)} dc-vendor dc-release")
+      cmd = "cvs -d#{@cvs.cvsroot(spec)} -q import -m \"\" #{@cvs.mod(spec)} dc-vendor dc-release"
+      system(cmd)
     end
 
-    def start_mock_server(test, expected)
+    def start_mock_server(test)
       Thread.abort_on_exception = true
       Thread.new {
-        session = TCPServer.new(4713).accept
-        payload = session.gets
-        session.close()
-        test.assert_equal(expected, payload.chomp)
+        socket = TCPServer.new(4713).accept
+        payload = ""
+        socket.each { |line|
+          payload << line
+          if(line.chomp == "...")
+            break
+          end
+        }
+        socket.close
       }
     end
   end

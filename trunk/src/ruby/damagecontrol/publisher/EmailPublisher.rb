@@ -1,6 +1,6 @@
 require 'damagecontrol/BuildEvents'
 require 'damagecontrol/AsyncComponent'
-require 'ftools'
+require 'net/smtp'
 
 module DamageControl
 
@@ -24,9 +24,15 @@ module DamageControl
       end
     end
     
-    def sendmail(content, from, to)
-      session = Net::SMTP.new(@server, @port)
-      session.sendmail(content, from, to)
+    def sendmail(msg, from, to)
+      begin
+        Net::SMTP.start(@server) do |smtp|
+          smtp.sendmail( msg, from, to )
+        end
+      rescue => e
+        puts "Couldn't send mail:" + e.message
+        puts e.backtrace.join("\n")
+      end
     end
   end
 end

@@ -43,7 +43,16 @@ module DamageControl
               client_hostname = socket.peeraddr[2]
               client_ip = socket.peeraddr[3]
               if(allowed?(client_hostname, client_ip))
-                payload = socket.gets(nil)
+puts "CONNECTION!"
+                payload = ""
+                socket.each { |line|
+puts line
+                  if(line.chomp == "...")
+                    break
+                  else
+                    payload << line
+                  end
+                }
                 begin
                   do_accept(payload)
                   socket.print("DamageControl server on #{@server.addr[2]}/#{@server.addr[3]} got message from #{client_hostname} / #{client_ip}\r\n")

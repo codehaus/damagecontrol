@@ -6,7 +6,15 @@ module DamageControl
 
   class BuildBootstrapper
     def create_build(build_yaml)
-      yaml_doc = YAML::load(build_yaml)
+      eof_stripped = ""
+      build_yaml.each { |line|
+        if(line.chomp == "...")
+          break
+        else
+          eof_stripped << line
+        end
+      }
+      yaml_doc = YAML::load(eof_stripped)
       Build.new(yaml_doc["project_name"], yaml_doc)
     end
 
@@ -22,17 +30,18 @@ module DamageControl
     # @param host where the dc server is running
     # @param port where the dc server is listening
     # @param replace_string what to replace "/" with (needed for CVS on windows)
-    def BuildBootstrapper.trigger_command(project_name, nc_command, dc_host, dc_port, path_sep="/")
-      "cat #{conf_file}|#{nc_command} #{dc_host} #{dc_port}"
+    def BuildBootstrapper.trigger_command(project_name, conf_file, nc_command, dc_host, dc_port)
+#      "#{cat_command} #{conf_file} | #{nc_command} #{dc_host} #{dc_port}"
+      "#{nc_command} #{dc_host} #{dc_port} < #{conf_file}"
     end
 
-    def BuildBootstrapper.build_spec(project_name, spec, build_command_line, nag_email, nc_command, dc_host, dc_port, path_sep="/")
+    def BuildBootstrapper.build_spec(project_name, scm_spec, build_command_line, nag_email, path_sep="/")
       {
         "project_name" => project_name,
-        "scm_spec" => spec.gsub('/', path_sep),
+        "scm_spec" => scm_spec.gsub('/', path_sep),
         "build_command_line" => build_command_line,
         "nag_email" => nag_email
-      }.to_yaml
+      }.to_yaml << "\n...\n"
     end
 end
 
