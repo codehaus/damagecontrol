@@ -186,13 +186,13 @@ module RSCM
       svn(dir, import_cmd)
     end
 
-    def changesets(checkout_dir, from_identifier, to_identifier=Time.infinity, files=nil)
+    def changesets(checkout_dir, from_identifier, to_identifier=Time.infinity)
       # Return empty changeset if the requested revision doesn't exist yet.
       return ChangeSets.new if(from_identifier.is_a?(Integer) && head_revision(checkout_dir) < from_identifier)
 
       checkout_dir = PathConverter.filepath_to_nativepath(checkout_dir, false)
       changesets = nil
-      command = "svn #{changes_command(from_identifier, to_identifier, files)}"
+      command = "svn #{changes_command(from_identifier, to_identifier)}"
       yield command if block_given?
 
       with_working_dir(checkout_dir) do
@@ -281,7 +281,7 @@ module RSCM
       "update #{revision_option(nil,to_identifier)}"
     end
     
-    def changes_command(from_identifier, to_identifier, files)
+    def changes_command(from_identifier, to_identifier)
       # http://svnbook.red-bean.com/svnbook-1.1/svn-book.html#svn-ch-3-sect-3.3
       # file_list = files.join('\n')
 # WEIRD cygwin bug garbles this!?!?!?!

@@ -3,6 +3,7 @@ require 'needle'
 require 'rscm'
 require 'damagecontrol/poller'
 require 'damagecontrol/standard_persister'
+require 'damagecontrol/publisher/base'
 
 # Wire up the whole DamageControl app with Needle's nice block based DI framework.
 # I wonder - is BDI (Block Dependency Injection) a new flavour of DI?
