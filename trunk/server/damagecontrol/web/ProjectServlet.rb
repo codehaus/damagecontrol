@@ -1,8 +1,11 @@
 require 'damagecontrol/web/AbstractAdminServlet'
 require 'damagecontrol/scm/SCMFactory'
+require 'damagecontrol/util/FileUtils'
 
 module DamageControl
   class ProjectServlet < AbstractAdminServlet
+    include FileUtils
+  
     def initialize(type, build_history_repository, project_config_repository, trigger, build_scheduler)
       super(type, build_scheduler, build_history_repository, project_config_repository)
       @trigger = trigger
