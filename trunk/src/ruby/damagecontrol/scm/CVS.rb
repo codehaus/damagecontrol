@@ -77,11 +77,12 @@ module DamageControl
     end
     
     def changes_command(time_before, time_after)
-      "log -d\"#{cvsdate(time_before)}<#{cvsdate(time_after)}\""
+      "log -d\"#{cvsdate(time_before)}<=#{cvsdate(time_after)}\""
     end
     
     def cvsdate(time)
-      time.strftime("%Y-%m-%d %H:%M:%S")
+      # CVS wants all dates as UTC.
+      time.utc.strftime("%Y-%m-%d %H:%M:%S UTC")
     end
     
     def commit(directory, message, &proc)
@@ -231,6 +232,7 @@ module DamageControl
   
     def cvs_with_io(cmd, &proc)
       cmd = "cvs -q #{cmd} 2>&1"
+
       logger.debug "executing #{cmd}"
       ret = nil
       io = IO.popen("#{cmd}") do |io|

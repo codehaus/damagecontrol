@@ -75,24 +75,24 @@ module DamageControl
       
     end
     
-    def test_determines_changes_and_checks_out_before_building
+    def test_checks_out_and_determines_changes_before_building
       mock_build_history = MockIt::Mock.new
       mock_build_history.__expect(:last_succesful_build) { |project_name|
         assert_equal("damagecontrolled", project_name)
         b = Build.new("damagecontrolled")
-        b.timestamp = Time.gm(2004, 04, 02, 12, 00, 00)
+        b.timestamp = Time.utc(2004, 04, 02, 12, 00, 00)
         b
       }
       mock_scm = MockIt::Mock.new
-      mock_scm.__expect(:changes) { |scm_spec, dir, time_before, time_after|
-        assert_equal("scm_spec", scm_spec)
-        assert_equal("#{damagecontrol_home}/builds/damagecontrolled", dir)
-        assert_equal(Time.gm(2004, 04, 02, 12, 00, 00), time_before)
-        assert_equal(Time.gm(2004, 04, 02, 13, 00, 00), time_after)
-      }
       mock_scm.__expect(:checkout) { |scm_spec, dir|
         assert_equal("scm_spec", scm_spec)
         assert_equal("#{damagecontrol_home}/builds/damagecontrolled", dir)
+      }
+      mock_scm.__expect(:changes) { |scm_spec, dir, time_before, time_after|
+        assert_equal("scm_spec", scm_spec)
+        assert_equal("#{damagecontrol_home}/builds/damagecontrolled", dir)
+        assert_equal(Time.utc(2004, 04, 02, 12, 00, 00), time_before)
+        assert_equal(Time.utc(2004, 04, 02, 13, 00, 00), time_after)
       }
       
       ::FileUtils.mkpath("#{damagecontrol_home}/builds/damagecontrolled")
@@ -100,7 +100,7 @@ module DamageControl
       @build_executor = BuildExecutor.new(hub, mock_build_history, "#{damagecontrol_home}/builds", mock_scm)
       @build = Build.new("damagecontrolled",
         { "scm_spec" => "scm_spec", "build_command_line" => "echo hello world"})
-      @build.timestamp = Time.gm(2004, 04, 02, 13, 00, 00)
+      @build.timestamp = Time.utc(2004, 04, 02, 13, 00, 00)
 
       @build_executor.schedule_build(@build)
       @build_executor.process_next_scheduled_build

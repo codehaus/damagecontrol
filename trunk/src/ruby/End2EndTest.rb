@@ -124,32 +124,7 @@ class End2EndTest < Test::Unit::TestCase
   def create_cvs_repository
     system("cvs -d#{@cvsroot} init")
   end
-    
-  class SysOutProgressReporter
-    def initialize(hub)
-      hub.add_subscriber(self)
-    end
-    
-    def receive_message(message)
-      if !message.is_a?(BuildEvent)
-        return
-      end
-      
-      name = message.build.project_name
-      if message.is_a?(BuildRequestEvent)
-        puts "[#{name}] BUILD STARTING"
-      end
-      
-      if message.is_a?(BuildProgressEvent)
-        puts "[#{name}] [#{message.build.project_name}] #{message.output}"
-      end
-      
-      if message.is_a?(BuildCompleteEvent)
-        puts "BUILD COMPLETE [#{message.build.project_name}]"
-      end
-    end
-  end
-  
+
   def builddir
     "#{basedir}/build"
   end
@@ -285,22 +260,7 @@ class End2EndTest < Test::Unit::TestCase
       build_result,
       "build not executed")
   end
-  
-  def TODO_test_builds_on_svn_add
-      create_svn_repository
-      start_damagecontrol
-      install_and_activate_damagecontrol_for_svn
-      checkout_svn_repository
-      Dir.chdir(@svn_wc_usage_dir)
-      File.open("build.bat", "w") do |file|
-          file.puts('echo "Hello world from DamageControl" > buildresult.txt')
-      end
-      add_file_to_svn("build.bat")
-      
-      wait_for_build_to_complete
-      verify_output_of_svn_build
-  end
-        
+          
   def create_svn_repository
     dsystem("svnadmin create #{@svn_repo_dir}")
   end

@@ -37,13 +37,13 @@ module DamageControl
       
       # modify file and commit it
       change_file("#{testcheckout}/build.xml")
-      time_before = Time.now
+      time_before = Time.now.utc
       sleep(1)
       @cvs.commit(testcheckout, "changed something")
       sleep(1)
-      time_after = Time.now
+      time_after = Time.now.utc
       
-      # check that this was the correct
+      # check that we now have one more change
       changes = @cvs.changes(spec, testcheckout, time_before, time_after)
       assert_equal(1, changes.length)
       mod = changes[0]
@@ -55,13 +55,13 @@ module DamageControl
       time_before = Time.gm(2004,01,01,12,00,00) 
       time_after = Time.gm(2004,01,01,13,00,00)
       spec = ":local:repo:module"
-      assert_equal("log -d\"2004-01-01 12:00:00<2004-01-01 13:00:00\"",
+      assert_equal("log -d\"2004-01-01 12:00:00 UTC<=2004-01-01 13:00:00 UTC\"",
         @cvs.changes_command(time_before, time_after))
     end
     
     def change_file(file)
       File.open(file, "w+") do |io|
-      	io.puts("changed\n")
+        io.puts("changed\n")
       end
     end
     

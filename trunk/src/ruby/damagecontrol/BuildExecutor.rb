@@ -74,25 +74,23 @@ module DamageControl
     
     def determine_changeset
       begin
-        # this won't work the first build, so I just skip it (it's kind of pointless anyway)
-        return unless File.exists?(project_base_dir)
-      
         last_successful_build = @build_history.last_succesful_build(current_build.project_name)
-        return if last_successful_build.nil?
-        time_before = last_successful_build.timestamp_as_time
+        
+        # Assume last build was at the start of time. This way it will work for new projects too.
+        time_before = Build.timestamp_to_time(Build.format_timestamp(0))
+        if(!last_successful_build.nil?)
+          time_before = last_successful_build.timestamp_as_time
+        end
         
         time_after = current_build.timestamp_as_time
+                
         current_build.modification_set = 
           @scm.changes(current_build.scm_spec, project_base_dir, time_before, time_after)
-      rescue
-        logger.error "could not determine changeset #{$!}"
+
+      rescue Exception => e
+        msg = e.message + e.backtrace.join("\n")
+        logger.error "could not determine changeset: #{msg}"
       end
-    end
-    
-    def build_started
-      determine_changeset    
-      current_build.start_time = Time.now.to_i
-      @channel.publish_message(BuildStartedEvent.new(current_build))
     end
     
     def build_complete
@@ -115,8 +113,10 @@ module DamageControl
     def process_next_scheduled_build
       next_scheduled_build
       begin
-        build_started
+        current_build.start_time = Time.now.to_i
+        @channel.publish_message(BuildStartedEvent.new(current_build))
         checkout if checkout?
+        determine_changeset
         execute
       rescue Exception => e
         message = e.message + e.backtrace.join("\n")
