@@ -24,9 +24,14 @@ module RSCM
 
       # post 0.17, this can be "cd dir && cmd add ."
 
-      to_add = Dir["#{dir}/**/*"].collect{|p| p[dir.length+1..-1]}
-      
-      add_cmd = "monotone --db=\"#{@db_file}\" add #{to_add.join(' ')}"
+      files = Dir["#{dir}/*"]
+      dirs = files.find_all {|f| File.directory?(f)}
+      relative_dirs = dirs.collect{|p| p[dir.length+1..-1]}
+puts
+puts relative_dirs.join("\n")
+puts
+
+      add_cmd = "monotone --db=\"#{@db_file}\" add #{relative_dirs.join(' ')}"
       commit_cmd = "monotone --db=\"#{@db_file}\" --branch=\"#{@branch}\" commit '#{message}'"
 
       puts "IMPORTING: #{add_cmd}"
