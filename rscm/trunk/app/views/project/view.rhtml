@@ -1,15 +1,6 @@
-<html>
-<head>
-<title>Add Project</title>
-<link type="text/css" rel="stylesheet" href="css/style.css">
-</head>
-<body onLoad="executeOnLoad()">
 <script><!--
 
 function executeOnLoad() {
-  <% @scms.each do |scm| %>
-    <%= scm.javascript_on_load %>
-  <% end %>
 }
 
 function showElement(selected, elements) {
@@ -24,20 +15,13 @@ function showElement(selected, elements) {
   }
 }
 
-// All thew tabs
 tabs = ["project_tab", "scm_tab", "tracker_tab"]
 
-// All the SCMs
 scms = [
 <% @scms.each do |scm| %>
   "<%=scm.class.name %>",
 <% end %> "" ];
 
-<% @scms.each do |scm| %>
-  <%= scm.javascript %>
-<% end %>
-
-// All the Trackers
 trackers = [
 <% @trackers.each do |tracker| %>
   "<%=tracker.class.name %>",
@@ -47,15 +31,15 @@ trackers = [
 </script>
 
 <ul id="foldertab">
-    <li><a href="javascript:showElement('project_tab', tabs)"><img src="../images/16x16//wrench.png"> General</a></li>
-    <li><a href="javascript:showElement('scm_tab', tabs)"><img src="../images/16x16//safe.png"> Source Control</a></li>
-    <li><a href="javascript:showElement('tracker_tab', tabs)"><img src="../images/16x16//scroll_information.png"> Issue Tracker</a></li>
+    <li><a href="javascript:showElement('project_tab', tabs)"><img src="/images/16x16/wrench.png"> General</a></li>
+    <li><a href="javascript:showElement('scm_tab', tabs)"><img src="/images/16x16/safe.png"> Source Control</a></li>
+    <li><a href="javascript:showElement('tracker_tab', tabs)"><img src="/images/16x16/scroll_information.png"> Issue Tracker</a></li>
 </ul>
 
-<form action="save">
+<form action="/project/save">
 
 <div id="project_tab" style="display:block">
-  <%= @project.config_form %>
+  <%= render_partial("project", @project) %>
 </div>
 
 <div id="scm_tab" style="display:none">
@@ -77,7 +61,7 @@ trackers = [
 
   <% @scms.each do |scm| %>
     <div id="<%= scm.class.name %>" style="<% if(scm.selected?)%>display:block<%else%>display:none<%end%>">
-      <%= scm.config_form %>
+      <%= render_partial(scm.form, scm) %>
     </div>
   <% end %>
   
@@ -105,7 +89,7 @@ This way people browsing changesets can easily navigate to related issues.
 
   <% @trackers.each do |tracker| %>
     <div id="<%= tracker.class.name %>" style="<% if(tracker.selected?)%>display:block<%else%>display:none<%end%>">
-      <%= tracker.config_form %>
+      <%= render_partial(tracker.form, tracker) %>
     </div>
   <% end %>
 </div>
@@ -113,6 +97,3 @@ This way people browsing changesets can easily navigate to related issues.
   <input type="submit" value="Save"/>
   
 </form>
-  
-</body>
-</html>

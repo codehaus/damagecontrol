@@ -1,0 +1,34 @@
+<input name="project" type="hidden" value="<%= project.class.name %>"/>
+
+<table width="100%">
+<tr>
+  <td class="setting-name">Project name</td>
+  <td width="75%">
+    <input class="setting-input" name="RSCM::Project[name]" type="text" value="<%= project.name %>"/>
+  </td>
+</tr>
+<tr>
+  <td>&nbsp;</td>
+  <td class="setting-description">
+    The project name should not use space characters, as it will be used to create a folder on the DC server.
+  </td>
+</tr>
+<tr>
+  <td>Project description</td>
+  <td><input class="setting-input" name="RSCM::Project[description]" type="text" value="<%= project.description %>"></td>
+</tr>
+<tr>
+  <td>&nbsp;</td>
+  <td class="setting-description">
+    A short description of the project.
+  </td>
+</tr>
+<tr>
+  <td>Project home page</td>
+  <td><input class="setting-input" name="RSCM::Project[home_page]" type="text" value="<%= project.home_page %>"></td>
+</tr>
+<tr>
+  <td>Enable RSS generation</td>
+  <td><input name="RSCM::Project[rss_enabled]" type="checkbox" <%= project.rss_enabled ? "checked=true" : "" %> /></td>
+</tr>
+</table>

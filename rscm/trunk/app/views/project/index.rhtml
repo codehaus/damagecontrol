@@ -1,0 +1,10 @@
+<table id="projectstatus" class="pane">
+  <tr>
+    <th align="left">Project</th>
+  </tr>
+<% @projects.each do |project| %>
+  <tr>
+    <td align="left"><%= link_to(project.name, :controller => "project", :action => "view", :id => project.name) %></td>
+  </tr>
+<% end %>
+</table>
