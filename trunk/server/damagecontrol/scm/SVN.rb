@@ -127,7 +127,12 @@ module DamageControl
 
   private
     def svnrootdir
-      svnurl["file://".length..-(svnpath.length)-2]
+      result = svnurl["file://".length..-(svnpath.length)-2]
+      # for windows, turn /c:/blabla into c:/blabla"
+      if(result =~ /^\/[a-zA-Z]:/)
+        result = result[1..-1]
+      end
+      result
     end
 
     def changesets(checkout_dir, scm_from_time, scm_to_time, files, &line_proc)

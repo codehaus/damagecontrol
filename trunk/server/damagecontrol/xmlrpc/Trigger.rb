@@ -8,8 +8,9 @@ module DamageControl
 module XMLRPC
 
   class Trigger
+    DEPRECATED_MESSAGE = 'The trig(project_name, timestamp) method is deprecated. Please use request(project_name) instead'
     INTERFACE = ::XMLRPC::interface("build") {
-      meth 'string trig(string, string)', 'trig(project_name, timestamp) is deprecated. Please use request instead'
+      meth 'string trig(string, string)', DEPRECATED_MESSAGE
       meth 'string request(string)', 'Requests a build, specifying project name'
     }
     
@@ -25,7 +26,9 @@ module XMLRPC
 
     # deprecated
     def trig(project_name, timestamp)
-      trig(project_name)
+      result = request(project_name)
+      message = "\n#{DEPRECATED_MESSAGE}\n#{result}"
+      message
     end
 
     def request(project_name)
