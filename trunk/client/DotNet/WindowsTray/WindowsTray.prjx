@@ -1,36 +1,35 @@
-<?xml version="1.0" encoding="iso-8859-1"?>
-<Project xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema" name="WindowsTray" description="" newfilesearch="None" enableviewstate="True" version="1.1" projecttype="C#">
+<Project name="WindowsTray" description="" newfilesearch="None" enableviewstate="True" version="1.1" projecttype="C#">
   <Contents>
-    <File name="./App.ico" subtype="Code" buildaction="EmbedAsResource" data="" />
-    <File name="./AssemblyInfo.cs" subtype="Code" buildaction="Compile" data="" />
-    <File name="./Audio.cs" subtype="Code" buildaction="Compile" data="" />
-    <File name="./Gray.ico" subtype="Code" buildaction="EmbedAsResource" data="" />
-    <File name="./Green.ico" subtype="Code" buildaction="EmbedAsResource" data="" />
-    <File name="./NotifyIconEx.cs" subtype="Code" buildaction="Compile" data="" />
-    <File name="./NotifyIconEx.resx" subtype="Code" buildaction="EmbedAsResource" dependson="NotifyIconEx.cs" data="" />
-    <File name="./ProjectForm.cs" subtype="Code" buildaction="Compile" data="" />
-    <File name="./ProjectForm.resx" subtype="Code" buildaction="EmbedAsResource" dependson="ProjectForm.cs" data="" />
-    <File name="./ProxyForm.cs" subtype="Code" buildaction="Compile" data="" />
-    <File name="./ProxyForm.resx" subtype="Code" buildaction="EmbedAsResource" dependson="ProxyForm.cs" data="" />
-    <File name="./Red.ico" subtype="Code" buildaction="EmbedAsResource" data="" />
-    <File name="./Settings.cs" subtype="Code" buildaction="Compile" data="" />
-    <File name="./SettingsForm.cs" subtype="Code" buildaction="Compile" data="" />
-    <File name="./SettingsForm.resx" subtype="Code" buildaction="EmbedAsResource" dependson="SettingsForm.cs" data="" />
-    <File name="./SettingsManager.cs" subtype="Code" buildaction="Compile" data="" />
-    <File name="./SystemTrayMonitor.cs" subtype="Code" buildaction="Compile" data="" />
-    <File name="./SystemTrayMonitor.resx" subtype="Code" buildaction="EmbedAsResource" dependson="SystemTrayMonitor.cs" data="" />
-    <File name="./Audio\broken.wav" subtype="Code" buildaction="Exclude" data="" />
-    <File name="./Audio\fixed.wav" subtype="Code" buildaction="Exclude" data="" />
-    <File name="./Audio\still-failing.wav" subtype="Code" buildaction="Exclude" data="" />
-    <File name="./Audio\still-successful.wav" subtype="Code" buildaction="Exclude" data="" />
-    <File name="./Images\green-16.gif" subtype="Code" buildaction="Exclude" data="" />
-    <File name="./Images\green-64.gif" subtype="Code" buildaction="Exclude" data="" />
-    <File name="./Images\grey-16.gif" subtype="Code" buildaction="Exclude" data="" />
-    <File name="./Images\grey-64.gif" subtype="Code" buildaction="Exclude" data="" />
-    <File name="./Images\icon-open-file.gif" subtype="Code" buildaction="EmbedAsResource" data="" />
-    <File name="./Images\icon-play.gif" subtype="Code" buildaction="EmbedAsResource" data="" />
-    <File name="./Images\red-16.gif" subtype="Code" buildaction="Exclude" data="" />
-    <File name="./Images\red-64.gif" subtype="Code" buildaction="Exclude" data="" />
+    <File name="./App.ico" subtype="Code" buildaction="EmbedAsResource" dependson="" data="" />
+    <File name="./AssemblyInfo.cs" subtype="Code" buildaction="Compile" dependson="" data="" />
+    <File name="./Audio.cs" subtype="Code" buildaction="Compile" dependson="" data="" />
+    <File name="./Gray.ico" subtype="Code" buildaction="EmbedAsResource" dependson="" data="" />
+    <File name="./Green.ico" subtype="Code" buildaction="EmbedAsResource" dependson="" data="" />
+    <File name="./NotifyIconEx.cs" subtype="Code" buildaction="Compile" dependson="" data="" />
+    <File name="./NotifyIconEx.resx" subtype="Code" buildaction="EmbedAsResource" dependson="./NotifyIconEx.cs" data="" />
+    <File name="./ProjectForm.cs" subtype="Code" buildaction="Compile" dependson="" data="" />
+    <File name="./ProjectForm.resx" subtype="Code" buildaction="EmbedAsResource" dependson="./ProjectForm.cs" data="" />
+    <File name="./ProxyForm.cs" subtype="Code" buildaction="Compile" dependson="" data="" />
+    <File name="./ProxyForm.resx" subtype="Code" buildaction="EmbedAsResource" dependson="./ProxyForm.cs" data="" />
+    <File name="./Red.ico" subtype="Code" buildaction="EmbedAsResource" dependson="" data="" />
+    <File name="./Settings.cs" subtype="Code" buildaction="Compile" dependson="" data="" />
+    <File name="./SettingsForm.cs" subtype="Code" buildaction="Compile" dependson="" data="" />
+    <File name="./SettingsForm.resx" subtype="Code" buildaction="EmbedAsResource" dependson="./SettingsForm.cs" data="" />
+    <File name="./SettingsManager.cs" subtype="Code" buildaction="Compile" dependson="" data="" />
+    <File name="./SystemTrayMonitor.cs" subtype="Code" buildaction="Compile" dependson="" data="" />
+    <File name="./SystemTrayMonitor.resx" subtype="Code" buildaction="EmbedAsResource" dependson="./SystemTrayMonitor.cs" data="" />
+    <File name="./Audio/broken.wav" subtype="Code" buildaction="Exclude" dependson="" data="" />
+    <File name="./Audio/fixed.wav" subtype="Code" buildaction="Exclude" dependson="" data="" />
+    <File name="./Audio/still-failing.wav" subtype="Code" buildaction="Exclude" dependson="" data="" />
+    <File name="./Audio/still-successful.wav" subtype="Code" buildaction="Exclude" dependson="" data="" />
+    <File name="./Images/green-16.gif" subtype="Code" buildaction="Exclude" dependson="" data="" />
+    <File name="./Images/green-64.gif" subtype="Code" buildaction="Exclude" dependson="" data="" />
+    <File name="./Images/grey-16.gif" subtype="Code" buildaction="Exclude" dependson="" data="" />
+    <File name="./Images/grey-64.gif" subtype="Code" buildaction="Exclude" dependson="" data="" />
+    <File name="./Images/icon-open-file.gif" subtype="Code" buildaction="EmbedAsResource" dependson="" data="" />
+    <File name="./Images/icon-play.gif" subtype="Code" buildaction="EmbedAsResource" dependson="" data="" />
+    <File name="./Images/red-16.gif" subtype="Code" buildaction="Exclude" dependson="" data="" />
+    <File name="./Images/red-64.gif" subtype="Code" buildaction="Exclude" dependson="" data="" />
   </Contents>
   <References>
     <Reference type="Gac" refto="System, Version=1.0.5000.0, Culture=neutral, PublicKeyToken=b77a5c561934e089" localcopy="True" />
@@ -43,20 +42,20 @@
   </References>
   <DeploymentInformation target="" script="" strategy="File" />
   <Configuration runwithwarnings="False" name="Debug">
-    <CodeGeneration runtime="MsNet" compiler="Csc" warninglevel="4" nowarn="" includedebuginformation="True" optimize="False" unsafecodeallowed="False" generateoverflowchecks="False" mainclass="" target="WinExe" generatexmldocumentation="False" win32Icon="" />
+    <CodeGeneration runtime="MsNet" compiler="Csc" warninglevel="4" nowarn="" includedebuginformation="True" optimize="False" unsafecodeallowed="False" generateoverflowchecks="False" mainclass="" target="WinExe" definesymbols="" generatexmldocumentation="False" win32Icon="" />
     <Execution commandlineparameters="" consolepause="True" />
-    <Output directory="bin\Debug\" assembly="WindowsTray" executeScript="" executeBeforeBuild="" executeAfterBuild="" />
+    <Output directory="./bin/Debug" assembly="WindowsTray" executeScript="" executeBeforeBuild="" executeAfterBuild="" />
   </Configuration>
   <Configurations active="Debug">
     <Configuration runwithwarnings="False" name="Debug">
-      <CodeGeneration runtime="MsNet" compiler="Csc" warninglevel="4" nowarn="" includedebuginformation="True" optimize="False" unsafecodeallowed="False" generateoverflowchecks="False" mainclass="" target="WinExe" generatexmldocumentation="False" win32Icon="" />
+      <CodeGeneration runtime="MsNet" compiler="Csc" warninglevel="4" nowarn="" includedebuginformation="True" optimize="False" unsafecodeallowed="False" generateoverflowchecks="False" mainclass="" target="WinExe" definesymbols="" generatexmldocumentation="False" win32Icon="" />
       <Execution commandlineparameters="" consolepause="True" />
-      <Output directory="bin\Debug\" assembly="WindowsTray" executeScript="" executeBeforeBuild="" executeAfterBuild="" />
+      <Output directory="./bin/Debug" assembly="WindowsTray" executeScript="" executeBeforeBuild="" executeAfterBuild="" />
     </Configuration>
     <Configuration runwithwarnings="False" name="Release">
-      <CodeGeneration runtime="MsNet" compiler="Csc" warninglevel="4" nowarn="" includedebuginformation="False" optimize="True" unsafecodeallowed="False" generateoverflowchecks="False" mainclass="" target="WinExe" generatexmldocumentation="False" win32Icon="" />
+      <CodeGeneration runtime="MsNet" compiler="Csc" warninglevel="4" nowarn="" includedebuginformation="False" optimize="True" unsafecodeallowed="False" generateoverflowchecks="False" mainclass="" target="WinExe" definesymbols="" generatexmldocumentation="False" win32Icon="" />
       <Execution commandlineparameters="" consolepause="True" />
-      <Output directory="bin\Release\" assembly="WindowsTray" executeScript="" executeBeforeBuild="" executeAfterBuild="" />
+      <Output directory="./bin/Release" assembly="WindowsTray" executeScript="" executeBeforeBuild="" executeAfterBuild="" />
     </Configuration>
   </Configurations>
 </Project>

@@ -3,14 +3,14 @@
 
 OUTPUTDIR := ./build/bin
 
-all: depcheck __init Makefile.XmlRpcCs.all Makefile.DamageControlClientNet.all Makefile.WindowsTray.all Makefile.DamageControlConsoleMonitor.all 
+all: depcheck __init Makefile.XmlRpcCs.all Makefile.DamageControlClientNet.all Makefile.WindowsTray.all Makefile.DamageControlConsoleMonitor.all Makefile.MonoTray.all 
 
 __init:
 	mkdir -p $(OUTPUTDIR)
 
-clean: Makefile.XmlRpcCs.clean Makefile.DamageControlClientNet.clean Makefile.WindowsTray.clean Makefile.DamageControlConsoleMonitor.clean 
+clean: Makefile.XmlRpcCs.clean Makefile.DamageControlClientNet.clean Makefile.WindowsTray.clean Makefile.DamageControlConsoleMonitor.clean Makefile.MonoTray.clean 
 
-depcheck: Makefile.XmlRpcCs.depcheck Makefile.DamageControlClientNet.depcheck Makefile.WindowsTray.depcheck Makefile.DamageControlConsoleMonitor.depcheck 
+depcheck: Makefile.XmlRpcCs.depcheck Makefile.DamageControlClientNet.depcheck Makefile.WindowsTray.depcheck Makefile.DamageControlConsoleMonitor.depcheck Makefile.MonoTray.depcheck 
 
 run: all
 	cd $(OUTPUTDIR) && mono WindowsTray.exe
@@ -26,4 +26,7 @@ Makefile.WindowsTray.%:
 
 Makefile.DamageControlConsoleMonitor.%:
 	@cd ./DamageControlConsoleMonitor && $(MAKE) -f $(subst .$*,,$@) $*
+
+Makefile.MonoTray.%:
+	@cd ./MonoTray && $(MAKE) -f $(subst .$*,,$@) $*
 
