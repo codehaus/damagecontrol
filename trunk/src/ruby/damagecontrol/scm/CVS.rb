@@ -68,11 +68,11 @@ module DamageControl
 
     def checkout_command(scm_spec, directory)
       os_directory = directory.gsub('/', path_separator)
-      "-d #{cvsroot(scm_spec)} checkout -d #{os_directory} #{mod(scm_spec)}"
+      "-d#{cvsroot(scm_spec)} checkout -d #{os_directory} #{mod(scm_spec)}"
     end
 
     def update_command(scm_spec)
-      "-d #{cvsroot(scm_spec)} update -d -P"
+      "-d#{cvsroot(scm_spec)} update -d -P"
     end
     
     def checkout(scm_spec, directory, &proc)
