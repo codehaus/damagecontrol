@@ -16,6 +16,7 @@ module XMLRPC
   
     INTERFACE = ::XMLRPC::interface("control") {
       meth 'string shutdown()', 'shut down the server'
+      meth 'string shutdown_with_message_and_time(string, int)', 'shut down server after specified time with message'
       meth 'string shutdown_with_message(string)', 'shut down server with message'
       meth 'string kill()', 'kill server (without running exit hooks)'
     }
@@ -25,18 +26,22 @@ module XMLRPC
       xmlrpc_servlet.add_handler(INTERFACE, self)
     end
     
-    def do_later
+    def do_later(time=5)
       Thread.new do
-        sleep 5
+        sleep time
         yield
       end
     end
     
-    def shutdown_with_message(message)
-      logger.info("request to shut down server: #{message}")
+    def shutdown_with_message_and_time(message, time)
+      logger.info("request to shut down server in #{time} seconds: #{message}")
       @channel.publish_message(UserMessage.new(message))
-      do_later { exit ; sleep 2 ; exit! }
-      "DamageControl server is shutting down within 5 to 7 seconds"
+      do_later(time) { exit ; sleep 2 ; exit! }
+      "DamageControl server is shutting down within #{time} to #{time + 2} seconds"
+    end
+    
+    def shutdown_with_message(message)
+      shutdown_with_message("DamageControl server is shutting down in 5 secs", 5)
     end
     
     def shutdown

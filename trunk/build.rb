@@ -253,7 +253,7 @@ class Project
     begin
       require 'xmlrpc/client'
       client = ::XMLRPC::Client.new2("http://localhost:4712/private/xmlrpc")
-      info(client.proxy("control").shutdown_with_message(message))
+      info(client.proxy("control").shutdown_with_message_and_time(message, 10))
     rescue XMLRPC::FaultException => e
       fail(e.faultString)
     end
