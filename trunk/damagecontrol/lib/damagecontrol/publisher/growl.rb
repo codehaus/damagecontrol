@@ -18,7 +18,7 @@ module DamageControl
       end    
 
       def publish(build)
-        status_message = build.successful? ? "Successful" : "Failed. Process exit code: #{build.exit_code}"
+        status_message = build.successful? ? "Successful" : "Failed"
         hosts = @hosts.split(%r{,\s*})
         hosts.each do |host|
           begin
