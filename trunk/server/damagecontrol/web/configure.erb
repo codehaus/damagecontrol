@@ -41,14 +41,23 @@ function showTracker(tracker) {
   oldTrackerDiv = newTrackerDiv
 }
 
-<% scm_configurators.each do |scm_configurator| %> 
+function configureAction() {
+	//alert(document.forms[1].elements[0].value)
+	if (window.location.href.indexOf("/configure/")!=-1) {
+		document.forms[1].action=document.forms[1].elements[0].value;
+	} else {
+		document.forms[1].action="configure/" + document.forms[1].elements[0].value;
+	}
+
+
+<% scm_configurators.each do |scm_configurator| %>
   <%= scm_configurator.javascript_declarations %>
 <% end %>
 
 // -->
 </script>
 
-<form>
+<form onsubmit="configureAction();" id="configform">
 <table width="100%">
 <tr>
   <td class="setting-name">Project name</td>

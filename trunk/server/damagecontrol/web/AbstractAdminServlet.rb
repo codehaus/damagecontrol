@@ -23,7 +23,9 @@ module DamageControl
     attr_reader :build_scheduler
 
     def project_name
-      request.query['project_name']
+      # Use path info instead of query string, this makes better access control possible
+			# but query string takes precedence before path info in order to enable project cloning
+      request.path_info[1..-1]
     end
     
     def project_exists?
@@ -69,10 +71,12 @@ module DamageControl
       #]
       result = [] 
       if private?
+				configpath = "configure"
+				configpath = "../configure" if toplevel
         result += [
-          task(:icon => "largeicons/box_new.png", :name => "New project", :url => "configure")
+          task(:icon => "largeicons/box_new.png", :name => "New project", :url => configpath)
         ]
-      else
+      else 
       end
       result
     end
@@ -100,10 +104,15 @@ module DamageControl
     def private?
       @type == :private
     end
+		
+		def toplevel
+			!request.path_info.empty?
+		end
     
     def breadcrumbs
-      result = "<a href=\"dashboard\">Dashboard</a>"
-      result << " > <a href=\"project?project_name=#{project_name}\">#{project_name}</a>" if request.query['project_name']
+			result = "<a href=\"dashboard\">Dashboard</a>"
+      result = "<a href=\"../dashboard\">Dashboard</a>" if toplevel
+      result << " > <a href=\"../project/#{project_name}\">#{project_name}</a>" if toplevel
       result
     end
     
@@ -151,7 +160,7 @@ module DamageControl
   private
     def build_url(build)
       return nil unless build
-      "?project_name=#{build.project_name}&dc_creation_time=#{build.dc_creation_time.ymdHMS}"
+      "{build.project_name}?dc_creation_time=#{build.dc_creation_time.ymdHMS}"
     end
     
     def build_status(build)

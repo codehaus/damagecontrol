@@ -15,7 +15,7 @@ module DamageControl
       b = Build.new("cheese")
       b.dc_start_time = Time.utc(1971,2,28,23,45,0,0)
       b.status = Build::SUCCESSFUL
-      b.url = "http://moradi.com/public/project?action=build_details&project_name=cheese&dc_creation_time=19710228234500"
+      b.url = "http://moradi.com/public/project/cheese?action=build_details&dc_creation_time=19710228234500"
       @build_complete_event = BuildCompleteEvent.new(b)
     end
     
@@ -42,7 +42,7 @@ module DamageControl
       )
       @publisher.jabber = @jabber_mock
   
-      expected = "<a href=\"http://moradi.com/public/project?action=build_details&project_name=cheese&dc_creation_time=19710228234500\">[cheese] BUILD SUCCESSFUL</a>"
+      expected = "<a href=\"http://moradi.com/public/project/cheese?action=build_details&dc_creation_time=19710228234500\">[cheese] BUILD SUCCESSFUL</a>"
       @jabber_mock.__expect(:send_message_to_recipient) { |recipient, message|
         assert_equal("recipient1", recipient)
         assert_equal(expected, message)

@@ -30,11 +30,11 @@ module DamageControl
     def test_email_is_sent_upon_build_complete_event    
       build = Build.new("cheese", {"nag_email" => "somelist@someproject.bar"})
       build.status = Build::FAILED
-      build.url =  "http://moradi.com/public/project?action=build_details&project_name=cheese&dc_creation_time=19710228234500"
+      build.url =  "http://moradi.com/public/project/cheese?action=build_details&dc_creation_time=19710228234500"
       build.dc_start_time = Time.utc(1971,2,28,23,45,0,0)
 
       @email_publisher.on_message(BuildCompleteEvent.new(build))
-      assert_equal("[cheese] BUILD FAILED|<a href=\"http://moradi.com/public/project?action=build_details&project_name=cheese&dc_creation_time=19710228234500\">[cheese] BUILD FAILED</a>|noreply@somewhere.foo|somelist@someproject.bar", @email_publisher.mail_content)
+      assert_equal("[cheese] BUILD FAILED|<a href=\"http://moradi.com/public/project/cheese?action=build_details&dc_creation_time=19710228234500\">[cheese] BUILD FAILED</a>|noreply@somewhere.foo|somelist@someproject.bar", @email_publisher.mail_content)
     end
     
     def test_nothing_is_sent_unless_build_complete_event

@@ -24,7 +24,7 @@ module DamageControl
     end
     
     def tasks
-      task(:icon => "largeicons/navigate_left.png", :name => "Back to project", :url => "project?project_name=#{project_name}")
+      task(:icon => "largeicons/navigate_left.png", :name => "Back to project", :url => "../project/#{project_name}")
     end
     
     def do_install_trigger

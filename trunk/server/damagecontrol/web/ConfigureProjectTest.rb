@@ -45,7 +45,7 @@ module DamageControl
 
     def test_fills_in_project_name_if_specified_in_url
       response, data = store_configuration("Milano")
-      response, data = @client.get("/private/configure?project_name=Milano")
+      response, data = @client.get("/private/configure/Milano")
       assert_response_ok(response)
       assert_match(/Milano/, data)
     end
@@ -57,7 +57,7 @@ module DamageControl
 
   private
     def store_configuration(project_name)
-      @client.post("/private/configure", "action=store_configuration&project_name=#{project_name}&scm_id=#{CVS.name}")
+      @client.post("/private/configure/#{project_name}", "action=store_configuration&scm_id=#{CVS.name}")
     end
 
   end

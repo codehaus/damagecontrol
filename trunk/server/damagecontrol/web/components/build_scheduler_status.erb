@@ -18,7 +18,7 @@
       build_queue.each do |build|
     %>
       <tr>
-        <td class="pane"><a href="project?project_name=<%= build.project_name %>"><%= build.project_name %></a></td>
+        <td class="pane"><a href="project/<%= build.project_name %>"><%= build.project_name %></a></td>
         <td class="pane"><%= build.dc_creation_time.to_human %></td>
       </tr>
     <% end %>

@@ -11,7 +11,7 @@ module DamageControl
     
     def service(req, res)
       super(req, res)
-      project_name = req.query['project_name'] || required_parameter('project_name')
+      project_name = req.path_info || req.query['project_name'] || required_parameter('project_name')
       path = status_image(project_name)
       st = File::stat(path)
       res['content-length'] = st.size

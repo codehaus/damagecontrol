@@ -4,8 +4,7 @@
 </head>
 <body>
 
-<h1 class="pane"><img src="images/timestampstatus?project_name=<%= project_name %>&timestamp=<%= selected_build.dc_creation_time %>" width="32" height="32" border="0" /> <%= build_description(selected_build) %></h1>
-
+<h1 class="pane"><img src="images/timestampstatus/<%= project_name %>?timestamp=<%= selected_build.dc_creation_time %>" width="32" height="32" border="0" /> <%= build_description(selected_build) %></h1>
 <div style="padding-top: 5px">
 <ul id="foldertab">
     <% reports.each do |report| 

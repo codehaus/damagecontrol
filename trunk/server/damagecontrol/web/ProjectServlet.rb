@@ -66,7 +66,7 @@ puts "DONE"
     end
 
     def rss_url
-      @rss_url + "?project_name=" + CGI.escape(project_name)
+      @rss_url + "/" + CGI.escape(project_name)
     end
 
     def tasks    
@@ -76,10 +76,10 @@ puts "DONE"
           # Standard private operations
           result +=
             [
-              task(:icon => "largeicons/box_into.png", :name => "Clone project", :url => "configure?project_name=#{project_name}&action=clone_project"),
-              task(:icon => "largeicons/wrench.png", :name => "Configure", :url => "configure?project_name=#{project_name}&action=configure"),
-              task(:icon => "largeicons/gears_run.png", :name => "Trig build now", :url => "?project_name=#{project_name}&action=trig_build"),
-              task(:icon => "largeicons/garbage.png", :name => "Clean out working files", :url => "?project_name=#{project_name}&action=clean_out_working_files"),
+              task(:icon => "largeicons/box_into.png", :name => "Clone project", :url => "../configure/#{project_name}?action=clone_project"),
+              task(:icon => "largeicons/wrench.png", :name => "Configure", :url => "../configure/#{project_name}?action=configure"),
+              task(:icon => "largeicons/gears_run.png", :name => "Trig build now", :url => "#{project_name}?action=trig_build"),
+              task(:icon => "largeicons/garbage.png", :name => "Clean out working files", :url => "#{project_name}?action=clean_out_working_files"),
             ]
 
           scm = project_config["scm"]
@@ -88,7 +88,7 @@ puts "DONE"
           if(scm.can_create? && !scm.exists?)
             result +=
               [
-                task(:icon => "largeicons/package_new.png", :name => "Create repository", :url => "configure?project_name=#{project_name}&action=create_scm")
+                task(:icon => "largeicons/package_new.png", :name => "Create repository", :url => "configure/#{project_name}?action=create_scm")
               ]
           end
           # Install/uninstall trigger
@@ -98,12 +98,12 @@ puts "DONE"
             if(scm.supports_trigger? && scm.trigger_installed?(trigger_command, trigger_files_checkout_dir))
               result +=
                 [
-                  task(:icon => "largeicons/gear_delete.png", :name => "Uninstall trigger", :url => "install_trigger?project_name=#{project_name}&install=false"),
+                  task(:icon => "largeicons/gear_delete.png", :name => "Uninstall trigger", :url => "install_trigger/#{project_name}?install=false"),
                 ]
             elsif(scm.supports_trigger?)
               result +=
                 [
-                  task(:icon => "largeicons/gear_connection.png", :name => "Install trigger", :url => "install_trigger?project_name=#{project_name}&install=true"),
+                  task(:icon => "largeicons/gear_connection.png", :name => "Install trigger", :url => "../install_trigger/#{project_name}?install=true"),
                 ]
             end
           end
@@ -111,7 +111,7 @@ puts "DONE"
         end
         result +=
           [
-            task(:icon => "largeicons/folders.png", :name => "Working files", :url => "root/#{project_name}/checkout"),
+            task(:icon => "largeicons/folders.png", :name => "Working files", :url => "../root/#{project_name}/checkout"),
           ]
         prev_build = build_history_repository.prev(selected_build)
         if(prev_build)

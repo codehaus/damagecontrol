@@ -36,7 +36,7 @@ module XMLRPC
 
 <<-EOF
 Monitor build results at:
-#{@public_web_url}project?project_name=#{project_name}
+#{@public_web_url}project/#{project_name}
 EOF
       rescue => e
         logger.error(e)

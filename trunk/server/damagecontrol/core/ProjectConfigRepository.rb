@@ -97,7 +97,7 @@ module DamageControl
       build = Build.new(project_name, project_config(project_name))
       build.dc_creation_time = Time.new.utc
       ymdHMS = build.dc_creation_time.ymdHMS
-      build.url = "#{ensure_trailing_slash(@public_web_url)}project?project_name=#{build.project_name}&dc_creation_time=#{ymdHMS}"
+      build.url = "#{ensure_trailing_slash(@public_web_url)}project/#{build.project_name}?dc_creation_time=#{ymdHMS}"
       build.scm = create_scm(project_name)
       build.potential_label = peek_next_build_number(project_name).to_s
       build.log_file = "#{log_dir(project_name)}/#{ymdHMS}.log"

@@ -239,12 +239,20 @@ module DamageControl
       httpd.mount("/public/rss", RssServlet.new(build_history_repository, public_web_url + "/project"))
       
       httpd.mount("/public/images", WEBrick::HTTPServlet::FileHandler, "#{webdir}/images")
+			httpd.mount("/public/project/images", WEBrick::HTTPServlet::FileHandler, "#{webdir}/images")
+			httpd.mount("/public/search/images", WEBrick::HTTPServlet::FileHandler, "#{webdir}/images")
       httpd.mount("/public/largeicons", WEBrick::HTTPServlet::FileHandler, "#{webdir}/icons/24x24/plain")
+			httpd.mount("/public/project/largeicons", WEBrick::HTTPServlet::FileHandler, "#{webdir}/icons/24x24/plain")
+			httpd.mount("/public/search/largeicons", WEBrick::HTTPServlet::FileHandler, "#{webdir}/icons/24x24/plain")
       httpd.mount("/public/smallicons", WEBrick::HTTPServlet::FileHandler, "#{webdir}/icons/16x16/plain")
+			httpd.mount("/public/project/smallicons", WEBrick::HTTPServlet::FileHandler, "#{webdir}/icons/16x16/plain")
+			httpd.mount("/public/search/smallicons", WEBrick::HTTPServlet::FileHandler, "#{webdir}/icons/16x16/plain")
       httpd.mount("/public/images/currentstatus", CurrentStatusImageServlet.new(build_history_repository, build_scheduler))
       httpd.mount("/public/images/lastcompletedstatus", LastCompletedImageServlet.new(build_history_repository, build_scheduler))
       httpd.mount("/public/images/timestampstatus", TimestampImageServlet.new(build_history_repository, build_scheduler))
       httpd.mount("/public/css", WEBrick::HTTPServlet::FileHandler, "#{webdir}/css")
+			httpd.mount("/public/project/css", WEBrick::HTTPServlet::FileHandler, "#{webdir}/css")
+			httpd.mount("/public/search/css", WEBrick::HTTPServlet::FileHandler, "#{webdir}/css")
     end
     
     def indexing_file_handler
@@ -278,12 +286,29 @@ module DamageControl
       httpd.mount("/private/root", indexing_file_handler)
       
       httpd.mount("/private/images", WEBrick::HTTPServlet::FileHandler, "#{webdir}/images")
+			httpd.mount("/private/project/images", WEBrick::HTTPServlet::FileHandler, "#{webdir}/images")
+			httpd.mount("/private/configure/images", WEBrick::HTTPServlet::FileHandler, "#{webdir}/images")
+			httpd.mount("/private/install_trigger/images", WEBrick::HTTPServlet::FileHandler, "#{webdir}/images")
+			httpd.mount("/private/search/images", WEBrick::HTTPServlet::FileHandler, "#{webdir}/images")
       httpd.mount("/private/largeicons", WEBrick::HTTPServlet::FileHandler, "#{webdir}/icons/24x24/plain")
+			httpd.mount("/private/project/largeicons", WEBrick::HTTPServlet::FileHandler, "#{webdir}/icons/24x24/plain")
+			httpd.mount("/private/configure/largeicons", WEBrick::HTTPServlet::FileHandler, "#{webdir}/icons/24x24/plain")
+			httpd.mount("/private/install_trigger/largeicons", WEBrick::HTTPServlet::FileHandler, "#{webdir}/icons/24x24/plain")
+			httpd.mount("/private/search/largeicons", WEBrick::HTTPServlet::FileHandler, "#{webdir}/icons/24x24/plain")
       httpd.mount("/private/smallicons", WEBrick::HTTPServlet::FileHandler, "#{webdir}/icons/16x16/plain")
+			httpd.mount("/private/project/smallicons", WEBrick::HTTPServlet::FileHandler, "#{webdir}/icons/16x16/plain")
+			httpd.mount("/private/configure/smallicons", WEBrick::HTTPServlet::FileHandler, "#{webdir}/icons/16x16/plain")
+			httpd.mount("/private/install_trigger/smallicons", WEBrick::HTTPServlet::FileHandler, "#{webdir}/icons/16x16/plain")
+			httpd.mount("/private/search/smallicons", WEBrick::HTTPServlet::FileHandler, "#{webdir}/icons/16x16/plain")
+			
       httpd.mount("/private/images/currentstatus", CurrentStatusImageServlet.new(build_history_repository, build_scheduler))
       httpd.mount("/private/images/lastcompletedstatus", LastCompletedImageServlet.new(build_history_repository, build_scheduler))
       httpd.mount("/private/images/timestampstatus", TimestampImageServlet.new(build_history_repository, build_scheduler))
       httpd.mount("/private/css", WEBrick::HTTPServlet::FileHandler, "#{webdir}/css")
+			httpd.mount("/private/project/css", WEBrick::HTTPServlet::FileHandler, "#{webdir}/css")
+			httpd.mount("/private/configure/css", WEBrick::HTTPServlet::FileHandler, "#{webdir}/css")
+			httpd.mount("/private/install_trigger/css", WEBrick::HTTPServlet::FileHandler, "#{webdir}/css")
+			httpd.mount("/private/search/css", WEBrick::HTTPServlet::FileHandler, "#{webdir}/css")
     end
     
     def report_classes

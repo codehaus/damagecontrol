@@ -13,12 +13,12 @@ module DamageControl
     end
 
     def rss
-      if request["If-None-Match"] == current_etag(request.query["project_name"])
+      if request["If-None-Match"] == current_etag(request.path_info)
         response.status = WEBrick::HTTPStatus::NotModified.code
         response.body = ""
       else
-        response.body = build_history_repository.to_rss(request.query["project_name"], @url + "?project_name=" + CGI.escape(request.query["project_name"])).to_s
-        response["ETag"] = current_etag(request.query["project_name"])
+        response.body = build_history_repository.to_rss(request.path_info, @url + "/" + CGI.escape(request.path_info)).to_s
+        response["ETag"] = current_etag(request.path_info)
       end
     end
 

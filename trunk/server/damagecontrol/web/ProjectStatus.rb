@@ -12,11 +12,11 @@ module DamageControl
     end
     
     def href
-      "project?project_name=#{name}"
+      "project/#{name}"
     end
     
     def image
-      "images/lastcompletedstatus?project_name=#{name}"
+      "images/lastcompletedstatus/#{name}"
     end
     
     def last_successful_build
