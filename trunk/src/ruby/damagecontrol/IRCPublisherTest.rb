@@ -45,8 +45,9 @@ module DamageControl
 		def test_if_not_in_channel_joins_channel_and_does_not_consume_message
 			@irc_mock.__return(:connected?, true)
 			@irc_mock.__return(:in_channel?, false)
-			@irc_mock.__next(:join_channel) {|channel| 
-				assert_equal(channel, "channel") }
+			@irc_mock.__next(:join_channel) {|channel, handle| 
+				assert_equal(channel, "channel")
+				assert_equal(handle, "dcontrol") }
 			
 			@publisher.enq_message(@event)
 			@publisher.process_messages

@@ -20,7 +20,14 @@ module DamageControl
 		
 		def process_messages
 			# process copy of array so that process_message can remove entries via consume
-			@inq.clone.each {|message| process_message(message) }
+			@inq.clone.each do |message| 
+				begin
+					process_message(message)
+					consume_message(message)
+				rescue
+					puts "error processing message #{message}: " + $!
+				end
+			end
 		end
 
 		def consume_message(message)

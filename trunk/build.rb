@@ -22,6 +22,8 @@ class Project
 	def initialize
 		$damagecontrol_home = File::expand_path(".")
 		
+		$:<<'lib'
+		$:<<'lib/rica'
 		$:<<'src/ruby'
 	end
 
@@ -30,7 +32,7 @@ class Project
 	end
 
 	def integration_test
-		require 'End2EndTest.rb'
+		require 'End2EndTest'
 	end
 	
 	def all

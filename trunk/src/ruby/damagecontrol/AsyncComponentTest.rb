@@ -4,7 +4,7 @@ require 'damagecontrol/HubTestHelper'
 
 module DamageControl
 
-	class NonConsumingAsyncComponent < AsyncComponent
+	class SucceedingAsyncComponent < AsyncComponent
 		attr_reader :processed_messages
 		
 		def initialize(hub)
@@ -17,10 +17,10 @@ module DamageControl
 		end
 	end
 	
-	class ConsumingAsyncComponent < NonConsumingAsyncComponent
+	class FailingAsyncComponent < SucceedingAsyncComponent
 		def process_message(message)
 			super(message)
-			consume_message(message)
+			raise "error"
 		end
 	end
 
@@ -34,7 +34,7 @@ module DamageControl
 		end
 
 		def test_enqueued_message_processed_on_tick
-			comp = NonConsumingAsyncComponent.new(hub)
+			comp = SucceedingAsyncComponent.new(hub)
 			@messages.each {|message|
 				@hub.publish_message(message)
 			}
@@ -42,8 +42,8 @@ module DamageControl
 			assert_equal(@messages, comp.processed_messages)
 		end
 		
-		def test_non_consumed_messages_processed_again_on_next_tick
-			comp = NonConsumingAsyncComponent.new(hub)
+		def test_error_on_process_message_will_process_message_again_on_next_tick
+			comp = FailingAsyncComponent.new(hub)
 			@messages.each {|message|
 				hub.publish_message(message)
 			}
@@ -58,7 +58,7 @@ module DamageControl
 		
 
 		def test_consumed_message_not_processed_on_next_tick
-			comp = ConsumingAsyncComponent.new(hub)
+			comp = SucceedingAsyncComponent.new(hub)
 			@messages.each {|message|
 				@hub.publish_message(message)
 			}
