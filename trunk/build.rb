@@ -232,7 +232,7 @@ class Project
   
   def self_upgrade
     unless windows?
-      mv("~/damagecontrol", "~/damagecontrol.bak") rescue
+      system("mv ~/damagecontrol ~/damagecontrol.bak") rescue
       mkdir_p("~/damagecontrol")
       system("cp -a target/dist/* ~/damagecontrol")
     end
