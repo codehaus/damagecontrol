@@ -138,7 +138,7 @@
     <section>
       <title>Installing DamageControl</title>
 
-      <section>
+      <section os="unix">
         <title>Linux, UNIX, Mac OS X</title>
 
         <para>To install DamageControl on a server with an UNIX-like operating
@@ -198,21 +198,207 @@
         <section>
           <title>Gentoo Linux</title>
 
-          <para></para>
+          <para>Users of Gentoo Linux can take advantage of a ebuild that wil
+          automatically install DamageControl. Follow these instructions to
+          install the ebuild.</para>
+
+          <procedure>
+            <step>
+              <para>Open the file <filename>/etc/make.conf</filename> and
+              define the variable <varname>PORTDIR_OVERLAY</varname>. This
+              variable contains a list of directories portage uses to search
+              for ebuild.</para>
+            </step>
+
+            <step>
+              <para>Change to one of the directories defined before.</para>
+            </step>
+
+            <step>
+              <para>Download the ebuilds.</para>
+
+              <screen><prompt># </prompt><userinput>wget http://www.goshaky.com/goshaky-distfiles/gentoo/damagecontrol-ebuild.tar.bz2</userinput></screen>
+            </step>
+
+            <step>
+              <para>Unpack the tarball.</para>
+
+              <screen><prompt># </prompt><userinput>tar -jxvf damagecontrol-ebuild.tar.bz2</userinput></screen>
+            </step>
+          </procedure>
+
+          <para>DamageControl can be installed by typing <literal>emerge
+          damagecontrol</literal> on the command line. If you would like to
+          use HTTP authentification, you should have the use-flag
+          <literal>apache2</literal> set.</para>
         </section>
       </section>
 
-      <section>
+      <section os="windows">
         <title>Windows</title>
 
-        <para></para>
+        <para>Users of the Microsoft WIndows Operating System can install
+        DamageControl using the installer. You do not need to download a
+        separate Ruby runtime, as it is included in the installer.</para>
       </section>
     </section>
 
     <section>
       <title>Configuring the DamageControl Server</title>
 
-      <para></para>
+      <para>Users of DamageControl under Microsoft Windows can start
+      DamageControl using the created entries in the Start menu. On other
+      platforms, starting
+      <filename><envar>DAMAGECONTROL_HOME</envar>/bin/damagecontrol</filename>
+      is the preferred solution. This script expects a configuration file as
+      command line argument.</para>
+
+      <caution>
+        <para>It is very dangerous to run DamageControl as
+        <literal>root</literal>-user. It is better to create a new user, which
+        has read and write access to <envar>DAMAGECONTROL_HOME</envar> and
+        <envar>DAMAGECONTROL_WORK</envar>, but cannot access other user's
+        files.</para>
+      </caution>
+
+      <para>A default configuration is provided in the file
+      <filename><envar>DAMAGECONTROL_HOME</envar>/bin/server.rb</filename>. If
+      you would like to make changes to the configuration, you should create a
+      copy of <filename>server.rb</filename> and edit and use this
+      configuration file.</para>
+
+      <para>The following sections cover example configurations for a number
+      of purposes. All these configurations are optional and not needed if you
+      just want to test DamageControl.</para>
+
+      <section>
+        <title>Access Control</title>
+
+        <para>By default everyone can access the DamageControl server and add
+        projects or change configurations. This is not useful if you want to
+        have an public build server, because you do not want to allow
+        strangers to change the configuration of your DamageControl
+        server.</para>
+
+        <para>This configuration involves two steps. Firstly you have to
+        configure DamageControl to allow connections only from the local
+        machine. Secondly you have to create a Apache proxy server that will
+        serve the DamageControl pages.</para>
+
+        <para>To modify the DamageControl configuration follow these
+        steps.</para>
+
+        <procedure>
+          <step>
+            <para>Open your DamageControl server configuration file in a text
+            editor.</para>
+          </step>
+
+          <step>
+            <para>Find the section which configures the network server. This
+            section looks in the default configuration like this:</para>
+
+            <programlisting>server = DamageControlServer.new(
+  :RootDir =&gt; ENV["DAMAGECONTROL_WORK"],
+  :HttpPort =&gt; 4712,
+  :PollingInterval =&gt; 60 # specified in seconds
+  # to allow access only from localhost then uncomment line below 
+  # (when running behind an Apache proxy for example)
+  #:AllowIPs =&gt; [ "127.0.0.1" ],
+  )</programlisting>
+          </step>
+
+          <step>
+            <para>Change the lines to this configuration to allow access only
+            from the local machine. If your webserver is running on a
+            different machine, you should replace <literal>127.0.0.1</literal>
+            with the IP-address of the remote webserver.</para>
+
+            <programlisting>server = DamageControlServer.new(
+  :RootDir =&gt; ENV["DAMAGECONTROL_WORK"],
+  :HttpPort =&gt; 4712,
+  :PollingInterval =&gt; 60,
+  :AllowIPs =&gt; [ "127.0.0.1" ]
+  )</programlisting>
+          </step>
+        </procedure>
+
+        <para>In order to serve the DamageControl pages from an ordinary web
+        server, install a web server and configure it to work as a proxy for
+        DamageControl. An example configuration for the Apache webserver is
+        like this.</para>
+
+        <programlisting>ProxyRequests off
+RewriteEngine On
+ProxyPass /public http://localhost:4712/public
+ProxyPassReverse /public http://localhost:4712/public
+ProxyPass /private http://localhost:4712/private
+ProxyPassReverse /private http://localhost:4712/private</programlisting>
+
+        <para>This configuration passes all requests to
+        http://servername/public and http://servername/private to the
+        corresponding locations of the DamageControl server. To add
+        authentification to the private configuration parts, you should append
+        following lines to the Apache configuration.</para>
+
+        <programlisting>&lt;Location /private&gt;
+        AuthName "DamageControl"
+        AuthType Basic
+        AuthUserFile /etc/apache2/dc.passwd
+        Require valid-user
+&lt;/Location&gt;</programlisting>
+
+        <para>No user will be able to access the web configuration interface
+        of the DamageControl server, unless the user has provided a
+        username-password-configuration that is included in the password file
+        <filename>/etc/apache2/dc.passwd</filename>.</para>
+      </section>
+
+      <section>
+        <title>Multiple Build Executors</title>
+
+        <para>DamageControl has the ability to run multiple build parallel.
+        Each build will be executed by one build executor. The default
+        configuration includes only one build executor, so if this executor is
+        in use and a new build is triggered, the build will queued in the
+        build queue.</para>
+
+        <para>If you would like to build two projects at once, you have to
+        define a new build executor. To do this, follow these steps.</para>
+
+        <procedure>
+          <step>
+            <para>Open your DamageControl server configuration file in a text
+            editor.</para>
+          </step>
+
+          <step>
+            <para>Find the line</para>
+
+            <programlisting>def server.init_build_executors</programlisting>
+          </step>
+
+          <step>
+            <para>Insert following code behind this line.</para>
+
+            <programlisting>build_scheduler.add_executor(
+  BuildExecutor.new(
+    'executor2', 
+    hub, 
+    project_directories, 
+    build_history_repository))</programlisting>
+
+            <para><literal>executor2</literal> is the name of the new
+            executor. This name must be unique for one DamageControl server
+            installation.</para>
+          </step>
+
+          <step>
+            <para>For each additional build executor, repeat the last step but
+            do not forget to select a unique name for each executor.</para>
+          </step>
+        </procedure>
+      </section>
     </section>
 
     <section>
@@ -269,15 +455,78 @@
       <title>DamageControl Notifications</title>
 
       <section>
-        <title>EMail</title>
+        <title>Send EMails on build</title>
 
-        <para></para>
+        <para>By default DamageControl will send no notification messages on
+        each build. In oder to send EMails on successful or failed build, you
+        have to configure an EMail publisher. To do this, follow these
+        steps.</para>
+
+        <procedure>
+          <step>
+            <para>Open your DamageControl server configuration file in a text
+            editor.</para>
+          </step>
+
+          <step>
+            <para>Find following line.</para>
+
+            <programlisting>def server.init_custom_components</programlisting>
+          </step>
+
+          <step>
+            <para>Add following code below this line.</para>
+
+            <programlisting>require 'damagecontrol/publisher/EmailPublisher'
+component(:email_publisher, EmailPublisher.new(hub, build_history_repository,
+  :SubjectTemplate =&gt; "short_text_build_result.erb", 
+  :BodyTemplate =&gt; "short_html_build_result.erb",
+  :FromEmail =&gt; "damagecontrol@mydomain.com",
+  :MailServerHost =&gt; "localhost",
+  :MailServerPort =&gt; 25))</programlisting>
+
+            <para>Replace <literal>damagecontrol@mydomain.com</literal> with
+            the desired sender address and <literal>localhost</literal> with
+            the hostname of the mail server.</para>
+          </step>
+        </procedure>
       </section>
 
       <section>
-        <title>IRC and Jabber</title>
+        <title>Publish to IRC server</title>
 
-        <para></para>
+        <para>Publishing build results to an IRC server requires similar
+        configuration of an IRC publisher. This is done by following these
+        steps.</para>
+
+        <procedure>
+          <step>
+            <para>Open your DamageControl server configuration file in a text
+            editor.</para>
+          </step>
+
+          <step>
+            <para>Find following line.</para>
+
+            <programlisting>def server.init_custom_components</programlisting>
+          </step>
+
+          <step>
+            <para>Add following code below this line.</para>
+
+            <programlisting>require 'damagecontrol/publisher/IRCPublisher'
+component(:irc_publisher, 
+  IRCPublisher.new(
+    hub, 
+   "some.irc.server", 
+   '#somechannel', 
+   "short_text_build_result_with_link.erb"))</programlisting>
+
+            <para>Replace <literal>some.irc.server</literal> with the hostname
+            of your IRC server and <literal>somechannel</literal> with the
+            channel name.</para>
+          </step>
+        </procedure>
       </section>
 
       <section>
