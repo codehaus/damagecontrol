@@ -10,7 +10,7 @@ module DamageControl
   
     def setup
       @server = DamageControlServer.new(
-        :RootDir => buildRoot,
+        :RootDir => new_temp_dir,
         :SocketTriggerPort => 14711,
         :HttpPort => 14712
       )
