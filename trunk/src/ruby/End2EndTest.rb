@@ -104,6 +104,7 @@ class End2EndTest < Test::Unit::TestCase
           @project,
           "#{@cvsroot}:#{@project}",
           script_file("build"),
+          "e2eproject-dev@codehaus.org",
           "localhost",
           "4711",
           nc_exe_location)

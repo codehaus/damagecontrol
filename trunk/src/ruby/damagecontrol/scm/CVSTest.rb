@@ -12,6 +12,12 @@ module DamageControl
       @cvs = CVS.new
     end
     
+    def teardown
+      mock_server.kill
+      # wait for max 2 secs. if mock server is still waiting, it's a failure
+      @mock_server.join(2) unless @mock_server.nil?
+    end
+    
     def test_parse_local_unix_spec
       protocol = "local"
       path     = "/cvsroot/damagecontrol"
@@ -82,7 +88,7 @@ module DamageControl
       build_command = "echo hello"
       nag_email = "maillist@project.bar"
 
-      mock_server = start_mock_server(self)
+      start_mock_server(self)
 
       pwd = Dir.getwd
       create_repo(testrepo)
@@ -102,10 +108,7 @@ module DamageControl
 
       import_damagecontrolled(testcheckout, spec)      
       
-      # wait for max 2 secs. if mock server is still waiting, it's a failure
-      mock_server.join(2)
       assert(!mock_server.alive?, "mock server didn't get incoming connection")
-      mock_server.kill
     end
 
   private
@@ -132,7 +135,7 @@ module DamageControl
 
     def start_mock_server(test)
       Thread.abort_on_exception = true
-      Thread.new {
+      @mock_server = Thread.new {
         socket = TCPServer.new(4713).accept
         payload = ""
         socket.each { |line|

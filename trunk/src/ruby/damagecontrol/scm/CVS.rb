@@ -111,7 +111,7 @@ module DamageControl
       nag_email, \
       dc_host="localhost", \
       dc_port="4711", \
-      nc_exe_file=nil, \
+      nc_exe_file="#{damagecontrol_home}/bin/nc.exe", \
       &proc
     )
       directory = File.expand_path(directory)
@@ -119,7 +119,7 @@ module DamageControl
       Dir.chdir("#{directory}")
 
       # install trigger command
-      loginfo = File.open("#{directory}/loginfo", File::WRONLY | File::APPEND) do |file|
+      File.open("#{directory}/loginfo", File::WRONLY | File::APPEND) do |file|
         conf_file = conf_script(scm_spec, BuildBootstrapper.conf_file(project_name))
         trigger_command = BuildBootstrapper.trigger_command(project_name, conf_file, nc_command(scm_spec), dc_host, dc_port)
         file.puts("#{mod(scm_spec)} #{trigger_command}")
