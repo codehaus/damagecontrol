@@ -53,7 +53,11 @@ EOF
     def test_parses_entire_log_into_changesets
       File.open("#{damagecontrol_home}/testdata/proxytoys-svn.log") do |io|
         parser = SVNLogParser.new(io, "trunk/proxytoys")
-        changesets = parser.parse_changesets {|line|}
+
+        start_date = Time.utc(2004,02,13,19,02,44,0)
+        end_date = Time.utc(2004,9,06,14,50,25,0)
+
+        changesets = parser.parse_changesets(start_date, end_date) {|line|}
         
         assert_equal(66, changesets.length)
         # just some random assertions
@@ -84,5 +88,19 @@ EOF
       end
     end
     
+    def test_skips_entries_outside_range
+      File.open("#{damagecontrol_home}/testdata/proxytoys-svn.log") do |io|
+        parser = SVNLogParser.new(io, "trunk/proxytoys")
+        # revisions r16, r17 and r18
+        start_date = Time.utc(2004,04,14,14,17,35,0) # same as r15
+        end_date = Time.utc(2004,05,10,22,36,25,0) # same as r18
+        changesets = parser.parse_changesets(start_date, end_date) {|line|}
+        assert_equal(3, changesets.length)
+
+        assert_equal("r18", changesets[0].revision)
+        assert_equal("r17", changesets[1].revision)
+        assert_equal("r16", changesets[2].revision)
+      end
+    end
   end
 end

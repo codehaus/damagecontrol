@@ -61,7 +61,7 @@ module DamageControl
 
       cmd_with_io(checkout_dir, "svn #{command}") do |io|
         parser = SVNLogParser.new(io, svnpath)
-        parser.parse_changesets(&line_proc)
+        parser.parse_changesets(from_time, to_time, &line_proc)
       end
 
     end
@@ -126,8 +126,8 @@ module DamageControl
     end
     
     def changes_command(from_time, to_time)
-#      "log -v -r {\"#{svndate(from_time)}\"}:{\"#{svndate(to_time)}\"} #{svnurl}"
-      "log -v -r HEAD #{svnurl}"
+      # http://svnbook.red-bean.com/svnbook-1.1/svn-book.html#svn-ch-3-sect-3.3
+      "log -v --revision {\"#{svndate(from_time)}\"}:{\"#{svndate(to_time)}\"} #{svnurl}"
     end
 
     def svndate(time)

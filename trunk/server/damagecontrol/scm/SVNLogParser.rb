@@ -11,13 +11,18 @@ module DamageControl
       @changeset_parser = SVNLogEntryParser.new(path)
     end
     
-    def parse_changesets(&line_proc)
+    # we need to pass in dates, since the log may contain changes outside the desired dates.
+    # this is because the svn log command strangely includes the first changeset before the start date.
+    # this is probably an svn bug, or at least a very odd feature.
+    def parse_changesets(start_date, end_date, &line_proc)
       # skip over the first ------
-      @changeset_parser.parse(@io,true, &line_proc)
+      @changeset_parser.parse(@io, true, &line_proc)
       changesets = ChangeSets.new
       while(!@io.eof?)
         changeset = @changeset_parser.parse(@io, &line_proc)
-        changesets.add(changeset) unless changeset.nil?
+        if(changeset && start_date < changeset.time && changeset.time <= end_date)
+          changesets.add(changeset)
+        end
       end
       changesets
     end
