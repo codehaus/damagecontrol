@@ -1,3 +1,3 @@
 require 'test/unit'
-require 'damagecontrol/AllTraverserTest'
-require 'damagecontrol/UpstreamDownstreamTraverserTest'
+require 'damagecontrol/dependency/AllTraverserTest'
+require 'damagecontrol/dependency/UpstreamDownstreamTraverserTest'
