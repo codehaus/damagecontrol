@@ -86,9 +86,13 @@ Section "DamageControl Server" SecServer
   File "${DISTDIR}\release-notes.txt"
   File /r "${DISTDIR}\*"
 
+  ;Include extra Windows cygwin binaries
+  SetOutPath $INSTDIR\bin
+  File /r "${ROOTDIR}\installer\windows\bin\*"
+  
   ;Include CVS binaries
   SetOutPath $INSTDIR\bin
-  File /r ${CVS_EXECUTABLE}
+  File /r "${CVS_EXECUTABLE}"
   
   ;Store installation folder
   WriteRegStr HKCU "Software\Modern UI Test" "" $INSTDIR

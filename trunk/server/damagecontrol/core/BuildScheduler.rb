@@ -7,7 +7,7 @@ require 'damagecontrol/util/Logging'
 
 module DamageControl
 
-  class PendingBuild < Pebbles::Countdown
+  class QuietPeriodCountDown < Pebbles::Countdown
     attr_accessor :build
   
     def initialize(quiet_period, build_scheduler)
@@ -16,7 +16,7 @@ module DamageControl
     end
     
     def tick(time)
-      @build_scheduler.done(self)
+      @build_scheduler.quiet_period_elapsed(self)
     end
 
     def exception(e)
@@ -36,7 +36,7 @@ module DamageControl
       super(hub)
       @quiet_period = quiet_period
       @executors = []
-      @pending_builds = {}
+      @countdowns = {}
       @exception_logger = exception_logger
     end
   
@@ -55,16 +55,16 @@ module DamageControl
       @executors << executor
     end
     
-    def done(pending_build)
-      unless(project_building?(pending_build.build.project_name))
+    def quiet_period_elapsed(countdown)
+      unless(project_building?(countdown.build.project_name))
         # find an available executor
         executor = @executors.find {|executor| !executor.busy? }
         if(executor)
-          @pending_builds.delete(pending_build.build.project_name)
-          executor.put(pending_build.build)
+          @countdowns.delete(countdown.build.project_name)
+          executor.put(countdown.build)
         else
           # If no executors are available, just restart the quiet period.
-          pending_build.start
+          countdown.start
         end
       end
     end
@@ -74,7 +74,7 @@ module DamageControl
     end
     
     def build_queue
-      queue.collect { |build_request_event| build_request_event.build }
+      @countdowns.values.sort {|c1, c2| c1.time_left <=> c2.time_left}.collect {|c| c.build }
     end
 
     def project_building?(project_name)
@@ -84,13 +84,13 @@ module DamageControl
   private
   
     def schedule_build(build)
-      pending_build = @pending_builds[build.project_name]
-      if(pending_build.nil?)
-        pending_build = PendingBuild.new(quiet_period(build), self)
-        @pending_builds[build.project_name] = pending_build
+      countdown = @countdowns[build.project_name]
+      if(countdown.nil?)
+        countdown = QuietPeriodCountDown.new(quiet_period(build), self)
+        @countdowns[build.project_name] = countdown
       end
-      pending_build.build = build
-      pending_build.start
+      countdown.build = build
+      countdown.start
     end
     
     def quiet_period(build)

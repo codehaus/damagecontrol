@@ -55,10 +55,10 @@ class IRCDriver
     @irc_listener = IRCListener.new
     irc_listener.connect("irc.codehaus.org", "testsuite")
     wait_for(10) { irc_listener.connected? }
-    assert(irc_listener.connected?)
+    assert("could not connect to irc", irc_listener.connected?)
     irc_listener.join_channel("#dce2e")
     wait_for(15) { irc_listener.in_channel? }
-    assert(irc_listener.in_channel?)
+    assert("could not join irc channel", irc_listener.in_channel?)
     irc_listener.send_message_to_channel("Hello, this is DamageControl's test-suite. I'm just here to check that DamageControl is performing its duties well.")
     sleep 1
     irc_listener.send_message_to_channel("I expect DamageControl to pop by soon and notify me of the build status, please ignore this.")

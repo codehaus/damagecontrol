@@ -18,6 +18,7 @@ EOF
   class ChangeSets
     include XMLRPC::Marshallable
     include Pebbles::Matchable
+    include Enumerable
 
     attr_reader :changesets
 
@@ -86,6 +87,7 @@ EOF
   class ChangeSet
     include XMLRPC::Marshallable
     include Pebbles::Matchable
+    include Enumerable
 
     attr_reader :changes
     attr_accessor :revision

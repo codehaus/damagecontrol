@@ -60,9 +60,9 @@ module XMLRPC
       response_as_string = ""
       response = REXML::Document.new(data, pref)
       response.write(response_as_string)
-      File.open("#{damagecontrol_home}/testdata/actual.xml", "w+") do |io|
-        response.write(io)
-      end
+      #File.open("#{damagecontrol_home}/testdata/actual.xml", "w+") do |io|
+      #  response.write(io)
+      #end
       expected_as_string = ""
       REXML::Document.new( File.new("#{damagecontrol_home}/testdata/expected_xmlrpc_fetch_all_reply.xml"), pref).write(expected_as_string)
       # Just compare the lengths. Not 100% foolproof, but if they're not equal, compare the actual content

@@ -155,12 +155,17 @@ module DamageControl
       @mock_executor.__verify
     end
     
-    def test_build_queue_is_accessible
-      build2 = Build.new("project")
-      @scheduler.put(BuildRequestEvent.new(@build))
-      @scheduler.put(BuildRequestEvent.new(build2))
+    def test_build_queue_is_sorted_according_to_elapsed_quiet_period_next_build_first
+      @build.config["quiet_period"] = 100
+      build2 = Build.new("project2")
+      build2.config["quiet_period"] = 100
+      earliest_build = Build.new("earliest_project")
+      earliest_build.config["quiet_period"] = 2
+      @scheduler.on_message(BuildRequestEvent.new(@build))
+      @scheduler.on_message(BuildRequestEvent.new(build2))
+      @scheduler.on_message(BuildRequestEvent.new(earliest_build))
       
-      assert_equal([@build, build2], @scheduler.build_queue)
+      assert_equal([earliest_build, @build, build2], @scheduler.build_queue)
     end
   end
 end

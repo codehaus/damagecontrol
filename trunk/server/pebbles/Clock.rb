@@ -7,6 +7,10 @@ module Pebbles
       @callback = callback
       @run = true
     end
+    
+    def time_to_next_tick
+      (@started - Time.now) + @seconds
+    end
 
     def start
       shutdown
@@ -14,6 +18,7 @@ module Pebbles
       return increase if @seconds == 0
       @sleeper = Thread.new do
         while(@run)
+          @started = Time.now
           sleep @seconds
           begin
             increase
@@ -50,6 +55,8 @@ module Pebbles
       super
       shutdown
     end
+    
+    alias :time_left :time_to_next_tick
   end
 end
 
@@ -59,6 +66,17 @@ if __FILE__ == $0
 
   class CountdownTest < Test::Unit::TestCase # :nodoc:
     include Pebbles
+    
+    def test_time_left
+      t = Countdown.new(5)
+      timeout(6) do
+        t.start
+        sleep 1
+        assert(t.time_left < 4)
+        sleep 2
+        assert(t.time_left < 2)
+      end
+    end
 
     def test_countdown
       t = Countdown.new(2)
