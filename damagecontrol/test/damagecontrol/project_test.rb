@@ -19,11 +19,11 @@ module DamageControl
       ENV["DAMAGECONTROL_HOME"] = RSCM.new_temp_dir("epoch")
       @p.scm = new_mock
       changesets = new_mock
+      changesets.__expect(:empty?) {true}
       @p.scm.__expect(:changesets) do |checkout_dir, from|
         assert_equal(Time.epoch, from)
         changesets
       end
-      @p.scm.__expect(:transactional?) {true}
       @p.poll do |cs|
         assert_equal(changesets, cs)
       end
@@ -65,6 +65,7 @@ module DamageControl
       end
       @p.scm = new_mock
       changesets = new_mock
+      changesets.__expect(:empty?) {false}
       @p.scm.__expect(:changesets) do |checkout_dir, from|
         assert_equal(a+1, from)
         changesets

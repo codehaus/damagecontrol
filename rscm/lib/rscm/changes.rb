@@ -65,7 +65,7 @@ module RSCM
     end
     
     # The latest ChangeSet (with the latest time)
-    # or nil if this changeset is empty
+    # or nil if there are none.
     def latest
       result = nil
       each do |changeset|
@@ -110,6 +110,7 @@ module RSCM
       time
     end
 
+    # Sorts the changesets according to time
     def sort!
       @changesets.sort!
       self
@@ -117,6 +118,10 @@ module RSCM
 
   end
 
+  # Represents a collection of Change that were committed at the same time.
+  # Non-transactional SCMs (such as CVS and StarTeam) emulate ChangeSet
+  # by grouping Change s that were committed by the same developer, with the
+  # same commit message, and within a "reasonably" small timespan.
   class ChangeSet
     include Enumerable
     include XMLRPC::Marshallable
@@ -170,22 +175,15 @@ module RSCM
       @time <=> other.time
     end
 
+    # Whether this instance can contain a Change. Used
+    # by non-transactional SCMs.
     def can_contain?(change)
       self.developer == change.developer &&
       self.message == change.message &&
       (self.time - change.time).abs < 60
     end
 
-    def format(template, format_time=Time.new.utc)
-      time_difference = time_difference(format_time)
-      ERB.new(template).result(binding)
-    end
-    
-    def time_difference(format_time=Time.new.utc)
-      return "UNKNOWN" unless time
-      time_difference = format_time.difference_as_text(time)
-    end
-    
+    # String representation that can be used for debugging.
     def to_s
       result = "#{revision} | #{developer} | #{time} | #{message}\n"
       self.each do |change|
@@ -194,13 +192,15 @@ module RSCM
       result
     end
     
-    # Returns the identifier of the changeset. This is the revision (if defined) or an UTC time if revision is undefined.
+    # Returns the identifier of the changeset. This is the revision 
+    # (if defined) or an UTC time if revision is undefined.
     def identifier
       @revision || @time
     end
     
   end
 
+  # Represents a change to an individual file.
   class Change
     include XMLRPC::Marshallable
 
@@ -208,13 +208,6 @@ module RSCM
     DELETED = "DELETED"
     ADDED = "ADDED"
     MOVED = "MOVED"
-    
-    ICONS = {
-      MODIFIED => "/images/16x16/document_edit.png",
-      DELETED => "/images/16x16/document_delete.png",
-      ADDED => "/images/16x16/document_add.png",
-      MOVED => "/images/16x16/document_exchange.png",
-    }
     
     attr_accessor :status
     attr_accessor :path
@@ -239,10 +232,6 @@ module RSCM
       "#{path} | #{revision}"
     end
 
-    def to_rss_description
-      status_text = status.nil? ? path : "#{status.capitalize} #{path}"
-    end
-  
     def developer=(developer)
       raise "can't be null" if developer.nil?
       @developer = developer
@@ -277,10 +266,6 @@ module RSCM
       self.time == other.time
     end
     
-    def icon
-      ICONS[@status] || "/images/16x16/document_warning.png"
-    end
-
   end
 
 end
