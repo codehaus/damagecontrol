@@ -1,9 +1,12 @@
 require 'test/unit'
 require 'mockit'
+require 'damagecontrol/FileUtils'
 
 require 'AcceptanceTestRunner'
 
 class StoryTest < Test::Unit::TestCase
+
+  include DamageControl::FileUtils
 
 TEST_WITH_STORY_ENTRY =
 <<-EOF
@@ -179,7 +182,7 @@ A little bit of that.}, content)
   end
   
   def test_run_failing_test_from_file
-    runner = Story.new("failing_test.txt")
+    runner = Story.new("#{damagecontrol_home}/src/ruby/failing_test.txt")
     runner.add_driver(FailingDriver.new)
     assert_raises(RuntimeError) { runner.run }
   end

@@ -75,7 +75,7 @@ class TestDriver
     assert(mail =~ /^Subject: (.*)$/, "email has no subject #{mail}")
     subject = $1
     assert(mail =~/$^(.*)\Z/m, "email has no body #{mail}")
-    body = $1.chomp
+    body = $1
     %{Subject: #{subject}
 #{body}}
   end
