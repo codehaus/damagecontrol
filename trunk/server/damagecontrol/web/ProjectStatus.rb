@@ -43,19 +43,19 @@ module DamageControl
     end
     
     def label
-      if last_successful_build
-        " (##{last_successful_build.label})"
+      if last_completed_build
+        " (##{last_completed_build.label})"
       else
-        ""
+        " (Never built)"
       end
     end
     
     def time_since_last_success
-			if(last_successful_build  && last_successful_build.dc_end_time)
-			"#{Time.now.utc.difference_as_text(last_successful_build.dc_end_time)} ago"
- 	    else 
- 	    	"Never successfuly built" 
- 	    end
+      if(last_successful_build  && last_successful_build.dc_end_time)
+      "#{Time.now.utc.difference_as_text(last_successful_build.dc_end_time)} ago"
+      else 
+        "Never successfuly built" 
+      end
     end
     
     def last_duration
