@@ -2,12 +2,21 @@ module Pebbles
   module Pathutils
 
     def filepath_to_nativepath(path, escaped)
-      result = IO.popen("cygpath --windows #{path}").read.chomp
-      escaped ? result.gsub(/\\/, "\\\\\\\\") : result
+      cygpath = IO.popen("cygpath --windows #{path}").read.chomp
+      if(cygpath)
+        escaped ? cygpath.gsub(/\\/, "\\\\\\\\") : cygpath
+      else
+        path
+      end
     end
 
     def filepath_to_nativeurl(path)
-      "file://" + IO.popen("cygpath --type mixed #{path}").read.chomp[2..-1]
+      cygpath = IO.popen("cygpath --type mixed #{path}").read.chomp[2..-1]
+      if(cygpath)
+        "file://#{cygpath}"
+      else
+        path
+      end
     end
 
   end

@@ -7,16 +7,24 @@ module Pebbles
     include Pebbles::Pathutils
 
     def test_should_convert_cygwin_path_to_windows_path
-      assert_equal("c:\\scm\\damagecontrol", filepath_to_nativepath("/cygdrive/c/scm/damagecontrol", false))
-      # This format is needed when passing to an IO.popen on non-cygwin windows (like windows native svn)
-      assert_equal("c:\\\\scm\\\\damagecontrol", filepath_to_nativepath("/cygdrive/c/scm/damagecontrol", true))
+      if(cygwin?)
+        assert_equal("c:\\scm\\damagecontrol", filepath_to_nativepath("/cygdrive/c/scm/damagecontrol", false))
+        # This format is needed when passing to an IO.popen on non-cygwin windows (like windows native svn)
+        assert_equal("c:\\\\scm\\\\damagecontrol", filepath_to_nativepath("/cygdrive/c/scm/damagecontrol", true))
+      end
     end
 
     def test_should_convert_cygwin_path_to_windows_url
-      assert_equal("file:///scm/damagecontrol", filepath_to_nativeurl("/cygdrive/c/scm/damagecontrol"))
+      if(cygwin?)
+        assert_equal("file:///scm/damagecontrol", filepath_to_nativeurl("/cygdrive/c/scm/damagecontrol"))
+      end
     end
-    
-    def test_should_recognise_cygwin
+  
+  private
+
+    def cygwin?
+      system("cygpath C:\\\\")
+      $? == 0
     end
   end
 end
