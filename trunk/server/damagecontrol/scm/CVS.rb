@@ -106,6 +106,7 @@ module DamageControl
         end
         system("#{cvs_executable} commit -m \"Installed DamageControl trigger for #{project_name}\"")
       end
+      raise "Couldn't install/commit trigger to loginfo" unless trigger_installed?(project_name)
     end
     
     def trigger_installed?(project_name)
@@ -139,6 +140,7 @@ module DamageControl
       with_working_dir(cvsroot_cvs.working_dir) do
         system("#{cvs_executable} commit -m \"Disabled DamageControl trigger for #{project_name}\"")
       end
+      raise "Couldn't uninstall/commit trigger to loginfo" unless !trigger_installed?(project_name)
     end
 
     def create

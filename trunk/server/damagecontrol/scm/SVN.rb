@@ -1,4 +1,5 @@
-require 'stringio'
+require 'pebbles/Pathutils'
+require 'pebbles/LineEditor'
 require 'damagecontrol/scm/AbstractSCM'
 require 'damagecontrol/scm/SVNLogParser'
 require 'damagecontrol/util/FileUtils'
@@ -7,45 +8,64 @@ module DamageControl
 
   class SVN < AbstractSCM
     include FileUtils
+    include Pebbles::Pathutils
+    include Pebbles::LineEditor
     
     attr_accessor :svnurl
-    attr_accessor :svnprefix
+    attr_accessor :svnpath
 
-    def checkout(time = nil, &proc)
+    def checkout(time = nil, &line_proc)
       if(checked_out?)
-        svn(working_dir, update_command(time), &proc)
+        svn(working_dir, update_command(time), &line_proc)
       else
-        svn(checkout_dir, checkout_command(time), &proc)
+        svn(checkout_dir, checkout_command(time), &line_proc)
       end
     end
 
-    def commit(message, &proc)
-      svn(working_dir, commit_command(message), &proc)
+    def commit(message, &line_proc)
+      svn(working_dir, commit_command(message), &line_proc)
     end
 
-    def changesets(from_time, to_time)
-      log = ""
+    def changesets(from_time, to_time, &line_proc)
       command = changes_command(from_time, to_time)
       yield command if block_given?
-      svn(working_dir, command) do |io|
-        io.each_line do |line|
-          log << line
-          yield line if block_given?
-        end
+
+      cmd_with_io(working_dir, "svn #{command}") do |io|
+        parser = SVNLogParser.new(io, svnpath)
+        parser.parse_changesets(&line_proc)
       end
 
-      parser = SVNLogParser.new(StringIO.new(log), svnprefix)
-      parser.parse_changesets
     end
 
     def working_dir
-      "#{checkout_dir}/#{svnprefix}"
+      "#{checkout_dir}/#{svnpath}"
     end
-
+    
   private
   
+    def svn(dir, cmd, &line_proc)
+      command_line = "svn #{cmd}"
+      yield command_line if block_given?
+      cmd_with_io(dir, command_line) { |io|
+        io.each_line { |line|
+          yield line if block_given?
+        }
+      }
+    end
+
+    def svnadmin(dir, cmd, &line_proc)
+      command_line = "svnadmin #{cmd}"
+      yield command_line if block_given?
+      cmd_with_io(dir, command_line) { |io|
+        io.each_line { |line|
+          yield line if block_given?
+        }
+      }
+    end
+    
     def checked_out?
-      false
+      rootentries = File.expand_path("#{working_dir}/.svn/entries")
+      File.exists?(rootentries)
     end
 
     def checkout_command(time)
@@ -53,7 +73,7 @@ module DamageControl
     end
 
     def update_command(time)
-      "-d#{svnroot} update -d -P"
+      "update"
     end
     
     def commit_command(message)
@@ -69,14 +89,6 @@ module DamageControl
       time.utc.strftime("%Y-%m-%d %H:%M:%S")
     end
 
-    def svn(dir, cmd, &proc)
-      cmd(dir, "svn #{cmd}", &proc)
-    end
-
-    def svnadmin(dir, cmd, &proc)
-      cmd(dir, "svnadmin #{cmd}", &proc)
-    end
-    
     def install_trigger(*args)
       raise "can't automatically install trigger for Subversion, you need to install it manually"
     end
@@ -89,25 +101,52 @@ module DamageControl
   class LocalSVN < SVN
     attr_accessor :svnrootdir
     attr_accessor :project_url
+    # set to true if the local svn binaries (for trigger installation) is native windows
+    # triggers don't work with cygwin svn (svn bug)
+    attr_accessor :native_windows
   
-    def initialize(basedir, svnprefix)
+    def initialize(basedir, svnpath)
       self.svnrootdir = "#{basedir}/svnroot"
-      hack = "/" if windows?
-      hack = "" unless hack
-      self.svnurl = "file://#{hack}#{svnrootdir}/#{svnprefix}"
-      self.svnprefix = svnprefix
+      self.svnurl = "#{filepath_to_nativeurl(svnrootdir)}/#{svnpath}"
+      self.svnpath = svnpath
       self.checkout_dir = "#{basedir}/checkout"
     end
 
-    def create
-      svnadmin(svnrootdir, "create #{svnrootdir}")
+    def create(&line_proc)
+      svnadmin(svnrootdir, "create #{filepath_to_nativepath(svnrootdir, true)}", &line_proc)
     end
 
-    def import(dir)
+    def import(dir, &line_proc)
       basename = File.basename(dir)
-      svn(dir, "import #{dir} #{svnurl} -m \"initial import\"")
+      cmd = "import #{filepath_to_nativepath(dir, true)} #{svnurl} -m \"initial import\""
+      svn(dir, cmd, &line_proc)
     end
 
+    def can_install_trigger?
+      true
+    end
+
+    def install_trigger(damagecontrol_install_dir, project_name, dc_url="http://localhost:4712/private/xmlrpc", &proc)
+      mode = File.exists?(post_commit_file) ? File::APPEND|File::WRONLY : File::CREAT|File::WRONLY
+      File.open(post_commit_file, mode) do |file|
+        trigger_command = trigger_command(damagecontrol_install_dir, project_name, dc_url)
+        file.puts("#!/bin/sh")
+        file.puts(trigger_command)
+      end
+      system("chmod g+x #{post_commit_file}")
+    end
+    
+    def uninstall_trigger(project_name)
+      File.uncomment(post_commit_file, /#{project_name}/, "# ")
+    end
+    
+    def trigger_installed?(project_name)
+      return false unless File.exist?(post_commit_file)
+      # This is not exatly accurate, but it will do for  now
+      post_commit_contents = File.new(post_commit_file).read
+      Regexp.new("^[^# ].*--projectname #{project_name}") =~ post_commit_contents ? true : false
+    end
+    
     def add_file(relative_filename, content, is_new)
       with_working_dir(working_dir) do
         File.mkpath(File.dirname(relative_filename))
@@ -116,29 +155,15 @@ module DamageControl
         end
 
         if(is_new)
-          svn(working_dir, "add #{relative_filename}")
+          svn(working_dir, "add #{relative_filename}", &line_proc)
         end
 
-        commit("adding #{relative_filename}")
+        commit("adding #{relative_filename}", &line_proc)
       end
     end
     
-    def post_commit_file
-      if windows? then "#{svnrootdir}/hooks/post-commit.bat" else "#{svnrootdir}/hooks/post-commit" end
-    end
-    
-    def install_trigger(damagecontrol_install_dir, project_name, dc_url="http://localhost:4712/private/xmlrpc", &proc)
-      # this stuff doesn't work for some reason, if you execute the file manually it works, but svn never executes the post-commit trigger
-      File.open("#{post_commit_file}", "w") do |file|
-        trigger_command = trigger_command(damagecontrol_install_dir, project_name, dc_url)
-        file.puts("#!/bin/sh") unless windows?
-        file.puts(trigger_command)
-      end
-      system("chmod g+x #{post_commit_file}") unless windows?
-    end
-    
-    # TODO: refactor. This is ugly!
-    def add_or_edit_and_commit_file(relative_filename, content)
+    # TODO: refactor. This is ugly! Should go to the generic tests
+    def add_or_edit_and_commit_file(relative_filename, content, &line_proc)
       existed = false
       with_working_dir(working_dir) do
         File.mkpath(File.dirname(relative_filename))
@@ -147,11 +172,20 @@ module DamageControl
           file.puts(content)
         end
       end
-      svn(working_dir, "add #{relative_filename}") unless(existed)
+      svn(working_dir, "add #{relative_filename}", &line_proc) unless(existed)
 
       message = existed ? "editing" : "adding"
 
-      commit("#{message} #{relative_filename}")
+      commit("#{message} #{relative_filename}", &line_proc)
     end
+
+  private
+
+    def post_commit_file
+      # We actualy need to use the .cmd when on cygwin. The cygwin svn post-commit
+      # hook is hosed. We'll be relying on native windows
+      native_windows ? "#{svnrootdir}/hooks/post-commit.cmd" : "#{svnrootdir}/hooks/post-commit"
+    end
+    
   end
 end

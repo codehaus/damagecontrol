@@ -210,6 +210,7 @@ module DamageControl
     end
     
     def build_start
+      @was_killed = false
       logger.info("build starting #{current_build.project_name}")
       current_build.start_time = Time.now.utc
       determine_changeset

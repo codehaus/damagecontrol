@@ -43,12 +43,16 @@ module Pebbles
       t = Clock.new(1) do |time|
         r += 1
       end
-      
-      timeout(2) do
-        t.start
-        sleep(3)
+
+      begin
+        timeout(3, TimeoutError) do
+          t.start
+          sleep(3)
+        end
+      rescue TimeoutError => e
+        #expected
       end
-      assert_equal(r >= 2)
+      assert(r >= 2)
       t.shutdown
     end
   end

@@ -76,7 +76,7 @@ the working directory has been cleaned out, or because there has been no success
       scm_web_url = project_config["scm_web_url"]
 
       # TODO better handling of working dir for the file
-      return "root/#{project_name}/checkout/#{project_name}/#{change.path}" if scm_web_url.nil? || scm_web_url == "" 
+      return "root/#{project_name}/checkout/#{change.path}" if scm_web_url.nil? || scm_web_url == "" 
 
       scm_web_url = ensure_trailing_slash(scm_web_url)
       url = "#{scm_web_url}#{change.path}"

@@ -35,7 +35,7 @@ EOF
     end
     
     def can_parse_simple_log_entry(parser, entry)
-      changeset = parser.parse(StringIO.new(entry))
+      changeset = parser.parse(StringIO.new(entry)) {|line|}
 
       assert_equal("r2", changeset.revision)
       assert_equal("ahelleso", changeset.developer)
@@ -53,7 +53,7 @@ EOF
     def test_parses_entire_log_into_changesets
       File.open("#{damagecontrol_home}/testdata/proxytoys-svn.log") do |io|
         parser = SVNLogParser.new(io, "trunk/proxytoys")
-        changesets = parser.parse_changesets
+        changesets = parser.parse_changesets {|line|}
         
         assert_equal(66, changesets.length)
         # just some random assertions

@@ -9,14 +9,14 @@ module DamageControl
     def initialize(io, path)
       @io = io
       @changeset_parser = SVNLogEntryParser.new(path)
-      # skip over the first ------
-      @changeset_parser.parse(@io,true)
     end
     
-    def parse_changesets
+    def parse_changesets(&line_proc)
+      # skip over the first ------
+      @changeset_parser.parse(@io,true, &line_proc)
       changesets = ChangeSets.new
       while(!@io.eof?)
-        changeset = @changeset_parser.parse(@io)
+        changeset = @changeset_parser.parse(@io, &line_proc)
         changesets.add(changeset) unless changeset.nil?
       end
       changesets

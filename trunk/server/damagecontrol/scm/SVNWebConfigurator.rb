@@ -31,7 +31,7 @@ module DamageControl
       def configuration_keys
         [
           "svnurl",
-          "svnprefix"
+          "svnpath"
         ]
       end
       

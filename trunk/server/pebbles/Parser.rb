@@ -5,8 +5,8 @@ module Pebbles
       @break_regexp = break_regexp
     end
   
-    def parse(io, skip_line_parsing=false)
-      parse_until_regexp_matches(io, skip_line_parsing)
+    def parse(io, skip_line_parsing=false, &line_proc)
+      parse_until_regexp_matches(io, skip_line_parsing, &line_proc)
       if(skip_line_parsing)
         nil
       else
@@ -26,8 +26,9 @@ module Pebbles
     
   private
 
-    def parse_until_regexp_matches(io, skip_line_parsing)
+    def parse_until_regexp_matches(io, skip_line_parsing, &line_proc)
       io.each_line { |line|
+        yield line if block_given?
         if line =~ @break_regexp
           return
         end

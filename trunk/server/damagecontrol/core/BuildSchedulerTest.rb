@@ -43,36 +43,30 @@ module DamageControl
     end
     
     def test_build_is_sheduled_on_first_available_executor_only
-      other_executor = MockIt::Mock.new
-      @scheduler.add_executor(other_executor)
+      only_available_executor = MockIt::Mock.new
+      @scheduler.add_executor(only_available_executor)
     
       @mock_executor.__expect(:building_project?) { |project_name| assert_equal("project", project_name); false }
       @mock_executor.__expect(:can_execute?) {|b| false }
-      other_executor.__expect(:building_project?) { |project_name| assert_equal("project", project_name); false }
-      other_executor.__expect(:can_execute?) {|b| true }
-      other_executor.__expect(:put) { |o| assert_same(@build, o) }
+      only_available_executor.__expect(:building_project?) { |project_name| assert_equal("project", project_name); false }
+      only_available_executor.__expect(:can_execute?) {|b| true }
+      only_available_executor.__expect(:put) { |o| assert_same(@build, o) }
 
       @scheduler.on_message(BuildRequestEvent.new(@build))
       @mock_hub.__verify
       @mock_executor.__verify
     end
     
-    def Xtest_queued_build_is_scheduled_when_executor_is_available
-      other_build = Build.new("other")
+    def test_queued_build_is_scheduled_when_executor_is_available
+      busy_build = Build.new("busy")
 
+      @mock_executor.__expect(:building_project?) { |project_name| assert_equal("project", project_name); true }
       @mock_executor.__expect(:building_project?) { |project_name| assert_equal("project", project_name); false }
-      @mock_executor.__expect(:busy?) { false }
+      @mock_executor.__expect(:can_execute?) {|build| assert_same(@build, build); true }
       @mock_executor.__expect(:put) { |o| assert_same(@build, o) }
 
-      @mock_executor.__expect(:building_project?) { |project_name| assert_equal("other", project_name); false }
-      @mock_executor.__expect(:busy?) { true }
-
-      @mock_executor.__expect(:building_project?) { |project_name| assert_equal("other", project_name); false }
-      @mock_executor.__expect(:busy?) { false }
-      @mock_executor.__expect(:put) { |o| assert_same(other_build, o) }
-    
       @scheduler.on_message(BuildRequestEvent.new(@build))
-      @scheduler.on_message(BuildRequestEvent.new(other_build))      
+      @scheduler.on_message(BuildCompleteEvent.new(busy_build))      
       @mock_hub.__verify
       @mock_executor.__verify
     end
@@ -115,34 +109,30 @@ module DamageControl
     end
     
     def test_request_from_same_project_twice_removes_earlier_entries_in_queue
-      mock_exception_logger = MockIt::Mock.new
-      mock_hub = MockIt::Mock.new
-      mock_hub.__expect(:add_consumer) {|consumer| assert(consumer.is_a?(BuildScheduler))}
-
-      scheduler = BuildScheduler.new(mock_hub, 1, mock_exception_logger)
-      mock_executor = MockIt::Mock.new
-      scheduler.add_executor(mock_executor)
-    
       build2 = Build.new("project")
       build3 = Build.new("project")
 
-      @building_project = false
-      mock_executor.__setup(:building_project?) {|project_name| 
+      @mock_executor.__expect(:building_project?) {|project_name| 
         assert_equal("project", project_name)
-        @building_project
+        false
       }
-      mock_executor.__expect(:can_execute?) { true }
-      mock_executor.__expect(:put) {|b| assert_same(build3, b) ; @building_project = true }
+      @mock_executor.__expect(:can_execute?) { true }
+      @mock_executor.__expect(:put) {|b| assert_same(@build, b)}
+      @mock_executor.__expect(:building_project?) {|project_name| 
+        assert_equal("project", project_name)
+        true
+      }
+      @mock_executor.__expect(:building_project?) {|project_name| 
+        assert_equal("project", project_name)
+        true
+      }
 
-      scheduler.on_message(BuildRequestEvent.new(@build))
-      scheduler.on_message(BuildRequestEvent.new(build2))
-      scheduler.on_message(BuildRequestEvent.new(build3))
-
-      sleep(2)
+      @scheduler.on_message(BuildRequestEvent.new(@build))
+      @scheduler.on_message(BuildRequestEvent.new(build2))
+      @scheduler.on_message(BuildRequestEvent.new(build3))
       
-      mock_hub.__verify
-      mock_executor.__verify
-      mock_exception_logger.__verify
+      @mock_hub.__verify
+      @mock_executor.__verify
     end
     
     def test_quiet_period_can_be_specified_per_build

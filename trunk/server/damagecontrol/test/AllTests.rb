@@ -2,8 +2,11 @@ require 'damagecontrol/util/Logging'
 
 DamageControl::Logging.silent
 
+###### Keep it alphabetical - easier to keep track then ######
+
 require 'damagecontrol/core/BuildExecutorTest'
 require 'damagecontrol/core/BuildHistoryRepositoryTest'
+#!
 require 'damagecontrol/core/BuildSchedulerTest'
 require 'damagecontrol/core/BuildTest'
 require 'damagecontrol/core/DependentBuildTriggerTest'
@@ -52,10 +55,12 @@ require 'damagecontrol/web/BuildExecutorStatusTest'
 # let's stick to unit test and e2etest
 #require 'damagecontrol/test/IntegrationTests'
 
-require 'pebbles/RiteMeshTest'
-require 'pebbles/TimeUtilsTest'
+#!
+require 'pebbles/ClockTest'
+require 'pebbles/LineEditorTest'
 require 'pebbles/MatchableTest'
-# this test causes havoc with the build script
-#require 'pebbles/ClockTest'
+require 'pebbles/PathutilsTest'
 require 'pebbles/ParserTest'
 require 'pebbles/ProcessTest'
+require 'pebbles/RiteMeshTest'
+require 'pebbles/TimeUtilsTest'

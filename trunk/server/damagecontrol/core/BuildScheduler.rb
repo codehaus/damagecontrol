@@ -2,12 +2,12 @@ require 'pebbles/Clock'
 require 'pebbles/Space'
 require 'damagecontrol/core/BuildEvents'
 require 'damagecontrol/core/Build'
-require 'damagecontrol/core/BuildExecutor'
+require 'damagecontrol/util/FileUtils'
 require 'damagecontrol/util/Logging'
 
 module DamageControl
 
-  class BuildScheduler < AsyncComponent
+  class BuildScheduler < Pebbles::Space
 
     include Logging
   
@@ -17,20 +17,23 @@ module DamageControl
     attr_reader :default_quiet_period
     attr_reader :build_queue
     
-    def initialize(hub, default_quiet_period=DEFAULT_QUIET_PERIOD, exception_logger=nil)
-      super(hub)
+    def initialize(multicast_space, default_quiet_period=DEFAULT_QUIET_PERIOD, exception_logger=nil)
+      super
+      @channel = multicast_space
+      @channel.add_consumer(self) unless @channel.nil?
+
       @default_quiet_period = default_quiet_period
       @executors = []
       @build_queue = []
       @exception_logger = exception_logger
     end
   
-    def process_message(event)
+    def on_message(event)
       if event.is_a?(BuildRequestEvent)
         schedule_build(event.build)
       end
       if event.is_a?(BuildCompleteEvent)
-        executor_available
+        try_to_execute_builds
       end
     end
     
@@ -49,7 +52,7 @@ module DamageControl
     end
 
     def project_building?(project_name)
-      @executors.find {|e| e.building_project?(project_name) }
+      executors.find {|e| e.building_project?(project_name) }
     end
     
     def project_scheduled?(project_name)
@@ -59,6 +62,10 @@ module DamageControl
     def kill_named_executor(executor_name)
       executor = executors.find{|e| e.name == executor_name}
       executor.kill_build_process
+    end
+
+    def project_building?(project_name)
+      @executors.find {|e| e.building_project?(project_name) }
     end
 
   private
@@ -94,11 +101,6 @@ module DamageControl
     
     # called when the quiet period of any build has elapsed
     def quiet_period_elapsed
-      try_to_execute_builds
-    end
-    
-    # called when a new executor is available
-    def executor_available
       try_to_execute_builds
     end
     

@@ -39,6 +39,7 @@ module DamageControl
       ensure_in_channel
     end
     
+    # TODO: use standard library timeout maybe? --Aslak
     def wait_until(timeout=nil)
       time_waited = 0
       while !yield
@@ -142,7 +143,7 @@ module DamageControl
     
     def send_message_to_channel(message)
       logger.info("sending irc message #{message}")
-      cmnd_privmsg(@current_server, @current_channel, message)
+      cmnd_privmsg(@current_server, @current_channel, message) unless @current_channel.nil?
     end
   
     def connect(server, handle)

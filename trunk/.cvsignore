@@ -4,6 +4,7 @@
 *.iws
 .project
 target
+dist
 dctray
 work
 ruby

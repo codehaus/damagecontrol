@@ -27,6 +27,19 @@ module Utils
       sleep 1
     end
   end
+
+  def baseurl
+    "http://localhost:14712"
+  end
+  
+  def privateurl
+    "#{baseurl}/private/xmlrpc"
+  end
+  
+  def publicurl
+    "#{baseurl}/public/xmlrpc"
+  end
+  
 end
 
 class IRCListener < IRCConnection
@@ -140,7 +153,6 @@ class Driver
   end
 
   def teardown
-    #FileUtils.rm_rf(cvsrootdir)
   end
   
   def system(cmd)
@@ -199,18 +211,6 @@ class DamageControlServerDriver < Driver
     project_config_repo.modify_project_config(project, project_config)
   end
   
-  def baseurl
-    "http://localhost:14712"
-  end
-  
-  def privateurl
-    "#{baseurl}/private/xmlrpc"
-  end
-  
-  def publicurl
-    "#{baseurl}/public/xmlrpc"
-  end
-  
   def assert_server_running
     assert(server_running?, "server did not start up properly")
   end
@@ -240,7 +240,6 @@ class DamageControlServerDriver < Driver
   
   def teardown
     assert_server_running
-    puts @server_startup_result
     assert(!server_shutdown?, "server did not start up properly")
     shutdown_server
     wait_for(20) { server_shutdown? }
@@ -291,6 +290,7 @@ end
 class End2EndTest < Test::Unit::TestCase
 
   include FileUtils
+  include Utils
   
   attr_reader :basedir
   attr_reader :irc
@@ -310,26 +310,13 @@ class End2EndTest < Test::Unit::TestCase
     @irc.teardown if @irc
     @scm.teardown if @scm
     @xmlrpc.teardown if @xmlrpc
-    
-    #FileUtils.rm_rf(basedir)
   end
   
   def test_damagecontrol_works_with_cvs
     cvs = LocalCVS.new(@basedir, "e2e_testproject")
     test_build_and_log_and_irc(cvs, false)
   end
-  
-  # I have debugged further. The problem isn't that the post-commit
-  # script doesn't get executed. It actually does! The problem is that
-  # for some reason (that is beyond me), the post-commit process running forked from
-  # within svn isn't allowed to connect anywhere ?!?!?!"$%"$!£%!"£%
-  #
-  # After this test has run, have a look at DC_HOME/target/trigger_output.XXX.
-  # These files prove that the triggers are indeed executed - they contain the
-  # output printed to stdout by request_build.rb
-  #
-  # WEIRD STUFF! -Aslak
-  #
+
   def test_damagecontrol_works_with_svn
     svn = LocalSVN.new(@basedir, "e2e_testproject")
     test_build_and_log_and_irc(svn, true)
@@ -342,23 +329,8 @@ class End2EndTest < Test::Unit::TestCase
     File.mkpath(importdir)
     scm.import(importdir)
     
-    # With localhost in URL I get this error with test_damagecontrol_works_with_svn:
-    # 
-    # Trigging build of TestingProject DamageControl on http://localhost:14712/private/xmlrpc
-    # getaddrinfo: no address associated with hostname.
-    # /usr/lib/ruby/1.8/net/protocol.rb:83:in `initialize'
-    # /usr/lib/ruby/1.8/net/protocol.rb:83:in `new'
-    # 
-    # With 127.0.0.1 in URL I get this error with test_damagecontrol_works_with_svn:
-    # 
-    # Trigging build of TestingProject DamageControl on http://127.0.0.1:14712/private/xmlrpc
-    # Operation not permitted - socket(2)
-    # /usr/lib/ruby/1.8/net/protocol.rb:83:in `initialize'
-    # /usr/lib/ruby/1.8/net/protocol.rb:83:in `new'
-    # /usr/lib/ruby/1.8/net/protocol.rb:83:in `connect'
-    # 
     project_name = "TestingProject_#{scm.class.name.gsub(/\:/, '_')}"
-    scm.install_trigger(damagecontrol_home, project_name, "http://127.0.0.1:14712/private/xmlrpc")
+    scm.install_trigger(damagecontrol_home, project_name, privateurl)
 
     @server = DamageControlServerDriver.new("#{basedir}/serverroot")
     @server.setup
@@ -371,7 +343,7 @@ class End2EndTest < Test::Unit::TestCase
     # add build.bat file and commit it (will trigger build)
     scm.checkout
     scm.add_or_edit_and_commit_file(script_file("build"), 'echo "Hello world from DamageControl" > buildresult.txt')
-    
+
     wait_less_time_than_default_quiet_period
     assert_not_built_yet(project_name)
     
@@ -416,11 +388,7 @@ class End2EndTest < Test::Unit::TestCase
   end
 
   def execute_script_commandline(name)
-    if windows?
-      script_file("build")
-    else
-      "sh #{script_file(name)}"
-    end
+    "sh #{script_file(name)}"
   end
   
   def build_result(project_name)
@@ -433,11 +401,7 @@ class End2EndTest < Test::Unit::TestCase
   
   def assert_build_produced_correct_output(project_name)
     expected_content =
-            if windows?
-              '"Hello world from DamageControl" '
-            else
               'Hello world from DamageControl'
-            end
     assert_file_content(expected_content, build_result(project_name), "build not executed")
   end
 end

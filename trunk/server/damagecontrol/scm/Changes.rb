@@ -193,13 +193,13 @@ EOF
       @time = time
     end
 
-    def ==(change)
-      return false if !change.is_a?(self.class)
-      self.path == change.path &&
-      self.developer == change.developer &&
-      self.message == change.message &&
-      self.revision == change.revision &&
-      self.time == change.time
+    def ==(other)
+      return false if !other.is_a?(self.class)
+      self.path == other.path &&
+      self.developer == other.developer &&
+      self.message == other.message &&
+      self.revision == other.revision &&
+      self.time == other.time
     end
 
   end

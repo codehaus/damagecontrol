@@ -23,6 +23,7 @@ module Pebbles
     # provided the space has been started.
     #
     def put(o)
+      raise "@mutex is nil. super was probably not called from subclass: #{self.class.name}" if @mutex.nil?
       @mutex.synchronize do
         @in_queue.push(o)
         @queue.push(o)

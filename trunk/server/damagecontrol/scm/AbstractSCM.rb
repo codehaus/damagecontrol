@@ -3,6 +3,48 @@ require 'damagecontrol/util/FileUtils'
 require 'damagecontrol/scm/Changes'
 require 'xmlrpc/utils'
 
+# Base class for SCM (Source Control Management systems). In order to
+# add support for a new SCM (let's say it's called Snoopy):
+#
+# 1) Implement SnoopyTest that includes GenericSCMTests and implements create_scm
+#
+# 2) Implement Snoopy < DamageControl::AbstractSCM.
+# Implement the following methods:
+# (The methods that take a line_proc should yield each output line from 
+# the underlying SCM command line (if appliccable))
+#
+# checkout(utc_time, &line_proc) -> nil
+# changesets(utc_time, &line_proc) -> DamageControl::Changesets
+# checkout(utc_time, &line_proc)
+# working_dir -> String
+# atomic? -> [true|false] (TODO: avoid quiet period for atomic SCMs)
+#
+# 3) Implement LocalSnoopy < Snoopy. This is to support proper compliance testing
+# as well as the possibility to create new repositories on the same machine as
+# where the DC server will be running.
+#
+# Implement the following methods:
+#
+# create(&line_proc) -> nil
+# import(dir, &line_proc) -> nil
+#
+# 4) (Optional) If the native SCM supports triggers, implement the following methods:
+# (In either Snoopy or LocalSnoopy depending on the native trigger installation mechanism)
+#
+# can_install_trigger? -> true
+# install_trigger(damagecontrol_install_dir, project_name, dc_xml_rpx_url) -> nil (throw ex on failure)
+# uninstall_trigger(project_name) -> nil (throw ex on failure)
+# trigger_installed?(project_name) -> [true|false]
+#
+# 5) implement snoopy_configure_form.erb
+#
+# 6) SnoopyWebConfigurator.rb
+# (TODO - a generic test for this)
+#
+# 7) (optional) snoopy_declarations.js
+#
+# 8) Add your configurator to DamageControlServer.scm_configurator_classes
+#
 module DamageControl
   class AbstractSCM
     include FileUtils
@@ -33,12 +75,12 @@ module DamageControl
       true
     end
 
-    def trigger_command(damagecontrol_install_dir, project_name, dc_url="http://localhost:4712/private/xmlrpc")
-      script = "#{script_prefix}#{damagecontrol_install_dir}/bin/requestbuild#{script_suffix}"
-      "#{to_os_path(script)} --url #{dc_url} --projectname #{project_name}"
+    def trigger_command(damagecontrol_install_dir, project_name, dc_url="http://localhost:4712/private/xmlrpc", script_suffix="")
+      script = "sh #{damagecontrol_install_dir}/bin/requestbuild#{script_suffix}"
+      "#{script} --url #{dc_url} --projectname #{project_name}"
     end
 
-    def checkout(time = nil, &proc)
+    def checkout(utc_time = nil, &proc)
     end
 
     def changesets(from_time, to_time, &proc)
@@ -47,7 +89,7 @@ module DamageControl
     
     def checkout_dir=(checkout_dir)
       raise "checkout_dir can't be nil" unless checkout_dir
-      checkout_dir = to_os_path(File.expand_path(checkout_dir))
+      checkout_dir = File.expand_path(checkout_dir)
       @checkout_dir = checkout_dir
     end
     
@@ -61,14 +103,6 @@ module DamageControl
 
   protected
 
-    def script_prefix
-      if windows? then "" else "sh " end
-    end
-
-    def script_suffix
-      if windows? then ".cmd" else "" end
-    end
-      
     def cmd(dir, cmd, &proc)
       if block_given? then yield "#{cmd}\n" else logger.debug("#{cmd}\n") end
       cmd_with_io(dir, cmd) do |io|

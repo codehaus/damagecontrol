@@ -9,10 +9,11 @@ module DamageControl
     end
 
     def test_modifiying_one_file_produces_correct_changeset
-      scm = create_scm
-      scm.create
-      scm.import("#{damagecontrol_home}/testdata/damagecontrolled")
-      scm.checkout
+      scm = create_scm { |line| logger.debug(line) }
+      scm.create {|line| logger.debug(line)}
+      path = "#{damagecontrol_home}/testdata/damagecontrolled"
+      scm.import(path) { |line| logger.debug(line) }
+      scm.checkout { |line| logger.debug(line) }
       
       # modify file and commit it
       sleep(1)
@@ -20,12 +21,12 @@ module DamageControl
       sleep(1)
       change_file("#{scm.working_dir}/build.xml")
       change_file("#{scm.working_dir}/src/java/com/thoughtworks/damagecontrolled/Thingy.java")
-      scm.commit("changed something")
+      scm.commit("changed something") { |line| logger.debug(line) }
       sleep(1)
       time_after = Time.now.utc
       
       # check that we now have one more change
-      changesets = scm.changesets(time_before, time_after)
+      changesets = scm.changesets(time_before, time_after) { |line| logger.debug(line) }
 
       assert_equal(1, changesets.length)
       changeset = changesets[0]
@@ -45,35 +46,29 @@ module DamageControl
       assert(changeset[1].previous_revision)
 
       # for debugging only
-#      scm.install_trigger(
-#        damagecontrol_home,
-#        "Whatever",
-#        "http://localhost:4712/private/xmlrpc"
-#      )
+      scm.install_trigger(
+        damagecontrol_home,
+        "Whatever",
+        "http://localhost:4712/private/xmlrpc"
+      ) { |line| logger.debug(line) }
     end
     
-    def Xtest_install_uninstall_install_should_work_as_many_times_as_we_like
+    def test_install_uninstall_install_trigger_should_work_as_many_times_as_we_like
       scm = create_scm
-      scm.create
+      scm.create {|line| logger.debug(line)}
 
       project_name = "OftenModified"
       
-      assert(!scm.trigger_installed?(project_name))
-      scm.install_trigger(
-        damagecontrol_home,
-        project_name,
-        "http://localhost:4713/private/xmlrpc"
-      )
-      assert(scm.trigger_installed?(project_name))
-      scm.uninstall_trigger(project_name)
-      assert(!scm.trigger_installed?(project_name))
-      scm.install_trigger(
-        damagecontrol_home,
-        project_name,
-        "http://localhost:4713/private/xmlrpc"
-      )
-      assert(scm.trigger_installed?(project_name))
-
+      (1..3).each do
+        assert(!scm.trigger_installed?(project_name))
+        scm.install_trigger(
+          damagecontrol_home,
+          project_name,
+          "http://localhost:4713/private/xmlrpc"
+        ) {|line| logger.debug(line)}
+        assert(scm.trigger_installed?(project_name))
+        scm.uninstall_trigger(project_name)
+      end
     end
     
     def change_file(file)

@@ -24,28 +24,14 @@ module FileUtils
     end
   end
 
-  def windows?
-    require 'rbconfig.rb'
-    !Config::CONFIG["host"].index("mswin32").nil?
-  end
-    
   def username
     ENV['USERNAME'] || ENV['USER']
   end
   
   def script_file(file)
-    return "#{file}.bat" if windows?
     "#{file}.sh"
   end
   
-  def path_separator
-    windows? ? "\\" : "/"
-  end
-    
-  def to_os_path(path)
-    path.gsub('/', path_separator)
-  end
-    
   def damagecontrol_home
     $damagecontrol_home = find_damagecontrol_home.untaint if $damagecontrol_home.nil?
     $damagecontrol_home
