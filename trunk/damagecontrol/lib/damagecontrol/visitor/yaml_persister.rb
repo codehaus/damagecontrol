@@ -37,6 +37,7 @@ module DamageControl
       # the last changeset.
       #
       def load_upto(last_changeset_identifier, prior)
+        Log.info "Loading #{prior} changesets from #{@changesets_dir} (from #{last_changeset_identifier} and down)"
         last = identifiers.index(last_changeset_identifier)
 
         changesets = RSCM::ChangeSets.new

@@ -12,7 +12,7 @@ module DamageControl
 
       ENV["DAMAGECONTROL_HOME"] = home
       t = Time.utc(1971, 2, 28, 23, 45, 00)
-      build = Build.new("mooky", "some_rev", t)
+      build = Build.new("mooky", "some_rev", t, "Test")
       a_program = File.expand_path(File.dirname(__FILE__) + "/a_program.rb")
       build.execute("ruby #{a_program} 0", {'foo' => 'zap'})
       stderr = "#{home}/mooky/changesets/some_rev/builds/19710228234500/stderr.log"
@@ -27,7 +27,7 @@ module DamageControl
 
       ENV["DAMAGECONTROL_HOME"] = home
       t = Time.utc(1971, 2, 28, 23, 45, 00)
-      build = Build.new("mooky", "some_rev", t)
+      build = Build.new("mooky", "some_rev", t, "Test")
       a_program = File.expand_path(File.dirname(__FILE__) + "/a_program.rb")
       build.execute("ruby #{a_program} 44", {'foo' => 'bar'})
       stderr = "#{home}/mooky/changesets/some_rev/builds/19710228234500/stderr.log"
@@ -42,7 +42,7 @@ module DamageControl
 
       ENV["DAMAGECONTROL_HOME"] = home
       t = Time.utc(1971, 2, 28, 23, 45, 00)
-      build = Build.new("mooky", "some_rev", t)
+      build = Build.new("mooky", "some_rev", t, "Test")
       a_program = File.expand_path(File.dirname(__FILE__) + "/a_slow_program.rb")
       t = Thread.new do
         build.execute("ruby #{a_program} 55", {'foo' => 'mooky'})

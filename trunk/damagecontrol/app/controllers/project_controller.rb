@@ -1,4 +1,3 @@
-require 'drb'
 require 'rscm'
 require 'damagecontrol/project'
 require 'damagecontrol/directories'
@@ -9,30 +8,6 @@ class ProjectController < ApplicationController
 
   # TODO: check if the various SCMs are installed and disable them with a warning if not.
   # Each SCM class should have an available? method
-
-  SCMS = [
-# Uncomment this to see Mooky in action in the web interface!
-#    RSCM::Mooky,
-    RSCM::CVS, 
-    RSCM::SVN, 
-    RSCM::StarTeam
-  ]
-
-  TRACKERS = [
-    DamageControl::Tracker::Null, 
-    DamageControl::Tracker::Bugzilla, 
-    DamageControl::Tracker::JIRA,
-    DamageControl::Tracker::RubyForge,
-    DamageControl::Tracker::SourceForge,
-    DamageControl::Tracker::Scarab,
-    DamageControl::Tracker::Trac
-  ]
-
-  SCM_WEBS = [
-#    SCMWeb::Null.new, 
-#    SCMWeb::ViewCVS.new, 
-#    SCMWeb::Fisheye.new
-  ]
 
   def initialize
     super
@@ -46,16 +21,19 @@ class ProjectController < ApplicationController
 
   def new
     @project = DamageControl::Project.new
-    @scms = SCMS.collect {|o| o.new}
+
+    @scms = RSCM::AbstractSCM.classes.collect {|cls| cls.new}
     first_scm = @scms[0]
     def first_scm.selected?
       true
     end
-    @trackers = TRACKERS.collect {|o| o.new}
+    
+    @trackers = DamageControl::Tracker::Base.classes.collect {|cls| cls.new}
     first_tracker = @trackers[0]
     def first_tracker.selected?
       true
     end
+
     @edit = true
     @new_project = true
     render_action("view")
@@ -89,18 +67,12 @@ class ProjectController < ApplicationController
   end
 
   def save
-    project         = instantiate_from_params("project")
-    project.scm     = instantiate_from_params("scm")
-    project.tracker = instantiate_from_params("tracker")
-    
-    begin
-      DRb.start_service()
-      rscm = DRbObject.new(nil, 'druby://localhost:9000')
-      rscm.save_project(project)
-    rescue => e
-      $stderr.puts(e.backtrace.join("\n"))
-      return render_text("Couldn't connect to RSCM server. Please make sure it's running.<br>" + e.message)
-    end
+    project = instantiate_from_hash(DamageControl::Project, @params[DamageControl::Project.name])
+    project.scm = selected("scms")
+    project.tracker = selected("trackers")
+    project.publishers = instantiate_array_from_hashes(@params["publishers"])
+
+    project.save
 
     redirect_to(:action => "view", :id => project.name)
   end
@@ -108,7 +80,7 @@ class ProjectController < ApplicationController
   def changeset
     load
     changeset_identifier = @params["changeset"]
-    @changeset = @project.changeset(changeset_identifier.to_identifier)    
+    @changeset = @project.changeset(changeset_identifier.to_identifier)
     @changeset.accept(HtmlDiffVisitor.new(@project))
   end
   
@@ -213,7 +185,7 @@ protected
       }
     end
 
-    if(@project.exists?)
+    if(@project.exists? && @project.tracker)
       @sidebar_links << {
         :href       => @project.tracker.url, 
         :image      => "/images/24x24/scroll_information.png",
@@ -250,17 +222,15 @@ private
     def scm.selected?
       true
     end
+    # Make a dupe of the scm/tracker lists and substitute with project's value
+    @scms = RSCM::AbstractSCM.classes.collect {|cls| $stderr.puts "CLASS: #{cls.name}" ;cls.new}
+    @scms.each_index {|i| @scms[i] = @project.scm if @scms[i].class == @project.scm.class}
 
     tracker = @project.tracker
     def tracker.selected?
       true
     end
-
-    # Make a dupe of the scm/tracker lists and substitute with project's value
-    @scms = SCMS.collect {|o| o.new}
-    @scms.each_index {|i| @scms[i] = @project.scm if @scms[i].class == @project.scm.class}
-
-    @trackers = TRACKERS.collect {|o| o.new}
+    @trackers = DamageControl::Tracker::Base.classes.collect {|cls| cls.new}
     @trackers.each_index {|i| @trackers[i] = @project.tracker if @trackers[i].class == @project.tracker.class}
 
     @linkable_changesets = @project.changesets(@project.latest_changeset_identifier, 10)
@@ -268,17 +238,4 @@ private
 
     set_sidebar_links
   end
-
-  # Instantiates an object from parameters
-  def instantiate_from_params(param)
-    class_name = @params[param]
-    clazz = eval(class_name)
-    ob = clazz.new
-    attribs = @params[class_name] || {}
-    attribs.each do |k,v|
-      ob.send("#{k}=", v)
-    end
-    ob
-  end
-
 end

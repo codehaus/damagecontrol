@@ -1,7 +1,7 @@
 require 'test/unit'
 require 'rscm/mockit'
 require 'rscm/changes'
-require 'damagecontrol/publisher/email'
+require 'damagecontrol/publisher/base'
 require 'damagecontrol/build'
 
 module DamageControl

@@ -1,0 +1,18 @@
+<script><!--
+<%= tab_pane.name %> = [
+<% tab_pane.each do |o| %>
+  "<%= o.class.name %>",
+<% end %> "" ];
+--></script>
+
+<ul id="foldertab">
+  <% tab_pane.each do |o| %>
+  <li><a href="javascript:showElement('<%= o.class.name %>', <%= tab_pane.name %>)"><img src="/images/growlicon.png" width="20" height="20"><%= o.name %></a></li>
+  <% end %>
+</ul>
+
+<% tab_pane.each do |o| %>
+  <div id="<%= o.class.name %>" style="<% if(o.selected?)%>display:block<%else%>display:none<%end%>">
+    <%= render_object(o, tab_pane.name, @edit) %>
+  </div>
+<% end %>

@@ -1,22 +1,36 @@
 require 'rubygems'
-require_gem 'actionmailer'
+#require_gem 'actionmailer'
 require 'action_mailer'
+require 'rscm/annotations'
 require 'damagecontrol/project'
+require 'damagecontrol/publisher/base'
 
 module DamageControl
   module Publisher
-    class Email
-      # Register ourself
-      Project.available_publisher_classes << self
+    class Email < Base
+      register self
     
+      ann :description => "How to deliver email [\"sendmail\"|\"smtp\"]"
       attr_accessor :delivery_method
+
+      ann :description => "Recipients (comma separated)"
       attr_accessor :recipients
+
+      ann :description => "Who sends the email"
       attr_accessor :from
+      
+      ann :description => "Active", :type => TrueClass # ? syntax doesn't work for attrs :-(
+      attr_accessor :active
       
       def initialize
         @delivery_method = "sendmail"
         @recipients = []
         @from = "dcontrol@codehaus.org"
+        @active = false
+      end
+      
+      def name
+        "Email"
       end
     
       def publish(build)
@@ -46,4 +60,4 @@ module DamageControl
       end
     end
   end
-end
+end  
