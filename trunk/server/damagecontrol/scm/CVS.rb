@@ -17,8 +17,9 @@ module DamageControl
     attr_accessor :rsh_client
     attr_accessor :cvs_executable
     
-    def initialize
-      self.cvs_executable = "cvs"
+    def cvs_executable
+      "cvs" unless @cvs_executable
+      @cvs_executable
     end
     
     def changesets(from_time, to_time, &proc)
