@@ -30,6 +30,9 @@ module DamageControl
     attr_accessor :status
     attr_accessor :url
 
+    # the scm to use to talk to this builds source control system
+    attr_accessor :scm
+    
     attr_accessor :start_time
     attr_accessor :end_time
     attr_accessor :potential_label

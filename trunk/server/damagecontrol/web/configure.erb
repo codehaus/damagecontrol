@@ -59,6 +59,10 @@ function showScm(scm) {
   <td><input class="scm_info" name="jira_url" id="jira_url" type="text" value="<%= project_config['jira_url'] %>"/></td>
 </tr>
 <tr>
+  <td>Next build number</td>
+  <td><input class="scm_info" name="next_build_number" id="next_build_number" type="text" value="<%= next_build_number %>"/></td>
+</tr>
+<tr>
   <td>Source control</td>
   <td>
     <% scm_configurators.each do |scm_configurator| %>

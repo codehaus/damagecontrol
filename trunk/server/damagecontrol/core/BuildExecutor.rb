@@ -23,13 +23,14 @@ module DamageControl
     
     attr_accessor :last_build_request
 
-    def initialize(channel, build_history, project_directories, scm_factory=SCMFactory.new)
+    def initialize(channel, build_history_repository, *args)
       @channel = channel
-      @build_history = build_history
-      @project_directories = project_directories
-      @scm_factory = scm_factory
+      @build_history_repository = build_history_repository
 
       @scheduled_build_slot = Slot.new
+      
+      # TODO remove this, just warning people about refactorings
+      raise "NOTE: BuildExecutor has been refactored! It now only takes two arguments, like this: BuildExecutor.new(hub, build_history_repository)" unless args.empty?
     end
     
     def checkout?
@@ -88,7 +89,7 @@ module DamageControl
     end
     
     def project_base_dir
-      @project_directories.checkout_dir(current_build.project_name)
+      current_build.scm.working_dir
     end
     
     def scheduled_build
@@ -125,7 +126,7 @@ module DamageControl
       end
       
       begin
-        last_successful_build = @build_history.last_successful_build(current_build.project_name)
+        last_successful_build = @build_history_repository.last_successful_build(current_build.project_name)
         # we have no record of when the last succesful build was made, don't determine the changeset
         # (might be a new project, see comment above)
         return if last_successful_build.nil?
@@ -159,26 +160,13 @@ module DamageControl
       @scheduled_build_slot.get
     end
     
-    def project_checkout_dir
-      @project_directories.checkout_dir(current_build.project_name)
-    end
-    
     def current_scm
-      @scm_factory.get_scm(current_build.config, project_checkout_dir)
+      current_build.scm
     end
     
     def build_start
       logger.info("build starting #{current_build.project_name}")
         current_build.start_time = Time.now.to_i
-
-        # set potential label
-        last_successful_build = @build_history.last_successful_build(current_build.project_name)
-        if(last_successful_build && last_successful_build.label)
-          current_build.potential_label = last_successful_build.label + 1
-        else
-          current_build.potential_label = 1
-        end
-        
         determine_changeset
         @channel.publish_message(BuildStartedEvent.new(current_build))
     end

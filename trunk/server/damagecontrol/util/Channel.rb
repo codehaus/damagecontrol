@@ -13,12 +13,12 @@ module DamageControl
     end   
         
     def publish_message(message)
-      protect {
+      protect do
         @last_message=message
-        @subscribers.each {|subscriber|
+        @subscribers.each do |subscriber|
           subscriber.receive_message(message)
-        }
-      }
+        end
+      end
     end
     
     def add_subscriber(subscriber)

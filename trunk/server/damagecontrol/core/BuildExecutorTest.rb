@@ -9,6 +9,7 @@ require 'damagecontrol/core/BuildExecutor'
 require 'damagecontrol/util/HubTestHelper'
 require 'damagecontrol/util/FileUtils'
 require 'damagecontrol/core/BuildHistoryRepository'
+require 'damagecontrol/core/ProjectConfigRepository'
 require 'damagecontrol/core/ProjectDirectories'
 
 module DamageControl
@@ -46,8 +47,9 @@ module DamageControl
       mock_scm.__expect(:working_dir) { "." }
       mock_scm.__expect(:checkout) {}
       mock_scm.__expect(:working_dir) { "." }
+      @build.scm = mock_scm
 
-      @build_executor = BuildExecutor.new(hub, BuildHistoryRepository.new(hub), ProjectDirectories.new(@basedir), MockScmFactory.new(mock_scm))
+      @build_executor = BuildExecutor.new(hub, BuildHistoryRepository.new(hub))
 
       @build_executor.schedule_build(@build)
       @build_executor.process_next_scheduled_build
@@ -64,9 +66,10 @@ module DamageControl
       mock_scm.__expect(:working_dir) { "." }
       mock_scm.__expect(:checkout) {}
       mock_scm.__expect(:working_dir) { "." }
-      @build_executor = BuildExecutor.new(hub, BuildHistoryRepository.new(hub), ProjectDirectories.new(@basedir), MockScmFactory.new(mock_scm))
+      @build_executor = BuildExecutor.new(hub, BuildHistoryRepository.new(hub))
 
       @build = Build.new("damagecontrolled", Time.now, { "build_command_line" => "bad_command"})
+      @build.scm = mock_scm
       @build_executor.schedule_build(@build)
       @build_executor.process_next_scheduled_build
       # what happens for bad_command is different on windows and linux
@@ -94,12 +97,6 @@ module DamageControl
         b.timestamp = last_build_time
         b
       }
-      mock_build_history.__expect(:last_successful_build) { |project_name|
-        assert_equal("damagecontrolled", project_name)
-        b = Build.new("damagecontrolled")
-        b.timestamp = last_build_time
-        b
-      }
       mock_scm = MockIt::Mock.new
       mock_scm.__setup(:working_dir) { checkoutdir }
       mock_scm.__expect(:changesets) {|from_time, to_time|
@@ -110,15 +107,9 @@ module DamageControl
       
       FileUtils.mkdir_p(checkoutdir)
       
-      @build_executor = BuildExecutor.new(hub, mock_build_history, ProjectDirectories.new(@basedir), MockScmFactory.new(mock_scm))
+      @build_executor = BuildExecutor.new(hub, mock_build_history)
       @build = Build.new("damagecontrolled", Time.now,
         { "build_command_line" => "echo hello world"})
-      def @build.scm=(scm)
-        @scm = scm
-      end
-      def @build.get_scm(dir)
-        @scm
-      end
       @build.scm = mock_scm
       @build.timestamp = current_build_time
 
@@ -136,16 +127,6 @@ module DamageControl
     
     def ant
       windows? ? "ant.bat" : "ant"
-    end
-  end
-  
-  class MockScmFactory
-    def initialize(scm)
-      @scm = scm
-    end
-
-    def get_scm(config_map, checkout_dir_root)
-      @scm
     end
   end
 end

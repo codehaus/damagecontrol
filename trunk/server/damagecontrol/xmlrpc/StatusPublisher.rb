@@ -3,8 +3,6 @@ require 'damagecontrol/core/Build'
 require 'damagecontrol/core/BuildEvents'
 require 'damagecontrol/core/BuildHistoryRepository'
 
-::XMLRPC::Config::ENABLE_NIL_CREATE = true
-
 # Exposes a BuildHistoryRepository to XML-RPC
 # 
 # Authors: Steven Meyfroidt, Aslak Hellesoy, Jon Tirsen

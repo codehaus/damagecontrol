@@ -1,5 +1,5 @@
 #
-# $Id: config.rb,v 1.1 2004/05/17 14:41:24 tirsen Exp $
+# $Id: config.rb,v 1.2 2004/07/23 05:16:09 tirsen Exp $
 # Configuration file for XML-RPC for Ruby
 #
 
@@ -19,7 +19,7 @@ module XMLRPC
     DEFAULT_PARSER = XMLParser::REXMLStreamParser
 
     # enable <nil/> tag
-    ENABLE_NIL_CREATE    = false
+    ENABLE_NIL_CREATE    = true
     ENABLE_NIL_PARSER    = false
     
     # allows integers greater than 32-bit if true

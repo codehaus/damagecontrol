@@ -13,6 +13,7 @@ require 'damagecontrol/core/HostVerifyingHandler'
 require 'damagecontrol/core/LogWriter'
 require 'damagecontrol/core/BuildHistoryRepository'
 require 'damagecontrol/core/ProjectConfigRepository'
+require 'damagecontrol/core/BuildNumberIncreaser'
 require 'damagecontrol/core/HostVerifier'
 require 'damagecontrol/web/ProjectServlet'
 require 'damagecontrol/web/InstallTriggerServlet'
@@ -250,13 +251,14 @@ module DamageControl
     end
     
     def init_build_scheduler
+      component(:build_scheduler, BuildNumberIncreaser.new(hub, project_config_repository))
       component(:build_scheduler, BuildScheduler.new(hub))
       init_build_executors
     end
     
     def init_build_executors
       # Only use one build executor (don't allow parallel builds)
-      build_scheduler.add_executor(BuildExecutor.new(hub, build_history_repository, project_directories))
+      build_scheduler.add_executor(BuildExecutor.new(hub, build_history_repository))
     end
     
     def polling_interval

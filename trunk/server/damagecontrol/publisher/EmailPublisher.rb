@@ -8,7 +8,12 @@ module DamageControl
 
   class EmailPublisher < AsyncComponent
 
-    attr_reader :always_mail
+    attr_accessor :subject_template
+    attr_accessor :body_template
+    attr_accessor :from
+    attr_accessor :mail_server
+    attr_accessor :port
+    attr_accessor :always_mail
     
     def initialize(channel, subject_template, body_template, from, always_mail=false, mail_server="localhost", port=25)
       super(channel)

@@ -73,11 +73,34 @@ module DamageControl
     def create_build(project_name, timestamp)
       build = Build.new(project_name, timestamp, project_config(project_name))
       build.url = "#{public_web_url}/project?action=build_details&project_name=#{build.project_name}&timestamp=#{build.timestamp}"
+      build.scm = create_scm(project_name)
+      build.potential_label = peek_next_build_number(project_name)
       build
     end
     
     def create_scm(project_name)
       scm_factory.get_scm(project_config(project_name), checkout_dir(project_name))
+    end
+    
+    def next_build_number_file
+      project_directories.checkout_dir(project_name)
+    end
+    
+    def next_build_number(project_name)
+      number = peek_next_build_number(project_name)
+      set_next_build_number(project_name, number + 1)
+      number
+    end
+    
+    def peek_next_build_number(project_name)
+      return 1 unless File.exists?(project_directories.next_build_number_file(project_name))
+      File.read(project_directories.next_build_number_file(project_name)).chomp.to_i
+    end
+    
+    def set_next_build_number(project_name, number)
+      File.open(project_directories.next_build_number_file(project_name), "w+") do |io|
+        io.puts(number)
+      end
     end
 
   private

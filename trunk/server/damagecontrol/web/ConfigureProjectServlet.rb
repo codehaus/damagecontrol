@@ -26,6 +26,7 @@ module DamageControl
     
     def configure
       action = "store_configuration"
+      next_build_number = project_config_repository.peek_next_build_number(project_name)
       render("configure.erb", binding)
     end
         
@@ -44,6 +45,7 @@ module DamageControl
       end
 
       @project_config_repository.modify_project_config(project_name, project_config)
+      @project_config_repository.set_next_build_number(project_name, request.query["next_build_number"].chomp.to_i) if request.query["next_build_number"]
       
       action_redirect(:configure, { "project_name" => project_name })
     end
