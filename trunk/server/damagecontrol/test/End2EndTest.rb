@@ -387,7 +387,7 @@ class End2EndTest < Test::Unit::TestCase
     }
     central_scm.import(@import_root_dir) { |line| puts line }
     
-    trigger_command = DamageControl::XMLRPC::Trigger.trigger_command(damagecontrol_home, @project_name, privateurl)
+    trigger_command = DamageControl::XMLRPC::Trigger.trigger_command(damagecontrol_home, @project_name, privateurl, windows?)
     central_scm.install_trigger(trigger_command, @trigger_files_checkout_dir)
   end
   

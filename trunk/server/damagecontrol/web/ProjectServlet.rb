@@ -9,6 +9,7 @@ module DamageControl
   
     def initialize(type, build_history_repository, project_config_repository, trigger, build_scheduler, report_classes, rss_url, trig_xmlrpc_url)
       super(type, build_scheduler, build_history_repository, project_config_repository)
+      absolute_template_dir # initialize it
       @trigger = trigger
       @report_classes = report_classes
       @rss_url = rss_url
@@ -99,7 +100,7 @@ module DamageControl
           # Install/uninstall trigger
           if(scm.exists?)
             native_damagecontrol_home = filepath_to_nativepath(damagecontrol_home, false)
-            trigger_command = DamageControl::XMLRPC::Trigger.trigger_command(native_damagecontrol_home, project_name, @trig_xmlrpc_url)
+            trigger_command = DamageControl::XMLRPC::Trigger.trigger_command(native_damagecontrol_home, project_name, @trig_xmlrpc_url, windows?)
             trigger_files_checkout_dir = project_config_repository.trigger_checkout_dir(project_name)
             installed = scm.trigger_installed?(trigger_command, trigger_files_checkout_dir)
             if(scm.supports_trigger? && installed)

@@ -32,7 +32,7 @@ module DamageControl
     end
     
     def on_message(message)
-      if message.is_a?(BuildEvent) && !message.is_a?(BuildProgressEvent)
+      if message.is_a?(BuildEvent) && !message.is_a?(StandardOutEvent)
         register(message.build)
       end
     end

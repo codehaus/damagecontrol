@@ -1,5 +1,4 @@
 require 'test/unit'
-require 'pebbles/Process'
 require 'damagecontrol/scm/GenericSCMTests'
 require 'damagecontrol/scm/CVS'
 require 'damagecontrol/util/FileUtils'
@@ -47,8 +46,8 @@ module DamageControl
     
     def test_invalid_cvs_command_raises_error
       cvs = create_cvs("cvsroot", "cvsmodule")
-      assert_raises(Pebbles::ProcessFailedException, "invalid cvs command should raise error") do
-        cvs.cvs(".", "invalid_command") { |line| }
+      assert_raises(FileUtils::ProcessFailedException, "invalid cvs command should raise error") do
+        cvs.cvs(".", "invalid_command", 5) { |line| }
       end
     end
         

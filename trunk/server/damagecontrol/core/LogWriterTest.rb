@@ -29,7 +29,7 @@ module DamageControl
     end
     
     def test_writes_error_events_to_ordinary_log_file_AND_special_log_file
-      @writer.put(BuildErrorEvent.new(@build, "error"))
+      @writer.put(StandardErrEvent.new(@build, "error"))
       assert(!@writer.stderr_file(@build).closed?)
       assert_file_content("error\n", 
         "#{@basedir}/project_name/build/19770614002000/stderr.log")
@@ -38,7 +38,7 @@ module DamageControl
     end
 
     def test_log_writer_creates_new_log_on_build_request_and_closes_it_on_build_complete
-      @writer.put(BuildProgressEvent.new(@build, "hello"))
+      @writer.put(StandardOutEvent.new(@build, "hello"))
       assert(!@writer.stdout_file(@build).closed?)
       
       @writer.put(BuildCompleteEvent.new(@build))
@@ -50,8 +50,8 @@ module DamageControl
     end
     
     def test_closes_all_files_on_build_complete
-      @writer.put(BuildProgressEvent.new(@build, "progress"))
-      @writer.put(BuildErrorEvent.new(@build, "error"))
+      @writer.put(StandardOutEvent.new(@build, "progress"))
+      @writer.put(StandardErrEvent.new(@build, "error"))
       @writer.put(BuildCompleteEvent.new(@build))
       assert(@writer.stdout_file(@build).closed?)
       assert(@writer.stderr_file(@build).closed?)

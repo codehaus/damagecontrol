@@ -50,6 +50,14 @@ module DamageControl
     include XmlSerialization
     
   public
+  
+    # Timeout in seconds for various operations
+    CHANGESET_TIMEOUT       = 30*60
+    CHECKIN_TIMEOUT         = 10*60
+    CHECKOUT_TIMEOUT        = 30*60
+    IMPORT_TIMEOUT          = 30*60
+    LOCAL_OPERATION_TIMEOUT =    60
+    CREATE_REPO_TIMEOUT     =  2*60
 
     # Should return an utc time of the latest checkin, according to the SCM's clock.
     # If this is the fisrst checkout, null can be returned (to minimise size)

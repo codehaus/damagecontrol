@@ -12,12 +12,12 @@ module DamageControl
     end
   end
   
-  class BuildProgressEvent < BuildEvent
-    attr_reader :output
+  class StandardOutEvent < BuildEvent
+    attr_reader :data
   
-    def initialize(build, output)
+    def initialize(build, data)
       super(build)
-      @output = output
+      @data = data
     end
 
     def ==(event)
@@ -25,16 +25,16 @@ module DamageControl
     end
   end
 
-  class BuildErrorEvent < BuildEvent
-    attr_reader :message
+  class StandardErrEvent < BuildEvent
+    attr_reader :data
   
-    def initialize(build, message)
+    def initialize(build, data)
       super(build)
-      @message = message
+      @data = data
     end
 
     def ==(event)
-      super(event) && event.message == message
+      super(event) && event.data == data
     end
   end
 

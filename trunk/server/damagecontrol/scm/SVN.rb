@@ -1,6 +1,5 @@
 require 'pebbles/Pathutils'
 require 'pebbles/LineEditor'
-require 'pebbles/Process'
 require 'damagecontrol/scm/AbstractSCM'
 require 'damagecontrol/scm/SVNLogParser'
 require 'damagecontrol/util/FileUtils'
@@ -30,7 +29,7 @@ module DamageControl
           file.puts(content)
         end
       end
-      svn(checkout_dir, "add #{relative_filename}", &line_proc) unless(existed)
+      svn(checkout_dir, "add #{relative_filename}", CHECKIN_TIMEOUT, &line_proc) unless(existed)
 
       message = existed ? "editing" : "adding"
 
@@ -42,14 +41,14 @@ module DamageControl
       checked_out_files = []
       path_regex = /^[A|D|U]\s*(.*)/
       if(checked_out?(checkout_dir))
-        svn(checkout_dir, update_command(scm_to_time)) do |line|
+        svn(checkout_dir, update_command(scm_to_time), CHECKOUT_TIMEOUT) do |line|
           if(line =~ path_regex)
             checked_out_files << $1
           end
           line_proc.call(line) if block_given?
         end
       else
-        svn(checkout_dir, checkout_command(scm_to_time)) do |line|
+        svn(checkout_dir, checkout_command(scm_to_time, checkout_dir), CHECKOUT_TIMEOUT) do |line|
           if(line =~ path_regex)
             checked_out_files << $1
           end
@@ -72,7 +71,7 @@ module DamageControl
 
     def local_revision(checkout_dir)
       local_revision = nil
-      svn(checkout_dir, "info") do |line|
+      svn(checkout_dir, "info", 20) do |line|
         if(line =~ /Revision: ([0-9]*)/)
           return $1.to_i
         end
@@ -82,15 +81,15 @@ module DamageControl
     def head_revision(checkout_dir)
       cmd = "svn log #{repourl} -r HEAD"
       logger.info(cmd)
-      cmd_with_io(checkout_dir, cmd) do |io|
-        parser = SVNLogParser.new(io, svnpath)
+      cmd_with_io(checkout_dir, cmd, nil, {}, LOCAL_OPERATION_TIMEOUT) do |stdout, process|
+        parser = SVNLogParser.new(stdout, svnpath)
         changesets = parser.parse_changesets
         changesets[0].revision.to_i
       end
     end
 
     def commit(checkout_dir, message, &line_proc)
-      svn(checkout_dir, commit_command(message), &line_proc)
+      svn(checkout_dir, commit_command(message), CHECKIN_TIMEOUT, &line_proc)
     end
 
     def label(checkout_dir)
@@ -117,7 +116,7 @@ module DamageControl
     def create(&line_proc)      
       native_path = filepath_to_nativepath(svnrootdir, true)
       mkdir_p(nativepath_to_filepath(native_path))
-      svnadmin(svnrootdir, "create #{native_path}", &line_proc)
+      svnadmin(svnrootdir, "create #{native_path}", CREATE_REPO_TIMEOUT, &line_proc)
     end
 
     def install_trigger(trigger_command, damagecontrol_install_dir, &proc)
@@ -164,7 +163,7 @@ module DamageControl
     
     def import(dir, &line_proc)
       import_cmd = "import #{svnurl} -m \"initial import\""
-      svn(dir, import_cmd, &line_proc)
+      svn(dir, import_cmd, IMPORT_TIMEOUT, &line_proc)
     end
 
     def changesets(checkout_dir, scm_from_time, scm_to_time, files, &line_proc)
@@ -173,7 +172,7 @@ module DamageControl
       command = "svn #{changes_command(scm_from_time, scm_to_time, files)}"
       yield command if block_given?
 
-      cmd_with_io(checkout_dir, command) do |stdout|
+      cmd_with_io(checkout_dir, command, nil, {}, CHANGESET_TIMEOUT) do |stdout, process|
         parser = SVNLogParser.new(stdout, svnpath)
         changesets = parser.parse_changesets(scm_from_time, scm_to_time, &line_proc)
       end
@@ -198,13 +197,12 @@ module DamageControl
       result
     end
 
-    def svn(dir, cmd, &line_proc)
+    def svn(dir, cmd, timeout, &line_proc)
       command_line = "svn #{cmd}"
 
       # not specifying stderr - cmd_with_io will read it in a separate thread.
-      cmd_with_io(dir, command_line) do |stdout|
+      cmd_with_io(dir, command_line, nil, {}, timeout) do |stdout, process|
         begin
-          logger.info("Reading stdout")
           stdout.each_line do |progress|
             if block_given? then yield progress else logger.debug(progress) end
           end
@@ -212,11 +210,11 @@ module DamageControl
       end
     end
 
-    def svnadmin(dir, cmd, &line_proc)
+    def svnadmin(dir, cmd, timeout, &line_proc)
       command_line = "svnadmin #{cmd}"
 
       # not specifying stderr - cmd_with_io will read it in a separate thread.
-      cmd_with_io(dir, command_line) do |stdout|
+      cmd_with_io(dir, command_line, nil, {}, timeout) do |stdout, process|
         stdout.each_line do |progress|
             if block_given? then yield progress else logger.debug(progress) end
         end
@@ -228,8 +226,9 @@ module DamageControl
       File.exists?(rootentries)
     end
 
-    def checkout_command(scm_to_time)
-      "checkout #{revision_option(nil, scm_to_time)} #{svnurl} ."
+    def checkout_command(scm_to_time, checkout_dir)
+      checkout_dir = windows? ? "\"#{checkout_dir}\"" : "."
+      "checkout #{revision_option(nil, scm_to_time)} #{svnurl} #{checkout_dir}"
     end
 
     def update_command(scm_to_time)

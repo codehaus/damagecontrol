@@ -91,6 +91,12 @@ function configureAction() {
   </td>
 </tr>
 <tr>
+  <td>&nbsp;</td>
+  <td class="setting-description">
+    The project name should not use space characters, as it will be used to create a folder on the DC server.
+  </td>
+</tr>
+<tr>
   <% 
     require 'cgi'
     build_command_line_attrib_value = project_config['build_command_line'] ? CGI.escapeHTML(project_config['build_command_line']) : ""

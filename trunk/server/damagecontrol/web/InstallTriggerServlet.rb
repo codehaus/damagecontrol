@@ -35,7 +35,7 @@ module DamageControl
       @trig_xmlrpc_url = request.query['damagecontrol_xmlrpc_url']
       scm = @project_config_repository.create_scm(project_name)
       error = nil
-      trigger_command = DamageControl::XMLRPC::Trigger.trigger_command(damagecontrol_install_dir, project_name, @trig_xmlrpc_url)
+      trigger_command = DamageControl::XMLRPC::Trigger.trigger_command(damagecontrol_install_dir, project_name, @trig_xmlrpc_url, windows?)
       trigger_files_checkout_dir = project_config_repository.trigger_checkout_dir(project_name)
       begin
         if scm.trigger_installed?(trigger_command, trigger_files_checkout_dir)
@@ -54,7 +54,7 @@ module DamageControl
       damagecontrol_install_dir = request.query['damagecontrol_install_dir']
       scm = @project_config_repository.create_scm(project_name)
       error = nil
-      trigger_command = DamageControl::XMLRPC::Trigger.trigger_command(damagecontrol_install_dir, project_name, @trig_xmlrpc_url)
+      trigger_command = DamageControl::XMLRPC::Trigger.trigger_command(damagecontrol_install_dir, project_name, @trig_xmlrpc_url, windows?)
       trigger_files_checkout_dir = project_config_repository.trigger_checkout_dir(project_name)
       begin
         if !scm.trigger_installed?(trigger_command, trigger_files_checkout_dir)

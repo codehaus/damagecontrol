@@ -1,7 +1,6 @@
 require 'parsedate'
 require 'pebbles/LineEditor'
 require 'pebbles/Pathutils'
-require 'pebbles/Process'
 require 'damagecontrol/scm/AbstractSCM'
 require 'damagecontrol/scm/CVSLogParser'
 require 'damagecontrol/scm/Changes'
@@ -39,11 +38,11 @@ module DamageControl
           file.puts(content)
         end
       end
-      cvs(checkout_dir, "add #{relative_filename}") unless(existed)
+      cvs(checkout_dir, "add #{relative_filename}", CHECKIN_TIMEOUT) unless(existed)
 
       message = existed ? "editing" : "adding"
 
-      cvs(checkout_dir, "com -m \"#{message} #{relative_filename}\"")
+      cvs(checkout_dir, "com -m \"#{message} #{relative_filename}\"", CHECKIN_TIMEOUT)
     end
 
     def cvs_executable
@@ -53,14 +52,14 @@ module DamageControl
 
     def import(dir)
       modulename = File.basename(dir)
-      cvs(dir, "import -m \"initial import\" #{modulename} VENDOR START")
+      cvs(dir, "import -m \"initial import\" #{modulename} VENDOR START", IMPORT_TIMEOUT)
     end
 
     def checkout(checkout_dir, scm_to_time, &line_proc)
       checked_out_files = []
       if(checked_out?(checkout_dir))
         path_regex = /^[U|P] (.*)/
-        cvs(checkout_dir, update_command(scm_to_time)) do |line, err|
+        cvs(checkout_dir, update_command(scm_to_time), CHECKOUT_TIMEOUT) do |line, err|
           if(line =~ path_regex)
             checked_out_files << $1
           end
@@ -73,7 +72,7 @@ module DamageControl
         target_dir = File.basename(checkout_dir)
         run_checkout_command_dir = File.dirname(checkout_dir)
         # -D is sticky, but subsequent updates will reset stickiness with -A
-        cvs(run_checkout_command_dir, checkout_command(scm_to_time, target_dir)) do |line, err|
+        cvs(run_checkout_command_dir, checkout_command(scm_to_time, target_dir), CHECKOUT_TIMEOUT) do |line, err|
           if(line =~ path_regex)
             checked_out_files << $1
           end
@@ -84,7 +83,7 @@ module DamageControl
     end
     
     def commit(checkout_dir, message, &proc)
-      cvs(checkout_dir, commit_command(message), &proc)
+      cvs(checkout_dir, commit_command(message), CHECKIN_TIMEOUT, &proc)
     end
 
     def uptodate?(checkout_dir, start_time, end_time)
@@ -106,7 +105,7 @@ module DamageControl
     def changesets(checkout_dir, scm_from_time, scm_to_time, files, &line_proc)
       begin
         parse_log(checkout_dir, new_changes_command(scm_from_time, scm_to_time, files), &line_proc)
-      rescue ProcessFailedException => e
+      rescue FileUtils::ProcessFailedException => e
         parse_log(checkout_dir, old_changes_command(scm_from_time, scm_to_time, files), &line_proc)
       end
     end
@@ -171,7 +170,7 @@ module DamageControl
     def create
       raise "Can't create CVS repository for #{cvsroot}" unless can_create?
       File.mkpath(path)
-      cvs(path, "init")
+      cvs(path, "init", CREATE_REPO_TIMEOUT)
     end
     
     def can_create?
@@ -243,7 +242,7 @@ module DamageControl
 
       execed_command_line = command_line(cvspassword, cmd)
       changesets = nil
-      cmd_with_io(checkout_dir, execed_command_line, environment) do |stdout|
+      cmd_with_io(checkout_dir, execed_command_line, nil, environment, CHANGESET_TIMEOUT) do |stdout, process|
         parser = CVSLogParser.new(stdout)
         parser.cvspath = path
         parser.cvsmodule = cvsmodule
@@ -252,18 +251,17 @@ module DamageControl
       changesets
     end
     
-    def cvs(dir, cmd)
+    def cvs(dir, cmd, timeout)
       logged_command_line = command_line(hidden_password, cmd)
       if block_given?
         yield logged_command_line
       else 
         logger.debug(logged_command_line) 
       end
-
       execed_command_line = command_line(cvspassword, cmd)
 
       # not specifying stderr - cmd_with_io will read it in a separate thread.
-      cmd_with_io(dir, execed_command_line, environment) do |stdout|
+      cmd_with_io(dir, execed_command_line, nil, environment, timeout) do |stdout, process|
         stdout.each_line do |progress|
           if block_given? then yield progress else logger.debug(progress) end
         end
@@ -311,13 +309,13 @@ module DamageControl
       end
       
       # convert backslashes before running in shell
-      result.gsub(/\\/, '\\\\\\\\')
+#      result.gsub(/\\/, '\\\\\\\\')
     end
     
   private
   
     def command_line(password, cmd)
-      "cvs '-d#{cvsroot_with_password(password)}' #{cmd}"
+      "cvs \"-d#{cvsroot_with_password(password)}\" #{cmd}"
     end
 
     def create_cvsroot_cvs

@@ -21,21 +21,19 @@ module DamageControl
 
       build = event.build
       
-      if event.is_a? BuildProgressEvent
+      if event.is_a? StandardOutEvent
         begin
-          stdout_file(build).puts(event.output)
+          stdout_file(build).puts(event.data)
           stdout_file(build).flush
         rescue Exception => e
           logger.error("Couldn't write to file:#{format_exception(e)}")
         end
       end
       
-      if event.is_a? BuildErrorEvent
+      if event.is_a? StandardErrEvent
         begin
-          stderr_file(build).puts(event.message)
+          stderr_file(build).puts(event.data)
           stderr_file(build).flush
-          stdout_file(build).puts(event.message)
-          stdout_file(build).flush
         rescue Exception => e
           logger.error("Couldn't write to file:#{format_exception(e)}")
         end
@@ -49,6 +47,7 @@ module DamageControl
     
     def shutdown
       @open_files.each do |name, file|
+        file.flush
         file.close unless file.closed?
         @open_files.delete(name)
       end

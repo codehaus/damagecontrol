@@ -73,13 +73,5 @@ module DamageControl
         puts e.backtrace.join("\n")
       end
     end
-    
-    def stdout?
-      File.exist?(@build_history_repository.stdout_file(build.project_name, build.dc_creation_time))
-    end
-
-    def stderr?
-      File.exist?(@build_history_repository.stdout_file(build.project_name, build.dc_creation_time))
-    end
   end
 end

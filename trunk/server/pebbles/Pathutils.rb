@@ -1,11 +1,13 @@
 module Pebbles
   module Pathutils
-
-    system("cygpath C:\\\\")
-    CYGWIN = $? == 0
+    WIN32 = RUBY_PLATFORM == "i386-mswin32"
+    CYGWIN = RUBY_PLATFORM == "i386-cygwin"
 
     def filepath_to_nativepath(path, escaped)
-      if(CYGWIN)
+      path = File.expand_path(path)
+      if(WIN32)
+        path.gsub(/\//, "\\")
+      elsif(CYGWIN)
         cygpath = IO.popen("cygpath --windows #{path}").read.chomp
         escaped ? cygpath.gsub(/\\/, "\\\\\\\\") : cygpath
       else
@@ -14,7 +16,7 @@ module Pebbles
     end
 
     def filepath_to_nativeurl(path)
-      if(CYGWIN)
+      if(CYGWIN || WIN32)
         urlpath = filepath_to_nativepath(path, false).gsub(/\\/, "/")
         path = "/#{urlpath}"
       end
@@ -22,7 +24,9 @@ module Pebbles
     end
 
     def nativepath_to_filepath(path)
-      if(CYGWIN)
+      if(WIN32)
+        path.gsub(/\//, "\\")
+      elsif(CYGWIN)
         cygpath = IO.popen("cygpath '#{path}'").read.chomp
       else
         path

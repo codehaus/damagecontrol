@@ -1,6 +1,7 @@
 require 'fileutils'
 require 'ftools'
 require 'damagecontrol/util/Logging'
+require 'pebbles/Process2'
 
 module FileUtils
 
@@ -95,7 +96,7 @@ module FileUtils
   # If option c) is used, it is the caller's responsibility to read all streams,
   # typically in a separate thread for each.
   #
-  def cmd_with_io(dir, cmd, environment = {}, &proc)
+  def cmd_with_io_old(dir, cmd, environment = {}, &proc)
     begin
       File.mkpath(dir)
       p = Pebbles::Process.new
@@ -136,8 +137,38 @@ module FileUtils
     end
   end
   
+  def cmd_with_io(dir, cmd, stderr_file, environment, timeout, &proc)
+    with_working_dir(dir) do
+      stdout = nil
+      ret = Pebbles::Process2.new(cmd, stderr_file, environment, timeout).execute do |stdout, process|
+        proc.call(stdout, process)
+      end
+      if(ret != 0)
+        msg = "\n" +
+          "---------------------------------------\n" +
+          "Process failed with return code #{ret}: #{cmd}\n" +
+          "Dir: #{dir}\n" +
+          "---------------------------------------\n" 
+        raise ProcessFailedException.new(msg)
+      end
+    end
+  end
+  
+  # writes contents of a stream line by line to a file
+  def write_to_file(input, file)
+    mkdir_p(File.dirname(file))
+    File.open(file, "w") do |f|
+      input.each_line do |line|
+        f.puts line
+      end
+    end
+  end
+  
   def windows?
-    ENV['WINDIR'] || ENV['windir']
+    RUBY_PLATFORM == "i386-mswin32"
+  end
+
+  class ProcessFailedException < StandardError
   end
 
 end

@@ -54,8 +54,8 @@ EOF
 
 
     # The trigger command that will trig a build for a certain project 
-    def Trigger.trigger_command(damagecontrol_install_dir, project_name, trigger_xml_rpc_url="http://localhost:4712/private/xmlrpc")
-      delim = FileUtils::windows? ? "\\" : "/"
+    def Trigger.trigger_command(damagecontrol_install_dir, project_name, trigger_xml_rpc_url, windows)
+      delim = windows ? "\\" : "/"
       script = "#{damagecontrol_install_dir}#{delim}bin#{delim}requestbuild" 
       "#{script} --url #{trigger_xml_rpc_url} --projectname #{project_name}" 
     end

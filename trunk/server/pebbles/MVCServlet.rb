@@ -12,21 +12,13 @@ module Pebbles
   end
 
   module SimpleERB
-    protected
+
+  protected
     
-    # save the absolute path to the template directory
-    # DamageControl is playing around with the working dir quite a bit because there's yet no fork implementation on Win32
-    # usually __FILE__ is relative so it makes the web gui completely borked
-    def absolute_template_dir
-      @absolute_template_dir = File.expand_path(template_dir) unless defined?(@absolute_template_dir)
-      @absolute_template_dir
+    def template_dir
+      raise "you must override template_dir"
     end
-    
-    def file_content(file)
-      template_path = File.expand_path("#{absolute_template_dir}/#{file}")
-      template = File.new(template_path).read.untaint
-    end
-    
+
     def erb(template, binding)
       begin
         ERB.new(file_content(template)).result(binding)
@@ -35,14 +27,28 @@ module Pebbles
       end
     end
     
+  private
+
+    # save the absolute path to the template directory
+    # DamageControl is playing around with the working dir quite a bit because there's yet no fork implementation on Win32
+    # usually __FILE__ is relative so it makes the web gui completely borked
+    def absolute_template_dir
+      unless defined?(@absolute_template_dir)
+        @absolute_template_dir = File.expand_path(template_dir)
+      end
+      @absolute_template_dir
+    end
+    
+    def file_content(file)
+      template_path = File.expand_path("#{absolute_template_dir}/#{file}")
+      template = File.new(template_path).read.untaint
+    end
+    
     # default template for error pages
     def error_page(template)
       'error.erb'
     end
     
-    def template_dir
-      raise "you must overload template dir"
-    end
   end
 
   class SimpleServlet

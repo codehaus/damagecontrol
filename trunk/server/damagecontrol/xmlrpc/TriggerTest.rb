@@ -50,16 +50,13 @@ module XMLRPC
     end
     
     def test_unix_trigger_url
-      ENV['WINDIR'] = nil
-      ENV['windir'] = nil
       expected = "/some/where/bin/requestbuild --url http://builds.codehaus.org/damagecontrol/private/xmlrpc --projectname jalla"
-      assert_equal(expected, Trigger.trigger_command("/some/where", "jalla", "http://builds.codehaus.org/damagecontrol/private/xmlrpc"))
+      assert_equal(expected, Trigger.trigger_command("/some/where", "jalla", "http://builds.codehaus.org/damagecontrol/private/xmlrpc", false))
     end
     
     def test_win_trigger_url
-      ENV['windir'] = "blah"
       expected = "C:\\somewhere\\bin\\requestbuild --url http://builds.codehaus.org/damagecontrol/private/xmlrpc --projectname jalla"
-      assert_equal(expected, Trigger.trigger_command("C:\\somewhere", "jalla", "http://builds.codehaus.org/damagecontrol/private/xmlrpc"))
+      assert_equal(expected, Trigger.trigger_command("C:\\somewhere", "jalla", "http://builds.codehaus.org/damagecontrol/private/xmlrpc", true))
     end
   end
 

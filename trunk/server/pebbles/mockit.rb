@@ -70,7 +70,7 @@ module MockIt
       false
     end
     
-    private
+  private
     
     def symbol(string)
       return nil if string==""

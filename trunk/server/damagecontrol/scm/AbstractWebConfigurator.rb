@@ -7,6 +7,7 @@ module DamageControl
   public
 
     def initialize(project_config, project_config_repo)
+      absolute_template_dir # initialize it
       @project_config = project_config
       @project_config_repo = project_config_repo
     end
