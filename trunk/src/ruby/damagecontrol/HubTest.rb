@@ -4,7 +4,6 @@ module DamageControl
 
   class HubTest < Test::Unit::TestCase
     def setup
-      fail
       @hub = Hub.new
     end
   
