@@ -23,6 +23,10 @@ provide a very nice alternative to SCM web front-ends.
 Implement import/export functionality to allow migrating from one SCM to another while
 keeping the history. Great for migration from archaic SCMs!
 
+Bridging: Your project uses a different SCM type than the one *you* like to use. You set up a local
+repo of your preferred SCM type, and RSCM automatically mediates changesets back and forth between the
+central SCM and your local one.
+
 == RSCM Server
 
 RSCM ships with a web app based on Rails (which you have to install separately). To launch:
@@ -31,7 +35,7 @@ RSCM ships with a web app based on Rails (which you have to install separately).
   
 You also need to launch (in a separate console) the RSCM daemon process:
 
-  ruby -Ilib lib/rscm/server.rv
+  ruby -Ilib lib/rscm/server.rb
   
 The daemon process is the core of RSCM, that performs SCM access. The web app communicates with this process
 over Drb. The reason why two processes are needed is due to the fact that Dir.chdir may happen in various threads,
@@ -39,11 +43,7 @@ which will confuse the webapp. We tried with forking, but this is not supported 
 
 Once the two servers are started, you can access the web app on:
 
-  http://localhost:3000/project
-  
-Create new projects by going to:
-
-  http://localhost:3000/project/view
+  http://localhost:4712/
 
 == RSS Support
 
