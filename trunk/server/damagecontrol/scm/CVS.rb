@@ -201,12 +201,12 @@ module DamageControl
       # https://www.cvshome.org/docs/manual/cvs-1.11.17/cvs_16.html#SEC144
       # -N => Suppress the header if no revisions are selected.
       # -S => Do not print the list of tags for this file.
-      "log #{branch_option}-N -S #{period_option(scm_from_time, scm_to_time)}#{files ? files.join(' ') : ''}"
+      "log #{branch_option}-N -S #{period_option(scm_from_time, scm_to_time)}"
     end
     
     def old_changes_command(scm_from_time, scm_to_time, files)
       # Many servers don't support the new -S option
-      "log #{branch_option}-N #{period_option(scm_from_time, scm_to_time)}#{files ? files.join(' ') : ''}"
+      "log #{branch_option}-N #{period_option(scm_from_time, scm_to_time)}"
     end
     
     def branch_specified?
@@ -235,7 +235,7 @@ module DamageControl
     def parse_log(checkout_dir, cmd, &proc)
       changesets = nil
 
-      execed_command_line = "cvs -d#{cvsroot_with_password(cvspassword)} #{cmd}"
+      execed_command_line = command_line(cvspassword, cmd)
       cmd_with_io(checkout_dir, execed_command_line, environment) do |io|
         parser = CVSLogParser.new(io)
         parser.cvspath = path
@@ -246,14 +246,14 @@ module DamageControl
     end
     
     def cvs(dir, cmd)
-      logged_command_line = "cvs \"-d#{cvsroot_with_password(hidden_password)}\" #{cmd}"
+      logged_command_line = command_line(hidden_password, cmd)
       if block_given?
         yield logged_command_line
       else 
         logger.debug(logged_command_line) 
       end
 
-      execed_command_line = "cvs \"-d#{cvsroot_with_password(cvspassword)}\" #{cmd}"
+      execed_command_line = command_line(cvspassword, cmd)
 
       cmd_with_io(dir, execed_command_line, environment) do |io|
         io.each_line do |progress|
@@ -307,6 +307,10 @@ module DamageControl
     end
     
   private
+  
+    def command_line(password, cmd)
+      "cvs \"-d#{cvsroot_with_password(password)}\" #{cmd}"
+    end
 
     def create_cvsroot_cvs
       cvs = CVS.new

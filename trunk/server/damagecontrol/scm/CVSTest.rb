@@ -18,9 +18,9 @@ module DamageControl
       time_before = Time.utc(2004,01,01,12,00,00) 
       time_after = Time.utc(2005,01,01,12,00,00) 
       cvs = create_cvs(":local:repo", "module")
-      assert_equal("log -N -S -d\"2004-01-01 12:00:00 UTC<=2005-01-01 12:00:00 UTC\" foo bar",
+      assert_equal("log -N -S -d\"2004-01-01 12:00:00 UTC<=2005-01-01 12:00:00 UTC\" ",
         cvs.new_changes_command(time_before, time_after, ["foo","bar"]))
-      assert_equal("log -N -d\"2004-01-01 12:00:00 UTC<=2005-01-01 12:00:00 UTC\" foo bar",
+      assert_equal("log -N -d\"2004-01-01 12:00:00 UTC<=2005-01-01 12:00:00 UTC\" ",
         cvs.old_changes_command(time_before, time_after, ["foo","bar"]))
     end
     
@@ -51,16 +51,13 @@ module DamageControl
         cvs.cvs(".", "invalid_command") { |line| }
       end
     end
-		
-		
-#		def test_spaces_in_pserver_login
-#			#this could fail
-#			
-#			cvsroot = ":pserver:arno nym@localhost:/var/cvsroot"
-#			cvs = create_cvs(cvsroot, "testdata");
-#			cvs.cvspassword = 'anoncvs'
-#			cvs.cvs(".", "login") if (File.ftype('/var/cvsroot') == 'directory')
-#		end
+        
+    def test_should_handle_spaces_in_pserver_login
+      cvsroot = ":pserver:arno nym@localhost:/var/cvsroot"
+      cvs = create_cvs(cvsroot, "testdata");
+      cvs.cvspassword = 'anoncvs'
+      
+    end
 
   private
 
