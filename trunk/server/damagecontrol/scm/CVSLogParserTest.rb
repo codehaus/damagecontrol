@@ -40,7 +40,7 @@ module DamageControl
         @parser = CVSLogParser.new(io)
         changesets = @parser.parse_changesets
         
-        assert_equal(271, changesets.length)
+        assert_equal(272, changesets.length)
       end
     end
 
