@@ -88,7 +88,7 @@ the working directory has been cleaned out, or because there has been no success
     
     def file_icon(change)
       icon = FILE_ICONS[change.status]
-      icon = Icon.new("document_warning.png") unless icon
+      icon = Icon.new("document_warning.png", "Unknown status: '#{change.status}'") unless icon
       icon
     end
     
