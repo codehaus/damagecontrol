@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <DamageControlMonitor xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="http://damagecontrol.codehaus.org">
   <PollingIntervalSeconds>15</PollingIntervalSeconds>
-  <RemoteServerUrl>http://localhost:4712/public/xmlrpc</RemoteServerUrl>
-  <ProjectName>ProjectName</ProjectName>
+  <RemoteServerUrl>http://builds.codehaus.org/public/xmlrpc</RemoteServerUrl>
+  <ProjectName>damagecontrol</ProjectName>
   <NotificationBalloon ShowBalloon="true" />
   <Sounds>
     <AnotherSuccessfulBuildSound Play="false" FileName="still-successful.wav" />
