@@ -30,8 +30,7 @@ module RSCM
       # post 0.17, this can be "cd dir && cmd add ."
 
       files = Dir["#{dir}/*"]
-## refactor this to a private method to_relative, reuse near line 96
-      relative_paths_to_add = files.collect{|p| p[dir.length+1..-1]}
+      relative_paths_to_add = to_relative(dir, files)
 
       with_working_dir(dir) do
         monotone("add #{relative_paths_to_add.join(' ')}")
@@ -61,51 +60,22 @@ module RSCM
       end
     end
 
-## move this to abstract_scm called checkout_without_stdout, make this call to
-## that function
-    def checkout(checkout_dir)
-      checkout_dir = PathConverter.filepath_to_nativepath(checkout_dir, false)
-      mkdir_p(checkout_dir)
-      checked_out_files = []
-      if (checked_out?(checkout_dir))
-        # update
-      else
-        before = Dir["#{checkout_dir}/**/*"]
-puts "BEFORE:"
-puts before.join("\n")
-puts
-        monotone("checkout #{checkout_dir}", @branch, @key) do |stdout|
-          stdout.each_line do |line|
-            # TODO: checkout prints nothing to stdout - may be fixed in a future monotone...
-            yield line if block_given?
-          end
-        end
-        after = Dir["#{checkout_dir}/**/*"]
-puts "AFTER:"
-puts after.join("\n")
-puts
-        # ignore monotone administrative files
-        added = (after - before).delete_if{|path| path =~ /MT/}
-puts "ADDED TOTAL:"
-puts added.join("\n")
-puts
-        added_file_paths = added.find_all do |path|
-          File.file?(path)
-        end
-puts "ADDED FILES:"
-puts added_file_paths.join("\n")
-puts
-        added_file_paths.each do |path|
-          yield path
-        end
-        return added_file_paths
-      end
-    end
-
     def commit(checkout_dir, message)
 
     end
-    
+
+  protected
+
+    # Checks out silently. Called by superclass' checkout.
+    def checkout_silent(checkout_dir)
+      monotone("checkout #{checkout_dir}", @branch, @key) do |stdout|
+        stdout.each_line do |line|
+          # TODO: checkout prints nothing to stdout - may be fixed in a future monotone...
+          yield line if block_given?
+        end
+      end
+    end
+
   private
   
     def monotone(monotone_cmd, branch=nil, key=nil)

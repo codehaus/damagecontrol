@@ -86,39 +86,28 @@ module RSCM
     # This method will yield the relative file name of each checked out file, and also return
     # them in an array. Only files, not directories, will be yielded/returned.
     #
+    # This method should be overridden for SCMs that are able to yield checkouts as they happen.
+    # For some SCMs this is not possible, or at least very hard. In that case, just override
+    # the checkout_silent method (should be protected).
     def checkout(checkout_dir, to_identifier=Time.infinity) # :yield: file
-      ["not/implemented/in", __FILE__, "do/it/now"]
       before = Dir["#{checkout_dir}/**/*"]
-puts "BEFORE:"
-puts before.join("\n")
-puts
-    end
-  
-    # Checks out or updates to +checkout_dir+, where the SCM does not report
-    # checked out files to stdout.
-    #
-    def checkout_without_stdout(checkout_dir)
+
+      # We expect subclasses to implement this as a protected method.
+      checkout_silent(checkout_dir)
+
       after = Dir["#{checkout_dir}/**/*"]
-puts "AFTER:"
-puts after.join("\n")
-puts
       # ignore monotone administrative files
       added = (after - before).delete_if{|path| path =~ /MT/}
-puts "ADDED TOTAL:"
-puts added.join("\n")
-puts
       added_file_paths = added.find_all do |path|
         File.file?(path)
       end
-puts "ADDED FILES:"
-puts added_file_paths.join("\n")
-puts
-      added_file_paths.each do |path|
+      relative_added_file_paths = to_relative(checkout_dir, added_file_paths)
+      relative_added_file_paths.each do |path|
         yield path
       end
-      return added_file_paths
+      relative_added_file_paths
     end
-    
+  
     # Returns a ChangeSets object for the period specified by +from_identifier+
     # and +to_identifier+. See AbstractSCM for details about the parameters.
     #
@@ -207,6 +196,13 @@ puts
     end
 
   protected
+
+    # Takes an array of +absolute_path+s and turn them into an array
+    # of paths relative to +dir+
+    # 
+    def to_relative(dir, absolute_paths)
+      absolute_paths.collect{|p| File.expand_path(p)[dir.length+1..-1]}
+    end
 
     def with_working_dir(dir)
       # Can't use Dir.chdir{ block } - will fail with multithreaded code.
