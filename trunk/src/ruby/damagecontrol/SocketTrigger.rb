@@ -55,15 +55,15 @@ module DamageControl
           
           while (socket = @server.accept)
             begin
-              client_hostname = socket.addr[2]
-              client_ip = socket.addr[3]
+              client_hostname = socket.peeraddr[2]
+              client_ip = socket.peeraddr[3]
               if(allowed?(client_hostname, client_ip))
                 payload = socket.gets
                 do_accept(payload)
-                socket.print("DamageControl on #{@server.addr[2]}/#{@server.addr[3]} got your message\r\n")
+                socket.print("DamageControl on #{@server.addr[2]}/#{@server.addr[3]} got your message (#{client_hostname} / #{client_ip})\r\n")
                 socket.print("http://damagecontrol.codehaus.org/\r\n")
               else
-                socket.print("This DamageControl server doesn't allow connections from #{client_ip}\r\n")
+                socket.print("This DamageControl server doesn't allow connections from #{client_hostname} / #{client_ip}\r\n")
               end
             ensure
               socket.close
