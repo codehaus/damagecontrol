@@ -6,7 +6,6 @@ module DamageControl
     class SVN < SCM
     
         def handles_spec?(spec)
-            puts "svn handles spec: #{spec}"
             if(/^(.+)\:\/\//.match(spec)) then
                 method = $1
                 return method == "svn" || method == "http" || method == "file"
@@ -16,7 +15,7 @@ module DamageControl
         
         def svn(cmd)
             cmd = "svn #{cmd}"
-            puts "executing: #{cmd}"
+            puts "SVN executing: #{cmd}"
             IO.popen(cmd) do |io|
                 io.each_line do |progress|
                     yield progress
@@ -25,7 +24,6 @@ module DamageControl
         end
         
         def checkout(spec, directory, &proc)
-            puts "SVN.checkout(#{spec}, #{directory})"
             sleep 1
             File.mkpath(directory)
             Dir.chdir(File.dirname(directory))
