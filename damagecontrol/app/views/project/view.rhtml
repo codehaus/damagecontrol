@@ -8,18 +8,7 @@ function executeOnLoad() {
   setTab(tab)
 }
 
-tabs = ["projects", "scms", "trackers", "changesets"]
-
-scms = [
-<% @scms.each do |scm| %>
-  "<%= scm.class.name %>",
-<% end %> "" ];
-scm_tip = "<div class='tp1'>If you don't find your SCM here, file a feature request in DamageControl's JIRA</div>";
-
-trackers = [
-<% @trackers.each do |tracker| %>
-  "<%= tracker.class.name %>",
-<% end %> "" ];
+tabs = ["projects", "scms", "publishers", "trackers"]
 
 // -->
 </script>
@@ -27,6 +16,7 @@ trackers = [
 <ul id="foldertab">
   <li><a href="javascript:setTab('projects')"><img src="/images/16x16/wrench.png"> General</a></li>
   <li><a href="javascript:setTab('scms')"><img src="/images/16x16/safe.png"> Source Control</a></li>
+  <li><a href="javascript:setTab('publishers')"><img src="/images/16x16/component.png"> Publishers</a></li>
   <li><a href="javascript:setTab('trackers')"><img src="/images/16x16/scroll_information.png"> Issue Tracker</a></li>
 </ul>
 
@@ -39,11 +29,23 @@ trackers = [
 </div>
 
 <div id="scms" style="display:none">
-  <%= render_partial("scms", @scms) %>
+  <p>
+  If you don't find your SCM here, file a feature request in DamageControl's 
+  <a href="http://damagecontrol.codehaus.org/">JIRA</a>.
+  </p>
+  <p>
+  Or better - <a href="http://rscm.rubyforge.org/">implement it yourself</a>.
+  </p>
+  
+  <%= select_pane("Source Control", "scms", @scms) %>
+</div>
+
+<div id="publishers" style="display:none">
+  <%= tab_pane("publishers", @project.publishers) %>
 </div>
 
 <div id="trackers" style="display:none">
-  <%= render_partial("trackers", @trackers) %>
+  <%= select_pane("Issue Trackers", "trackers", @trackers) %>
 </div>
 
 <% if(@edit) %>

@@ -1,4 +1,5 @@
 require 'rscm/path_converter'
+require 'rscm/annotations'
 
 module DamageControl
   module Tracker
@@ -6,12 +7,23 @@ module DamageControl
     # Simple superclass so we can easily include mixins
     # for all subclasses in one fell swoop.
     class Base #:nodoc:
+      @@classes = []
+      def self.register(cls) 
+        @@classes << cls unless @@classes.index(cls)
+      end
+      
+      def self.classes
+        @@classes
+      end
+
       def htmlize(str)
         str.gsub(/\n/, "<br>")
       end
     end
 
     class Null < Base
+      register self
+    
       def name
         "No Tracker"
       end
@@ -27,9 +39,12 @@ module DamageControl
     end
 
     class Bugzilla < Base
+      register self
+
+      ann :description => "Bugzilla URL", :tip => "The URL of the Bugzilla installation."
       attr_accessor :url
 
-      def initialize(url=nil)
+      def initialize(url="http://bugzilla.org/")
         @url = url
       end
       
@@ -48,9 +63,12 @@ module DamageControl
     end
     
     class Trac < Base
+      register self
+
+      ann :description => "Trac URL", :tip => "The URL of the Trac installation. This URL should include no trailing slash. Example: http://my.trac.home/cgi-bin/trac.cgi"
       attr_accessor :url
 
-      def initialize(url=nil)
+      def initialize(url="http://trac.org/")
         @url = url
       end
       
@@ -69,10 +87,15 @@ module DamageControl
     end
 
     class JIRA < Base
+      register self
+
+      ann :description => "Base URL", :tip => "The base URL of the JIRA installation (not the URL to the specific JIRA project)."
       attr_accessor :baseurl
+
+      ann :description => "Project id", :tip => "The id of the project - example: 'DC'"
       attr_accessor :project_id
 
-      def initialize(baseurl=nil, project_id=nil)
+      def initialize(baseurl="http://jira.codehaus.org/", project_id="")
         @baseurl, @project_id = baseurl, project_id
       end
 
@@ -95,12 +118,19 @@ module DamageControl
     end
 
     class SourceForge < Base
+      register self
+
       PATTERN = /#([0-9]+)/
     
+      ann :description => "Project id"
+      ann :tip => "The id of the project (group_id). Example: <br><tt>http://sourceforge.net/tracker/index.php?func=detail&amp;aid=1051927&amp;group_id=<strong>7856</strong>&amp;atid=107856</tt>"
       attr_accessor :group_id
+
+      ann :description => "Tracker id"
+      ann :tip => "The id of the tracker (aid). Example: <br><tt>http://sourceforge.net/tracker/index.php?func=detail&amp;aid=<strong>1051927</strong>&amp;group_id=7856&amp;atid=107856</tt>."
       attr_accessor :tracker_id
 
-      def initialize(group_id=nil, tracker_id=nil)
+      def initialize(group_id="", tracker_id="")
         @group_id, @tracker_id = group_id, tracker_id
       end
 
@@ -118,8 +148,15 @@ module DamageControl
     end
 
     class RubyForge < SourceForge
+      register self
 
-      # TODO: share the same rhtml template
+      ann :description => "Project id"
+      ann :tip => "The id of the project (group_id). Example: <br><tt>http://rubyforge.org/tracker/index.php?func=detail&amp;aid=1120&amp;group_id=<strong>426</strong>&amp;atid=1698</tt>."
+      attr_accessor :group_id
+
+      ann :description => "Tracker id"
+      ann :tip => "The id of the tracker (aid). Example: <br><tt>http://rubyforge.org/tracker/index.php?func=detail&amp;aid=<strong>1120</strong>&amp;group_id=426&amp;atid=1698</tt>."
+      attr_accessor :tracker_id
 
       def name
         "RubyForge"
@@ -135,10 +172,15 @@ module DamageControl
     end
 
     class Scarab < Base
+      register self
+
+      ann :description => "Base URL", :tip => "The URL of the Scarab installation."
       attr_accessor :baseurl
+
+      ann :description => "Scarab Module", :tip => "The Scarab Module key."
       attr_accessor :module_key
 
-      def initialize(baseurl=nil, module_key=nil)
+      def initialize(baseurl="http://scarab.org/", module_key="")
         @baseurl, @module_key = baseurl, module_key
       end
 

@@ -1,0 +1,26 @@
+<script>
+<%= select_pane.name %>_array = [
+<% select_pane.each do |o| %>
+  "<%= o.class.name %>",
+<% end %> "" ];
+</script>
+
+<table>
+  <tr>
+    <td>
+      <%= select_pane.description %>
+    </td>
+    <td>
+      <%= text_or_select(@edit, 
+            :name => "#{select_pane.name}_selected", 
+            :values => select_pane, 
+            :onchange => "showElement(this.value, #{select_pane.name}_array)") %>
+    </td>
+  </tr>
+</table>
+
+<% select_pane.each do |o| %>
+  <div id="<%= o.class.name %>" style="<% if(o.selected?)%>display:block<%else%>display:none<%end%>">
+    <%= render_object(o, select_pane.name, @edit) %>
+  </div>
+<% end %>

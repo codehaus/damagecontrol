@@ -1,7 +1,6 @@
 require 'fileutils'
 require 'yaml'
 require 'rscm'
-require 'action_controller/support/class_inheritable_attributes'
 require 'damagecontrol/build'
 require 'damagecontrol/directories'
 require 'damagecontrol/diff_parser'
@@ -30,16 +29,24 @@ module DamageControl
     attr_accessor :build_command
     attr_accessor :publishers
 
-    @@available_publisher_classes = []
-    cattr_reader :available_publisher_classes
-
     # Loads the project with the given +name+.
     def Project.load(name)
       config_file = Directories.project_config_file(name)
       Log.info "Loading project from #{config_file}"
-      File.open(config_file) do |io|
+      project = File.open(config_file) do |io|
         YAML::load(io)
       end
+
+      # Add new publishers that may have be defined after the project was YAMLed.
+      project.publishers = [] if project.publishers.nil?
+      Publisher::Base.classes.collect{|cls| cls.new}.each do |publisher|
+        publisher_of_same_type = project.publishers.find do |p|
+          p.class == publisher.class
+        end
+        project.publishers << publisher unless publisher_of_same_type
+      end
+
+      project
     end
 
     # Loads all projects
@@ -49,19 +56,9 @@ module DamageControl
       end
     end
     
-    # Available publisher classes
-    def Project.publisher_classes
-      if(@@available_publisher_classes.length == 0)
-        Dir[File.dirname(__FILE__) + "/publisher/*.rb"].each do |publisher_source|
-          Kernel.load(File.expand_path(publisher_source))
-        end
-      end
-      @@available_publisher_classes
-    end
-
     def initialize(name=nil)
       @name = name
-      @publishers = []
+      @publishers = Publisher::Base.classes.collect{|cls| cls.new}
       @scm = nil
       @tracker = Tracker::Null.new
       @scm_web = SCMWeb::Null.new
@@ -69,7 +66,7 @@ module DamageControl
     
     # Tells all publishers to publish a build
     def publish(build)
-      @publishers.each { |publisher| publisher.publish(build) } unless @publishers.nil?
+      @publishers.each { |publisher| publisher.publish(build) }
     end
     
     # Saves the state of this project to persistent store (YAML)
@@ -79,8 +76,6 @@ module DamageControl
       File.open(f, "w") do |io|
         YAML::dump(self, io)
       end
-      
-      REGISTRY.poller.add_project(self) if REGISTRY
     end
     
     # Path to file containing pathnames of latest checked out files.
@@ -178,8 +173,10 @@ module DamageControl
     end
 
     def changeset(changeset_identifier)
-      changesets(changeset_identifier, 1)[0]
-    end
+      result = changesets(changeset_identifier, 1)[0]
+      raise "No changeset with id '#{changeset_identifier}' for project '#{name}'" unless result
+      result
+     end
 
     def changeset_identifiers
       changesets_persister.identifiers
@@ -205,9 +202,9 @@ module DamageControl
     # Creates, persists and executes a Build for the changeset with the given 
     # +changeset_identifier+.
     # Should be called with a block of arity 1 that will receive the build.
-    def execute_build(changeset_identifier)
+    def execute_build(changeset_identifier, build_reason)
       scm.checkout(checkout_dir, changeset_identifier)
-      build = Build.new(name, changeset_identifier, Time.now.utc)
+      build = Build.new(name, changeset_identifier, Time.now.utc, build_reason)
       yield build
     end
 
@@ -215,7 +212,7 @@ module DamageControl
     def builds(changeset_identifier)
       Directories.build_dirs(name, changeset_identifier).collect do |dir|
         # The dir's basename will always be a Time
-        Build.new(name, changeset_identifier, File.basename(dir).to_identifier)
+        Build.new(name, changeset_identifier, File.basename(dir).to_identifier, "TODO: get from file")
       end
     end
 

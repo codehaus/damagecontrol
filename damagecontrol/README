@@ -2,12 +2,38 @@
 
 = Feature overview
 
-* Supports all SCMs supported by RSCM.
+* Builds projects of any kind:
+  * Java
+  * .NET
+  * Ruby
+  * C/C++
+  * (This is getting boring, you can build projects in any language)
+* Supports any kind of build tools:
+  * Ant
+  * Nant
+  * Make
+  * Rake
+  * Maven
+  * Bash/Sh/Bat scripts
+  * (You get the picture)
+* Several notification channels
+  * Email
+  * IRC
+  * RSS
+  * Growl
+* Supports all SCMs supported by RSCM:
+  * CVS
+  * Subversion
+  * Perforce
+  * Monotone
+  * ClearCase
+  * (See http://rscm.codehaus.org for details)
+* Trend graphs and statistics (soming soon)
 * Web interface based on RoR (http://www.rubyonrails.org/)
+* No funny config files, all web based configuration (you can use config files if you wish)
 * Colourised HTML diffs.
-* RSS feeds for changesets and builds.
-* Generation of URL links to diffs for several popular SCM web front-ends.
-* Generation of URL links to bugs/issues for several popular bug/issue trackers.
+* Integration with several SCM web front-ends.
+* Integration with several issue trackers.
 * Uses UTC times according to the SCM server's clock, not the machine running RSCM. No NTP needed!
 
 == DamageControl Server
@@ -59,17 +85,47 @@ Planned:
 
 * RT - http://fsck.com/projects/rt/
 
-== SCM web front-ends - diffs
+== SCM web front-ends
 
-DamageControl's web interface features colourised diffs for all changes in a changeset.
-It can also generate links to individual diff pages in other SCM web frontends:
+DamageControl's web interface features colourised diffs for all changes in a changeset (for any supported SCM).
+It can also generate links to individual diff pages in other SCM web frontends, provided it's compatible with
+the given project's SCM:
 
-* RSCM Built-in HTML diffs.
 * Fisheye - http://www.cenqua.com/fisheye/
 * ViewCVS - http://viewcvs.sourceforge.net/
+* Trac - http://www.edgewall.com/trac/
 
 Planned:
 
-* Trac - http://www.edgewall.com/trac/
 * Chora - http://horde.org/chora/
 
+= Extending DamageControl
+
+== SourceControl
+
+See http://rscm.rubyforge.org for instructions about how to add support for new SCMs
+
+== Build Publishers
+
+If you have an idea for a new publisher it's very easy to hook in. Just drop your class into the lib/publisher directory. Your publisher class
+must implement the following methods:
+
+  # This method will be called when a build is complete.
+  def publish(build)
+    ...
+  end
+
+  # This is the display name of the publisher
+  def name
+    ...
+  end
+
+You must also make sure your publisher class registers with the Project class. Put this in the class body:
+
+  Project.available_publisher_classes << self
+
+If your publisher requires some sort of configuration, just make an attr_accessor for each configuration option. DamageControl will automatically
+pick up your publisher, render it under the Publishers tab on the project configuration page.
+
+If you want to share your publisher with the rest of the world, just upload it to DamageControl's JIRA. If you include a unit test for it,
+we'll be extra happy.

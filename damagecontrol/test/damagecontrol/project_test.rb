@@ -104,7 +104,7 @@ module DamageControl
       end
 
       before = Time.new
-      p.execute_build("boo") do |build|
+      p.execute_build("boo", "Test") do |build|
         now = Time.new
         assert(before <= build.time)
         assert(build.time <= now)
@@ -143,26 +143,22 @@ module DamageControl
     def test_should_tell_each_publisher_to_publish_build
       p = Project.new("mooky")
       
+      build = new_mock
+      build.__expect(:project) {p}
+
       publisher_1 = new_mock
-      publisher_1.__expect(:publish) do |build|
-        assert_equal("build", build)
+      publisher_1.__expect(:publish) do |b|
+        assert_equal(build, b)
       end
       p.publishers << publisher_1
       
       publisher_2 = new_mock
-      publisher_2.__expect(:publish) do |build|
-        assert_equal("build", build)
+      publisher_2.__expect(:publish) do |b|
+        assert_equal(build, b)
       end
       p.publishers << publisher_2
 
-      p.publish("build")
-    end
-
-    def test_should_have_all_publisher_classes_available
-      publisher_class_names = Project.publisher_classes.collect{ |cls| cls.name }
-      assert_equal(1, publisher_class_names.length)
-      
-      assert(publisher_class_names.index("DamageControl::Publisher::Email"))
+      p.publish(build)
     end
   end
 end

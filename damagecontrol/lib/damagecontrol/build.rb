@@ -25,8 +25,8 @@ module DamageControl
     attr_reader :time
   
     # Creates a new Build for a +project+'s +changeset+, created at +time+.
-    def initialize(project_name, changeset_identifier, time)
-      @project_name, @changeset_identifier, @time = project_name, changeset_identifier, time
+    def initialize(project_name, changeset_identifier, time, build_reason)
+      @project_name, @changeset_identifier, @time, @build_reason = project_name, changeset_identifier, time, build_reason
     end
 
     # Our unique id within the changeset
@@ -58,6 +58,9 @@ module DamageControl
       begin
         with_working_dir(checkout_dir) do
           env.each {|k,v| ENV[k]=v}
+          Log.info "Executing '#{command_line}'"
+          Log.info "Execution environment:"
+          ENV.each {|k,v| Log.info("#{k}=#{v}")}
           IO.popen(command_line) do |io|
             File.open(pid_file, "w") do |pid_io|
               pid_io.write(pid)
