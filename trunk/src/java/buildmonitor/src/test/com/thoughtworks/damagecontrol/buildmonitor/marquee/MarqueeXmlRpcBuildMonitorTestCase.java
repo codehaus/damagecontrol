@@ -3,9 +3,9 @@ package com.thoughtworks.damagecontrol.buildmonitor.marquee;
 import com.thoughtworks.damagecontrol.buildmonitor.BuildConstants;
 import com.thoughtworks.damagecontrol.buildmonitor.BuildListener;
 import com.thoughtworks.damagecontrol.buildmonitor.BuildPoller;
-import junit.framework.TestCase;
-import org.jmock.Constraint;
 import org.jmock.Mock;
+import org.jmock.MockObjectTestCase;
+import org.jmock.core.Constraint;
 
 import java.io.File;
 import java.io.FileReader;
@@ -25,9 +25,9 @@ import java.util.Map;
 //that goes against the ruby server
 /**
  * @author Aslak Helles&oslash;y
- * @version $Revision: 1.6 $
+ * @version $Revision: 1.7 $
  */
-public class MarqueeXmlRpcBuildMonitorTestCase extends TestCase {
+public class MarqueeXmlRpcBuildMonitorTestCase extends MockObjectTestCase {
     private IOException serverEx;
 
     public void testResponseIsParsedToListOfMap() throws Exception {
@@ -127,7 +127,7 @@ public class MarqueeXmlRpcBuildMonitorTestCase extends TestCase {
         expectedBuildListMap.put("apple", expectedBuildList);
 
         Mock mockBuildListener = new Mock(BuildListener.class);
-        mockBuildListener.expect("update", new Constraint() {
+        mockBuildListener.expects(once()).method("update"), new Constraint() {
             public boolean eval(Object o) {
                 assertEquals(expectedBuildListMap, o);
                 return true;

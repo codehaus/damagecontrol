@@ -116,7 +116,13 @@ module DamageControl
     end
     
     def shutdown
-      @server.shutdown
+      begin
+        @server.shutdown
+      rescue => e
+        # fails if socket is closed, which it might be. just ignore that.
+        logger.error(format_exception(e))
+        @error = e
+      end
     end
     
     def get_ip
