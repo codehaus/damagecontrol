@@ -84,25 +84,23 @@ module FileUtils
     
   def cmd_with_io(dir, cmd, stderr_file, environment, timeout, &proc)
     res = nil
-    with_working_dir(dir) do
-      ret = Pebbles::Process2.new(cmd, dir, stderr_file, environment, timeout).execute do |stdout, process|
-        begin
-          res = proc.call(stdout, process)
-        ensure
-          process.kill
-        end
+    ret = Pebbles::Process2.new(cmd, dir, stderr_file, environment, timeout).execute do |stdout, process|
+      begin
+        res = proc.call(stdout, process)
+      ensure
+        process.kill
       end
-      if(ret.nil?)
-        return
-      end
-      if(ret != 0)
-        msg = "\n" +
-          "---------------------------------------\n" +
-          "Process failed with return code #{ret}: #{cmd}\n" +
-          "Dir: #{dir}\n" +
-          "---------------------------------------\n" 
-        raise ProcessFailedException.new(msg)
-      end
+    end
+    if(ret.nil?)
+      return
+    end
+    if(ret != 0)
+      msg = "\n" +
+        "---------------------------------------\n" +
+        "Process failed with return code #{ret}: #{cmd}\n" +
+        "Dir: #{dir}\n" +
+        "---------------------------------------\n" 
+      raise ProcessFailedException.new(msg)
     end
     res
   end
