@@ -3,6 +3,11 @@
 <link rel="stylesheet" href="../css/style.css" type="text/css">
 <link rel="stylesheet" href="css/style.css" type="text/css">
 <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+
+<% if auto_refresh? %>
+  <meta http-equiv="Refresh" content="<%= auto_refresh_rate %>">
+<% end %>
+
 <title><%= title %> - <%= html_quote(DamageControl::VERSION_TEXT) %></title>
 </head>
 <body>
@@ -15,7 +20,13 @@
 
 <div class="task-header">Navigation</div>
 <div class="task-entry"><a href="dashboard">Dashboard</a></div>
-<div class="task-entry"><a href="?auto_refresh=true">Auto refresh</a></div>
+<div class="task-entry">
+<% if auto_refresh? %>
+  <a href="<%= auto_refresh_url_prefix %>auto_refresh=false">Auto refresh off</a>
+<% else %>
+  <a href="<%= auto_refresh_url_prefix %>auto_refresh=true">Auto refresh on</a>
+<% end %>
+</div>
 
 <% if !tasks.empty? then %>
 	<div class="task-entry">&nbsp;</div>

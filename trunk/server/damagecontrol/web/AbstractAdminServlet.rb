@@ -10,6 +10,22 @@ module DamageControl
     end
     
   protected
+  
+    def auto_refresh_rate
+      10
+    end
+  
+    def auto_refresh?
+      to_boolean(request.query['auto_refresh'])
+    end
+    
+    def auto_refresh_url_prefix
+      query_string = request.query_string
+      return "?" if query_string.nil?
+      query_string.gsub!(/&?auto_refresh=.*&?/, "")
+      return "?" if query_string == ""
+      "?#{query_string}&"
+    end
     
     def title
       ""
@@ -35,5 +51,9 @@ module DamageControl
     
     attr_reader :build_history_repository
 
+    def to_boolean(text)
+      text && text == "true"
+    end
+  
   end
 end
