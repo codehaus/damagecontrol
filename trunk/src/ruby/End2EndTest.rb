@@ -34,11 +34,12 @@ end
 class End2EndTest < Test::Unit::TestCase
 
   def test_builds_on_cvs_add
+    start_damagecontrol
+    
     create_cvs_repository
     create_cvsmodule("e2eproject")
     
     install_damagecontrol_into_cvs(execute_script_commandline("build"))
-    start_damagecontrol
     
     join_irc_channel
     
@@ -57,7 +58,7 @@ class End2EndTest < Test::Unit::TestCase
   def join_irc_channel
     @irc_listener = IRCListener.new
     irc_listener.connect("irc.codehaus.org", "dctest")
-    sleep 1
+    sleep 10
     assert(irc_listener.connected?)
     irc_listener.join_channel("#damagecontrol")
     puts "joined"
@@ -82,7 +83,7 @@ class End2EndTest < Test::Unit::TestCase
   end
   
   include FileUtils
-        
+  
   def initialize(someparam)
       super(someparam)
       @@damagecontrol_started = false
@@ -152,18 +153,16 @@ class End2EndTest < Test::Unit::TestCase
 	
   def start_damagecontrol
     if(@@damagecontrol_started == false) then
-      $:<<"#{damagecontrol_home}/src/ruby"
-      require 'simple'
-      start_simple_server(
-        :BuildsDir => buildsdir,
-        :SocketTriggerPort => 4713, 
-        :WebPort => 8081, 
-        :AllowIPs => ["127.0.0.1" ])
-      IRCPublisher.new(@hub, "irc.codehaus.org", "\#damagecontrol", ShortTextTemplate.new).start
+      start_damagecontrol_forked
       @@damagecontrol_started = true
     end
   end
         
+  def start_damagecontrol_forked
+    Thread.new {
+      system("ruby #{damagecontrol_home}/src/ruby/start_damagecontrol_forked.rb #{buildsdir}")
+    }
+  end
 	
   def create_cvsmodule(project)
     Dir.chdir(@tempdir)
