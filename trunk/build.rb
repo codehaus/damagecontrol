@@ -210,9 +210,19 @@ exec ruby -I"$DAMAGECONTROL_HOME/server" "#{target}" $*})
     params['scp_executable'] = "pscp"
   end
   
-  def installer_from_build
+  def aslak_windows_settings
+    # This is where it lands after Make install
+    params['ruby_home'] = "c:\\cygwin\\usr\\local"
+    # This seems to be the most uptodate CVS version for windows
+    params['cvs_executable'] = "\"C:\\Program Files\\TortoiseCVS\\cvs.exe\""
+    params['user'] = "rinkrank"
+    params['scp_executable'] = "pscp"
+  end
+  
+  def installer_from_codehaus_build
     dist = "damagecontrol-#{version}.tar.gz"
     unless File.exists?("target/#{dist}")
+      mkdir_p("target") unless File.exists?("target")
       with_working_dir("target") do
         system("wget http://dist.codehaus.org/damagecontrol/distributions/#{dist}")
       end
@@ -222,7 +232,7 @@ exec ruby -I"$DAMAGECONTROL_HOME/server" "#{target}" $*})
     installer_nodeps
   end
   
-  def installer
+  def installer_from_local_build
     dist_nodeps
     installer_nodeps
   end
@@ -254,7 +264,7 @@ exec ruby -I"$DAMAGECONTROL_HOME/server" "#{target}" $*})
     makensis_executable
     #svn_executable
 
-    system("\"#{makensis_executable}\" /DVERSION=#{version} /DSVN_BIN= /DCVS_EXECUTABLE='#{cvs_executable}' /DRUBY_HOME='#{ruby_home}' installer/windows/nsis/DamageControl.nsi")
+    system("\"#{makensis_executable}\" /DVERSION=#{version} /DSVN_BIN=xx /DCVS_EXECUTABLE=#{cvs_executable} /DRUBY_HOME=#{ruby_home} installer/windows/nsis/DamageControl.nsi")
   end
   
   def archive
@@ -276,8 +286,13 @@ exec ruby -I"$DAMAGECONTROL_HOME/server" "#{target}" $*})
   end
   
   def clean
-    rm_rf("target") if windows?
-    system("rm -rf target") unless windows?
+    if(windows?)
+      rm_rf("target")
+      rm_rf("dist")
+    else
+      system("rm -rf target")
+      system("rm -rf dist")
+    end
   end
   
   def user
@@ -337,12 +352,12 @@ exec ruby -I"$DAMAGECONTROL_HOME/server" "#{target}" $*})
     self_upgrade
   end
   
-  def release
+  def manual_release
     clean
-    test
-    dist_nodeps
-    archive_nodeps
-    installer_nodeps
+#    test
+#    dist_nodeps
+#    archive_nodeps
+    installer_from_build
     upload_nodeps
   end
   

@@ -52,6 +52,8 @@ module DamageControl
     end
     
     def sendmail(subject, body, from, to)
+      # convert separators to spaces, according to the SMTP protocol.
+      to.gsub(',',' ').gsub(';',' ')
       mail = "To: #{to}\r\n" +
              "From: #{from}\r\n" +
              "Subject: #{subject}\r\n" +
@@ -62,7 +64,8 @@ module DamageControl
       begin
         logger.info("sending email to #{to} using SMTP server #{@mail_server}")
         Net::SMTP.start(@mail_server) do |smtp|
-          smtp.sendmail( mail, from, to )
+          # convert space separated string to array
+          smtp.sendmail( mail, from, to.split )
         end
       rescue => e
         puts "Couldn't send mail:" + e.message

@@ -22,13 +22,10 @@ module DamageControl
     
     attr_accessor :last_build_request
 
-    def initialize(name, channel, build_history_repository=nil, *args)
-      # TODO remove this, just warning people about refactorings
-      raise "NOTE: BuildExecutor has been refactored! You must now specify a name for the executor, like this: BuildExecutor.new('executor1', hub, build_history_repository)" if !name.is_a?(String) || build_history_repository.nil?
-      raise "NOTE: BuildExecutor has been refactored! It now takes three arguments, like this: BuildExecutor.new(name, hub, build_history_repository)" unless args.empty?
-      
+    def initialize(name, channel, project_directories, build_history_repository)
       super
       @channel = channel
+      @project_directories = project_directories
       @build_history_repository = build_history_repository
       @name = name
     end
@@ -41,9 +38,13 @@ module DamageControl
       return if !checkout?
       
       current_build.status = Build::CHECKING_OUT
-      current_scm.checkout(current_build.timestamp_as_time) do |progress|
+      current_scm.checkout(checkout_dir, current_build.timestamp_as_time) do |progress|
         report_progress(progress)
       end
+    end
+    
+    def checkout_dir
+      @project_directories.checkout_dir(current_build.project_name)
     end
     
     def with_working_directory(dir)
@@ -60,7 +61,7 @@ module DamageControl
     def execute
       current_build.status = Build::BUILDING
 
-      working_dir = if current_scm.nil? then project_base_dir else current_scm.working_dir end
+      working_dir = if current_scm.nil? then project_base_dir else checkout_dir end
       # set up some environment variables the build can use
       environment = { "DAMAGECONTROL_BUILD_LABEL" => current_build.potential_label.to_s }
       unless current_build.changesets.nil?
@@ -91,7 +92,8 @@ module DamageControl
 
       # set the label
       if(current_build.successful? && current_build.potential_label)
-        current_build.label = current_build.potential_label
+        current_scm_label = current_scm.label(checkout_dir)
+        current_build.label = current_scm_label ? current_scm_label : current_build.potential_label
       end
 
     end
@@ -164,7 +166,7 @@ module DamageControl
         logger.info("does not determine changeset for #{current_build.project_name} because scm not configured")
         return 
       end
-      unless File.exists?(current_scm.working_dir)
+      unless File.exists?(checkout_dir)
         # this won't work the first build, so I just skip it
         # the first time a project is built it will have a changeset of every file in the repository
         # this is almost useless information and there's no point in spending lots of time trying to code around it (not to mention executing it)
@@ -183,7 +185,7 @@ module DamageControl
         from_time = last_successful_build.timestamp_as_time
         to_time = current_build.timestamp_as_time
         logger.info("determining change set for #{current_build.project_name}, from #{from_time} to #{to_time}")
-        changesets = current_scm.changesets(from_time, to_time) {|p| report_progress(p)}
+        changesets = current_scm.changesets(checkout_dir, from_time, to_time) {|p| report_progress(p)}
         current_build.changesets = changesets if changesets
         logger.info("change set for #{current_build.project_name} is #{current_build.changesets.inspect}")
 

@@ -66,7 +66,7 @@ module DamageControl
     def initialize(params={})
       @params = params
       @components = []
-      @project_directories = ProjectDirectories.new(rootdir)
+      @rootdir = rootdir
     end
     
     def startup_time
@@ -103,7 +103,7 @@ module DamageControl
     end
     
     def http_port 
-      params[:HttpPort] || 4712
+      params[:HttpPort] || 81
     end
     
     def https_port
@@ -119,7 +119,7 @@ module DamageControl
     end
     
     def public_web_url
-      params[:PublicWebUrl] || "#{web_url}/public"
+      params[:PublicWebUrl] || "#{web_url}public/"
     end
     
     def get_ip
@@ -129,9 +129,9 @@ module DamageControl
     def init_config_services
       component(:hub, Hub.new)
       
-      component(:project_directories, @project_directories)
+      component(:project_directories, ProjectDirectories.new(@rootdir))
       component(:project_config_repository, ProjectConfigRepository.new(project_directories, public_web_url))
-      component(:build_history_repository, BuildHistoryRepository.new(hub, @project_directories))
+      component(:build_history_repository, BuildHistoryRepository.new(hub, project_directories))
     end
     
     def init_components
@@ -250,7 +250,7 @@ module DamageControl
     def init_build_scheduler
       component(:log_writer, LogWriter.new(hub))
       component(:log_merger, LogMerger.new(hub))
-      component(:artifact_archiver, ArtifactArchiver.new(hub))
+      component(:artifact_archiver, ArtifactArchiver.new(hub, @project_directories))
       component(:build_number_increaser, BuildNumberIncreaser.new(hub, project_config_repository))
       component(:dependent_build_trigger, DependentBuildTrigger.new(hub, project_config_repository))
       component(:build_scheduler, BuildScheduler.new(hub))
@@ -259,7 +259,7 @@ module DamageControl
     
     def init_build_executors
       # Only use one build executor (don't allow parallel builds)
-      build_scheduler.add_executor(BuildExecutor.new('executor1', hub, build_history_repository))
+      build_scheduler.add_executor(BuildExecutor.new('executor1', hub, project_directories, build_history_repository))
     end
     
     def polling_interval
@@ -268,7 +268,7 @@ module DamageControl
     
     def init_scm_poller
       component(:scm_poller, 
-        SCMPoller.new(hub, polling_interval, project_config_repository, build_history_repository, build_scheduler))
+        SCMPoller.new(hub, polling_interval, @project_directories, project_config_repository, build_history_repository, build_scheduler))
     end
     
     def init_custom_components

@@ -8,12 +8,12 @@ require 'damagecontrol/core/Build'
 require 'damagecontrol/core/BuildExecutor'
 require 'damagecontrol/core/BuildScheduler'
 require 'damagecontrol/core/ProjectConfigRepository'
+require 'damagecontrol/publisher/IRCPublisher'
 require 'damagecontrol/scm/CVS'
 require 'damagecontrol/scm/SVN'
 require 'damagecontrol/util/FileUtils'
 require 'damagecontrol/xmlrpc/ConnectionTester'
 require 'damagecontrol/util/Logging'
-require 'damagecontrol/publisher/IRCPublisher'
 
 module DamageControl
 
@@ -329,8 +329,10 @@ class End2EndTest < Test::Unit::TestCase
     File.mkpath(importdir)
     scm.import(importdir)
     
+    trigger_files_checkout_dir = "#{@basedir}/trigger_installation"
+    
     project_name = "TestingProject_#{scm.class.name.gsub(/\:/, '_')}"
-    scm.install_trigger(damagecontrol_home, project_name, privateurl)
+    scm.install_trigger(damagecontrol_home, project_name, trigger_files_checkout_dir, privateurl)
 
     @server = DamageControlServerDriver.new("#{basedir}/serverroot")
     @server.setup
@@ -341,8 +343,9 @@ class End2EndTest < Test::Unit::TestCase
     server.setup_project_config(project_name, scm, execute_script_commandline("build"), polling)
     
     # add build.bat file and commit it (will trigger build)
-    scm.checkout
-    scm.add_or_edit_and_commit_file(script_file("build"), 'echo "Hello world from DamageControl" > buildresult.txt')
+    checkout_dir = "#{@basedir}/checkout_dir"
+    scm.checkout(checkout_dir)
+    scm.add_or_edit_and_commit_file(checkout_dir, script_file("build"), 'echo "Hello world from DamageControl" > buildresult.txt')
 
     wait_less_time_than_default_quiet_period
     assert_not_built_yet(project_name)
@@ -355,7 +358,7 @@ class End2EndTest < Test::Unit::TestCase
     irc.reset_log
     
     # update the buld file to something bogus, which should fail the build
-    scm.add_or_edit_and_commit_file(script_file("build"), 'this_will_not_work')
+    scm.add_or_edit_and_commit_file(checkout_dir, script_file("build"), 'this_will_not_work')
 
     wait_for_build_to_fail
     irc.assert_build_failed_and_changes_on_channel(username, project_name)
@@ -392,7 +395,7 @@ class End2EndTest < Test::Unit::TestCase
   end
   
   def build_result(project_name)
-    "#{basedir}/serverroot/#{project_name}/checkout/e2e_testproject/buildresult.txt"
+    "#{basedir}/serverroot/#{project_name}/checkout/buildresult.txt"
   end
   
   def assert_not_built_yet(project_name)

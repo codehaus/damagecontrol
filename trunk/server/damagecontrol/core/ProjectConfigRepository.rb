@@ -62,7 +62,7 @@ module DamageControl
       end
       config_map["project_name"] = project_name
       config_map = upgrade_project_config(config_map)
-      config_map["scm"].checkout_dir = checkout_dir(project_name)
+#      config_map["scm"].checkout_dir = checkout_dir(project_name)
       config_map
     end
     

@@ -26,7 +26,7 @@ module DamageControl
   class SVNLogEntryParser < Pebbles::Parser
     def initialize(path)
       super(/^-+/)
-      @path = path
+      @path = path ? path : ""
     end
 
   protected

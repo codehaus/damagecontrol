@@ -8,6 +8,7 @@ require 'damagecontrol/scm/NoSCM'
 module DamageControl  
   class ArtifactArchiverTest < Test::Unit::TestCase
     include FileUtils
+    include MockIt
     
     def test_copies_away_artifacts_on_build_complete
       basedir = new_temp_dir
@@ -19,7 +20,6 @@ module DamageControl
       
       build.archive_dir = "#{basedir}/project/archive/#{build_timestamp}"
       build.scm = NoSCM.new
-      build.scm.checkout_dir = "#{basedir}/checkout"
       
       mkdir_p("#{basedir}/checkout/target/jars")
       touch("#{basedir}/checkout/target/1.jar")
@@ -32,7 +32,10 @@ module DamageControl
         assert(subscriber.is_a?(ArtifactArchiver))
       end
 
-      aa = ArtifactArchiver.new(hub)
+      aa = ArtifactArchiver.new(
+        hub,
+        new_mock.__expect(:checkout_dir) { "#{basedir}/checkout" }
+      )
       aa.put(BuildCompleteEvent.new(build))
       
       assert_equal(["#{build.archive_dir}/1.jar", "#{build.archive_dir}/jars"], Dir["#{build.archive_dir}/*"].sort)

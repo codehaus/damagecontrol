@@ -5,7 +5,7 @@ require 'damagecontrol/DamageControlServer'
 include DamageControl
 
 server = DamageControlServer.new(
-  :RootDir => "#{$damagecontrol_home}/work",
+  :RootDir => ENV["DAMAGECONTROL_HOME"] || "#{$damagecontrol_home}/work",
   :HttpPort => 4712,
   :PollingInterval => 60 # specified in seconds
   # to allow access only from localhost then uncomment line below (when running behind an Apache proxy for example)
@@ -13,11 +13,11 @@ server = DamageControlServer.new(
   )
 
 def server.init_build_executors
-  build_scheduler.add_executor(BuildExecutor.new('executor1', hub, build_history_repository))
+  build_scheduler.add_executor(BuildExecutor.new('executor1', hub, project_directories, build_history_repository))
   # each BuildExecutor can execute one build in parallel to the others
   # to enable additional parallel builds (for multiple projects) uncomment lines below
   # you can have as many BuildExecutors as your machine can take
-  #build_scheduler.add_executor(BuildExecutor.new('executor2', hub, build_history_repository, project_directories))
+  #build_scheduler.add_executor(BuildExecutor.new('executor2', hub, project_directories, build_history_repository))
 end
 
 def server.init_custom_components
@@ -33,7 +33,7 @@ def server.init_custom_components
   #  :BodyTemplate => "short_html_build_result.erb",
   #  :FromEmail => "damagecontrol@mydomain.com",
   #  :MailServerHost => "localhost",
-  #  :MailServerPort => 25)
+  #  :MailServerPort => 25))
   
 end
 

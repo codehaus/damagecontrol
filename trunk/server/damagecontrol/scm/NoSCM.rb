@@ -5,10 +5,10 @@ module DamageControl
   
   class NoSCM < AbstractSCM
     def method_missing(*args)
-      "does nothing :-)"
+      "NoSCM does nothing :-)"
     end
     
-    def checkout(time = nil, &proc)
+    def checkout(checkout_dir, time = nil, &proc)
       File.mkpath(checkout_dir)
     end
   end

@@ -16,7 +16,6 @@ require 'xmlrpc/utils'
 # checkout(utc_time, &line_proc) -> nil
 # changesets(utc_time, &line_proc) -> DamageControl::Changesets
 # checkout(utc_time, &line_proc)
-# working_dir -> String
 # atomic? -> [true|false] (TODO: avoid quiet period for atomic SCMs)
 #
 # 3) Implement LocalSnoopy < Snoopy. This is to support proper compliance testing
@@ -53,14 +52,27 @@ module DamageControl
     
   public
 
-    attr_accessor :checkout_dir
-    
-    def working_dir
-      checkout_dir
+    def checkout(checkout_dir, utc_time = nil, &proc)
     end
 
+    def changesets(checkout_dir, from_time, to_time, &proc)
+      ChangeSets.new
+    end
+    
+    def uptodate?(checkout_dir, from_time, to_time, &proc)
+      true
+    end
+    
+    def label(checkout_dir, &proc)
+      nil
+    end
+    
     def can_install_trigger?
       false
+    end
+
+    def exists?
+      true
     end
 
     def trigger_installed?(project_name)
@@ -71,28 +83,11 @@ module DamageControl
       false
     end
 
-    def exists?
-      true
-    end
-
-    def trigger_command(damagecontrol_install_dir, project_name, dc_url="http://localhost:4712/private/xmlrpc", script_suffix="")
+    def trigger_command(damagecontrol_install_dir, project_name, trigger_xml_rpc_url="http://localhost:4712/private/xmlrpc", script_suffix="")
       script = "sh #{damagecontrol_install_dir}/bin/requestbuild#{script_suffix}"
-      "#{script} --url #{dc_url} --projectname #{project_name}"
+      "#{script} --url #{trigger_xml_rpc_url} --projectname #{project_name}"
     end
 
-    def checkout(utc_time = nil, &proc)
-    end
-
-    def changesets(from_time, to_time, &proc)
-      ChangeSets.new
-    end
-    
-    def checkout_dir=(checkout_dir)
-      raise "checkout_dir can't be nil" unless checkout_dir
-      checkout_dir = File.expand_path(checkout_dir)
-      @checkout_dir = checkout_dir
-    end
-    
     def ==(other_scm)
       return false if self.class != other_scm.class
       self.instance_variables.each do |var|

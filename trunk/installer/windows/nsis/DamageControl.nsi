@@ -14,8 +14,9 @@
   !define DISTDIR "${ROOTDIR}\target\dist"
   
   ; VERSION needs to be defined on the command line with /DVERSION=1.2.3 option
-  ; RUBY_HOME needs to point to a Cygwin Ruby distribution. Put the following .dlls in the bin directory: cygwin1.dll, cygcrypto-0.9.7.dll.
-  ; CVS_EXECUTABLE needs to point to a CVS executable.
+  ; RUBY_HOME needs to point to a Cygwin Ruby distribution built from source. 
+  ; 
+  ; CVS_EXECUTABLE needs to point to a NON-CYGWIN CVS executable.
   
   ;Name and file
   Name "DamageControl ${VERSION}"
@@ -101,8 +102,11 @@ SectionEnd
 
 Section "DamageControl Server" SecServer
 
+  ;Include CVS binaries
+  SetOutPath $INSTDIR\bin
+  File /r "${CVS_EXECUTABLE}"
+
   SetOutPath "$INSTDIR" 
-  
   File "${DISTDIR}\license.txt"
   File "${DISTDIR}\release-notes.txt"
   File /r "${DISTDIR}\*"
@@ -110,23 +114,19 @@ Section "DamageControl Server" SecServer
   ;Include extra Windows cygwin binaries
   SetOutPath $INSTDIR\bin
   File /r "${ROOTDIR}\installer\windows\bin\*"
-  
-  ;Include CVS binaries
-  SetOutPath $INSTDIR\bin
-  File /r "${CVS_EXECUTABLE}"
-  
+    
   ;Store installation folder
   WriteRegStr HKCU "Software\Modern UI Test" "" $INSTDIR
 
   !insertmacro MUI_STARTMENU_WRITE_BEGIN Application
     
     CreateDirectory "$SMPROGRAMS\$STARTMENU_FOLDER"
-    CreateShortCut "$SMPROGRAMS\$STARTMENU_FOLDER\Start Server.lnk" "$INSTDIR\bin\server.cmd"
-    CreateShortCut "$SMPROGRAMS\$STARTMENU_FOLDER\Stop Server.lnk" "$INSTDIR\bin\shutdownserver.cmd" "--url http://localhost:4712/private/xmlrpc"
-    CreateShortCut "$SMPROGRAMS\$STARTMENU_FOLDER\Modify settings.lnk" "$WINDIR\notepad.exe" "$INSTDIR\bin\server.rb"
-    CreateShortCut "$SMPROGRAMS\$STARTMENU_FOLDER\Dashboard.lnk" "http://localhost:4712/private/dashboard"
+    CreateShortCut "$SMPROGRAMS\$STARTMENU_FOLDER\Start DamageControl Server.lnk" "$INSTDIR\bin\server.cmd"
+    CreateShortCut "$SMPROGRAMS\$STARTMENU_FOLDER\Stop DamageControl Server.lnk" "$INSTDIR\bin\shutdownserver.cmd" "--url http://localhost:4712/private/xmlrpc"
+    CreateShortCut "$SMPROGRAMS\$STARTMENU_FOLDER\Modify DamageControl settings.lnk" "$WINDIR\notepad.exe" "$INSTDIR\bin\server.rb"
+    CreateShortCut "$SMPROGRAMS\$STARTMENU_FOLDER\DamageControl Dashboard.lnk" "http://localhost:4712/private/dashboard"
     CreateShortCut "$SMPROGRAMS\$STARTMENU_FOLDER\DamageControl Website.lnk" "http://damagecontrol.codehaus.org"
-    CreateShortCut "$SMPROGRAMS\$STARTMENU_FOLDER\Uninstall.lnk" "$INSTDIR\Uninstall.exe"
+    CreateShortCut "$SMPROGRAMS\$STARTMENU_FOLDER\Uninstall DamageControl.lnk" "$INSTDIR\Uninstall.exe"
   
   !insertmacro MUI_STARTMENU_WRITE_END
 

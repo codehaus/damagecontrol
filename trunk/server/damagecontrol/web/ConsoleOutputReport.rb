@@ -19,7 +19,6 @@ module DamageControl
     end
     
     def content
-      #"<pre class=\"console\">#{File.read(selected_build.log_file)}</pre>"
       "<iframe border=\"0\" width=\"100%\" height=\"100%\" src=\"log?project_name=#{project_name}&timestamp=#{selected_build.timestamp_as_s}\" />"
     end
   end

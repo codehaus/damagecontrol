@@ -7,8 +7,8 @@ module DamageControl
     
     include GenericSCMTests
     
-    def create_scm
-      LocalCVS.new(new_temp_dir, "damagecontrolled")
+    def create_scm(repository_dir, path)
+      LocalCVS.new(repository_dir, path)
     end
   
     def test_can_build_a_cvs_rdiff_command_for_retrieving_the_changes_between_two_dates
@@ -25,7 +25,6 @@ module DamageControl
       cvs = CVS.new
       cvs.cvsroot = cvsroot
       cvs.cvsmodule = cvsmodule
-      cvs.checkout_dir = checkout_dir
       cvs
     end
     
@@ -36,7 +35,7 @@ module DamageControl
     def test_checkout_command
       cvs = create_cvs(":pserver:anonymous@cvs.codehaus.org:/cvsroot/damagecontrol", "damagecontrol")
       assert_equal(
-        'checkout -D "1977-06-15 12:00:00 UTC" damagecontrol', \
+        'checkout -D "1977-06-15 12:00:00 UTC" -d . damagecontrol', \
         cvs.checkout_command(jons_birthday))
     end
     
@@ -89,7 +88,7 @@ EOF
     def test_invalid_cvs_command_raises_error
       cvs = create_cvs("cvsroot", "cvsmodule")
       assert_raises(Pebbles::ProcessFailedException, "invalid cvs command did not raise error") do
-        cvs.cvs(cvs.checkout_dir, "invalid_command") { |line| }
+        cvs.cvs(".", "invalid_command") { |line| }
       end
     end
 

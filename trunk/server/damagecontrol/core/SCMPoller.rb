@@ -8,10 +8,11 @@ module DamageControl
   class SCMPoller < Pebbles::Clock
     include Logging
     
-    def initialize(hub, polling_interval, project_config_repository, build_history_repository, build_scheduler)
+    def initialize(hub, polling_interval, project_directories, project_config_repository, build_history_repository, build_scheduler)
       super(polling_interval)
       @hub = hub
       @polling_interval = polling_interval
+      @project_directories = project_directories
       @project_config_repository = project_config_repository
       @build_history_repository = build_history_repository
       @build_scheduler = build_scheduler
@@ -37,22 +38,31 @@ module DamageControl
       @project_config_repository.project_config(project_name)
     end
     
-    def poll_project(project_name, time)
-      return unless should_poll?(project_name, time)
+    def poll_project(project_name, time_now)
+      return unless should_poll?(project_name, time_now)
       scm = @project_config_repository.create_scm(project_name)
       last_completed_build = @build_history_repository.last_completed_build(project_name)
       if last_completed_build.nil?
         # not built yet, just build without checking
-        request_build(project_name, time)
+        request_build(project_name, time_now)
       else
         logger.info("polling project #{project_name}")
         # check for any changes since last completed build and now
-        changesets = scm.changesets(last_completed_build.timestamp_as_time, time)
-        if changesets.empty?
+        checkout_dir = @project_directories.checkout_dir(project_name)
+        if(scm.uptodate?(
+          checkout_dir, 
+          last_completed_build.timestamp_as_time, 
+          time_now
+        ))
           logger.info("no changes in #{project_name}")
         else
           logger.info("changes in #{project_name}, requesting build")
-          request_build(project_name, time, changesets)
+          changesets = scm.changesets(
+            checkout_dir, 
+            last_completed_build.timestamp_as_time, 
+            time_now
+          )
+          request_build(project_name, time_now, changesets)
         end
       end
     end

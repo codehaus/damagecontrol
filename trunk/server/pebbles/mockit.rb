@@ -1,6 +1,25 @@
 require 'test/unit/assertions'
 
 module MockIt
+    
+  def setup
+    @to_verify = []
+  end
+    
+  def teardown
+    super
+    if(@test_passed && @to_verify)
+      @to_verify.each{|m| m.__verify}
+    end
+  end
+
+  def new_mock
+    mock = MockIt::Mock.new
+    @to_verify = [] unless @to_verify
+    @to_verify << mock
+    mock
+  end
+
   class Mock
     include Test::Unit::Assertions
     
@@ -15,11 +34,13 @@ module MockIt
       validation_proc=Proc.new {|*args| nil} if validation_proc.nil?
       @expected_methods<<method
       @expected_validation_procs<<validation_proc
+      self
     end
     
     def __setup(method, &proc)
       proc=Proc.new {|*args| nil} if proc.nil?
       @setup_call_procs[method]=proc
+      self
     end
     
     def __verify
@@ -85,7 +106,7 @@ module MockIt
     
     def handle_unexpected_call(method)
       @unexpected_calls << method
-      flunk("#{method} expected to never be called")
+      flunk("Unexpected method invocation: #{method}")
     end
     
     def currently_expected_method

@@ -19,7 +19,8 @@ end
 def server.init_custom_components
   if(ONLINE)
     require 'damagecontrol/publisher/IRCPublisher'
-    component(:irc_publisher, IRCPublisher.new(hub, "irc.codehaus.org", '#dce2e', "short_text_build_result.erb"))
+    irc_host = ENV["DC_TEST_IRC_HOST"] || "irc.codehaus.org"
+    component(:irc_publisher, IRCPublisher.new(hub, irc_host, '#dce2e', "short_text_build_result.erb"))
     irc_publisher.handle = "server"
   end
 end

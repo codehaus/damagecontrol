@@ -50,6 +50,7 @@ function showScm(scm) {
     # Hackish/Neat trick:
     # the inspect will convert backslashes to double backslashes and do all sorts of nice things
     # it will also add " " around the string so it is not needed in the actual html
+    # TODO: It also garbles double quotes! (AH)
     build_command_line_attrib_value = project_config['build_command_line'] ? project_config['build_command_line'].inspect : "\"\""
   %>
   <td class="setting-name">Build command</td>
@@ -60,6 +61,12 @@ function showScm(scm) {
 <tr>
   <td class="setting-name">Nag email</td>
   <td><input class="setting-input" name="nag_email" id="nag_email" type="text" value="<%= project_config['nag_email'] %>"/></td>
+</tr>
+<tr>
+  <td>&nbsp;</td>
+  <td class="setting-description">
+    Several email addresses can be specified here, separated by a comma or a space charatcter.
+  </td>
 </tr>
 <tr>
   <td class="setting-name">JIRA url</td>

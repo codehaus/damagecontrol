@@ -10,7 +10,9 @@ module FileUtils
   def new_temp_dir(identifier = self)
     identifier = identifier.to_s
     identifier.gsub!(/\(|:|\)/, '_')
-    "#{damagecontrol_home}/target/temp_#{identifier}_#{Time.new.to_i}"
+    dir = "#{damagecontrol_home}/target/temp_#{identifier}_#{Time.new.to_i}"
+    mkdir_p(dir)
+    dir
   end
   
   def with_working_dir(dir)

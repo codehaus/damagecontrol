@@ -1,4 +1,5 @@
 require 'stringio'
+require 'pebbles/Pathutils'
 require 'damagecontrol/scm/AbstractSCM'
 require 'damagecontrol/scm/CVSLogParser'
 require 'damagecontrol/scm/Changes'
@@ -9,6 +10,7 @@ module DamageControl
   # Handles parsing of CVS roots, checkouts and installation of trigger scripts
   class CVS < AbstractSCM
     include FileUtils
+    include Pebbles::Pathutils
 
   public
     attr_accessor :cvsbranch
@@ -22,28 +24,37 @@ module DamageControl
       return "cvs" if !defined?(@cvs_executable) || @cvs_executable.nil?
       @cvs_executable
     end
-    
-    def changesets(from_time, to_time, &proc)
+
+    def changesets(checkout_dir, from_time, to_time, &proc)
       # exclude commits that occured on from_time
       from_time = from_time + 1
       begin
-        parse_log(new_changes_command(from_time, to_time), &proc)
+        parse_log(checkout_dir, new_changes_command(from_time, to_time), &proc)
       rescue Pebbles::ProcessFailedException => e
         parse_log(old_changes_command(from_time, to_time), &proc)
       end
     end
     
-    def new_process
+    def uptodate?(checkout_dir, start_time, end_time)
+      changesets = changesets(
+        checkout_dir,
+        start_time,
+        end_time
+      )
+      changesets.empty?
+    end
+
+    def new_process(checkout_dir)
       p = Pebbles::Process.new
-      p.working_dir = working_dir
+      p.working_dir = checkout_dir
       p.environment = environment
       p
     end
     
-    def parse_log(cmd, &proc)
+    def parse_log(checkout_dir, cmd, &proc)
       if block_given? then yield "#{cvs_cmd_without_password(cmd)}\n" else logger.debug("#{cvs_cmd_without_password(cmd)}\n") end
       
-      new_process.execute(cvs_cmd_with_password(cmd, cvspassword)) do |stdin, stdout, stderr|
+      new_process(checkout_dir).execute(cvs_cmd_with_password(cmd, cvspassword)) do |stdin, stdout, stderr|
         threads = []
         threads << Thread.new do
           stderr.each_line do |line|
@@ -62,22 +73,18 @@ module DamageControl
       end
     end
     
-    def checkout(time = nil, &proc)
-      if(checked_out?)
-        cvs(working_dir, update_command(time), &proc)
+    def checkout(checkout_dir, time = nil, &proc)
+      if(checked_out?(checkout_dir))
+        cvs(checkout_dir, update_command(time), &proc)
       else
         cvs(checkout_dir, checkout_command(time), &proc)
       end
     end
     
-    def commit(message, &proc)
-      cvs(working_dir, commit_command(message), &proc)
+    def commit(checkout_dir, message, &proc)
+      cvs(checkout_dir, commit_command(message), &proc)
     end
 
-    def working_dir
-      "#{checkout_dir}/#{cvsmodule}"
-    end
-    
     def can_install_trigger?
       begin
         exists?
@@ -87,39 +94,45 @@ module DamageControl
     end
     
     # Installs and activates the trigger script in the repository
-    # for a certain module. Upon subsequent checkins, the damage
-    # control server will be notified over a socket and start
-    # building
+    # for this SCM. Upon subsequent checkins, the damage
+    # control server will be notified over a XML-RPC and start
+    # put a new request on the build request queue.
     #
-    # @param project_name a human readable name for the module
-    # @param dc_url where the dc server is running
+    # @param damagecontrol_install_dir where DC is installed
+    # @trigger_files_checkout_dir where the SCM can check out admin files.
+    #   This may be ignored by some SCMs (like SVN), but some need it, and it is therefore in the API.
+    #   CVS will check out the CVSROOT admin files here. It is recommended that this
+    #   dir is a sibling dir to the checkout_dir
+    # @param trigger_xml_rpc_url where the dc server is running
     #
     # @block &proc a block that can handle the output (should typically log to file)
     #
-    def install_trigger(damagecontrol_install_dir, project_name, dc_url, &proc)
+    def install_trigger(damagecontrol_install_dir, project_name, trigger_files_checkout_dir, trigger_xml_rpc_url, &proc)
       cvsroot_cvs = create_cvsroot_cvs
-      cvsroot_cvs.checkout(&proc)
-      with_working_dir(cvsroot_cvs.working_dir) do
+      cvsroot_cvs.checkout(trigger_files_checkout_dir, &proc)
+      with_working_dir(trigger_files_checkout_dir) do
         # install trigger command
         File.open("loginfo", File::WRONLY | File::APPEND) do |file|
-          file.puts("#{cvsmodule} #{trigger_command(damagecontrol_install_dir, project_name, dc_url)}")
+          file.puts("#{cvsmodule} #{trigger_command(damagecontrol_install_dir, project_name, trigger_xml_rpc_url)}")
         end
         system("#{cvs_executable} commit -m \"Installed DamageControl trigger for #{project_name}\"")
       end
-      raise "Couldn't install/commit trigger to loginfo" unless trigger_installed?(project_name)
+      raise "Couldn't install/commit trigger to loginfo" unless trigger_installed?(trigger_files_checkout_dir, project_name)
     end
     
-    def trigger_installed?(project_name)
+    def trigger_installed?(trigger_files_checkout_dir, project_name)
       cvsroot_cvs = create_cvsroot_cvs
       begin
-        cvsroot_cvs.checkout
-        loginfo = File.join(cvsroot_cvs.working_dir, "loginfo")
+        cvsroot_cvs.checkout(trigger_files_checkout_dir)
+        loginfo = File.join(trigger_files_checkout_dir, "loginfo")
         return false if !File.exist?(loginfo)
         loginfo_file = File.new(loginfo)
         loginfo_content = loginfo_file.read
         loginfo_file.close
         in_local_copy = trigger_in_string?(loginfo_content, project_name)
-        entries = File.join(cvsroot_cvs.working_dir, "CVS", "Entries")
+        entries = File.join(trigger_files_checkout_dir, "CVS", "Entries")
+        
+        # Also verify that loginfo has been committed back to the repo
         committed = File.mtime(entries) >= File.mtime(loginfo)
         in_local_copy && committed
       rescue
@@ -127,20 +140,20 @@ module DamageControl
       end
     end
 
-    def uninstall_trigger(project_name)
+    def uninstall_trigger(trigger_files_checkout_dir, project_name)
       cvsroot_cvs = create_cvsroot_cvs
-      cvsroot_cvs.checkout
-      loginfo_file = File.new(File.join(cvsroot_cvs.working_dir, "loginfo"))
+      cvsroot_cvs.checkout(trigger_files_checkout_dir)
+      loginfo_file = File.new(File.join(trigger_files_checkout_dir, "loginfo"))
       loginfo_content = loginfo_file.read
       loginfo_file.close
       modified_loginfo = disable_trigger_from_string(loginfo_content, project_name, Time.new.utc)
-      loginfo_file = File.new(File.join(cvsroot_cvs.working_dir, "loginfo"), "w")
+      loginfo_file = File.new(File.join(trigger_files_checkout_dir, "loginfo"), "w")
       loginfo_file.write(modified_loginfo)
       loginfo_file.close
-      with_working_dir(cvsroot_cvs.working_dir) do
+      with_working_dir(trigger_files_checkout_dir) do
         system("#{cvs_executable} commit -m \"Disabled DamageControl trigger for #{project_name}\"")
       end
-      raise "Couldn't uninstall/commit trigger to loginfo" unless !trigger_installed?(project_name)
+      raise "Couldn't uninstall/commit trigger to loginfo" unless !trigger_installed?(trigger_files_checkout_dir, project_name)
     end
 
     def create
@@ -217,7 +230,7 @@ module DamageControl
     end
     
     def checkout_command(time)
-      "checkout #{branch_option}#{time_option(time)} #{cvsmodule}"
+      "checkout #{branch_option}#{time_option(time)} -d . #{cvsmodule}"
     end
     
     def cvs_cmd_with_password(cmd, password)
@@ -251,8 +264,8 @@ module DamageControl
       time.utc.strftime("%Y-%m-%d %H:%M:%S UTC")
     end
     
-    def checked_out?
-      rootcvs = File.expand_path("#{working_dir}/CVS/Root")
+    def checked_out?(checkout_dir)
+      rootcvs = File.expand_path("#{checkout_dir}/CVS/Root")
       File.exists?(rootcvs)
     end
         
@@ -274,7 +287,6 @@ module DamageControl
       cvs.cvsroot = self.cvsroot
       cvs.cvsmodule = "CVSROOT"
       cvs.cvspassword = self.cvspassword
-      cvs.checkout_dir = self.checkout_dir
       cvs
     end
 
@@ -321,11 +333,11 @@ module DamageControl
   ##################################################################################
 
   class LocalCVS < CVS
-    def initialize(basedir, cvsmodule)
+    def initialize(cvsroot_dir, cvsmodule)
       super()
-      self.cvsroot = ":local:#{basedir}/cvsroot"
+      cvsroot_dir = filepath_to_nativepath(cvsroot_dir, true)
+      self.cvsroot = ":local:#{cvsroot_dir}"
       self.cvsmodule = cvsmodule
-      self.checkout_dir = "#{basedir}/checkout"
     end
 
     def import(dir)
@@ -334,20 +346,20 @@ module DamageControl
     end
 
     # TODO: refactor. This is ugly!
-    def add_or_edit_and_commit_file(relative_filename, content)
+    def add_or_edit_and_commit_file(checkout_dir, relative_filename, content)
       existed = false
-      with_working_dir(working_dir) do
+      with_working_dir(checkout_dir) do
         File.mkpath(File.dirname(relative_filename))
         existed = File.exist?(relative_filename)
         File.open(relative_filename, "w") do |file|
           file.puts(content)
         end
       end
-      cvs(working_dir, "add #{relative_filename}") unless(existed)
+      cvs(checkout_dir, "add #{relative_filename}") unless(existed)
 
       message = existed ? "editing" : "adding"
 
-      cvs(working_dir, "com -m \"#{message} #{relative_filename}\"")
+      cvs(checkout_dir, "com -m \"#{message} #{relative_filename}\"")
     end
   end
 end

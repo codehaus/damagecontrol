@@ -7,23 +7,8 @@ module DamageControl
 
   class SCMPollerTest < Test::Unit::TestCase
   
-    def setup
-      @to_verify = []
-    end
-    
-    def to_verify(mock)
-      @to_verify<<mock
-      mock
-    end
-    
-    def verify_all
-      @to_verify.each{|m| m.__verify}
-    end
-    
-    def new_mock
-      to_verify(MockIt::Mock.new)
-    end
-    
+    include MockIt
+
     def test_doesnt_check_scm_if_build_is_executing
       hub = new_mock
       build_scheduler = new_mock
@@ -39,13 +24,13 @@ module DamageControl
       
       poller = SCMPoller.new(hub,
         1,
+        new_mock,
         mock_project_config_repository(project_config_with_polling, 10, should_not_poll_scm), 
         mock_build_history_repository(10),
         build_scheduler)
         
       poller.tick(10)
 
-      verify_all
     end
     
     def test_request_build_without_checking_if_there_is_no_completed_build
@@ -60,6 +45,7 @@ module DamageControl
       
       poller = SCMPoller.new(hub,
         1,
+        new_mock,
         mock_project_config_repository(project_config_with_polling, 10, should_not_poll_scm), 
         build_history_repository,
         mock_build_scheduler)
@@ -68,8 +54,6 @@ module DamageControl
         assert(message.is_a?(BuildRequestEvent))
       end
       poller.tick(10)
-
-      verify_all
     end
     
     def test_should_not_poll_projects_where_polling_hasnt_been_specified
@@ -78,13 +62,13 @@ module DamageControl
       
       poller = SCMPoller.new(hub,
         1,
+        new_mock,
         mock_project_config_repository(project_config_without_polling, 0, should_not_poll_scm), 
         mock_build_history_repository(10),
         mock_build_scheduler)
         
       poller.tick(10)
 
-      verify_all
     end
 
     def TODO_test_should_not_poll_outside_polling_interval
@@ -93,29 +77,29 @@ module DamageControl
       
       poller = SCMPoller.new(hub,
         30,
+        new_mock,
         mock_project_config_repository(project_config_with_polling, 0, should_not_poll_scm), 
         mock_build_history_repository(0),
         mock_build_scheduler)
         
       poller.tick(15)
 
-      verify_all
     end
     
     def test_should_poll_during_polling_interval
       hub = new_mock
       should_poll_scm = new_mock
-      should_poll_scm.__expect(:changesets) { |from, to| [] }
+      should_poll_scm.__expect(:uptodate?) { true }
       
       poller = SCMPoller.new(hub,
         10,
+        new_mock.__expect(:checkout_dir) { |project_name| assert_equal("project", project_name); "some_dir" },
         mock_project_config_repository(project_config_with_polling, 0, should_poll_scm),
         mock_build_history_repository(10),
         mock_build_scheduler)
         
       poller.tick(20)
 
-      verify_all
     end
     
     def test_does_not_send_build_request_when_no_change_has_happened
@@ -124,21 +108,22 @@ module DamageControl
       last_build = 2000
       
       scm = new_mock
-      scm.__expect(:changesets) { |from, to|
+      scm.__expect(:uptodate?) { |checkout_dir, from, to|
+        assert_equal("some_dir", checkout_dir)
         assert_equal(Time.at(last_build), from)
         assert_equal(Time.at(now), to)
-        ChangeSets.new([])
+        true
       }
             
       poller = SCMPoller.new(hub,
         1,
+        new_mock.__expect(:checkout_dir) { |project_name| assert_equal("project", project_name); "some_dir" },
         mock_project_config_repository(project_config_with_polling, now, scm),
         mock_build_history_repository(last_build),
         mock_build_scheduler)
       
       poller.tick(now)
       
-      verify_all
     end
     
     def test_sends_build_request_when_changes_since_last_completed_build
@@ -148,7 +133,14 @@ module DamageControl
       project_config = {}
       
       scm = new_mock
-      scm.__expect(:changesets) { |from, to|
+      scm.__expect(:uptodate?) { |checkout_dir, from, to|
+        assert_equal("some_dir", checkout_dir)
+        assert_equal(Time.at(last_build), from)
+        assert_equal(Time.at(now), to)
+        false
+      }
+      scm.__expect(:changesets) { |checkout_dir, from, to|
+        assert_equal("some_dir", checkout_dir)
         assert_equal(Time.at(last_build), from)
         assert_equal(Time.at(now), to)
         ChangeSets.new([ChangeSet.new([Change.new])])
@@ -156,6 +148,7 @@ module DamageControl
       
       poller = SCMPoller.new(hub, 
         1,
+        new_mock.__expect(:checkout_dir) { |project_name| assert_equal("project", project_name); "some_dir" },
         mock_project_config_repository(project_config_with_polling, now, scm),
         mock_build_history_repository(last_build),
         mock_build_scheduler)
@@ -166,7 +159,6 @@ module DamageControl
 
       poller.poll_project("project", Time.at(now))
       
-      verify_all
     end
     
     def project_config_with_polling
