@@ -24,7 +24,7 @@ module Pebbles
 
     def test_should_return_zero_for_successful_command_and_yield_stdout
       ret = Process2.new("cvs --version").execute do |stdout, process|
-        assert_match(/CVSNT version/, stdout.read)
+        assert_match(/Concurrent Versions System/, stdout.read)
       end
       assert_equal(0, ret)
     end
