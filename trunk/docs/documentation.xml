@@ -301,7 +301,7 @@
             <para>Find the section which configures the network server. This
             section looks in the default configuration like this:</para>
 
-            <programlisting>server = DamageControlServer.new(
+            <programlisting role="ruby">server = DamageControlServer.new(
   :RootDir =&gt; ENV["DAMAGECONTROL_WORK"],
   :HttpPort =&gt; 4712,
   :PollingInterval =&gt; 60 # specified in seconds
@@ -317,7 +317,7 @@
             different machine, you should replace <literal>127.0.0.1</literal>
             with the IP-address of the remote webserver.</para>
 
-            <programlisting>server = DamageControlServer.new(
+            <programlisting role="ruby">server = DamageControlServer.new(
   :RootDir =&gt; ENV["DAMAGECONTROL_WORK"],
   :HttpPort =&gt; 4712,
   :PollingInterval =&gt; 60,
@@ -331,7 +331,7 @@
         DamageControl. An example configuration for the Apache webserver is
         like this.</para>
 
-        <programlisting>ProxyRequests off
+        <programlisting role="apacheconf">ProxyRequests off
 RewriteEngine On
 ProxyPass /public http://localhost:4712/public
 ProxyPassReverse /public http://localhost:4712/public
@@ -344,7 +344,7 @@ ProxyPassReverse /private http://localhost:4712/private</programlisting>
         authentification to the private configuration parts, you should append
         following lines to the Apache configuration.</para>
 
-        <programlisting>&lt;Location /private&gt;
+        <programlisting role="apacheconf">&lt;Location /private&gt;
         AuthName "DamageControl"
         AuthType Basic
         AuthUserFile /etc/apache2/dc.passwd
@@ -378,13 +378,13 @@ ProxyPassReverse /private http://localhost:4712/private</programlisting>
           <step>
             <para>Find the line</para>
 
-            <programlisting>def server.init_build_executors</programlisting>
+            <programlisting role="ruby">def server.init_build_executors</programlisting>
           </step>
 
           <step>
             <para>Insert following code behind this line.</para>
 
-            <programlisting>build_scheduler.add_executor(
+            <programlisting role="ruby">build_scheduler.add_executor(
   BuildExecutor.new(
     'executor2', 
     hub, 
@@ -495,7 +495,7 @@ ProxyPassReverse /private http://localhost:4712/private</programlisting>
           code. This is done by adding following code at the end of
           <filename>ant.bat</filename>.</para>
 
-          <programlisting>exit %errorlevel%</programlisting>
+          <programlisting role="batch">exit %errorlevel%</programlisting>
         </sidebar>
 
         <para>Example commands to be run by DamageControl are:</para>
@@ -670,7 +670,7 @@ maven jar</screen>
               exist, copy the template create a new file caled
               <filename>post-commit</filename> with following contents.</para>
 
-              <programlisting>#! /bin/sh</programlisting>
+              <programlisting role="bash">#! /bin/sh</programlisting>
 
               <para>This is a shell script that will be executed after every
               successful commit. This file does nothing, because the actual
@@ -757,7 +757,7 @@ maven jar</screen>
           <step>
             <para>Add following code below this line.</para>
 
-            <programlisting>require 'damagecontrol/publisher/JIRAPublisher'
+            <programlisting role="ruby">require 'damagecontrol/publisher/JIRAPublisher'
 component(:jira_publisher, 
   JIRAPublisher.new(
     hub, 
@@ -800,13 +800,13 @@ component(:jira_publisher,
           <step>
             <para>Find following line.</para>
 
-            <programlisting>def server.init_custom_components</programlisting>
+            <programlisting role="ruby">def server.init_custom_components</programlisting>
           </step>
 
           <step>
             <para>Add following code below this line.</para>
 
-            <programlisting>require 'damagecontrol/publisher/EmailPublisher'
+            <programlisting role="ruby">require 'damagecontrol/publisher/EmailPublisher'
 component(:email_publisher, EmailPublisher.new(hub, build_history_repository,
   :SubjectTemplate =&gt; "short_text_build_result.erb", 
   :BodyTemplate =&gt; "short_html_build_result.erb",
@@ -836,7 +836,7 @@ component(:email_publisher, EmailPublisher.new(hub, build_history_repository,
             <para>Find the section which configures the network server. This
             section looks in the default configuration like this:</para>
 
-            <programlisting>server = DamageControlServer.new(
+            <programlisting role="ruby">server = DamageControlServer.new(
   :RootDir =&gt; ENV["DAMAGECONTROL_WORK"],
   :HttpPort =&gt; 4712,
   :PollingInterval =&gt; 60 # specified in seconds
@@ -850,7 +850,7 @@ component(:email_publisher, EmailPublisher.new(hub, build_history_repository,
             <para>Add the parameter ExternalWebUrl, which points to the public
             root of the DamageControl installation.</para>
 
-            <programlisting>server = DamageControlServer.new(
+            <programlisting role="ruby">server = DamageControlServer.new(
   :RootDir =&gt; ENV["DAMAGECONTROL_WORK"],
   :HttpPort =&gt; 4712,
   :ExternalWebUrl =&gt; "http://my-machine/damagecontrol/public"
@@ -879,13 +879,13 @@ component(:email_publisher, EmailPublisher.new(hub, build_history_repository,
           <step>
             <para>Find following line.</para>
 
-            <programlisting>def server.init_custom_components</programlisting>
+            <programlisting role="ruby">def server.init_custom_components</programlisting>
           </step>
 
           <step>
             <para>Add following code below this line.</para>
 
-            <programlisting>require 'damagecontrol/publisher/IRCPublisher'
+            <programlisting role="ruby">require 'damagecontrol/publisher/IRCPublisher'
 component(:irc_publisher, 
   IRCPublisher.new(
     hub, 
@@ -1015,7 +1015,8 @@ component(:irc_publisher,
               couple of times every day. Usually something like the following
               is displayed in the log and in the console output:</para>
 
-              <screen><computeroutput>/usr/lib/ruby/1.8/yaml.rb:39: [BUG] rb_gc_mark(): unknown data type 0x14(0x4023e51c) non object
+              <screen><computeroutput>/usr/lib/ruby/1.8/yaml.rb:39: [BUG] rb_gc_mark(): \
+  unknown data type 0x14(0x4023e51c) non object
 ruby 1.8.1 (2004-05-02) [i686-linux-gnu]</computeroutput></screen>
 
               <para>Installing Ruby 1.8.2 solves the problem (it is currently
@@ -1062,7 +1063,7 @@ ruby 1.8.1 (2004-05-02) [i686-linux-gnu]</computeroutput></screen>
               ruby and which of course are built in DamageControl itself) have
               code that looks something like this:</para>
 
-              <programlisting>def fail(message = $?.to_s)
+              <programlisting role="ruby">def fail(message = $?.to_s)
   puts "BUILD FAILED: #{message}"
   exit!(1) # &lt;------ non-zero exit code, build failed!
 end
@@ -1183,7 +1184,7 @@ end</programlisting>
                 and add the following line:</para>
               </formalpara>
 
-              <programlisting>executor_selector: <replaceable>FunctionalTests</replaceable></programlisting>
+              <programlisting role="ruby">executor_selector: <replaceable>FunctionalTests</replaceable></programlisting>
 
               <para>This will pin the current build to only the
               <quote>FunctionalTests</quote> build executor. The
@@ -1236,11 +1237,13 @@ end</programlisting>
         codehaus.</para>
 
         <screen><prompt># </prompt><userinput>cvs -d \
-  :pserver:anonymous@cvs.damagecontrol.codehaus.org:/home/projects/damagecontrol/scm \
+  :pserver:anonymous@cvs.damagecontrol.codehaus.org\
+  :/home/projects/damagecontrol/scm \
   login</userinput>
 <computeroutput>Password: </computeroutput><keycap>RETURN</keycap>
 <prompt># </prompt><userinput>cvs -d \
-  :pserver:anonymous@cvs.damagecontrol.codehaus.org:/home/projects/damagecontrol/scm \
+  :pserver:anonymous@cvs.damagecontrol.codehaus.org:\
+  /home/projects/damagecontrol/scm \
   co damagecontrol </userinput></screen>
 
         <para>You will find the source code for the server in the directory
@@ -1256,7 +1259,8 @@ end</programlisting>
 
         <screen><prompt># </prompt><userinput>export CVS_RSH=ssh</userinput>
 <prompt># </prompt><userinput>cvs -d \
-  :ext:<replaceable>username</replaceable>@cvs.damagecontrol.codehaus.org:/home/projects/damagecontrol/scm \
+  :ext:<replaceable>username</replaceable>@cvs.damagecontrol.codehaus.org:\
+  /home/projects/damagecontrol/scm \
   co damagecontrol</userinput></screen>
       </section>
 
@@ -1301,8 +1305,10 @@ end</programlisting>
 
               <row>
                 <entry><screen><prompt># </prompt><userinput>./build.rb installer \
-  -Druby_home=<replaceable>C:\\Program Files\\Ruby</replaceable> \
-  -Dcvs_executable=<replaceable>C:\\Program Files\\CVS\\bin</replaceable></userinput></screen></entry>
+  -Druby_home=\
+  <replaceable>C:\\Program Files\\Ruby</replaceable> \
+  -Dcvs_executable=\
+  <replaceable>C:\\Program Files\\CVS\\bin</replaceable></userinput></screen></entry>
 
                 <entry>Builds the installer. The paths to the ruby
                 installation and the CVS executable need to be absolute
@@ -2157,7 +2163,7 @@ end</programlisting>
         <para>This will probably fail, and it is time to fix the first error -
         implement the <methodname>create</methodname> method.</para>
 
-        <programlisting>def initialize(mooky_dir)
+        <programlisting role="ruby">def initialize(mooky_dir)
   @mooky_dir = mooky_dir
 end
 
@@ -2761,18 +2767,24 @@ end</programlisting>
 
               <screen><computeroutput>1) Error:
 test_successful_build_data(DamageControl::CruiseControlLogParserTest):
-NameError: undefined local variable or method `num' for REXML::Encoding:Module
+NameError: undefined local variable or method `num' for \
+  REXML::Encoding:Module
     c:/ruby/lib/ruby/1.8/rexml/encodings/ISO-8859-1.rb:13
     c:/ruby/lib/ruby/1.8/rexml/encoding.rb:29:in `load'
     c:/ruby/lib/ruby/1.8/rexml/encoding.rb:29:in `encoding='
     c:/ruby/lib/ruby/1.8/rexml/source.rb:41:in `encoding='
     c:/ruby/lib/ruby/1.8/rexml/parsers/baseparser.rb:183:in `pull'
     c:/ruby/lib/ruby/1.8/rexml/parsers/pullparser.rb:45:in `pull'
-    ./damagecontrol/cruisecontrol/CruiseControlLogParser.rb:40:in `parse_top_level'
-    ./damagecontrol/cruisecontrol/CruiseControlLogParser.rb:27:in `parse'
-    ./damagecontrol/cruisecontrol/CruiseControlLogParser.rb:25:in `open'
-    ./damagecontrol/cruisecontrol/CruiseControlLogParser.rb:25:in `parse'
-    damagecontrol/cruisecontrol/CruiseControlLogParserTest.rb:14:in `test_successful_build_data'</computeroutput></screen>
+    ./damagecontrol/cruisecontrol/CruiseControlLogParser.rb:40:in \
+  `parse_top_level'
+    ./damagecontrol/cruisecontrol/CruiseControlLogParser.rb:27:in \
+  `parse'
+    ./damagecontrol/cruisecontrol/CruiseControlLogParser.rb:25:in \
+  `open'
+    ./damagecontrol/cruisecontrol/CruiseControlLogParser.rb:25:in \
+  `parse'
+    damagecontrol/cruisecontrol/CruiseControlLogParserTest.rb:14:in \
+  `test_successful_build_data'</computeroutput></screen>
 
               <para>This is because the REXML distributed with certain
               versions of Ruby is pretty crappy. So DamageControl includes its
@@ -2789,7 +2801,7 @@ NameError: undefined local variable or method `num' for REXML::Encoding:Module
 
               <para> then do:</para>
 
-              <programlisting><prompt># </prompt><userinput>ruby -I. damagecontrol/AllTests.rb</userinput></programlisting>
+              <screen><prompt># </prompt><userinput>ruby -I. damagecontrol/AllTests.rb</userinput></screen>
             </answer>
           </qandaentry>
 
@@ -2812,7 +2824,7 @@ NameError: undefined local variable or method `num' for REXML::Encoding:Module
               <methodname>with_working_dir</methodname> restores the previous
               working directory before it exits. Like this:</para>
 
-              <programlisting>require 'damagecontrol/util/FileUtils'
+              <programlisting role="ruby">require 'damagecontrol/util/FileUtils'
 include FileUtils
 
 with_working_dir("somedirectory") do
