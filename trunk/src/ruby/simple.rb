@@ -15,7 +15,10 @@ require 'damagecontrol/XMLRPCTrigger'
 
 include DamageControl 
 
-def start_simple_server(buildsdir, port = 4711, allow_ips = ["127.0.0.1"], params = {})
+def start_simple_server(params = {})
+  buildsdir = params[:BuildsDir] || "builds"
+  allow_ips = params[:AllowIPs] || ["127.0.0.1"]
+  port = params[:SocketTriggerPort] || 4711
   web_port = params[:WebPort] || 8080
   @hub = Hub.new
 

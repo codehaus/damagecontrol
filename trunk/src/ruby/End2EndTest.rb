@@ -85,7 +85,11 @@ class End2EndTest < Test::Unit::TestCase
     if(@@damagecontrol_started == false) then
       $:<<"#{damagecontrol_home}/src/ruby"
       require 'simple'
-      start_simple_server(buildsdir, 4713)
+      start_simple_server(
+        :BuildsDir => buildsdir,
+        :SocketTriggerPort => 4713, 
+        :WebPort => 8081, 
+        :AllowIPs => ["127.0.0.1" ])
       @@damagecontrol_started = true
     end
   end
