@@ -37,6 +37,7 @@ module Pebbles
     def start
       @in_queue_popper = Thread.new do
         while(true)
+puts "#{self} pop"
           o = @in_queue.pop
           @queue.shift
           break if o == @shutdown
