@@ -54,7 +54,6 @@ module DamageControl
   private
   
     def project_name
-      raise "project_name not specified" if request.query['project_name'].nil?
       request.query['project_name']
     end
     
