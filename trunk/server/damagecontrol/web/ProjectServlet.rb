@@ -143,7 +143,7 @@ module DamageControl
       if project_name
         project_search_form(:project_name => project_name)
       else
-        global_search_form
+        super
       end
     end
     
