@@ -36,11 +36,11 @@ def server.init_custom_components
  # require 'damagecontrol/publisher/GraphPublisher'
  # component(:graph_publisher, GraphPublisher.new(hub, project_directories, build_history_repository))
   
-  require 'damagecontrol/publisher/EmailPublisher'
-  component(:email_publisher, EmailPublisher.new(hub, build_history_repository,
-    :SubjectTemplate => "short_text_build_result.erb", 
-    :BodyTemplate => "short_html_build_result.erb", 
-    :FromEmail => "dcontrol@builds.codehaus.org"))
+#  require 'damagecontrol/publisher/EmailPublisher'
+#  component(:email_publisher, EmailPublisher.new(hub, build_history_repository,
+#    :SubjectTemplate => "short_text_build_result.erb", 
+#    :BodyTemplate => "short_html_build_result.erb", 
+#    :FromEmail => "dcontrol@builds.codehaus.org"))
   
 end
 
