@@ -134,11 +134,6 @@ module RSCM
       false
     end
 
-    # Whether the command denoted by +trigger_command+ is installed in the SCM.
-    #
-    def trigger_installed?(trigger_command, trigger_files_checkout_dir)
-    end
-
     # Installs +trigger_command+ in the SCM.
     # The +install_dir+ parameter should be an empty local
     # directory that the SCM can use for temporary files
@@ -150,7 +145,12 @@ module RSCM
 
     # Uninstalls +trigger_command+ from the SCM.
     #
-    def uninstall_trigger(trigger_command, trigger_files_checkout_dir)
+    def uninstall_trigger(trigger_command, install_dir)
+    end
+
+    # Whether the command denoted by +trigger_command+ is installed in the SCM.
+    #
+    def trigger_installed?(trigger_command, install_dir)
     end
 
     # The command line to run in order to check out a fresh working copy.

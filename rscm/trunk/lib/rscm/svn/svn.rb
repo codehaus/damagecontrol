@@ -120,8 +120,17 @@ module RSCM
       if(local?)
         File.exists?("#{svnrootdir}/db")
       else
-        # don't know. assume yes.
-        true
+        # Do a simple command over the network
+        # If the repo/path doesn't exist, we'll get zero output
+        # on stdout (and an error msg on std err).
+        exists = false
+        cmd = "svn log #{url} -r HEAD"
+        IO.popen(cmd) do |stdout|
+          stdout.each_line do |line|
+            exists = true
+          end
+        end
+        exists
       end
     end
 

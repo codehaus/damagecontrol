@@ -1,9 +1,11 @@
+require 'rscm'
+
 class ProjectController < ApplicationController
 
   layout 'rscm'
 
   def index
-    @projects = RSCM::Project.find_all
+    @projects = find_all_projects
   end
 
   def view

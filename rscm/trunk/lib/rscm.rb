@@ -1,6 +1,5 @@
 require 'rscm/changes'
 require 'rscm/directories'
-require 'rscm/threadfile'
 require 'rscm/project'
 require 'rscm/tracker'
 require 'rscm/abstract_scm'
@@ -36,5 +35,23 @@ module RSCM
 #    SCMWeb::ViewCVS.new, 
 #    SCMWeb::Fisheye.new
   ]
+  
+end
 
+if(__FILE__ == $0)
+  # Run as server
+  require 'drb'
+
+  class RSCMServer
+    def find_all_projects
+      RSCM::Project.find_all
+    end
+
+    def load_project(name)
+      RSCM::Project.load(name)
+    end
+  end
+
+  DRb.start_service('druby://localhost:9000', RSCMServer.new)  
+  DRb.thread.join # Don't exit just yet!
 end

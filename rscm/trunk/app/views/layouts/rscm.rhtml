@@ -1,15 +1,53 @@
 <html>
-<head>
-<title>RSCM</title>
-<link type="text/css" rel="stylesheet" href="/stylesheets/style.css">
-</head>
-<body onLoad="executeOnLoad()">
-<script>
+  <head>
+    <title>RSCM</title>
+    <link type="text/css" rel="stylesheet" href="/stylesheets/style.css">
+    <script>
 // http://developer.irt.org/script/1428.htm - add timezone
 function intercept(a) {
   if(a.href.indexOf('?') == -1) a.href += '?'; else a.href += '&';
   a.href += 'timezone=' + new Date().getTimezoneOffset()
 }
-</script>
+    </script>
+  </head>
+  <body onLoad="executeOnLoad()">
+
+<table id="header" cellpadding="0" cellspacing="0" width="100%" border="0">
+  <tr id="top-panel">
+    <td>
+      <a href="http://damagecontrol.codehaus.org/"><img class="logo" src="images/damagecontrol-logo.gif"/></a>
+    </td>
+  </tr>
+  <tr id="top-nav">
+    <td id="left-top-nav">
+      <%= link_to("Home") + @controller.breadcrumbs.collect { |p| link_to(p) }.join(" > ") %>
+    </td>
+  </tr>
+</table>
+
+<table id="main-table" width="100%" height="70%" border="0">
+<tr>
+
+<td id="side-panel" width="20%">
+  <div id="tasks">  
+    <% @tasks.each do |task| %>
+      <div class="task"><%= task %></div>
+    <% end %>  
+  </div>
+</td>
+
+<td id="main-panel" width="80%" height="100%">
 <%= @content_for_layout %>
-</body></html>
+</td>
+
+</tr>
+
+<tr><td id="footer" colspan="2" background="images/footer_grad.gif">
+This stuff displays best in a Mozilla based browser. Try <a href="http://www.mozilla.org/products/firefox/">Firefox</a>.
+<br>
+</td></tr>
+
+</table>
+
+</body>
+</html>

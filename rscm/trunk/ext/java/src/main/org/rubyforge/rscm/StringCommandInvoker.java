@@ -20,6 +20,12 @@ public class StringCommandInvoker {
         this.argSeparator = argSeparator;
     }
 
+    /**
+     * Invokes a method.
+     *
+     * @param command String of format
+     * <pre>new fully.qualified.ClassName("any", "number", "of").someMethod("string", arguments)</pre>
+     */
     public Object invoke(String command) throws ClassNotFoundException, NoSuchMethodException, IllegalAccessException, InvocationTargetException, InstantiationException {
         Matcher m = newInvocationPattern.matcher(command);
         if (m.matches()) {

@@ -12,14 +12,10 @@
     </content>
     <orderEntry type="inheritedJdk" />
     <orderEntry type="sourceFolder" forTests="false" />
-    <orderEntry type="library" name="groovy-20040624.203614" level="application" />
-    <orderEntry type="library" name="junit-3.8.1" level="application" />
-    <orderEntry type="library" name="jmock-1.0.1" level="application" />
-    <orderEntry type="library" name="jmock-cglib-1.0.1" level="application" />
     <orderEntry type="module-library">
       <library>
         <CLASSES>
-          <root url="jar://C:/Program Files/Borland/StarTeam SDK 6.0/Lib/starteam60.jar!/" />
+          <root url="jar://C:/Program Files/Borland/StarTeam SDK 2005/Lib/starteam70.jar!/" />
         </CLASSES>
         <JAVADOC />
         <SOURCES />
@@ -28,7 +24,7 @@
     <orderEntry type="module-library">
       <library>
         <CLASSES>
-          <root url="jar://C:/Program Files/Borland/StarTeam SDK 6.0/Lib/ss.jar!/" />
+          <root url="jar://C:/ngst/external/apache-ant-1.6.2/lib/ant-starteam.jar!/" />
         </CLASSES>
         <JAVADOC />
         <SOURCES />
@@ -37,15 +33,21 @@
     <orderEntry type="module-library">
       <library>
         <CLASSES>
-          <root url="jar://C:/Program Files/Borland/StarTeam SDK 6.0/Lib/starteam60-resources.jar!/" />
+          <root url="jar://C:/ngst/external/apache-ant-1.6.2/lib/ant.jar!/" />
         </CLASSES>
         <JAVADOC />
         <SOURCES />
       </library>
     </orderEntry>
-    <orderEntry type="library" name="cglib-full-2.0" level="application" />
-    <orderEntry type="library" name="ant-1.6" level="application" />
-    <orderEntry type="library" name="ant-starteam" level="application" />
+    <orderEntry type="module-library">
+      <library>
+        <CLASSES>
+          <root url="jar://C:/ngst/external/apache-ant-1.6.2/lib/junit-3.8.1.jar!/" />
+        </CLASSES>
+        <JAVADOC />
+        <SOURCES />
+      </library>
+    </orderEntry>
     <orderEntryProperties />
   </component>
 </module>

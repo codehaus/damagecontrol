@@ -1,6 +1,5 @@
-require 'erb'
-require 'rscm'
-require 'rscm/tracker'
+#require 'rscm'
+#require 'rscm/tracker'
 
 class AdminController < ApplicationController
 

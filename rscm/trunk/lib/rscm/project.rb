@@ -1,9 +1,11 @@
 require 'yaml'
+require 'drb'
 require 'fileutils'
 require 'rscm/directories'
 
 module RSCM
   class Project
+    include DRb::DRbUndumped
 
     attr_accessor :name
     attr_accessor :description
