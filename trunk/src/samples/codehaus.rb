@@ -11,13 +11,13 @@ require 'damagecontrol/IRCPublisher'
 
 include DamageControl
 
-project = Project.new("picocontainer")
-project.basedir = "~/pico"
-project.build_command_line = "maven jar:install"
+build = Build.new("picocontainer")
+build.basedir = "~/pico"
+build.build_command_line = "maven jar:install"
 hub = Hub.new
 BuildExecutor.new(hub)
 IRCPublisher.new(hub, server, channel).start
-SocketTrigger.new(hub,project).start
+SocketTrigger.new(hub, build).start
 
 # sleep until ctrl-c
 sleep
