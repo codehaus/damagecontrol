@@ -3,13 +3,15 @@ package damagecontrol;
 /**
  * 
  * @author Aslak Helles&oslash;y
- * @version $Revision: 1.1 $
+ * @version $Revision: 1.2 $
  */
 public class MockBuilder implements Builder {
     private long buildDurationMillis;
     private int buildCount;
+    private String name;
 
-    public MockBuilder(long buildDurationMillis) {
+    public MockBuilder(String name, long buildDurationMillis) {
+        this.name = name;
         this.buildDurationMillis = buildDurationMillis;
     }
 
@@ -26,4 +28,11 @@ public class MockBuilder implements Builder {
         return buildCount;
     }
 
+    public String getName() {
+        return name;
+    }
+
+    public String toString() {
+        return getName();
+    }
 }

@@ -5,20 +5,21 @@ package damagecontrol;
  * It's up to the concrete build schedulers to implement the
  * strategy for when/how to invoke a build.
  *
- * TODO: one BuildScheduler per Builder or one per machine?
- * We want to make sure that builds for several projects
- * aren't run simultaneously.
- *
  * @author Aslak Helles&oslash;y
  * @author Jon Tirs&eacute;n
- * @version $Revision: 1.1 $
+ * @version $Revision: 1.2 $
  */
 public interface BuildScheduler {
-    // TODO take a Builder as arg?
-    void requestBuild();
+    /**
+     * Requests a build.
+     * @param builder the builder that will perform the build.
+     */
+    void requestBuild(Builder builder);
 
-    // TODO move to Builder? It's nice to avoid threading in Builder impls.
-    // If we move this method to Builder, we have blocking issues. Better keep it
-    // here. Maybe take Builder as arg here too.
-    boolean isBuildRunning();
+    /**
+     * Returns the currently running Builder. If no builder is
+     * currently running, null is returned.
+     * @return currently running Builder.
+     */
+    Builder getCurrentlyRunningBuilder();
 }

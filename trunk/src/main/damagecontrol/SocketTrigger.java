@@ -9,6 +9,9 @@ import java.io.PrintWriter;
 import java.io.InputStream;
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
+import java.util.StringTokenizer;
+import java.util.Map;
+import java.util.HashMap;
 
 /**
  * This class is a socket gateway to DC. It listens for connection
@@ -20,18 +23,19 @@ import java.io.InputStreamReader;
  * <P>
  * @author Aslak Helles&oslash;y
  * @author Jon Tirs&eacute;e
- * @version $Revision: 1.1 $
+ * @version $Revision: 1.2 $
  */
 public class SocketTrigger {
     public static final String BUILD = "BUILD";
 
-    private BuildScheduler builder;
+    private BuildScheduler buildScheduler;
     private int port;
     ServerSocket serverSocket;
     Thread listener;
+    private Map builders = new HashMap();
 
-    public SocketTrigger(BuildScheduler builder, int port) {
-        this.builder = builder;
+    public SocketTrigger(BuildScheduler buildScheduler, int port) {
+        this.buildScheduler = buildScheduler;
         this.port = port;
     }
 
@@ -46,9 +50,15 @@ public class SocketTrigger {
 
                         InputStream inputStream = socket.getInputStream();
                         BufferedReader in = new BufferedReader(new InputStreamReader(inputStream));
-                        String command = in.readLine();
+                        String commandLine = in.readLine();
+
+                        StringTokenizer commandTokenizer = new StringTokenizer(commandLine);
+                        String command = commandTokenizer.nextToken();
                         if(BUILD.equals(command)) {
-                            builder.requestBuild();
+                            String projectName = commandTokenizer.nextToken();
+                            Builder builder = getBuilder(projectName);
+
+                            buildScheduler.requestBuild(builder);
                         }
 
                         OutputStream outputStream = socket.getOutputStream();
@@ -65,6 +75,10 @@ public class SocketTrigger {
         listener.start();
     }
 
+    private Builder getBuilder(String projectName) {
+        return (Builder) builders.get(projectName);
+    }
+
     public void stop() throws IOException, InterruptedException {
         serverSocket.close();
         listener.interrupt();
@@ -77,12 +91,12 @@ public class SocketTrigger {
     public static void main(String[] args) {
         try {
             SocketTrigger socketTrigger = new SocketTrigger(new BuildScheduler() {
-                public void requestBuild() {
-                    System.out.println("BUILDING");
+                public void requestBuild(Builder builder) {
+                    System.out.println("Build requested for " + builder.getName());
                 }
 
-                public boolean isBuildRunning() {
-                    return true;
+                public Builder getCurrentlyRunningBuilder() {
+                    return null;
                 }
 
             }, 4711);

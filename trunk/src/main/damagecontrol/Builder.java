@@ -9,7 +9,7 @@ package damagecontrol;
  * that is responsible for invoking the actual build.
  * 
  * @author Aslak Helles&oslash;y
- * @version $Revision: 1.1 $
+ * @version $Revision: 1.2 $
  */
 public interface Builder {
     /**
@@ -25,4 +25,6 @@ public interface Builder {
      * @return the build number.
      */
     int getBuildNumber();
+
+    String getName();
 }

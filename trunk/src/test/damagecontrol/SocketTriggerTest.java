@@ -15,7 +15,7 @@ import java.net.Socket;
  *
  * @author Aslak Helles&oslash;y
  * @author Jon Tirs&eacute;n
- * @version $Revision: 1.1 $
+ * @version $Revision: 1.2 $
  */
 public class SocketTriggerTest extends TestCase {
     private SocketTrigger socketTrigger;
@@ -23,12 +23,15 @@ public class SocketTriggerTest extends TestCase {
 
     protected void setUp() throws Exception {
         BuildScheduler mockBuildScheduler = new BuildScheduler() {
-            public void requestBuild() {
+            private Builder builder;
+
+            public void requestBuild(Builder builder) {
+                this.builder = builder;
                 buildRequestCount++;
             }
 
-            public boolean isBuildRunning() {
-                return false;
+            public Builder getCurrentlyRunningBuilder() {
+                return builder;
             }
         };
 
@@ -44,11 +47,11 @@ public class SocketTriggerTest extends TestCase {
 
     public void testConnectToSocketOnceWillRequestBuild() throws IOException {
         assertEquals(0, buildRequestCount);
-        requestOnSocket(SocketTrigger.BUILD);
+        requestOnSocket(SocketTrigger.BUILD + " testproject");
         assertEquals(1, buildRequestCount);
     }
 
-    public void testLaunchOtherThaOnBuildCommandWillNotTriggerBuild() throws IOException {
+    public void testLaunchOtherThanBuildCommandWillNotTriggerBuild() throws IOException {
         assertEquals(0, buildRequestCount);
         requestOnSocket("NONSENSE");
         assertEquals(0, buildRequestCount);
@@ -57,7 +60,7 @@ public class SocketTriggerTest extends TestCase {
     public void testConnectToSocketMoreThanOnceWillRequestBuildMoreThanOnce() throws IOException {
         for (int i = 0; i < 10; i++) {
             assertEquals(i, buildRequestCount);
-            requestOnSocket(SocketTrigger.BUILD);
+            requestOnSocket(SocketTrigger.BUILD + " testproject");
             assertEquals(i + 1, buildRequestCount);
         }
     }
