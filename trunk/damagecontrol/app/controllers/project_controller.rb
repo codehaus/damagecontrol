@@ -4,6 +4,10 @@ require 'damagecontrol/diff_parser'
 require 'damagecontrol/diff_htmlizer'
 
 class ProjectController < ApplicationController
+
+  # TODO: check if the various SCMs are installed and disable them with a warning if not.
+  # Each SCM class should have an available? method
+
   SCMS = [
 # Uncomment this to see Mooky in action in the web interface!
 #    RSCM::Mooky,

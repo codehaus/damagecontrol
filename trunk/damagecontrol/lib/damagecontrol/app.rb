@@ -4,14 +4,15 @@ require 'needle'
 require_gem 'rscm'
 require 'damagecontrol/poller'
 
+
+REGISTRY = Needle::Registry.define do |b|
+  b.poller     { DamageControl::Poller.new }
+  b.drb_server { DamageControl::DrbServer.new('druby://localhost:9000') }
+end
+  
 module DamageControl
 
   class App
-    REGISTRY = Needle::Registry.define do |b|
-      b.poller     { DamageControl::Poller.new }
-      b.drb_server { DamageControl::DrbServer.new('druby://localhost:9000') }
-    end
-  
     def run
       REGISTRY.poller.start
       REGISTRY.drb_server.start

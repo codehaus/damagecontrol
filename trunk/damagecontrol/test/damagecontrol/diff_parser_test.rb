@@ -1,10 +1,15 @@
 require 'test/unit'
 require 'rscm/tempdir'
+require 'rscm/path_converter'
 require 'damagecontrol/diff_parser'
 
-# TODO: how do we make this work cross platform??
+# TODO: how do we make this work cross platform in a nicer way?
 # Play more with $/, $\ and such
-NL = "\r\n"
+if(WINDOWS)
+  NL = "\n"
+else
+  NL = "\r\n"
+end
 
 module DamageControl
   class DiffParserTest < Test::Unit::TestCase

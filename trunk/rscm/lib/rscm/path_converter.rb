@@ -50,11 +50,12 @@ module RSCM
 
     def filepath_to_nativeurl(path)
       return nil if path.nil?
-      if(CYGWIN || WIN32)
+      if(WINDOWS)
         urlpath = filepath_to_nativepath(path, false).gsub(/\\/, "/")
-        path = "/#{urlpath}"
+        "file:///#{urlpath}"
+      else
+        "file://#{File.expand_path(path)}"
       end
-      "file://#{File.expand_path(path)}"
     end
 
     def nativepath_to_filepath(path)

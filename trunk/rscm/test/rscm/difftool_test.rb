@@ -1,5 +1,6 @@
 require 'test/unit'
 require 'rscm/tempdir'
+require 'rscm/path_converter'
 
 module Test
   module Unit
@@ -8,10 +9,14 @@ module Test
       # useful when comparing big strings
       def assert_equal_with_diff(expected, actual)
         dir = RSCM.new_temp_dir("diff")
-        File.open("#{dir}/expected", "w") {|io| io.write(expected)}
-        File.open("#{dir}/actual", "w") {|io| io.write(actual)}
+        
+        expected_file = "#{dir}/expected"
+        actual_file = "#{dir}/actual"
+        File.open(expected_file, "w") {|io| io.write(expected)}
+        File.open(actual_file, "w") {|io| io.write(actual)}
 
-        IO.popen("diff #{dir}/expected #{dir}/actual") do |io|
+        difftool = WINDOWS ? File.dirname(__FILE__) + "/../../bin/diff.exe" : "diff"
+        IO.popen("#{difftool} #{RSCM::PathConverter.filepath_to_nativepath(expected_file, false)} #{RSCM::PathConverter.filepath_to_nativepath(actual_file, false)}") do |io|
           diff = io.read
           assert_equal("", diff, diff)
         end
