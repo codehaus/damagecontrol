@@ -32,6 +32,10 @@ module RSCM
       "Perforce"
     end
 
+    def transactional?
+      true
+    end
+
     def import(dir, comment)
       with_create_client(dir) do |client|
         client.add_all(list_files)

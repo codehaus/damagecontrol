@@ -1,5 +1,6 @@
 require 'drb'
 require 'rscm'
+require 'needle'
 
 module RSCM
   # The Server is an object that is bound as a Drb top-level
@@ -22,9 +23,11 @@ module RSCM
   
 end
 
-POLLER = RSCM::Poller.new
-POLLER.add_all_projects
-POLLER.start(10)
+REGISTRY = Needle::Registry.define do |b|
+  b.poller { RSCM::Poller.new }
+end
+
+REGISTRY.poller.start
 
 url = 'druby://localhost:9000'
 DRb.start_service(url, RSCM::Server.new)  

@@ -49,6 +49,12 @@ module RSCM
       # determined programmatically.
       true
     end
+    
+    # Whether or not this SCM is transactional.
+    #
+    def transactional?
+      false
+    end
 
     # Creates a new repository. Throws an exception if the
     # repository cannot be created.

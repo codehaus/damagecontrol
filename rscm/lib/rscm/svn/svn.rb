@@ -29,6 +29,10 @@ module RSCM
       svn(checkout_dir, "add #{relative_filename}")
     end
 
+    def transactional?
+      true
+    end
+
     def checkout(checkout_dir)
       checkout_dir = PathConverter.filepath_to_nativepath(checkout_dir, false)
       mkdir_p(checkout_dir)

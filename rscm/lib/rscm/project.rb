@@ -2,6 +2,7 @@ require 'yaml'
 require 'drb'
 require 'rss/maker'
 require 'fileutils'
+require 'rscm/logging'
 require 'rscm/directories'
 require 'rscm/time_ext'
 require 'rscm/changes'
@@ -35,7 +36,10 @@ module RSCM
     attr_accessor :scm
     attr_accessor :tracker
     attr_accessor :scm_web
-  
+
+    # How long to sleep between each changesets invocation for non-transactional SCMs  
+    attr_accessor :quiet_period
+
     # Loads the project with the given +name+.
     def Project.load(name)
       File.open(Directories.project_config_file(name)) do |io|
@@ -84,7 +88,7 @@ module RSCM
       end
     end
 
-    # Polls SCM for new changesets and updates
+    # Polls SCM for new changesets and yields them to the given block. and updates
     # RSS and YAML files on disk. If this is the first poll (i.e. no changesets have
     # been previously stored on disk), then changesets since +from_if_first_poll+
     # will be retrieved.
@@ -94,55 +98,25 @@ module RSCM
 
       from = next_changeset_identifier || from_if_first_poll
       
-puts "Getting changesets for #{name} from #{from}"
-      # TODO: Use a yield model here so we don't have to cache as much in memory.
+      Log.info "Getting changesets for #{name} from #{from}"
       changesets = @scm.changesets(checkout_dir, from)
-
-puts "Got changesets for #{@name} in #{Time.now.difference_as_text(start)}"
-      start = Time.now
-
-      if(changesets.empty?)
-puts "No changesets for #{name} from #{from}"
-      else
-      
-        # Save the changesets to disk as YAML
-puts "Saving changesets for #{@name}"
-        changesets.accept(changesets_persister)
-puts "Saved changesets for #{@name} in #{Time.now.difference_as_text(start)}"
-      start = Time.now
-
-        # Get the diff for each change and save them.
-        # They may be turned into HTML on the fly later (quick)
-puts "Getting diffs for #{@name}"
-        dp = RSCM::Visitor::DiffPersister.new(@scm, @name)
-        changesets.accept(dp)
-puts "Saved diffs for #{@name} in #{Time.now.difference_as_text(start)}"
-      start = Time.now
-
-        # Now we need to update the RSS. The RSS spec says max 15 items in a channel,
-        # (http://www.chadfowler.com/ruby/rss/)
-        # We'll get upto the latest 15 changesets and turn them into RSS.
-puts "Generating RSS for #{@name}"
-        last_changesets = changesets_persister.load_upto(changesets_persister.latest_id, 15)
-        RSS::Maker.make("2.0") do |rss|
-          FileUtils.mkdir_p(File.dirname(changesets_rss_file))
-          File.open(changesets_rss_file, "w") do |io|
-            rss_writer = RSCM::Visitor::RssWriter.new(
-              rss,
-              "Changesets for #{@name}",
-              "http://localhost:4712/", # TODO point to web version of changeset
-              @description, 
-              @tracker || Tracker::Null.new, 
-              @scm_web || SCMWeb::Null.new        
-            )
-            last_changesets.accept(rss_writer)
-            io.write(rss.to_rss)
-          end
+      if(!@scm.transactional?)
+        # We're dealing with a non-transactional SCM (like CVS/StarTeam/ClearCase),
+        # unlike Subversion/Monotone. Sleep a little, get the changesets again.
+        # When the changesets are not changing, we can consider the last commit done.
+        commit_in_progress = true
+        while(commit_in_progress)
+          @quiet_period ||= 5
+          Log.info "Sleeping for #{@quiet_period} secs since #{name}'s SCM (#{@scm.name}) is not transactional."
+          sleep @quiet_period
+          next_changesets = @scm.changesets(checkout_dir, from)
+          commit_in_progress = changesets != next_changesets
+          changesets = next_changesets
         end
-puts "Generated diffs for #{@name} in #{Time.now.difference_as_text(start)}"
-puts "Polled everyting from #{@name} in #{Time.now.difference_as_text(all_start)}"
-
+        Log.info "Quiet period elapsed for #{name}"
       end
+      Log.info "Got changesets for #{@name} in #{Time.now.difference_as_text(start)}"
+      yield changesets
     end
 
     # Returns the id (string label or time) that should be used to get the next (unrecorded)

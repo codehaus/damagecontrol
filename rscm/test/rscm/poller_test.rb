@@ -7,7 +7,7 @@ module RSCM
     include MockIt
   
     def test_should_not_add_projects_twice
-      s = Poller.new
+      s = Poller.new(0)
       a1 = Project.new; a1.name = "jalla"
       s.add_project(a1)
       assert_equal([a1], s.projects)
@@ -26,7 +26,7 @@ module RSCM
       p.__expect(:scm_exists?){true}
       p.__expect(:poll)
 
-      s = Poller.new
+      s = Poller.new(0)
       s.add_project(p)
       s.poll
     end
@@ -37,9 +37,9 @@ module RSCM
       p.__expect(:scm_exists?){true}
       p.__expect(:poll)
 
-      s = Poller.new
+      s = Poller.new(2)
       s.add_project(p)
-      s.start(2)
+      s.start
       sleep 3
       s.stop
     end
