@@ -70,7 +70,7 @@ module DamageControl
               task(:icon => "icons/box_into.png", :name => "Clone project", :url => "configure?project_name=#{project_name}&action=clone_project"),
               task(:icon => "icons/wrench.png", :name => "Configure", :url => "configure?project_name=#{project_name}&action=configure"),
               task(:icon => "icons/gears_run.png", :name => "Trig build now", :url => "?project_name=#{project_name}&action=trig_build"),
-              task(:icon => "icons/folders.png", :name => "Clean out working files", :url => "?project_name=#{project_name}&action=clean_out_working_files"),
+              task(:icon => "icons/garbage.png", :name => "Clean out working files", :url => "?project_name=#{project_name}&action=clean_out_working_files"),
             ]
         end
         result +=
