@@ -108,7 +108,7 @@ class ProjectController < ApplicationController
     @changesets = @project.changesets(last_changeset_identifier.to_identifier, 1)    
     @changesets.accept(HtmlDiffVisitor.new(@project))
   end
-
+  
 protected
 
   # Visitor that adds a method called +html_diff+ to each change

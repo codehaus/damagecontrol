@@ -138,5 +138,11 @@ module DamageControl
         builds[1].execute("this should fail because command file exists")
       end
     end
+    
+    def test_should_convert_to_xml
+      p = Project.new
+      p.name = "aslak"
+      puts p.to_xml
+    end
   end
 end

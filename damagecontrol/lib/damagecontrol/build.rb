@@ -45,6 +45,7 @@ module DamageControl
 
       begin
         with_working_dir(checkout_dir) do
+          ENV['PKG_BUILD'] = "456"
           IO.popen(command_line) do |io|
             File.open(pid_file, "w") do |pid_io|
               pid_io.write(pid)

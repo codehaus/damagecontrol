@@ -5,7 +5,7 @@ module DamageControl
   module Visitor
 
     # Visitor that executes a build for each visited changeset.
-    # 
+    # TODO: THIS CLASS IS NOT USED YET - FINISH IT. PASS A BLOCK TO CTOR.
     class BuildExecutor
       # Creates a new BuildExecutor that will build the project for
       # each visited changeset. The +description+ will be persisted
