@@ -8,15 +8,15 @@
                         <value>
                             <struct>
                                 <member>
-                                    <name>status</name>
-                                    <value>
-                                        <string>SUCCESSFUL</string>
-                                    </value>
-                                </member>
-                                <member>
                                     <name>timestamp</name>
                                     <value>
                                         <string>20040316225946</string>
+                                    </value>
+                                </member>
+                                <member>
+                                    <name>status</name>
+                                    <value>
+                                        <string>SUCCESSFUL</string>
                                     </value>
                                 </member>
                                 <member>
@@ -70,15 +70,15 @@
                         <value>
                             <struct>
                                 <member>
-                                    <name>status</name>
-                                    <value>
-                                        <string>FAILED</string>
-                                    </value>
-                                </member>
-                                <member>
                                     <name>timestamp</name>
                                     <value>
                                         <string>20040316225948</string>
+                                    </value>
+                                </member>
+                                <member>
+                                    <name>status</name>
+                                    <value>
+                                        <string>FAILED</string>
                                     </value>
                                 </member>
                                 <member>
@@ -105,6 +105,18 @@
                                                         <data>
                                                             <value>
                                                                 <struct>
+                                                                    <member>
+                                                                        <name>message</name>
+                                                                        <value>
+                                                                            <string>tjo bing</string>
+                                                                        </value>
+                                                                    </member>
+                                                                    <member>
+                                                                        <name>time</name>
+                                                                        <value>
+                                                                            <dateTime.iso8601>20040705T12:00:02</dateTime.iso8601>
+                                                                        </value>
+                                                                    </member>
                                                                     <member>
                                                                         <name>changes</name>
                                                                         <value>
@@ -192,6 +204,12 @@
                                                                                     </value>
                                                                                 </data>
                                                                             </array>
+                                                                        </value>
+                                                                    </member>
+                                                                    <member>
+                                                                        <name>developer</name>
+                                                                        <value>
+                                                                            <string>jon</string>
                                                                         </value>
                                                                     </member>
                                                                     <member>

@@ -14,7 +14,7 @@ module DamageControl
       if(checked_out?)
         svn(working_dir, update_command(time), &proc)
       else
-        svn(working_dir_root, checkout_command(time), &proc)
+        svn(checkout_dir, checkout_command(time), &proc)
       end
     end
 
@@ -28,6 +28,12 @@ module DamageControl
           puts line
         end
       end
+    end
+
+    def working_dir
+      # yeah, @svnurl is not a file path, but this works
+      subdir = File.basename(@svnurl)
+      "#{checkout_dir}/#{subdir}"
     end
 
   private
@@ -49,7 +55,8 @@ module DamageControl
     end
     
     def changes_command(from_time, to_time)
-      "log -v -r {\"#{svndate(from_time)}\"}:{\"#{svndate(to_time)}\"} #{@svnurl}"
+#      "log -v -r {\"#{svndate(from_time)}\"}:{\"#{svndate(to_time)}\"} #{@svnurl}"
+      "log -v -r HEAD #{@svnurl}"
     end
 
     def svndate(time)
@@ -84,7 +91,8 @@ module DamageControl
       hack = "" unless hack
       @repo_url = "file://#{hack}#{@svnrootdir}"
       @project_url = "#{@repo_url}/#{subdir}"
-      super("svnurl" => @project_url, "working_dir" => "#{basedir}/checkout/#{subdir}")
+      super("svnurl" => @project_url, "checkout_dir" => "#{basedir}/checkout")
+      @subdir = subdir
     end
 
     def create
@@ -93,7 +101,7 @@ module DamageControl
 
     def import(dir)
       basename = File.basename(dir)
-      svn(dir, "import #{dir} #{config_map['svnurl']} -m \"initial import\"")
+      svn(dir, "import #{dir} #{@svnurl} -m \"initial import\"")
     end
 
     def add_file(relative_filename, content, is_new)

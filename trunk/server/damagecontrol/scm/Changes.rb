@@ -40,6 +40,11 @@ EOF
       @changesets == other.changesets
     end
 
+    # adds a Change or a ChangeSet
+    # if the argument is a Change and no corresponding ChangeSet exist,
+    # then a new ChangeSet is created, added, and the Change is added to that ChangeSet -
+    # and then finally the newly created ChangeSet is returned.
+    # Otherwise nil is returned.
     def add(change_or_changeset)
       if(change_or_changeset.is_a?(ChangeSet))
         @changesets << change_or_changeset
@@ -47,11 +52,16 @@ EOF
       else
         changeset = @changesets.find { |a_changeset| a_changeset.can_contain?(change_or_changeset) }
         if(changeset.nil?)
-          changeset = ChangeSet.new 
+          changeset = ChangeSet.new
+          changeset.developer = change_or_changeset.developer
+          changeset.message = change_or_changeset.message
+          changeset.time = change_or_changeset.time
           @changesets << changeset
+          changeset << change_or_changeset
+          return changeset
         end
         changeset << change_or_changeset
-        return changeset
+        return nil
       end
     end
     
@@ -74,6 +84,9 @@ EOF
 
     attr_reader :changes
     attr_accessor :revision
+    attr_accessor :developer
+    attr_accessor :message
+    attr_accessor :time
 
     def initialize()
       @changes = []
@@ -99,18 +112,6 @@ EOF
       @changes == other.changes
     end
 
-    def developer
-      @changes[0].developer
-    end
-
-    def message
-      @changes[0].message
-    end
-
-    def time
-      @changes[0].time
-    end
-    
     def can_contain?(change)
       self.developer == change.developer &&
       self.message == change.message
@@ -124,11 +125,20 @@ EOF
     def time_difference(format_time=Time.new.utc)
       time_difference = format_time.difference_as_text(time)
     end
+    
+    def to_s
+      "#{revision} | #{developer} | #{time}"
+    end
   end
 
   class Change
     include XMLRPC::Marshallable
     include Pebbles::Matchable
+    
+    MODIFIED = "MODIFIED"
+    DELETED = "DELETED"
+    ADDED = "ADDED"
+    MOVED = "MOVED"
     
     def initialize(path="", developer="", message="", revision="", time="")
       @path, @developer, @message, @revision, @time = path, developer, message, revision, time
@@ -138,7 +148,7 @@ EOF
       "#{path} #{developer} #{revision} #{time}"
     end
   
-    attr_accessor :deleted
+    attr_accessor :status
     attr_accessor :developer
     attr_accessor :message
     attr_accessor :path

@@ -21,7 +21,7 @@ module DamageControl
       assert(!@parser.had_error?, "parser had errors")
     end
     
-    def Xtest_read_log_entry
+    def test_read_log_entry
       assert_equal("blahblah\n", @parser.read_log_entry(StringIO.new("blahblah\n============\nubbaubba\n===========")))
       assert_equal(nil, @parser.read_log_entry(StringIO.new("")))
       assert_equal(nil, @parser.read_log_entry(StringIO.new("============\n===========")))
@@ -37,7 +37,7 @@ module DamageControl
       end
     end
     
-    def Xtest_parse_changes
+    def test_parse_changes
       changesets = ChangeSets.new
       @parser.parse_changes(LOG_ENTRY, changesets)
       assert_equal(4, changesets.length)
@@ -45,18 +45,18 @@ module DamageControl
       assert_match(/linux-windows galore/, changesets[2][0].message)
     end
     
-    def Xtest_sets_previous_revision_to_one_before_the_current
+    def test_sets_previous_revision_to_one_before_the_current
       change = @parser.parse_change(CHANGE_ENTRY)
       assert_equal("1.20", change.revision)
       assert_equal("1.19", change.previous_revision)
     end
     
-    def Xtest_can_determine_previous_revisions_from_tricky_input
+    def test_can_determine_previous_revisions_from_tricky_input
       assert_equal("2.2.1.1", @parser.determine_previous_revision("2.2.1.2"))
       assert_equal(nil, @parser.determine_previous_revision("2.2.1.1"))
     end
 
-    def Xtest_parse_change
+    def test_parse_change
       change = @parser.parse_change(CHANGE_ENTRY)
       assert_equal("1.20", change.revision)
       assert_equal(Time.utc(2003,11,9,17,53,37), change.time)
@@ -64,7 +64,7 @@ module DamageControl
       assert_match(/Quiet period is configurable for each project/, change.message)
     end
     
-    def Xtest_can_split_entries_separated_by_line_of_dashes
+    def test_can_split_entries_separated_by_line_of_dashes
       entries = @parser.split_entries(LOG_ENTRY)
       assert_equal(5, entries.length)
       assert_equal(CHANGE_ENTRY, entries[1])
@@ -76,7 +76,7 @@ date: 2003/11/09 17:53:37;  author: tirsen;  state: Exp;  lines: +3 -4
 Quiet period is configurable for each project
 EOF
 
-    def Xtest_log_from_e2e_test
+    def test_log_from_e2e_test
       io = StringIO.new(LOG_FROM_E2E_TEST)
       changesets = @parser.parse_changesets_from_log(io)
       assert_equal(2, changesets.length)
@@ -141,7 +141,7 @@ o EmailPublisher
 =============================================================================
     EOF
     
-    def Xtest_can_parse_path
+    def test_can_parse_path
       assert_equal("testdata/damagecontrolled/src/java/com/thoughtworks/damagecontrolled/Thingy.java", 
         @parser.parse_path(LOG_ENTRY_FROM_05_07_2004_19_42))
     end
@@ -161,7 +161,7 @@ total revisions: 1; selected revisions: 1
 description:
 EOF
 
-    def Xtest_can_parse_LOG_FROM_05_07_2004_19_41
+    def test_can_parse_LOG_FROM_05_07_2004_19_41
       assert_equal(11, @parser.split_entries(LOG_FROM_05_07_2004_19_41).size)
       assert_equal("server/damagecontrol/scm/CVS.rb", @parser.parse_path(@parser.split_entries(LOG_FROM_05_07_2004_19_41)[0]))
       changesets = @parser.parse_changesets_from_log(StringIO.new(LOG_FROM_05_07_2004_19_41))
@@ -250,7 +250,7 @@ description:
 
 EOF
 
-    def Xtest_can_parse_LOG_ENTRY_FROM_06_07_2004_19_25_1
+    def test_can_parse_LOG_ENTRY_FROM_06_07_2004_19_25_1
       @parser.cvspath = "/home/projects/jmock/scm/jmock"
       @parser.cvsmodule = "core"
       assert_equal("src/test/jmock/core/testsupport/MockInvocationMat", @parser.parse_path(LOG_ENTRY_FROM_06_07_2004_19_25_1))
@@ -270,7 +270,7 @@ description:
 
 EOF
 
-    def Xtest_can_parse_LOG_ENTRY_FROM_06_07_2004_19_19
+    def test_can_parse_LOG_ENTRY_FROM_06_07_2004_19_19
       assert_equal("lib/xmlrpc/datetime.rb", @parser.parse_path(LOG_ENTRY_FROM_06_07_2004_19_19))
     end
     
@@ -295,7 +295,7 @@ description:
 
 EOF
 
-    def Xtest_can_parse_LOG_ENTRY_FROM_06_07_2004_19_25_2
+    def test_can_parse_LOG_ENTRY_FROM_06_07_2004_19_25_2
       assert_equal("website/templates/logo.gif", @parser.parse_path(LOG_ENTRY_FROM_06_07_2004_19_25_2))
     end
 
@@ -326,27 +326,31 @@ fixed broken url (NANO-8)
 =============================================================================
 EOF
 
-    def Xtest_can_parse_LOG_WITH_DELETIONS
+    def test_can_parse_LOG_WITH_DELETIONS
       changesets = @parser.parse_changesets_from_log(StringIO.new(LOG_WITH_DELETIONS))
       assert_equal(2, changesets.length)
 
       changeset_delete = changesets[0]
+      assert_equal("MAIN:rinkrank:20031013000454", changeset_delete.revision)
+      assert_equal(Time.utc(2003,10,13,00,04,54,0), changeset_delete.time)
       assert_equal("Obsolete", changeset_delete.message)
       assert_equal("rinkrank", changeset_delete.developer)
       assert_equal(1, changeset_delete.length)
       assert_equal("build.xml", changeset_delete[0].path)
       assert_equal("1.11", changeset_delete[0].revision)
       assert_equal("1.10", changeset_delete[0].previous_revision)
-      assert(changeset_delete[0].deleted)
+      assert(Change::DELETED, changeset_delete[0].status)
 
       changeset_fix_url = changesets[1]
+      assert_equal("MAIN:rinkrank:20030725163239", changeset_fix_url.revision)
+      assert_equal(Time.utc(2003,07,25,16,32,39,0), changeset_fix_url.time)
       assert_equal("fixed broken url (NANO-8)", changeset_fix_url.message)
       assert_equal("rinkrank", changeset_fix_url.developer)
       assert_equal(1, changeset_fix_url.length)
       assert_equal("build.xml", changeset_fix_url[0].path)
       assert_equal("1.10", changeset_fix_url[0].revision)
       assert_equal("1.9", changeset_fix_url[0].previous_revision)
-      assert(!changeset_fix_url[0].deleted)
+      assert_equal(Change::MODIFIED, changeset_fix_url[0].status)
     end
 
 LOG_WITH_MISSING_ENTRIES= <<EOF

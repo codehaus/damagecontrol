@@ -37,7 +37,7 @@ module DamageControl
 
       assert_equal("changed something", changeset.message)
 # Why is username nil ? (FileUtils method) 
-#      assert(username, changeset.developer)
+#      assert_equal(username, changeset.developer)
       assert(changeset.developer)
       assert(changeset.revision)
 

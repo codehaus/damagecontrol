@@ -1,8 +1,7 @@
 require 'test/unit'
-require 'ftools'
 require 'damagecontrol/scm/AbstractSCMTest'
 require 'damagecontrol/scm/SVN'
-require 'webrick'
+require 'damagecontrol/scm/Changes'
 
 module DamageControl
   class SVNTest < AbstractSCMTest
@@ -10,5 +9,6 @@ module DamageControl
     def create_scm
       LocalSVN.new(new_temp_dir, "damagecontrolled")
     end
+
   end
 end

@@ -79,7 +79,7 @@ module DamageControl
         changeset = changesets.add(change)
         # CVS doesn't have revision for changesets, use
         # Fisheye-style revision
-        changeset.revision = "MAIN:#{change.developer}:#{change.time.utc.strftime('%Y%m%d%H%M%S')}" unless changeset.revision
+        changeset.revision = "MAIN:#{change.developer}:#{change.time.utc.strftime('%Y%m%d%H%M%S')}" if changeset
       end
       nil
     end
@@ -111,13 +111,12 @@ module DamageControl
 
       change.revision = extract_match(change_entry[0], /revision (.*)$/)
 
-#puts change_entry[0]
-#puts change.revision 
-
       change.previous_revision = determine_previous_revision(change.revision)
       change.time = parse_cvs_time(extract_required_match(change_entry[1], /date: (.*?)(;|$)/))
       change.developer = extract_match(change_entry[1], /author: (.*?);/)
-      change.deleted = extract_match(change_entry[1], /state: (.*?);/) == "dead"
+      
+      state = extract_match(change_entry[1], /state: (.*?);/)
+      change.status = STATES[state]
       change.message = change_entry[2..-1].join("\n")
          
       change
@@ -167,7 +166,14 @@ module DamageControl
     def had_error?
       @had_error
     end
-    
+  
+  private
+  
+    # The state field is "Exp" both for added and modified files. retards!
+    # We need some additional logic to figure out whether it is added or not.
+    # Maybe look at the revision. (1.1 means new I think. - deal with it later)
+    STATES = {"dead" => Change::DELETED, "Exp" => Change::MODIFIED}
+
   end
 
 end
