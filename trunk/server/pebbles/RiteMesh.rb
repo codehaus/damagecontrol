@@ -1,4 +1,5 @@
 require 'erb'
+require 'digest/md5'
 
 module Pebbles
 
@@ -15,13 +16,15 @@ module Pebbles
     private
     
     def parse_tag(input, tag, binding, attributes)
-      value = ""
+      Thread.current['parse_tag_value'] = ""
       if input =~ Regexp.new("<#{tag}(.*?)>(.*)<\/#{tag}>", Regexp::MULTILINE)
         attributes[tag] = $1.chomp
-        value = $2.chomp
-      end
-      eval("#{tag} = #{value.inspect}", binding)
+        Thread.current['parse_tag_value'] = $2.chomp
+      end      
+      eval("#{tag} = Thread.current['parse_tag_value']", binding)
+      Thread.current['parse_tag_value'] = nil
     end
+    
   end
     
 end

@@ -62,6 +62,13 @@ module Pebbles
       page = "<body>'</body>"
       assert_equal("'", mesh(page, "<%= body %>"))
     end
+
+    def test_can_mesh_body_containing_hash_followed_by_an_at
+      body = 'Hello, #@ world'
+      # An old implementation evaled body.inspect, which in this case
+      # causes a syntax error
+      assert_equal(body, mesh("<body>" + body + "</body>", "<%= body %>"))
+    end
     
   end
   
