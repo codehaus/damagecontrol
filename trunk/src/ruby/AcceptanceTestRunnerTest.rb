@@ -1,7 +1,6 @@
 require 'test/unit'
 require 'mockit'
 require 'damagecontrol/FileUtils'
-
 require 'AcceptanceTestRunner'
 
 class StoryTest < Test::Unit::TestCase
