@@ -18,9 +18,9 @@ module RSCM
   
 end
 
-RSS_SERVICE = RSCM::RssService.new
-RSS_SERVICE.add_all_projects
-RSS_SERVICE.start(10)
+POLLER = RSCM::Poller.new
+POLLER.add_all_projects
+POLLER.start(10)
 
 url = 'druby://localhost:9000'
 DRb.start_service(url, RSCM::Server.new)  

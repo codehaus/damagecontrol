@@ -2,6 +2,7 @@ require 'yaml'
 require 'drb'
 require 'fileutils'
 require 'rscm/directories'
+require 'rscm/changes'
 
 module RSCM
   # Represents a project with associated SCM, Tracker and SCMWeb
@@ -43,7 +44,7 @@ module RSCM
         YAML::dump(self, io)
       end
       
-      RSS_SERVICE.add_project(self) if RSS_SERVICE
+      POLLER.add_project(self) if POLLER
 
     end
     
@@ -129,6 +130,10 @@ module RSCM
 
     def changesets_dir
       Directories.changesets_dir(name)
+    end
+    
+    def changesets
+      ChangeSets.load_upto(changesets_dir, 5)
     end
 
   private

@@ -2,7 +2,7 @@ require 'rscm/changes'
 require 'rscm/directories'
 require 'rscm/project'
 require 'rscm/tracker'
-require 'rscm/rss_service'
+require 'rscm/poller'
 require 'rscm/abstract_scm'
 # scms
 require 'rscm/scm_web'

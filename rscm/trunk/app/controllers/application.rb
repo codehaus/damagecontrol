@@ -18,7 +18,6 @@ class ApplicationController < ActionController::Base
         :name       => "New project"
       }
     ]
-    @tab = "project_tab"
     @controller = self
   end
 

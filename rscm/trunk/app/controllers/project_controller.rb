@@ -158,6 +158,8 @@ private
     @trackers = RSCM::TRACKERS.dup
     @trackers.each_index {|i| @trackers[i] = @project.tracker if @trackers[i].class == @project.tracker.class}
 
+    @changesets = @project.changesets
+
     set_sidebar_links
   end
 

@@ -1,0 +1,36 @@
+<% if(changesets.length == 0)then %>
+  <table class="pane">
+    <tr>
+      <td colspan="3">
+        <%= no_changes_in_this_build %>
+      </td>
+    </tr>
+  </table>
+<% else %>
+  <%
+  changesets.each do |changeset|
+  %>
+  <table class="pane">
+    <tr class="pane">
+      <td colspan="3" class="changeset">
+        <div class="changeset-message">
+          <b><%= changeset.developer %>:</b><br>
+          <%= @project.tracker.highlight(changeset.message) %>
+        </div>
+      </td>
+    </tr>
+    <%
+    changeset.each do |change|
+    %>
+      <tr>
+        <td width="5%"><%= "ICON" %></td>
+        <td width="5%"><%= change.revision %></td>
+        <td width="90%">
+          <%= change.path %>
+        </td>
+      </tr>
+    <% end %>
+  </table>
+  <% end %>
+<% end %>
+  

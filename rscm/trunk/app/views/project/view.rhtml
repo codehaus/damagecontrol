@@ -1,7 +1,5 @@
 <script><!--
 
-tabs = ["project_tab", "scm_tab", "tracker_tab"]
-
 function setTab(tab) {
   stickyTab = tab
   showElement(stickyTab, tabs)
@@ -11,7 +9,7 @@ function executeOnLoad() {
 <% @scms.each do |scm| %>
   <%= scm.short %>_init();
 <% end %>
-  tab = "<%= @params['tab'] || 'project_tab' %>"
+  tab = "<%= @params['tab'] || 'tabs[0]' %>"
   setTab(tab)
 }
 
@@ -26,6 +24,8 @@ function showElement(selected, elements) {
     document.getElementById(id).style.display = style
   }
 }
+
+tabs = ["projects", "scms", "trackers", "changesets"]
 
 scms = [
 <% @scms.each do |scm| %>
@@ -42,55 +42,28 @@ trackers = [
 </script>
 
 <ul id="foldertab">
-  <li><a href="javascript:setTab('project_tab')"><img src="/images/16x16/wrench.png"> General</a></li>
-  <li><a href="javascript:setTab('scm_tab')"><img src="/images/16x16/safe.png"> Source Control</a></li>
-  <li><a href="javascript:setTab('tracker_tab')"><img src="/images/16x16/scroll_information.png"> Issue Tracker</a></li>
+  <li><a href="javascript:setTab('projects')"><img src="/images/16x16/wrench.png"> General</a></li>
+  <li><a href="javascript:setTab('scms')"><img src="/images/16x16/safe.png"> Source Control</a></li>
+  <li><a href="javascript:setTab('trackers')"><img src="/images/16x16/scroll_information.png"> Issue Tracker</a></li>
+  <li><a href="javascript:setTab('changesets')"><img src="/images/16x16/scroll_information.png"> Changesets</a></li>
 </ul>
 
 <form action="/project/save">
 
-<div id="project_tab" style="display:block">
+<div id="projects" style="display:block">
   <%= render_partial("project", @project) %>
 </div>
 
-<div id="scm_tab" style="display:none">
-<table width="100%">
-  <tr>
-    <td width="25%">Source Control</td>
-    <td class="config_cell"><%= tip(:txt => "scm_tip") %></td>
-    <td width="75%">
-      <%= text_or_select(@edit, :name => "scm", :values => @scms, :onchange => "showElement(this.value, scms)") %>
-    </td>
-  </tr>
-</table>
-
-<% @scms.each do |scm| %>
-  <div id="<%= scm.class.name %>" style="<% if(scm.selected?)%>display:block<%else%>display:none<%end%>">
-    <%= render_partial(scm.short, scm) %>
-  </div>
-<% end %>
-
+<div id="scms" style="display:none">
+  <%= render_partial("scms", @scms) %>
 </div>
 
-<div id="tracker_tab" style="display:none">
-By specifying an issue tracker issue numbers/ids in developers' SCM commit messages
-will be detected and highlighted with external links to the particular issue. 
-This way people browsing changesets can easily navigate to related issues.
-<table width="100%">
-  <tr>
-    <td width="25%">Issue tracker</td>
-    <td class="config_cell"><%= tip(:txt => "scm_tip") %></td>
-    <td width="75%">
-      <%= text_or_select(@edit, :name => "tracker", :values => @trackers, :onchange => "showElement(this.value, trackers)") %>
-    </td>
-  </tr>
-</table>
+<div id="trackers" style="display:none">
+  <%= render_partial("trackers", @trackers) %>
+</div>
 
-  <% @trackers.each do |tracker| %>
-    <div id="<%= tracker.class.name %>" style="<% if(tracker.selected?)%>display:block<%else%>display:none<%end%>">
-      <%= render_partial(tracker.short, tracker) %>
-    </div>
-  <% end %>
+<div id="changesets" style="display:none">
+  <%= render_partial("changesets", @changesets) %>
 </div>
 
   <input type="submit" value="Save"/>

@@ -1,18 +1,18 @@
 module RSCM
-  # Writes RSS for projects to file.
-  class RssService
+  # Polls all projects in intervals.
+  class Poller
     attr_reader :projects
 
     def initialize
       @projects = []
     end
 
-    # Adds a project to generate RSS for
+    # Adds a project to poll
     def add_project(project)
       @projects << project unless @projects.index(project)
     end
     
-    # Writes RSS for all registered projects
+    # Polls all registered projects
     def poll
       @projects.each do |project|
         begin
@@ -25,7 +25,7 @@ module RSCM
       end
     end
     
-    # Runs +write_rss+ in a separate thread.
+    # Runs +poll+ in a separate thread.
     def start(sleeptime=60)
       @t = Thread.new do
         while(true)
