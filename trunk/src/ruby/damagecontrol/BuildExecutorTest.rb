@@ -84,15 +84,15 @@ module DamageControl
         b
       }
       mock_scm = MockIt::Mock.new
-      mock_scm.__expect(:checkout) { |scm_spec, dir|
-        assert_equal("scm_spec", scm_spec)
-        assert_equal("#{damagecontrol_home}/builds/damagecontrolled", dir)
-      }
       mock_scm.__expect(:changes) { |scm_spec, dir, time_before, time_after|
         assert_equal("scm_spec", scm_spec)
         assert_equal("#{damagecontrol_home}/builds/damagecontrolled", dir)
         assert_equal(Time.utc(2004, 04, 02, 12, 00, 00), time_before)
         assert_equal(Time.utc(2004, 04, 02, 13, 00, 00), time_after)
+      }
+      mock_scm.__expect(:checkout) { |scm_spec, dir|
+        assert_equal("scm_spec", scm_spec)
+        assert_equal("#{damagecontrol_home}/builds/damagecontrolled", dir)
       }
       
       ::FileUtils.mkpath("#{damagecontrol_home}/builds/damagecontrolled")
