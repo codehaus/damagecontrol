@@ -6,7 +6,7 @@ import net.sourceforge.cruisecontrol.Modification;
 import java.util.Date;
 
 public class CruiseControlBridgeTest extends TestCase {
-    public void test() throws Exception {
+    public void testIt() throws Exception {
         CruiseControlBridge bridge = new CruiseControlBridge();
         Date lastbuild = new Date();
         Date now = new Date();
