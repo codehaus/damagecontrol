@@ -21,8 +21,6 @@ module DamageControl
       assert_private
 puts "CALLING TRIGGER"
       @trigger.request(project_name)
-puts "SLEEPING"
-      sleep 0.5
 puts "REDIRECTING"
       build_details_redirect
 puts "DONE"
