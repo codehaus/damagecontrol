@@ -48,7 +48,13 @@ module DamageControl
           identifiers[first..last].each do |identifier|
             changeset_yaml = "#{@changesets_dir}/#{identifier.to_s}/changeset.yaml"
             Log.info "Loading changesets from #{changeset_yaml}"
-            changesets.add(YAML::load_file(changeset_yaml))
+            begin
+              changesets.add(YAML::load_file(changeset_yaml))
+            rescue Exception => e
+              # Sometimes the yaml files get corrupted
+              Log.error "Error loading changesets file: #{File.expand_path(changeset_yaml)}"
+              # Todo: delete it and schedule it for re-retrieval somehow.
+            end
           end
         end
         changesets
