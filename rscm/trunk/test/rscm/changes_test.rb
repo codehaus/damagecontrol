@@ -100,6 +100,7 @@ module RSCM
         YAML::load(io)
       end
       assert_equal("rinkrank", changesets[0][1].developer)
+      assert_equal("En to\ntre buksa \nned\n", changesets[0][1].message)
     end
     
     def test_reports_timestamp_of_latest_change

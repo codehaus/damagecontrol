@@ -26,7 +26,7 @@ module RSCM
     # Creates a new repository. Throws an exception if the
     # repository cannot be created.
     #
-    def create      
+    def create
     end
 
     # Whether a repository can be created.
