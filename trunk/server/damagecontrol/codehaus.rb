@@ -15,7 +15,7 @@ server = DamageControlServer.new(
   :SocketTriggerPort => 4711, 
   :HttpPort => 4712,
   :HttpsPort => 4713,
-  :AllowIPs => ["127.0.0.1" ])
+  :AllowIPs => [ "127.0.0.1", "64.7.141.17" ])
 
 def server.logging_level
   #Logging.debug
