@@ -1,4 +1,5 @@
 require 'damagecontrol/Logging'
+
 DamageControl::Logging.silent
 
 require 'damagecontrol/scm/CVSTest'
