@@ -19,7 +19,7 @@ module DamageControl
     end
   
     def test_file_is_written_in_correct_location_upon_build_complete_event    
-      build = Build.new("xyz", ":local:/foo/bar:zap", nil, nil, "/some/where")
+      build = Build.new("xyz", ":local:/foo/bar:zap", nil, "/some/where")
       
       @template.__return(:file_name, "trash.txt")
       @template.__next(:generate) { |build2|

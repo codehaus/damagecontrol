@@ -33,13 +33,13 @@ module DamageControl
     # @param host where the dc server is running
     # @param port where the dc server is listening
     # @param replace_string what to replace "/" with (needed for CVS on windows)
-    def trigger_command(project_name, spec, build_command_line, relative_path, nc_command, dc_host, dc_port, replace_string="/")
-      "echo #{project_name},#{spec.gsub('/', replace_string)},#{build_command_line},#{relative_path}|#{nc_command} #{dc_host} #{dc_port}"
+    def trigger_command(project_name, spec, build_command_line, nc_command, dc_host, dc_port, path_sep="/")
+      "echo #{project_name},#{spec.gsub('/', path_sep)},#{build_command_line}|#{nc_command} #{dc_host} #{dc_port}"
     end
 
     def create_build(build_spec)
-      project_name, scm_spec, build_command_line, build_path = build_spec.split(",")
-      Build.new(project_name.chomp, scm_spec.chomp, build_command_line.chomp, build_path.chomp, @root_dir.chomp)
+      project_name, scm_spec, build_command_line = build_spec.split(",")
+      Build.new(project_name.chomp, scm_spec.chomp, build_command_line.chomp, @root_dir.chomp)
     end
 
     def do_accept(payload)

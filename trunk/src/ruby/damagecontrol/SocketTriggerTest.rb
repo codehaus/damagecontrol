@@ -19,7 +19,7 @@ module DamageControl
       @scm_spec = ":local:/cvsroot/picocontainer:pico"
       @build_command_line = "echo damagecontrol rocks"
     end
-
+    
     def test_fires_build_request_on_socket_accept
 
       @s.do_accept(cvs_trigger_command)
@@ -40,17 +40,27 @@ module DamageControl
           assert_equal(@scm_spec,           build.scm_spec)
           assert_equal(@build_command_line, build.build_command_line)
           assert_equal("/usr/local/builds/picocontainer/pico/MAIN/checkout", build.absolute_checkout_path)
-          assert_equal("/usr/local/builds/picocontainer/pico/MAIN/checkout/pico/src", build.absolute_build_path)
         end
       end
       
       assert_equal("0", $?.to_s)
     end
 
+    def TODO_test_uses_modification_from_request_payload
+      
+    end
+
+    def TODO_test_includes_all_modifications_since_last_succesful_build
+      
+    end
+
+    def TODO_test_resets_modification_set_on_succesful_build
+      
+    end
+
   private
   
     def cvs_trigger_command
-      build_path = "src"
       nc_command = cat_command # behaves like ncat without the network
       dc_host = ""
       dc_port = ""
@@ -59,7 +69,6 @@ module DamageControl
         @project_name, \
         @scm_spec, \
         @build_command_line, \
-        build_path, \
         nc_command, \
         dc_host, \
         dc_port)

@@ -5,33 +5,45 @@ require 'damagecontrol/ant/ant'
 
 module DamageControl
 
+  class Modification
+    attr_accessor :developer
+    attr_accessor :path
+    attr_accessor :message
+    attr_accessor :time
+  end
+
   class Build
 
     # these should ideally be set before exceution
     # they are exposed as accessors only so they can be re-set from a cc log file
     # we should turn them into proper get/set methods so that we can perform
     # checking if a non-nil value is overwritten with a different value
-    attr_accessor :project_name, :scm_spec, :build_command_line, :build_path, :scm
+    attr_accessor :project_name, :scm_spec, :build_command_line, :scm
     
     # these should be set after execution
-    attr_accessor :label, :timestamp, :error_message, :successful, :developers, :modification
+    attr_accessor :label
+    attr_accessor :timestamp
+    attr_accessor :error_message
+    attr_accessor :successful
+    attr_accessor :modification_set
+    attr_accessor :filesystem
 
     def initialize(
       project_name              = nil , \
       scm_spec                  = nil , \
       build_command_line        = nil , \
-      build_path                = nil , \
       global_checkout_root_dir  = nil , \
-      filesystem                = FileSystem.new , \
       scm                       = DefaultSCMRegistry.new)
 
+      @filesystem                = FileSystem.new
       @project_name             = project_name
-      @scm_spec                 = scm_spec
-      @build_command_line       = build_command_line
-      @build_path               = build_path
+      @scm_spec = scm_spec
+      @build_command_line = build_command_line
       @global_checkout_root_dir = global_checkout_root_dir
-      @filesystem               = filesystem
-      @scm                      = scm
+      @filesystem = filesystem
+      @scm = scm
+      
+      @modification_set = []
       
       @label                    = Time.now.to_i.to_s
     end
@@ -41,8 +53,8 @@ module DamageControl
     end
 
     def execute(&proc)
-      puts "Changing dir to #{absolute_build_path}"
-      @filesystem.chdir("#{absolute_build_path}")
+      puts "Changing dir to #{absolute_checkout_path}"
+      @filesystem.chdir(absolute_checkout_path)
       IO.popen(build_command_line) do |output|
         output.each_line do |line|
           yield line
@@ -73,11 +85,6 @@ module DamageControl
     def absolute_log_file_path
       "#{@global_checkout_root_dir}/#{log_file_path}"
     end
-
-    def absolute_build_path
-      "#{absolute_checkout_path}/#{@scm.mod(scm_spec)}/#{@build_path}"
-    end
-
 
     def branch_path
 #      "#{@global_checkout_root_dir}/#{project_name}/#{@scm.mod(scm_spec)}/#{@scm.branch(scm_spec)}"

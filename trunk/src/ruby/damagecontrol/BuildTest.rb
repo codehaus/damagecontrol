@@ -13,16 +13,15 @@ module DamageControl
         "DamageControlled", \
         ":local:/foo/bar:zap", \
         "#{ant} compile", \
-        ".", \
-        nil)
+        ".")
 
-      def build.override_absolute_build_path(abspath)
+      def build.override_absolute_checkout_path(abspath)
         @abspath = abspath
       end
-      def build.absolute_build_path
+      def build.absolute_checkout_path
         @abspath
       end
-      build.override_absolute_build_path(File.expand_path("#{damagecontrol_home}/testdata/damagecontrolled"))
+      build.override_absolute_checkout_path(File.expand_path("#{damagecontrol_home}/testdata/damagecontrolled"))
       
       successful = nil
       build.execute { |progress|

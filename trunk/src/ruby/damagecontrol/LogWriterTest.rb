@@ -13,7 +13,7 @@ module DamageControl
 
       @writer = LogWriter.new(@hub)
       
-      @build = Build.new("plopp", ":local:/foo/bar:zap", nil, nil, "#{damagecontrol_home}/target/logwritertest")
+      @build = Build.new("plopp", ":local:/foo/bar:zap", nil, "#{damagecontrol_home}/target/logwritertest")
       @build.label = "a_label"
     end
 

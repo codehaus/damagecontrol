@@ -39,7 +39,6 @@ module DamageControl
           build.project_name       = res[1]['value'] if res[1]['name'] == 'projectname'
           build.scm_spec           = res[1]['value'] if res[1]['name'] == 'scm_spec'
           build.build_command_line = res[1]['value'] if res[1]['name'] == 'build_command_line'
-          build.build_path         = res[1]['value'] if res[1]['name'] == 'build_path'
         end
                 
         return if res.end_element? and res[0] == 'info'
