@@ -12,8 +12,9 @@ module DamageControl
     end
     
     def content
-      xslt(stylesheet_file(stylesheet), selected_build.xml_log_file, "#{selected_build.xml_log_file}.html")
-      File.new("#{selected_build.xml_log_file}.html").read
+      #xslt(stylesheet_file(stylesheet), selected_build.xml_log_file, "#{selected_build.xml_log_file}.html")
+      #File.new("#{selected_build.xml_log_file}.html").read
+      "FIXME"
     end
     
   protected
