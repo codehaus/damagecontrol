@@ -33,7 +33,7 @@ module DamageControl
       @config = config
       
       @modification_set = []
-      @timestamp = Build.format_timestamp(Time.utc(*Time.now.to_a))
+      @timestamp = Build.format_timestamp(Time.utc(*Time.now.gmtime.to_a))
     end
     
     def timestamp=(time)
