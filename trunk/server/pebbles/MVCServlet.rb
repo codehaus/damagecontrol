@@ -1,8 +1,12 @@
 require 'erb'
+require 'uri'
 require 'pebbles/RiteMesh'
 
 module Pebbles
   class SimpleServlet
+
+    FORWARDED_HOST_HEADER = "x-forwarded-host"
+
     def get_instance(config, *options)
       self
     end
@@ -10,12 +14,43 @@ module Pebbles
     def html_quote(text)
       text.gsub(/</, "&lt;")
     end
+
+    def to_uri(uri)
+      if uri.is_a?(URI) then uri else URI.parse(uri) end
+    end
+
+    def protocol
+      request.meta_vars["SERVER_PROTOCOL"].split(/\//)[0].downcase
+    end
     
+    def host
+      host = request.host
+      host = request.header[FORWARDED_HOST_HEADER].to_s unless request.header[FORWARDED_HOST_HEADER].nil?
+    end
+
     def redirect(url)
-puts "REDIRECTING TO #{url}"
-      response["Location"] = url
+      #dump_headers
+      uri = to_uri(url)
+      if uri.host.nil?
+        puts "adding host #{host}"
+        uri = to_uri("#{protocol}://#{host}#{uri}")
+        puts "result #{uri}"
+      end
+      response["Location"] = uri.to_s
       response.status = WEBrick::HTTPStatus::Found.code
     end
+
+    def dump_headers
+      puts "================ dump_headers"
+      puts "request:"
+      p request
+      puts "header:"
+      p request.header
+      puts "meta:"
+      p request.meta_vars
+      puts "==============="
+    end
+    
   end
 
   class MVCServlet < SimpleServlet
@@ -31,11 +66,6 @@ puts "REDIRECTING TO #{url}"
       self
     end
 
-    def dump_headers
-      puts "header:"
-      p request.header
-    end
-    
     def content_type
       "text/html"
     end
@@ -52,8 +82,6 @@ puts "REDIRECTING TO #{url}"
     def service(req, res)
       Thread.current["request"] = req
       Thread.current["response"] = res
-
-      dump_headers
 
       action = req.query['action'] || "default_action"
       

@@ -32,7 +32,7 @@ module DamageControl
     end
     
     # last_completed_or_current must be :last_completed_build or :current_build
-    def get_status_image(last_or_current, project_name)
+    def status_image(last_or_current, project_name)
       color = "grey"
       pulse = ""
       build = @build_history_repository.send(last_or_current, project_name)
