@@ -1,5 +1,6 @@
 require 'webrick'
 require 'pebbles/MVCServlet'
+require 'damagecontrol/scm/Changes'
 
 module DamageControl
   class AbstractAdminServlet < Pebbles::MVCServlet
@@ -91,7 +92,17 @@ module DamageControl
       raise "required keyed parameter #{param.inspect}"
     end
     
+    def file_icon(change)
+      FILE_ICONS[change.status]
+    end
+    
   private
+    FILE_ICONS = {
+      MODIFIED => "icons/document_edit.png",
+      DELETED  => "icons/document_delete.png",
+      ADDED    => "icons/document_new.png",
+      MOVED    => "icons/document_exchange.png"
+    }
     
     def build_url(build)
       return nil unless build
