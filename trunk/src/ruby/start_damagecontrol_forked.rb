@@ -28,4 +28,4 @@ irc_publisher = IRCPublisher.new(@hub, "irc.codehaus.org", "\#damagecontrol", Sh
 irc_publisher.handle = "dce2e"
 irc_publisher.start
 
-sleep 20
+sleep 30
