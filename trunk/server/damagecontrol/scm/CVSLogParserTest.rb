@@ -165,7 +165,7 @@ total revisions: 1;	selected revisions: 1
 description:
 EOF
 
-    def test_can_parse_log_from_05_07_2004_19_41
+    def test_can_parse_LOG_FROM_05_07_2004_19_41
       assert_equal(11, @parser.split_entries(LOG_FROM_05_07_2004_19_41).size)
       assert_equal("server/damagecontrol/scm/CVS.rb", @parser.parse_path(@parser.split_entries(LOG_FROM_05_07_2004_19_41)[0]))
       changes = @parser.parse_changes_from_log(StringIO.new(LOG_FROM_05_07_2004_19_41))
@@ -231,6 +231,25 @@ revision 1.1
 date: 2003/10/04 12:04:14;  author: tirsen;  state: Exp;
 Cleaned up the end-to-end test, did some more work on the CCLogPoller
 EOF
+
+LOG_ENTRY_FROM_06_07_2004_19_25 = <<EOF
+RCS file: /home/projects/jmock/scm/jmock/core/src/test/jmock/core/testsupport/MockInvocationMat
+	V1_0_1: 1.4
+	V1_0_0: 1.4
+	V1_0_0_RC1: 1.4
+	v1_0_0_RC1: 1.4
+	before_removing_features_deprecated_pre_1_0_0: 1.1
+keyword substitution: kv
+total revisions: 4;	selected revisions: 0
+description:
+
+EOF
+
+    def test_can_parse_LOG_ENTRY_FROM_06_07_2004_19_25
+      @parser.cvspath = "/home/projects/jmock/scm/jmock"
+      @parser.cvsmodule = "core"
+      assert_equal("src/test/jmock/core/testsupport/MockInvocationMat", @parser.parse_path(LOG_ENTRY_FROM_06_07_2004_19_25))
+    end
 
   end
 

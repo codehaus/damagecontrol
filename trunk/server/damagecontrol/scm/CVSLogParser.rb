@@ -84,7 +84,7 @@ module DamageControl
     end
     
     def parse_path(first_entry)
-      make_relative_to_module(extract_required_match(first_entry, Regexp.new("RCS file: (.*),v", Regexp::MULTILINE)))
+      make_relative_to_module(extract_required_match(first_entry, /^RCS file: (.*?)(,v|$)/m))
     end
     
     attr_accessor :cvspath
