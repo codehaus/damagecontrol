@@ -17,7 +17,7 @@ module DamageControl
     def process_message(message)
       if message.is_a? BuildCompleteEvent
         build = message.build
-        dir = project_directories.report_dir(build.project_name)
+        dir = @project_directories.report_dir(build.project_name)
         FileUtils.mkpath(dir)
         @bhrg.generate(dir, build.project_name)
       end

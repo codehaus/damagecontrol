@@ -12,9 +12,9 @@ buildRoot = File.expand_path("~/build")
 
 server = DamageControlServer.new(
   :RootDir => buildRoot,
-  :SocketTriggerPort => 14711, 
-  :HttpPort => 14712,
-  :HttpsPort => 14713,
+  :SocketTriggerPort => 4711, 
+  :HttpPort => 4712,
+  :HttpsPort => 4713,
   :AllowIPs => ["127.0.0.1" ])
 
 def server.logging_level

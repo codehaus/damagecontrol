@@ -8,11 +8,14 @@ module DamageControl
       @build_history_repository = build_history_repository
       @project_config_repository = project_config_repository
       @trigger = trigger
-      self.templatedir = File.dirname(__FILE__)
+    end
+
+    def templatedir
+      File.dirname(__FILE__)
     end
   
     def default_command
-      configure
+      dashboard
     end
     
     def configure
@@ -25,7 +28,7 @@ module DamageControl
     def store_configuration
       @project_config_repository.new_project(project_name) unless @project_config_repository.project_exists?(project_name)
       project_config = @project_config_repository.project_config(project_name)
-      project_config["build_command"] = request.query['build_command']
+      project_config["build_command_line"] = request.query['build_command_line']
       project_config["scm_spec"] = request.query['scm_spec']
       @project_config_repository.modify_project_config(project_name, project_config)
       dashboard
@@ -33,7 +36,7 @@ module DamageControl
     
     def build_status(build)
       return "Never built" if build.nil?
-      buil.status
+      build.status
     end
 
     def dashboard
@@ -51,6 +54,7 @@ module DamageControl
   private
   
     def project_name
+      raise "project_name not specified" if request.query['project_name'].nil?
       request.query['project_name']
     end
     
