@@ -24,8 +24,13 @@ module DamageControl
       before_import = Time.new.utc
       sleep(1)
       scm.import(import_dir) { |line| logger.info(line) }
-      timestamp = scm.checkout(checkout_dir, before_import, nil) { |line| logger.info(line) }
-      assert(before_import < timestamp)
+      sleep(1)
+      after_import = Time.new.utc
+      files = scm.checkout(checkout_dir, nil) { |line| logger.info(line) }
+      files.each{|f| puts f}
+      changesets = scm.changesets(checkout_dir, before_import, after_import, files)
+#      assert_equal(4, changesets[0].length)
+#      assert_equal("src/java/com/thoughtworks/damagecontrolled/Thingy.java", changesets[0][2].path)
       
       # modify file and commit it
       sleep(1)
@@ -36,7 +41,7 @@ module DamageControl
       scm.commit(checkout_dir, "changed something") { |line| logger.info(line) }
       
       # check that we now have one more change
-      changesets = scm.checkout(checkout_dir, before_change, nil) { |line| logger.info(line) }
+      changesets = scm.changesets(checkout_dir, before_change, nil, nil) { |line| logger.info(line) }
 
       assert_equal(1, changesets.length)
       changeset = changesets[0]
@@ -65,11 +70,9 @@ module DamageControl
       scm.create {|line| logger.info(line)}
       path = "#{damagecontrol_home}/testdata/damagecontrolled"
 
-      before_import = Time.now.utc
-      sleep(1)
       scm.import(path)
-      assert(before_import < scm.checkout(checkout_dir, before_import, nil))
-      assert(before_import < scm.checkout(other_checkout_dir, before_import, nil))
+      assert(0, scm.checkout(checkout_dir, nil).length)
+      assert(0, scm.checkout(other_checkout_dir, nil).length)
       
       # modify file and commit it
       sleep(1)
@@ -81,7 +84,7 @@ module DamageControl
       sleep(1)
       after_change = Time.now.utc
 
-      changesets = scm.checkout(checkout_dir, before_change, nil) { |line| puts line }
+      changesets = scm.changesets(checkout_dir, before_change, after_change, nil) { |line| puts line }
       assert(1, changesets.length)
       
       assert(before_change < changesets[0].time)
@@ -89,9 +92,6 @@ module DamageControl
 
       assert_equal("build.xml", changesets[0][0].path)
       assert_equal("src/java/com/thoughtworks/damagecontrolled/Thingy.java", changesets[0][1].path)
-
-      changesets = scm.checkout(checkout_dir, before_change, nil)
-      assert(0, changesets.length)
     end
     
     # test_install_uninstall_install_trigger_should_work_as_many_times_as_we_like

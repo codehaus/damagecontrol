@@ -33,14 +33,10 @@ module Pebbles
   class LifecycleContainerTest < Test::Unit::TestCase
 
     def test_components_can_be_assembled_with_nice_syntax_and_lifecycled
-      lc = LifecycleContainer.new
-      
-      lc.component(
-        :bar, 
-        Bar.new(
-          lc.component(:foo, Foo.new)
-        )
-      )
+      lc = LifecycleContainer.new {
+        component(:foo, Foo.new),
+        component(:bar, Bar.new(foo))
+      }
       
       assert(!lc.foo.started?)
       assert(!lc.bar.started?)

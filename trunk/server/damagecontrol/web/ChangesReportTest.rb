@@ -1,3 +1,4 @@
+require 'damagecontrol/scm/Jira'
 require 'damagecontrol/web/ChangesReport'
 require 'damagecontrol/util/FileUtils'
 require 'damagecontrol/core/Build'
@@ -20,8 +21,10 @@ module DamageControl
     
     def test_quoted_message_replaces_jira_keys
       build = Build.new("myprojectname")
+      jira = Jira.new
+      jira.jira_url = "http://jira.codehaus.org/"
       @report = ChangesReport.new(build, mock_project_config_repository({
-        "jira_url" => "http://jira.codehaus.org"
+        "tracking" => jira
       }))
       assert_equal("", @report.quote_message(''))
       assert_equal('<a href="http://jira.codehaus.org/browse/DC-148">DC-148</a>', @report.quote_message('DC-148'))

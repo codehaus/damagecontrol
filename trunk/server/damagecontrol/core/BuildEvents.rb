@@ -38,6 +38,9 @@ module DamageControl
     end
   end
 
+  class BuildRequestEvent < BuildEvent
+  end
+
   class BuildStartedEvent < BuildEvent
   end
 
@@ -49,26 +52,6 @@ module DamageControl
     
     def initialize(message)
       @message = message
-    end
-  end
-
-  class DoCheckoutEvent
-    attr_reader :project_name
-    attr_reader :force_build
-
-    def initialize(project_name, force_build)
-      @project_name, @force_build = project_name, force_build
-    end
-  end
-
-  # event to picked up by BuildScheduler, which will only build if force_build || !changesets_or_last_commit_time.nil?
-  class CheckedOutEvent
-    attr_reader :project_name
-    attr_reader :changesets_or_last_commit_time
-    attr_reader :force_build
-
-    def initialize(project_name, changesets_or_last_commit_time, force_build)
-      @project_name, @changesets_or_last_commit_time, @force_build = project_name, changesets_or_last_commit_time, force_build
     end
   end
 

@@ -1,6 +1,6 @@
 require 'pebbles/Pathutils'
 require 'pebbles/LineEditor'
-require 'pebbles/AsyncProcess'
+require 'pebbles/Process'
 require 'damagecontrol/scm/AbstractSCM'
 require 'damagecontrol/scm/SVNLogParser'
 require 'damagecontrol/util/FileUtils'
@@ -41,27 +41,53 @@ module DamageControl
       commit(checkout_dir, "#{message} #{relative_filename}", &line_proc)
     end
 
-    def checkout(checkout_dir, scm_from_time, scm_to_time, &line_proc)
+    def checkout(checkout_dir, scm_time, &line_proc)
       mkdir_p(checkout_dir)
       checked_out_files = []
       path_regex = /^[A|D|U]\s*(.*)/
       if(checked_out?(checkout_dir))
-        svn(checkout_dir, update_command(scm_from_time, scm_to_time)) do |line|
+        svn(checkout_dir, update_command(scm_time)) do |line|
           if(line =~ path_regex)
             checked_out_files << $1
           end
           line_proc.call(line) if block_given?
         end
-        changesets(checkout_dir, scm_from_time, scm_to_time, checked_out_files, &line_proc)
       else
-        svn(checkout_dir, checkout_command(scm_from_time, scm_to_time)) do |line|
+        svn(checkout_dir, checkout_command(scm_time)) do |line|
           if(line =~ path_regex)
             checked_out_files << $1
           end
           line_proc.call(line) if block_given?
         end
-        # See comment in AbstractSCM.checkout
-          most_recent_timestamp(changesets(checkout_dir, scm_from_time, scm_to_time, checked_out_files, &line_proc))
+      end
+      checked_out_files
+    end
+
+    def uptodate?(checkout_dir, start_time, end_time)
+      if(!checked_out?(checkout_dir))
+        # might as well check it out if it isn't checked out
+        # TODO: is this the right place to do that? prolly not.
+        checkout(checkout_dir, end_time)
+        false
+      else
+        local_revision(checkout_dir) == head_revision(checkout_dir)
+      end
+    end
+
+    def local_revision(checkout_dir)
+      local_revision = nil
+      svn(checkout_dir, "info") do |line|
+        if(line =~ /Revision: (\d)*/)
+          return $1.to_i
+        end
+      end
+    end
+
+    def head_revision(checkout_dir)
+      cmd_with_io(checkout_dir, "svn log -r HEAD") do |io|
+        parser = SVNLogParser.new(io, svnpath)
+        last_changeset = parser.parse_changesets[0]
+        last_changeset.revision.to_i
       end
     end
 
@@ -135,7 +161,23 @@ module DamageControl
       svn(dir, import_cmd, &line_proc)
     end
 
+    def changesets(checkout_dir, scm_from_time, scm_to_time, files, &line_proc)
+      changesets = nil
+
+      command = "svn #{changes_command(scm_from_time, scm_to_time, files)}"
+      yield command if block_given?
+
+      cmd_with_io(checkout_dir, command) do |stdout|
+        logger.info("Reading changeset log from stdout")
+        parser = SVNLogParser.new(stdout, svnpath)
+        changesets = parser.parse_changesets(scm_from_time, scm_to_time, &line_proc)
+        logger.info("DONE Reading changeset log from stdout")
+      end
+      changesets
+    end
+
   private
+
     def svnrootdir
       last = svnpath.nil? ? -1 : -(svnpath.length)-2
       result = svnurl["file://".length..last]
@@ -146,37 +188,21 @@ module DamageControl
       result
     end
 
-    def changesets(checkout_dir, scm_from_time, scm_to_time, files, &line_proc)
-      changesets = nil
-
-      command = "svn #{changes_command(scm_from_time, scm_to_time, files)}"
-      yield command if block_given?
-
-      execute(command, checkout_dir) do |stdin, stdout, stderr, pid|
-        logger.info("Reading changeset log from stdout")
-        parser = SVNLogParser.new(stdout, svnpath)
-        changesets = parser.parse_changesets(scm_from_time, scm_to_time, &line_proc)
-        logger.info("DONE Reading changeset log from stdout")
-      end
-      changesets
-    end
-
     def svn(dir, cmd, &line_proc)
       command_line = "svn #{cmd}"
 
-      execute(command_line, dir) do |stdin, stdout, stderr, pid|
+      cmd_with_io(dir, command_line) do |stdout|
         begin
           logger.info("Reading stdout")
           stdout.each_line do |progress|
               if block_given? then yield progress else logger.debug(progress) end
           end
-          logger.info("DONE Reading stdout")
         ensure
-          logger.info("Reading stderr")
-          stderr.each_line do |progress|
-              if block_given? then yield progress else logger.debug(progress) end
-          end
-          logger.info("DONE Reading stderr")
+#          logger.info("Reading stderr")
+#          stderr.each_line do |progress|
+#              if block_given? then yield progress else logger.debug(progress) end
+#          end
+#          logger.info("DONE Reading stderr")
         end
       end
     end
@@ -184,7 +210,7 @@ module DamageControl
     def svnadmin(dir, cmd, &line_proc)
       command_line = "svnadmin #{cmd}"
 
-      execute(command_line, dir) do |stdin, stdout, stderr, pid|
+      cmd_with_io(dir, command_line) do |stdout|
         stdout.each_line do |progress|
             if block_given? then yield progress else logger.debug(progress) end
         end
@@ -196,17 +222,17 @@ module DamageControl
       File.exists?(rootentries)
     end
 
-    def checkout_command(scm_from_time, scm_to_time)
-      "checkout #{svnurl} ."
+    def checkout_command(scm_time)
+      "checkout #{revision_option(nil, scm_time)} #{svnurl} ."
     end
 
-    def update_command(scm_from_time, scm_to_time)
-      "update"
+    def update_command(scm_time)
+      "update  #{revision_option(nil, scm_time)}"
     end
     
     def changes_command(scm_from_time, scm_to_time, files)
       # http://svnbook.red-bean.com/svnbook-1.1/svn-book.html#svn-ch-3-sect-3.3
-      file_list = files.join('\n')
+      # file_list = files.join('\n')
 # WEIRD cygwin bug garbles this!?!?!?!
       "log --verbose #{revision_option(scm_from_time, scm_to_time)}"
     end

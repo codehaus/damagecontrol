@@ -10,7 +10,7 @@ module DamageControl
       result = super
       unless project_name.nil?
         result += [
-          task(:icon => "smallicons/navigate_left.png", :name => "Back to project", :url => "../project/#{project_name}")
+          task(:icon => "smallicons/navigate_left.png", :name => "Back to project", :url => "/project/#{project_name}")
         ]
       end 
       result
@@ -24,8 +24,7 @@ module DamageControl
       search_string = request.query['search']
       regexp = Regexp.new(search_string, Regexp::IGNORECASE)
       
-      required_project_name = request.query['project_name']
-      builds = build_history_repository.search(regexp, required_project_name)
+      builds = build_history_repository.search(regexp, project_name)
       find_method = "search"
       
       render("search_results.erb", binding)

@@ -7,7 +7,6 @@ require 'damagecontrol/util/Logging'
 
 module DamageControl
 
-  # This class is responsible for scheduling builds among several BuildExecutors
   class BuildScheduler < Pebbles::Space
 
     include Logging
@@ -18,38 +17,20 @@ module DamageControl
     attr_reader :default_quiet_period
     attr_reader :build_queue
     
-    def initialize(channel, project_config_repository, default_quiet_period=DEFAULT_QUIET_PERIOD, exception_logger=nil)
+    def initialize(multicast_space, default_quiet_period=DEFAULT_QUIET_PERIOD, exception_logger=nil)
       super
-      @channel = channel
+      @channel = multicast_space
       @channel.add_consumer(self) unless @channel.nil?
-
-      @project_config_repository = project_config_repository
+raise "NaN" unless default_quiet_period.kind_of? Numeric 
       @default_quiet_period = default_quiet_period
-      @exception_logger = exception_logger
-
       @executors = []
       @build_queue = []
+      @exception_logger = exception_logger
     end
   
     def on_message(event)
-      if event.is_a?(CheckedOutEvent)
-        # We only want to build if this is a forced build or if there are changes
-        if(event.force_build || !event.changesets_or_last_commit_time.nil?)
-          build = @project_config_repository.create_build(event.project_name)
-          if(event.changesets_or_last_commit_time.is_a?(ChangeSets))
-            build.changesets = event.changesets_or_last_commit_time
-          end
-
-          build.status = Build::QUEUED
-          if(!event.changesets_or_last_commit_time.nil?)
-            logger.info("Scheduling build for #{event.project_name} as there were changes.")
-          else
-            logger.info("Scheduling build for #{event.project_name} as it was forced.")
-          end
-          schedule_build(build)
-        else
-          logger.info("Not scheduling build for #{event.project_name} as there were no changes and the build isn't forced.")
-        end
+      if event.is_a?(BuildRequestEvent)
+        schedule_build(event.build)
       end
       if event.is_a?(BuildCompleteEvent)
         try_to_execute_builds
@@ -71,7 +52,9 @@ module DamageControl
     end
 
     def project_building?(project_name)
-      executors.find {|e| e.building_project?(project_name) }
+      executors.find do |e| 
+        e.building_project?(project_name) 
+      end
     end
     
     def project_scheduled?(project_name)
@@ -86,23 +69,35 @@ module DamageControl
   private
     
     def find_available_executor(build)
-      executors.find {|e| e.can_execute?(build) }
+      executors.find do |e| 
+        e.can_execute?(build)
+      end
     end
 
     # try to execute build, taking quiet period and available suitable executors into consideration
     def try_to_execute_build(build)
-      return if project_building?(build.project_name)
-      return unless quiet_period_elapsed?(build)
+      if project_building?(build.project_name)
+puts "Project is building"
+        return
+      end
+
+      if(!quiet_period_elapsed?(build))
+puts "Quiet period not yet elapsed"
+        return
+      end
       
       executor = find_available_executor(build)
-      return unless executor
-      
-      build_queue.delete(build)
-      executor.put(build)
+      if(executor)
+        build_queue.delete(build)
+        executor.put(build)
+      else
+puts "No available executor"
+      end
     end
     
     def quiet_period_elapsed?(build)
-      time_in_queue(build) > quiet_period(build)
+      result = time_in_queue(build) > quiet_period(build)
+      result
     end
     
     def time_in_queue(build)
@@ -113,20 +108,19 @@ module DamageControl
     def try_to_execute_builds
       build_queue.each {|b| try_to_execute_build(b) }
     end
-    
-    # called when the quiet period of any build has elapsed
-    def quiet_period_elapsed
-      try_to_execute_builds
-    end
-    
+        
     def schedule_build(build)
+puts "Scheduling build for #{build.project_name}"
       build_queue.delete_if{|b| b.project_name == build.project_name}
       build_queue << build
       
       c = Pebbles::Countdown.new(quiet_period(build)) do |time|
         begin
-          quiet_period_elapsed
+puts "Trying"
+          try_to_execute_build(build)
+puts "Tried"
         rescue
+puts "Ouch"
           exception($!)
         end
       end
@@ -134,7 +128,9 @@ module DamageControl
     end
     
     def quiet_period(build)
-      build.quiet_period ? build.quiet_period : @default_quiet_period
+      result = build.quiet_period ? build.quiet_period : @default_quiet_period
+puts "QP: #{result}"
+      result
     end
     
   end

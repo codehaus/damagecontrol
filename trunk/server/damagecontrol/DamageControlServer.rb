@@ -11,7 +11,6 @@ require 'damagecontrol/Version'
 require 'damagecontrol/core/Build'
 require 'damagecontrol/core/BuildExecutor'
 require 'damagecontrol/core/BuildScheduler'
-require 'damagecontrol/core/CheckoutManager'
 require 'damagecontrol/core/DependentBuildTrigger'
 require 'damagecontrol/core/SCMPoller'
 require 'damagecontrol/core/HostVerifyingHandler'
@@ -239,20 +238,20 @@ module DamageControl
       httpd.mount("/public/rss", RssServlet.new(build_history_repository, public_web_url + "/project"))
       
       httpd.mount("/public/images", WEBrick::HTTPServlet::FileHandler, "#{webdir}/images")
-			httpd.mount("/public/project/images", WEBrick::HTTPServlet::FileHandler, "#{webdir}/images")
-			httpd.mount("/public/search/images", WEBrick::HTTPServlet::FileHandler, "#{webdir}/images")
+      httpd.mount("/public/project/images", WEBrick::HTTPServlet::FileHandler, "#{webdir}/images")
+      httpd.mount("/public/search/images", WEBrick::HTTPServlet::FileHandler, "#{webdir}/images")
       httpd.mount("/public/largeicons", WEBrick::HTTPServlet::FileHandler, "#{webdir}/icons/24x24/plain")
-			httpd.mount("/public/project/largeicons", WEBrick::HTTPServlet::FileHandler, "#{webdir}/icons/24x24/plain")
-			httpd.mount("/public/search/largeicons", WEBrick::HTTPServlet::FileHandler, "#{webdir}/icons/24x24/plain")
+      httpd.mount("/public/project/largeicons", WEBrick::HTTPServlet::FileHandler, "#{webdir}/icons/24x24/plain")
+      httpd.mount("/public/search/largeicons", WEBrick::HTTPServlet::FileHandler, "#{webdir}/icons/24x24/plain")
       httpd.mount("/public/smallicons", WEBrick::HTTPServlet::FileHandler, "#{webdir}/icons/16x16/plain")
-			httpd.mount("/public/project/smallicons", WEBrick::HTTPServlet::FileHandler, "#{webdir}/icons/16x16/plain")
-			httpd.mount("/public/search/smallicons", WEBrick::HTTPServlet::FileHandler, "#{webdir}/icons/16x16/plain")
+      httpd.mount("/public/project/smallicons", WEBrick::HTTPServlet::FileHandler, "#{webdir}/icons/16x16/plain")
+      httpd.mount("/public/search/smallicons", WEBrick::HTTPServlet::FileHandler, "#{webdir}/icons/16x16/plain")
       httpd.mount("/public/images/currentstatus", CurrentStatusImageServlet.new(build_history_repository, build_scheduler))
       httpd.mount("/public/images/lastcompletedstatus", LastCompletedImageServlet.new(build_history_repository, build_scheduler))
       httpd.mount("/public/images/timestampstatus", TimestampImageServlet.new(build_history_repository, build_scheduler))
       httpd.mount("/public/css", WEBrick::HTTPServlet::FileHandler, "#{webdir}/css")
-			httpd.mount("/public/project/css", WEBrick::HTTPServlet::FileHandler, "#{webdir}/css")
-			httpd.mount("/public/search/css", WEBrick::HTTPServlet::FileHandler, "#{webdir}/css")
+      httpd.mount("/public/project/css", WEBrick::HTTPServlet::FileHandler, "#{webdir}/css")
+      httpd.mount("/public/search/css", WEBrick::HTTPServlet::FileHandler, "#{webdir}/css")
     end
     
     def indexing_file_handler
@@ -273,7 +272,7 @@ module DamageControl
       DamageControl::XMLRPC::StatusPublisher.new(private_xmlrpc_servlet, build_history_repository)
       DamageControl::XMLRPC::ConnectionTester.new(private_xmlrpc_servlet)
       DamageControl::XMLRPC::ServerControl.new(private_xmlrpc_servlet, hub)
-      component(:trigger, DamageControl::XMLRPC::Trigger.new(private_xmlrpc_servlet, @hub, checkout_manager, public_web_url))
+      component(:trigger, DamageControl::XMLRPC::Trigger.new(private_xmlrpc_servlet, @hub, project_config_repository, public_web_url))
       # For private authenticated and encrypted (with eg an Apache proxy) XML-RPC connections like triggering a build
       httpd.mount("/private/xmlrpc", private_xmlrpc_servlet)
 
@@ -286,29 +285,29 @@ module DamageControl
       httpd.mount("/private/root", indexing_file_handler)
       
       httpd.mount("/private/images", WEBrick::HTTPServlet::FileHandler, "#{webdir}/images")
-			httpd.mount("/private/project/images", WEBrick::HTTPServlet::FileHandler, "#{webdir}/images")
-			httpd.mount("/private/configure/images", WEBrick::HTTPServlet::FileHandler, "#{webdir}/images")
-			httpd.mount("/private/install_trigger/images", WEBrick::HTTPServlet::FileHandler, "#{webdir}/images")
-			httpd.mount("/private/search/images", WEBrick::HTTPServlet::FileHandler, "#{webdir}/images")
+      httpd.mount("/private/project/images", WEBrick::HTTPServlet::FileHandler, "#{webdir}/images")
+      httpd.mount("/private/configure/images", WEBrick::HTTPServlet::FileHandler, "#{webdir}/images")
+      httpd.mount("/private/install_trigger/images", WEBrick::HTTPServlet::FileHandler, "#{webdir}/images")
+      httpd.mount("/private/search/images", WEBrick::HTTPServlet::FileHandler, "#{webdir}/images")
       httpd.mount("/private/largeicons", WEBrick::HTTPServlet::FileHandler, "#{webdir}/icons/24x24/plain")
-			httpd.mount("/private/project/largeicons", WEBrick::HTTPServlet::FileHandler, "#{webdir}/icons/24x24/plain")
-			httpd.mount("/private/configure/largeicons", WEBrick::HTTPServlet::FileHandler, "#{webdir}/icons/24x24/plain")
-			httpd.mount("/private/install_trigger/largeicons", WEBrick::HTTPServlet::FileHandler, "#{webdir}/icons/24x24/plain")
-			httpd.mount("/private/search/largeicons", WEBrick::HTTPServlet::FileHandler, "#{webdir}/icons/24x24/plain")
+      httpd.mount("/private/project/largeicons", WEBrick::HTTPServlet::FileHandler, "#{webdir}/icons/24x24/plain")
+      httpd.mount("/private/configure/largeicons", WEBrick::HTTPServlet::FileHandler, "#{webdir}/icons/24x24/plain")
+      httpd.mount("/private/install_trigger/largeicons", WEBrick::HTTPServlet::FileHandler, "#{webdir}/icons/24x24/plain")
+      httpd.mount("/private/search/largeicons", WEBrick::HTTPServlet::FileHandler, "#{webdir}/icons/24x24/plain")
       httpd.mount("/private/smallicons", WEBrick::HTTPServlet::FileHandler, "#{webdir}/icons/16x16/plain")
-			httpd.mount("/private/project/smallicons", WEBrick::HTTPServlet::FileHandler, "#{webdir}/icons/16x16/plain")
-			httpd.mount("/private/configure/smallicons", WEBrick::HTTPServlet::FileHandler, "#{webdir}/icons/16x16/plain")
-			httpd.mount("/private/install_trigger/smallicons", WEBrick::HTTPServlet::FileHandler, "#{webdir}/icons/16x16/plain")
-			httpd.mount("/private/search/smallicons", WEBrick::HTTPServlet::FileHandler, "#{webdir}/icons/16x16/plain")
-			
+      httpd.mount("/private/project/smallicons", WEBrick::HTTPServlet::FileHandler, "#{webdir}/icons/16x16/plain")
+      httpd.mount("/private/configure/smallicons", WEBrick::HTTPServlet::FileHandler, "#{webdir}/icons/16x16/plain")
+      httpd.mount("/private/install_trigger/smallicons", WEBrick::HTTPServlet::FileHandler, "#{webdir}/icons/16x16/plain")
+      httpd.mount("/private/search/smallicons", WEBrick::HTTPServlet::FileHandler, "#{webdir}/icons/16x16/plain")
+      
       httpd.mount("/private/images/currentstatus", CurrentStatusImageServlet.new(build_history_repository, build_scheduler))
       httpd.mount("/private/images/lastcompletedstatus", LastCompletedImageServlet.new(build_history_repository, build_scheduler))
       httpd.mount("/private/images/timestampstatus", TimestampImageServlet.new(build_history_repository, build_scheduler))
       httpd.mount("/private/css", WEBrick::HTTPServlet::FileHandler, "#{webdir}/css")
-			httpd.mount("/private/project/css", WEBrick::HTTPServlet::FileHandler, "#{webdir}/css")
-			httpd.mount("/private/configure/css", WEBrick::HTTPServlet::FileHandler, "#{webdir}/css")
-			httpd.mount("/private/install_trigger/css", WEBrick::HTTPServlet::FileHandler, "#{webdir}/css")
-			httpd.mount("/private/search/css", WEBrick::HTTPServlet::FileHandler, "#{webdir}/css")
+      httpd.mount("/private/project/css", WEBrick::HTTPServlet::FileHandler, "#{webdir}/css")
+      httpd.mount("/private/configure/css", WEBrick::HTTPServlet::FileHandler, "#{webdir}/css")
+      httpd.mount("/private/install_trigger/css", WEBrick::HTTPServlet::FileHandler, "#{webdir}/css")
+      httpd.mount("/private/search/css", WEBrick::HTTPServlet::FileHandler, "#{webdir}/css")
     end
     
     def report_classes
@@ -328,36 +327,35 @@ module DamageControl
         DamageControl::SVNWebConfigurator
       ]
     end
-		
-		def tracking_configurator_classes
-			[
-				DamageControl::NoTrackerWebConfigurator,
-				DamageControl::JiraWebConfigurator,
-				DamageControl::ScarabWebConfigurator,
-				DamageControl::SourceForgeTrackerWebConfigurator,
-				DamageControl::BugzillaWebConfigurator
-			]
-			
-		end
+    
+    def tracking_configurator_classes
+      [
+        DamageControl::NoTrackerWebConfigurator,
+        DamageControl::JiraWebConfigurator,
+        DamageControl::ScarabWebConfigurator,
+        DamageControl::SourceForgeTrackerWebConfigurator,
+        DamageControl::BugzillaWebConfigurator
+      ]
+      
+    end
     
     def webdir
       "#{damagecontrol_home}/server/damagecontrol/web"
     end
     
     def init_build_scheduler
-      component(:checkout_manager, CheckoutManager.new(hub, project_directories, project_config_repository))
       component(:log_writer, LogWriter.new(hub))
       component(:log_merger, LogMerger.new(hub, project_directories))
       component(:artifact_archiver, ArtifactArchiver.new(hub, project_directories))
       component(:build_number_increaser, BuildNumberIncreaser.new(hub, project_config_repository))
-      component(:dependent_build_trigger, DependentBuildTrigger.new(hub))
-      component(:build_scheduler, BuildScheduler.new(hub, project_config_repository))
+      component(:dependent_build_trigger, DependentBuildTrigger.new(hub, project_config_repository))
+      component(:build_scheduler, BuildScheduler.new(hub))
       init_build_executors
     end
     
     def init_build_executors
       # Only use one build executor (don't allow parallel builds)
-      build_scheduler.add_executor(BuildExecutor.new('executor1', hub, project_directories))
+      build_scheduler.add_executor(BuildExecutor.new('executor1', hub, project_directories, build_history_repository))
     end
     
     def polling_interval
@@ -368,7 +366,7 @@ module DamageControl
 
       if(polling_interval > 0)
         component(:scm_poller, 
-          SCMPoller.new(hub, polling_interval, project_config_repository, build_scheduler))
+          SCMPoller.new(hub, polling_interval, project_directories, project_config_repository, build_history_repository, build_scheduler))
       end
     end
     

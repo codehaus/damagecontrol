@@ -28,17 +28,22 @@ module XMLRPC
 
     def test_call_on_trig_requests_a_build
       hub = new_mock
+      project_config_repository = new_mock
       t = Trigger.new(
         ::XMLRPC::WEBrickServlet.new,
         hub, 
-        new_mock,
+        project_config_repository,
         "foo"
       )
 
+      project_config_repository.__expect(:create_build) do |project_name| 
+        assert_equal("damagecontrol", project_name)
+        Build.new(project_name)
+      end
+
       hub.__expect(:put) do |message|
-        assert(message.is_a?(DoCheckoutEvent))
-        assert(message.force_build)
-        assert_equal("damagecontrol", message.project_name)
+        assert(message.is_a?(BuildRequestEvent))
+        assert_equal("damagecontrol", message.build.project_name)
       end
 
       val = t.request("damagecontrol")

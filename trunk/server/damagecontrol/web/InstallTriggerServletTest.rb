@@ -17,16 +17,16 @@ module DamageControl
     end
 
     def test_install_trigger
-      @project_config_repository.modify_project_config("myprojectname", {"scm_type" => NoSCM.name})
-      result = do_request("project_name" => "myprojectname") do
+      @project_config_repository.modify_project_config("myprojectname", {"scm" => NoSCM.new})
+      result = do_request("/myprojectname", {}) do
         @servlet.default_action
       end
       assert_match(/myprojectname/i, result)
     end
 
     def test_do_install_trigger
-      @project_config_repository.modify_project_config("myprojectname", {"scm_type" => NoSCM.name})
-      result = do_request("project_name" => "myprojectname") do
+      @project_config_repository.modify_project_config("myprojectname", {"scm" => NoSCM.new})
+      result = do_request("/myprojectname", {}) do
         @servlet.do_install_trigger
       end
       assert_match(/success/i, result)

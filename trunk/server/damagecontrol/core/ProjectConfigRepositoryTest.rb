@@ -41,7 +41,7 @@ module DamageControl
     
     def test_can_modify_project_config
       @pcr.new_project("newproject")
-      @pcr.modify_project_config("newproject", { "scm_type" => NoSCM.name })
+      @pcr.modify_project_config("newproject", { "scm" => NoSCM.new })
       assert_equal(
         {
           "project_name" => "newproject",
@@ -56,7 +56,7 @@ module DamageControl
 
     def test_creates_build_with_proper_attributes_from_project_config
       @pcr.new_project("newproject")
-      @pcr.modify_project_config("newproject", { "scm_type" => NoSCM.name })
+      @pcr.modify_project_config("newproject", { "scm" => NoSCM.new })
       build = @pcr.create_build("newproject")
       assert_equal(
         {

@@ -1,37 +1,21 @@
 require 'pebbles/Clock'
-require 'pebbles/TimeUtils'
 require 'damagecontrol/core/BuildEvents'
 require 'damagecontrol/core/Build'
 require 'damagecontrol/util/Logging'
 
-require 'damagecontrol/core/ProjectConfigRepository'
-require 'damagecontrol/core/BuildScheduler'
-
 module DamageControl
 
-
-  # This class checks for a "polling" property in each project's config.
-  # If it is defined, and equals true, then it will poll using the default polling interval.
-  # If it is defined, and is an integer, then it will poll at that interval. (If the project
-  # specific interval is shorter than the default interval, it will have no effect,
-  # since ticks only occur at the default interval.
-  #
   class SCMPoller < Pebbles::Clock
     include Logging
-    include Pebbles::TimeUtils
     
-    def initialize(channel, polling_interval, project_config_repository, build_scheduler)
+    def initialize(hub, polling_interval, project_directories, project_config_repository, build_history_repository, build_scheduler)
       super(polling_interval)
+      @hub = hub
       @polling_interval = polling_interval
-      @channel = channel
-      @polling_interval = polling_interval
+      @project_directories = project_directories
       @project_config_repository = project_config_repository
+      @build_history_repository = build_history_repository
       @build_scheduler = build_scheduler
-      @poll_times = {}
-    end
-    
-    def to_s
-      "#{super} polling_interval: #{duration_as_text(@polling_interval)}"
     end
     
     def start
@@ -40,41 +24,53 @@ module DamageControl
     end
   
     def tick(time)
-      logger.info("tick #{time.to_human}")
-      @project_config_repository.project_names.each do |project_name|        
-        if(@poll_times[project_name].nil?)
-          @poll_times[project_name] = Time.new.utc
-        end
-
-        if should_poll?(project_name, time)
-          @poll_times[project_name] = time
-          @channel.put(DoCheckoutEvent.new(project_name, false))
-          logger.info("Requested checkout for #{project_name}")
-        else
-          logger.info("Not requesting checkout for #{project_name}. It isn't time yet.")
-        end
-      end
+      @project_config_repository.project_names.each {|project_name| poll_project(project_name)}
     end
     
-  private
-
-    def should_poll?(project_name, time)
+    def should_poll?(project_name)
       return false if @build_scheduler.project_scheduled?(project_name)
       return false if @build_scheduler.project_building?(project_name)
-
-      project_config = @project_config_repository.project_config(project_name)
-      polling_interval = project_config["polling"]
-      if(polling_interval.is_a?(FalseClass) || polling_interval.is_a?(TrueClass))
-        # old format
-        should_poll = polling_interval
-        return should_poll
+      return false unless project_config(project_name)["polling"]
+      true
+    end
+    
+    def project_config(project_name)
+      @project_config_repository.project_config(project_name)
+    end
+    
+    def poll_project(project_name)
+      return unless should_poll?(project_name)
+      scm = @project_config_repository.create_scm(project_name)
+      last_completed_build = @build_history_repository.last_completed_build(project_name)
+      if last_completed_build.nil?
+        # not built yet, just build without checking
+        request_build(project_name)
       else
-        interval =  polling_interval || @polling_interval
-        last_poll = @poll_times[project_name]
-        required_time = last_poll + interval
-        return required_time < time
+        logger.info("polling project #{project_name}")
+        # check for any changes since last completed build and now
+        checkout_dir = @project_directories.checkout_dir(project_name)
+        if(scm.uptodate?(
+          checkout_dir, 
+          last_completed_build.scm_commit_time, 
+          nil
+        ))
+          logger.info("no changes in #{project_name}")
+        else
+          logger.info("changes in #{project_name}, requesting build")
+          changesets = scm.changesets(
+            checkout_dir, 
+            last_completed_build.scm_commit_time, 
+            nil
+          )
+          request_build(project_name, changesets)
+        end
       end
     end
     
+    def request_build(project_name, changesets=nil)
+      build = @project_config_repository.create_build(project_name)
+      build.changesets = changesets if changesets # set this to avoid BuildExecutor from having to parse the log again
+      @hub.put(BuildRequestEvent.new(build))
+    end
   end
 end

@@ -29,7 +29,7 @@ module DamageControl
       now = Time.new.utc
       path = "#{damagecontrol_home}/testdata/damagecontrolled"
       scm.import(path) { |line| logger.debug(line) }
-      scm.checkout(checkout_dir, nil, nil) { |line| logger.debug(line) }
+      scm.checkout(checkout_dir, nil) { |line| logger.debug(line) }
       assert_equal(
         "1",
         scm.label(checkout_dir) { |line| logger.debug(line) }

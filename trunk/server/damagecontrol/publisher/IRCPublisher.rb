@@ -1,10 +1,10 @@
 require 'erb'
 require 'rica/rica'
-require 'pebbles/Space'
 require 'damagecontrol/scm/Changes'
 require 'damagecontrol/core/BuildEvents'
 require 'damagecontrol/util/Logging'
 require 'pebbles/MVCServlet'
+require 'pebbles/Space'
 
 module DamageControl
 
@@ -20,7 +20,7 @@ module DamageControl
     attr_accessor :send_message_on_build_request
   
     def initialize(channel, irc_server, irc_channel, template)
-      super
+      super(channel)
       channel.add_consumer(self)
       @irc = IRCConnection.new
       @irc_server = irc_server
@@ -30,52 +30,16 @@ module DamageControl
       @send_message_on_build_request = true
       @template = template
     end
-
-    def start
-      super
-      ensure_in_channel
-    end
-    
-    def on_message(message)
-      ensure_in_channel
-
-      if send_message_on_build_request && message.is_a?(DoCheckoutEvent)
-        @irc.send_message_to_channel("[#{message.project_name}] CHECKOUT REQUESTED")
-      end
-
-      if send_message_on_build_request && message.is_a?(CheckedOutEvent)
-        if(message.changesets_or_last_commit_time.nil?)
-          @irc.send_message_to_channel("[#{message.project_name}] No changes.")
-        elsif(message.changesets_or_last_commit_time.is_a?(ChangeSets))
-          message.changesets_or_last_commit_time.each do |changeset|
-            @irc.send_message_to_channel("[#{message.project_name}] (by #{changeset.developer} #{changeset.time_difference} ago) : #{changeset.message}")
-            changeset.each do |change|
-              @irc.send_message_to_channel("[#{message.project_name}] #{change.path} #{change.revision}")
-            end
-          end
-        else
-          @irc.send_message_to_channel("[#{message.project_name}] First checkout. Last change was at #{message.changesets_or_last_commit_time}")
-        end
-        @irc.send_message_to_channel("[#{message.project_name}] CHECKOUT COMPLETE")
-      end
-
-      if message.is_a?(BuildCompleteEvent)
-        build = message.build
-        msg = erb(@template, binding)
-        @irc.send_message_to_channel(msg)
-      end
-
-      if message.is_a?(UserMessage)
-        @irc.send_message_to_channel(message.message)
-      end
-    end
     
     def template_dir
       "#{File.expand_path(File.dirname(__FILE__))}/../template"
     end
     
-  private
-
+    def start
+      super
+      ensure_in_channel
+    end
+    
     # TODO: use standard library timeout maybe? --Aslak
     def wait_until(timeout=nil)
       time_waited = 0
@@ -100,6 +64,38 @@ module DamageControl
       end
     end
   
+    def on_message(message)
+      ensure_in_channel
+      
+      if (message.is_a?(BuildEvent))
+        build = message.build
+        
+        if send_message_on_build_request && message.is_a?(BuildRequestEvent)
+          @irc.send_message_to_channel("#{prefix(message)} BUILD REQUESTED")
+        end
+        
+        if message.is_a?(BuildStartedEvent)
+          url = if build.url then ": #{build.url}" else "" end
+          @irc.send_message_to_channel("#{prefix(message)} BUILD STARTED#{url}")
+          build.changesets.each do |changeset|
+            @irc.send_message_to_channel("#{prefix(message)} (by #{changeset.developer} #{changeset.time_difference} ago) : #{changeset.message}")
+            changeset.each do |change|
+              @irc.send_message_to_channel("#{prefix(message)} #{change.path} #{change.revision}")
+            end
+          end
+        end
+        
+        if message.is_a?(BuildCompleteEvent)
+          msg = erb(@template, binding)
+          @irc.send_message_to_channel(msg)
+        end
+      end
+
+      if message.is_a?(UserMessage)
+        @irc.send_message_to_channel(message.message)
+      end
+    end
+    
     def prefix(message)
       "[#{message.build.project_name}]"
     end

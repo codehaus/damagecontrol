@@ -1,7 +1,7 @@
 require 'parsedate'
 require 'pebbles/LineEditor'
 require 'pebbles/Pathutils'
-require 'pebbles/AsyncProcess'
+require 'pebbles/Process'
 require 'damagecontrol/scm/AbstractSCM'
 require 'damagecontrol/scm/CVSLogParser'
 require 'damagecontrol/scm/Changes'
@@ -56,19 +56,16 @@ module DamageControl
       cvs(dir, "import -m \"initial import\" #{modulename} VENDOR START")
     end
 
-    def checkout(checkout_dir, scm_from_time, scm_to_time, &line_proc)
+    def checkout(checkout_dir, scm_time, &line_proc)
       checked_out_files = []
       if(checked_out?(checkout_dir))
         path_regex = /^[U|P] (.*)/
-        cvs(checkout_dir, update_command(scm_to_time)) do |line|
+        cvs(checkout_dir, update_command(scm_time)) do |line|
           if(line =~ path_regex)
             checked_out_files << $1
           end
           line_proc.call(line) if block_given?
         end
-        changesets = changesets(checkout_dir, scm_from_time, scm_to_time, checked_out_files, &line_proc)
-logger.info("Got changesets from CVS checkout: #{changesets}")
-        return changesets
       else
         path_regex = /^[U|P] checkout\/(.*)/
         # This is a workaround for the fact that -d . doesn't work - must be an existing sub folder.
@@ -76,25 +73,39 @@ logger.info("Got changesets from CVS checkout: #{changesets}")
         target_dir = File.basename(checkout_dir)
         run_checkout_command_dir = File.dirname(checkout_dir)
         # -D is sticky, but subsequent updates will reset stickiness with -A
-        cvs(run_checkout_command_dir, checkout_command(scm_to_time, target_dir)) do |line|
+        cvs(run_checkout_command_dir, checkout_command(scm_time, target_dir)) do |line|
           if(line =~ path_regex)
             checked_out_files << $1
           end
           line_proc.call(line) if block_given?
         end
-        # See comment in AbstractSCM.checkout
-        most_recent_timestamp(changesets(checkout_dir, scm_from_time, scm_to_time, checked_out_files, &line_proc))
       end
+      checked_out_files
     end
     
     def commit(checkout_dir, message, &proc)
       cvs(checkout_dir, commit_command(message), &proc)
     end
 
+    def uptodate?(checkout_dir, start_time, end_time)
+      if(!checked_out?(checkout_dir))
+        # might as well check it out if it isn't checked out
+        checkout(checkout_dir)
+        false
+      end
+
+      changesets = changesets(
+        checkout_dir,
+        start_time,
+        end_time
+      )
+      changesets.empty?
+    end
+
     def changesets(checkout_dir, scm_from_time, scm_to_time, files, &line_proc)
       begin
         parse_log(checkout_dir, new_changes_command(scm_from_time, scm_to_time, files), &line_proc)
-      rescue ProcessError => e
+      rescue ProcessFailedException => e
         parse_log(checkout_dir, old_changes_command(scm_from_time, scm_to_time, files), &line_proc)
       end
     end
@@ -103,7 +114,7 @@ logger.info("Got changesets from CVS checkout: #{changesets}")
       raise "cvsmodule can't be null or empty" if (cvsmodule.nil? || cvsmodule == "")
 
       cvsroot_cvs = create_cvsroot_cvs
-      cvsroot_cvs.checkout(trigger_files_checkout_dir, nil, nil, &line_proc)
+      cvsroot_cvs.checkout(trigger_files_checkout_dir, nil, &line_proc)
       with_working_dir(trigger_files_checkout_dir) do
         trigger_line = "#{cvsmodule} #{trigger_command}\n"
         File.open("loginfo", File::WRONLY | File::APPEND) do |file|
@@ -122,7 +133,7 @@ logger.info("Got changesets from CVS checkout: #{changesets}")
       regex = /#{cvsmodule} #{trigger_command}/
       cvsroot_cvs = create_cvsroot_cvs
       begin
-        cvsroot_cvs.checkout(trigger_files_checkout_dir, nil, nil, &line_proc)
+        cvsroot_cvs.checkout(trigger_files_checkout_dir, nil, &line_proc)
         loginfo = File.join(trigger_files_checkout_dir, "loginfo")
         return false if !File.exist?(loginfo)
 
@@ -143,7 +154,7 @@ logger.info("Got changesets from CVS checkout: #{changesets}")
     def uninstall_trigger(trigger_command, trigger_files_checkout_dir, &line_proc)
       regex = /#{cvsmodule} #{trigger_command}/
       cvsroot_cvs = create_cvsroot_cvs
-      cvsroot_cvs.checkout(trigger_files_checkout_dir, nil, nil, &line_proc)
+      cvsroot_cvs.checkout(trigger_files_checkout_dir, nil, &line_proc)
       loginfo_path = File.join(trigger_files_checkout_dir, "loginfo")
       File.comment_out(loginfo_path, regex, "# ")
       with_working_dir(trigger_files_checkout_dir) do
@@ -186,12 +197,12 @@ logger.info("Got changesets from CVS checkout: #{changesets}")
       # https://www.cvshome.org/docs/manual/cvs-1.11.17/cvs_16.html#SEC144
       # -N => Suppress the header if no revisions are selected.
       # -S => Do not print the list of tags for this file.
-      "log #{branch_option}-N -S #{period_option(scm_from_time, scm_to_time)}#{files.join(' ')}"
+      "log #{branch_option}-N -S #{period_option(scm_from_time, scm_to_time)}#{files ? files.join(' ') : ''}"
     end
     
     def old_changes_command(scm_from_time, scm_to_time, files)
       # Many servers don't support the new -S option
-      "log #{branch_option}-N #{period_option(scm_from_time, scm_to_time)}#{files.join(' ')}"
+      "log #{branch_option}-N #{period_option(scm_from_time, scm_to_time)}#{files ? files.join(' ') : ''}"
     end
     
     def branch_specified?
@@ -202,13 +213,13 @@ logger.info("Got changesets from CVS checkout: #{changesets}")
       if branch_specified? then "-r#{cvsbranch} " else "" end
     end
     
-    def update_command(scm_to_time)
+    def update_command(scm_time)
       # get a clean copy
-      "update #{branch_option}#{to_time_option(scm_to_time)} -d -P -A -C"
+      "update #{branch_option}#{to_time_option(scm_time)} -d -P -A -C"
     end
     
-    def checkout_command(scm_to_time, target_dir)
-      "checkout #{branch_option}#{to_time_option(scm_to_time)} -d #{target_dir} #{cvsmodule}"
+    def checkout_command(scm_time, target_dir)
+      "checkout #{branch_option}#{to_time_option(scm_time)} -d #{target_dir} #{cvsmodule}"
     end
     
     def environment
@@ -220,16 +231,13 @@ logger.info("Got changesets from CVS checkout: #{changesets}")
     def parse_log(checkout_dir, cmd, &proc)
       changesets = nil
 
-      execed_command_line = "cvs -d#{cvsroot_with_password(cvspassword)} #{cmd}"      
-      execute(execed_command_line, checkout_dir, environment) do |stdin, stdout, stderr, pid|
-        logger.info("Reading chengeset log from stdout")
-        parser = CVSLogParser.new(stdout)
+      execed_command_line = "cvs -d#{cvsroot_with_password(cvspassword)} #{cmd}"
+      cmd_with_io(checkout_dir, execed_command_line, environment) do |io|
+        parser = CVSLogParser.new(io)
         parser.cvspath = path
         parser.cvsmodule = cvsmodule
         changesets = parser.parse_changesets
-        logger.info("DONE Reading chengeset log from stdout")
       end
-      logger.info("OUTSIDE changesets BLOCK")
       changesets
     end
     
@@ -243,16 +251,11 @@ logger.info("Got changesets from CVS checkout: #{changesets}")
 
       execed_command_line = "cvs -d#{cvsroot_with_password(cvspassword)} #{cmd}"
 
-      execute(execed_command_line, dir, environment) do |stdin, stdout, stderr, pid|
-        logger.info("Reading from stdout")
-        stdout.each_line do |progress|
-          if block_given? then yield progress else logger.info(progress) end
+      cmd_with_io(dir, execed_command_line, environment) do |io|
+        io.each_line do |progress|
+          if block_given? then yield progress else logger.debug(progress) end
         end
-        logger.info("DONE Reading from stdout. Killing cvs")
-        Process.kill("SIGHUP", pid)
-        logger.info("Killed cvs")
       end
-      logger.info("OUTSIDE cvs BLOCK")
     end
 
   protected

@@ -16,6 +16,10 @@ module DamageControl
       @project_config_repository = project_config_repository
     end
     
+    def create_scm
+      @project_config_repository.create_scm(project_name)
+    end
+    
   protected
   
     attr_reader :build_history_repository
@@ -24,7 +28,7 @@ module DamageControl
 
     def project_name
       # Use path info instead of query string, this makes better access control possible
-			# but query string takes precedence before path info in order to enable project cloning
+      # but query string takes precedence before path info in order to enable project cloning
       request.path_info[1..-1]
     end
     
@@ -33,12 +37,8 @@ module DamageControl
     end
     
     def project_config
-      return @project_config_repository.default_project_config unless project_exists?
+      return @project_config_repository.default_project_config("") unless project_exists?
       @project_config_repository.project_config(project_name)
-    end
-    
-    def create_scm
-      @project_config_repository.create_scm(project_name)
     end
     
     def template_dir
@@ -71,8 +71,8 @@ module DamageControl
       #]
       result = [] 
       if private?
-				configpath = "configure"
-				configpath = "../configure" if toplevel
+        configpath = "configure"
+        configpath = "../configure" if toplevel
         result += [
           task(:icon => "largeicons/box_new.png", :name => "New project", :url => configpath)
         ]
@@ -104,13 +104,13 @@ module DamageControl
     def private?
       @type == :private
     end
-		
-		def toplevel
-			!request.path_info.empty?
-		end
+    
+    def toplevel
+      !request.path_info.empty?
+    end
     
     def breadcrumbs
-			result = "<a href=\"dashboard\">Dashboard</a>"
+      result = "<a href=\"dashboard\">Dashboard</a>"
       result = "<a href=\"../dashboard\">Dashboard</a>" if toplevel
       result << " > <a href=\"../project/#{project_name}\">#{project_name}</a>" if toplevel
       result

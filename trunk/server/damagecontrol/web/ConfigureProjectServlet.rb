@@ -9,7 +9,7 @@ module DamageControl
     def initialize(project_config_repository, scm_configurator_classes, tracking_configurator_classes, trig_xmlrpc_url)
       super(:private, nil, nil, project_config_repository)
       @scm_configurator_classes = scm_configurator_classes
-			@tracking_configurator_classes = tracking_configurator_classes
+      @tracking_configurator_classes = tracking_configurator_classes
       @trig_xmlrpc_url = trig_xmlrpc_url
     end
     
@@ -17,7 +17,7 @@ module DamageControl
       result = []
       unless project_name.nil?
         result += [
-          task(:icon => "largeicons/navigate_left.png", :name => "Back to project", :url => "project?project_name=#{project_name}"),
+          task(:icon => "largeicons/navigate_left.png", :name => "Back to project", :url => "/#{project_name}"),
         ]
       end 
       result
@@ -54,7 +54,8 @@ module DamageControl
       project_config['artifacts_to_archive'] = to_array(request.query['artifacts_to_archive'])
       project_config['polling'] = to_boolean(request.query['polling'])
       scm_configurators(project_config).find{|c| c.scm_id == request.query['scm_id'] }.store_configuration_from_request(request)
-			tracking_configurators(project_config).find{|c| c.tracking_id == request.query['tracking_id'] }.store_configuration_from_request(request)
+
+      tracking_configurators(project_config).find{|c| c.tracking_id == request.query['tracking_id'] }.store_configuration_from_request(request)
 
       @project_config_repository.modify_project_config(project_name, project_config)
       @project_config_repository.set_next_build_number(project_name, request.query["next_build_number"].chomp.to_i) if request.query["next_build_number"]
@@ -99,11 +100,11 @@ module DamageControl
     end
     
     def scm_configurators(project_config = self.project_config)
-      @scm_configurator_classes.collect {|cls|	cls.new(project_config, project_config_repository)	}
+      @scm_configurator_classes.collect {|cls|  cls.new(project_config, project_config_repository)  }
     end
     
-		def tracking_configurators(project_config = self.project_config)
-			@tracking_configurator_classes.collect {|cls| cls.new(project_config, project_config_repository)}
-		end
+    def tracking_configurators(project_config = self.project_config)
+      @tracking_configurator_classes.collect {|cls| cls.new(project_config, project_config_repository)}
+    end
   end
 end

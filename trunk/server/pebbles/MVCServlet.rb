@@ -101,7 +101,7 @@ module Pebbles
       action = request.query['action'] || "default_action"
       
       begin
-        raise "no such action: #{action}" unless actions.index(action)
+        raise "no such action: #{action} in #{self.class.name}. Available:<br> #{actions.join('<br>')}" unless actions.index(action)
         self.send(action.untaint)
       rescue Exception => e
         response.body = "<html><body><pre>" + e.class.name + ": " + e.message + "\n" + e.backtrace.join("\n\t") + "</pre></body></html>" 
@@ -109,7 +109,7 @@ module Pebbles
     end
     
     def actions
-      self.public_methods - self.class.superclass.public_instance_methods
+      self.public_methods #- self.class.superclass.public_instance_methods
     end
     
     def send(method, *args)
