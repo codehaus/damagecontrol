@@ -64,17 +64,19 @@ module DamageControl
       @current_build.quiet_period || default_quiet_period
     end
     
+    def reset_last_build_request
+      @last_build_request = nil
+    end
+    
     def tick(time)
         if quiet_period_elapsed
+          reset_last_build_request
           begin
             checkout if checkout?
             execute
           rescue Exception => e
             stacktrace = e.backtrace.join("\n")
-            msg = "Build failed due to: #{stacktrace}"
-            puts msg
-# Can't report progress here. Logfile might be closed.
-#            report_progress(msg)
+            report_progress("Build failed due to: #{stacktrace}")
             current_build.successful = false
           end
           @channel.publish_message(BuildCompleteEvent.new(current_build))

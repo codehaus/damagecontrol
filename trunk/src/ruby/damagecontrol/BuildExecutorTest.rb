@@ -51,9 +51,11 @@ module DamageControl
     def test_waits_quiet_period_after_last_build_request_before_building
       def @build_executor.checkout
         # stub it
+        report_progress("checkout")
       end
       def @build_executor.execute
         # stub it
+        report_progress("execute")
       end
       @build_executor.clock = FakeClock.new
 
@@ -66,7 +68,12 @@ module DamageControl
       @build_executor.clock.advance(@quiet_period)
       assert(@build_executor.quiet_period_elapsed)
       @build_executor.force_tick
-      assert_message_types_from_hub([BuildRequestEvent, BuildCompleteEvent])
+      assert_message_types_from_hub([BuildRequestEvent, BuildProgressEvent, BuildCompleteEvent])
+      assert_nil(@build_executor.last_build_request)
+      assert(!@build_executor.quiet_period_elapsed)
+
+      @build_executor.force_tick
+      assert_message_types_from_hub([BuildRequestEvent, BuildProgressEvent, BuildCompleteEvent])
     end
     
     def test_failing_build_sends_build_complete_event_with_successful_flag_set_to_false
