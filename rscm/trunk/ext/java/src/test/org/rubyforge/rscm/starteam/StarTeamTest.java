@@ -2,6 +2,7 @@ package org.rubyforge.rscm.starteam;
 
 import junit.framework.TestCase;
 import org.rubyforge.rscm.ChangeSets;
+import org.rubyforge.rscm.RSCM;
 
 import java.io.IOException;
 import java.io.PrintWriter;
@@ -19,9 +20,11 @@ public class StarTeamTest extends TestCase {
         String userName = "andybarba";
         String password = "";
         String serverName = "192.168.254.21";
-        int serverPort = 49201;
+        String serverPort = "49201";
         String projectName = "NGST Application";
         String viewName = "NGST Application";
+        String folderName = "java";
+        RSCM starTeam = new StarTeam(userName, password, serverName, serverPort, projectName, viewName, folderName);
 
         TimeZone UTC = TimeZone.getTimeZone("UTC");
 //        Calendar cal = new GregorianCalendar(UTC, Locale.UK);
@@ -34,7 +37,7 @@ public class StarTeamTest extends TestCase {
         Date to = cal.getTime();
         to = null;
 
-        ChangeSets changeSets = new StarTeam(userName, password, serverName, serverPort, projectName, viewName).getChangeSets(from, to, "java");
+        ChangeSets changeSets = starTeam.getChangeSets(from, to);
         final PrintWriter out = new PrintWriter(System.out);
         changeSets.write(out);
         out.flush();

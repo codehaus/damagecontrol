@@ -1,18 +1,26 @@
 <project name="rscm" basedir="." default="jar">
 
+    <property environment="ENV"/>
+
     <target name="compile">
+        <fail unless="ENV.RSCM_STARTEAM">The RSCM_STARTEAM environment variable must be defined and point to the StarTeam SDK directory</fail>
+
         <mkdir dir="target/classes"/>
         <javac destdir="target/classes" debug="on" includeantruntime="true">
             <src location="src/main"/>
             <src location="src/test"/>
             <classpath>
-                <fileset dir="${starteam.home}/Lib"/>
+                <fileset dir="${ENV.RSCM_STARTEAM}/Lib"/>
             </classpath>
         </javac>
     </target>
 
     <target name="jar" depends="compile">
-        <jar basedir="target/classes" file="../rscm.jar"/>
+        <jar file="../rscm.jar">
+            <fileset dir="target/classes">
+                <exclude name="**/*Test.class"/>
+            </fileset>
+        </jar>
     </target>
 
     <target name="test" depends="compile">
@@ -22,7 +30,7 @@
                 <pathelement location="target/classes"/>
                 <fileset dir="${starteam.home}/Lib"/>
             </classpath>
-            <jvmarg value="-Djava.library.path=${starteam.home}/Lib"/>
+            <jvmarg value="-Djava.library.path=${ENV.RSCM_STARTEAM}/Lib"/>
 
             <formatter type="xml"/>
             <formatter type="plain"/>

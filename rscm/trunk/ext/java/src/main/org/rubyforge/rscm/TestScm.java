@@ -23,7 +23,7 @@ public class TestScm implements RSCM {
         this.bar = bar;
     }
 
-    public ChangeSets getChangeSets(Date from, Date to, String folderName) {
+    public ChangeSets getChangeSets(Date from, Date to) {
         ChangeSets changeSets = new ChangeSets();
 
         changeSets.add(new Change("rinkrank",

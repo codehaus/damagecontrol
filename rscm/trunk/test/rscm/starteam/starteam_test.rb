@@ -8,7 +8,7 @@ module RSCM
 #    include GenericSCMTests
 
     def create_scm(repository_root_dir, path)
-      StarTeam.new
+      StarTeam.new("a_user_name", "a_password", "a_server_name", "49201", "a_project_name", "a_view_name", "a_folder_name")
     end
     
     def test_yaml

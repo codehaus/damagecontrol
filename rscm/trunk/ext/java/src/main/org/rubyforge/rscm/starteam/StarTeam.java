@@ -37,17 +37,19 @@ public class StarTeam implements RSCM {
     private boolean canLookupEmails = true;
     private static final DateFormat ISO8601_FORMAT = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss", Locale.UK);;
     private final String url;
+    private final String folderName;
 
-    public StarTeam(String url) {
+    public StarTeam(String url, String folderName) {
         this.url = url;
+        this.folderName = folderName;
     }
 
-    public StarTeam(String userName, String password, String serverName, int serverPort, String projectName, String viewName) {
-        this(userName + ":" + password + "@" + serverName + ":" + serverPort + "/" + projectName + "/" + viewName);
+    public StarTeam(String userName, String password, String serverName, String serverPort, String projectName, String viewName, String folderName) {
+        this(userName + ":" + password + "@" + serverName + ":" + Integer.parseInt(serverPort) + "/" + projectName + "/" + viewName, folderName);
     }
 
 
-    public ChangeSets getChangeSets(Date from, Date to, String folderName) {
+    public ChangeSets getChangeSets(Date from, Date to) {
         System.out.println("CHANGESETS FOR " + url + " " + from + "-" + to + " - FOLDER:" + folderName);
         ChangeSets changeSets = new ChangeSets();
 

@@ -41,7 +41,7 @@ public class Main {
             }
             rscm = (RSCM) clazz.getConstructor(parameterTypes).newInstance(ctorargs);
         }
-        ChangeSets changeSets = rscm.getChangeSets(from, to, folderName);
+        ChangeSets changeSets = rscm.getChangeSets(from, to);
         // Print changesets to stdout in YAML form so they can be slurped on the calling ruby side.
         final PrintWriter out = new PrintWriter(System.out);
         changeSets.write(out);

@@ -9,5 +9,5 @@ import java.util.Date;
  */
 public interface RSCM {
     // TODO: move folderName to starteam's ctor, it's a bit weird here - may not fit with other scms.
-    ChangeSets getChangeSets(Date from, Date to, String folderName);
+    ChangeSets getChangeSets(Date from, Date to);
 }
