@@ -327,7 +327,7 @@ module DamageControl
     end
     
     def polling_interval
-      params[:PollingInterval] || 10 # poll every ten seconds if not specified
+      params[:PollingInterval] || 60 # poll every minute if not specified
     end
     
     def init_scm_poller
