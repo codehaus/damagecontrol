@@ -65,8 +65,8 @@ module DamageControl
       parse_spec(spec)[4]
     end
 
-    def checkout_command(spec)
-      "-d #{cvsroot(spec)} checkout #{mod(spec)}"
+    def checkout_command(spec, directory)
+      "-d #{cvsroot(spec)} checkout -d #{directory} #{mod(spec)}"
     end
 
     def update_command(spec)
@@ -77,11 +77,11 @@ module DamageControl
       directory = File.expand_path(directory)
       File.makedirs(directory)
       if(checked_out?(directory, spec))
-        Dir.chdir("#{directory}/#{mod(spec)}")
+        Dir.chdir(directory)
         cvs(update_command(spec), &proc)
       else
         Dir.chdir(directory)
-        cvs(checkout_command(spec), &proc)
+        cvs(checkout_command(spec, directory), &proc)
       end
     end
 

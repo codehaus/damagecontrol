@@ -1,4 +1,5 @@
 require 'damagecontrol/BuildEvents'
+require 'damagecontrol/AsyncComponent'
 require 'damagecontrol/scm/DefaultSCMRegistry'
 require 'damagecontrol/FileSystem'
 
@@ -7,12 +8,13 @@ module DamageControl
   # This class tells the build to execute and reports
   # progress as events back to the channel
   #
-  class BuildExecutor
+  class BuildExecutor < AsyncComponent
   
     attr_reader :current_build
     attr_reader :builds_dir
 
     def initialize(channel, builds_dir, scm = DefaultSCMRegistry.new)
+      super(channel)
       @channel = channel
       @channel.add_subscriber(self)
       @builds_dir = builds_dir
@@ -29,18 +31,24 @@ module DamageControl
     def execute
       @filesystem.makedirs(project_base_dir)
       @filesystem.chdir(project_base_dir)
-      current_build.successful = IO.popen(current_build.build_command_line) do |output|
+      
+      # temp hack that only works for Ant/Maven. We need to get the return code!!!
+      did_read_build_failed = false
+      IO.popen(current_build.build_command_line) do |output|
         output.each_line do |line|
           report_progress(line)
+          did_read_build_failed = true if /BUILD FAILED/ =~ line
         end
       end
+      
+      current_build.successful = !did_read_build_failed
     end
  
     def project_base_dir
       "#{@builds_dir}/#{current_build.project_name}"
     end
 
-    def receive_message(message)
+    def process_message(message)
       if message.is_a? BuildRequestEvent
         @current_build = message.build
         checkout unless current_build.scm_spec.nil?

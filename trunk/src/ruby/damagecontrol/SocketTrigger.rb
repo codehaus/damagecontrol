@@ -15,9 +15,8 @@ module DamageControl
   
     attr_accessor :port
     
-    def initialize(channel, root_dir, port=4711)
+    def initialize(channel, port=4711)
       @channel = channel
-      @root_dir = root_dir
       @port = port
     end
     

@@ -15,7 +15,7 @@ module DamageControl
     
     def setup
       create_hub
-      @s = SocketTrigger.new(hub, "/usr/local/builds")
+      @s = SocketTrigger.new(hub)
       @project_name = "picocontainer"
       @scm_spec = ":local:/cvsroot/picocontainer:pico"
       @build_command_line = "echo damagecontrol rocks"
