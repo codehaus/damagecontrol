@@ -277,10 +277,8 @@ class Project
     clean
     test
     dist_nodeps
-    # this doesn't seem to work either!
-    #archive_nodeps
-    # doesn't seem to work yet for the dcontrol user :-(
-    #upload_nodeps
+    archive_nodeps
+    upload_nodeps
     self_upgrade
   end
   
