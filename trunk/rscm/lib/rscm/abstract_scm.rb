@@ -77,8 +77,13 @@ module RSCM
       false
     end
 
-    # Creates a new repository. Throws an exception if the
-    # repository cannot be created.
+    # Creates a new 'central' repository. This is intended only for creation of 'central'
+    # repositories (not for working copies). You shouldn't have to call this method if a central repository
+    # already exists. This method is used primarily for testing of RSCM, but can also
+    # be used if you *really* want to create a central repository. 
+    # 
+    # This method should throw an exception if the repository cannot be created (for
+    # example if the repository is 'remote'.
     #
     def create
     end
