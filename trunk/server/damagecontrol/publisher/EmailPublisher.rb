@@ -31,6 +31,7 @@ module DamageControl
       @always_mail = config[:SendEmailOnAllBuilds] || false
       @mail_server = config[:MailServerHost] || "localhost"
       @port = config[:MailServerPort] || 25
+      @sender = config[:Sender] || Net::SMTP      
     end
     
     def required_config(key)
@@ -44,17 +45,18 @@ module DamageControl
             build = message.build
             subject = ERB.new(@subject_template).result(binding)
             body    = ERB.new(@body_template).result(binding)
-            sendmail(subject, body, @from, nag_email)
+            sendmail(subject, build.dc_start_time, body, @from, nag_email)
           end
         end
       end
     end
     
-    def sendmail(subject, body, from, to)
+    def sendmail(subject, date, body, from, to)
       # convert separators to spaces, according to the SMTP protocol.
       to.gsub(',',' ').gsub(';',' ')
       mail = "To: #{to}\r\n" +
              "From: #{from}\r\n" +
+             "Date: " + date.to_rfc2822 + "\r\n" +
              "Subject: #{subject}\r\n" +
              "MIME-Version: 1.0\r\n" +
              "Content-Type: text/html\r\n" +
@@ -62,7 +64,7 @@ module DamageControl
              body
       begin
         logger.info("sending email to #{to} using SMTP server #{@mail_server}")
-        Net::SMTP.start(@mail_server) do |smtp|
+        @sender.start(@mail_server) do |smtp|
           # convert space separated string to array
           smtp.sendmail( mail, from, to.split )
         end

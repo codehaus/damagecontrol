@@ -11,21 +11,38 @@ module DamageControl
 
   class EmailPublisherTest < Test::Unit::TestCase
     include MockIt
+
+    class FakeSender
+
+      attr_accessor :server
+      attr_accessor :mail
+      attr_accessor :from
+      attr_accessor :to
+
+      def start(server)
+        @server = server
+        yield self
+      end
+
+      def sendmail(mail, from, to)
+        @mail = mail
+        @from = from
+        @to = to
+      end
+
+    end
   
-    def setup
+    def setup      
+      @sender = FakeSender.new()
       @email_publisher = EmailPublisher.new(
         new_mock.__expect(:add_consumer),
         nil,
         :SubjectTemplate => "short_text_build_result.erb", 
         :BodyTemplate => "short_html_build_result.erb",
-        :FromEmail => "noreply@somewhere.foo")
+        :FromEmail => "noreply@somewhere.foo",
+        :MailServerHost => "mail.somewhere.foo",
+        :Sender => @sender)
 
-      def @email_publisher.sendmail(subject, body, from, to)
-        @mail_content = "#{subject}|#{body}|#{from}|#{to}"
-      end
-      def @email_publisher.mail_content
-        @mail_content
-      end
     end
   
     def test_email_is_sent_upon_build_complete_event    
@@ -37,20 +54,23 @@ module DamageControl
       build.changesets.add(change1)
 
       @email_publisher.on_message(BuildCompleteEvent.new(build))
-      assert_equal(
-        "[cheese] BUILD FAILED|" +
-        # This is the body of the mail
+      assert_equal("mail.somewhere.foo", @sender.server)
+      assert_equal("noreply@somewhere.foo", @sender.from)
+      assert_equal(["somelist@someproject.bar"], @sender.to)
+      assert_equal("To: somelist@someproject.bar\r\n" +
+        "From: noreply@somewhere.foo\r\n" +
+        "Date: Sun, 28 Feb 1971 23:45:00 +0000\r\n" + 
+        "Subject: [cheese] BUILD FAILED\r\n" + 
+        "MIME-Version: 1.0\r\nContent-Type: text/html\r\n" +
+        "\r\n" + 
         "aslak broke the build <br>" +
-        "<a href=\"http://moradi.com/public/project/cheese?action=build_details&dc_creation_time=19710228234500\">[cheese] BUILD FAILED</a>" +
-
-        # End mail body
-        "|noreply@somewhere.foo|somelist@someproject.bar", 
-        @email_publisher.mail_content)
+        "<a href=\"http://moradi.com/public/project/cheese?action=build_details&dc_creation_time=19710228234500\">[cheese] BUILD FAILED</a>", 
+        @sender.mail)
     end
     
     def test_nothing_is_sent_unless_build_complete_event
       @email_publisher.on_message(nil)
-      assert_nil(@email_publisher.mail_content)
+      assert_nil(@sender.mail)
     end
     
   end

@@ -48,6 +48,7 @@ require 'damagecontrol/web/ChangesReportTest'
 require 'damagecontrol/web/SearchServletTest'
 require 'damagecontrol/web/ProjectStatusTest'
 require 'damagecontrol/web/BuildExecutorStatusTest'
+require 'damagecontrol/web/RssServletTest'
 
 # let's stick to unit test and e2etest
 #require 'damagecontrol/test/IntegrationTests'

@@ -23,6 +23,7 @@ module Pebbles
 
     class FakeHttpRequest < FakeHttpMessage
       def initialize(path_info)
+        super()
         @path_info = path_info
       end
       attr_accessor :query

@@ -47,8 +47,8 @@ class Time
     )
   end
   
-  def to_rss
-    utc.strftime("%a, %d %b %Y %H:%M:%S GMT0:00")
+  def to_rfc2822
+    utc.strftime("%a, %d %b %Y %H:%M:%S +0000")
   end
   
   def to_human

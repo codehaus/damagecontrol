@@ -21,7 +21,7 @@ module DamageControl
         @build
       end
 
-      def to_rss(project_name, url)
+      def to_rss(project_name)
         document = REXML::Document.new()
         document.add_element("rss")
         document        
@@ -34,7 +34,7 @@ module DamageControl
       build.dc_creation_time = Time.utc(2004,10,7,16,0,0)
       build_history_repository = FakeBuildHistoryRepository.new(build)
       servlet = RssServlet.new(build_history_repository, "http://builds.codehaus.org/rss")
-      result = do_request("project_name" => "myproject") do
+      result = do_request("/myproject", {}) do
         servlet.default_action
       end
 
@@ -46,7 +46,7 @@ module DamageControl
       build.dc_creation_time = Time.utc(2004,10,7,16,0,0)
       build_history_repository = FakeBuildHistoryRepository.new(build)
       servlet = RssServlet.new(build_history_repository, "http://builds.codehaus.org/rss")
-      result = do_request("project_name" => "myproject") do
+      result = do_request("/myproject", {}) do
         Thread.current["request"]["If-None-Match"] = 'W/"20041007160000"'
         servlet.default_action
         assert_equal(WEBrick::HTTPStatus::NotModified.code, Thread.current["response"].status)
@@ -59,7 +59,7 @@ module DamageControl
       build.dc_creation_time = Time.utc(2004,10,7,16,0,0)
       build_history_repository = FakeBuildHistoryRepository.new(build)
       servlet = RssServlet.new(build_history_repository, "http://builds.codehaus.org/rss")
-      result = do_request("project_name" => "myproject") do
+      result = do_request("/myproject", {}) do
         Thread.current["request"]["If-None-Match"] = 'W/"20041004100000"'
         servlet.default_action
         assert_equal('W/"20041007160000"', Thread.current["response"]["ETag"])

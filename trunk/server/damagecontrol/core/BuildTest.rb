@@ -24,7 +24,7 @@ module DamageControl
       item = build.to_rss_item
       assert_equal("myproject: Build #42 successful", item.get_text("title").value)
       assert_equal("http://builds.codehaus.org/something", item.get_text("link").value)
-      assert_equal(t.to_rss, item.get_text("pubDate").value)
+      assert_equal(t.to_rfc2822, item.get_text("pubDate").value)
       assert_equal("Fixed bug 42", item.get_text("description").value)
     end
     

@@ -101,7 +101,7 @@ module DamageControl
       title = "#{project_name}: Build #{label_text}#{status.downcase}"
       item.add_element("title").add_text(title)
       item.add_element("link").add_text(url)
-      item.add_element("pubDate").add_text(dc_creation_time.to_rss)
+      item.add_element("pubDate").add_text(dc_creation_time.to_rfc2822)
       item.add_element("description").add_text(changesets.to_rss_description.to_s())
       item
     end
