@@ -44,7 +44,8 @@ module DamageControl
 
         @subject = "#{build.project.name} Build #{build.status_message}"
         @sent_on = Time.new.utc
-        @body = {"build" => build}
+        @headers['Content-Type'] = "text/html"
+        @body["build"] = build
       end
       
       # We have to define this, since our name is used to find the email template

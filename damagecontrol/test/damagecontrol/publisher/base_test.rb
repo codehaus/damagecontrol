@@ -12,7 +12,7 @@ module DamageControl
           #Execute,
           Growl,
           #Irc,
-          Jabber
+          Jabber,
           #X10Cm11A,
           #X10Cm17A,
           #Yahoo
