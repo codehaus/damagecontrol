@@ -1,8 +1,8 @@
 module DamageControl
   module XSLT
-    def xslt(xml, xsl, out)
+    def xslt(xml, xsl, out, options="")
       result = ""
-      cmd = "xsltproc '#{xsl}' '#{xml}' > '#{out}'"
+      cmd = "xsltproc #{options} '#{xsl}' '#{xml}' > '#{out}'"
       system(cmd)
       if($? != 0)
         result += "Error executing XSLT process"

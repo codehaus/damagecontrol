@@ -41,7 +41,7 @@ module DamageControl
         "[cheese] BUILD FAILED|" +
         # This is the body of the mail
         "aslak broke the build <br>" +
-        "<a href=\"http://moradi.com/public/project/cheese?action=build_details&dc_creation_time=19710228234500\">[cheese] BUILD FAILED</a><br>" +
+        "<a href=\"http://moradi.com/public/project/cheese?action=build_details&dc_creation_time=19710228234500\">[cheese] BUILD FAILED</a>" +
 
         # End mail body
         "|noreply@somewhere.foo|somelist@someproject.bar", 

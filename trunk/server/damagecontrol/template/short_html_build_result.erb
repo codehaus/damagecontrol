@@ -4,4 +4,4 @@ if(!build.successful?)
     to_blame << changeset.developer unless to_blame.index(changeset.developer)
   end
 end
-if(!to_blame.empty?) %><%= to_blame.join(", ") %> broke the build <br><% end %><a href="<%=build.url%>">[<%=build.project_name%>] BUILD <%=build.status%></a><br>
+if(!to_blame.empty?) %><%= to_blame.join(", ") %> broke the build <br><% end %><a href="<%=build.url%>">[<%=build.project_name%>] BUILD <%=build.status%></a>
