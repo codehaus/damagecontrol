@@ -1,7 +1,6 @@
 require 'test/unit'
 require 'damagecontrol/HubTestHelper'
 require 'damagecontrol/CruiseControlLogPoller'
-require 'rexml/document'
 require 'ftools'
 
 module DamageControl
@@ -32,6 +31,8 @@ module DamageControl
 			assert_message_types("DamageControl::BuildCompleteEvent")
 			assert_equal('dxbranch', messages_from_hub[0].build.project_name)
 			assert_equal('build.698', messages_from_hub[0].build.label)
+			assert_equal(false, messages_from_hub[0].build.successful)
+			assert_equal("BUILD FAILED detected", messages_from_hub[0].build.error_message)
 		end
 		
 	end

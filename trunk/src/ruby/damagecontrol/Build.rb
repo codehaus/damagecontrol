@@ -3,7 +3,13 @@ module DamageControl
 
 	class Build
 		attr_reader :project_name
-		attr_accessor :website_directory, :logs_directory, :build_command_line, :basedir
+		attr_accessor :website_directory
+		attr_accessor :logs_directory
+		attr_accessor :basedir
+		attr_accessor :build_command_line
+		attr_accessor :label
+		attr_accessor :successful
+		attr_accessor :error_message
 	
 		def initialize (project_name)
 			@project_name = project_name
@@ -18,6 +24,10 @@ module DamageControl
 			}
 		end
 		
+		def successful?
+			successful
+		end
+
 		def open_log_file (filename, params="w")
 			Dir.mkdir( website_directory ) unless File.exists?( website_directory )
 			File.open( website_file(filename), "w") { |file|
