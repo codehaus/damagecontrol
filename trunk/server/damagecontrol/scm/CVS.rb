@@ -248,7 +248,9 @@ logger.info("Got changesets from CVS checkout: #{changesets}")
         stdout.each_line do |progress|
           if block_given? then yield progress else logger.info(progress) end
         end
-        logger.info("DONE Reading from stdout")
+        logger.info("DONE Reading from stdout. Killing cvs")
+        Process.kill("SIGHUP", pid)
+        logger.info("Killed cvs")
       end
       logger.info("OUTSIDE cvs BLOCK")
     end

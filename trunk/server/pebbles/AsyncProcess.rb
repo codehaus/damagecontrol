@@ -68,7 +68,7 @@ module Pebbles
 
     begin
       # FixNum, Process::ProcessStatus
-puts "YIELDING streams"
+puts "YIELDING streams for #{cmd}"
       yield stdin_pipe[1], stdout_pipe[0], stderr_pipe[0], pid if block_given?
 puts "YIELDED streams - WAITING for process"
       pid, process_status = Process.waitpid2(pid)
