@@ -61,7 +61,7 @@ module XMLRPC
         # -- Jon Tirsen
         build.config["apa"]="banan" if o.config.empty?
         build
-      when Enumerable
+      when Array
         o.collect {|s| clean_for_marshal(s)}
       else
         o

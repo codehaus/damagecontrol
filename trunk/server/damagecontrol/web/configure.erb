@@ -39,7 +39,7 @@ function showScm(scm) {
   <td width="75%">
     <% if project_exists? %>
       <%= project_name %>
-      <input class="setting-input" name="project_name" type="hidden" value="<%= project_name %>"/>
+      <input name="project_name" type="hidden" value="<%= project_name %>"/>
     <% else %>
       <input class="setting-input" name="project_name" type="text" value="<%= project_name %>"/>
     <% end %>

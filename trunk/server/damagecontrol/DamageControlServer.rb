@@ -200,6 +200,8 @@ module DamageControl
     
     def init_private_web
       private_xmlrpc_servlet = ::XMLRPC::WEBrickServlet.new
+      DamageControl::XMLRPC::StatusPublisher.new(private_xmlrpc_servlet, build_history_repository)
+      DamageControl::XMLRPC::ConnectionTester.new(private_xmlrpc_servlet)
       DamageControl::XMLRPC::ServerControl.new(private_xmlrpc_servlet, hub)
       component(:trigger, DamageControl::XMLRPC::Trigger.new(private_xmlrpc_servlet, @hub, project_config_repository))
       # For private authenticated and encrypted (with eg an Apache proxy) XML-RPC connections like triggering a build

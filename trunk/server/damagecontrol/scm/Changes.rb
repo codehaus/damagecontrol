@@ -39,6 +39,7 @@ EOF
     end
 
     def ==(other)
+      return false if !other.is_a?(self.class)
       @changesets == other.changesets
     end
     
@@ -116,6 +117,7 @@ EOF
     end
     
     def ==(other)
+      return false if !other.is_a?(self.class)
       @changes == other.changes
     end
 
@@ -192,6 +194,7 @@ EOF
     end
 
     def ==(change)
+      return false if !other.is_a?(self.class)
       self.path == change.path &&
       self.developer == change.developer &&
       self.message == change.message &&
