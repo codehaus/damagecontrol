@@ -31,6 +31,7 @@ def start_simple_server(buildsdir, port = 4711, allow_ips = ["127.0.0.1"], param
 
   httpserver = WEBrick::HTTPServer.new(:Port => web_port, :RequestHandler => HostVerifyingHandler.new(host_verifier))
   httpserver.mount("/RPC2", xmlrpc_servlet)
+  httpserver.mount("/xmlrpc", xmlrpc_servlet)
   at_exit { httpserver.shutdown }
   Thread.new { httpserver.start }
 end
