@@ -12,6 +12,7 @@ require 'damagecontrol/template/HTMLTemplate'
 require 'damagecontrol/publisher/IRCPublisher' 
 require 'damagecontrol/publisher/FilePublisher' 
 require 'damagecontrol/publisher/EmailPublisher' 
+require 'damagecontrol/publisher/JIRAPublisher' 
 
 include DamageControl
 
@@ -23,6 +24,7 @@ LogWriter.new(@hub, "#{buildRoot}/log")
 FilePublisher.new(@hub, "#{buildRoot}/report", HTMLTemplate.new).start 
 IRCPublisher.new(@hub, "irc.codehaus.org", "\#damagecontrol", ShortTextTemplate.new).start
 EmailPublisher.new(@hub, ShortTextTemplate.new, HTMLTemplate.new, "dcontrol@builds.codehaus.org").start
+JIRAPublisher.new(@hub, ShortTextTemplate.new, "jira.codehaus.org").start
 SelfUpgrader.new(@hub).start
 
 # wait until ctrl-c 
