@@ -232,9 +232,10 @@ class Project
   
   def self_upgrade
     unless windows?
-      system("mv ~/damagecontrol ~/damagecontrol.bak") rescue
-      mkdir_p("~/damagecontrol")
-      system("cp -a target/dist/* ~/damagecontrol")
+      system("mkdir -p ~/damagecontrol.new")
+      system("cp -a target/dist/* ~/damagecontrol.new")
+      system("mv ~/damagecontrol ~/damagecontrol.old") rescue
+      system("mv ~/damagecontrol.new ~/damagecontrol") 
     end
     shutdown_server("DamageControl is restarting (self upgrade)") rescue info("could not shutdown server")
     # daemontools should automatically start it again
