@@ -19,7 +19,7 @@ module DamageControl
           log_file(message.build).puts(message.output)
           log_file(message.build).flush
         rescue => e
-          puts "BuildProgressEvent: Couldn't write to file #{log_file(message.build).path}:#{e.message}"
+          puts "BuildProgressEvent: Couldn't write to file #{log_file_name(build)}:#{e.message}"
         end
       end
 
@@ -29,17 +29,20 @@ module DamageControl
           log_file(message.build).flush
           log_file(message.build).close
         rescue => e
-          puts "BuildCompleteEvent: Couldn't write to file #{log_file(message.build).path}:#{e.message}"
+          puts "BuildCompleteEvent: Couldn't write to file #{log_file_name(build)}:#{e.message}"
         end
       end
     end
+    
+    def log_file_name(build)
+      "#{@logs_base_dir}/#{build.project_name}/#{build.timestamp}.log"
+    end
 
     def log_file(build)
-      file_name = "#{@logs_base_dir}/#{build.project_name}/#{build.timestamp}.log"
+      file_name = log_file_name(build)
       file = @log_files[file_name]
       if(!file)
-        dir = File.dirname(file_name)
-        File.makedirs(dir)
+        File.makedirs(File.dirname(file_name))
         file = File.open(file_name, "w")
         @log_files[file_name] = file
       end
