@@ -26,7 +26,6 @@ module RSCM
     end
 
     def changesets(checkout_dir, from_identifier=Time.epoch, to_identifier=Time.infinity, files=nil)
-
       # just assuming it is a Time for now, may support labels later.
       # the java class really wants rfc822 and not rfc2822, but this works ok anyway.
       from = from_identifier.to_rfc2822
@@ -34,12 +33,18 @@ module RSCM
 
       changesets = java("getChangeSets(\"#{from}\";\"#{to}\")")
       raise "changesets must be of type #{ChangeSets.name} - was #{changesets.class.name}" unless changesets.is_a?(::RSCM::ChangeSets)
+
+      # Just a little sanity check
+      if(changesets.latest)
+        latest_time = changesets.latest.time
+        if(latest_time < from_identifier || to_identifier < latest_time)
+          raise "Latest time (#{latest_time}) is not within #{from_identifier}-#{to_identifier}"
+        end
+      end
       changesets
     end
 
     def checkout(checkout_dir)
-      to = to_identifier.to_rfc2822      
-
       files = java("checkout(\"#{checkout_dir}\")")
       files
     end
@@ -77,8 +82,8 @@ module RSCM
 #puts cmdline
 #puts "------------"
       IO.popen(cmdline) do |io|
-        io = io.read
-        puts io
+#        io = io.read
+#        puts io
 #puts "------------"
         YAML::load(io)
       end

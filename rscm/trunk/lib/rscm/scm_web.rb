@@ -3,6 +3,12 @@ require 'rscm/path_converter'
 module RSCM
   module SCMWeb
 
+    class Null
+      def change_url(change, anchor=false)
+        change.path
+      end
+    end
+
     class ViewCVS
       attr_accessor :view_cvs_url
 

@@ -135,7 +135,8 @@ System.err.println("(java) to: " + to);
                         stPropertyNames.MODIFIED_USER_ID,
                         stPropertyNames.FILE_NAME};
 
-            View snapshotAtFrom = new View(view, ViewConfiguration.createFromTime(new OLEDate(from)));
+            OLEDate fromDate = new OLEDate(from);
+            View snapshotAtFrom = new View(view, ViewConfiguration.createFromTime(fromDate));
 
             ViewConfiguration toConfig;
             OLEDate toDate;
@@ -164,7 +165,8 @@ System.err.println("(java) to: " + to);
             } catch (Exception e) {
                 e.printStackTrace();
             }
-            compareFileLists(fromFiles, toFiles, toDate, changeSets);
+
+            compareFileLists(fromFiles, toFiles, changeSets, fromDate, toDate);
 
             return changeSets;
         } finally {
@@ -259,7 +261,7 @@ System.err.println("(java) to: " + to);
     /**
      * Compare old and new file lists to determine what happened
      */
-    private void compareFileLists(Map fromFiles, Map toFiles, OLEDate toDate, ChangeSets changeSets) {
+    private void compareFileLists(Map fromFiles, Map toFiles, ChangeSets changeSets, OLEDate fromDate, OLEDate toDate) {
         for (Iterator iter = toFiles.keySet().iterator(); iter.hasNext();) {
             Integer currentItemID = (Integer) iter.next();
             File currentFile = (File) toFiles.get(currentItemID);
@@ -268,9 +270,9 @@ System.err.println("(java) to: " + to);
                 File lastBuildFile = (File) fromFiles.get(currentItemID);
 
                 if (fileHasBeenModified(currentFile, lastBuildFile)) {
-                    addRevision(currentFile, "MODIFIED", changeSets);
+                    addRevision(currentFile, "MODIFIED", changeSets, fromDate, toDate);
                 } else if (fileHasBeenMoved(currentFile, lastBuildFile)) {
-                    addRevision(currentFile, "MOVED", changeSets);
+                    addRevision(currentFile, "MOVED", changeSets, fromDate, toDate);
                 }
                 // Remove the identified last build file from the list of
                 // last build files.  It will make processing the delete
@@ -278,20 +280,20 @@ System.err.println("(java) to: " + to);
                 fromFiles.remove(currentItemID);
             } else {
                 // File is new
-                addRevision(currentFile, "ADDED", changeSets);
+                addRevision(currentFile, "ADDED", changeSets, fromDate, toDate);
             }
         }
-        examineOldFiles(fromFiles, changeSets, toDate);
+        examineOldFiles(fromFiles, changeSets, fromDate, toDate);
     }
 
     /**
      * Now examine old files.  They have to have been deleted as we know they
      * are not in the new list from the processing above.
      */
-    private void examineOldFiles(Map lastBuildFiles, ChangeSets changeSets, OLEDate toDate) {
+    private void examineOldFiles(Map lastBuildFiles, ChangeSets changeSets, OLEDate fromDate, OLEDate toDate) {
         for (Iterator iter = lastBuildFiles.values().iterator(); iter.hasNext();) {
             File currentLastBuildFile = (File) iter.next();
-            addRevision((File) currentLastBuildFile.getFromHistoryByDate(toDate), "DELETED", changeSets);
+            addRevision((File) currentLastBuildFile.getFromHistoryByDate(toDate), "DELETED", changeSets, fromDate, toDate);
         }
     }
 
@@ -315,14 +317,18 @@ System.err.println("(java) to: " + to);
         }
     }
 
-    private void addRevision(File revision, String status, ChangeSets changeSets) {
+    private void addRevision(File revision, String status, ChangeSets changeSets, OLEDate fromDate, OLEDate toDate) {
+        String path = (revision.getParentFolderHierarchy() + revision.getName()).replace('\\', '/');
+
+        OLEDate modifiedTime = revision.getModifiedTime();
+        if(modifiedTime.getLongValue() < fromDate.getLongValue() || toDate.getLongValue() < modifiedTime.getLongValue()) {
+            // Outside time range
+            // System.err.println("Outside: " + path + ":" + modifiedTime.toISO8601String());
+            return;
+        }
+
         User user = revision.getServer().getUser(revision.getModifiedBy());
 
-//        System.out.println(revision.getParentFolder().getFolderHierarchy());
-//        System.out.println(revision.getName());
-//        System.out.println("----");
-
-        String path = (revision.getParentFolderHierarchy() + revision.getName()).replace('\\', '/');
         Matcher m = relativePathPattern.matcher(path);
         if(m.matches()) {
             path = m.group(1);
@@ -332,16 +338,9 @@ System.err.println("(java) to: " + to);
         String prevRev = "" + (revision.getContentVersion() - 1);
         String rev = "" + revision.getContentVersion();
         Date time = null;
-        final String isoString = revision.getModifiedTime().toISO8601String();
-        if(path.equals("NGST Application/java/testsrc/com/dcx/NGST/gui/screens/miscfuncs/FCM/ChangeEnabledStateDisplayViewTest.java")) {
-            System.err.println(path + ":" + isoString);
-        }
+        final String isoString = modifiedTime.toISO8601String();
         try {
             time = ISO8601_FORMAT.parse(isoString);
-            if (path.equals("NGST Application/java/testsrc/com/dcx/NGST/gui/screens/miscfuncs/FCM/ChangeEnabledStateDisplayViewTest.java")) {
-                System.err.println("timeString = " + time + ":" + time.getTimezoneOffset());
-            }
-//            System.out.println(Change.format(time));
         } catch (ParseException e) {
             throw new RuntimeException("Couldn't parse date: " + isoString, e);
         }

@@ -3,6 +3,12 @@ require 'rscm/path_converter'
 module RSCM
   module Tracker
 
+    class Null
+      def highlight(s)
+        s
+      end
+    end
+
     class Bugzilla
       attr_accessor :bugzilla_url
 
