@@ -8,6 +8,9 @@ import java.util.List;
 import java.util.Collections;
 
 /**
+ * Java incarnation of ChangeSets defined in changes.rb
+ * Can emit compatible YAML
+ *
  * @author Aslak Helles&oslash;y
  */
 public class ChangeSets implements YamlDumpable {
@@ -20,10 +23,15 @@ public class ChangeSets implements YamlDumpable {
     public void dumpYaml(Writer out) throws IOException {
         Collections.sort(changeSets);
         out.write("--- !ruby/object:RSCM::ChangeSets \n");
-        out.write("changesets: \n");
-        for (Iterator iterator = changeSets.iterator(); iterator.hasNext();) {
-            ChangeSet changeSet = (ChangeSet) iterator.next();
-            changeSet.write(out);
+        out.write("changesets: ");
+        if(!changeSets.isEmpty()) {
+            out.write("\n");
+            for (Iterator iterator = changeSets.iterator(); iterator.hasNext();) {
+                ChangeSet changeSet = (ChangeSet) iterator.next();
+                changeSet.write(out);
+            }
+	    } else {
+            out.write("[]");
         }
     }
 

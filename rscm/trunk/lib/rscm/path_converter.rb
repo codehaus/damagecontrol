@@ -5,6 +5,7 @@ WINDOWS = WIN32 || CYGWIN
 module RSCM
   module PathConverter
     def filepath_to_nativepath(path, escaped)
+      return nil if path.nil?
       path = File.expand_path(path)
       if(WIN32)
         path.gsub(/\//, "\\")
@@ -17,6 +18,7 @@ module RSCM
     end
 
     def filepath_to_nativeurl(path)
+      return nil if path.nil?
       if(CYGWIN || WIN32)
         urlpath = filepath_to_nativepath(path, false).gsub(/\\/, "/")
         path = "/#{urlpath}"
@@ -25,6 +27,7 @@ module RSCM
     end
 
     def nativepath_to_filepath(path)
+      return nil if path.nil?
       if(WIN32)
         path.gsub(/\//, "\\")
       elsif(CYGWIN)

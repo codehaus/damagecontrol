@@ -11,9 +11,6 @@ class Time
 end
 
 module RSCM
-  # WARNING! THE STARTEAM IMPLEMENTATION IS INCOMPLETE AT THIS STAGE.
-  # VOLUNTEERS TO COMPLETE IT ARE WELCOME.
-  #
   # The RSCM StarTeam class requires that the following software be installed:
   #
   # * Java Runtime (1.4.2)
@@ -22,29 +19,31 @@ module RSCM
   #
   class StarTeam < AbstractSCM
 
-    def initialize(user_name, password, server_name, server_port, project_name, view_name, folder_name)
-      raise "The RSCM_STARTEAM environment variable must be defined and point to the StarTeam SDK directory" unless ENV['RSCM_STARTEAM']
-      raise "The ANT_HOME environment variable must be defined and point to the Ant installation directory" unless ENV['ANT_HOME']
-      
-      @user_name, @password, @server_name, @server_port, @project_name, @view_name, @folder_name = user_name, password, server_name, server_port, project_name, view_name, folder_name
+    attr_accessor :st_user_name, :st_password, :st_server_name, :st_server_port, :st_project_name, :st_view_name, :st_folder_name
+
+    def initialize(st_user_name=nil, st_password=nil, st_server_name=nil, st_server_port=nil, st_project_name=nil, st_view_name=nil, st_folder_name=nil)
+      @st_user_name, @st_password, @st_server_name, @st_server_port, @st_project_name, @st_view_name, @st_folder_name = st_user_name, st_password, st_server_name, st_server_port, st_project_name, st_view_name, st_folder_name
     end
 
-    def changesets(checkout_dir, from_identifier, to_identifier=Time.infinity, files=nil)
+    def changesets(checkout_dir, from_identifier=Time.epoch, to_identifier=Time.infinity, files=nil)
 
       # just assuming it is a Time for now, may support labels later.
       # the java class really wants rfc822 and not rfc2822, but this works ok anyway.
       from = from_identifier.to_rfc2822
       to = to_identifier.to_rfc2822      
 
-      java("getChangeSets(\"#{from}\";\"#{to}\")")
+      changesets = java("getChangeSets(\"#{from}\";\"#{to}\")")
+      raise "changesets must be of type #{ChangeSets.name} - was #{changesets.class.name}" unless changesets.is_a?(::RSCM::ChangeSets)
+      changesets
     end
 
-    def checkout(checkout_dir, to_identifier=Time.infinity)
+    def checkout(checkout_dir)
       to = to_identifier.to_rfc2822      
 
-      java("checkout(\"#{checkout_dir}\";\"#{to}\")")
+      files = java("checkout(\"#{checkout_dir}\")")
+      files
     end
-
+    
   private
   
     def cmd
@@ -57,8 +56,11 @@ module RSCM
     end
 
     def java(m)
+      raise "The RSCM_STARTEAM environment variable must be defined and point to the StarTeam SDK directory" unless ENV['RSCM_STARTEAM']
+      raise "The ANT_HOME environment variable must be defined and point to the Ant installation directory" unless ENV['ANT_HOME']
+
       clazz = "org.rubyforge.rscm.starteam.StarTeam"
-      ctor_args = "#{@user_name};#{@password};#{@server_name};#{@server_port};#{@project_name};#{@view_name};#{@folder_name}"
+      ctor_args = "#{@st_user_name};#{@st_password};#{@st_server_name};#{@st_server_port};#{@st_project_name};#{@st_view_name};#{@st_folder_name}"
 
 #     Uncomment if you're not Aslak - to run against a bogus java class.
 #      clazz = "org.rubyforge.rscm.TestScm"
@@ -69,11 +71,15 @@ module RSCM
       tf.puts(command)
       tf.close 
       cmdline = "#{cmd} #{tf.path}"
+#puts "------------"
 #puts command
+#puts "------------"
 #puts cmdline
+#puts "------------"
       IO.popen(cmdline) do |io|
-#        io = io.read
-#        puts io
+        io = io.read
+        puts io
+#puts "------------"
         YAML::load(io)
       end
     end

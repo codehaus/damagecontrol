@@ -45,6 +45,16 @@ module RSCM
       end
       result
     end
+    
+    # The latest ChangeSet (with the latest time)
+    # or nil if this changeset is empty
+    def latest
+      latest = nil
+      each do |changeset|
+        latest = changeset if latest.nil? || latest.time < changeset.time
+      end
+      latest
+    end
 
     # Adds a Change or a ChangeSet.
     # If the argument is a Change and no corresponding ChangeSet exists,
@@ -196,8 +206,8 @@ module RSCM
     # This is a UTC ruby time
     attr_accessor :time
     
-    def initialize(path=nil, developer=nil, message=nil, revision=nil, time=nil)
-      @path, @developer, @message, @revision, @time = path, developer, message, revision, time
+    def initialize(path=nil, developer=nil, message=nil, revision=nil, time=nil, status=DELETED)
+      @path, @developer, @message, @revision, @time, @status = path, developer, message, revision, time, status
     end
   
     def to_s

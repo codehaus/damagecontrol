@@ -52,7 +52,7 @@ puts $?
       end
     end
 
-    def checkout(checkout_dir, to_identifier=nil) # :yield: file
+    def checkout(checkout_dir) # :yield: file
       with_working_dir(File.dirname(checkout_dir)) do
 cmd = "darcs get --verbose --repo-name #{File.basename(checkout_dir)} #{@dir}"
 puts cmd

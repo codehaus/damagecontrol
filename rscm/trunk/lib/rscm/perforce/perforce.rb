@@ -39,8 +39,8 @@ module RSCM
       end
     end
 
-    def checkout(checkout_dir, to_time=nil)
-      client(checkout_dir).checkout(to_time)
+    def checkout(checkout_dir)
+      client(checkout_dir).checkout
     end
 
     def add(checkout_dir, relative_filename)
@@ -55,7 +55,7 @@ module RSCM
       client(checkout_dir).changesets(from_time, to_time, files)
     end
 
-    def uptodate?(checkout_dir)
+    def uptodate?(checkout_dir, from_identifier)
       client(checkout_dir).uptodate?
     end
 
@@ -273,7 +273,7 @@ module RSCM
       end
     end
 
-    def checkout(scm_to_time=nil)
+    def checkout
       checked_out_files = []
       p4("sync").collect do |output| 
         puts "output: '#{output}'"

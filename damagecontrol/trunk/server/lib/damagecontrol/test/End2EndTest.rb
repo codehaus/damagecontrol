@@ -402,7 +402,7 @@ class End2EndTest < Test::Unit::TestCase
     server.setup_project_config(@project_name, remote_scm, execute_script_commandline("build"), polling)
     
     # add build.bat file and commit it (should trig build)
-    remote_scm.checkout(@user_checkout_dir, nil) { |line| puts line }
+    remote_scm.checkout(@user_checkout_dir) { |line| puts line }
 
     remote_scm.add_or_edit_and_commit_file(@user_checkout_dir, script_file("build"), 'echo "Hello world from DamageControl" > buildresult.txt')
 

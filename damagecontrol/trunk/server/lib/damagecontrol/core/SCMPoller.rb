@@ -41,41 +41,26 @@ module DamageControl
     def poll_project(project_name)
       return unless should_poll?(project_name)
       scm = @project_config_repository.create_scm(project_name)
-      last_completed_build = @build_history_repository.last_completed_build(project_name)
-      if last_completed_build.nil?
-        # not built yet, just build without checking
-        request_build(project_name)
+      logger.info("polling project #{project_name}")
+      checkout_dir = @project_directories.checkout_dir(project_name)
+
+      last_commit_time = @build_history_repository.last_commit_time(project_name)
+      from_time = last_commit_time ? last_commit_time + 1 : Time.epoch
+
+      changesets = nil
+      # check for any changes since last completed build and now
+      if(scm.uptodate?(checkout_dir, from_time))
+        logger.info("#{project_name} seems to be uptodate")
+        return
       else
-        logger.info("polling project #{project_name}")
-        # check for any changes since last completed build and now
-        checkout_dir = @project_directories.checkout_dir(project_name)
-
-        # TODO: refactor. same code as in BuildExecutor
-        last_successful_build = @build_history_repository.last_completed_build(project_name)
-        from_time = last_completed_build ? last_completed_build.scm_commit_time : nil
-        from_time = from_time ? from_time + 1 : nil
-
-        if(scm.uptodate?(
-          checkout_dir, 
-          from_time, 
-          nil
-        ))
-          logger.info("#{project_name} seems to be uptodate")
-        else
-          logger.info("changes in #{project_name}, requesting build")
-          changesets = scm.changesets(
-            checkout_dir, 
-            from_time, 
-            nil,
-            nil
-          )
-          if(changesets.empty?)
-            logger.info("WARNING!!!! we decided #{project_name} was not uptodate, yet there were no changes. This is contradictory!!")
-            return
-          end
-          request_build(project_name, changesets)
+        logger.info("Local working copy for #{project_name} is not uptodate, getting changesets and requesting build")
+        changesets = scm.changesets(checkout_dir, from_time)
+        if(changesets.empty? && last_commit_time)
+          logger.info("WARNING!!!! we decided #{project_name} was not uptodate, yet there were no changes. This is contradictory!!")
+          return
         end
       end
+      request_build(project_name, changesets)
     end
     
     def request_build(project_name, changesets=nil)

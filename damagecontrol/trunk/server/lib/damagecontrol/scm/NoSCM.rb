@@ -14,7 +14,7 @@ module DamageControl
       self
     end
     
-    def checkout(checkout_dir, time = nil, &proc)
+    def checkout(checkout_dir)
       File.mkpath(checkout_dir)
       nil
     end

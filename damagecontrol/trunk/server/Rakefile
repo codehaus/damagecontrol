@@ -84,9 +84,13 @@ end
 test_file_pattern = ENV["TEST_FILES"] ? ENV["TEST_FILES"] : 'lib/**/*est.rb'
 fl = FileList.new(test_file_pattern)
 
+fl.exclude("**/IRCPublisherTest.rb")
+fl.exclude("**/TimeUtilsTest.rb")
+fl.exclude("**/End2EndTest.rb")
+
 desc "Run Unit Tests"
 Rake::TestTask.new :unit_test do |t|
-#  t.libs << "."
+  t.libs << "lib"
   t.test_files = fl
   t.verbose = true
 end

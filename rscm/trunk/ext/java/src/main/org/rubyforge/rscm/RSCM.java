@@ -12,8 +12,7 @@ public interface RSCM {
 
     /**
      * @param dir where to check out
-     * @param toIdentifier date (java.util.Date) or label (java.lang.String)
      * @return
      */
-    YamlDumpable checkout(String dir, String toIdentifier);
+    YamlDumpable checkout(String dir);
 }

@@ -108,6 +108,9 @@ public class StarTeam implements RSCM {
         Date from = parseRfc822(fromSpecifier);
         Date to = parseRfc822(toSpecifier);
 
+System.err.println("(java) from: " + from);
+System.err.println("(java) to: " + to);
+
         ChangeSets changeSets = new ChangeSets();
 
         Server server = null;
@@ -193,7 +196,7 @@ public class StarTeam implements RSCM {
         task.setServerport(serverPort);
     }
 
-    public YamlDumpable checkout(String dir, String toIdentifier) {
+    public YamlDumpable checkout(String dir) {
         StarTeamCheckout checkout = new StarTeamCheckout();
         final YamlList checkedOutFiles = new YamlList();
         BuildListener buildListener = new BuildListener() {

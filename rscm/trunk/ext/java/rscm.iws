@@ -154,26 +154,10 @@
     <option name="HIDE_WARNINGS" value="false" />
   </component>
   <component name="FileEditorManager" split-orientation="vertical" split-proportion="0.5">
-    <first-group selected-file="file://$PROJECT_DIR$/src/main/org/rubyforge/rscm/starteam/StarTeam.java">
-      <entry file="file://$PROJECT_DIR$/src/main/org/rubyforge/rscm/ChangeSet.java" pinned="false">
-        <provider selected="true" editor-type-id="text-editor">
-          <state line="52" column="30" selection-start="1549" selection-end="1549" vertical-scroll-proportion="1.0637786">
-            <folding>
-              <element signature="imports" expanded="true" />
-            </folding>
-          </state>
-        </provider>
-      </entry>
-      <entry file="jar://C:/Program Files/Borland/StarTeam SDK 6.0/Lib/starteam60.jar!/com/starbase/util/Sortable.class" pinned="false">
-        <provider selected="true" editor-type-id="text-editor">
-          <state line="5" column="17" selection-start="159" selection-end="159" vertical-scroll-proportion="0.08182912">
-            <folding />
-          </state>
-        </provider>
-      </entry>
+    <first-group selected-file="file://C:/scm/dc_svn/damagecontrol/trunk/server/lib/damagecontrol/xmlrpc/expected_xmlrpc_history_reply.xml">
       <entry file="file://$PROJECT_DIR$/src/test/org/rubyforge/rscm/starteam/StarTeamTest.java" pinned="false">
         <provider selected="true" editor-type-id="text-editor">
-          <state line="29" column="83" selection-start="1055" selection-end="1080" vertical-scroll-proportion="0.6041667">
+          <state line="29" column="83" selection-start="1055" selection-end="1080" vertical-scroll-proportion="0.5932611">
             <folding>
               <element signature="imports" expanded="true" />
             </folding>
@@ -182,7 +166,7 @@
       </entry>
       <entry file="file://$PROJECT_DIR$/src/main/org/rubyforge/rscm/TestScm.java" pinned="false">
         <provider selected="true" editor-type-id="text-editor">
-          <state line="28" column="37" selection-start="666" selection-end="666" vertical-scroll-proportion="0.57280385">
+          <state line="28" column="37" selection-start="645" selection-end="645" vertical-scroll-proportion="0.57280385">
             <folding>
               <element signature="imports" expanded="true" />
             </folding>
@@ -191,7 +175,7 @@
       </entry>
       <entry file="file://$PROJECT_DIR$/src/main/org/rubyforge/rscm/YamlList.java" pinned="false">
         <provider selected="true" editor-type-id="text-editor">
-          <state line="9" column="3" selection-start="168" selection-end="168" vertical-scroll-proportion="0.18411553">
+          <state line="9" column="2" selection-start="167" selection-end="167" vertical-scroll-proportion="0.18411553">
             <folding>
               <element signature="imports" expanded="true" />
             </folding>
@@ -207,30 +191,44 @@
       </entry>
       <entry file="file://$PROJECT_DIR$/build.xml" pinned="false">
         <provider selected="true" editor-type-id="text-editor">
-          <state line="33" column="51" selection-start="1387" selection-end="1387" vertical-scroll-proportion="0.46691176">
+          <state line="33" column="51" selection-start="1387" selection-end="1387" vertical-scroll-proportion="0.502451">
             <folding />
           </state>
         </provider>
       </entry>
       <entry file="file://$PROJECT_DIR$/src/main/org/rubyforge/rscm/RSCM.java" pinned="false">
         <provider selected="true" editor-type-id="text-editor">
-          <state line="17" column="0" selection-start="391" selection-end="391" vertical-scroll-proportion="0.34777376">
+          <state line="16" column="0" selection-start="314" selection-end="314" vertical-scroll-proportion="0.3273165">
             <folding />
           </state>
         </provider>
       </entry>
       <entry file="file://$PROJECT_DIR$/src/main/org/rubyforge/rscm/starteam/StarTeam.java" pinned="false">
         <provider selected="true" editor-type-id="text-editor">
-          <state line="326" column="102" selection-start="13556" selection-end="13556" vertical-scroll-proportion="0.47916666">
+          <state line="198" column="27" selection-start="7847" selection-end="7847" vertical-scroll-proportion="0.33333334">
             <folding>
               <element signature="imports" expanded="true" />
             </folding>
           </state>
         </provider>
       </entry>
+      <entry file="file://C:/scm/dc_svn/damagecontrol/trunk/server/lib/damagecontrol/xmlrpc/expected_xmlrpc_current_build_reply.xml" pinned="false">
+        <provider selected="true" editor-type-id="text-editor">
+          <state line="198" column="0" selection-start="0" selection-end="14227" vertical-scroll-proportion="0.875">
+            <folding />
+          </state>
+        </provider>
+      </entry>
+      <entry file="file://C:/scm/dc_svn/damagecontrol/trunk/server/lib/damagecontrol/xmlrpc/expected_xmlrpc_history_reply.xml" pinned="false">
+        <provider selected="true" editor-type-id="text-editor">
+          <state line="266" column="17" selection-start="19943" selection-end="19943" vertical-scroll-proportion="0.875">
+            <folding />
+          </state>
+        </provider>
+      </entry>
       <entry file="file://$PROJECT_DIR$/src/main/org/rubyforge/rscm/Change.java" pinned="false">
         <provider selected="true" editor-type-id="text-editor">
-          <state line="92" column="20" selection-start="2903" selection-end="2903" vertical-scroll-proportion="1.7083334">
+          <state line="92" column="20" selection-start="2903" selection-end="2903" vertical-scroll-proportion="1.0061275">
             <folding />
           </state>
         </provider>
@@ -253,23 +251,23 @@
   <component name="PackagesPane">
     <expanded_node url="" module="rscm" type="module" />
     <expanded_node url="org.rubyforge.rscm" module="rscm" type="package" />
-    <expanded_node url="org" module="rscm" type="package" />
     <expanded_node url="org.rubyforge" module="rscm" type="package" />
+    <expanded_node url="org" module="rscm" type="package" />
   </component>
   <component name="ProjectPane">
-    <expanded_node url="file://$PROJECT_DIR$/src/main/org/rubyforge/rscm" module="rscm" type="directory" />
-    <expanded_node url="file://$PROJECT_DIR$/src/test/org/rubyforge/rscm" module="rscm" type="directory" />
-    <expanded_node url="file://$PROJECT_DIR$/src/test/org/rubyforge/rscm/starteam" module="rscm" type="directory" />
-    <expanded_node url="file://$PROJECT_DIR$/src/main/org" module="rscm" type="directory" />
-    <expanded_node url="file://$PROJECT_DIR$/src/test/org/rubyforge" module="rscm" type="directory" />
-    <expanded_node url="file://$PROJECT_DIR$/src/main/org/rubyforge/rscm/starteam" module="rscm" type="directory" />
-    <expanded_node url="file://$PROJECT_DIR$/src/main/org/rubyforge" module="rscm" type="directory" />
-    <expanded_node url="file://$PROJECT_DIR$/src/test/org" module="rscm" type="directory" />
-    <expanded_node url="file://$PROJECT_DIR$/src/test" module="rscm" type="directory" />
-    <expanded_node url="file://$PROJECT_DIR$/src/main" module="rscm" type="directory" />
     <expanded_node url="" module="rscm" type="module" />
     <expanded_node url="file://$PROJECT_DIR$/src" module="rscm" type="directory" />
+    <expanded_node url="file://$PROJECT_DIR$/src/test" module="rscm" type="directory" />
+    <expanded_node url="file://$PROJECT_DIR$/src/main" module="rscm" type="directory" />
+    <expanded_node url="file://$PROJECT_DIR$/src/test/org/rubyforge/rscm/starteam" module="rscm" type="directory" />
+    <expanded_node url="file://$PROJECT_DIR$/src/test/org/rubyforge/rscm" module="rscm" type="directory" />
+    <expanded_node url="file://$PROJECT_DIR$/src/test/org" module="rscm" type="directory" />
+    <expanded_node url="file://$PROJECT_DIR$/src/test/org/rubyforge" module="rscm" type="directory" />
     <expanded_node url="file://$PROJECT_DIR$" module="rscm" type="directory" />
+    <expanded_node url="file://$PROJECT_DIR$/src/main/org/rubyforge" module="rscm" type="directory" />
+    <expanded_node url="file://$PROJECT_DIR$/src/main/org" module="rscm" type="directory" />
+    <expanded_node url="file://$PROJECT_DIR$/src/main/org/rubyforge/rscm" module="rscm" type="directory" />
+    <expanded_node url="file://$PROJECT_DIR$/src/main/org/rubyforge/rscm/starteam" module="rscm" type="directory" />
   </component>
   <component name="ProjectView">
     <navigator currentView="ProjectPane" splitterProportion="0.5">
@@ -289,7 +287,7 @@
     <property name="MemberChooser.showClasses" value="true" />
     <property name="MemberChooser.sorted" value="false" />
     <property name="GoToFile.includeJavaFiles" value="false" />
-    <property name="last_opened_file_path" value="C:\scm\dc_svn\damagecontrol\trunk\lib\damagecontrol\xmlrpc" />
+    <property name="last_opened_file_path" value="C:\scm\dc_svn\damagecontrol\trunk\server\lib\damagecontrol\xmlrpc" />
     <property name="GoToClass.toSaveIncludeLibraries" value="false" />
   </component>
   <component name="RunManager">
@@ -310,20 +308,6 @@
       <RunnerSettings RunnerId="Run" />
       <ConfigurationWrapper RunnerId="Run" />
     </tempConfiguration>
-    <configuration selected="false" default="true" type="WebLogic Instance" factoryName="Local">
-      <option name="WORKING_DIRECTORY" />
-      <option name="HOST" value="localhost" />
-      <option name="PORT" value="7001" />
-      <option name="LOCAL" value="true" />
-      <option name="OPEN_IN_BROWSER" value="true" />
-      <option name="OPEN_IN_BROWSER_URL" value="/" />
-      <option name="COMMON_VM_ARGUMENTS" value="" />
-      <option name="DOMAIN_PATH" value="" />
-      <option name="USER" value="weblogic" />
-      <option name="PASSWORD" value="weblogic" />
-      <option name="SERVER_NAME" value="myserver" />
-      <option name="DOMAIN_NAME" value="mydomain" />
-    </configuration>
     <configuration selected="false" default="true" type="JUnit" factoryName="JUnit">
       <module name="" />
       <option name="PACKAGE_NAME" />
@@ -345,6 +329,27 @@
       <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$" />
       <module name="" />
     </configuration>
+    <configuration selected="false" default="true" type="Remote" factoryName="Remote">
+      <option name="USE_SOCKET_TRANSPORT" value="true" />
+      <option name="SERVER_MODE" value="false" />
+      <option name="SHMEM_ADDRESS" value="javadebug" />
+      <option name="HOST" value="localhost" />
+      <option name="PORT" value="5005" />
+    </configuration>
+    <configuration selected="false" default="true" type="WebLogic Instance" factoryName="Local">
+      <option name="WORKING_DIRECTORY" />
+      <option name="HOST" value="localhost" />
+      <option name="PORT" value="7001" />
+      <option name="LOCAL" value="true" />
+      <option name="OPEN_IN_BROWSER" value="true" />
+      <option name="OPEN_IN_BROWSER_URL" value="/" />
+      <option name="COMMON_VM_ARGUMENTS" value="" />
+      <option name="DOMAIN_PATH" value="" />
+      <option name="USER" value="weblogic" />
+      <option name="PASSWORD" value="weblogic" />
+      <option name="SERVER_NAME" value="myserver" />
+      <option name="DOMAIN_NAME" value="mydomain" />
+    </configuration>
     <configuration selected="false" default="true" type="Applet" factoryName="Applet">
       <module name="" />
       <option name="MAIN_CLASS_NAME" />
@@ -354,13 +359,6 @@
       <option name="HEIGHT" value="300" />
       <option name="POLICY_FILE" value="$APPLICATION_HOME_DIR$/bin/appletviewer.policy" />
       <option name="VM_PARAMETERS" />
-    </configuration>
-    <configuration selected="false" default="true" type="Remote" factoryName="Remote">
-      <option name="USE_SOCKET_TRANSPORT" value="true" />
-      <option name="SERVER_MODE" value="false" />
-      <option name="SHMEM_ADDRESS" value="javadebug" />
-      <option name="HOST" value="localhost" />
-      <option name="PORT" value="5005" />
     </configuration>
     <configuration selected="true" default="false" name="Main" type="Application" factoryName="Application">
       <option name="MAIN_CLASS_NAME" value="org.rubyforge.rscm.Main" />
@@ -482,14 +480,14 @@
     <layout>
       <window_info id="CVS" active="false" anchor="bottom" auto_hide="false" internal_type="docked" type="docked" visible="false" weight="0.33" order="8" />
       <window_info id="TODO" active="false" anchor="bottom" auto_hide="false" internal_type="docked" type="docked" visible="false" weight="0.33" order="7" />
-      <window_info id="Project" active="false" anchor="left" auto_hide="false" internal_type="docked" type="docked" visible="true" weight="0.22321428" order="0" />
+      <window_info id="Project" active="false" anchor="left" auto_hide="false" internal_type="docked" type="docked" visible="true" weight="0.18973215" order="0" />
       <window_info id="Find" active="false" anchor="bottom" auto_hide="false" internal_type="docked" type="docked" visible="false" weight="0.3482143" order="1" />
       <window_info id="Structure" active="false" anchor="left" auto_hide="false" internal_type="docked" type="docked" visible="false" weight="0.25" order="1" />
       <window_info id="Messages" active="false" anchor="bottom" auto_hide="false" internal_type="docked" type="docked" visible="false" weight="0.20647322" order="8" />
       <window_info id="Inspection" active="false" anchor="bottom" auto_hide="false" internal_type="docked" type="docked" visible="false" weight="0.4" order="6" />
       <window_info id="TestDox" active="false" anchor="right" auto_hide="false" internal_type="docked" type="docked" visible="false" weight="0.33035713" order="3" />
       <window_info id="Dependency Viewer" active="false" anchor="bottom" auto_hide="false" internal_type="docked" type="docked" visible="false" weight="0.33" order="8" />
-      <window_info id="Ant Build" active="false" anchor="right" auto_hide="false" internal_type="docked" type="docked" visible="true" weight="0.11532738" order="1" />
+      <window_info id="Ant Build" active="false" anchor="right" auto_hide="false" internal_type="docked" type="docked" visible="true" weight="0.11160714" order="1" />
       <window_info id="Run" active="false" anchor="bottom" auto_hide="false" internal_type="docked" type="docked" visible="false" weight="0.45870537" order="2" />
       <window_info id="Hierarchy" active="false" anchor="right" auto_hide="false" internal_type="docked" type="docked" visible="false" weight="0.25" order="2" />
       <window_info id="Debug" active="false" anchor="bottom" auto_hide="false" internal_type="docked" type="docked" visible="false" weight="0.3046875" order="4" />
@@ -581,24 +579,6 @@
     </buildFile>
   </component>
   <component name="editorHistoryManager">
-    <entry file="file://$PROJECT_DIR$/src/main/org/rubyforge/rscm/StringCommandInvoker.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state line="18" column="54" selection-start="629" selection-end="629" vertical-scroll-proportion="0.3885246">
-          <folding>
-            <element signature="imports" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/main/org/rubyforge/rscm/Main.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state line="23" column="38" selection-start="890" selection-end="890" vertical-scroll-proportion="0.7294776">
-          <folding>
-            <element signature="imports" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/src/test/org/rubyforge/rscm/StringCommandInvokerTest.java">
       <provider selected="true" editor-type-id="text-editor">
         <state line="24" column="73" selection-start="773" selection-end="773" vertical-scroll-proportion="0.5">
@@ -608,9 +588,50 @@
         </state>
       </provider>
     </entry>
+    <entry file="jar://C:/Documents and Settings/ahelleso/.maven/repository/ant/jars/ant-1.6.jar!/org/apache/tools/ant/Project.class">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="298" column="0" selection-start="10002" selection-end="10002" vertical-scroll-proportion="0.39583334">
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/main/org/rubyforge/rscm/ChangeSets.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="24" column="17" selection-start="701" selection-end="701" vertical-scroll-proportion="0.4839109">
+          <folding>
+            <element signature="imports" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/main/org/rubyforge/rscm/ChangeSet.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="52" column="30" selection-start="1549" selection-end="1549" vertical-scroll-proportion="1.0156438">
+          <folding>
+            <element signature="imports" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="jar://C:/Program Files/Borland/StarTeam SDK 6.0/Lib/starteam60.jar!/com/starbase/util/Sortable.class">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="5" column="17" selection-start="159" selection-end="159" vertical-scroll-proportion="0.08182912">
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/test/org/rubyforge/rscm/starteam/StarTeamTest.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="29" column="83" selection-start="1055" selection-end="1080" vertical-scroll-proportion="0.5932611">
+          <folding>
+            <element signature="imports" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
     <entry file="file://$PROJECT_DIR$/src/main/org/rubyforge/rscm/TestScm.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state line="28" column="37" selection-start="666" selection-end="666" vertical-scroll-proportion="0.57280385">
+        <state line="28" column="37" selection-start="645" selection-end="645" vertical-scroll-proportion="0.57280385">
           <folding>
             <element signature="imports" expanded="true" />
           </folding>
@@ -619,7 +640,7 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/src/main/org/rubyforge/rscm/YamlList.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state line="9" column="3" selection-start="168" selection-end="168" vertical-scroll-proportion="0.18411553">
+        <state line="9" column="2" selection-start="167" selection-end="167" vertical-scroll-proportion="0.18411553">
           <folding>
             <element signature="imports" expanded="true" />
           </folding>
@@ -635,71 +656,44 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/build.xml">
       <provider selected="true" editor-type-id="text-editor">
-        <state line="33" column="51" selection-start="1387" selection-end="1387" vertical-scroll-proportion="0.46691176">
+        <state line="33" column="51" selection-start="1387" selection-end="1387" vertical-scroll-proportion="0.502451">
           <folding />
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/src/main/org/rubyforge/rscm/RSCM.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state line="17" column="0" selection-start="391" selection-end="391" vertical-scroll-proportion="0.34777376">
+        <state line="16" column="0" selection-start="314" selection-end="314" vertical-scroll-proportion="0.3273165">
           <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="jar://C:/Documents and Settings/ahelleso/.maven/repository/ant/jars/ant-1.6.jar!/org/apache/tools/ant/Project.class">
-      <provider selected="true" editor-type-id="text-editor">
-        <state line="298" column="0" selection-start="10002" selection-end="10002" vertical-scroll-proportion="0.39583334">
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/test/org/rubyforge/rscm/starteam/StarTeamTest.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state line="29" column="83" selection-start="1055" selection-end="1080" vertical-scroll-proportion="0.6041667">
-          <folding>
-            <element signature="imports" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/main/org/rubyforge/rscm/starteam/StarTeam.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state line="326" column="102" selection-start="13556" selection-end="13556" vertical-scroll-proportion="0.47916666">
-          <folding>
-            <element signature="imports" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/main/org/rubyforge/rscm/ChangeSets.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state line="24" column="17" selection-start="701" selection-end="701" vertical-scroll-proportion="0.4839109">
-          <folding>
-            <element signature="imports" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="jar://C:/Program Files/Borland/StarTeam SDK 6.0/Lib/starteam60.jar!/com/starbase/util/Sortable.class">
-      <provider selected="true" editor-type-id="text-editor">
-        <state line="5" column="17" selection-start="159" selection-end="159" vertical-scroll-proportion="0.08182912">
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/main/org/rubyforge/rscm/ChangeSet.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state line="52" column="30" selection-start="1549" selection-end="1549" vertical-scroll-proportion="1.0637786">
-          <folding>
-            <element signature="imports" expanded="true" />
-          </folding>
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/src/main/org/rubyforge/rscm/Change.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state line="92" column="20" selection-start="2903" selection-end="2903" vertical-scroll-proportion="1.7083334">
+        <state line="92" column="20" selection-start="2903" selection-end="2903" vertical-scroll-proportion="1.0061275">
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/main/org/rubyforge/rscm/starteam/StarTeam.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="198" column="27" selection-start="7847" selection-end="7847" vertical-scroll-proportion="0.33333334">
+          <folding>
+            <element signature="imports" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://C:/scm/dc_svn/damagecontrol/trunk/server/lib/damagecontrol/xmlrpc/expected_xmlrpc_history_reply.xml">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="266" column="17" selection-start="19943" selection-end="19943" vertical-scroll-proportion="0.875">
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://C:/scm/dc_svn/damagecontrol/trunk/server/lib/damagecontrol/xmlrpc/expected_xmlrpc_current_build_reply.xml">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="198" column="0" selection-start="0" selection-end="14227" vertical-scroll-proportion="0.875">
           <folding />
         </state>
       </provider>

@@ -23,7 +23,7 @@ public class TestScm implements RSCM {
         this.bar = bar;
     }
 
-    public YamlDumpable checkout(String dir, String toIdentifier) {
+    public YamlDumpable checkout(String dir) {
         final YamlList yamlList = new YamlList();
         yamlList.add("eenie/meenie/minee/mo");
         yamlList.add("catch/a/redneck/by");

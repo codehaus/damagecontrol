@@ -38,11 +38,11 @@ module RSCM
 
     # The extra simulate parameter is not in accordance with the AbstractSCM API,
     # but it's optional and is only being used from within this class (uptodate? method).
-    def checkout(checkout_dir, to_identifier=Time.infinity, simulate=false)
+    def checkout(checkout_dir, simulate=false)
       checked_out_files = []
       if(checked_out?(checkout_dir))
         path_regex = /^[U|P] (.*)/
-        cvs(checkout_dir, update_command(to_identifier), simulate) do |line|
+        cvs(checkout_dir, update_command, simulate) do |line|
           if(line =~ path_regex)
             path = $1.chomp
             yield path if block_given?
@@ -57,7 +57,7 @@ module RSCM
         target_dir = File.basename(checkout_dir)
         run_checkout_command_dir = File.dirname(checkout_dir)
         # -D is sticky, but subsequent updates will reset stickiness with -A
-        cvs(run_checkout_command_dir, checkout_command(to_identifier, target_dir), simulate) do |line|
+        cvs(run_checkout_command_dir, checkout_command(target_dir), simulate) do |line|
           if(line =~ path_regex)
             path = $1.chomp
             yield path if block_given?
@@ -72,29 +72,26 @@ module RSCM
       "cvs checkout #{branch_option} #{to_option(to_identifier)} #{cvsmodule}"
     end
 
-    def update_commandline(to_identifier=Time.infinity)
-      "cvs update #{branch_option} #{to_option(to_identifier)} -d -P -A"
+    def update_commandline
+      "cvs update #{branch_option} -d -P -A"
     end
 
     def commit(checkout_dir, message, &proc)
       cvs(checkout_dir, commit_command(message), &proc)
     end
 
-    def uptodate?(checkout_dir)
+    def uptodate?(checkout_dir, since)
       if(!checked_out?(checkout_dir))
         return false
       end
 
       # simulate a checkout
-      files = checkout(
-        checkout_dir,
-        nil,
-        true
-      )
+      files = checkout(checkout_dir, true)
       files.empty?
     end
 
     def changesets(checkout_dir, from_identifier, to_identifier=Time.infinity, files=nil)
+puts "CHANGESETS #{from_identifier} - #{to_identifier}"
       begin
         parse_log(checkout_dir, new_changes_command(from_identifier, to_identifier, files))
       rescue => e
@@ -110,7 +107,7 @@ module RSCM
       raise "cvsmodule can't be null or empty" if (cvsmodule.nil? || cvsmodule == "")
 
       cvsroot_cvs = create_cvsroot_cvs
-      cvsroot_cvs.checkout(trigger_files_checkout_dir, nil)
+      cvsroot_cvs.checkout(trigger_files_checkout_dir)
       with_working_dir(trigger_files_checkout_dir) do
         trigger_line = "#{cvsmodule} #{trigger_command}\n"
         File.open("loginfo", File::WRONLY | File::APPEND) do |file|
@@ -131,7 +128,7 @@ module RSCM
 
       cvsroot_cvs = create_cvsroot_cvs
       begin
-        cvsroot_cvs.checkout(trigger_files_checkout_dir, nil)
+        cvsroot_cvs.checkout(trigger_files_checkout_dir)
         loginfo = File.join(trigger_files_checkout_dir, "loginfo")
         return false if !File.exist?(loginfo)
 
@@ -154,7 +151,7 @@ module RSCM
       regex = Regexp.new(Regexp.escape(loginfo_line))
 
       cvsroot_cvs = create_cvsroot_cvs
-      cvsroot_cvs.checkout(trigger_files_checkout_dir, nil)
+      cvsroot_cvs.checkout(trigger_files_checkout_dir)
       loginfo_path = File.join(trigger_files_checkout_dir, "loginfo")
       File.comment_out(loginfo_path, regex, "# ")
       with_working_dir(trigger_files_checkout_dir) do
@@ -205,8 +202,8 @@ module RSCM
       end
     end
 
-    def checkout_command(to_identifier, target_dir)
-      "checkout #{branch_option} #{to_option(to_identifier)} -d #{target_dir} #{cvsmodule}"
+    def checkout_command(target_dir)
+      "checkout #{branch_option} -d #{target_dir} #{cvsmodule}"
     end
 
     def parse_log(checkout_dir, cmd, &proc)
@@ -241,9 +238,9 @@ module RSCM
       branch_specified? ? "-r#{cvsbranch}" : ""
     end
 
-    def update_command(to_identifier)
+    def update_command
       # get a clean copy
-      "update #{branch_option} #{to_option(to_identifier)} -d -P -A"
+      "update #{branch_option} -d -P -A"
     end
 
     def old_changes_command(from_identifier, to_identifier, files)

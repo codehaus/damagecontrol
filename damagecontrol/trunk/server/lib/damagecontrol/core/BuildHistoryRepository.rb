@@ -84,13 +84,17 @@ module DamageControl
       nil
     end
     
-    # returns the commit time for the last build that had a registered commit time.
+    # Returns the commit time for the last build that had a registered commit time
+    # or nil if none was found.
     def last_commit_time(project_name)
+      result = nil
       @project_directories.build_dirs(project_name).reverse.each do |build_dir|
         build = @build_serializer.load(build_dir, false)
-        return build.scm_commit_time if build.scm_commit_time
+        result = build.scm_commit_time if build.scm_commit_time
       end
-      nil
+      msg = result ? result : "(we don't know)"
+      logger.info("Last commit time for #{project_name} was #{msg}")
+      result
     end
     
     def last_successful_build(project_name, with_changesets=false)
@@ -131,8 +135,6 @@ module DamageControl
       config_map["project_name"] = project_name
       config_map
     end
-
-#### Files and directories ####
     
   private
   

@@ -34,7 +34,7 @@ public class StarTeamTest extends TestCase {
     }
 
     public void testShouldCheckout() throws IOException {
-        YamlDumpable files = starTeam.checkout("target/starteam/checkout", null);
+        YamlDumpable files = starTeam.checkout("target/starteam/checkout");
         String expected = "--- \n- eenie/meenie/minee/mo\n- catch/a/redneck/by\n- the/toe\n";
         StringWriter yaml = new StringWriter();
         files.dumpYaml(yaml);

@@ -29,23 +29,22 @@ module RSCM
       svn(checkout_dir, "add #{relative_filename}")
     end
 
-    def checkout(checkout_dir, to_identifier=Time.infinity, &line_proc)
+    def checkout(checkout_dir)
       checkout_dir = PathConverter.filepath_to_nativepath(checkout_dir, false)
       mkdir_p(checkout_dir)
       checked_out_files = []
       path_regex = /^[A|D|U]\s+(.*)/
       if(checked_out?(checkout_dir))
-        svn(checkout_dir, update_command(to_identifier)) do |line|
+        svn(checkout_dir, update_command) do |line|
           if(line =~ path_regex)
             absolute_path = "#{checkout_dir}/#{$1}"
             relative_path = $1.chomp
             relative_path = relative_path.gsub(/\\/, "/") if WINDOWS
             checked_out_files << relative_path
           end
-          line_proc.call(line) if block_given?
         end
       else
-        svn(checkout_dir, checkout_command(to_identifier, checkout_dir)) do |line|
+        svn(checkout_dir, checkout_command(checkout_dir)) do |line|
           if(line =~ path_regex)
             native_absolute_path = $1
             native_checkout_dir = $1
@@ -57,21 +56,20 @@ module RSCM
               checked_out_files << relative_path
             end
           end
-          line_proc.call(line) if block_given?
         end
       end
       checked_out_files.sort!
     end
 
-    def checkout_commandline(to_identifier=Time.infinity)
-      "svn checkout #{revision_option(nil, to_identifier)}"
+    def checkout_commandline
+      "svn checkout #{revision_option(nil)}"
     end
 
-    def update_commandline(to_identifier=Time.infinity)
-      "svn update #{revision_option(nil, to_identifier)} #{svnurl} #{checkout_dir}"
+    def update_commandline
+      "svn update #{svnurl} #{checkout_dir}"
     end
 
-    def uptodate?(checkout_dir)
+    def uptodate?(checkout_dir, from_identifier)
       if(!checked_out?(checkout_dir))
         false
       else
@@ -101,10 +99,10 @@ module RSCM
       end
     end
 
-    def commit(checkout_dir, message, &line_proc)
-      svn(checkout_dir, commit_command(message), &line_proc)
+    def commit(checkout_dir, message)
+      svn(checkout_dir, commit_command(message))
       # We have to do an update to get the local revision right
-      svn(checkout_dir, "update", &line_proc)
+      svn(checkout_dir, "update")
     end
 
     def label(checkout_dir)
@@ -128,21 +126,21 @@ module RSCM
       local?
     end
 
-    def create(&line_proc)      
+    def create      
       native_path = PathConverter.filepath_to_nativepath(svnrootdir, true)
       mkdir_p(PathConverter.nativepath_to_filepath(native_path))
-      svnadmin(svnrootdir, "create #{native_path}", &line_proc)
+      svnadmin(svnrootdir, "create #{native_path}")
     end
 
-    def install_trigger(trigger_command, damagecontrol_install_dir, &line_proc)
+    def install_trigger(trigger_command, damagecontrol_install_dir)
       if (WINDOWS)
-        install_win_trigger(trigger_command, damagecontrol_install_dir, &line_proc)
+        install_win_trigger(trigger_command, damagecontrol_install_dir)
       else
-        install_unix_trigger(trigger_command, damagecontrol_install_dir, &line_proc)
+        install_unix_trigger(trigger_command, damagecontrol_install_dir)
       end
     end
     
-    def uninstall_trigger(trigger_command, trigger_files_checkout_dir, &line_proc)
+    def uninstall_trigger(trigger_command, trigger_files_checkout_dir)
       File.comment_out(post_commit_file, /#{Regexp.escape(trigger_command)}/, nil)
     end
     
@@ -152,12 +150,12 @@ module RSCM
       not_already_commented
     end
     
-    def import(dir, message, &line_proc)
+    def import(dir, message)
       import_cmd = "import #{svnurl} -m \"#{message}\""
-      svn(dir, import_cmd, &line_proc)
+      svn(dir, import_cmd)
     end
 
-    def changesets(checkout_dir, from_identifier, to_identifier=Time.infinity, files=nil, &line_proc)
+    def changesets(checkout_dir, from_identifier, to_identifier=Time.infinity, files=nil)
       checkout_dir = PathConverter.filepath_to_nativepath(checkout_dir, false)
       changesets = nil
       command = "svn #{changes_command(from_identifier, to_identifier, files)}"
@@ -166,7 +164,7 @@ module RSCM
       with_working_dir(checkout_dir) do
         IO.popen(command) do |stdout|
           parser = SVNLogParser.new(stdout, svnpath, checkout_dir)
-          changesets = parser.parse_changesets(from_identifier, to_identifier, &line_proc)
+          changesets = parser.parse_changesets(from_identifier, to_identifier)
         end
       end
       changesets
@@ -180,7 +178,7 @@ module RSCM
 
   private
 
-    def install_unix_trigger(trigger_command, damagecontrol_install_dir, &proc)
+    def install_unix_trigger(trigger_command, damagecontrol_install_dir)
       post_commit_exists = File.exists?(post_commit_file)
       mode = post_commit_exists ? File::APPEND|File::WRONLY : File::CREAT|File::WRONLY
       begin
@@ -196,7 +194,7 @@ module RSCM
       end
     end
     
-    def install_win_trigger(trigger_command, damagecontrol_install_dir, &line_proc)
+    def install_win_trigger(trigger_command, damagecontrol_install_dir)
       post_commit_exists = File.exists?(post_commit_file)
       mode = post_commit_exists ? File::APPEND|File::WRONLY : File::CREAT|File::WRONLY
       File.open(post_commit_file, mode) do |file|
@@ -214,15 +212,15 @@ module RSCM
       result
     end
 
-    def svnadmin(dir, cmd, &line_proc)
-      svncommand("svnadmin", dir, cmd, &line_proc)
+    def svnadmin(dir, cmd, &proc)
+      svncommand("svnadmin", dir, cmd, &proc)
     end
 
-    def svn(dir, cmd, &line_proc)
-      svncommand("svn", dir, cmd, &line_proc)
+    def svn(dir, cmd, &proc)
+      svncommand("svn", dir, cmd, &proc)
     end
 
-    def svncommand(executable, dir, cmd, &line_proc)
+    def svncommand(executable, dir, cmd, &proc)
       command_line = "#{executable} #{cmd}"
       dir = File.expand_path(dir)
       with_working_dir(dir) do
@@ -240,13 +238,13 @@ module RSCM
       result
     end
 
-    def checkout_command(to_identifier, checkout_dir)
+    def checkout_command(checkout_dir)
       checkout_dir = "\"#{checkout_dir}\""
-      "checkout #{revision_option(nil, to_identifier)} #{svnurl} #{checkout_dir}"
+      "checkout #{svnurl} #{checkout_dir}"
     end
 
-    def update_command(to_identifier)
-      "update  #{revision_option(nil, to_identifier)}"
+    def update_command
+      "update"
     end
     
     def changes_command(from_identifier, to_identifier, files)

@@ -66,6 +66,12 @@
                                                                                     </value>
                                                                                 </member>
                                                                                 <member>
+                                                                                    <name>status</name>
+                                                                                    <value>
+                                                                                        <string>DELETED</string>
+                                                                                    </value>
+                                                                                </member>
+                                                                                <member>
                                                                                     <name>time</name>
                                                                                     <value>
                                                                                         <dateTime.iso8601>20040705T12:00:02</dateTime.iso8601>
@@ -103,6 +109,12 @@
                                                                                     <name>message</name>
                                                                                     <value>
                                                                                         <string>tjo bing</string>
+                                                                                    </value>
+                                                                                </member>
+                                                                                <member>
+                                                                                    <name>status</name>
+                                                                                    <value>
+                                                                                        <string>DELETED</string>
                                                                                     </value>
                                                                                 </member>
                                                                                 <member>

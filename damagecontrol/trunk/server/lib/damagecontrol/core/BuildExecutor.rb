@@ -53,7 +53,7 @@ module DamageControl
       # is running. therefore, specify nil and get the latest. In worst case we'll get
       # some more changes than wanted in case someone committed files after the build request,
       # but chances of this happening are rather slim, and if it happens it isn't a big problem.
-      current_scm.checkout(checkout_dir, nil) do |line|
+      current_scm.checkout(checkout_dir) do |line|
         stdout(line)
       end
 
@@ -164,27 +164,22 @@ module DamageControl
       end
       
       begin
-        # TODO: refactor. same code as in SCMPoller
-        last_completed_build = @build_history_repository.last_completed_build(current_build.project_name)
-        from_time = last_completed_build ? last_completed_build.scm_commit_time : nil
-        from_time = from_time ? from_time + 1 : nil
+        last_commit_time = @build_history_repository.last_commit_time(current_build.project_name)
+        from_time = last_commit_time ? last_commit_time + 1 : Time.epoch
 
         changesets = current_build.changesets
         if !current_build.changesets.empty?
           logger.info("Not determining changeset for #{current_build.project_name} because other component (such as SCMPoller) has already determined it")
         else
-          logger.info("Determining changesets for #{current_build.project_name} from #{from_time}")
-          changesets = current_scm.changesets(checkout_dir, from_time, nil, nil) {|line| stdout(line)}
+          logger.info("Determining changesets for #{current_build.project_name} from #{from_time} (inclusive)")
+          changesets = current_scm.changesets(checkout_dir, from_time) {|line| stdout(line)}
         end
 
         # Only store changesets if the previous commit time was known
-        current_build.changesets = changesets if changesets && from_time
+        current_build.changesets = changesets if changesets && last_commit_time
         
-        # Set last commit time
-        changesets = changesets.sort do |a,b|
-          a.time <=> b.time
-        end
-        current_build.scm_commit_time = changesets[-1] ? changesets[-1].time : @build_history_repository.last_commit_time(current_build.project_name)
+        latest = changesets.latest
+        current_build.scm_commit_time = latest ? latest.time : @build_history_repository.last_commit_time(current_build.project_name)
         logger.info("Done determining changesets for #{current_build.project_name}. Last commit time: #{current_build.scm_commit_time}")
         @channel.put(BuildStateChangedEvent.new(current_build))
       rescue Exception => e

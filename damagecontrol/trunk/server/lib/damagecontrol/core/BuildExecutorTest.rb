@@ -132,10 +132,8 @@ module DamageControl
       project_directories.__expect(:stdout_file) {"#{logdir}/stdout.log"}
       project_directories.__expect(:stderr_file) {"#{logdir}/stderr.log"}
 
-      build_history_repository.__expect(:last_completed_build) { |project_name|
-        assert_equal("damagecontrolled", project_name)
-        b = Build.new("damagecontrolled")
-        b
+      build_history_repository.__expect(:last_commit_time) { |project_name|
+        nil
       }
       
       @build_executor = BuildExecutor.new(
@@ -163,10 +161,8 @@ module DamageControl
       mkdir_p(checkout_dir)
       project_directories.__expect(:stdout_file) {"#{logdir}/stdout.log"}
       project_directories.__expect(:stderr_file) {"#{logdir}/stderr.log"}
-      build_history_repository.__expect(:last_completed_build) { |project_name|
-        assert_equal("damagecontrolled", project_name)
-        b = Build.new("damagecontrolled")
-        b
+      build_history_repository.__expect(:last_commit_time) { |project_name|
+        nil
       }
 
       t = Time.new.utc
@@ -208,11 +204,8 @@ module DamageControl
       logdir = new_temp_dir
       project_directories.__expect(:stdout_file) {"#{logdir}/stdout.log"}
       project_directories.__expect(:stderr_file) {"#{logdir}/stderr.log"}
-      build_history_repository.__expect(:last_completed_build) { |project_name|
-        assert_equal("damagecontrolled", project_name)
-        b = Build.new("damagecontrolled")
-        b.scm_commit_time = last_build_time
-        b
+      build_history_repository.__expect(:last_commit_time) { |project_name|
+        last_build_time
       }
       prev = Build.new
       prev.label = "39"

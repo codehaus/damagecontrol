@@ -48,7 +48,7 @@ if $0 == __FILE__
   else
     scm = RSCM::SVN.new("svn://beaver.codehaus.org/damagecontrol/svn/rscm/trunk", "rscm/trunk")
     checkout_dir = "target/rscm-rss"
-    rss_file = "target/rscm.rss"
+    rss_file = "target/rscm.xml"
     title = "RSCM Changesets"
     url = "http://damagecontrol.codehaus.org/"
     description = "This feed contains SCM changes for the RSCM project (eating its own dogfood)"

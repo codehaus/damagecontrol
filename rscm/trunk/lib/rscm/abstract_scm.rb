@@ -35,6 +35,14 @@ module RSCM
     
   public
   
+    # Whether the physical SCM represented by this instance exists.
+    #
+    def exists?
+      # The default implementation assumes yes - override if it can be
+      # determined programmatically.
+      true
+    end
+
     # Creates a new repository. Throws an exception if the
     # repository cannot be created.
     #
@@ -54,6 +62,8 @@ module RSCM
     # The display name of this SCM
     #
     def name
+      # Should be overridden by subclasses to display a nicer name
+      self.class.name
     end
 
     # Gets the label for the working copy currently checked out in +checkout_dir+.
@@ -66,7 +76,6 @@ module RSCM
     def edit(file)
     end
 
-
     # Checks out or updates contents from an SCM to +checkout_dir+ - a local working copy.
     #
     # The +to_identifier+ parameter may be optionally specified to obtain files up to a
@@ -77,17 +86,45 @@ module RSCM
     # them in an array. Only files, not directories, will be yielded/returned.
     #
     def checkout(checkout_dir, to_identifier=Time.infinity) # :yield: file
+      ["not/implemented/in", __FILE__, "do/it/now"]
     end
     
     # Returns a ChangeSets object for the period specified by +from_identifier+
     # and +to_identifier+. See AbstractSCM for details about the parameters.
     #
     def changesets(checkout_dir, from_identifier, to_identifier=Time.infinity, files=nil)
+      # Should be overridden by subclasses
+      changesets = ChangeSets.new
+      changesets.add(
+        Change.new(
+          "up/the/chimney",
+          "DamageControl",
+          "The #{name} SCM class in #{__FILE__} doesn't\n" +
+            "correctly implement the changesets method. This is\n" +
+            "not a real changeset, but a hint to the developer to go and implement it.\n\n" +
+            "Do It Now!",
+          "999",
+          Time.now.utc
+        )
+      )
+      changesets
     end
 
-    # Whether the working copy in +checkout_dir+ is uptodate with the repository.
+    # Whether the working copy in +checkout_dir+ is uptodate with the repository
+    # since +from_identifier+.
     #
-    def uptodate?(checkout_dir)
+    def uptodate?(checkout_dir, from_identifier)
+      # Suboptimal algorithm that works for all SCMs.
+      # Subclasses can override this to increase efficiency.
+      
+      changesets(checkout_dir, from_identifier).empty?
+    end
+
+    # Whether triggers are supported by this SCM
+    def supports_trigger?
+      # The default implementation assumes no - override if it can be
+      # determined programmatically.
+      false
     end
 
     # Whether the command denoted by +trigger_command+ is installed in the SCM.
@@ -96,8 +133,12 @@ module RSCM
     end
 
     # Installs +trigger_command+ in the SCM.
+    # The +install_dir+ parameter should be an empty local
+    # directory that the SCM can use for temporary files
+    # if necessary (CVS needs this to check out its administrative files).
+    # Most implementations will ignore this parameter.
     #
-    def install_trigger(trigger_command, damagecontrol_install_dir)
+    def install_trigger(trigger_command, install_dir)
     end
 
     # Uninstalls +trigger_command+ from the SCM.

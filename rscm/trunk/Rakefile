@@ -12,7 +12,7 @@ PKG_VERSION   = '0.1.0' + PKG_BUILD
 PKG_FILE_NAME = "#{PKG_NAME}-#{PKG_VERSION}"
 
 desc "Default Task"
-task :default => [ :test ]
+task :default => [ :all ]
 
 # Run the unit tests
 # To run a specific test: rake test TEST_FILES=<some glob>
@@ -34,15 +34,23 @@ rd = Rake::RDocTask.new { |rdoc|
   rdoc.rdoc_files.include('docs/**/*.rd')
 }
 
-# ====================================================================
-# Create a task that will package the Rake software into distributable
-# tar, zip and gem files.
+task :ant do |t|
+  ant = RUBY_PLATFORM == "i386-mswin32" ? "ant.bat" : "ant.sh"
+  IO.popen("#{ant} -f ext/java/build.xml clean jar") do |io|
+    io.each_line do |line|
+      puts line
+    end
+  end
+end
+
+task :all => [:ant, :gem]
 
 PKG_FILES = FileList[
   '[A-Z]*',
   'lib/**/*.rb', 
   'test/**/*.rb',
-  'doc/**/*'
+  'doc/**/*',
+  'ext/rscm.jar'
 ]
 
 if ! defined?(Gem)

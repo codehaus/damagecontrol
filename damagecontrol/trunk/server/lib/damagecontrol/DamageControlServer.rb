@@ -34,6 +34,7 @@ require 'damagecontrol/xmlrpc/StatusPublisher'
 require 'damagecontrol/xmlrpc/ConnectionTester'
 require 'damagecontrol/xmlrpc/ServerControl'
 
+require 'damagecontrol/scm/StarTeamWebConfigurator'
 require 'damagecontrol/scm/CVSWebConfigurator'
 require 'damagecontrol/scm/SVNWebConfigurator'
 require 'damagecontrol/scm/NoSCMWebConfigurator'
@@ -290,7 +291,8 @@ module DamageControl
       [
         DamageControl::NoSCMWebConfigurator,
         DamageControl::CVSWebConfigurator,
-        DamageControl::SVNWebConfigurator
+        DamageControl::SVNWebConfigurator,
+        DamageControl::StarTeamWebConfigurator
       ]
     end
     

@@ -128,6 +128,11 @@ module DamageControl
       dc_creation_time == o.dc_creation_time &&
       changesets == o.changesets
     end
+    
+    def changesets=(changesets)
+      raise "changesets must be of type #{ChangeSets.name} - was #{changesets.class.name}" unless changesets.is_a?(::RSCM::ChangeSets)
+      @changesets = changesets
+    end
 
     def __get_instance_variables
       (instance_variables.reject {|var| var == "@html_url"}).collect {|var| [var[1..-1], eval(var)] }
