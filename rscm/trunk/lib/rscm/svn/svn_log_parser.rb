@@ -63,7 +63,7 @@ module RSCM
           @changeset << change unless File.directory?(fullpath)
         end
       elsif(@parse_state == :parse_message)
-        @changeset.message << line
+        @changeset.message << line.chomp << "\n"
       end
     end
 

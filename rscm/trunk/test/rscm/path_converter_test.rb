@@ -26,6 +26,9 @@ module RSCM
       end
       assert_equal(n1, filepath_to_nativepath(p1, false))
       assert_equal(n2, filepath_to_nativepath(p1, true))
+
+      assert_equal(p1, nativepath_to_filepath(n2))
+      assert_equal(p1, nativepath_to_filepath(n1))
     end
 
     def test_should_convert_os_path_to_native_url

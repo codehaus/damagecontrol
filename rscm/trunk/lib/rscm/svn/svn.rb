@@ -1,6 +1,6 @@
+require 'rscm/abstract_scm'
 require 'rscm/path_converter'
 require 'rscm/line_editor'
-require 'rscm/abstract_scm'
 require 'rscm/svn/svn_log_parser'
 
 module RSCM
@@ -25,15 +25,12 @@ module RSCM
       "Subversion"
     end
 
-    def form_file
-      File.dirname(__FILE__) + "/form.html"
-    end
-
     def add(checkout_dir, relative_filename)
       svn(checkout_dir, "add #{relative_filename}")
     end
 
     def checkout(checkout_dir)
+
       checkout_dir = PathConverter.filepath_to_nativepath(checkout_dir, false)
       mkdir_p(checkout_dir)
       checked_out_files = []
@@ -97,7 +94,7 @@ module RSCM
     def head_revision(checkout_dir)
       cmd = "svn log #{repourl} -r HEAD"
       with_working_dir(checkout_dir) do
-        IO.popen(cmd) do |stdout|
+        safer_popen(cmd) do |stdout|
           parser = SVNLogParser.new(stdout, path, checkout_dir)
           changesets = parser.parse_changesets
           changesets[0].revision.to_i
@@ -124,7 +121,7 @@ module RSCM
         File.exists?("#{svnrootdir}/db")
       else
         # don't know. assume yes.
-        false
+        true
       end
     end
 
@@ -168,7 +165,7 @@ module RSCM
       yield command if block_given?
 
       with_working_dir(checkout_dir) do
-        IO.popen(command) do |stdout|
+        safer_popen(command) do |stdout|
           parser = SVNLogParser.new(stdout, path, checkout_dir)
           changesets = parser.parse_changesets(from_identifier, to_identifier)
         end
@@ -230,7 +227,7 @@ module RSCM
       command_line = "#{executable} #{cmd}"
       dir = File.expand_path(dir)
       with_working_dir(dir) do
-        IO.popen(command_line) do |stdout|
+        safer_popen(command_line) do |stdout|
           stdout.each_line do |line|
             yield line if block_given?
           end

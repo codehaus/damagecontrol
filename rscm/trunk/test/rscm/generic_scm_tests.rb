@@ -80,6 +80,7 @@ module RSCM
       assert_equal(2, changeset.length)
 
       assert_equal("changed\nsomething", changeset.message)
+
       # why is this nil when running as the dcontrol user on codehaus? --jon
       #assert_equal(username, changeset.developer)
       assert(changeset.developer)
@@ -136,6 +137,7 @@ module RSCM
       scm2 = scm.class.new
       assert_same(scm.class, scm2.class)
     end
+
   private
 
     def new_temp_dir
@@ -150,7 +152,8 @@ module RSCM
       mkdir_p(import_copy_dir)
       path = File.dirname(__FILE__) + "/../../testproject/damagecontrolled"
       path = File.expand_path(path)
-      cp_r(path, File.dirname(import_copy_dir))
+      dirname = File.dirname(import_copy_dir)
+      cp_r(path, dirname)
       todelete = Dir.glob("#{import_copy_dir}/**/.svn")
       rm_rf(todelete)
       scm.import(import_copy_dir, "imported\nsources")

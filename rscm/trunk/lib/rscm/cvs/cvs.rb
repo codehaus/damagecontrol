@@ -1,5 +1,4 @@
 require 'rscm/abstract_scm'
-
 require 'rscm/path_converter'
 require 'rscm/line_editor'
 require 'rscm/cvs/cvs_log_parser'
@@ -201,8 +200,8 @@ module RSCM
   private
 
     def cvs(dir, cmd, simulate=false)
+      dir = PathConverter.nativepath_to_filepath(dir)
       dir = File.expand_path(dir)
-
       execed_command_line = command_line(password, cmd, simulate)
       with_working_dir(dir) do
         safer_popen(execed_command_line) do |stdout|

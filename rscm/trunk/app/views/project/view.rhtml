@@ -68,11 +68,11 @@ trackers = [
   </div>
 <% end %>
 
-<% if(!@project.scm.exists? && @project.scm.can_create?) %>
+<% if(@project.scm && !@project.scm.exists? && @project.scm.can_create?) %>
   <%= link_to("create", :controller => "scm", :action => "create", :id => @project.name) %><br>
 <% end %>
 
-<% if(@project.scm.exists?) %>
+<% if(@project.scm && @project.scm.exists?) %>
   <%= link_to("checkout", :controller => "scm", :action => "checkout", :id => @project.name) %>
 <% end %>  
 

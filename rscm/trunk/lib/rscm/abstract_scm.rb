@@ -15,9 +15,10 @@ class Time
 end
 
 def safer_popen(cmd, mode="r", &proc)
-  IO.popen(cmd, mode="r", &proc)
+  ret = IO.popen(cmd, mode="r", &proc)
   exit_code = $? >> 8
   raise "#{cmd} failed with code #{exit_code}" if exit_code != 0
+  ret
 end
 
 module RSCM
@@ -170,15 +171,13 @@ module RSCM
       true
     end
 
-    # The Javascript function that should be called when the page
-    # is loaded, to initialise the web ui.
-    def javascript_on_load
-      ""
-    end
-
   protected
 
     def with_working_dir(dir)
+      # Can't use Dir.chdir{ block } - will fail with multithreaded code.
+      # http://www.ruby-doc.org/core/classes/Dir.html#M000790
+      #
+      # Therefore we have threadfile.rb
       prev = Dir.pwd
       begin
         mkdir_p(dir)

@@ -9,9 +9,5 @@ module RSCM
       "Mooky"
     end
 
-    def form_file
-      File.dirname(__FILE__) + "/form.html"
-    end
-
   end
 end

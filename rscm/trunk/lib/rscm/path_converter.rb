@@ -2,6 +2,14 @@ WIN32 = RUBY_PLATFORM == "i386-mswin32"
 CYGWIN = RUBY_PLATFORM == "i386-cygwin"
 WINDOWS = WIN32 || CYGWIN
 
+def safer_popen(cmd, mode="r", &proc)
+  ret = IO.popen(cmd, mode="r", &proc)
+  exit_code = $? >> 8
+  raise "#{cmd} failed with code #{exit_code}" if exit_code != 0
+  ret
+end
+
+# Utility for converting between win32 and cygwin paths. Does nothing on *nix.
 module RSCM
   module PathConverter
     def filepath_to_nativepath(path, escaped)
@@ -10,8 +18,11 @@ module RSCM
       if(WIN32)
         path.gsub(/\//, "\\")
       elsif(CYGWIN)
-        cygpath = IO.popen("cygpath --windows #{path}").read.chomp
-        escaped ? cygpath.gsub(/\\/, "\\\\\\\\") : cygpath
+        cmd = "cygpath --windows #{path}"
+        safer_popen(cmd) do |io|
+          cygpath = io.read.chomp
+          escaped ? cygpath.gsub(/\\/, "\\\\\\\\") : cygpath
+        end
       else
         path
       end
@@ -31,7 +42,11 @@ module RSCM
       if(WIN32)
         path.gsub(/\//, "\\")
       elsif(CYGWIN)
-        cygpath = IO.popen("cygpath '#{path}'").read.chomp
+        path = path.gsub(/\\/, "/")
+        cmd = "cygpath --unix #{path}"
+        safer_popen(cmd) do |io|
+          io.read.chomp
+        end
       else
         path
       end

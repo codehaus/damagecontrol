@@ -6,10 +6,6 @@ module RSCM
     # Simple superclass so we can easily include mixins
     # for all subclasses in one fell swoop.
     class Base #:nodoc:
-      def form_file
-        basename = $1 if (self.class.name =~ /RSCM::Tracker::(.*)/)
-        File.dirname(__FILE__) + "/tracker/#{basename}_form.rhtml"
-      end
     end
 
     class Null < Base

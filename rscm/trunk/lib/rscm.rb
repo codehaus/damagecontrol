@@ -1,5 +1,6 @@
 require 'rscm/changes'
 require 'rscm/directories'
+require 'rscm/threadfile'
 require 'rscm/project'
 require 'rscm/tracker'
 require 'rscm/abstract_scm'
