@@ -1,8 +1,11 @@
 require 'damagecontrol/scm/SCM'
 require 'damagecontrol/FileUtils'
+require 'damagecontrol/BuildBootstrapper'
 
 module DamageControl
 
+  # Handles parsing of CVS specs, checkouts and installation of triggers script
+  #
   # format of spec is cvsroot:module
   # examples
   # :local:/cvsroot/damagecontrol:damagecontrol
@@ -58,7 +61,7 @@ module DamageControl
     end
 
     def checkout_command(spec)
-      "-d #{cvsroot(spec)} co #{mod(spec)}"
+      "-d #{cvsroot(spec)} checkout #{mod(spec)}"
     end
 
     def update_command(spec)
@@ -92,6 +95,8 @@ module DamageControl
     # @param port where the dc server is listening
     # @param nc_exe_file where nc.exe file can be copied from (only needed for windows)
     #
+    # @block &proc a block that can handle the output (should typically log to file)
+    #
     def install_trigger(
       directory, \
       project_name, \
@@ -107,7 +112,7 @@ module DamageControl
       checkout("#{cvsroot(spec)}:CVSROOT", directory, &proc)
       Dir.chdir("#{directory}/CVSROOT")
       File.open("#{directory}/CVSROOT/loginfo", File::WRONLY | File::APPEND) do |file|
-        script = trigger_command(project_name, spec, build_command_line, relative_path, nc_command(spec), dc_host, dc_port, path_separator)
+        script = BuildBootstrapper.new.trigger_command(project_name, spec, build_command_line, relative_path, nc_command(spec), dc_host, dc_port, path_separator)
         file.puts("#{mod(spec)} #{script}")
       end
 
@@ -121,7 +126,7 @@ module DamageControl
           file.puts("nc.exe")
         end
         Dir.chdir("#{directory}/CVSROOT")
-        system("cvs com -m \"added damagecontrol\"")
+        system("cvs commit -m \"added damagecontrol\"")
       end
     end
     

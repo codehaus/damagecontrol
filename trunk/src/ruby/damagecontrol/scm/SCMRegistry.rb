@@ -12,11 +12,11 @@ module DamageControl
       @scms<<scm
     end
 
-    def find_scm(path)
-      @scms.find {|scm| scm.handles_path?(path) }
+    def find_scm(spec)
+      @scms.find {|scm| scm.handles_spec?(spec) }
     end
 
-    def handles_path?(path)
+    def handles_spec?(path)
       find_scm(path)
     end
         
@@ -27,6 +27,15 @@ module DamageControl
         scm.checkout(path, directory, &proc)
       else
         super(path, directory, &proc)
+      end
+    end
+
+    def mod(spec)
+      scm = find_scm(spec)
+      if scm
+        scm.mod(spec)
+      else
+        super(spec)
       end
     end
 

@@ -60,6 +60,15 @@
       <property name="interval" value="2" />
       <property name="lastbuildsuccessful" value="false" />
       <property name="logfile" value="\log20030929145347.xml" />
+
+      <!-- Extra properties added for DamageControl. 
+           Maybe request that it be addded to 
+           CC's Project class.
+           
+           These values are taken from BuildBootstrapperTest.rb -->
+      <property name="scm_spec"           value=":local:/cvsroot/picocontainer:pico" />
+      <property name="build_command_line" value="echo damagecontrol rocks" />
+      <property name="build_path"         value="src" />
    </info>
    <build error="BUILD FAILED detected">
       <mavengoal name="ccbuild" time="? seconds" />
