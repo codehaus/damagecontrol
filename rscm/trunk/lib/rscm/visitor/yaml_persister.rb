@@ -54,9 +54,14 @@ module RSCM
       # Returns a sorted array of ints representing the changeset directories.
       #
       def ids
+        # This is pretty quick - even with a lot of directories.
+        # TODO: the method is called 5 times for a page refresh!
+        start = Time.new
         dirs = Dir["#{@changesets_dir}/*"].find_all {|f| File.directory?(f) && File.exist?("#{f}/changeset.yaml")}
         # Turn them into ints so they can be sorted.
-        dirs.collect { |dir| File.basename(dir).to_i }.sort
+        ids = dirs.collect { |dir| File.basename(dir).to_i }.sort
+$stderr.puts("Loaded ids in secs: #{start - Time.new}")
+        ids
       end
 
       # Returns the id of the latest changeset.

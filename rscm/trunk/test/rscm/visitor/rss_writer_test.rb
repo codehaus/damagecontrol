@@ -4,6 +4,18 @@ require 'rss/maker'
 require 'rscm/tracker'
 require 'rscm/scm_web'
 
+class File
+  def read_fix_nl
+    result = ""
+    self.each_line do |line|
+      chomped = line.chomp
+      result << chomped
+      result << "\n" if chomped != line
+    end
+    result
+  end
+end
+
 module RSCM
   module Visitor
     class RssWriterTest < Test::Unit::TestCase
@@ -23,7 +35,7 @@ module RSCM
             RSCM::Tracker::JIRA.new("http://jira.codehaus.org/", "DC"), 
             RSCM::SCMWeb::ViewCVS.new("http://cvs.damagecontrol.codehaus.org/")
           ))
-          assert_equal(File.open(File.dirname(__FILE__) + "/changesets.rss").read, rss.to_rss.to_s)
+          assert_equal(File.open(File.dirname(__FILE__) + "/changesets.rss").read_fix_nl, rss.to_rss.to_s)
         end
       end
 

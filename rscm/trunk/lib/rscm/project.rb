@@ -216,7 +216,7 @@ puts "Polled everyting from #{@name} in #{Time.now.difference_as_text(all_start)
   private
 
     def changesets_persister
-      @@changesets_persister ||= RSCM::Visitor::YamlPersister.new(changesets_dir)
+      RSCM::Visitor::YamlPersister.new(changesets_dir)
     end
 
     def project_config_file

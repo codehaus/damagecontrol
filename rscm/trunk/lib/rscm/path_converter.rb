@@ -38,7 +38,7 @@ module RSCM
         urlpath = filepath_to_nativepath(path, false).gsub(/\\/, "/")
         path = "/#{urlpath}"
       end
-      "file://#{path}"
+      "file://#{File.expand_path(path)}"
     end
 
     def nativepath_to_filepath(path)
