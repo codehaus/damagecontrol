@@ -20,8 +20,8 @@ server = DamageControlServer.new(
   )
 
 def server.logging_level
-  #Logging.debug
-  Logging.quiet
+  Logging.debug
+  #Logging.quiet
 end
 
 def server.init_build_executors

@@ -34,7 +34,7 @@ next_link = " | <a href=\"#{build_url(next_build)}\">#{build_description(next_bu
 	</tr>
 <%
 view_cvs_url = project_config_repository.project_config(project_name)["view_cvs_url"]
-view_cvs_url_patched = "#{view_cvs_url}/" if(view_cvs_url && view_cvs_url[-1] != "/")
+view_cvs_url_patched = "#{view_cvs_url}/" if(view_cvs_url && view_cvs_url[-1..-1] != "/")
 build.modification_set.each do |modification|
 	path = modification.path
 	if(view_cvs_url)
