@@ -3,7 +3,7 @@ require 'rscm'
 require 'rscm/generic_scm_tests'
 
 module RSCM
-  class SVNTest < Test::Unit::TestCase
+  class SubversionTest < Test::Unit::TestCase
   
     include GenericSCMTests
     include LabelTest
