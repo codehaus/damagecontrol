@@ -168,7 +168,7 @@
 
               <listitem>
                 <para>the <ulink url="http://www.cvshome.org/">Concurrent
-                Versioning System</ulink> (CVS)</para>
+                Versioning System</ulink> (<abbrev>CVS</abbrev>)</para>
               </listitem>
             </itemizedlist>
           </step>
@@ -240,7 +240,7 @@
       <section os="windows">
         <title>Windows</title>
 
-        <para>Users of the Microsoft WIndows Operating System can install
+        <para>Users of the Microsoft Windows Operating System can install
         DamageControl using the installer. You do not need to download a
         separate Ruby runtime, as it is included in the installer.</para>
       </section>
@@ -357,7 +357,7 @@ ProxyPassReverse /private http://localhost:4712/private</programlisting>
         <filename>/etc/apache2/dc.passwd</filename>.</para>
       </section>
 
-      <section>
+      <section id="section.multiplebuildexecutors">
         <title>Multiple Build Executors</title>
 
         <para>DamageControl has the ability to run multiple build parallel.
@@ -550,10 +550,11 @@ maven jar</screen>
         (an event) occurs. To make this triggering possible, your software
         configuration management system must support triggers.</para>
 
-        <para>For SCM systems like CVS and Subversion, DamageControl can
-        install triggers automatically if it has local access to the
-        repository. To use a specific SCM, you will have to select the radio
-        box for this SCM and enter the required configuration
+        <para>For <abbrev>SCM</abbrev> systems like <abbrev>CVS</abbrev> and
+        Subversion, DamageControl can install triggers automatically if it has
+        local access to the repository. To use a specific
+        <abbrev>SCM</abbrev>, you will have to select the radio box for this
+        <abbrev>SCM</abbrev> and enter the required configuration
         parameters.</para>
 
         <para>If you have local access to the repository, there will be a new
@@ -563,15 +564,16 @@ maven jar</screen>
         described in the following sections.</para>
 
         <section>
-          <title>Installing Triggers for CVS</title>
+          <title>Installing Triggers for <abbrev>CVS</abbrev></title>
 
-          <para>To install the triggers for CVS you need to have DamageControl
-          installed at the CVS server. DamageControl does not need to be
-          running, as it will be used as client to trigger new builds via the
-          remote API.</para>
+          <para>To install the triggers for <abbrev>CVS</abbrev> you need to
+          have DamageControl installed at the <abbrev>CVS</abbrev> server.
+          DamageControl does not need to be running, as it will be used as
+          client to trigger new builds via the remote
+          <acronym>API</acronym>.</para>
 
           <para>To install the trigger follow these steps from a computer that
-          has access to the CVS repository.</para>
+          has access to the <abbrev>CVS</abbrev> repository.</para>
 
           <procedure>
             <step>
@@ -623,10 +625,10 @@ maven jar</screen>
                 </callout>
 
                 <callout arearefs="dcurl">
-                  <para>The URL of the actual build server. You specify the
-                  private XML-RPC address here. Please make sure that this URI
-                  is accessible from the SCM server without
-                  authentification.</para>
+                  <para>The <abbrev>URL</abbrev> of the actual build server.
+                  You specify the private <abbrev>XML-RPC</abbrev> address
+                  here. Please make sure that this URI is accessible from the
+                  SCM server without authentification.</para>
                 </callout>
 
                 <callout arearefs="projectname">
@@ -636,7 +638,8 @@ maven jar</screen>
             </step>
 
             <step>
-              <para>Finally commit the changes to the CVS server.</para>
+              <para>Finally commit the changes to the <abbrev>CVS</abbrev>
+              server.</para>
 
               <screen><prompt># </prompt><userinput>cvs ci CVSROOT/loginfo -m "<replaceable>Installed DamageControl triggers</replaceable>"</userinput></screen>
             </step>
@@ -708,9 +711,10 @@ maven jar</screen>
                   </callout>
 
                   <callout arearefs="svn.dcurl">
-                    <para>The URL of the actual build server. You specify the
-                    private XML-RPC address here. Please make sure that this
-                    URI is accessible from the SCM server without
+                    <para>The <abbrev>URL</abbrev> of the actual build server.
+                    You specify the private <abbrev>XML-RPC</abbrev> address
+                    here. Please make sure that this <abbrev>URL</abbrev> is
+                    accessible from the <abbrev>SCM</abbrev> server without
                     authentification.</para>
                   </callout>
 
@@ -860,11 +864,11 @@ component(:email_publisher, EmailPublisher.new(hub, build_history_repository,
       </section>
 
       <section>
-        <title>Publish to IRC server</title>
+        <title>Publish to <abbrev>IRC</abbrev> server</title>
 
-        <para>Publishing build results to an IRC server requires similar
-        configuration of an IRC publisher. This is done by following these
-        steps.</para>
+        <para>Publishing build results to an <abbrev>IRC</abbrev> server
+        requires similar configuration of an <abbrev>IRC</abbrev> publisher.
+        This is done by following these steps.</para>
 
         <procedure>
           <step>
@@ -897,15 +901,15 @@ component(:irc_publisher,
       </section>
 
       <section>
-        <title>RSS</title>
+        <title><abbrev>RSS</abbrev></title>
 
         <para>DamageControl offers a convenient way to view the results of the
-        last builds of a project. If you use a RSS reader like <phrase
-        os="macosx">NetNewsWire,</phrase> <phrase
+        last builds of a project. If you use a <abbrev>RSS</abbrev> reader
+        like <phrase os="macosx">NetNewsWire,</phrase> <phrase
         os="windows">RSSBandit,</phrase> <phrase os="linux">Straw</phrase> or
         the LiveBookmarks fetaure of Mozilla Firefox, you should locate the
-        orange XML icon at the project page and subscribe to the linked
-        RSS-feed.</para>
+        orange <abbrev>XML</abbrev> icon at the project page and subscribe to
+        the linked <abbrev>RSS</abbrev>-feed.</para>
 
         <figure>
           <title>The XML icon</title>
@@ -920,7 +924,7 @@ component(:irc_publisher,
         </figure>
 
         <para>Each time a build succeeds or fails, you will be notified
-        through your RSS reader.</para>
+        through your <abbrev>RSS</abbrev> reader.</para>
       </section>
 
       <section>
@@ -953,9 +957,10 @@ component(:irc_publisher,
       <section>
         <title>GNOME System Tray</title>
 
-        <para>There is also a System Tray Icon for the GNOME desktop, which
-        will show a red or green status light if depending on the build status
-        of your monitored projects. The GNOME System Tray Icon currently does
+        <para>There is also a System Tray Icon for the
+        <acronym>GNOME</acronym> desktop, which will show a red or green
+        status light if depending on the build status of your monitored
+        projects. The <acronym>GNOME</acronym> System Tray Icon currently does
         not support the display of notification messages nor the playing of
         sound to notify the user of finished builds.</para>
 
@@ -972,12 +977,232 @@ component(:irc_publisher,
         </figure>
 
         <para>To use this icon, you will need a Linux computer with following
-        software: Mono, Gtk# and the GNOME desktop. After unpacking the
-        DamageControl-MonoTray package, you can start the Tray Icon using
-        following command.</para>
+        software: Mono, Gtk# and the <acronym>GNOME</acronym> desktop. After
+        unpacking the DamageControl-MonoTray package, you can start the Tray
+        Icon using following command.</para>
 
         <screen><prompt># </prompt><userinput>mono MonoTray.exe</userinput></screen>
       </section>
+    </section>
+
+    <section>
+      <title>Getting Support</title>
+
+      <para>The best way to contact the developers of DamageControl is though
+      the DamageControl-Users-Mailinglist. You can subscribe to this mailing
+      list by sending an empty EMail to
+      <email>user-subscribe@damagecontrol.codehaus.org</email>.</para>
+
+      <para>Sometimes you might find other users or developers in the
+      DamageControl <abbrev>IRC</abbrev> channel
+      (<literal>#damagecontrol</literal>) at
+      <literal>irc.codehaus.org</literal>.</para>
+    </section>
+
+    <section>
+      <title>Frequently Asked Questions</title>
+
+      <qandaset>
+        <qandadiv>
+          <qandaentry>
+            <question>
+              <para>Why do I get random crashes?</para>
+            </question>
+
+            <answer>
+              <para>There is a bug in the <acronym>YAML</acronym>
+              implementation in Ruby 1.8.1 which makes DamageControl crash a
+              couple of times every day. Usually something like the following
+              is displayed in the log and in the console output:</para>
+
+              <screen><computeroutput>/usr/lib/ruby/1.8/yaml.rb:39: [BUG] rb_gc_mark(): unknown data type 0x14(0x4023e51c) non object
+ruby 1.8.1 (2004-05-02) [i686-linux-gnu]</computeroutput></screen>
+
+              <para>Installing Ruby 1.8.2 solves the problem (it is currently
+              in preview3 but should be released soon).</para>
+            </answer>
+
+            <answer>
+              <para>See also <ulink
+              url="http://jira.codehaus.org/browse/DC-206">JIRA issue
+              DC-206</ulink>.</para>
+            </answer>
+          </qandaentry>
+
+          <qandaentry>
+            <question>
+              <para>How does DamageControl detect a failed build?</para>
+            </question>
+
+            <answer>
+              <para>DamageControl has absolutely no knowledge of what the
+              build command it executes actually does. It just launches the
+              command you tell it to launch. (Could be notepad.exe or gimp for
+              that matter - try it!). Since the build command is an arbitrary
+              command, there might not even be any (system err/system out)
+              output from it, so DamageControl doesn't try to parse that
+              output. (Although it pipes it to a log file which you can browse
+              to from the web admin).</para>
+
+              <para>What DamageControl does is quite old fashioned (yet a
+              well-established paradigm, at least in <acronym>UNIX</acronym>
+              land): It looks at the return code from the build command. If
+              it's 0 it is OK, otherwise it is KO. In short this means that
+              your build command (whatever it is) must make sure to return a
+              non-0 return code in the event of a build failure. Ant, Maven
+              and Make do that.</para>
+
+              <para>If you are writing a your build script in shell-script or
+              some other scripting languages like Python and Ruby you need to
+              make sure you are exiting with a non-zero exit code on build
+              failure. Have a look at ant.bat to see how to do it from a .bat
+              script.</para>
+
+              <para>For example, the DamageControl build scripts (written in
+              ruby and which of course are built in DamageControl itself) have
+              code that looks something like this:</para>
+
+              <programlisting>def fail(message = $?.to_s)
+  puts "BUILD FAILED: #{message}"
+  exit!(1) # &lt;------ non-zero exit code, build failed!
+end
+
+def run(args)
+  begin
+    # … snip, run the build ...
+  rescue Exception =&gt; e
+    fail(e.message)
+  end
+  puts "BUILD SUCCESSFUL"
+  # exits with exit code zero
+end</programlisting>
+
+              <para>Under <abbrev>UNIX</abbrev>, the exit status of a shell
+              script is the same as the last command run, which is generally
+              what you want.</para>
+
+              <para>Under Windows, you may have to add <literal>exit
+              errorlevel</literal> to the end of your batch file.</para>
+            </answer>
+          </qandaentry>
+
+          <qandaentry>
+            <question>
+              <para>How do I execute a build in a different directory than the
+              base directory?</para>
+            </question>
+
+            <answer>
+              <para>In your build command line cd to that directory and then
+              execute the command line you need to build. Your build command
+              line could look something like this:</para>
+
+              <screen>cd <replaceable>directory/to/build/in/relative/to/checkout</replaceable> &amp;&amp; <replaceable>ant</replaceable></screen>
+            </answer>
+          </qandaentry>
+
+          <qandaentry>
+            <question>
+              <para>How do I create child builds that build from the same
+              checkout as another build?</para>
+            </question>
+
+            <answer>
+              <para>Say you have a project named myproject and you want to for
+              example perform the deployment phase in a different build stage
+              than the initial one. There is currently no explicit support for
+              this in DamageControl but it's relatively easy to accomplish
+              anyway using a trick:</para>
+
+              <procedure>
+                <step>
+                  <para> Create a new project named
+                  <quote>myproject-deploy</quote> (for example).</para>
+                </step>
+
+                <step>
+                  <para> Configure <quote>myproject-deploy</quote> to be a
+                  child build of <quote>myproject</quote> (so it gets
+                  triggered at each commit).</para>
+                </step>
+
+                <step>
+                  <para> Configure <quote>myproject-deploy</quote> so it has
+                  no <abbrev>SCM</abbrev> and that the build command line
+                  looks something like:</para>
+
+                  <screen>cd /<replaceable>var/damagecontrol/myproject/checkout/myproject</replaceable> &amp;&amp; <replaceable>deploy</replaceable></screen>
+
+                  <para> Where
+                  <replaceable>/var/damagecontrol/project/checkout/myproject</replaceable>
+                  is the full path to the checkout directory of the parent
+                  project <quote>myproject</quote> and
+                  <command>deploy</command> is the actual command to execute
+                  the <quote>myproject</quote>-deploy script.</para>
+                </step>
+              </procedure>
+            </answer>
+          </qandaentry>
+
+          <qandaentry>
+            <question>
+              <para>How do I pin certain builds to certain executors?</para>
+            </question>
+
+            <answer>
+              <para>DamageControl has the ability (see <ulink
+              url="http://jira.codehaus.org/browse/DC-240">DC-240</ulink>) to
+              have builds 'pinned' to certain executors. This means that each
+              build can control which executors will, or won't, be allowed to
+              execute it.</para>
+
+              <formalpara>
+                <title> Why would I want to pin a build?</title>
+
+                <para>Well there's a number of ways this would be useful, but
+                for example in our scenario we have 8 or 9 functional test
+                builds that <emphasis>must</emphasis> be run in serial (ie
+                FTest A, FTest B, FTest C etc). The advantage to having
+                multiple executors allows us to reduce the average time for
+                each build. However if the problem is that if we have a set of
+                serial builds like this we can no longer have multiple
+                executors because we can't guarantee they won't start to
+                parallel each other. Pinning all these builds to a single
+                executor means that they will run in serial, but won't block
+                the entire build queue.</para>
+              </formalpara>
+
+              <formalpara>
+                <title> So how do I pin a build?</title>
+
+                <para>It's not documented anywhere (hence why I'm writing this
+                <acronym>FAQ</acronym>) but it really is quite simple. To pin
+                a build, you need to edit it's <filename>conf.yaml</filename>
+                file (usually located in
+                <filename><envar>DCHOME</envar>/work/<replaceable>pprojectname</replaceable></filename>)
+                and add the following line:</para>
+              </formalpara>
+
+              <programlisting>executor_selector: <replaceable>FunctionalTests</replaceable></programlisting>
+
+              <para>This will pin the current build to only the
+              <quote>FunctionalTests</quote> build executor. The
+              <parameter>executor_selector</parameter> property is a regular
+              expression that must match the executor name. The default value
+              is <literal>\.*</literal> - hence the default is to match all
+              executors.</para>
+
+              <formalpara>
+                <title> Why can not I pin a build through the web UI?</title>
+
+                <para>This feature hasn't been implemented yet, but it is
+                scheduled (see <ulink
+                url="http://jira.codehaus.org/browse/DC-241">DC-241</ulink>).</para>
+              </formalpara>
+            </answer>
+          </qandaentry>
+        </qandadiv>
+      </qandaset>
     </section>
   </chapter>
 
@@ -988,6 +1213,1788 @@ component(:irc_publisher,
     users of DamageControl who would like to extend the features offered by
     DamageControl.</para>
 
-    <remark>TODO.</remark>
+    <section>
+      <title>Development Environment</title>
+
+      <para>Development of DamageControl requires the Ruby runtime, a CVS
+      client and some developer packages like <command>crypt</command>. If you
+      are workon on a <abbrev>UNIX</abbrev>- or Linux-machine, you can install
+      the programs via the operating system's package manager. Users of
+      Microsoft Windows should install cygwin.</para>
+
+      <para>If you would like to create installers for Microsoft Windows, you
+      should install the <ulink url="http://nsis.sourceforge.net/">Nullsoft
+      Scriptable Installation System</ulink>. It is possible to run
+      <command>makensis</command> on Linux, if you compile it yourself or
+      install <abbrev>NSIS</abbrev> under Wine.</para>
+
+      <section>
+        <title>Getting the Source</title>
+
+        <para>In order to get the latest source code, you should checkout the
+        module damagecontrol from the <abbrev>CVS</abbrev> repository at
+        codehaus.</para>
+
+        <screen><prompt># </prompt><userinput>cvs -d \
+  :pserver:anonymous@cvs.damagecontrol.codehaus.org:/home/projects/damagecontrol/scm \
+  login</userinput>
+<computeroutput>Password: </computeroutput><keycap>RETURN</keycap>
+<prompt># </prompt><userinput>cvs -d \
+  :pserver:anonymous@cvs.damagecontrol.codehaus.org:/home/projects/damagecontrol/scm \
+  co damagecontrol </userinput></screen>
+
+        <para>You will find the source code for the server in the directory
+        <filename>server</filename>, the directory <filename>client</filename>
+        contains the source code for the various DamageControl client
+        programs.</para>
+
+        <para>Developers use different connection settings to access the
+        DamageControl <abbrev>CVS</abbrev> repository. You will have to use
+        <abbrev>CVS</abbrev> via <abbrev>SSH</abbrev>, which should be no
+        problem, as Public Key Authentification is already set up for all
+        CodeHaus developers.</para>
+
+        <screen><prompt># </prompt><userinput>export CVS_RSH=ssh</userinput>
+<prompt># </prompt><userinput>cvs -d \
+  :ext:<replaceable>username</replaceable>@cvs.damagecontrol.codehaus.org:/home/projects/damagecontrol/scm \
+  co damagecontrol</userinput></screen>
+      </section>
+
+      <section>
+        <title>Building</title>
+
+        <para>The build scripts are located in the
+        <filename>build.rb</filename> file. There are a number of targets you
+        can use.</para>
+
+        <informaltable>
+          <tgroup cols="2">
+            <thead>
+              <row>
+                <entry>Build Command</entry>
+
+                <entry>Action</entry>
+              </row>
+            </thead>
+
+            <tbody>
+              <row>
+                <entry><screen><prompt># </prompt><userinput>./build.rb test</userinput></screen></entry>
+
+                <entry>Runs unit tests and all integration tests.</entry>
+              </row>
+
+              <row>
+                <entry><screen><prompt># </prompt><userinput>./build.rb dist</userinput></screen></entry>
+
+                <entry>Builds a complete distribution into
+                <filename>targets/dist</filename></entry>
+              </row>
+
+              <row>
+                <entry><screen><prompt># </prompt><userinput>./build.rb dist \
+  -Ddist_dir=<replaceable>/path/to/distdir</replaceable></userinput></screen></entry>
+
+                <entry>Builds a complete distribution into the specified
+                directory</entry>
+              </row>
+
+              <row>
+                <entry><screen><prompt># </prompt><userinput>./build.rb installer \
+  -Druby_home=<replaceable>C:\\Program Files\\Ruby</replaceable> \
+  -Dcvs_executable=<replaceable>C:\\Program Files\\CVS\\bin</replaceable></userinput></screen></entry>
+
+                <entry>Builds the installer. The paths to the ruby
+                installation and the CVS executable need to be absolute
+                windows paths with backslashes doubled.</entry>
+              </row>
+            </tbody>
+          </tgroup>
+        </informaltable>
+      </section>
+
+      <section>
+        <title>Contributing patches</title>
+
+        <para>You should make changes directly in the codebase which you
+        checked out from <abbrev>CVS</abbrev>. You can create patches by
+        running following command.</para>
+
+        <screen><prompt># </prompt><userinput>cvs diff -u &gt; my.patch</userinput></screen>
+
+        <para>If you have created a patch, you should submit it to the <ulink
+        url="http://jira.codehaus.org/">JIRA issue tracker at
+        CodeHaus</ulink>. The corresponding product is <quote>DamageControl
+        (DC)</quote>.</para>
+
+        <para>It you be very nice, if you could send an EMail to the
+        DamageControl-Developers-Mailinglist, which you can subscribe to by
+        sending an empty message to
+        <email>dev-subscribe@damagecontrol.codehaus.org</email>.</para>
+      </section>
+    </section>
+
+    <section>
+      <title>Core Architecture</title>
+
+      <figure>
+        <title>The Checkout-Build-Process</title>
+
+        <mediaobject>
+          <imageobject role="html">
+            <imagedata fileref="images/architecture.png" />
+          </imageobject>
+
+          <imageobject role="fo">
+            <imagedata contentwidth="15cm" fileref="images/architecture.svg" />
+          </imageobject>
+
+          <textobject>
+            <para>This object diagram describes in coarse detail how some of
+            the core objects relate to each other. It describes how a build
+            process starts by first checking out, determining if there are any
+            changes, and then possibly executing a build.</para>
+          </textobject>
+        </mediaobject>
+      </figure>
+
+      <procedure>
+        <step>
+          <title>A checkout is requested</title>
+
+          <para>There are two different stituations that will result in a
+          build to be executed. They both start with the blue objects.</para>
+
+          <itemizedlist>
+            <listitem>
+              <para>A build is triggered (step 0). This can be done via the
+              web interface or over <abbrev>XML-RPC</abbrev>. Typical
+              <abbrev>XML-RPC</abbrev> invocations come from either a trigger
+              in the <abbrev>SCM</abbrev> (if it is installed), or via some
+              other external program using the
+              <abbrev>XML-RPC</abbrev>-interface.</para>
+            </listitem>
+
+            <listitem>
+              <para>The <classname>SCMPoller</classname> decides it is time to
+              poll a project and see if there are any changes.</para>
+            </listitem>
+          </itemizedlist>
+        </step>
+
+        <step>
+          <title>The SCM checks out latest</title>
+
+          <para>The <classname>CheckoutManager</classname> asks the
+          <abbrev>SCM</abbrev> to check out the latest code. This call will
+          return a <classname>ChangeSets</classname> object which contains
+          detailed information of what was checked out (and maybe even
+          deleted) since the last checkout. It then finds most recent
+          timestamp of all the changes in the
+          <classname>ChangeSets</classname> and saves that timestamp in the
+          project configuration (to be used in the future).</para>
+
+          <note>
+            <para>For practical reasons, if the checkout is a
+            first-time-checkout, the <abbrev>SCM</abbrev> will return the
+            timestamp of the most recent checkin rather than all the
+            changesets. This is to avoid having a too big list of changes in
+            the first build report.</para>
+          </note>
+        </step>
+
+        <step>
+          <title>A build is requested</title>
+
+          <para>A build object is created (which holds the changesets), and
+          the execution of that build is requested within the
+          <classname>BuildScheduler</classname>.</para>
+
+          <note>
+            <title>Special Note for <classname>SCMPoller</classname></title>
+
+            <para>This will only happen if there were changes. If there were
+            no changes as the result of the checkout, no request will be made
+            with the <classname>BuildScheduler</classname>.</para>
+          </note>
+        </step>
+
+        <step>
+          <title>A build is executed</title>
+
+          <para>When a <classname>BuildExecutor</classname> becomes
+          available<footnote>
+              <para>There may be several of them, depending on how you have
+              configured DamageControl. See <xref
+              linkend="section.multiplebuildexecutors" />.</para>
+            </footnote>, the scheduled build will be given to it. The
+          <classname>BuildExecutor</classname> will execute the build, and
+          finally send an event on the hub when the build is finnished (wether
+          it succeeded or not). This event will then be picked up by other
+          components, which may perform various notification tasks (EMail,
+          <abbrev>IRC</abbrev>, etc.).</para>
+        </step>
+      </procedure>
+    </section>
+
+    <section>
+      <title>DamageControl Remote <acronym>API</acronym></title>
+
+      <section>
+        <title>Introduction</title>
+
+        <para>DamageControl features a powerful <abbrev>XML-RPC</abbrev>
+        <acronym>API</acronym> that allows developers to create various
+        clients for DamageControl.</para>
+
+        <para>Some operations of the <acronym>API</acronym> should be open for
+        all. This includes all operations that do not modify any state on the
+        DamageControl system, but merely provide querying functionality. These
+        operations are part of the public API and marked with the modifier
+        keyword <literal>public</literal> in the following synopes. The
+        endpoint for the public <acronym>API</acronym> is
+        <literal>http://host:port/public/xmlrpc</literal>.</para>
+
+        <para>Other operations should be restricted to administrators or
+        project developers. These are operations that modify the DamageControl
+        system's state or execute builds on the server. The endpoint for this
+        <acronym>API</acronym> is
+        <literal>http://host:port/public/xmlrpc</literal> and access to it is
+        usually authenticated. The following synopses will mark these
+        functions as <literal>private</literal>.</para>
+
+        <note>
+          <title>Why <abbrev>XML-RPC</abbrev> and not <replaceable>insert
+          favourite RPC technology here</replaceable>?</title>
+
+          <itemizedlist>
+            <listitem>
+              <para>It is platform neutral, and clients can be written for
+              many platforms.</para>
+            </listitem>
+
+            <listitem>
+              <para>It is simpler than e.g. <acronym>SOAP</acronym>.</para>
+            </listitem>
+
+            <listitem>
+              <para>The <abbrev>XML-RPC</abbrev> library for Ruby is
+              excellent.</para>
+            </listitem>
+          </itemizedlist>
+
+          <para>We are consigering to also support <acronym>SOAP</acronym>,
+          but we have not found an easy and clean way of doing this in Ruby.
+          If you really need <acronym>SOAP</acronym>, let us know.</para>
+        </note>
+      </section>
+
+      <section>
+        <title>Methods</title>
+
+        <refentry>
+          <refnamediv>
+            <refname><methodname>status.project_names</methodname></refname>
+
+            <refpurpose>Gets all the project names registered with the
+            server</refpurpose>
+          </refnamediv>
+
+          <refsect1>
+            <title>Synopsis</title>
+
+            <methodsynopsis>
+              <modifier>public</modifier>
+
+              <type>string[]</type>
+
+              <methodname>status.project_names</methodname>
+
+              <void />
+            </methodsynopsis>
+          </refsect1>
+        </refentry>
+
+        <refentry>
+          <refnamediv>
+            <refname><methodname>status.current_build</methodname></refname>
+
+            <refpurpose>Returns the currently executing build</refpurpose>
+          </refnamediv>
+
+          <refsect1>
+            <title>Synopsis</title>
+
+            <methodsynopsis>
+              <modifier>public</modifier>
+
+              <type>Build</type>
+
+              <methodname>status.current_build</methodname>
+
+              <methodparam>
+                <type>string</type>
+
+                <parameter>projectname</parameter>
+              </methodparam>
+            </methodsynopsis>
+          </refsect1>
+
+          <refsect1>
+            <title>Description</title>
+
+            <para>Returns the currently executing build of the specified
+            project. Takes a project name as a string.</para>
+          </refsect1>
+        </refentry>
+
+        <refentry>
+          <refnamediv>
+            <refname><methodname>status.project_names</methodname></refname>
+
+            <refpurpose>Gets all the project names registered with the
+            server</refpurpose>
+          </refnamediv>
+
+          <refsynopsisdiv>
+            <methodsynopsis>
+              <modifier>public</modifier>
+
+              <type>string[]</type>
+
+              <methodname>status.project_names</methodname>
+
+              <void />
+            </methodsynopsis>
+          </refsynopsisdiv>
+
+          <refsect1>
+            <title>Description</title>
+
+            <para>Gets all the project names registered with the
+            server.</para>
+          </refsect1>
+        </refentry>
+
+        <refentry>
+          <refnamediv>
+            <refname><methodname>status.last_completed_build</methodname></refname>
+
+            <refpurpose>Returns the last completed build</refpurpose>
+          </refnamediv>
+
+          <refsynopsisdiv>
+            <methodsynopsis>
+              <modifier>public</modifier>
+
+              <type>Build</type>
+
+              <methodname>status.last_completed_build</methodname>
+
+              <methodparam>
+                <type>string</type>
+
+                <parameter>projectname</parameter>
+              </methodparam>
+            </methodsynopsis>
+          </refsynopsisdiv>
+
+          <refsect1>
+            <title>Description</title>
+
+            <para>Returns the last completed build of the specified project.
+            Takes a project name as a string.</para>
+          </refsect1>
+        </refentry>
+
+        <refentry>
+          <refnamediv>
+            <refname><methodname>status.global_search</methodname></refname>
+
+            <refpurpose>Searches for the specified phrase</refpurpose>
+          </refnamediv>
+
+          <refsynopsisdiv>
+            <methodsynopsis>
+              <modifier>public</modifier>
+
+              <type>Build[]</type>
+
+              <methodname>status.global_search</methodname>
+
+              <methodparam>
+                <type>string</type>
+
+                <parameter>phrase</parameter>
+              </methodparam>
+            </methodsynopsis>
+          </refsynopsisdiv>
+
+          <refsect1>
+            <title>Description</title>
+
+            <para>Searches for the specified phrase in all the projects and
+            returns an array of builds.</para>
+          </refsect1>
+        </refentry>
+
+        <refentry>
+          <refnamediv>
+            <refname><methodname>server.trig_build</methodname></refname>
+
+            <refpurpose>Requests a build</refpurpose>
+          </refnamediv>
+
+          <refsynopsisdiv>
+            <methodsynopsis>
+              <modifier>private</modifier>
+
+              <type>string</type>
+
+              <methodname>server.trig_build</methodname>
+
+              <methodparam>
+                <type>string</type>
+
+                <parameter>project_name</parameter>
+              </methodparam>
+
+              <methodparam>
+                <type>Timestamp</type>
+
+                <parameter>timestamp</parameter>
+              </methodparam>
+            </methodsynopsis>
+          </refsynopsisdiv>
+
+          <refsect1>
+            <title>Description</title>
+
+            <para>Requests a build, timestamp has to be formatted according to
+            the Timestamp format and must be in <abbrev>UTC</abbrev>. The
+            function returns a confirmation message from the server.</para>
+          </refsect1>
+        </refentry>
+      </section>
+
+      <section>
+        <title>Data Formats</title>
+
+        <refentry>
+          <refnamediv>
+            <refname><structname>Build</structname></refname>
+
+            <refpurpose>A build result</refpurpose>
+          </refnamediv>
+
+          <refsynopsisdiv>
+            <classsynopsis>
+              <ooclass>
+                <classname>Build</classname>
+              </ooclass>
+
+              <fieldsynopsis>
+                <type>string</type>
+
+                <varname>projectname</varname>
+              </fieldsynopsis>
+
+              <fieldsynopsis>
+                <type>string</type>
+
+                <varname>status</varname>
+              </fieldsynopsis>
+
+              <fieldsynopsis>
+                <type>Changesets</type>
+
+                <varname>changesets</varname>
+              </fieldsynopsis>
+
+              <fieldsynopsis>
+                <type>string</type>
+
+                <varname>request_time</varname>
+              </fieldsynopsis>
+
+              <fieldsynopsis>
+                <type>string</type>
+
+                <varname>start_time</varname>
+              </fieldsynopsis>
+
+              <fieldsynopsis>
+                <type>string</type>
+
+                <varname>end_time</varname>
+              </fieldsynopsis>
+
+              <fieldsynopsis>
+                <type>string</type>
+
+                <varname>label</varname>
+              </fieldsynopsis>
+
+              <fieldsynopsis>
+                <type>string</type>
+
+                <varname>url</varname>
+              </fieldsynopsis>
+            </classsynopsis>
+          </refsynopsisdiv>
+
+          <refsection>
+            <title>Description</title>
+
+            <para>Represents a build result (in the past or currenty
+            running).</para>
+          </refsection>
+
+          <refsection>
+            <title>Fields</title>
+
+            <variablelist>
+              <varlistentry>
+                <term><varname>projectname</varname></term>
+
+                <listitem>
+                  <para>The name of the project</para>
+                </listitem>
+              </varlistentry>
+
+              <varlistentry>
+                <term><varname>status</varname></term>
+
+                <listitem>
+                  <para>Status of the build. It is one of
+                  <quote><literal>IDLE</literal></quote>,
+                  <quote><literal>SUCCESSFUL</literal></quote>,
+                  <quote><literal>FAILED</literal></quote>,
+                  <quote><literal>QUEUED</literal></quote>,
+                  <quote><literal>BUILDING</literal></quote>,
+                  <quote><literal>PAUSED</literal></quote> or
+                  <quote><literal>CHECKING OUT</literal></quote>.</para>
+                </listitem>
+              </varlistentry>
+
+              <varlistentry>
+                <term><varname>changesets</varname></term>
+
+                <listitem>
+                  <para>a <classname>ChangeSets</classname> struct containing
+                  the modifications in this build.</para>
+                </listitem>
+              </varlistentry>
+
+              <varlistentry>
+                <term><varname>request_time</varname></term>
+
+                <listitem>
+                  <para>The time the build was requested, in
+                  <abbrev>UTC</abbrev>, according to the <abbrev>SCM</abbrev>
+                  machine.</para>
+                </listitem>
+              </varlistentry>
+
+              <varlistentry>
+                <term><varname>start_time</varname></term>
+
+                <listitem>
+                  <para>The time the build started, in <abbrev>UTC</abbrev>,
+                  according to the <abbrev>SCM</abbrev> machine.</para>
+                </listitem>
+              </varlistentry>
+
+              <varlistentry>
+                <term><varname>end_time</varname></term>
+
+                <listitem>
+                  <para>The time the build ended, in <abbrev>UTC</abbrev>,
+                  according to the <abbrev>SCM</abbrev> machine.</para>
+                </listitem>
+              </varlistentry>
+
+              <varlistentry>
+                <term><varname>label</varname></term>
+
+                <listitem>
+                  <para>The label of the build. Only set for
+                  <quote><literal>SUCCESSFUL</literal></quote> builds.</para>
+                </listitem>
+              </varlistentry>
+
+              <varlistentry>
+                <term><varname>url</varname></term>
+
+                <listitem>
+                  <para><abbrev>URL</abbrev> pointing to a build-specific
+                  web-page with more detailed information.</para>
+                </listitem>
+              </varlistentry>
+            </variablelist>
+          </refsection>
+        </refentry>
+
+        <refentry>
+          <refnamediv>
+            <refname><structname>ChangeSets</structname></refname>
+
+            <refpurpose>Changesets of one build</refpurpose>
+          </refnamediv>
+
+          <refsynopsisdiv>
+            <classsynopsis>
+              <ooclass>
+                <classname>ChangeSets</classname>
+              </ooclass>
+
+              <fieldsynopsis>
+                <type>ChangeSet[]</type>
+
+                <varname>changesets</varname>
+              </fieldsynopsis>
+            </classsynopsis>
+          </refsynopsisdiv>
+
+          <refsection>
+            <title>Description</title>
+
+            <para>Represents the changesets of one build. A build can contain
+            several changesets.</para>
+          </refsection>
+
+          <refsection>
+            <title>Fields</title>
+
+            <variablelist>
+              <varlistentry>
+                <term><varname>changesets</varname></term>
+
+                <listitem>
+                  <para>The changesets of this build</para>
+                </listitem>
+              </varlistentry>
+            </variablelist>
+          </refsection>
+        </refentry>
+
+        <refentry>
+          <refnamediv>
+            <refname><structname>ChangeSet</structname></refname>
+
+            <refpurpose>A set of changes</refpurpose>
+          </refnamediv>
+
+          <refsynopsisdiv>
+            <classsynopsis>
+              <ooclass>
+                <classname>ChangeSet</classname>
+              </ooclass>
+
+              <fieldsynopsis>
+                <type>Change[]</type>
+
+                <varname>changes</varname>
+              </fieldsynopsis>
+
+              <fieldsynopsis>
+                <type>string</type>
+
+                <varname>developer</varname>
+              </fieldsynopsis>
+
+              <fieldsynopsis>
+                <type>string</type>
+
+                <varname>message</varname>
+              </fieldsynopsis>
+            </classsynopsis>
+          </refsynopsisdiv>
+
+          <refsection>
+            <title>Description</title>
+
+            <para>Represents a set of changes done for the same purposes, some
+            <abbrev>SCM</abbrev>s support this natively (such as Subversion),
+            where they are not supportet (as in <abbrev>CVS</abbrev>)
+            DamageControl tries to collate changesets based on message and
+            time.</para>
+          </refsection>
+
+          <refsection>
+            <title>Fields</title>
+
+            <variablelist>
+              <varlistentry>
+                <term><varname>changes</varname></term>
+
+                <listitem>
+                  <para>The changes in this changeset</para>
+                </listitem>
+              </varlistentry>
+
+              <varlistentry>
+                <term><varname>developer</varname></term>
+
+                <listitem>
+                  <para><abbrev>SCM</abbrev> id of the developer</para>
+                </listitem>
+              </varlistentry>
+
+              <varlistentry>
+                <term><varname>message</varname></term>
+
+                <listitem>
+                  <para>The commit message</para>
+                </listitem>
+              </varlistentry>
+            </variablelist>
+          </refsection>
+        </refentry>
+
+        <refentry>
+          <refnamediv>
+            <refname><structname>Change</structname></refname>
+
+            <refpurpose>A changed file</refpurpose>
+          </refnamediv>
+
+          <refsynopsisdiv>
+            <classsynopsis>
+              <ooclass>
+                <classname>Change</classname>
+              </ooclass>
+
+              <fieldsynopsis>
+                <type>string</type>
+
+                <varname>path</varname>
+              </fieldsynopsis>
+
+              <fieldsynopsis>
+                <type>string</type>
+
+                <varname>revision</varname>
+              </fieldsynopsis>
+
+              <fieldsynopsis>
+                <type>string</type>
+
+                <varname>time</varname>
+              </fieldsynopsis>
+
+              <fieldsynopsis>
+                <type>string</type>
+
+                <varname>status</varname>
+              </fieldsynopsis>
+            </classsynopsis>
+          </refsynopsisdiv>
+
+          <refsection>
+            <title>Description</title>
+
+            <para>This struct represents a changed file.</para>
+          </refsection>
+
+          <refsection>
+            <title>Fields</title>
+
+            <variablelist>
+              <varlistentry>
+                <term><varname>path</varname></term>
+
+                <listitem>
+                  <para>Relative path to the modified file.
+                  <quote><literal>/</literal></quote> is used as path
+                  separator.</para>
+                </listitem>
+              </varlistentry>
+
+              <varlistentry>
+                <term><varname>revision</varname></term>
+
+                <listitem>
+                  <para>The current revision of the file.</para>
+                </listitem>
+              </varlistentry>
+
+              <varlistentry>
+                <term><varname>time</varname></term>
+
+                <listitem>
+                  <para>The timestamp of the file, in <abbrev>UTC</abbrev>,
+                  according to the <abbrev>SCM</abbrev>, formatted according
+                  to the SCM.</para>
+                </listitem>
+              </varlistentry>
+
+              <varlistentry>
+                <term><varname>status</varname></term>
+
+                <listitem>
+                  <para>What happened to the file since the last revision. The
+                  value is one of <quote><literal>MODIFIED</literal></quote>,
+                  <quote><literal>ADDED</literal></quote>,
+                  <quote><literal>MOVED</literal></quote> or
+                  <quote><literal>REMOVED</literal></quote>.</para>
+                </listitem>
+              </varlistentry>
+            </variablelist>
+          </refsection>
+        </refentry>
+
+        <refentry>
+          <refnamediv>
+            <refname>Timestamp</refname>
+
+            <refpurpose>A <abbrev>UTC</abbrev> Timestamp</refpurpose>
+          </refnamediv>
+
+          <refsynopsisdiv>
+            <literallayout>YYYYMMDDhhmmss</literallayout>
+
+            <variablelist>
+              <varlistentry>
+                <term><literal>YYYY</literal></term>
+
+                <listitem>
+                  <para>Year as 4-digit number, e.g. 2004</para>
+                </listitem>
+              </varlistentry>
+
+              <varlistentry>
+                <term><literal>MM</literal></term>
+
+                <listitem>
+                  <para>Month as 2-digit number, with trailing zero, e.g.
+                  09</para>
+                </listitem>
+              </varlistentry>
+
+              <varlistentry>
+                <term><literal>DD</literal></term>
+
+                <listitem>
+                  <para>Day of the month as 2-digit number with trailing zero,
+                  e.g. 08</para>
+                </listitem>
+              </varlistentry>
+
+              <varlistentry>
+                <term><literal>hh</literal></term>
+
+                <listitem>
+                  <para>Hour of the day as 2-digit number with trailing zero,
+                  e.g. 15 for 3 p.m. or 07 for 7 a.m.</para>
+                </listitem>
+              </varlistentry>
+
+              <varlistentry>
+                <term><literal>mm</literal></term>
+
+                <listitem>
+                  <para>Minute of the hour as 2-digit number with trailing
+                  zero, e.g. 02</para>
+                </listitem>
+              </varlistentry>
+
+              <varlistentry>
+                <term><literal>mm</literal></term>
+
+                <listitem>
+                  <para>Second as 2-digit number with trailing zero, e.g.
+                  06</para>
+                </listitem>
+              </varlistentry>
+            </variablelist>
+          </refsynopsisdiv>
+
+          <refsect1>
+            <title>Description</title>
+
+            <para>A timestamp format, This timestamp must be alway
+            <abbrev>UTC</abbrev>.</para>
+          </refsect1>
+        </refentry>
+      </section>
+    </section>
+
+    <section>
+      <title>SCM Extensions</title>
+
+      <para>This is a guide for people who want to write a new SCM plugin for
+      DamageControl.</para>
+
+      <section>
+        <title>Introduction</title>
+
+        <para>DamageControl relies on the RubySCM<footnote>
+            <para>Ruby SCMM is an API that has been factored out of
+            DamageControl's core).</para>
+          </footnote> API for interaction with underlying SCMs.</para>
+
+        <para>The first step in adding support for a new SCM is to write a
+        Ruby SCM class. To prove compliance with the RubySCM API we have
+        written a test suite that you can use. If your class passes that test
+        suite, you can be pretty sure your SCM class is good enough for
+        DamageControl and we will happily add it to the codebase.</para>
+      </section>
+
+      <section>
+        <title>Writing a test class that uses RubySCMs test suite</title>
+
+        <programlisting><remark>TODO</remark></programlisting>
+
+        <para>And a skeleton of your SCM class</para>
+
+        <programlisting><remark>TODO</remark></programlisting>
+
+        <para>Try to run the test:</para>
+
+        <screen><prompt># </prompt><userinput>ruby -Iserver <replaceable>server/rubyscm/MookyTest</replaceable></userinput></screen>
+
+        <para>This will probably fail, and it is time to fix the first error -
+        implement the <methodname>create</methodname> method.</para>
+
+        <programlisting>def initialize(mooky_dir)
+  @mooky_dir = mooky_dir
+end
+
+def create(&amp;line_proc)
+  cmd(@mooky_dir, "mooky create", &amp;line_proc)
+end</programlisting>
+
+        <para>Run the test again. Assuming your code is correct, you should
+        now get a different error, which should lead you to implement the next
+        method. Just continue like this until all tests are passing.</para>
+
+        <para>If your SCM's command line interface writes output that needs to
+        be parsed, we recommend you to implement the parsing logic in a
+        separate class. That will allow you to test the parser without running
+        the command.</para>
+      </section>
+
+      <section>
+        <title>Core RubySCM API</title>
+
+        <para>These methods are required for the implementation of the RubySCM
+        API.</para>
+
+        <refentry>
+          <refnamediv>
+            <refname> <methodname>create</methodname></refname>
+
+            <refpurpose>Creates a new repository</refpurpose>
+          </refnamediv>
+
+          <refsynopsisdiv>
+            <methodsynopsis>
+              <methodname>create</methodname>
+
+              <methodparam>
+                <modifier>&amp;</modifier>
+
+                <parameter>line_proc</parameter>
+              </methodparam>
+            </methodsynopsis>
+
+            <para>Local method</para>
+          </refsynopsisdiv>
+
+          <refsection>
+            <title>Description</title>
+
+            <para> This method should call the mooky command line that will
+            create a new repository. Details about where it should be created
+            should be passed to the constructor.</para>
+          </refsection>
+
+          <refsection>
+            <title>Parameters</title>
+
+            <variablelist>
+              <varlistentry>
+                <term><parameter>&amp;line_proc</parameter></term>
+
+                <listitem>
+                  <para> A block that should receive lines from the
+                  command(s)'s standard output.</para>
+                </listitem>
+              </varlistentry>
+            </variablelist>
+          </refsection>
+        </refentry>
+
+        <refentry>
+          <refnamediv>
+            <refname><methodname>import</methodname></refname>
+
+            <refpurpose>Imports files into the repository</refpurpose>
+          </refnamediv>
+
+          <refsynopsisdiv>
+            <methodsynopsis>
+              <methodname>import</methodname>
+
+              <methodparam>
+                <parameter>import_dir</parameter>
+              </methodparam>
+
+              <methodparam>
+                <modifier>&amp;</modifier>
+
+                <parameter>line_proc</parameter>
+              </methodparam>
+            </methodsynopsis>
+
+            <para>Local Method</para>
+          </refsynopsisdiv>
+
+          <refsection>
+            <title>Description</title>
+
+            <para> This method should call the mooky command line that will
+            recursively import files into the repository.</para>
+          </refsection>
+
+          <refsection>
+            <title>Parameters</title>
+
+            <variablelist>
+              <varlistentry>
+                <term><parameter>import_dir</parameter></term>
+
+                <listitem>
+                  <para>The directory to import.</para>
+                </listitem>
+              </varlistentry>
+
+              <varlistentry>
+                <term><parameter>&amp;line_proc</parameter></term>
+
+                <listitem>
+                  <para>A block that should receive lines from the
+                  command(s)'s standard output.</para>
+                </listitem>
+              </varlistentry>
+            </variablelist>
+          </refsection>
+        </refentry>
+
+        <refentry>
+          <refnamediv>
+            <refname><methodname>checkout</methodname></refname>
+
+            <refpurpose>Creates a working copy from a repository</refpurpose>
+          </refnamediv>
+
+          <refsynopsisdiv>
+            <methodsynopsis>
+              <methodname>checkout</methodname>
+
+              <methodparam>
+                <parameter>checkout_dir</parameter>
+              </methodparam>
+
+              <methodparam>
+                <parameter>scm_from_time</parameter>
+              </methodparam>
+
+              <methodparam>
+                <parameter>scm_to_time</parameter>
+              </methodparam>
+
+              <methodparam>
+                <modifier>&amp;</modifier>
+
+                <parameter>line_proc</parameter>
+              </methodparam>
+            </methodsynopsis>
+
+            <para>Regular method</para>
+          </refsynopsisdiv>
+
+          <refsection>
+            <title>Description</title>
+
+            <para> This method should call the mooky command line that will
+            check out previously imported sources to a working folder.</para>
+          </refsection>
+
+          <refsection>
+            <title>Parameters</title>
+
+            <variablelist>
+              <varlistentry>
+                <term><parameter>checkout_dir</parameter></term>
+
+                <listitem>
+                  <para>The directory where files should be checked
+                  out.</para>
+                </listitem>
+              </varlistentry>
+
+              <varlistentry>
+                <term><parameter>scm_from_time</parameter></term>
+
+                <listitem>
+                  <para>The from-time (inclusive) for which we want files
+                  checked out. If nil, it means from the start of time.</para>
+                </listitem>
+              </varlistentry>
+
+              <varlistentry>
+                <term><parameter>scm_to_time</parameter></term>
+
+                <listitem>
+                  <para>The to-time (inclusive) for which we want files
+                  checked out. If nil, it means up to the end of time.</para>
+                </listitem>
+              </varlistentry>
+
+              <varlistentry>
+                <term><parameter>&amp;line_proc</parameter></term>
+
+                <listitem>
+                  <para>A block that should receive lines from the
+                  command(s)'s standard output.</para>
+                </listitem>
+              </varlistentry>
+            </variablelist>
+          </refsection>
+
+          <refsection>
+            <title>Return Values</title>
+
+            <itemizedlist>
+              <listitem>
+                <para>If nothing was checked out (i.e. uptodate), return
+                nil.</para>
+              </listitem>
+
+              <listitem>
+                <para>If this is the first checkout, return the UTC timestamp
+                of the last checkin, according to the SCM's clock.</para>
+              </listitem>
+
+              <listitem>
+                <para>If this was an update, (i.e. previously checked out, but
+                not uptodate), return a ChangeSets object representing all the
+                changes within the period.</para>
+              </listitem>
+            </itemizedlist>
+          </refsection>
+        </refentry>
+
+        <refentry>
+          <refnamediv>
+            <refname><methodname>commit</methodname></refname>
+
+            <refpurpose>Writes changes back to the repository</refpurpose>
+          </refnamediv>
+
+          <refsynopsisdiv>
+            <methodsynopsis>
+              <methodname>commit</methodname>
+
+              <methodparam>
+                <parameter>checkout_dir</parameter>
+              </methodparam>
+
+              <methodparam>
+                <parameter>commit_message</parameter>
+              </methodparam>
+
+              <methodparam>
+                <modifier>&amp;</modifier>
+
+                <parameter>line_proc</parameter>
+              </methodparam>
+            </methodsynopsis>
+
+            <para>Local Method</para>
+          </refsynopsisdiv>
+
+          <refsection>
+            <title>Description</title>
+
+            <para> Commits (checks in) all files that have been locally
+            modified.</para>
+          </refsection>
+
+          <refsection>
+            <title>Parameters</title>
+
+            <variablelist>
+              <varlistentry>
+                <term><parameter>checkout_dir</parameter></term>
+
+                <listitem>
+                  <para>The directory where files should be checked
+                  out.</para>
+                </listitem>
+              </varlistentry>
+
+              <varlistentry>
+                <term><parameter>commit_message</parameter></term>
+
+                <listitem>
+                  <para>The message that should go along with the
+                  commit.</para>
+                </listitem>
+              </varlistentry>
+
+              <varlistentry>
+                <term><parameter>&amp;line_proc</parameter></term>
+
+                <listitem>
+                  <para>A block that should receive lines from the
+                  command(s)'s standard output.</para>
+                </listitem>
+              </varlistentry>
+            </variablelist>
+          </refsection>
+        </refentry>
+      </section>
+
+      <section>
+        <title>Optional Ruby SCM API</title>
+
+        <para>If the SCM supports triggers, you can implement the following
+        methods to allow installation (and uninstallation) of triggers in the
+        SCM. A trigger is a command that gets executed as the result of a
+        commit (checkin).</para>
+
+        <refentry>
+          <refnamediv>
+            <refname><methodname>install_trigger</methodname></refname>
+
+            <refpurpose>Installs a DamageControl trigger</refpurpose>
+          </refnamediv>
+
+          <refsynopsisdiv>
+            <methodsynopsis>
+              <methodname>install_trigger</methodname>
+
+              <methodparam>
+                <parameter>trigger_command</parameter>
+              </methodparam>
+
+              <methodparam>
+                <parameter>trigger_files_checkout_dir</parameter>
+              </methodparam>
+
+              <methodparam>
+                <modifier>&amp;</modifier>
+
+                <parameter>line_proc</parameter>
+              </methodparam>
+            </methodsynopsis>
+          </refsynopsisdiv>
+
+          <refsection>
+            <title>Description</title>
+
+            <para> This method should install the trigger command in such a
+            way that it is executed when a commit to the SCM occurs.</para>
+          </refsection>
+
+          <refsection>
+            <title>Parameters</title>
+
+            <variablelist>
+              <varlistentry>
+                <term><parameter>trigger_command</parameter></term>
+
+                <listitem>
+                  <para>The command to run when the trigger is fired.</para>
+                </listitem>
+              </varlistentry>
+
+              <varlistentry>
+                <term><parameter>trigger_files_checkout_dir</parameter></term>
+
+                <listitem>
+                  <para>A working folder that can optionally be used if the
+                  trigger installation requires it. (The parameter was added
+                  because CVS needs it).</para>
+                </listitem>
+              </varlistentry>
+
+              <varlistentry>
+                <term><parameter>&amp;line_proc</parameter></term>
+
+                <listitem>
+                  <para>A block that should receive lines from the
+                  command(s)'s standard output.</para>
+                </listitem>
+              </varlistentry>
+            </variablelist>
+          </refsection>
+        </refentry>
+
+        <refentry>
+          <refnamediv>
+            <refname><methodname>trigger_installed</methodname></refname>
+
+            <refpurpose>The the trigger already installed</refpurpose>
+          </refnamediv>
+
+          <refsynopsisdiv>
+            <methodsynopsis>
+              <methodname>trigger_installed</methodname>
+
+              <methodparam>
+                <parameter>trigger_command</parameter>
+              </methodparam>
+
+              <methodparam>
+                <parameter>trigger_files_checkout_dir</parameter>
+              </methodparam>
+
+              <methodparam>
+                <modifier>&amp;</modifier>
+
+                <parameter>line_proc</parameter>
+              </methodparam>
+            </methodsynopsis>
+          </refsynopsisdiv>
+
+          <refsection>
+            <title>Description</title>
+
+            <para> This method should return true if the trigger_command is
+            installed, otherwise false.</para>
+          </refsection>
+
+          <refsection>
+            <title>Parameters</title>
+
+            <variablelist>
+              <varlistentry>
+                <term><parameter>trigger_command</parameter></term>
+
+                <listitem>
+                  <para>The command to run when the trigger is fired.</para>
+                </listitem>
+              </varlistentry>
+
+              <varlistentry>
+                <term><parameter>trigger_files_checkout_dir</parameter></term>
+
+                <listitem>
+                  <para>A working folder that can optionally be used if the
+                  trigger installation requires it. (The parameter was added
+                  because CVS needs it).</para>
+                </listitem>
+              </varlistentry>
+
+              <varlistentry>
+                <term><parameter>&amp;line_proc</parameter></term>
+
+                <listitem>
+                  <para>A block that should receive lines from the
+                  command(s)'s standard output.</para>
+                </listitem>
+              </varlistentry>
+            </variablelist>
+          </refsection>
+
+          <refsection>
+            <title>Return Values</title>
+
+            <para>Returns <literal>true</literal>, if the trigger is
+            installed, otherwise <literal>false</literal>.</para>
+          </refsection>
+        </refentry>
+
+        <refentry>
+          <refnamediv>
+            <refname><methodname>uninstall_trigger</methodname></refname>
+
+            <refpurpose>Uninstalls a DamageControl trigger</refpurpose>
+          </refnamediv>
+
+          <refsynopsisdiv>
+            <methodsynopsis>
+              <methodname>uninstall_trigger</methodname>
+
+              <methodparam>
+                <parameter>trigger_command</parameter>
+              </methodparam>
+
+              <methodparam>
+                <parameter>trigger_files_checkout_dir</parameter>
+              </methodparam>
+
+              <methodparam>
+                <modifier>&amp;</modifier>
+
+                <parameter>line_proc</parameter>
+              </methodparam>
+            </methodsynopsis>
+          </refsynopsisdiv>
+
+          <refsection>
+            <title>Description</title>
+
+            <para> This method should install the trigger command in such a
+            way that it no longer executed when a commit to the
+            <abbrev>SCM</abbrev> occurs.</para>
+          </refsection>
+
+          <refsection>
+            <title>Parameters</title>
+
+            <variablelist>
+              <varlistentry>
+                <term><parameter>trigger_command</parameter></term>
+
+                <listitem>
+                  <para>The command to run when the trigger is fired.</para>
+                </listitem>
+              </varlistentry>
+
+              <varlistentry>
+                <term><parameter>trigger_files_checkout_dir</parameter></term>
+
+                <listitem>
+                  <para>A working folder that can optionally be used if the
+                  trigger installation requires it. (The parameter was added
+                  because <abbrev>CVS</abbrev> needs it).</para>
+                </listitem>
+              </varlistentry>
+
+              <varlistentry>
+                <term><parameter>&amp;line_proc</parameter></term>
+
+                <listitem>
+                  <para>A block that should receive lines from the
+                  command(s)'s standard output.</para>
+                </listitem>
+              </varlistentry>
+            </variablelist>
+          </refsection>
+        </refentry>
+      </section>
+
+      <section>
+        <title>Web Interface</title>
+
+        <para>If you write your own <abbrev>SCM</abbrev> plugin you would
+        probably also want the DamageControl web admin to display it as a
+        supported <abbrev>SCM</abbrev> in the project configuration pages.
+        Every <abbrev>SCM</abbrev> has its own set of values that needs to be
+        specified in order to check out code.</para>
+
+        <para>To enable your <abbrev>SCM</abbrev> to be configured from the
+        web you need to implement something we call an
+        <classname>SCMWebConfigurator</classname>. See <ulink
+        url="http://cvs.damagecontrol.codehaus.org/damagecontrol/server/damagecontrol/scm/CVSWebConfigurator.rb?view=auto">CVSWebConfigurator</ulink>
+        for an example on how to implement one.</para>
+
+        <para>Basically you need to create an erb file for the part of the
+        form that is the <abbrev>SCM</abbrev> configuration. This will be
+        included into configure.erb. You can also define JavaScript code that
+        will be included in the top of the same page and you can execute
+        JavaScript code on the onLoad event. The details of all this should
+        become quite apparent by reading the code for the above mentioned
+        <classname>CVSWebConfigurator</classname>.</para>
+
+        <para>To inform the DamageControl server about your new
+        <abbrev>SCM</abbrev> you edit
+        <varname>DamageControlServer.scm_configurator_classes</varname> in
+        <filename>DamageControlServer.rb</filename>. You can also override
+        this method in your own server configuration if you like.</para>
+      </section>
+
+      <section>
+        <title>How to contribute</title>
+
+        <para>If you contribute all of this with unit tests (see the
+        SVNTest.rb and SVNLogParserTest.rb for inspiration) you will earn lots
+        of DamageControl points. If you know how to write working code, but
+        not how to write unit tests, we'd of course be happy to accept your
+        contribution regardless.</para>
+
+        <note>
+          <title>If you do not know Ruby</title>
+
+          <para>f all of this is too big a task for you you can still
+          contribute. The DaamageControl development team doesn't have acces
+          to every single SCM out there. But we'd be able to implement this
+          for you if you help us out with some extra information such
+          as:</para>
+
+          <itemizedlist>
+            <listitem>
+              <para> What are the command line commands for executing
+              checkouts, updates and getting (history) logs?</para>
+            </listitem>
+
+            <listitem>
+              <para> What does the output of the log command typically look
+              like?</para>
+            </listitem>
+          </itemizedlist>
+
+          <para> Please contact us on
+          <email>dev@damagecontrol.codehaus.org</email> for further
+          information.</para>
+        </note>
+      </section>
+    </section>
+
+    <section>
+      <title>Frequently Asked Questions</title>
+
+      <qandaset>
+        <qandadiv>
+          <qandaentry>
+            <question>
+              <para>Why do I get a weird error from REXML?</para>
+            </question>
+
+            <answer>
+              <para>Sometimes you get an error like this:</para>
+
+              <screen><computeroutput>1) Error:
+test_successful_build_data(DamageControl::CruiseControlLogParserTest):
+NameError: undefined local variable or method `num' for REXML::Encoding:Module
+    c:/ruby/lib/ruby/1.8/rexml/encodings/ISO-8859-1.rb:13
+    c:/ruby/lib/ruby/1.8/rexml/encoding.rb:29:in `load'
+    c:/ruby/lib/ruby/1.8/rexml/encoding.rb:29:in `encoding='
+    c:/ruby/lib/ruby/1.8/rexml/source.rb:41:in `encoding='
+    c:/ruby/lib/ruby/1.8/rexml/parsers/baseparser.rb:183:in `pull'
+    c:/ruby/lib/ruby/1.8/rexml/parsers/pullparser.rb:45:in `pull'
+    ./damagecontrol/cruisecontrol/CruiseControlLogParser.rb:40:in `parse_top_level'
+    ./damagecontrol/cruisecontrol/CruiseControlLogParser.rb:27:in `parse'
+    ./damagecontrol/cruisecontrol/CruiseControlLogParser.rb:25:in `open'
+    ./damagecontrol/cruisecontrol/CruiseControlLogParser.rb:25:in `parse'
+    damagecontrol/cruisecontrol/CruiseControlLogParserTest.rb:14:in `test_successful_build_data'</computeroutput></screen>
+
+              <para>This is because the REXML distributed with certain
+              versions of Ruby is pretty crappy. So DamageControl includes its
+              own REXML version but in order to have the included version
+              override the version distributed with Ruby you need to specify
+              the switch <quote><literal>-I<replaceable>&lt;damagecontrol
+              home&gt;</replaceable>/server</literal></quote> (or
+              <quote><literal>-I.</literal></quote> if you are in that
+              directory) when starting the test-suite or the server.</para>
+
+              <para>So instead of: </para>
+
+              <screen><prompt># </prompt><userinput>ruby damagecontrol/AllTests.rb # will not work!</userinput></screen>
+
+              <para> then do:</para>
+
+              <programlisting><prompt># </prompt><userinput>ruby -I. damagecontrol/AllTests.rb</userinput></programlisting>
+            </answer>
+          </qandaentry>
+
+          <qandaentry>
+            <question>
+              <para>Why do I get weird problems with libraries?</para>
+            </question>
+
+            <answer>
+              <para>This could be because you have specified a relative path
+              in the library path (<literal>'.'</literal> for example, as in
+              <literal>ruby -I. script.rb</literal>) and have changed the
+              working directory somewhere in the script. There are basically
+              one workaround and one solution to this problem, the workaround
+              is simply to specify an absolute path instead of the relative
+              path. The solution is to use the
+              <methodname>with_working_dir</methodname> method (in the
+              <classname>FileUtils</classname> module) instead of changing the
+              directory with <methodname>Dir.chdir</methodname>, the
+              <methodname>with_working_dir</methodname> restores the previous
+              working directory before it exits. Like this:</para>
+
+              <programlisting>require 'damagecontrol/util/FileUtils'
+include FileUtils
+
+with_working_dir("somedirectory") do
+  # … trut your stuff ...
+end</programlisting>
+            </answer>
+          </qandaentry>
+        </qandadiv>
+      </qandaset>
+    </section>
   </chapter>
+
+  <glossary>
+    <glossentry>
+      <glossterm>Application Programming Interface</glossterm>
+
+      <acronym>API</acronym>
+
+      <glossdef>
+        <para>A set of interfaces for extending the functionality of
+        DamageControl.</para>
+      </glossdef>
+    </glossentry>
+
+    <glossentry>
+      <glossterm>Concurrent Versioning System</glossterm>
+
+      <abbrev>CVS</abbrev>
+
+      <glossdef>
+        <para>A widely distributed open-source <abbrev>SCM</abbrev>, that is
+        used for many Free Software projects.</para>
+      </glossdef>
+    </glossentry>
+
+    <glossentry>
+      <glossterm>Extensible Markup Language</glossterm>
+
+      <abbrev>XML</abbrev>
+
+      <glossdef>
+        <para>A widely-used standard for markup languages.</para>
+      </glossdef>
+    </glossentry>
+
+    <glossentry>
+      <glossterm>Frequently Asked Questions</glossterm>
+
+      <acronym>FAQ</acronym>
+
+      <glossdef>
+        <para>A list of questions that are often asked at mailing lists and
+        aggregated into one document to ensure a better signal-to-noise
+        ratio.</para>
+      </glossdef>
+    </glossentry>
+
+    <glossentry>
+      <glossterm>GNU Network Object Model Environment</glossterm>
+
+      <abbrev>GNOME</abbrev>
+
+      <glossdef>
+        <para> A project to build a complete, user-friendly desktop based
+        entirely on free software.</para>
+      </glossdef>
+    </glossentry>
+
+    <glossentry>
+      <glossterm>Internet Relay Chat</glossterm>
+
+      <abbrev>IRC</abbrev>
+
+      <glossdef>
+        <para>A widely used chat protocol.</para>
+      </glossdef>
+    </glossentry>
+
+    <glossentry>
+      <glossterm>Nullsoft Scriptable Installer System</glossterm>
+
+      <abbrev>NSIS</abbrev>
+
+      <glossdef>
+        <para>A software that allows you to write installers for programs to
+        be installed under Microsoft Windows.</para>
+      </glossdef>
+    </glossentry>
+
+    <glossentry>
+      <glossterm>Rich Site Summary</glossterm>
+
+      <abbrev>RSS</abbrev>
+
+      <glossdef>
+        <para>An XML-format to aggregate the news headlines of a
+        website.</para>
+      </glossdef>
+    </glossentry>
+
+    <glossentry>
+      <glossterm>Secure Shell</glossterm>
+
+      <abbrev>SSH</abbrev>
+
+      <glossdef>
+        <para>A secure remote terminal access protocol.</para>
+      </glossdef>
+    </glossentry>
+
+    <glossentry>
+      <glossterm>Simple Object Access Protocol</glossterm>
+
+      <acronym>SOAP</acronym>
+
+      <glossdef>
+        <para>A lightweight, XML-based protocol for Remote Method
+        Invocation.</para>
+      </glossdef>
+    </glossentry>
+
+    <glossentry>
+      <glossterm>Software Configuration Management</glossterm>
+
+      <abbrev>SCM</abbrev>
+
+      <glossdef>
+        <para>Manages different versions and revisions of the codebase of a
+        software.</para>
+      </glossdef>
+    </glossentry>
+
+    <glossentry>
+      <glossterm>Uniform Resource Locator</glossterm>
+
+      <abbrev>URL</abbrev>
+
+      <glossdef>
+        <para>Used to identify resources on the internet.</para>
+      </glossdef>
+    </glossentry>
+
+    <glossentry>
+      <glossterm> Universal Time Coordinated</glossterm>
+
+      <abbrev>UTC</abbrev>
+
+      <glossdef>
+        <para>Universal Time Coordinated is the same as Greenwich Mean
+        Time.</para>
+      </glossdef>
+    </glossentry>
+
+    <glossentry>
+      <glossterm><abbrev>UNIX</abbrev></glossterm>
+
+      <glossdef>
+        <para>A computer operating system.</para>
+      </glossdef>
+    </glossentry>
+
+    <glossentry>
+      <glossterm>XML-Remote Procedure Calls</glossterm>
+
+      <abbrev>XML-RPC</abbrev>
+
+      <glossdef>
+        <para>XML-RPC a spec and a set of implementations that allow software
+        running on disparate operating systems, running in different
+        environments to make procedure calls over the Internet.</para>
+      </glossdef>
+    </glossentry>
+
+    <glossentry>
+      <glossterm>YAML Ain't Markup Language</glossterm>
+
+      <abbrev>YAML</abbrev>
+
+      <glossdef>
+        <para>A simple language for representing data structures. It is used
+        for DamageControl's configuration files.</para>
+      </glossdef>
+    </glossentry>
+  </glossary>
 </book>
