@@ -115,7 +115,7 @@ module DamageControl
       timestamp = Build.timestamp_to_time(timestamp) if timestamp.is_a?(String)
       history = history(project_name)
       history.each do |build|
-        return build if build.timestamp_as_time == timestamp
+        return patch_build(build) if build.timestamp_as_time == timestamp
       end
       nil
     end
@@ -123,13 +123,22 @@ module DamageControl
     def next(build)
       h = history(build.project_name)
       i = h.index(build)
-      return h[i + 1] unless i == h.length - 1
+      return patch_build(h[i + 1]) unless i == h.length - 1
     end
 
     def prev(build)
       h = history(build.project_name)
       i = h.index(build)
-      return h[i - 1] unless i == 0
+      return patch_build(h[i - 1]) unless i == 0
+    end
+
+    def previous_successful_build(build)
+      history = history(build.project_name)
+      return nil unless history
+      idx = history.index(build)
+      patch_build(history[0..idx].reverse.find do |a_build| 
+        a_build.status == Build::SUCCESSFUL && a_build != build
+      end)
     end
 
   private

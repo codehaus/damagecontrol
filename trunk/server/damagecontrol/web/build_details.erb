@@ -15,6 +15,11 @@ build = build_history_repository.lookup(project_name, request.query["timestamp"]
 <table class="main-table">
 
   <%
+  previous_successful_build = build_history_repository.previous_successful_build(build)
+  previous_successful_build_link = "<a href=\"#{build_url(previous_successful_build)}\">(##{previous_successful_build.label})</a>" if previous_successful_build
+  %>
+
+  <%
   # =============== next/prev links pane
   prev_build = build_history_repository.prev(build)
   next_build = build_history_repository.next(build)
@@ -56,7 +61,11 @@ build = build_history_repository.lookup(project_name, request.query["timestamp"]
 
   <table class="pane">
     <tr><td class="pane-header" colspan="4">
-      Changes
+      <% if(previous_successful_build) %>
+        Changes since #{previous_successful_build_link}
+      <% else %>
+        Changes
+      <% end %>
     </td></tr>
     <% if build.modification_set.nil? || build.modification_set.empty? then %>
       <tr>

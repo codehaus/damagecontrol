@@ -4,6 +4,7 @@ require 'pebbles/mockit'
 require 'damagecontrol/core/Hub'
 require 'damagecontrol/core/BuildHistoryRepository'
 require 'damagecontrol/core/AbstractBuildHistoryTest'
+require 'damagecontrol/scm/Changes'
 
 module DamageControl
 
@@ -218,7 +219,7 @@ module DamageControl
       assert_equal([c], @bhp.search("funny", "onlythisone"))
     end
     
-    def test_should_retrieve_build_by_timestamp
+    def test_should_retrieve_build_by_timestamp_string
       t = Time.utc(2004, 01, 04, 12, 00, 00)
       p1 = Build.new("t", Time.utc(2004, 01, 01, 12, 00, 00))
       pt = Build.new("t", t)
@@ -244,6 +245,34 @@ module DamageControl
       assert_equal(nil, @bhp.next(b))
       assert_equal(a, @bhp.prev(b))
       assert_equal(nil, @bhp.prev(a))
+    end
+
+    def test_should_find_previous_successful_build
+      b1 = Build.new("yo", Time.utc(2004, 01, 01, 12, 00, 00))
+      b1.status = Build::SUCCESSFUL
+
+      b2 = Build.new("notthis", Time.utc(2004, 01, 01, 12, 00, 01))
+      b2.status = Build::SUCCESSFUL
+
+      b3 = Build.new("yo", Time.utc(2004, 01, 01, 12, 00, 02))
+      b3.status = Build::SUCCESSFUL
+
+      b4 = Build.new("yo", Time.utc(2004, 01, 01, 12, 00, 03))
+      b4.status = Build::FAILED
+
+      b5 = Build.new("yo", Time.utc(2004, 01, 01, 12, 00, 04))
+
+      @bhp.register(b1)
+      @bhp.register(b2)
+      @bhp.register(b3)
+      @bhp.register(b4)
+      @bhp.register(b5)
+
+      assert_equal(b3, @bhp.previous_successful_build(b5))
+      assert_equal(b3, @bhp.previous_successful_build(b4))
+      assert_equal(b1, @bhp.previous_successful_build(b3))
+      assert_equal(nil, @bhp.previous_successful_build(b2))
+      assert_equal(nil, @bhp.previous_successful_build(b1))
     end
   end
 end
