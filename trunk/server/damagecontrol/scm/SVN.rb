@@ -111,7 +111,7 @@ module DamageControl
         system("chmod g+x #{post_commit_file}")
       rescue
         raise "Didn't have persmissions to write to #{post_commit_file}. " +
-        "Try to manually add the following line:\n\n#{trigger_line}\n\n" +
+        "Try to manually add the following line:\n\n#{trigger_command}\n\n" +
         "Finally make it executable with chmod g+x #{post_commit_file}"
       end
     end
