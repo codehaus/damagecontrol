@@ -100,11 +100,4 @@ function enableOrDisableCvsFieldsAndUpdateScmSpec() {
 		document.getElementById('cvsserver').disabled = false
 		document.getElementById('cvsport').disabled = false
 	}
-	// disable unix_groups if the path is a windows path
-	windows_path = new RegExp("^[a-zA-Z].*")
-	if(windows_path.exec(document.getElementById('cvsrepodir').value))  {
-//		document.getElementById('unix_groups').disabled = true
-	} else {
-//		document.getElementById('unix_groups').disabled = false
-	}
 }

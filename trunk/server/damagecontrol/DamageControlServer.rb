@@ -183,6 +183,7 @@ module DamageControl
       httpd.mount("/public/root", WEBrick::HTTPServlet::FileHandler, rootdir, :FancyIndexing => true)
       
       httpd.mount("/public/images", WEBrick::HTTPServlet::FileHandler, "#{webdir}/images")
+      httpd.mount("/public/icons", WEBrick::HTTPServlet::FileHandler, "#{webdir}/icons/24x24/plain")
       httpd.mount("/public/images/currentstatus", CurrentStatusImageServlet.new(build_history_repository, build_scheduler))
       httpd.mount("/public/images/lastcompletedstatus", LastCompletedImageServlet.new(build_history_repository, build_scheduler))
       httpd.mount("/public/images/timestampstatus", TimestampImageServlet.new(build_history_repository, build_scheduler))
@@ -202,6 +203,7 @@ module DamageControl
       httpd.mount("/private/root", WEBrick::HTTPServlet::FileHandler, rootdir, :FancyIndexing => true)
       
       httpd.mount("/private/images", WEBrick::HTTPServlet::FileHandler, "#{webdir}/images")
+      httpd.mount("/private/icons", WEBrick::HTTPServlet::FileHandler, "#{webdir}/icons/24x24/plain")
       httpd.mount("/private/images/currentstatus", CurrentStatusImageServlet.new(build_history_repository, build_scheduler))
       httpd.mount("/private/images/lastcompletedstatus", LastCompletedImageServlet.new(build_history_repository, build_scheduler))
       httpd.mount("/private/images/timestampstatus", TimestampImageServlet.new(build_history_repository, build_scheduler))

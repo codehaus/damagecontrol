@@ -81,6 +81,7 @@ module DamageControl
     end
     
     def task(params)
+      icon = params[:icon] # || required_param(:icon)
       url = params[:url] || required_param(:url)
       name = params[:name] || required_param(:name)
       erb("components/task.erb", binding)

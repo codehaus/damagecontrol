@@ -31,14 +31,14 @@ module DamageControl
         if(private?)
           result +=
             [
-              task(:name => "Configure", :url => "?project_name=#{project_name}&action=configure"),
-              task(:name => "Trig build now", :url => "?project_name=#{project_name}&action=trig_build"),
-              task(:name => "Install trigger", :url => "?project_name=#{project_name}&action=install_trigger")
+              task(:icon => "icons/wrench.png", :name => "Configure", :url => "?project_name=#{project_name}&action=configure"),
+              task(:icon => "icons/gears_run.png", :name => "Trig build now", :url => "?project_name=#{project_name}&action=trig_build"),
+              task(:icon => "icons/gear_connection.png", :name => "Install trigger", :url => "?project_name=#{project_name}&action=install_trigger")
             ]
         end
         result +=
           [
-            task(:name => "Working files", :url => "root/#{project_name}/checkout"),
+            task(:icon => "icons/folders.png", :name => "Working files", :url => "root/#{project_name}/checkout"),
             builds_table(
                 :header_text => "Build history", 
                 :empty_text => "Never built", 
