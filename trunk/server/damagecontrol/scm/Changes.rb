@@ -21,8 +21,8 @@ EOF
 
     attr_reader :changesets
 
-    def initialize()
-      @changesets = []
+    def initialize(changesets=[])
+      @changesets = changesets
     end
 
     def [](change)
@@ -39,6 +39,10 @@ EOF
 
     def ==(other)
       @changesets == other.changesets
+    end
+    
+    def empty?
+      @changesets.empty?
     end
 
     # adds a Change or a ChangeSet
@@ -89,8 +93,8 @@ EOF
     attr_accessor :message
     attr_accessor :time
 
-    def initialize()
-      @changes = []
+    def initialize(changes=[])
+      @changes = changes
     end
     
     def << (change)

@@ -7,7 +7,12 @@ module MockIt
     def initialize
       @expected_methods=[]
       @expected_validation_procs=[]
+      @expect_not_called=[]
       @setup_call_procs={}
+    end
+    
+    def __expect_not_called(method)
+      @expect_not_called<<method
     end
     
     def __expect(method, &validation_proc)
@@ -26,7 +31,9 @@ module MockIt
     end
     
     def method_missing(method, *args, &proc)
-      if (is_setup_call(method)) then
+      if(is_expected_not_to_be_called(method)) then
+        flunk("#{method} expected to never be called")
+      elsif(is_setup_call(method)) then
         handle_setup_call(method, *args, &proc)
       else
         handle_expected_call(method, *args, &proc)
@@ -44,12 +51,16 @@ module MockIt
     private
     
     def symbol(string)
-      if string=="" then return nil end
+      return nil if string==""
       if string.is_a? String then string.intern else string end
     end
     
     def assert_all_expected_methods_called
       assert(@expected_validation_procs.empty?, "not all expected methods called, calls left: #{@expected_methods.inspect}")
+    end
+    
+    def is_expected_not_to_be_called(method)
+      @expect_not_called.index(method)
     end
     
     def is_setup_call(method)

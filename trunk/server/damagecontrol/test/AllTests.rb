@@ -13,7 +13,7 @@ require 'damagecontrol/core/HubTest'
 require 'damagecontrol/core/LogWriterTest'
 require 'damagecontrol/core/ProjectConfigRepositoryTest'
 require 'damagecontrol/core/ProjectDirectoriesTest'
-#require 'damagecontrol/core/SCMPollerTest'
+require 'damagecontrol/core/SCMPollerTest'
 
 require 'damagecontrol/cruisecontrol/CruiseControlLogPollerTest'
 require 'damagecontrol/cruisecontrol/CruiseControlLogParserTest'

@@ -1,5 +1,5 @@
 require 'test/unit'
-require 'mockit'
+require 'pebbles/mockit'
 
 module MockIt
   class MockTest < Test::Unit::TestCase
@@ -8,9 +8,15 @@ module MockIt
     end
 
     def test_unmocked_call_fails
-      @mock = Mock.new
       assert_raises(Test::Unit::AssertionFailedError) do
         @mock.unmocked_call
+      end
+    end
+    
+    def test_call_to_expect_not_called_call_fails
+      @mock.__expect_not_called(:expected_not_called)
+      assert_raises(Test::Unit::AssertionFailedError) do
+        @mock.expected_not_called
       end
     end
 
