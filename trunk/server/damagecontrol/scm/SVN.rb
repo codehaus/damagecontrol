@@ -163,8 +163,14 @@ module DamageControl
       command_line = "svn #{cmd}"
 
       execute(command_line, dir) do |stdin, stdout, stderr, pid|
-        stdout.each_line do |progress|
-            if block_given? then yield progress else logger.debug(progress) end
+        begin
+          stdout.each_line do |progress|
+              if block_given? then yield progress else logger.debug(progress) end
+          end
+        ensure
+          stderr.each_line do |progress|
+              if block_given? then yield progress else logger.debug(progress) end
+          end
         end
       end
     end
@@ -196,7 +202,7 @@ module DamageControl
       # http://svnbook.red-bean.com/svnbook-1.1/svn-book.html#svn-ch-3-sect-3.3
       file_list = files.join('\n')
 # WEIRD cygwin bug garbles this!?!?!?!
-      "log --verbose #{revision_option(scm_from_time, scm_to_time)} #{svnurl}"
+      "log --verbose #{revision_option(scm_from_time, scm_to_time)}"
     end
 
     def revision_option(scm_from_time, scm_to_time)
