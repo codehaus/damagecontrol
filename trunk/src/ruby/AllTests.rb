@@ -12,6 +12,7 @@ require 'damagecontrol/BuildDelayerTest'
 require 'damagecontrol/TimerTest'
 require 'damagecontrol/LogWriterTest'
 require 'damagecontrol/SocketTriggerTest'
+require 'damagecontrol/SelfUpgraderTest'
 
 require 'damagecontrol/publisher/IRCPublisherTest'
 require 'damagecontrol/publisher/FilePublisherTest'

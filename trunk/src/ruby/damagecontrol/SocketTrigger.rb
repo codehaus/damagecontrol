@@ -63,7 +63,7 @@ module DamageControl
                 socket.print("DamageControl got your message\r\n")
                 socket.print("http://damagecontrol.codehaus.org/\r\n")
               else
-                socket.print("Connections are not allowed from #{client_ip}")
+                socket.print("This DamageControl server doesn't allow connections from #{client_ip}\r\n")
               end
             ensure
               socket.close
