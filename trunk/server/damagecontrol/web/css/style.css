@@ -49,11 +49,11 @@ img {
   display: block;
   border-bottom: 1px #7f7f7f solid;
   font-weight: bold;
-  font-size: 1.1em;
+  font-size: 12pt;
 }
 
 .footer {
-  font-size: 0.8em;
+  font-size: 8pt;
   text-align: center;
   margin-top: 5em
 }

@@ -22,6 +22,19 @@ require 'damagecontrol/web/DashboardServlet'
 require 'damagecontrol/web/StatusImageServlet'
 require 'damagecontrol/web/LogFileServlet'
 
+# patch webrick so that it displays files it doesn't recognize as text
+module WEBrick
+  module HTTPUtils
+    def mime_type(filename, mime_tab)
+      if suffix = (/\.(\w+)$/ =~ filename && $1)
+        mtype = mime_tab[suffix.downcase]
+      end
+      mtype || "text/plain"
+    end
+    module_function :mime_type
+  end
+end
+
 module DamageControl
 
   class WarningServer

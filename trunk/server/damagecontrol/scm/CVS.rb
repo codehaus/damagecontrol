@@ -46,6 +46,9 @@ module DamageControl
     end
     
     def changes(from_time, to_time)
+      # hackish, to ensure we really get the changes we want let's increase the time span with one second each way
+      from_time = from_time - 1
+      to_time = to_time + 1
       with_working_dir(working_dir) do
         cvs_with_io(changes_command(from_time, to_time)) do |io|
           parser = CVSLogParser.new
@@ -74,27 +77,31 @@ module DamageControl
     def commit_command(message)
       "commit -m \"#{message}\""
     end
-
-    def checkout_command
-      "-d#{@cvsroot} checkout #{mod}"
+    
+    def time_option(time)
+      if time.nil? then "" else "-D \"#{cvsdate(time)}\"" end
     end
 
-    def update_command
-      "-d#{@cvsroot} update -d -P"
+    def checkout_command(time)
+      "-d#{@cvsroot} checkout #{time_option(time)} #{mod}"
+    end
+
+    def update_command(time)
+      "-d#{@cvsroot} update #{time_option(time)} -d -P"
     end
     
     def is_local_connection_method
       @cvsroot =~ /^:local:/
     end
     
-    def checkout(&proc)
+    def checkout(time = nil, &proc)
       if(checked_out?)
         with_working_dir(working_dir) do
-          cvs(update_command, &proc)
+          cvs(update_command(time), &proc)
         end
       else
         with_working_dir(@working_dir_root) do
-          cvs(checkout_command, &proc)
+          cvs(checkout_command(time), &proc)
         end
       end
     end
@@ -325,23 +332,33 @@ puts result
     end
     
     def parse_modification(modification_entry)
-      modification = Modification.new
-      modification.message = ""
-      modification_entry.each_line do |line|
-        raise "I've been given crappy input: #{modification_entry}" if line=~/-------*/
+      raise "can't parse: #{modification_entry}" if modification_entry=~/-------*/
       
-        if line=~/revision (.*)/
-          modification.revision = $1
-        elsif line=~/date: (.*);  author: (.*);  state: (.*);(.*)/
-          modification.time = $1
-          modification.developer = $2
-        else
-          modification.message<<line
-        end
+      modification_entry = modification_entry.split(/\r?\n/)
+      modification = Modification.new
+      
+      if modification_entry[0]=~/revision (.*)/
+        modification.revision = $1
+      else
+        raise "can't parse: #{modification_entry}"
       end
+      
+      if modification_entry[1]=~/date: (.*?);/
+          modification.time = $1
+      else
+        raise "can't parse: #{modification_entry}"
+      end
+      
+      if modification_entry[1]=~/author: (.*?);/
+        modification.developer = $1
+      else
+        raise "can't parse: #{modification_entry}"
+      end
+      
+      modification.message = modification_entry[2..-1].join("\n")
+      
       modification
-    end
-    
+    end    
   end
 
 end

@@ -11,7 +11,7 @@ module DamageControl
     include FileUtils
 
     def setup
-      @dir = File.expand_path("#{damagecontrol_home}/target/polltest/FilePoller#{Time.now.to_i}")
+      @dir = new_temp_dir
       File.makedirs(@dir)
       
       @file_handler = MockIt::Mock.new

@@ -87,7 +87,7 @@ module DamageControl
       current_build_time = Time.utc(2004, 04, 02, 13, 00, 00)
       
       mock_build_history = MockIt::Mock.new
-      mock_build_history.__expect(:last_succesful_build) { |project_name|
+      mock_build_history.__expect(:last_successful_build) { |project_name|
         assert_equal("damagecontrolled", project_name)
         b = Build.new("damagecontrolled")
         b.timestamp = last_build_time

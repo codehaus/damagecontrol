@@ -3,6 +3,7 @@ require 'damagecontrol/core/AsyncComponent'
 require 'damagecontrol/core/BuildEvents'
 require 'damagecontrol/core/ProjectDirectories'
 require 'pebbles/TimeUtils'
+require 'yaml'
 
 # Captures and persists build history.
 # All reads are from memory, which is populated from files at startup.

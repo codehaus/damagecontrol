@@ -33,9 +33,9 @@ module DamageControl
     
     def checkout
       return if !checkout?
-      current_build.status = Build::CHECKING_OUT
       
-      current_scm.checkout do |progress| 
+      current_build.status = Build::CHECKING_OUT
+      current_scm.checkout(current_build.timestamp_as_time) do |progress|
         report_progress(progress)
       end
     end
@@ -104,7 +104,7 @@ module DamageControl
       return unless File.exists?(current_scm.working_dir)
       
       begin
-        last_successful_build = @build_history.last_succesful_build(current_build.project_name)
+        last_successful_build = @build_history.last_successful_build(current_build.project_name)
         # we have no record of when the last succesful build was made, don't determine the changeset
         # (might be a new project, see comment above)
         return if last_successful_build.nil?

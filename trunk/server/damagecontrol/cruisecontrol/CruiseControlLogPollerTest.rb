@@ -12,7 +12,7 @@ module DamageControl
     include FileUtils
     
     def setup
-      @dir = "#{damagecontrol_home}/target/polltest/test#{Time.new.to_i}"
+      @dir = new_temp_dir
       File.mkpath(@dir)
       create_hub
       @log_file = "#{damagecontrol_home}/testdata/log20030929145347.xml"

@@ -37,7 +37,7 @@ module DamageControl
       assert_equal(1, changes.length)
       mod = changes[0]
       assert_equal("build.xml", mod.path)
-      assert_equal("changed something\n", mod.message)
+      assert_equal("changed something", mod.message)
     end
     
     def test_can_build_a_cvs_rdiff_command_for_retrieving_the_changes_between_two_dates
@@ -97,19 +97,23 @@ module DamageControl
       assert_equal(path,     cvs.path)
       assert_equal(mod,      cvs.mod)
     end
+    
+    def jons_birthday
+      Time.utc(1977, 06, 15, 12, 00, 00)
+    end
 
     def test_checkout_command
       cvs = CVS.new(":pserver:anonymous@cvs.codehaus.org:/cvsroot/damagecontrol", "damagecontrol", nil)
       assert_equal(
-        "-d:pserver:anonymous@cvs.codehaus.org:/cvsroot/damagecontrol checkout damagecontrol", \
-        cvs.checkout_command)
+        '-d:pserver:anonymous@cvs.codehaus.org:/cvsroot/damagecontrol checkout -D "1977-06-15 12:00:00 UTC" damagecontrol', \
+        cvs.checkout_command(jons_birthday))
     end
     
     def test_update_command
       cvs = CVS.new(":pserver:anonymous@cvs.codehaus.org:/cvsroot/damagecontrol", "damagecontrol", nil)
       assert_equal(
-        "-d:pserver:anonymous@cvs.codehaus.org:/cvsroot/damagecontrol update -d -P", \
-        cvs.update_command)
+        '-d:pserver:anonymous@cvs.codehaus.org:/cvsroot/damagecontrol update -D "1977-06-15 12:00:00 UTC" -d -P', \
+        cvs.update_command(jons_birthday))
     end
     
 LOGINFO_WITH_TWO_TRIGGERS = <<-EOF

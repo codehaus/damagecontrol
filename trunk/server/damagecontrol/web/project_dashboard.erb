@@ -41,29 +41,46 @@
 
 <tr><td>
 <table class="pane" width="100%">
+
   <tr class="pane">
     <td class="pane-header" colspan="3">Build history</td>
   </tr>
+  
+<%
+  builds = build_history_repository.history(project_name).reverse
+  
+  if builds.empty?
+%>
+
+  <tr class="pane">
+    <td class="pane" colspan="3">Never built</td>
+  </tr>
+  
+<% else %>
+
   <tr class="pane">
     <td class="pane-column-header">Timestamp</td>
     <td class="pane-column-header">Status</td>
     <td class="pane-column-header">Time</td>
   </tr>
-<%
-  builds = build_history_repository.history(project_name).reverse
-  builds.each do |build|
-    color = if build.successful? then "green" else "red" end
-    color = "grey" if !build.completed?
-    image = "images/#{color}-16.gif"
-%>
+  
+  <%
+    builds.each do |build|
+      color = if build.successful? then "green" else "red" end
+      color = "grey" if !build.completed?
+      image = "images/#{color}-16.gif"
+  %>
   <tr class="pane">
     <td class="pane"><a href="log?project_name=<%= project_name %>&timestamp=<%= build.timestamp %>"><%= build.timestamp_as_time %></a></td>
     <td class="pane"><img src="<%= image %>" />&nbsp;<%= build.status %></td>
     <td class="pane"><%= build.duration_formatted %></td>
   </tr>
-<% end %>
+  <% end %>
+
 </table>
 </td></tr>
+
+<% end %>
 
 </table>
 </body></html>
