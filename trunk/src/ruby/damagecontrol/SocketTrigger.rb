@@ -51,28 +51,32 @@ module DamageControl
       begin
         client_hostname = socket.peeraddr[2]
         client_ip = socket.peeraddr[3]
-        if(host_verifier.allowed?(client_hostname, client_ip))
-          payload = ""
-          socket.each do |line|
-            if(line.chomp == "...")
-              break
-            else
-              payload << line
-            end
-          end
-          begin
-            socket.print("DamageControl server on #{get_ip} got message from #{client_ip}\r\n")
-            socket.print("http://damagecontrol.codehaus.org/\r\n")
-            process_payload(payload)
-          rescue => e
-            print_error(e)
-            socket.print("DamageControl exception:\n")
-            socket.print(e.message)
-            socket.print("DamageControl config:\n")
-            socket.print(payload)
-          end
-        else
+        logger.info("request from #{client_hostname} / #{client_ip}")
+
+        if(!host_verifier.allowed?(client_hostname, client_ip))
+          logger.error("request from disallowed host #{client_hostname} / #{client_ip}")
           socket.print("This DamageControl server doesn't allow connections from #{client_hostname} / #{client_ip}\r\n")
+          return
+        end
+
+        payload = ""
+        socket.each do |line|
+          if(line.chomp == "...")
+            break
+          else
+            payload << line
+          end
+        end
+        begin
+          socket.print("DamageControl server on #{get_ip} got message from #{client_ip}\r\n")
+          socket.print("http://damagecontrol.codehaus.org/\r\n")
+          process_payload(payload)
+        rescue => e
+          print_error(e)
+          socket.print("DamageControl exception:\n")
+          socket.print(e.message)
+          socket.print("DamageControl config:\n")
+          socket.print(payload)
         end
       ensure
         socket.close

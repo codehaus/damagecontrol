@@ -14,16 +14,19 @@ require 'damagecontrol/template/HTMLTemplate'
 require 'damagecontrol/publisher/IRCPublisher' 
 require 'damagecontrol/publisher/FilePublisher' 
 require 'damagecontrol/publisher/EmailPublisher' 
-require 'damagecontrol/publisher/JIRAPublisher' 
+require 'damagecontrol/publisher/JIRAPublisher'
+require 'damagecontrol/Logging'
 
 include DamageControl
+
+Logging.quiet
 
 buildRoot = File.expand_path("~/build") 
  
 start_simple_server(
   :BuildsDir => "#{buildRoot}/checkout", 
   :SocketTriggerPort => 4711, 
-  :WebPort => 8080, 
+  :WebPort => 4712, 
   :AllowIPs => ["127.0.0.1", "66.216.68.111", "81.5.134.59", "217.158.24.17" ])
 
 LogWriter.new(@hub, "#{buildRoot}/log")

@@ -4,10 +4,13 @@ require 'rica'
 require 'damagecontrol/Timer'
 require 'damagecontrol/AsyncComponent'
 require 'damagecontrol/BuildEvents'
+require 'damagecontrol/Logging'
 
 module DamageControl
 
   class IRCPublisher < AsyncComponent
+
+    include Logging
   
     attr_accessor :irc
     attr_accessor :handle
@@ -27,8 +30,10 @@ module DamageControl
       if message.is_a?(BuildCompleteEvent)
         if @irc.connected? && @irc.in_channel?
           content = @template.generate(message.build)
+          logger.info("sending irc message #{content}")
           @irc.send_message_to_channel(content)
         else
+          logger.info("connecting to #{server} and joining #{@server_channel}")
           @irc.connect(server, handle) unless @irc.connected?
           @irc.join_channel(@irc_channel) if @irc.connected? && !@irc.in_channel?
           raise "not in channel yet"
