@@ -1,5 +1,6 @@
 require 'damagecontrol/scm/CVS'
 require 'damagecontrol/scm/SVN'
+require 'damagecontrol/scm/NoSCM'
 require 'damagecontrol/util/Logging'
 
 module DamageControl
@@ -8,6 +9,8 @@ module DamageControl
   
     # these are preconfigured "shortcuts", if you want to use another class as your scm just specify the full classname in your config file
     PRECONFIGURED_SCM_CLASSES = {
+      "" => DamageControl::NoSCM,
+      nil => DamageControl::NoSCM,
       "cvs" => DamageControl::CVS,
       "svn" => DamageControl::SVN
     }

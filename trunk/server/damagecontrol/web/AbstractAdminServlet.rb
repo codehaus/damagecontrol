@@ -1,6 +1,8 @@
 require 'webrick'
 require 'pebbles/MVCServlet'
 require 'damagecontrol/scm/Changes'
+require 'damagecontrol/util/Logging'
+require 'damagecontrol/Version'
 
 module DamageControl
   class AbstractAdminServlet < Pebbles::MVCServlet
@@ -12,6 +14,7 @@ module DamageControl
       @build_scheduler = build_scheduler
       @build_history_repository = build_history_repository
       @project_config_repository = project_config_repository
+      @scm_factory = SCMFactory.new
     end
     
   protected
@@ -20,6 +23,19 @@ module DamageControl
     attr_reader :project_config_repository
     attr_reader :build_scheduler
 
+    def project_name
+      request.query['project_name']
+    end
+    
+    def project_config
+      return {} unless @project_config_repository.project_exists?(project_name)
+      @project_config_repository.project_config(project_name)
+    end
+    
+    def create_scm
+      @scm_factory.get_scm(project_config, @project_config_repository.checkout_dir(project_name))
+    end
+    
     def template_dir
       File.expand_path(File.dirname(__FILE__))
     end
@@ -48,10 +64,14 @@ module DamageControl
       result = []
       if private?
         result += [
-          task(:icon => "icons/box_new.png", :name => "New project", :url => "project?action=configure")
+          task(:icon => "icons/box_new.png", :name => "New project", :url => "configure")
         ]
       end
       result
+    end
+    
+    def navigation
+      ""
     end
     
     def ritemesh_template

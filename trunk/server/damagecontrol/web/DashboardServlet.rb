@@ -2,7 +2,7 @@ require 'damagecontrol/web/AbstractAdminServlet'
 
 module DamageControl  
   class DashboardServlet < AbstractAdminServlet
-    def initialize(build_history_repository, project_config_repository, build_scheduler, type)
+    def initialize(type, build_history_repository, project_config_repository, build_scheduler)
       super(type, build_scheduler, build_history_repository, project_config_repository)
       @project_config_repository = project_config_repository
     end

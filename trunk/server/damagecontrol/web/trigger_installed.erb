@@ -5,19 +5,31 @@
 </head>
 <body>
   <% if error.nil? then %>
+  
     <p>
-    Trigger successfully installed.
+      Trigger was successfully installed into your source control system.
     </p>
+    
     <p>
-    The trigger installation mechanism can sometimes malfunction in tricky situations, double-check by
-    inspecting the content of your loginfo file:
-    <a href="root/<%= project_name %>/checkout/CVSROOT/loginfo">here</a>.
+      This is the command that is used to trig a build:
+      <pre>
+        <%= scm.trigger_command(damagecontrol_install_dir, project_name, @trig_xmlrpc_url).inspect %>
+      </pre>
     </p>
+    
+    <p>
+      The trigger installation mechanism can sometimes malfunction in tricky situations, double-check by
+      inspecting the content of your loginfo file:
+      <a href="root/<%= project_name %>/checkout/CVSROOT/loginfo">here</a>.
+    </p>
+    
   <% else %>
+  
     Could not install trigger:
     <pre>
     <%= format_exception(error) %>
     </pre>
+    
   <% end %>
 </body>
 </html>

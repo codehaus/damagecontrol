@@ -110,6 +110,10 @@ module DamageControl
       "#{checkout_dir}/#{mod}"
     end
     
+    def can_install_trigger?
+      true
+    end
+    
     # Installs and activates the trigger script in the repository
     # for a certain module. Upon subsequent checkins, the damage
     # control server will be notified over a socket and start
@@ -120,32 +124,16 @@ module DamageControl
     #
     # @block &proc a block that can handle the output (should typically log to file)
     #
-    def install_trigger(project_name, dc_url="http://localhost:4712/private/xmlrpc", &proc)
+    def install_trigger(damagecontrol_install_dir, project_name, dc_url="http://localhost:4712/private/xmlrpc", &proc)
       cvsroot_cvs = create_cvsroot_cvs
       cvsroot_cvs.checkout(&proc)
       with_working_dir(cvsroot_cvs.working_dir) do
         # install trigger command
         File.open("loginfo", File::WRONLY | File::APPEND) do |file|
-          trigger_command = trigger_command(project_name, dc_url)
-          file.puts("#{mod} #{trigger_command}")
+          file.puts("#{mod} #{trigger_command(damagecontrol_install_dir, project_name, dc_url)}")
         end
-
-        # install trigger script
-        File.open(trigger_script_name, "w") do |io|
-          io.puts(trigger_script)
-        end
-        system("cvs -d#{@cvsroot} add #{trigger_script_name}")
-
-        checkoutlist = File.open("checkoutlist", File::WRONLY | File::APPEND) do |file|
-          file.puts(File.basename(trigger_script_name))
-        end
-
-        system("cvs commit -m \"Installed CamageControl nudger for #{project_name}\"")
+        system("cvs commit -m \"Installed DamageControl trigger for #{project_name}\"")
       end
-    end
-    
-    def trigger_command(project_name, dc_url)
-      "#{ruby_path} " + to_os_path("#{path}/CVSROOT/#{trigger_script_name}") + " #{dc_url} #{project_name}"
     end
     
     def create_cvsroot_cvs
@@ -172,7 +160,7 @@ module DamageControl
       loginfo_file.write(modified_loginfo)
       loginfo_file.close
       with_working_dir(cvsroot_cvs.working_dir) do
-        system("cvs commit -m \"Disabled DamageControl nudger for #{project_name}\"")
+        system("cvs commit -m \"Disabled DamageControl trigger for #{project_name}\"")
       end
     end
 
@@ -184,9 +172,10 @@ module DamageControl
       modified = ""
       loginfo_content.each_line do |line|
         # TODO: couldn't find out how to express this with a single regexp.
-        matches = (Regexp.new(".*ruby.*dctrigger.rb http.* #{project_name}$") =~ line) && line[0..0] != "#"
-        # The old format - we want to match them to so they get deleted.
-        matches = (Regexp.new("^cat .* | nc.*4711$") =~ line) && line[0..0] != "#" unless matches
+        matches = line[0..0] != "#" && line =~ /requestbuild/
+        # The old formats - we want to match them to so they get deleted.
+        matches = line[0..0] != "#" && line =~ /.*ruby.*dctrigger.rb http.* #{project_name}$/ unless matches
+        matches = line[0..0] != "#" && line =~ /^cat .* | nc.*4711$/ unless matches
         if(matches)
           formatted_date = date.strftime("%B %d, %Y")
           modified << "# Disabled by DamageControl on #{formatted_date}\n"

@@ -1,13 +1,7 @@
 require 'damagecontrol/scm/AbstractWebConfigurator'
-require 'damagecontrol/scm/AbstractSCM'
+require 'damagecontrol/scm/NoSCM'
 
 module DamageControl
-  class NoSCM < AbstractSCM
-    def method_missing(*args)
-      "does nothing :-)"
-    end
-  end
-
   class NoSCMWebConfigurator < AbstractWebConfigurator
     
     public

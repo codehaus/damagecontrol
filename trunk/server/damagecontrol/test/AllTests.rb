@@ -40,6 +40,7 @@ require 'damagecontrol/xmlrpc/StatusPublisherTest'
 require 'damagecontrol/xmlrpc/TriggerTest'
 
 require 'damagecontrol/web/ConfigureProjectTest'
+require 'damagecontrol/web/InstallTriggerServletTest'
 
 require 'damagecontrol/test/IntegrationTests'
 

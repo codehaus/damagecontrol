@@ -256,7 +256,7 @@ class End2EndTest < Test::Unit::TestCase
     importdir = "#{@basedir}/testproject"
     File.mkpath(importdir)
     scm.import(importdir)
-    scm.install_trigger("TestingProject", "http://localhost:14712/private/xmlrpc")
+    scm.install_trigger(damagecontrol_home, "TestingProject", "http://localhost:14712/private/xmlrpc")
 
     @server = DamageControlServerDriver.new("#{basedir}/serverroot")
     server.setup    

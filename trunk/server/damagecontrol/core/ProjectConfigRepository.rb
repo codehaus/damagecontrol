@@ -56,6 +56,10 @@ module DamageControl
       end
     end
     
+    def checkout_dir(project_name)
+      project_directories.checkout_dir(project_name)
+    end
+    
     def modify_project_config(project_name, config_map)
       config_map["project_name"] = project_name
       File.open(project_directories.project_config_file(project_name), File::CREAT|File::WRONLY|File::TRUNC) do |io|

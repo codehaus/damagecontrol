@@ -14,6 +14,8 @@ require 'damagecontrol/core/BuildHistoryRepository'
 require 'damagecontrol/core/ProjectConfigRepository'
 require 'damagecontrol/core/HostVerifier'
 require 'damagecontrol/web/ProjectServlet'
+require 'damagecontrol/web/InstallTriggerServlet'
+require 'damagecontrol/web/ConfigureProjectServlet'
 require 'damagecontrol/web/DashboardServlet'
 require 'damagecontrol/web/StatusImageServlet'
 require 'damagecontrol/web/LogFileServlet'
@@ -128,8 +130,8 @@ module DamageControl
       params[:HttpsPort] || 4713
     end
     
-    def nudge_xmlrpc_url
-      params[:NudgeXmlrpcUrl] || "http://#{get_ip}:#{http_port}/private/xmlrpc"
+    def trig_xmlrpc_url
+      params[:TrigXmlrpcUrl] || "http://#{get_ip}:#{http_port}/private/xmlrpc"
     end
     
     def dc_url
@@ -177,8 +179,8 @@ module DamageControl
       # For public unauthenticated XML-RPC connections like getting status
       httpd.mount("/public/xmlrpc", public_xmlrpc_servlet)
       
-      httpd.mount("/public/dashboard", DashboardServlet.new(build_history_repository, project_config_repository, build_scheduler, :public))
-      httpd.mount("/public/project", ProjectServlet.new(build_history_repository, project_config_repository, nil, :public, build_scheduler, project_directories, nudge_xmlrpc_url, scm_configurator_classes))
+      httpd.mount("/public/dashboard", DashboardServlet.new(:public, build_history_repository, project_config_repository, build_scheduler))
+      httpd.mount("/public/project", ProjectServlet.new(:public, build_history_repository, project_config_repository, nil, build_scheduler))
       httpd.mount("/public/log", LogFileServlet.new(project_directories))
       httpd.mount("/public/root", WEBrick::HTTPServlet::FileHandler, rootdir, :FancyIndexing => true)
       
@@ -198,8 +200,10 @@ module DamageControl
       # For private authenticated and encrypted (with eg an Apache proxy) XML-RPC connections like triggering a build
       httpd.mount("/private/xmlrpc", private_xmlrpc_servlet)
 
-      httpd.mount("/private/dashboard", DashboardServlet.new(build_history_repository, project_config_repository, build_scheduler, :private))
-      httpd.mount("/private/project", ProjectServlet.new(build_history_repository, project_config_repository, trigger, :private, build_scheduler, project_directories, nudge_xmlrpc_url, scm_configurator_classes))
+      httpd.mount("/private/dashboard", DashboardServlet.new(:private, build_history_repository, project_config_repository, build_scheduler))
+      httpd.mount("/private/project", ProjectServlet.new(:private, build_history_repository, project_config_repository, trigger, build_scheduler))
+      httpd.mount("/private/install_trigger", InstallTriggerServlet.new(project_config_repository, trig_xmlrpc_url))
+      httpd.mount("/private/configure", ConfigureProjectServlet.new(project_config_repository, scm_configurator_classes))
       httpd.mount("/private/log", LogFileServlet.new(project_directories))
       httpd.mount("/private/root", WEBrick::HTTPServlet::FileHandler, rootdir, :FancyIndexing => true)
       
