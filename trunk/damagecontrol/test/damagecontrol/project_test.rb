@@ -11,7 +11,6 @@ module DamageControl
     def setup
       MockIt::setup
       @p = Project.new
-      @p.description = "bla bla"
       @p.name = "blabla"
     end
     

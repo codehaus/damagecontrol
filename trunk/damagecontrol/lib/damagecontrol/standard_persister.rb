@@ -33,7 +33,7 @@ module DamageControl
         File.open(project.changesets_rss_file, "w") do |io|
           rss_writer = DamageControl::Visitor::RssWriter.new(
             rss,
-            "Changesets for #{@name}",
+            "Changesets for #{project.name}",
             "http://localhost:4712/", # TODO point to web version of changeset
             project.name, 
             project.tracker || Tracker::Null.new, 
