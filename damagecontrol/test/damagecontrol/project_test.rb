@@ -98,8 +98,8 @@ module DamageControl
 
       p = Project.new("mooky")
       p.scm = new_mock
-      p.scm.__expect(:checkout) do |identifier|
-        assert_equal("boo", identifier)
+      p.scm.__expect(:checkout) do |checkout_dir, changeset_identifier|
+        assert_equal("boo", changeset_identifier)
       end
 
       before = Time.new
