@@ -11,6 +11,7 @@ class ProjectController < ApplicationController
 
   def index
     @projects = RSCM::Project.find_all
+    @navigation_name = "null"
   end
 
   def new
@@ -64,7 +65,7 @@ class ProjectController < ApplicationController
   end
   
   def changesets
-    load_project
+    load
     last_changeset_id = @params["changeset"]
     # Later, when we "mix in" DC, we may want to pass a different number than 1 here..
     @changesets = @project.changesets(last_changeset_id, 1)
@@ -173,6 +174,9 @@ private
 
     @trackers = RSCM::TRACKERS.dup
     @trackers.each_index {|i| @trackers[i] = @project.tracker if @trackers[i].class == @project.tracker.class}
+
+    @linkable_changesets = @project.changesets(@project.latest_changeset_id, 10)
+    @select_changeset_ids = @project.changeset_ids[0..-(@linkable_changesets.length+1)]
 
     set_sidebar_links
   end

@@ -26,18 +26,6 @@ module RSCM
       "CVS"
     end
     
-    def javascript_on_load
-      "distributeCvsrootFields();"
-    end
-
-    def javascript_file
-      File.dirname(__FILE__) + "/cvs_declarations.js"
-    end
-    
-    def form_file
-      File.dirname(__FILE__) + "/form.html"
-    end
-    
     def import(dir, message)
       modname = File.basename(dir)
       cvs(dir, "import -m \"#{message}\" #{modname} VENDOR START")
@@ -223,6 +211,7 @@ module RSCM
     end
 
     def parse_log(checkout_dir, cmd, &proc)
+puts cmd
       logged_command_line = command_line(hidden_password, cmd)
       yield logged_command_line if block_given?
 

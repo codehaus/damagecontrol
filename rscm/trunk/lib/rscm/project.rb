@@ -83,6 +83,8 @@ module RSCM
     # will be retrieved.
     def poll(from_if_first_poll=Time.epoch)
       from = next_changeset_identifier || from_if_first_poll
+      
+      # TODO: Use a yield model here so we don't have to cache as much in memory.
       changesets = @scm.changesets(checkout_dir, from)
       if(!changesets.empty?)
         changesets.save(changesets_dir)
@@ -90,9 +92,9 @@ module RSCM
         # Now we need to update the RSS. The RSS spec says max 15 items in a channel,
         # So we'll get upto the latest 15 changesets and RSS it..
         # (http://www.chadfowler.com/ruby/rss/)
-        latest_changeset_id = ChangeSets.latest_id(changesets_dir)
-        if(latest_changeset_id)
-          last_changesets = ChangeSets.load_upto(changesets_dir, latest_changeset_id, 15)
+        latest_id = latest_changeset_id
+        if(latest_id)
+          last_changesets = ChangeSets.load_upto(changesets_dir, latest_id, 15)
           title = "Changesets for #{@name}"
           last_changesets.write_rss(
             title,
@@ -145,12 +147,16 @@ module RSCM
       Directories.changesets_dir(name)
     end
     
-    def changesets(last_changeset_id, prior)
-      ChangeSets.load_upto(changesets_dir, last_changeset_id, prior)
+    def changesets(changeset_id, prior)
+      ChangeSets.load_upto(changesets_dir, changeset_id, prior)
     end
 
     def changeset_ids
       ChangeSets.ids(changesets_dir)
+    end
+    
+    def latest_changeset_id
+      ChangeSets.latest_id(changesets_dir)
     end
     
     def delete
