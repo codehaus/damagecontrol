@@ -51,11 +51,11 @@ module DamageControl
     end
     
     def time_since_last_success
-      if(last_successful_build  && last_successful_build.duration)
-        duration_as_text(last_successful_build.duration)
-      else 
-        "Never successfuly built" 
-      end
+			if(last_successful_build  && last_successful_build.dc_end_time)
+			"#{Time.now.utc.difference_as_text(last_successful_build.dc_end_time)} ago"
+ 	    else 
+ 	    	"Never successfuly built" 
+ 	    end
     end
     
     def last_duration
