@@ -1,17 +1,17 @@
 require 'damagecontrol/Timer'
 
 module DamageControl
-  # TODO make it an adapter (instead of a superclass) for other components
+  # TODO make it an adapter (as well as a superclass) for other components
   class AsyncComponent
-    attr_reader :hub
+    attr_reader :channel
     
     include TimerMixin
     
-    def initialize(hub)
+    def initialize(channel)
       super()
       @inq = []
-      @hub = hub
-      hub.add_subscriber(self)
+      @channel = channel
+      channel.add_subscriber(self)
     end
 
     def tick(time)

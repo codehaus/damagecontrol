@@ -1,17 +1,16 @@
 require 'ftools'
-require 'damagecontrol/Hub'
 require 'damagecontrol/BuildEvents'
 
 module DamageControl
 
   class LogWriter
   
-    def initialize (hub)
+    def initialize(channel)
       @log_files = Hash.new      
-      hub.add_subscriber(self)      
+      channel.add_subscriber(self)      
     end
     
-    def receive_message (message)
+    def receive_message(message)
       
       if message.is_a? BuildProgressEvent
         log_file(message).puts(message.output)

@@ -11,8 +11,8 @@ module DamageControl
 
   class FilePublisher < AsyncComponent
 
-    def initialize(hub, template, filesystem=FileSystem.new)
-      super(hub)
+    def initialize(channel, template, filesystem=FileSystem.new)
+      super(channel)
       @template = template
       @filesystem = filesystem
     end

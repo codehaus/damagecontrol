@@ -2,14 +2,11 @@ require 'test/unit'
 require 'mock_with_returns'
 require 'damagecontrol/Build'
 require 'damagecontrol/FileUtils'
-require 'damagecontrol/HubTestHelper'
 
 module DamageControl
 
   class BuildTest < Test::Unit::TestCase
     include FileUtils
-    include HubTestHelper
-
     def test_build_failed
 
       build = Build.new( \

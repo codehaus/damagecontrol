@@ -1,4 +1,3 @@
-require 'damagecontrol/Hub'
 require 'damagecontrol/FilePoller'
 require 'damagecontrol/BuildEvents'
 require 'damagecontrol/Build'
@@ -8,9 +7,9 @@ module DamageControl
 
   # File handler to used in conjuction with FilePoller
   class CruiseControlLogPoller < FilePoller
-    def initialize(hub, dir_to_poll)
+    def initialize(channel, dir_to_poll)
       super(dir_to_poll)
-      @hub = hub
+      @channel = channel
       @ccparser = CruiseControlLogParser.new
     end
   
@@ -18,7 +17,7 @@ module DamageControl
       build = Build.new
       @ccparser.parse(file, build)
       evt = BuildCompleteEvent.new(build)
-      @hub.publish_message(evt)
+      @channel.publish_message(evt)
     end
   end
 end

@@ -1,6 +1,5 @@
 require 'socket'
 require 'damagecontrol/BuildEvents'
-require 'damagecontrol/Hub'
 require 'damagecontrol/Build'
 
 module DamageControl
@@ -21,7 +20,7 @@ module DamageControl
   # This class listens for incoming connections. For each incoming
   # connection it will read one line of payload. The payload is parsed
   # into a Build object which is then wrapped in a BuildRequestEvent
-  # and sent to the hub.
+  # and sent to the channel.
   #
   # Then it closes the connection and listens for new connections.
   #
@@ -29,8 +28,8 @@ module DamageControl
   
     attr_accessor :port
     
-    def initialize(hub, root_dir, port=4711)
-      @hub = hub
+    def initialize(channel, root_dir, port=4711)
+      @channel = channel
       @root_dir = root_dir
       @port = port
     end
@@ -58,7 +57,7 @@ module DamageControl
 
     def do_accept(payload)
       build = create_build(payload);
-      @hub.publish_message(BuildRequestEvent.new(build))
+      @channel.publish_message(BuildRequestEvent.new(build))
     end
     
     def start

@@ -36,7 +36,7 @@ module DamageControl
     def test_enqueued_message_processed_on_tick
       comp = SucceedingAsyncComponent.new(hub)
       @messages.each {|message|
-        @hub.publish_message(message)
+        hub.publish_message(message)
       }
       comp.force_tick
       assert_equal(@messages, comp.processed_messages)
@@ -60,7 +60,7 @@ module DamageControl
     def test_consumed_message_not_processed_on_next_tick
       comp = SucceedingAsyncComponent.new(hub)
       @messages.each {|message|
-        @hub.publish_message(message)
+        hub.publish_message(message)
       }
       comp.force_tick
       assert_equal(@messages, comp.processed_messages)

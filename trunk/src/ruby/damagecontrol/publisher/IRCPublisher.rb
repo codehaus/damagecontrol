@@ -14,8 +14,8 @@ module DamageControl
     attr_reader :channel
     attr_reader :server
   
-    def initialize(hub, server, channel, template)
-      super(hub)
+    def initialize(channel, server, channel, template)
+      super(channel)
       @irc = IRCConnection.new()
       @server = server
       @channel = channel

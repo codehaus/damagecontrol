@@ -2,7 +2,6 @@ require 'test/unit'
 
 require 'damagecontrol/BuildEvents'
 require 'damagecontrol/SocketTrigger'
-require 'damagecontrol/Hub'
 require 'damagecontrol/Build'
 require 'damagecontrol/BuildDelayer'
 require 'damagecontrol/Clock'
