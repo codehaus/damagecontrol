@@ -91,6 +91,10 @@ module DamageControl
     def successful?
       exit_code == 0
     end
+    
+    def status_message
+      successful? ? "Successful" : "Failed"
+    end
 
     # Returns the pid of the build process
     def pid
