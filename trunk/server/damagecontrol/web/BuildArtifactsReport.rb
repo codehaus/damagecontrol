@@ -15,7 +15,7 @@ module DamageControl
     end
     
     def icon
-      "icons/console_network.png"
+      "smallicons/component.png"
     end
     
     def build_artifacts

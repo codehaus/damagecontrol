@@ -15,7 +15,7 @@ module DamageControl
     end
     
     def icon
-      "icons/scroll_error.png"
+      "smallicons/console_error.png"
     end
     
     def content

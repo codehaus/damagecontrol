@@ -70,7 +70,7 @@ module DamageControl
       result = [] 
       if private?
         result += [
-          task(:icon => "icons/box_new.png", :name => "New project", :url => "configure")
+          task(:icon => "largeicons/box_new.png", :name => "New project", :url => "configure")
         ]
       else
       end

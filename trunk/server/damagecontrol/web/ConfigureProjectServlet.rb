@@ -15,19 +15,19 @@ module DamageControl
           if(scm.can_create? && !scm.exists?)
             result +=
               [
-                task(:icon => "icons/package_new.png", :name => "Create repository", :url => "configure?project_name=#{project_name}&action=create_scm")
+                task(:icon => "largeicons/package_new.png", :name => "Create repository", :url => "configure?project_name=#{project_name}&action=create_scm")
               ]
           end
           if(scm.can_install_trigger?)
             result +=
               [
-                task(:icon => "icons/gear_connection.png", :name => "Install trigger", :url => "install_trigger?project_name=#{project_name}"),
+                task(:icon => "largeicons/gear_connection.png", :name => "Install trigger", :url => "install_trigger?project_name=#{project_name}"),
               ]
           end
         end
 
         result += [
-          task(:icon => "icons/navigate_left.png", :name => "Back to project", :url => "project?project_name=#{project_name}"),
+          task(:icon => "largeicons/navigate_left.png", :name => "Back to project", :url => "project?project_name=#{project_name}"),
         ]
       end 
       result

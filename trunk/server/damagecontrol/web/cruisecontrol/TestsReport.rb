@@ -70,5 +70,11 @@ This could happen for the following reasons:
     def title
       "Tests"
     end
+
+    def icon
+      return "smallicons/bug_green.png" if(content =~ /All Tests Passed/)
+      return "smallicons/bug_yellow.png" if(content =~ /No Tests Run/)
+      return "smallicons/bug_red.png"
+    end
   end
 end

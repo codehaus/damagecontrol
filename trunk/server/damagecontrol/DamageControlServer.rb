@@ -178,8 +178,8 @@ module DamageControl
       httpd.mount("/public/root", indexing_file_handler)
       
       httpd.mount("/public/images", WEBrick::HTTPServlet::FileHandler, "#{webdir}/images")
-      httpd.mount("/public/icons", WEBrick::HTTPServlet::FileHandler, "#{webdir}/icons/24x24/plain")
-      httpd.mount("/public/fileicons", WEBrick::HTTPServlet::FileHandler, "#{webdir}/icons/16x16/plain")
+      httpd.mount("/public/largeicons", WEBrick::HTTPServlet::FileHandler, "#{webdir}/icons/24x24/plain")
+      httpd.mount("/public/smallicons", WEBrick::HTTPServlet::FileHandler, "#{webdir}/icons/16x16/plain")
       httpd.mount("/public/images/currentstatus", CurrentStatusImageServlet.new(build_history_repository, build_scheduler))
       httpd.mount("/public/images/lastcompletedstatus", LastCompletedImageServlet.new(build_history_repository, build_scheduler))
       httpd.mount("/public/images/timestampstatus", TimestampImageServlet.new(build_history_repository, build_scheduler))
@@ -217,8 +217,8 @@ module DamageControl
       httpd.mount("/private/root", indexing_file_handler)
       
       httpd.mount("/private/images", WEBrick::HTTPServlet::FileHandler, "#{webdir}/images")
-      httpd.mount("/private/icons", WEBrick::HTTPServlet::FileHandler, "#{webdir}/icons/24x24/plain")
-      httpd.mount("/private/fileicons", WEBrick::HTTPServlet::FileHandler, "#{webdir}/icons/16x16/plain")
+      httpd.mount("/private/largeicons", WEBrick::HTTPServlet::FileHandler, "#{webdir}/icons/24x24/plain")
+      httpd.mount("/private/smallicons", WEBrick::HTTPServlet::FileHandler, "#{webdir}/icons/16x16/plain")
       httpd.mount("/private/images/currentstatus", CurrentStatusImageServlet.new(build_history_repository, build_scheduler))
       httpd.mount("/private/images/lastcompletedstatus", LastCompletedImageServlet.new(build_history_repository, build_scheduler))
       httpd.mount("/private/images/timestampstatus", TimestampImageServlet.new(build_history_repository, build_scheduler))

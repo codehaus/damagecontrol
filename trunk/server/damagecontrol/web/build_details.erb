@@ -14,7 +14,7 @@
       <% if report.available? %>
     <li><a href="?project_name=<%= project_name %>&timestamp=<%= selected_build.timestamp %>&report=<%= report.id %>" 
     <% if selected then %>id="current"<% end %>>
-	<%= report.title %>
+	<image src="<%= report.icon %>"/> <%= report.title %>
 	</a></li>
     <% end %>
     <% end %>

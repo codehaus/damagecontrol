@@ -67,28 +67,28 @@ module DamageControl
         if(private?)
           result +=
             [
-              task(:icon => "icons/box_into.png", :name => "Clone project", :url => "configure?project_name=#{project_name}&action=clone_project"),
-              task(:icon => "icons/wrench.png", :name => "Configure", :url => "configure?project_name=#{project_name}&action=configure"),
-              task(:icon => "icons/gears_run.png", :name => "Trig build now", :url => "?project_name=#{project_name}&action=trig_build"),
-              task(:icon => "icons/garbage.png", :name => "Clean out working files", :url => "?project_name=#{project_name}&action=clean_out_working_files"),
+              task(:icon => "largeicons/box_into.png", :name => "Clone project", :url => "configure?project_name=#{project_name}&action=clone_project"),
+              task(:icon => "largeicons/wrench.png", :name => "Configure", :url => "configure?project_name=#{project_name}&action=configure"),
+              task(:icon => "largeicons/gears_run.png", :name => "Trig build now", :url => "?project_name=#{project_name}&action=trig_build"),
+              task(:icon => "largeicons/garbage.png", :name => "Clean out working files", :url => "?project_name=#{project_name}&action=clean_out_working_files"),
             ]
         end
         result +=
           [
-            task(:icon => "icons/folders.png", :name => "Working files", :url => "root/#{project_name}/checkout"),
+            task(:icon => "largeicons/folders.png", :name => "Working files", :url => "root/#{project_name}/checkout"),
           ]
         prev_build = build_history_repository.prev(selected_build)
         if(prev_build)
           result +=
             [
-              task(:icon => "icons/navigate_left.png", :name => "Previous build", :url => build_url(prev_build))
+              task(:icon => "largeicons/navigate_left.png", :name => "Previous build", :url => build_url(prev_build))
             ]
         end
         next_build = build_history_repository.next(selected_build)
         if(next_build)
           result +=
             [
-              task(:icon => "icons/navigate_right.png", :name => "Next build", :url => build_url(next_build))
+              task(:icon => "largeicons/navigate_right.png", :name => "Next build", :url => build_url(next_build))
             ]
         end
       end

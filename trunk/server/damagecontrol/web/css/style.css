@@ -245,7 +245,7 @@ th.pane {
 }
 
 #foldertab {
-  padding: 3px 0;
+  padding: 4px 0;
   margin-left: 0;
   border-bottom: 1px solid #090;
   font: bold 12px Verdana, sans-serif;
@@ -258,7 +258,7 @@ th.pane {
 }
 
 #foldertab li a {
-  padding: 3px 0.5em;
+  padding: 4px 0.5em;
   margin-left: 3px;
   border: 1px solid #090;
   border-bottom: none;

@@ -1,7 +1,5 @@
 require 'damagecontrol/web/Report'
 require 'damagecontrol/util/FileUtils'
-require 'damagecontrol/scm/Changes'
-require 'pebbles/MVCServlet'
 
 module DamageControl
   class Icon
@@ -11,7 +9,7 @@ module DamageControl
     end
     
     def url
-      "fileicons/#{@name}.png"
+      "smallicons/#{@name}.png"
     end
     
     def alt
@@ -48,7 +46,7 @@ module DamageControl
     end
     
     def icon
-      "icons/document_edit.png"
+      "smallicons/document_exchange.png"
     end
     
     def content
@@ -69,13 +67,12 @@ the working directory has been cleaned out, or because there has been no success
       end
     end
 
-    private
+  private
     
     # Works with ViewCVS
     def web_url_to_change(change)
       scm_web_url = project_config["scm_web_url"]
 
-      # TODO better handling of working dir for the file
       return "root/#{project_name}/checkout/#{change.path}" if scm_web_url.nil? || scm_web_url == "" 
 
       scm_web_url = ensure_trailing_slash(scm_web_url)
