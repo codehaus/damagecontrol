@@ -16,6 +16,10 @@ module DamageControl
       @build = Build.new("project")
     end
     
+    def test_fail
+      fail "selftest"
+    end
+    
     def test_build_is_scheduled_on_available_executor
     
       hub.publish_message(BuildRequestEvent.new(@build))
