@@ -116,6 +116,7 @@ module DamageControl
     end
     
     def build_complete
+      logger.info("build complete #{current_build.project_name}")
       current_build.end_time = Time.now.to_i
       @channel.publish_message(BuildCompleteEvent.new(current_build))
 
@@ -139,7 +140,8 @@ module DamageControl
         checkout if checkout?
         execute
       rescue Exception => e
-        message = e.message + "\n" + e.backtrace.join("\n")
+        message = format_exception(e)
+        logger.error("build failed: #{message}")
         current_build.error_message = message
         current_build.status = Build::FAILED
         report_progress("Build failed due to: #{message}")

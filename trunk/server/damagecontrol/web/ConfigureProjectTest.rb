@@ -9,7 +9,11 @@ module DamageControl
     include FileUtils
   
     def setup
-      @server = DamageControlServer.new(:RootDir => new_temp_dir(self.class.name))
+      @server = DamageControlServer.new(
+        :RootDir => buildRoot,
+        :SocketTriggerPort => 14711,
+        :HttpPort => 14712,
+      )
       @server.start
     end
 
