@@ -8,71 +8,98 @@ module DamageControl
 			@user = username
 		end
     
-		def oldexecute
-			#puts current_build.build_command_line = "ssh #{@user}@#{@host} \"#{current_build.build_command_line}\""
-
-			current_build.status = Build::BUILDING
+    def execute
+      current_build.status = Build::BUILDING
       @channel.put(BuildStateChangedEvent.new(current_build))
 
       # set up some environment variables the build can use
-      # TODO: do this in the remote shell
-      # environment = { "DAMAGECONTROL_BUILD_LABEL" => current_build.potential_label.to_s }
-			
-			
-			
+      environment = { 
+        "DAMAGECONTROL_BUILD_LABEL" => current_build.label.to_s, # DC style
+        "PKG_BUILD" => current_build.label.to_s # Seems to be Rake (and other build systems?) common convention..
+      }
       unless current_build.changesets.nil?
-        environment["DAMAGECONTROL_CHANGES"] = 
-          current_build.changesets.format(CHANGESET_TEXT_FORMAT, Time.new.utc)
+#        environment["DAMAGECONTROL_CHANGES"] = 
+#          current_build.changesets.format(CHANGESET_TEXT_FORMAT, Time.new.utc)
       end
-      report_progress(current_build.build_command_line)
-      begin
-        @build_process = Pebbles::Process.new
-        @build_process.working_dir = checkout_dir
-        @build_process.environment = environment
-				# -t -t forces an interactive terminal, even if it is really noninteractive
-				# this allows us to write commands to the standard input, but it also
-				# leaves us with some gimmicks, only interactive terminals can cope with
-				# like colors and ^H characters
-        @build_process.execute("ssh -t -t -l #{@user} #{@host}") do |stdin, stdout, stderr|
-          threads = []
-					threads << Thread.new {
-            # This thread fills the stdin. The first thing to do is to set the
-            # environment variables
-						sleep(20)
-            stdin << "export DAMAGECONTROL_BUILD_LABEL=#{current_build.label.to_s}"
-						# stdin << "#{current_build.build_command_line}\n"
-            
-            stdin << "echo $DAMAGECONTROL_BUILD_LABEL"
-            
-						stdin << "exit\n"
-					}
-          threads << Thread.new { stdout.each_line {|line| report_progress(line) } }
-          threads << Thread.new { stderr.each_line {|line| report_error(line) } }
-          threads.each{|t| t.join}
-        end
-        current_build.status = Build::SUCCESSFUL
-        @channel.put(BuildStateChangedEvent.new(current_build))
-      rescue Exception => e
-        logger.error("build failed: #{format_exception(e)}")
-        report_error(format_exception(e))
-        if was_killed?
-          current_build.status = Build::KILLED
-        else
-          current_build.status = Build::FAILED
-        end
-        @channel.put(BuildStateChangedEvent.new(current_build))
-      end
-
-      # set the label
-      if(current_build.successful?)
-        current_scm_label = current_scm.label(checkout_dir)
-        if(current_scm_label)
-          current_build.label = current_scm_label
-        else
-          current_build.label = current_build.potential_label
-        end
-      end
-    end
-		
+      stdout(current_build.build_command_line)
+      
+      # -t -t forces an interactive terminal, even if it is really noninteractive
+      # this allows us to write commands to the standard input, but it also
+      # leaves us with some gimmicks, only interactive terminals can cope with
+      # like colors and ^H characters
+      @build_process.execute("ssh -t -t -l #{@user} #{@host}") do |stdin, stdout, stderr|
+        threads = []
+        environment_thread = Thread.new {
+          # This thread fills the stdin. The first thing to do is to set the
+          # environment variables
+          sleep(20)
+          stdin << "echo \"DAMAGECONTROL::INIT ENVIRONMENT\""
+          stdin << "export DAMAGECONTROL_BUILD_LABEL=#{current_build.label.to_s}"
+          stdin << "export PKG_BUILD=#{current_build.label.to_s}"
+          # stdin << "#{current_build.build_command_line}\n"
+          stdin << "echo \"DAMAGECONTROL::INIT ENVIRONMENT OK\""
+        }
+        
+        checkout_thread = Thread.new {
+          Thread.stop
+          current_build.status = Build::CHECKING_OUT
+          @channel.put(BuildStateChangedEvent.new(current_build))
+          stdin << "echo \"DAMAGECONTROL::CHECKOUT\""
+          stdin << "svn co http://localhost/svn" #FIXME: use the correct checkout command
+          stdin << "echo \"DAMAGECONTROL::CHECKOUT STATUS\" $?"
+        }
+        
+        build_thread = Thread.new {
+          Thread.stop
+          current_build.status = Build::BUILDING
+          @channel.put(BuildStateChangedEvent.new(current_build))
+          stdin << "echo \"DAMAGECONTROL::BUILD\""
+          stdin << "fortune" #FIXME: use the correct build command
+          stdin << "echo \"DAMAGECONTROL::BUILD STATUS\" $?"
+        }
+        
+        exit_thread = Thread.new {
+          Thread.stop
+          stdin << "exit"
+        }
+        
+        threads << environment_thread
+        
+        threads << Thread.new { 
+          stdout.each_line { |line|
+            if (!line.match(/^DAMAGECONTROL::.*$/)) {
+              report_progress(line)
+            } else {
+              # handle command messages
+              if (line.match(/^DAMAGECONTROL::CHECKOUT STATUS 0$/)) {
+                # checkout was successful, start the build process
+                build_thread.wakeup
+              } elsif (line.match(/^DAMAGECONTROL::INIT ENVIRONMENT OK$/)) {
+                # start the checkout process
+                checkout_thread.wakeup
+              } elsif (line.match(/^DAMAGECONTROL::BUILD STATUS 0$/)) {
+                # build successful, set status and disconnect
+                current_build.status = Build::SUCCESSFUL
+                @channel.put(BuildStateChangedEvent.new(current_build))
+                exit_thread.wakeup
+              } elsif (line.match(/^DAMAGECONTROL::CHECKOUT STATUS .*$/)) {
+                # checkout failed, set status and disconnect
+                current_build.status = Build::FAILED
+                @channel.put(BuildStateChangedEvent.new(current_build))
+                exit_thread.wakeup
+              } elsif (line.match(/^DAMAGECONTROL::BUILD STATUS .*$/)) {
+                # build failed, set status and disconnect
+                current_build.status = Build::FAILED
+                @channel.put(BuildStateChangedEvent.new(current_build))
+                exit_thread.wakeup
+              }
+              #
+            }
+          }
+        }
+        
+        threads << Thread.new { stderr.each_line {|line| report_error(line) } }
+        threads.each{|t| t.join}
+      end		
 	end
 end
