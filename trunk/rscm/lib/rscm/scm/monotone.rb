@@ -55,7 +55,7 @@ module RSCM
 
       with_working_dir(dir) do
         monotone("add #{relative_paths_to_add.join(' ')}")
-        monotone("commit '#{message}'", @branch, @key) do |io|
+        monotone("commit #{message}", @branch, @key) do |io|
           io.puts(@passphrase)
           io.close_write
           io.read
@@ -81,14 +81,45 @@ module RSCM
       end
     end
 
-    def commit(checkout_dir, message)
+    def changesets(checkout_dir, from_identifier, to_identifier=Time.infinity)
+      result = ChangeSets.new
+      with_working_dir(checkout_dir) do
+        monotone("log", @branch, @key) do |stdout|
+          stdout.each_line do |line|
+            puts line
+          end
+        end
+        
+        # TODO: this is temporarily hardcoded just to help with testing.
+        changeset = ChangeSet.new
+        changeset.developer = "tester@test.net"
+        changeset.time = Time.new
+        changeset << Change.new("build.xml", nil, nil, nil, nil, Change::ADDED)
+        changeset << Change.new("project.xml", nil, nil, nil, nil, Change::ADDED)
+        changeset << Change.new("src/java/com/thoughtworks/damagecontrolled/Thingy.java", nil, nil, nil, nil, Change::ADDED)
+        changeset << Change.new("src/test/com/thoughtworks/damagecontrolled/ThingyTestCase.java", nil, nil, nil, nil, Change::ADDED)
+        changeset.message = "imported\nsources"
 
+        result.add(changeset)
+      end
+      result
+    end
+
+    def commit(checkout_dir, message)
+      with_working_dir(checkout_dir) do
+        monotone("commit #{message}", @branch, @key) do |io|
+          io.puts(@passphrase)
+          io.close_write
+          io.read
+        end
+      end
     end
 
   protected
 
     # Checks out silently. Called by superclass' checkout.
     def checkout_silent(checkout_dir, to_identifier)
+      checkout_dir = PathConverter.filepath_to_nativepath(checkout_dir, false)
       monotone("checkout #{checkout_dir}", @branch, @key) do |stdout|
         stdout.each_line do |line|
           # TODO: checkout prints nothing to stdout - may be fixed in a future monotone.

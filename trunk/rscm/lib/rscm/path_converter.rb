@@ -21,10 +21,11 @@ def with_working_dir(dir)
   #
   prev = Dir.pwd
   begin
-    Log.info "Making directory: '#{File.expand_path(dir)}'"
+    dir = File.expand_path(dir)
+    Log.info "Making directory: '#{dir}'"
     FileUtils.mkdir_p(dir)
     Dir.chdir(dir)
-    Log.info "In directory: '#{File.expand_path(dir)}'"
+    Log.info "In directory: '#{dir}'"
     yield
   ensure
     Dir.chdir(prev)

@@ -1,0 +1,27 @@
+-----------------------------------------------------------------
+Revision: abbe1eb8f75bdf9b27d440340ec329816c13985c
+Author: tester@test.net
+Date: 2005-03-02T06:33:01
+
+Modified files:
+        build.xml
+        src/java/com/thoughtworks/damagecontrolled/Thingy.java
+
+ChangeLog:
+
+changed
+something
+-----------------------------------------------------------------
+Revision: a2c58e276439de7d9da549870e245776c592c7e8
+Author: tester@test.net
+Date: 2005-03-02T06:32:43
+
+Added files:
+        build.xml project.xml
+        src/java/com/thoughtworks/damagecontrolled/Thingy.java
+        src/test/com/thoughtworks/damagecontrolled/ThingyTestCase.java
+
+ChangeLog:
+
+imported
+sources

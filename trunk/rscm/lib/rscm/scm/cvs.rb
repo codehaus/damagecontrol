@@ -96,9 +96,9 @@ module RSCM
       files.empty?
     end
 
-    def changesets(checkout_dir, from_identifier, to_identifier=Time.infinity, files=nil)
+    def changesets(checkout_dir, from_identifier, to_identifier=Time.infinity)
       checkout(checkout_dir) unless uptodate?(checkout_dir, nil) # must checkout to get changesets
-      parse_log(checkout_dir, changes_command(from_identifier, to_identifier, files))
+      parse_log(checkout_dir, changes_command(from_identifier, to_identifier))
     end
     
     def diff(checkout_dir, change)
@@ -242,7 +242,7 @@ module RSCM
       changesets
     end
 
-    def changes_command(from_identifier, to_identifier, files)
+    def changes_command(from_identifier, to_identifier)
       # https://www.cvshome.org/docs/manual/cvs-1.11.17/cvs_16.html#SEC144
       # -N => Suppress the header if no revisions are selected.
       "log #{branch_option} -N #{period_option(from_identifier, to_identifier)}"
