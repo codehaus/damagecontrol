@@ -6,8 +6,6 @@ module DamageControl
 
   class EmailPublisher < AsyncComponent
   
-    attr_writer :filesystem
-
     def initialize(channel, template, from, server="localhost", port=25)
       super(channel)
       @template = template
