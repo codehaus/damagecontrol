@@ -13,7 +13,7 @@ require 'damagecontrol/template/HTMLTemplate'
 require 'damagecontrol/publisher/IRCPublisher' 
 require 'damagecontrol/publisher/FilePublisher' 
 require 'damagecontrol/publisher/EmailPublisher' 
-
+ 
 include DamageControl 
 
 buildRoot = File.expand_path("/var/build") 
