@@ -23,7 +23,7 @@
     changeset.each do |change|
     %>
       <tr>
-        <td width="5%"><%= "ICON" %></td>
+        <td width="5%"><%= tag("img", :src => change.icon) %></td>
         <td width="5%"><%= change.revision %></td>
         <td width="90%">
           <%= change.path %>

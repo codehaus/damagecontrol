@@ -246,6 +246,13 @@ module RSCM
     ADDED = "ADDED"
     MOVED = "MOVED"
     
+    ICONS = {
+      MODIFIED => "/images/16x16/document_edit.png",
+      DELETED => "/images/16x16/document_delete.png",
+      ADDED => "/images/16x16/document_add.png",
+      MOVED => "/images/16x16/document_exchange.png",
+    }
+    
     attr_accessor :status
     attr_accessor :path
     attr_accessor :previous_revision
@@ -301,6 +308,10 @@ module RSCM
       self.message == other.message &&
       self.revision == other.revision &&
       self.time == other.time
+    end
+    
+    def icon
+      ICONS[@status] || "/images/16x16/document_warning.png"
     end
 
   end
