@@ -19,12 +19,24 @@ module DamageControl
       @hub = hub
       @project_directories = project_directories
       @project_config_repository = project_config_repository
+      
+      @active = []
+    end
+    
+    def put(event)
+      unless(@active.index(event.project_name))
+        @active << event.project_name
+        super(event)
+      else
+        logger.info("#{event.project_name} is already in the checkout queue. Not scheduling checkout.")
+      end
     end
 
     def on_message(event)
       if event.is_a?(DoCheckoutEvent)
         checked_out_event = CheckedOutEvent.new(event.project_name, checkout(event.project_name), event.force_build)
         @hub.publish_message(checked_out_event)
+        @active.delete(event.project_name)
       end
     end
 
@@ -55,6 +67,7 @@ module DamageControl
       changesets_or_last_commit_time = scm.checkout(checkout_dir, scm_from_time, nil) do |line|
         # TODO: it would be nice to get each update as a block arg, and then send ProjectCheckoutMessage to the hub.
         # (It would not be associated with a build, but a project)
+        logger.info(line)
       end
       if(scm_from_time.nil? && !changesets_or_last_commit_time.is_a?(Time))
         last_commit_time = scm.most_recent_timestamp(changesets_or_last_commit_time)

@@ -318,12 +318,21 @@ end
     self_upgrade
   end
   
-  def manual_release
+  def upload_release_from_local
     clean
 #    test
 #    dist_nodeps
 #    archive_nodeps
     installer_from_local_build
+    upload_nodeps
+  end
+  
+  def upload_release_from_codehaus
+    clean
+#    test
+#    dist_nodeps
+#    archive_nodeps
+    installer_from_codehaus_build
     upload_nodeps
   end
   

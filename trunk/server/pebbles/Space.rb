@@ -43,7 +43,8 @@ module Pebbles
           begin
             on_message(o)
           rescue => e
-            puts e
+            puts e.message
+            puts e.backtrace.join("\n")
           end
         end
       end
