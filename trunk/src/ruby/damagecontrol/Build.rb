@@ -1,4 +1,3 @@
-
 require 'damagecontrol/scm/DefaultSCMRegistry'
 require 'damagecontrol/BuildEvents'
 require 'xmlrpc/utils'
