@@ -73,6 +73,7 @@ function showScm(scm) {
     See <a href="http://damagecontrol.codehaus.org/Build+dependencies">Build dependencies</a>
   </td>
 </tr>
+
 <tr>
   <td class="setting-name">Log-files to merge</td>
   <td><input class="setting-input" name="logs_to_merge" id="logs_to_archive" type="text" value="<%= logs_to_merge %>"/></td>
@@ -83,6 +84,18 @@ function showScm(scm) {
     Merged into one log file, reports work on the content of this log-file. Can contain wildcards anywhere.
     For example: To see JUnit tests from Maven specify <tt>target/test-reports/*.xml</tt>, for multiple Maven modules <tt>*/target/test-reports/*.xml</tt>.
     See <a href="http://damagecontrol.codehaus.org/Viewing+build+results+from+build+tools">Viewing build results from build tools</a>
+  </td>
+</tr>
+
+<tr>
+  <td class="setting-name">Files to archive</td>
+  <td><input class="setting-input" name="artifacts_to_archive" id="artifacts_to_archive" type="text" value="<%= artifacts_to_archive %>"/></td>
+</tr>
+<tr>
+  <td>&nbsp;</td>
+  <td class="setting-description">
+    Specify comma-separated list of paths to files that DamageControl will archive after a build.
+    Archived files are accessible from the build page. May contain wildcards.
   </td>
 </tr>
 <tr>

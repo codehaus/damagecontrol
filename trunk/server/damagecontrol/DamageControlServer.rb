@@ -13,6 +13,7 @@ require 'damagecontrol/core/SCMPoller'
 require 'damagecontrol/core/HostVerifyingHandler'
 require 'damagecontrol/core/LogWriter'
 require 'damagecontrol/core/LogMerger'
+require 'damagecontrol/core/ArtifactArchiver'
 require 'damagecontrol/core/BuildHistoryRepository'
 require 'damagecontrol/core/ProjectConfigRepository'
 require 'damagecontrol/core/BuildNumberIncreaser'
@@ -34,6 +35,7 @@ require 'damagecontrol/scm/SVNWebConfigurator'
 require 'damagecontrol/scm/NoSCMWebConfigurator'
 
 require 'damagecontrol/web/ConsoleOutputReport'
+require 'damagecontrol/web/BuildArtifactsReport'
 require 'damagecontrol/web/ChangesReport'
 require 'damagecontrol/web/cruisecontrol/TestsReport'
 
@@ -250,7 +252,8 @@ module DamageControl
       [
         DamageControl::ChangesReport,
         DamageControl::ConsoleOutputReport,
-        DamageControl::TestsReport
+        DamageControl::TestsReport,
+        DamageControl::BuildArtifactsReport
       ]
     end
 
@@ -269,6 +272,7 @@ module DamageControl
     def init_build_scheduler
       component(:log_writer, LogWriter.new(hub))
       component(:log_merger, LogMerger.new(hub))
+      component(:artifact_archiver, ArtifactArchiver.new(hub))
       component(:build_number_increaser, BuildNumberIncreaser.new(hub, project_config_repository))
       component(:dependent_build_trigger, DependentBuildTrigger.new(hub, project_config_repository))
       component(:build_scheduler, BuildScheduler.new(hub))

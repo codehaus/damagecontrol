@@ -38,21 +38,11 @@ module DamageControl
     end
     
     def clone_project
-      project_config = self.project_config
-      action = "store_configuration"
-      next_build_number = 1
-      dependent_projects = from_array(project_config['dependent_projects'])
-      logs_to_merge = from_array(project_config['logs_to_merge'])
-      project_name = ""
-      render("configure.erb", binding)
+      configure_page("", project_config, 1)
     end
     
     def configure
-      action = "store_configuration"
-      next_build_number = project_config_repository.peek_next_build_number(project_name)
-      dependent_projects = from_array(project_config['dependent_projects'])
-      logs_to_merge = from_array(project_config['logs_to_merge'])
-      render("configure.erb", binding)
+      configure_page(project_name, project_config, project_config_repository.peek_next_build_number(project_name))
     end
         
     def store_configuration
@@ -71,6 +61,7 @@ module DamageControl
       end
       project_config['dependent_projects'] = to_array(request.query['dependent_projects'])
       project_config['logs_to_merge'] = to_array(request.query['logs_to_merge'])
+      project_config['artifacts_to_archive'] = to_array(request.query['artifacts_to_archive'])
       scm_configurators(project_config).each do |scm_configurator|
         scm_configurator.store_configuration_from_request(request)
       end
@@ -88,6 +79,14 @@ module DamageControl
     end
 
   private
+  
+    def configure_page(project_name, project_config, next_build_number)
+      action = "store_configuration"
+      dependent_projects = from_array(project_config['dependent_projects'])
+      logs_to_merge = from_array(project_config['logs_to_merge'])
+      artifacts_to_archive = from_array(project_config['artifacts_to_archive'])
+      render("configure.erb", binding)
+    end
   
     KEYS = [
       "build_command_line", 
