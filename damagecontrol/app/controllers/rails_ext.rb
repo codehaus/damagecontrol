@@ -30,6 +30,13 @@ class ActionController::Base
     array = instantiate_array_from_hashes(@params[name])
     selected = @params["#{name}_selected"]
     selected_object = array.find { |o| o.class.name == selected }
+    unless selected_object
+      Log.error "No selected object among '#{name}'"
+      Log.error "params: #{@params[name].inspect}"
+      Log.error "array: #{array.inspect}"
+      Log.error "selected: #{selected}"
+      raise "No selected object found. See log for details."
+    end
     def selected_object.selected?
       true
     end
@@ -200,6 +207,9 @@ module ActionView
             r << "  </tr>\n"
           end
         end
+        # workaround for RoR bug. 'hash' form params must have at least one value.
+        r << "<tr><td></td><td><input type='hidden' name ='#{collection_name}[#{o.class.name}][__dummy]'></td></tr>" if o.instance_variables.empty?
+
         r << "</table>"
         r
       end

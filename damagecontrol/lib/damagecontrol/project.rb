@@ -80,8 +80,8 @@ module DamageControl
       @name = name
       @publishers = Publisher::Base.classes.collect{|cls| cls.new}
       @scm = nil
-      @tracker = Tracker::Null.new
-      @scm_web = SCMWeb::Null.new
+      @tracker = Tracker::None.new
+      # @scm_web = SCMWeb::None.new
       # Default start time is 2 weeks ago
       @start_time = Time.now.utc - (3600*24*14)
       @quiet_period = DEFAULT_QUIET_PERIOD
