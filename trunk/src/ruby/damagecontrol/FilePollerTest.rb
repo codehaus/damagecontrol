@@ -1,6 +1,6 @@
 require 'test/unit'
-require 'ftools'
 require 'mockit'
+require 'ftools'
 require 'damagecontrol/FilePoller'
 require 'damagecontrol/FileUtils'
 
