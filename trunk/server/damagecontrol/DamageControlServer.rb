@@ -28,9 +28,14 @@ require 'damagecontrol/xmlrpc/Trigger'
 require 'damagecontrol/xmlrpc/StatusPublisher'
 require 'damagecontrol/xmlrpc/ConnectionTester'
 require 'damagecontrol/xmlrpc/ServerControl'
+
 require 'damagecontrol/scm/CVSWebConfigurator'
 require 'damagecontrol/scm/SVNWebConfigurator'
 require 'damagecontrol/scm/NoSCMWebConfigurator'
+
+require 'damagecontrol/web/ConsoleOutputReport'
+require 'damagecontrol/web/ChangesReport'
+require 'damagecontrol/web/cruisecontrol/TestResultReport'
 
 # patch webrick so that it displays files it doesn't recognize as text
 module WEBrick
@@ -191,7 +196,7 @@ module DamageControl
       httpd.mount("/public/xmlrpc", public_xmlrpc_servlet)
       
       httpd.mount("/public/dashboard", DashboardServlet.new(:public, build_history_repository, project_config_repository, build_scheduler))
-      httpd.mount("/public/project", ProjectServlet.new(:public, build_history_repository, project_config_repository, nil, build_scheduler))
+      httpd.mount("/public/project", ProjectServlet.new(:public, build_history_repository, project_config_repository, nil, build_scheduler, report_classes))
       httpd.mount("/private/search", SearchServlet.new(build_history_repository))
       httpd.mount("/public/log", LogFileServlet.new(project_directories))
       httpd.mount("/public/root", indexing_file_handler)
@@ -226,7 +231,7 @@ module DamageControl
       httpd.mount("/private/xmlrpc", private_xmlrpc_servlet)
 
       httpd.mount("/private/dashboard", DashboardServlet.new(:private, build_history_repository, project_config_repository, build_scheduler))
-      httpd.mount("/private/project", ProjectServlet.new(:private, build_history_repository, project_config_repository, trigger, build_scheduler))
+      httpd.mount("/private/project", ProjectServlet.new(:private, build_history_repository, project_config_repository, trigger, build_scheduler, report_classes))
       httpd.mount("/private/install_trigger", InstallTriggerServlet.new(project_config_repository, trig_xmlrpc_url))
       httpd.mount("/private/configure", ConfigureProjectServlet.new(project_config_repository, scm_configurator_classes))
       httpd.mount("/private/search", SearchServlet.new(build_history_repository))
@@ -242,6 +247,14 @@ module DamageControl
       httpd.mount("/private/css", WEBrick::HTTPServlet::FileHandler, "#{webdir}/css")
     end
     
+    def report_classes
+      [
+        DamageControl::ChangesReport,
+        DamageControl::ConsoleOutputReport,
+        DamageControl::TestResultReport
+      ]
+    end
+
     def scm_configurator_classes
       [
         DamageControl::NoSCMWebConfigurator,

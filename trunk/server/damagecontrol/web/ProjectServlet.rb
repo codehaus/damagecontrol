@@ -2,17 +2,14 @@ require 'damagecontrol/web/AbstractAdminServlet'
 require 'damagecontrol/scm/SCMFactory'
 require 'damagecontrol/util/FileUtils'
 
-require 'damagecontrol/web/ConsoleOutputReport'
-require 'damagecontrol/web/ChangesReport'
-require 'damagecontrol/web/cruisecontrol/TestResultReport'
-
 module DamageControl
   class ProjectServlet < AbstractAdminServlet
     include FileUtils
   
-    def initialize(type, build_history_repository, project_config_repository, trigger, build_scheduler)
+    def initialize(type, build_history_repository, project_config_repository, trigger, build_scheduler, report_classes)
       super(type, build_scheduler, build_history_repository, project_config_repository)
       @trigger = trigger
+      @report_classes = report_classes
     end
     
     def default_action
@@ -46,13 +43,11 @@ module DamageControl
     end
     
   protected
-
+  
+    attr_reader :report_classes
+  
     def reports
-      [
-        ChangesReport,
-        ConsoleOutputReport,
-        TestResultReport
-      ].collect {|report_class| report_class.new(selected_build, project_config_repository) }
+      report_classes.collect {|c| c.new(selected_build, project_config_repository) }
     end
     
     def selected_report
