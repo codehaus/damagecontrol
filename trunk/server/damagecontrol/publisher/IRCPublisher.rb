@@ -71,7 +71,8 @@ module DamageControl
       end
       
       if message.is_a?(BuildStartedEvent)
-        @irc.send_message_to_channel("#{prefix(message)} BUILD STARTED")
+        url = if build.url then ": #{build.url}" else "" end
+        @irc.send_message_to_channel("#{prefix(message)} BUILD STARTED#{url}")
         message.build.changesets.each do |changeset|
           @irc.send_message_to_channel("#{prefix(message)} (by #{changeset.developer} #{changeset.time_difference} ago) : #{changeset.message}")
           changeset.each do |change|
