@@ -93,15 +93,17 @@ module DamageControl
     end
     
     def file_icon(change)
-      FILE_ICONS[change.status]
+      icon = FILE_ICONS[change.status]
+      icon = "fileicons/document_warning.png" unless icon
+      icon
     end
     
   private
     FILE_ICONS = {
-      MODIFIED => "fileicons/document_edit.png",
-      DELETED  => "fileicons/document_delete.png",
-      ADDED    => "fileicons/document_new.png",
-      MOVED    => "fileicons/document_exchange.png"
+      Change::MODIFIED => "fileicons/document_edit.png",
+      Change::DELETED  => "fileicons/document_delete.png",
+      Change::ADDED    => "fileicons/document_new.png",
+      Change::MOVED    => "fileicons/document_exchange.png"
     }
     
     def build_url(build)
