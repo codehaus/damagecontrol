@@ -104,8 +104,8 @@ class ProjectController < ApplicationController
   
   def changesets
     load
-    last_changeset_id = @params["changeset"]
-    @changesets = @project.changesets(last_changeset_id.to_id, 1)    
+    last_changeset_identifier = @params["changeset"]
+    @changesets = @project.changesets(last_changeset_identifier.to_identifier, 1)    
     @changesets.accept(HtmlDiffVisitor.new(@project))
   end
 
@@ -263,8 +263,8 @@ private
     @trackers = TRACKERS.collect {|o| o.new}
     @trackers.each_index {|i| @trackers[i] = @project.tracker if @trackers[i].class == @project.tracker.class}
 
-    @linkable_changesets = @project.changesets(@project.latest_changeset_id, 10)
-    @select_changeset_ids = @project.changeset_ids[0..-(@linkable_changesets.length+1)]
+    @linkable_changesets = @project.changesets(@project.latest_changeset_identifier, 10)
+    @select_changeset_identifiers = @project.changeset_identifiers[0..-(@linkable_changesets.length+1)]
 
     set_sidebar_links
   end

@@ -5,7 +5,7 @@ require 'rscm/abstract_scm'
 module DamageControl
   module Visitor
     # Visitor that saves each ChangeSet in a folder with the name
-    # of each ChangeSet's +id+.
+    # of each ChangeSet's +identifier+.
     #
     # Is also able to load changesets.
     #
@@ -19,7 +19,7 @@ module DamageControl
       end
 
       def visit_changeset(changeset)
-        changeset_file = "#{@changesets_dir}/#{changeset.id.to_s}/changeset.yaml"
+        changeset_file = "#{@changesets_dir}/#{changeset.identifier.to_s}/changeset.yaml"
         dir = File.dirname(changeset_file)
         FileUtils.mkdir_p(dir)
         File.open(changeset_file, "w") do |io|
@@ -32,20 +32,20 @@ module DamageControl
 
     #### Non-visitor methods (for loading)
 
-      # Loads +prior+ number of changesets upto +last_changeset_id+.
-      # +last_changeset_id+ should be the dirname of the folder containing 
+      # Loads +prior+ number of changesets upto +last_changeset_identifier+.
+      # +last_changeset_identifier+ should be the dirname of the folder containing 
       # the last changeset.
       #
-      def load_upto(last_changeset_id, prior)
-        last = ids.index(last_changeset_id)
+      def load_upto(last_changeset_identifier, prior)
+        last = identifiers.index(last_changeset_identifier)
 
         changesets = RSCM::ChangeSets.new
         if(last)
           first = last - prior + 1
           first = 0 if first < 0
 
-          ids[first..last].each do |id|
-            changesets.add(YAML::load_file("#{@changesets_dir}/#{id.to_s}/changeset.yaml"))
+          identifiers[first..last].each do |identifier|
+            changesets.add(YAML::load_file("#{@changesets_dir}/#{identifier.to_s}/changeset.yaml"))
           end
         end
         changesets
@@ -53,18 +53,18 @@ module DamageControl
 
       # Returns a sorted array of Time or int representing the changeset directories.
       #
-      def ids
+      def identifiers
         # This is pretty quick - even with a lot of directories.
         # TODO: the method is called 5 times for a page refresh!
         dirs = Dir["#{@changesets_dir}/*"].find_all {|f| File.directory?(f) && File.exist?("#{f}/changeset.yaml")}
         # Turn them into ints so they can be sorted.
-        dirs.collect { |dir| File.basename(dir).to_id }.sort
+        dirs.collect { |dir| File.basename(dir).to_identifier }.sort
       end
 
-      # Returns the id of the latest changeset.
+      # Returns the identifier of the latest changeset.
       #
-      def latest_id
-        ids[-1]
+      def latest_identifier
+        identifiers[-1]
       end
     end
   end

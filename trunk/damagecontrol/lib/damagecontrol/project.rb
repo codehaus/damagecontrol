@@ -1,11 +1,12 @@
 require 'fileutils'
 require 'yaml'
 require 'rscm'
-require 'damagecontrol/tracker'
-require 'damagecontrol/scm_web'
+require 'damagecontrol/build'
 require 'damagecontrol/directories'
 require 'damagecontrol/diff_parser'
 require 'damagecontrol/diff_htmlizer'
+require 'damagecontrol/scm_web'
+require 'damagecontrol/tracker'
 require 'damagecontrol/visitor/yaml_persister'
 require 'damagecontrol/visitor/diff_persister'
 require 'damagecontrol/visitor/rss_writer'
@@ -67,11 +68,11 @@ module DamageControl
     
     # Checks out files to project's checkout directory.
     # Writes the checked out files to +checkout_list_file+.
-    # The +changeset_id+ parameter is a String or a Time
+    # The +changeset_identifier+ parameter is a String or a Time
     # representing a changeset.
-    def checkout(changeset_id)
+    def checkout(changeset_identifier)
       File.open(checkout_list_file, "w") do |f|
-        scm.checkout(checkout_dir, changeset_id) do |file_name|
+        scm.checkout(checkout_dir, changeset_identifier) do |file_name|
           f << file_name << "\n"
           f.flush
         end
@@ -107,14 +108,14 @@ module DamageControl
       yield changesets
     end
 
-    # Returns the id (int label or time) that should be used to get the next (unrecorded)
-    # changeset. This is the id *following* the latest recorded changeset. 
-    # This id is determined by looking at the directory names under 
+    # Returns the identifier (int label or time) that should be used to get the next (unrecorded)
+    # changeset. This is the identifier *following* the latest recorded changeset. 
+    # This identifier is determined by looking at the directory names under 
     # +changesets_dir+. If there are none, this method returns nil.
     def next_changeset_identifier(d=changesets_dir)
       # See String extension at top of this file.
-      latest_id = DamageControl::Visitor::YamlPersister.new(d).latest_id
-      latest_id ? latest_id + 1 : nil
+      latest_identifier = DamageControl::Visitor::YamlPersister.new(d).latest_identifier
+      latest_identifier ? latest_identifier + 1 : nil
     end
     
     # Where RSS is written.
@@ -150,20 +151,16 @@ module DamageControl
       Directories.changesets_dir(name)
     end
     
-    def changeset_html_file(changeset_id)
-      Directories.changeset_html_file(name, changeset_id)
-    end
-    
-    def changesets(changeset_id, prior)
-      changesets_persister.load_upto(changeset_id, prior)
+    def changesets(changeset_identifier, prior)
+      changesets_persister.load_upto(changeset_identifier, prior)
     end
 
-    def changeset_ids
-      changesets_persister.ids
+    def changeset_identifiers
+      changesets_persister.identifiers
     end
     
-    def latest_changeset_id
-      changesets_persister.latest_id
+    def latest_changeset_identifier
+      changesets_persister.latest_identifier
     end
     
     def delete
@@ -177,6 +174,23 @@ module DamageControl
 
     def changesets_persister
       DamageControl::Visitor::YamlPersister.new(changesets_dir)
+    end
+    
+    # Creates, persists and executes a build for the changeset with the given 
+    # +changeset_identifier+.
+    # Should be called with a block of arity 1 that will receive the build.
+    def build(changeset_identifier)
+      scm.checkout(checkout_dir, changeset_identifier)
+      build = Build.new(name, changeset_identifier, Time.now.utc)
+      yield build
+    end
+
+    # Returns an array of existing builds for the given +changeset+.
+    def builds(changeset_identifier)
+      Directories.build_dirs(name, changeset_identifier).collect do |dir|
+        # The dir's basename will always be a Time
+        Build.new(name, changeset_identifier, File.basename(dir).to_identifier)
+      end
     end
 
   private

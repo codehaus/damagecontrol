@@ -194,8 +194,8 @@ module RSCM
       result
     end
     
-    # Returns the id of the changeset. This is the revision (if defined) or an UTC time if revision is undefined.
-    def id
+    # Returns the identifier of the changeset. This is the revision (if defined) or an UTC time if revision is undefined.
+    def identifier
       @revision || @time
     end
     

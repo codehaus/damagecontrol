@@ -71,7 +71,7 @@ module RSCM
   protected
 
     # Checks out silently. Called by superclass' checkout.
-    def checkout_silent(checkout_dir)
+    def checkout_silent(checkout_dir, to_identifier)
       monotone("checkout #{checkout_dir}", @branch, @key) do |stdout|
         stdout.each_line do |line|
           # TODO: checkout prints nothing to stdout - may be fixed in a future monotone.
@@ -93,7 +93,6 @@ module RSCM
       branch_opt = branch ? "--branch=\"#{branch}\"" : ""
       key_opt = key ? "--key=\"#{key}\"" : ""
       cmd = "monotone --db=\"#{@db_file}\" #{branch_opt} #{key_opt} #{monotone_cmd}"
-puts "MONOTONE COMMAND: #{cmd}"
       safer_popen(cmd, "r+") do |io|
         if(block_given?)
           return(yield(io))

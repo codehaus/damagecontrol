@@ -77,7 +77,6 @@ module RSCM
 #      ctor_args = "hubba;bubba"
 
       command = "new #{clazz}(#{ctor_args}).#{m}"
-$stderr.puts command
       tf = Tempfile.new("rscm_starteam")
       tf.puts(command)
       tf.close 
@@ -87,7 +86,6 @@ $stderr.puts command
         if(block_given?)
           yaml_source = ""
           io.each_line do |line|
-$stderr.puts line
             yield line
             yaml_source << line << "\n"
           end

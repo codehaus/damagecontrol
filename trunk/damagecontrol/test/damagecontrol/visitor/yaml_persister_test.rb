@@ -24,9 +24,9 @@ module DamageControl
 
         changesets.accept(yp)
 
-        latest_id = yp.latest_id
-        assert_equal(Time.utc(2004,7,5,12,0,14), latest_id)
-        all_reloaded = yp.load_upto(latest_id, 100)
+        latest_identifier = yp.latest_identifier
+        assert_equal(Time.utc(2004,7,5,12,0,14), latest_identifier)
+        all_reloaded = yp.load_upto(latest_identifier, 100)
         assert_equal(changesets, all_reloaded)
 
         some_reloaded = yp.load_upto(Time.utc(2004,7,5,12,0,14), 2)
