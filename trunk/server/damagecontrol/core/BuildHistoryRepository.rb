@@ -97,14 +97,13 @@ module DamageControl
       build_periods
     end
     
-    def search(criterion, required_project_name=nil)
-      criterion = Regexp.new(criterion, Regexp::IGNORECASE) unless criterion.is_a?(Regexp)
+    def search(regexp, required_project_name=nil)
       result = []
       project_names.each do |project_name|
         if(required_project_name == project_name || required_project_name.nil?)
           history = history(project_name)
           history.each do |build|
-            result << build if build.matches?(criterion)
+            result << build if build =~ regexp
           end
         end
       end

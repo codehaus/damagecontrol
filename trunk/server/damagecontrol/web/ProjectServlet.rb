@@ -154,11 +154,13 @@ module DamageControl
     end
   
     def search
-      criterion = request.query['search']
+      search_string = request.query['search']
+      regexp = Regexp.new(search_string, Regexp::IGNORECASE)
+      
       required_project_name = request.query['project_name']
       current_build = build_history_repository.current_build(project_name)
       current_status = build_status(current_build)
-      builds = build_history_repository.search(criterion, required_project_name)
+      builds = build_history_repository.search(regexp, required_project_name)
       find_method = "search"
       
       render("search_results.erb", binding)

@@ -7,6 +7,7 @@ require 'damagecontrol/scm/Changes'
 module DamageControl
 
   # Handles parsing of CVS roots, checkouts and installation of trigger scripts
+  # TODO: strip down all the CVSROOT parsing. It ain't used!!!! (AH)
   #
   # If pserver is used, the user is assumed to already be authenticated with cvs login
   # prior to starting damagecontrol. (TODO: fix that!) 

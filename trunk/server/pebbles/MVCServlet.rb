@@ -40,6 +40,7 @@ module Pebbles
       raise WEBrick::HTTPStatus::BadRequest, "parameter required `#{parameter}'."
     end
     
+    # TODO: use the standard CGI class for this (might be something is WebRick too)
     def html_quote(text)
       text.gsub(/</, "&lt;")
     end

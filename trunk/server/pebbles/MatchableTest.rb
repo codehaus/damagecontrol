@@ -38,40 +38,40 @@ end
 class MatchableTest < Test::Unit::TestCase
 
   def test_string_matches
-    assert("Hello World".matches?(/orld/))
+    assert("Hello World" =~ /orld/)
   end
 
   def test_custom_classes_match
-    assert(SomeMatchingClass.new.matches?(/orld/))
-    assert(!SomeNonMatchingClass.new.matches?(/orld/))
+    assert(SomeMatchingClass.new =~ /orld/)
+    assert(!(SomeNonMatchingClass.new =~ /orld/))
   end
 
   def test_arrays_match
-    assert(["Hello", "World"].matches?(/orld/))
-    assert(!["Bonjour", "Monde"].matches?(/orld/))
-    assert([SomeMatchingClass.new].matches?(/orld/))
+    assert(["Hello", "World"] =~ /orld/)
+    assert(!(["Bonjour", "Monde"] =~ /orld/))
+    assert([SomeMatchingClass.new] =~ /orld/)
   end
 
   def test_search_in_non_matchable_should_not_fail
-    assert(![SomeNonMatchableClass.new].matches?(/orld/))
+    assert(!([SomeNonMatchableClass.new] =~ /orld/))
   end
 
   def test_search_in_non_matchable_should_not_fail
-    assert(![SomeNonMatchableClass.new].matches?(/orld/))
+    assert(!([SomeNonMatchableClass.new] =~ /orld/))
   end
 
   def test_search_in_matchable_with_non_matchable_member_should_not_fail
-    assert(![SomeMatchableClassWithNonMatchableMember.new].matches?(/orld/))
+    assert(!([SomeMatchableClassWithNonMatchableMember.new] =~ /orld/))
   end
 
   def test_search_in_map_searches_in_values_only
-    assert({SomeNonMatchingClass.new => SomeMatchingClass.new}.matches?(/orld/))
-    assert(!{SomeMatchingClass.new => SomeNonMatchingClass.new}.matches?(/orld/))
+    assert({SomeNonMatchingClass.new => SomeMatchingClass.new} =~ /orld/)
+    assert(!({SomeMatchingClass.new => SomeNonMatchingClass.new} =~ /orld/))
   end
 
   def test_ignore_fields_can_be_specified
-    assert(!SomeMatchingClass.new.matches?(/find me/))
+    assert(!(SomeMatchingClass.new =~ /find me/))
   end
-
+  
 end
 

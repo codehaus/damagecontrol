@@ -200,9 +200,9 @@ module DamageControl
       @bhp.register(b)
       @bhp.register(c)
 
-      assert_equal([b,c], @bhp.search("funny"))
-      assert_equal([c], @bhp.search("Me/pAT"))
-      assert_equal([a,b,c], @bhp.search("test"))
+      assert_equal([b,c], @bhp.search(/funny/))
+      assert_equal([c], @bhp.search(/some\/path/))
+      assert_equal([a,b,c], @bhp.search(/test/))
     end
 
     def test_should_only_search_in_project_when_project_name_specified
@@ -218,7 +218,7 @@ module DamageControl
       @bhp.register(b)
       @bhp.register(c)
 
-      assert_equal([c], @bhp.search("funny", "onlythisone"))
+      assert_equal([c], @bhp.search(/funny/, "onlythisone"))
     end
     
     def test_should_retrieve_build_by_timestamp_string

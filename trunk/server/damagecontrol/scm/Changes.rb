@@ -5,6 +5,7 @@ require 'pebbles/Matchable'
 
 module DamageControl
 
+    # TODO: change this so it looks similar to SVN's log output, which is nice.
     CHANGESET_TEXT_FORMAT = <<EOF
 MAIN:<%= developer %>:<%= time.utc.strftime("%Y%m%d%H%M%S") %>
 <%= developer%>
