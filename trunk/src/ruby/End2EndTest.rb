@@ -102,7 +102,7 @@ class End2EndTest < Test::Unit::TestCase
   def assert_build_failed_and_changes_on_irc_channel
     assert_match(/e2eproject/, irc_listener.received_text)
     assert_match(/BUILD FAILED/, irc_listener.received_text)
-    assert_match(/jtirsen/, irc_listener.received_text)
+    assert_match(/#{username}/, irc_listener.received_text)
     irc_listener.send_message_to_channel("Test successful. Thank you for your cooperation.")
   end
   
@@ -223,28 +223,24 @@ class End2EndTest < Test::Unit::TestCase
     end
   end
   
+  def username
+    return ENV["USERNAME"] if windows?
+    ENV["USER"]
+  end
+  
   def script_file(file)
-    if windows?
-      "#{file}.bat"
-    else
-      "#{file}.sh"
-    end
+    return "#{file}.bat" if windows?
+    "#{file}.sh"
   end
 
   def nc_file
-    if windows?
-      "nc.exe"
-    else
-      "nc"
-    end
+    return "nc.exe" if windows?
+    "nc"
   end
   
   def nc_exe_location
-    if windows?
-      "#{damagecontrol_home}/bin/#{nc_file}"
-    else
-      nil
-    end
+    return "#{damagecontrol_home}/bin/#{nc_file}" if windows?
+    nil
   end
   
   def assert_file_content(expected_content, file, message)
