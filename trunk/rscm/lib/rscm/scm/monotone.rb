@@ -21,7 +21,7 @@ module RSCM
     ann :description => "Keys file"
     attr_accessor :keys_file
 
-    def initialize(db_file="MT.db", branch="", key="", passphrase="", keys_file="", server="")
+    def initialize(db_file="MT.db", branch="", key="", passphrase="", keys_file="", server=nil)
       @db_file = File.expand_path(db_file)
       @branch = branch
       @key = key
