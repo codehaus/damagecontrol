@@ -1,5 +1,4 @@
 require 'damagecontrol/web/AbstractAdminServlet'
-require 'damagecontrol/scm/SCMFactory'
 
 module DamageControl
   class InstallTriggerServlet < AbstractAdminServlet

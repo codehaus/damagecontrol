@@ -74,9 +74,7 @@ class Project
   end
   
   def execute_ruby(test, safe_level=0)
-    with_working_dir("#{$damagecontrol_home}/server") do
-      system("ruby -I. -T#{safe_level} #{test}")
-    end
+    system("ruby -Iserver -T#{safe_level} #{test}")
   end
 
   def fail(message = $?.to_s)
@@ -90,11 +88,11 @@ class Project
   end
 
   def unit_test
-    execute_ruby("damagecontrol/test/AllTests.rb")
+    execute_ruby("server/damagecontrol/test/AllTests.rb")
   end
 
   def integration_test
-    execute_ruby("damagecontrol/test/End2EndTest.rb")
+    execute_ruby("server/damagecontrol/test/End2EndTest.rb")
   end
   
   def test

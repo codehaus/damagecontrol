@@ -163,7 +163,7 @@ module DamageControl
       # https://www.cvshome.org/docs/manual/cvs-1.11.17/cvs_16.html#SEC144
       # -N => Suppress the header if no revisions are selected.
       # -S => Do not print the list of tags for this file.
-      "log -N -S -d\"#{cvsdate(from_time)}<#{cvsdate(to_time)}\""
+      "log -N -S -d\"#{cvsdate(from_time)}<=#{cvsdate(to_time)}\""
     end
     
     def update_command(time)

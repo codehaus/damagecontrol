@@ -14,7 +14,6 @@ module DamageControl
       @build_scheduler = build_scheduler
       @build_history_repository = build_history_repository
       @project_config_repository = project_config_repository
-      @scm_factory = SCMFactory.new
     end
     
   protected
@@ -33,7 +32,7 @@ module DamageControl
     end
     
     def create_scm
-      @scm_factory.get_scm(project_config, @project_config_repository.checkout_dir(project_name))
+      @project_config_repository.create_scm(project_name)
     end
     
     def template_dir
@@ -92,9 +91,8 @@ module DamageControl
       result
     end
     
-    def scm_url(project_name, change)
-      scm = SCMFactory.new.get_scm(project_config_repository.project_config(project_name), "/dev/null")
-      scm.web_url_to_change(change)
+    def scm_url(change)
+      create_scm.web_url_to_change(change)
     end
     
     def task(params)

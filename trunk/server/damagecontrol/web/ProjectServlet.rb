@@ -6,7 +6,6 @@ module DamageControl
     def initialize(type, build_history_repository, project_config_repository, trigger, build_scheduler)
       super(type, build_scheduler, build_history_repository, project_config_repository)
       @trigger = trigger
-      @scm_factory = SCMFactory.new
     end
     
     def default_action

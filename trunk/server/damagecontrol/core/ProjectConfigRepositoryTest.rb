@@ -11,7 +11,7 @@ module DamageControl
     
     def test_can_add_new_project
       @basedir = new_temp_dir("test_can_add_new_project")
-      @pcr = ProjectConfigRepository.new(ProjectDirectories.new(basedir), "http://localhost/public")
+      @pcr = ProjectConfigRepository.new(ProjectDirectories.new(basedir), SCMFactory.new, "http://localhost/public")
 
       @pcr.new_project("newproject")
       assert(File.exists?("#{basedir}/newproject"))
@@ -20,7 +20,7 @@ module DamageControl
     
     def test_fails_if_project_already_exists
       @basedir = new_temp_dir("test_fails_if_project_already_exists")
-      @pcr = ProjectConfigRepository.new(ProjectDirectories.new(basedir), "http://localhost/public")
+      @pcr = ProjectConfigRepository.new(ProjectDirectories.new(basedir), SCMFactory.new, "http://localhost/public")
 
       @pcr.new_project("newproject")
       assert_raises(ProjectAlreadyExistsError) do
@@ -30,7 +30,7 @@ module DamageControl
     
     def test_can_get_config_from_created_project
       @basedir = new_temp_dir("test_can_get_config_from_created_project")
-      @pcr = ProjectConfigRepository.new(ProjectDirectories.new(basedir), "http://localhost/public")
+      @pcr = ProjectConfigRepository.new(ProjectDirectories.new(basedir), SCMFactory.new, "http://localhost/public")
 
       @pcr.new_project("newproject")
       assert(@pcr.project_exists?("newproject"))
@@ -39,7 +39,7 @@ module DamageControl
     
     def test_can_modify_project_config
       @basedir = new_temp_dir("test_can_modify_project_config")
-      @pcr = ProjectConfigRepository.new(ProjectDirectories.new(basedir), "http://localhost/public")
+      @pcr = ProjectConfigRepository.new(ProjectDirectories.new(basedir), SCMFactory.new, "http://localhost/public")
 
       @pcr.new_project("newproject")
       @pcr.modify_project_config("newproject", { "scm_spec" => ":local:/cvsroot" })
@@ -49,7 +49,7 @@ module DamageControl
 
     def test_can_create_build_from_project_config
       @basedir = new_temp_dir("test_can_create_build_from_project_config")
-      @pcr = ProjectConfigRepository.new(ProjectDirectories.new(basedir), "http://localhost/public")
+      @pcr = ProjectConfigRepository.new(ProjectDirectories.new(basedir), SCMFactory.new, "http://localhost/public")
 
       timestamp = Build.format_timestamp(Time.utc(2004, 06, 15, 12, 00, 00))
       @pcr.new_project("newproject")

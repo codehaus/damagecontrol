@@ -20,9 +20,9 @@ module DamageControl
 
     def test_can_list_project_directories
       assert_equal([], @pd.project_names)
-      ProjectConfigRepository.new(@pd, "").new_project("project1")
+      ProjectConfigRepository.new(@pd, SCMFactory.new, "").new_project("project1")
       assert_equal(["project1"], @pd.project_names)
-      ProjectConfigRepository.new(@pd, "").new_project("project2")
+      ProjectConfigRepository.new(@pd, SCMFactory.new, "").new_project("project2")
       assert_equal(["project1", "project2"], ProjectDirectories.new(@basedir).project_names)
     end
     
@@ -32,7 +32,7 @@ module DamageControl
     end
 
     def test_can_list_logs
-      ProjectConfigRepository.new(@pd, "").new_project("project1")
+      ProjectConfigRepository.new(@pd, SCMFactory.new, "").new_project("project1")
       assert_equal([], @pd.log_timestamps("project1"))
       File.open(@pd.log_file("project1", "20040630155405"), "w+") {|io| io.puts("loggielog") }
       assert_equal(["20040630155405"], @pd.log_timestamps("project1"))
