@@ -1,25 +1,46 @@
-require 'damagecontrol/BuildRequestEvent'
-require 'damagecontrol/BuildProgressEvent'
-require 'damagecontrol/BuildCompleteEvent'
+require 'damagecontrol/BuildEvents'
 
 module DamageControl
 	
-	class BuildExecutor
+	class SCM
+		def handles_path?(path)
+			false
+		end
 		
-		def initialize(hub)
+		# checks out (or updates) scm_path to directory
+		def checkout(path, directory)
+			raise "can't check out #{scm_path}"
+		end
+	end
+	
+	class NilSCM < SCM
+		def handles_path?(path)
+			true
+		end
+		
+		def checkout(path, directory)
+		end
+	end
+	
+	class BuildExecutor
+		attr_accessor :scm
+				
+		def initialize(hub, scm=NilSCM.new)
 			@hub = hub
 			hub.add_subscriber(self)
+			@scm = scm
 		end
 		
 		def receive_message(message)
 			if message.is_a? BuildRequestEvent
 				puts "building #{message.build.project_name}"
 				@current_build = message.build
-				@current_build.build {|progress|
-					progress.each_line {|line|
-						report_progress(line)
-					}
-				}
+				scm.checkout(@current_build.scm_path, @current_build.basedir) do |progress|
+					report_progress(progress)
+				end
+				@current_build.successful = @current_build.build do |progress|
+					report_progress(progress)
+				end
 				report_complete
 			end
 		end

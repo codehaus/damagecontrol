@@ -1,8 +1,6 @@
 require 'damagecontrol/Hub'
 require 'damagecontrol/Build'
-require 'damagecontrol/BuildRequestEvent'
-require 'damagecontrol/BuildProgressEvent'
-require 'damagecontrol/BuildCompleteEvent'
+require 'damagecontrol/BuildEvents'
 require 'damagecontrol/Clock'
 
 module DamageControl

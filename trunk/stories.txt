@@ -1,8 +1,6 @@
 PLANNED
 
-Complete full circle using CVS and simple build.
-
-Start process (a build) on (any) incoming request on socket.
+Checkout/update of project.
 
 Turn archived build logs into nice little website.
 
@@ -57,5 +55,11 @@ Integrate with intra-project dependency managing builder to trigger downstream b
 
 FIXED
 
+Zero configuration, socket request can contain build specification (command-line etc.)
+
 Start process every (say) 10 minutes.
+
+Complete full circle using CVS and simple build.
+
+Start process (a build) on (any) incoming request on socket.
 

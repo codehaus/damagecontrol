@@ -1,5 +1,5 @@
 require 'damagecontrol/Build'
-require 'damagecontrol/BuildCompleteEvent'
+require 'damagecontrol/BuildEvents'
 
 module DamageControl
 

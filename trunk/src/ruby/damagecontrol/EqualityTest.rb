@@ -1,6 +1,5 @@
 require 'test/unit'
-require 'damagecontrol/BuildCompleteEvent'
-require 'damagecontrol/BuildProgressEvent'
+require 'damagecontrol/BuildEvents'
 require 'damagecontrol/Build'
 
 module DamageControl

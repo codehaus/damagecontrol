@@ -1,4 +1,4 @@
-require 'damagecontrol/BuildRequestEvent'
+require 'damagecontrol/BuildEvents'
 require 'damagecontrol/Hub'
 require 'damagecontrol/Build'
 

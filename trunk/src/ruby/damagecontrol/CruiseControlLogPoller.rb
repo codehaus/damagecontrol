@@ -1,6 +1,6 @@
 require 'damagecontrol/Hub'
 require 'damagecontrol/FilePoller'
-require 'damagecontrol/BuildCompleteEvent'
+require 'damagecontrol/BuildEvents'
 require 'damagecontrol/Build'
 require 'rexml/document'
 

@@ -10,6 +10,7 @@ module DamageControl
 		attr_accessor :label
 		attr_accessor :successful
 		attr_accessor :error_message
+		attr_accessor :scm_path
 	
 		def initialize (project_name)
 			@project_name = project_name
@@ -59,9 +60,11 @@ module DamageControl
 		
 		def build
 			Dir.chdir(basedir) unless basedir.nil?
-			IO.popen(build_command_line) {|output|
-				yield(output)
-			}
+			IO.popen(build_command_line) do |output|
+				output.each_line do |progress|
+					yield progress
+				end
+			end
 		end
 		
 		def ==(other)

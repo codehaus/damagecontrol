@@ -1,6 +1,6 @@
 require 'test/unit'
 
-require 'damagecontrol/BuildRequestEvent'
+require 'damagecontrol/BuildwEvents'
 require 'damagecontrol/SocketTrigger'
 require 'damagecontrol/Hub'
 require 'damagecontrol/Build'
