@@ -56,7 +56,7 @@ module DamageControl
         change = parse_change(entry)
         change.path = parse_path(entries[0])
 
-        change.status = Change::ADDED if change.revision =~ /1.1$/
+        change.status = Change::ADDED if change.revision =~ /1\.1$/
 
         changeset = changesets.add(change)
         # CVS doesn't have revision for changesets, use

@@ -32,7 +32,6 @@ module DamageControl
       return false if @build_scheduler.project_building?(project_name)
       return false unless project_config(project_name)["polling"]
       return false unless eval(project_config(project_name)["polling"])
-      p time.to_i % polling_interval(project_name)
       time.to_i % polling_interval(project_name) == 0
     end
     

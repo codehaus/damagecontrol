@@ -439,17 +439,13 @@ keyword substitution: kv
 total revisions: 4;     selected revisions: 4
 description:
 ----------------------------
-revision 1.4
+revision 1.101
 date: 2004/07/10 17:41:14;  author: rinkrank;  state: Exp;  lines: +2 -2
 typo
 ----------------------------
-revision 1.3
+revision 1.11
 date: 2004/07/10 17:38:22;  author: rinkrank;  state: Exp;  lines: +2 -2
 fixed http://jira.codehaus.org/browse/DC-123
-----------------------------
-revision 1.2
-date: 2004/07/04 02:39:48;  author: rinkrank;  state: Exp;  lines: +1 -1
-doherss
 ----------------------------
 revision 1.1
 date: 2004/07/02 08:42:51;  author: tirsen;  state: Exp;
@@ -461,11 +457,10 @@ EOF
       @parser = CVSLogParser.new(StringIO.new(LOG_WITH_NEW_AND_OLD_FILE))
       changesets = @parser.parse_changesets
 
-      new_file = changesets[0][0] 
-      assert_equal(Change::ADDED, new_file.status)
-
-      old_file = changesets[1][0] 
-      assert_equal(Change::MODIFIED, old_file.status)
+      assert_equal(Change::ADDED,    changesets[0][0].status)
+      assert_equal(Change::MODIFIED, changesets[1][0].status)
+      assert_equal(Change::MODIFIED, changesets[2][0].status)
+      assert_equal(Change::ADDED,    changesets[3][0].status)
     end
 
   end
