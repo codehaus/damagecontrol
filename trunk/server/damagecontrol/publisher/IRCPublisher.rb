@@ -12,7 +12,7 @@ module DamageControl
     include Logging
   
     attr_reader :channel
-    attr_reader :server
+    attr_reader :irc_server
     attr_accessor :irc
     attr_accessor :handle
     attr_accessor :send_message_on_build_request
