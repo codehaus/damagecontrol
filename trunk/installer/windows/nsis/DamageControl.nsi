@@ -14,6 +14,8 @@
   !define DISTDIR "${ROOTDIR}\target\dist"
   
   ; VERSION needs to be defined on the command line with /DVERSION=1.2.3 option
+  ; RUBY_HOME needs to point to a Cygwin Ruby distribution. Put the following .dlls in the bin directory: cygwin1.dll, cygcrypto-0.9.7.dll.
+  ; CVS_EXECUTABLE needs to point to a CVS executable.
   
   ;Name and file
   Name "DamageControl ${VERSION}"
@@ -84,6 +86,32 @@ Section "DamageControl Server" SecServer
   File "${DISTDIR}\release-notes.txt"
   File /r "${DISTDIR}\*"
 
+  ;Include CVS binaries
+  SetOutPath $INSTDIR\bin
+  File /r ${CVS_EXECUTABLE}
+  
+  ;Store installation folder
+  WriteRegStr HKCU "Software\Modern UI Test" "" $INSTDIR
+
+  ;Create uninstaller
+  WriteUninstaller "$INSTDIR\Uninstall.exe"
+
+  
+  !insertmacro MUI_STARTMENU_WRITE_BEGIN Application
+    
+    CreateDirectory "$SMPROGRAMS\$STARTMENU_FOLDER"
+    CreateShortCut "$SMPROGRAMS\$STARTMENU_FOLDER\Start Server.lnk" "$INSTDIR\bin\server.cmd"
+    CreateShortCut "$SMPROGRAMS\$STARTMENU_FOLDER\Stop Server.lnk" "$INSTDIR\bin\shutdownserver.cmd" "--url http://localhost:4712/private/xmlrpc"
+    CreateShortCut "$SMPROGRAMS\$STARTMENU_FOLDER\Modify settings.lnk" "$WINDIR\notepad.exe" "$INSTDIR\bin\server.rb"
+    CreateShortCut "$SMPROGRAMS\$STARTMENU_FOLDER\Dashboard.lnk" "http://localhost:4712/private/dashboard"
+    CreateShortCut "$SMPROGRAMS\$STARTMENU_FOLDER\DamageControl Website.lnk" "http://damagecontrol.codehaus.org"
+    CreateShortCut "$SMPROGRAMS\$STARTMENU_FOLDER\Uninstall.lnk" "$INSTDIR\Uninstall.exe"
+  
+  !insertmacro MUI_STARTMENU_WRITE_END
+
+SectionEnd
+
+Section "Ruby" SecRuby
   ;Include a minimal ruby installation (to reduce the size of the installer)
 
   SetOutPath $INSTDIR\ruby\bin
@@ -114,41 +142,18 @@ Section "DamageControl Server" SecServer
   SetOutPath $INSTDIR\ruby\lib\ruby\1.8\webrick\httpservlet
   File /r ${RUBY_HOME}\lib\ruby\1.8\webrick\httpservlet\*.rb
     
-  ;Include CVS binaries
-  SetOutPath $INSTDIR\bin
-  File /r ${CVS_EXECUTABLE}
-  
-  ;Store installation folder
-  WriteRegStr HKCU "Software\Modern UI Test" "" $INSTDIR
-
-  ;Create uninstaller
-  WriteUninstaller "$INSTDIR\Uninstall.exe"
-
-  
-  !insertmacro MUI_STARTMENU_WRITE_BEGIN Application
-    
-    ;Create shortcuts
-    CreateDirectory "$SMPROGRAMS\$STARTMENU_FOLDER"
-    CreateShortCut "$SMPROGRAMS\$STARTMENU_FOLDER\Start Server.lnk" "$INSTDIR\bin\server.cmd"
-    CreateShortCut "$SMPROGRAMS\$STARTMENU_FOLDER\Stop Server.lnk" "$INSTDIR\bin\shutdownserver.cmd" "--url http://localhost:4712/private/xmlrpc"
-    CreateShortCut "$SMPROGRAMS\$STARTMENU_FOLDER\Modify settings.lnk" "$WINDIR\notepad.exe" "$INSTDIR\bin\server.rb"
-    CreateShortCut "$SMPROGRAMS\$STARTMENU_FOLDER\Dashboard.lnk" "http://localhost:4712/private/dashboard"
-    CreateShortCut "$SMPROGRAMS\$STARTMENU_FOLDER\DamageControl Website.lnk" "http://damagecontrol.codehaus.org"
-    CreateShortCut "$SMPROGRAMS\$STARTMENU_FOLDER\DCTray.NET Systray Monitor.lnk" "$INSTDIR\DCTray.NET\dctray.exe"
-    CreateShortCut "$SMPROGRAMS\$STARTMENU_FOLDER\Uninstall.lnk" "$INSTDIR\Uninstall.exe"
-  
-  !insertmacro MUI_STARTMENU_WRITE_END
-
 SectionEnd
 
 Section "DCTray.NET" SecDCTray
   SetOutPath "$INSTDIR\DCTray.NET"
   File ${ROOTDIR}\DCTray.NET\bin\Release\dctray.exe
+  File ${ROOTDIR}\DCTray.NET\readme.txt
   
   !insertmacro MUI_STARTMENU_WRITE_BEGIN Application
-    ;Create shortcuts
+  
     CreateDirectory "$SMPROGRAMS\$STARTMENU_FOLDER"
     CreateShortCut "$SMPROGRAMS\$STARTMENU_FOLDER\DCTray.NET Systray Monitor.lnk" "$INSTDIR\DCTray.NET\dctray.exe"
+    
   !insertmacro MUI_STARTMENU_WRITE_END
 SectionEnd
 
@@ -178,12 +183,14 @@ FunctionEnd
 
   ;Language strings
   LangString DESC_SecServer ${LANG_ENGLISH} "The DamageControl server. Runs and monitors builds for multiple projects."
-  LangString DESC_SecDCTray ${LANG_ENGLISH} "DamageControl systray monitor."
+  LangString DESC_SecDCTray ${LANG_ENGLISH} "DamageControl systray monitor. Require Microsoft .NET Framework 1.1. The systray can be installed separately, doesn't require the server or a Ruby distribution."
+  LangString DESC_SecRuby ${LANG_ENGLISH} "Ruby distribution tuned for DamageControl. It is recommended to use this Ruby distribution unless you really know what you are doing. DamageControl requires a Cygwin build of Ruby (it has to support fork)."
 
   ;Assign language strings to sections
   !insertmacro MUI_FUNCTION_DESCRIPTION_BEGIN
     !insertmacro MUI_DESCRIPTION_TEXT ${SecServer} $(DESC_SecServer)
     !insertmacro MUI_DESCRIPTION_TEXT ${SecDCTray} $(DESC_SecDCTray)
+    !insertmacro MUI_DESCRIPTION_TEXT ${SecRuby} $(DESC_SecRuby)
   !insertmacro MUI_FUNCTION_DESCRIPTION_END
 
 ;--------------------------------

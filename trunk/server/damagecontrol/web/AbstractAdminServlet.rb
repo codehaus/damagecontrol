@@ -60,11 +60,14 @@ module DamageControl
     end
     
     def tasks
-      result = []
+      result = [
+        search_form
+      ]
       if private?
         result += [
           task(:icon => "icons/box_new.png", :name => "New project", :url => "configure")
         ]
+      else
       end
       result
     end

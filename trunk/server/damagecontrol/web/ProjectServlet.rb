@@ -53,21 +53,13 @@ module DamageControl
     
   protected
   
-    def search_form(params)
-      project_name = params[:project_name] || required_param(:project_name)
-      erb("components/search_form.erb", binding)
-    end
-    
     def tasks
       result = super
       unless project_name.nil?
-        result +=
-          [
-            search_form(:project_name => project_name)
-          ]
         if(private?)
           result +=
             [
+              task(:icon => "icons/box_into.png", :name => "Clone project", :url => "configure?project_name=#{project_name}&action=clone_project"),
               task(:icon => "icons/wrench.png", :name => "Configure", :url => "configure?project_name=#{project_name}&action=configure"),
               task(:icon => "icons/gears_run.png", :name => "Trig build now", :url => "?project_name=#{project_name}&action=trig_build"),
               task(:icon => "icons/gear_connection.png", :name => "Install trigger", :url => "install_trigger?project_name=#{project_name}")
@@ -80,7 +72,16 @@ module DamageControl
       end
       result
     end
+    
+    def search_form
+      project_search_form(:project_name => project_name)
+    end
 
+    def project_search_form(params)
+      project_name = params[:project_name] || required_param(:project_name)
+      erb("components/search_form.erb", binding)
+    end
+    
     def navigation
       builds_table(
           :header_text => "Build history", 

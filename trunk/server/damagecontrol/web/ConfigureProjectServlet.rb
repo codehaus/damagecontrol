@@ -17,21 +17,18 @@ module DamageControl
       configure
     end
     
+    def clone_project
+      action = "store_configuration"
+      project_config = self.project_config
+      project_name = ""
+      render("configure.erb", binding)
+    end
+    
     def configure
       action = "store_configuration"
       render("configure.erb", binding)
     end
         
-    KEYS = [
-      "build_command_line", 
-      "project_name", 
-      "unix_groups",
-      "view_cvs_url",
-      "trigger", 
-      "nag_email", 
-      "scm_type"
-    ]
-    
     def store_configuration
       assert_private
       @project_config_repository.new_project(project_name) unless @project_config_repository.project_exists?(project_name)
@@ -53,6 +50,16 @@ module DamageControl
     
   private
   
+    KEYS = [
+      "build_command_line", 
+      "project_name", 
+      "unix_groups",
+      "view_cvs_url",
+      "trigger", 
+      "nag_email", 
+      "scm_type"
+    ]
+    
     def scm_configurators(project_config = project_config)
       scm_configurator_classes.collect {|cls| cls.new(project_config)}
     end

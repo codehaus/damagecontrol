@@ -12,6 +12,10 @@ module DamageControl
     end
     
   protected
+  
+    def search_form
+      global_search_form
+    end
     
     def global_search_form
       erb("components/global_search_form.erb", binding)
@@ -38,12 +42,6 @@ module DamageControl
     def build_executor_status
       build_executors = build_scheduler.executors
       erb("components/build_executor_status.erb", binding)
-    end
-    
-    def tasks
-      result = super
-      result += [ global_search_form ]
-      result
     end
     
     def title
