@@ -34,6 +34,12 @@ module DamageControl
       
       # check that we now have one more change
       changes = cvs.changes(time_before, time_after)
+
+puts "CHANGES"
+changes.each do |modif|
+  puts "#{modif.developer} : #{modif.path} : #{modif.time}"
+end
+
       assert_equal(1, changes.length)
       mod = changes[0]
       assert_equal("build.xml", mod.path)

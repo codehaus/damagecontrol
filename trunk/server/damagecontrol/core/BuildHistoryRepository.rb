@@ -112,7 +112,7 @@ module DamageControl
         file.close
 
         if(!builds.is_a?(Array))
-          raise "#{expanded} should be the YAML representation of a Ruby Array of Build!"
+          raise "#{filename} should contain the YAML representation of a Ruby Array of Build!"
         end
       end
       builds
