@@ -8,10 +8,21 @@
 <%
 build = build_history_repository.lookup(project_name, request.query["timestamp"])
 url = "log?project_name=#{project_name}&timestamp=#{request.query['timestamp']}"
+
+prev_build = build_history_repository.prev(build)
+next_build = build_history_repository.next(build)
+
+prev_link = ""
+prev_link = "&lt;<a href=\"#{build_url(prev_build)}\">#{build_description(prev_build)}</a>" if prev_build
+
+next_link = ""
+next_link = "<a href=\"#{build_url(next_build)}\">#{build_description(next_build)}</a>&gt;" if next_build
+
 %>
 <h1 class="pane"><img src="images/timestampstatus?project_name=<%= project_name %>&timestamp=<%= request.query['timestamp'] %>"/> <%= build_description(build) %></h1>
 
-<a href="#{url}">Console output</a>
+<a href="#{url}">Console output</a><br/>
+<%=prev_link%> <%=next_link%>
 <table class="main-table">
 <tr><td>
 <table>

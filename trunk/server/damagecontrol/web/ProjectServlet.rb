@@ -126,6 +126,11 @@ module DamageControl
       action_redirect(:dashboard, { "project_name" => project_name })
     end
     
+    def build_url(build)
+      return nil unless build
+      "?action=build_details&project_name=#{build.project_name}&timestamp=#{build.timestamp}"
+    end
+    
     def build_status(build)
       return "Never built" if build.nil?
       build.status

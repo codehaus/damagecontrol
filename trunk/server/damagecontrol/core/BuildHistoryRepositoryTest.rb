@@ -234,5 +234,16 @@ module DamageControl
       assert_equal(pt, @bhp.lookup("t", "20040104120000"))
     end
 
+    def test_should_find_previous_and_next
+      a = Build.new("test", Time.utc(2004, 01, 01, 12, 00, 00))
+      b = Build.new("test", Time.utc(2004, 01, 04, 12, 00, 00))
+      @bhp.register(a)
+      @bhp.register(b)
+
+      assert_equal(b, @bhp.next(a))
+      assert_equal(nil, @bhp.next(b))
+      assert_equal(a, @bhp.prev(b))
+      assert_equal(nil, @bhp.prev(a))
+    end
   end
 end

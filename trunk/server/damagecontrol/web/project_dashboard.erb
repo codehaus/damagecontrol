@@ -46,12 +46,11 @@
       color = if build.successful? then "green" else "red" end
       color = "grey" if !build.completed?
       image = "images/#{color}-16.gif"
-      url = "?action=build_details&project_name=#{build.project_name}&timestamp=#{build.timestamp}"
       prefix = ""
       prefix = "#{build.project_name} " if (find_method == "search")
   %>
   <tr class="pane">
-    <td class="pane"><img src="<%= image %>" />&nbsp;<a href="<%= url %>"><%= prefix %><%= build_description(build) %></a></td>
+    <td class="pane"><img src="<%= image %>" />&nbsp;<a href="<%= build_url(build) %>"><%= prefix %><%= build_description(build) %></a></td>
   </tr>
 <% end %>
 

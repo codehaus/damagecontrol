@@ -119,6 +119,18 @@ module DamageControl
       end
       nil
     end
+    
+    def next(build)
+      h = history(build.project_name)
+      i = h.index(build)
+      return h[i + 1] unless i == h.length - 1
+    end
+
+    def prev(build)
+      h = history(build.project_name)
+      i = h.index(build)
+      return h[i - 1] unless i == 0
+    end
 
   private
 
