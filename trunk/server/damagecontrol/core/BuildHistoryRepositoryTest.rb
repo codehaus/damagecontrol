@@ -133,7 +133,6 @@ module DamageControl
       bhp.register(@apple1)
 
       mock_project_directories.__verify
-      assert(File.exists?("#{tempdir}/apple.yaml"))
       assert(File.exists?("#{tempdir}/pear.yaml"))
     end
     

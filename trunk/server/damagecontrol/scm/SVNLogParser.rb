@@ -33,9 +33,9 @@ module DamageControl
       
       changeset = ChangeSet.new
       revision, developer, time, the_rest = log_entry[0].split("|")
-      changeset.revision = revision.strip
-      changeset.developer = developer.strip
-      changeset.time = parse_time(time.strip)
+      changeset.revision = revision.strip unless revision.nil?
+      changeset.developer = developer.strip unless developer.nil?
+      changeset.time = parse_time(time.strip) unless time.nil?
       
       # 3rd line to first empty line are changes
       log_entry[2..first_empty_line(log_entry) - 1].each do |change_line|

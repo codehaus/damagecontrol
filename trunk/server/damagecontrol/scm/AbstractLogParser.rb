@@ -17,6 +17,7 @@ module DamageControl
       result = ""
       io.each_line do |line|
         @current_line_number += 1
+        line.gsub!(/\r\n$/, "\n")
         break if line=~regexp
         result<<line
       end
