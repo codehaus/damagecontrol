@@ -20,8 +20,8 @@ REGISTRY = Needle::Registry.define do |b|
       changeset = changesets.latest
       project.build(changeset.identifier) do |build|
         env = {
-          'PKG_BUILD' => changeset.identifier, # Rake standard
-          'DAMAGECONTROL_BUILD_LABEL' => changeset.identifier # For others
+          'PKG_BUILD' => changeset.identifier.to_s, # Rake standard
+          'DAMAGECONTROL_BUILD_LABEL' => changeset.identifier.to_s # For others
         }
         build.execute(project.build_command, env)
       end
