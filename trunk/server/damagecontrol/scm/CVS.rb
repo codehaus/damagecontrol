@@ -66,7 +66,9 @@ module DamageControl
           end
           line_proc.call(line) if block_given?
         end
-        changesets(checkout_dir, scm_from_time, scm_to_time, checked_out_files, &line_proc)
+        changesets = changesets(checkout_dir, scm_from_time, scm_to_time, checked_out_files, &line_proc)
+logger.info("Got changesets from CVS checkout: #{changesets}")
+        return changesets
       else
         path_regex = /^[U|P] checkout\/(.*)/
         # This is a workaround for the fact that -d . doesn't work - must be an existing sub folder.
@@ -227,6 +229,7 @@ module DamageControl
         changesets = parser.parse_changesets
         logger.info("DONE Reading chengeset log from stdout")
       end
+      logger.info("OUTSIDE BLOCK")
       changesets
     end
     
