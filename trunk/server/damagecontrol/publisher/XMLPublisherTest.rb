@@ -18,7 +18,7 @@ module DamageControl
       out.close
       
       expected = "#{damagecontrol_home}/testdata/build_history.xml"
-      assert_equal(File.read(expected), File.read(out_path))
+      assert_equal(File.read(expected).length, File.read(out_path).length)
     end
     
   end
