@@ -55,6 +55,17 @@ module DamageControl
         wait_until(10) { @irc.in_channel? }
       end
     end
+    
+    def format_changeset(changeset)
+      message_to_modifications = {}
+      changeset.each {|m| message_to_modifications[m.message + m.developer] = []}
+      changeset.each {|m| message_to_modifications[m.message + m.developer]<<m}
+      result = message_to_modifications.collect do |key, modifications|
+        files = modifications.collect{|m| m.path}.join(", ")
+        "\"#{modifications[0].message}\" by #{modifications[0].developer}: #{files}"
+      end
+      result.sort
+    end
   
     def process_message(message)
       ensure_in_channel
@@ -64,10 +75,10 @@ module DamageControl
       end
       
       if message.is_a?(BuildStartedEvent)
-        changes = ""
-        developers = message.build.modification_set.collect {|m| m.developer}.uniq.join(", ")
-        changes += " changes by: #{developers}" unless developers.empty?
-        @irc.send_message_to_channel("[#{message.build.project_name}] BUILD STARTED#{changes}")
+        @irc.send_message_to_channel("[#{message.build.project_name}] BUILD STARTED")
+        format_changeset(message.build.modification_set).each do |change|
+          @irc.send_message_to_channel("[#{message.build.project_name}] #{change}")
+        end
       end
       
       if message.is_a?(BuildCompleteEvent)

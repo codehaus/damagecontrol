@@ -38,8 +38,25 @@ module DamageControl
       assert(@publisher.consumed_message?(evt))
     end
     
+    def test_formats_changeset_according_to_changeset
+      changeset = 
+        [
+          Modification.new("file1.txt", "jtirsen", "change1"),
+          Modification.new("file2.txt", "jtirsen", "change1"),
+          Modification.new("file3.txt", "jtirsen", "change2"),
+          Modification.new("file4.txt", "rinkrank", "change2"),
+        ]
+      expexted_format =
+      [
+        '"change1" by jtirsen: file1.txt, file2.txt',
+        '"change2" by jtirsen: file3.txt',
+        '"change2" by rinkrank: file4.txt',
+      ]
+      assert_equal(expexted_format, @publisher.format_changeset(changeset))
+    end
+    
     def test_sends_message_on_build_requested_and_started
-      setup_irc_connected
+      setup_irc_connected 
       @irc_mock.__expect(:send_message_to_channel) {|message| 
         assert_match(/REQUESTED/, message)
         assert_match(/project/, message)
@@ -53,10 +70,7 @@ module DamageControl
       @publisher.send_message_on_build_request = true
       
       build = Build.new("project")
-      mod = Modification.new
-      mod.developer = "jtirsen"
-      mod.path = "this/is/a/file.txt"
-      build.modification_set = [mod]
+      build.modification_set = [Modification.new("file.txt", "jtirsen")]
       @publisher.enq_message(BuildRequestEvent.new(build))
       @publisher.enq_message(BuildStartedEvent.new(build))
       @publisher.process_messages
