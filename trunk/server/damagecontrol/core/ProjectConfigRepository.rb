@@ -3,6 +3,12 @@ require 'damagecontrol/core/Build'
 require 'damagecontrol/core/ProjectDirectories'
 require 'yaml'
 
+# for default config
+require 'damagecontrol/scm/NoSCM'
+
+# for upgrading from old config
+require 'damagecontrol/scm/CVS'
+
 module DamageControl
 
   class ProjectAlreadyExistsError < Exception
@@ -43,12 +49,20 @@ module DamageControl
       @project_directories.project_names
     end
     
+    def default_project_config
+      config_map = {}
+      config_map["project_name"] = ""
+      config_map["scm"] = DamageControl::NoSCM.new
+      config_map
+    end
+    
     def project_config(project_name)
       config_map = File.open(@project_directories.project_config_file(project_name)) do |io|
         parse_project_config(io.gets(nil))
       end
-      config_map["checkout_dir"] = checkout_dir(project_name)
       config_map["project_name"] = project_name
+      config_map = upgrade_project_config(config_map)
+      config_map["scm"].checkout_dir = checkout_dir(project_name)
       config_map
     end
     
@@ -65,8 +79,7 @@ module DamageControl
     end
     
     def modify_project_config(project_name, config_map)
-      config_map["project_name"] = nil
-      config_map["checkout_dir"] = nil
+      config_map.delete("project_name")
       # remove empty pairs
       config_map.each do |key, value|
         config_map.delete(key) if value.nil? || value.to_s == ""
@@ -90,9 +103,7 @@ module DamageControl
     
     def create_scm(project_name)
       config_map = project_config(project_name)
-      raise "scm_type not specified" unless config_map["scm_type"]
-      scm_class = eval(config_map["scm_type"])
-      scm_class.new(config_map)
+      config_map["scm"]
     end
     
     def next_build_number_file
@@ -118,6 +129,42 @@ module DamageControl
     end
 
   private
+  
+    def create_scm_from_old_config(config_map)
+      scm = DamageControl::NoSCM.new
+      case config_map["scm_type"]
+        when "DamageControl::CVS"
+          scm = DamageControl::CVS.new
+          scm.cvsroot = config_map['cvsroot']
+          scm.cvsmodule = config_map['cvsmodule']
+          scm.cvspassword = config_map['cvspassword']
+          scm.rsh_client = config_map['rsh_client']
+      end
+      scm
+    end
+    
+    def upgrade_project_config(config_map)
+      config_map["scm"] = create_scm_from_old_config(config_map) unless config_map["scm"]
+      
+      upgrade_renamed_key("cvs_web_url", "scm_web_url", config_map)
+      upgrade_renamed_key("logs_to_archive", "logs_to_merge", config_map)
+      
+      upgrade_removed_key("scm_type", config_map)
+      upgrade_removed_key("cvsmodule", config_map)
+      upgrade_removed_key("cvsroot", config_map)
+      upgrade_removed_key("rsh_client", config_map)
+      
+      config_map
+    end
+    
+    def upgrade_removed_key(removed_key, config_map)
+      config_map.delete(removed_key)
+    end
+    
+    def upgrade_renamed_key(old_key, new_key, config_map)
+      config_map[new_key] = config_map[old_key] if !config_map[new_key] && config_map[old_key]
+      upgrade_removed_key(old_key, config_map)
+    end
 
     def parse_project_config(config_content)
       config = YAML::load(config_content)

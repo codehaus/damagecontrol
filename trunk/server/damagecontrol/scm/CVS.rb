@@ -11,15 +11,10 @@ module DamageControl
     include FileUtils
 
   public
-    attr_reader :mod
-    
-    def initialize(config_map)
-      super(config_map)
-      @cvsroot = config_map["cvsroot"] || required_config_param("cvsroot", config_map)
-      @mod = config_map["cvsmodule"] || required_config_param("cvsmodule", config_map)
-      @password = config_map["cvspassword"]
-      @rsh_client = config_map['rsh_client']
-    end
+    attr_accessor :cvsroot
+    attr_accessor :cvspassword
+    attr_accessor :cvsmodule
+    attr_accessor :rsh_client
     
     def changesets(from_time, to_time)
       # exclude commits that occured on from_time
@@ -32,7 +27,7 @@ module DamageControl
       end
       parser = CVSLogParser.new(StringIO.new(log))
       parser.cvspath = path
-      parser.cvsmodule = mod
+      parser.cvsmodule = cvsmodule
       parser.parse_changesets
     end
     
@@ -53,11 +48,15 @@ module DamageControl
     end
 
     def working_dir
-      "#{checkout_dir}/#{mod}"
+      "#{checkout_dir}/#{cvsmodule}"
     end
     
     def can_install_trigger?
-      exists?
+      begin
+        exists?
+      rescue
+        false
+      end
     end
     
     # Installs and activates the trigger script in the repository
@@ -76,7 +75,7 @@ module DamageControl
       with_working_dir(cvsroot_cvs.working_dir) do
         # install trigger command
         File.open("loginfo", File::WRONLY | File::APPEND) do |file|
-          file.puts("#{mod} #{trigger_command(damagecontrol_install_dir, project_name, dc_url)}")
+          file.puts("#{cvsmodule} #{trigger_command(damagecontrol_install_dir, project_name, dc_url)}")
         end
         system("cvs commit -m \"Installed DamageControl trigger for #{project_name}\"")
       end
@@ -116,13 +115,17 @@ module DamageControl
     end
 
     def create
-      raise "Can't create CVS repository for #{@cvsroot}" unless can_create?
+      raise "Can't create CVS repository for #{cvsroot}" unless can_create?
       File.mkpath(path)
       cvs(path, "-d#{cvsroot} init")
     end
     
     def can_create?
-      local?
+      begin
+        local?
+      rescue
+        false
+      end
     end
 
     def exists?
@@ -172,16 +175,16 @@ module DamageControl
     end
     
     def checkout_command(time)
-      "checkout #{time_option(time)} #{mod}"
+      "checkout #{time_option(time)} #{cvsmodule}"
     end
 
     def cvs(dir, cmd, &proc)
-      cmd_with_password = "cvs -q -d'#{cvsroot}' #{cmd}"
-      cmd_without_password = "cvs -q -d'#{cvsroot('********')}' #{cmd}"
+      cmd_with_cvspassword = "cvs -q -d'#{cvsroot_with_password}' #{cmd}"
+      cmd_without_cvspassword = "cvs -q -d'#{cvsroot_with_password('********')}' #{cmd}"
       env = {}
-      env["CVS_RSH"] = @rsh_client if @rsh_client && @rsh_client != ""
-      if block_given? then yield "#{cmd_without_password}\n" else logger.debug("#{cmd_without_password}\n") end
-      cmd_with_io(dir, cmd_with_password, env) do |io|
+      env["CVS_RSH"] = rsh_client if rsh_client && rsh_client != ""
+      if block_given? then yield "#{cmd_without_cvspassword}\n" else logger.debug("#{cmd_without_cvspassword}\n") end
+      cmd_with_io(dir, cmd_with_cvspassword, env) do |io|
         io.each_line do |progress|
           if block_given? then yield progress else logger.debug(progress) end
         end
@@ -201,19 +204,24 @@ module DamageControl
       File.exists?(rootcvs)
     end
         
-  private
-
-    def cvsroot(password=@password)
-      if @password && @password != ""
-        protocol, user, host, path = parse_cvsroot
+    def cvsroot_with_password(password=self.cvspassword)
+      if password && password != ""
+        protocol, user, host, path = parse_cvsroot(cvsroot)
         ":#{protocol}:#{user}:#{password}@#{host}:#{path}"
       else
-        @cvsroot
+        cvsroot
       end
     end
     
+  private
+
     def create_cvsroot_cvs
-      CVS.new("cvsroot" => @cvsroot, "cvsmodule" => "CVSROOT", "cvspassword" => @password, "checkout_dir" => checkout_dir)
+      cvs = CVS.new
+      cvs.cvsroot = self.cvsroot
+      cvs.cvsmodule = "CVSROOT"
+      cvs.cvspassword = self.cvspassword
+      cvs.checkout_dir = self.checkout_dir
+      cvs
     end
 
     def time_option(time)
@@ -229,26 +237,26 @@ module DamageControl
     end
     
     def path
-      parse_cvsroot[3]
+      parse_cvsroot(cvsroot)[3]
     end
     
     def protocol
-      parse_cvsroot[0]
+      parse_cvsroot(cvsroot)[0]
     end
     
     # parses the cvsroot into tokens
     # [protocol, user, host, path]
     #
-    def parse_cvsroot
+    def parse_cvsroot(cvsroot)
       md = case
-        when @cvsroot =~ /^:local:/   then /^:(local):(.*)/.match(@cvsroot)
-        when @cvsroot =~ /^:ext:/     then /^:(ext):(.*)@(.*):(.*)/.match(@cvsroot)
-        when @cvsroot =~ /^:pserver:/ then /^:(pserver):(.*)@(.*):(.*)/.match(@cvsroot)
+        when cvsroot =~ /^:local:/   then /^:(local):(.*)/.match(cvsroot)
+        when cvsroot =~ /^:ext:/     then /^:(ext):(.*)@(.*):(.*)/.match(cvsroot)
+        when cvsroot =~ /^:pserver:/ then /^:(pserver):(.*)@(.*):(.*)/.match(cvsroot)
       end
       result = case
-        when @cvsroot =~ /^:local:/   then [md[1], nil, nil, md[2]]
-        when @cvsroot =~ /^:ext:/     then md[1..4]
-        when @cvsroot =~ /^:pserver:/ then md[1..4]
+        when cvsroot =~ /^:local:/   then [md[1], nil, nil, md[2]]
+        when cvsroot =~ /^:ext:/     then md[1..4]
+        when cvsroot =~ /^:pserver:/ then md[1..4]
       end
     end
   end
@@ -258,8 +266,10 @@ module DamageControl
   ##################################################################################
 
   class LocalCVS < CVS
-    def initialize(basedir, mod)
-      super("cvsroot" => ":local:#{basedir}/cvsroot", "cvsmodule" => mod, "checkout_dir" => "#{basedir}/checkout")
+    def initialize(basedir, cvsmodule)
+      self.cvsroot = ":local:#{basedir}/cvsroot"
+      self.cvsmodule = cvsmodule
+      self.checkout_dir = "#{basedir}/checkout"
     end
 
     def import(dir)

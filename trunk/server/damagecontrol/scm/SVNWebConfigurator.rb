@@ -22,8 +22,8 @@ module DamageControl
         ""
       end
       
-      def config_form
-        erb("svn_configure_form.erb", binding)
+      def config_form_template
+        "svn_configure_form.erb"
       end
       
     protected
@@ -31,8 +31,7 @@ module DamageControl
       def configuration_keys
         [
           "svnurl",
-          "svnprefix",
-          "svn_web_url"
+          "svnprefix"
         ]
       end
       

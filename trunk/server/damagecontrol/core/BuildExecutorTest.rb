@@ -40,12 +40,13 @@ module DamageControl
         return if proc.call 
         sleep 1 
       end 
-    end 
+    end
      
     def test_can_kill_a_running_build 
       # this blocks forever
       @build.config["build_command_line"] = "cat"
-      @build.scm = NoSCM.new({"checkout_dir" => "."})
+      @build.scm = NoSCM.new
+      @build.scm.checkout_dir = "."
 
       mock_hub = MockIt::Mock.new
       mock_hub.__expect(:publish_message) {|message| assert(message.is_a?(BuildStartedEvent))}

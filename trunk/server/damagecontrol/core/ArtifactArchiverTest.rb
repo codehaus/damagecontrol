@@ -18,7 +18,8 @@ module DamageControl
       })
       
       build.archive_dir = "#{basedir}/project/archive/#{build_timestamp}"
-      build.scm = NoSCM.new("checkout_dir" => "#{basedir}/checkout")
+      build.scm = NoSCM.new
+      build.scm.checkout_dir = "#{basedir}/checkout"
       
       mkdir_p("#{basedir}/checkout/target/jars")
       touch("#{basedir}/checkout/target/1.jar")

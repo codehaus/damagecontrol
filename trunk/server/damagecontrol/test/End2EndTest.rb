@@ -54,10 +54,10 @@ class IRCDriver
   def setup
     @irc_listener = IRCListener.new
     irc_listener.connect("irc.codehaus.org", "testsuite")
-    sleep 10
+    wait_for(10) { irc_listener.connected? }
     assert(irc_listener.connected?)
     irc_listener.join_channel("#dce2e")
-    sleep 3
+    wait_for(15) { irc_listener.in_channel? }
     assert(irc_listener.in_channel?)
     irc_listener.send_message_to_channel("Hello, this is DamageControl's test-suite. I'm just here to check that DamageControl is performing its duties well.")
     sleep 1
@@ -158,8 +158,7 @@ class DamageControlServerDriver < Driver
     project_config = project_config_repo.project_config(project)
 
     project_config["build_command_line"] = build_command_line
-    project_config["scm_type"] = scm.class.superclass.name
-    scm.config_map.each {|key, val| project_config[key] = val }
+    project_config["scm"] = scm
     
     project_config_repo.modify_project_config(project, project_config)
   end

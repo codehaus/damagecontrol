@@ -9,9 +9,8 @@ module DamageControl
     
   public
 
-    attr_reader :checkout_dir
-    attr_reader :config_map
-
+    attr_accessor :checkout_dir
+    
     def working_dir
       checkout_dir
     end
@@ -43,19 +42,22 @@ module DamageControl
     def changesets(from_time, to_time, &proc)
       ChangeSets.new
     end
+    
+    def checkout_dir=(checkout_dir)
+      raise "checkout_dir can't be nil" unless checkout_dir
+      checkout_dir = to_os_path(File.expand_path(checkout_dir))
+      @checkout_dir = checkout_dir
+    end
+    
+    def ==(other_scm)
+      return false if self.class != other_scm.class
+      self.instance_variables.each do |var|
+        return false if self.instance_eval(var) != other_scm.instance_eval(var)
+      end
+      true
+    end
 
   protected
-
-    def initialize(config_map)
-      @config_map = config_map
-
-      checkout_dir = config_map["checkout_dir"] || required_config_param("checkout_dir", config_map)
-      @checkout_dir = to_os_path(File.expand_path(checkout_dir)) unless checkout_dir.nil?
-    end
-
-    def required_config_param(param, config_map)
-      raise "required configuration parameter: #{param}. config: #{config_map.inspect}"
-    end
 
     def script_prefix
       if windows? then "" else "sh " end

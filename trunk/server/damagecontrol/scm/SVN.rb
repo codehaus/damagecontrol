@@ -7,22 +7,9 @@ module DamageControl
 
   class SVN < AbstractSCM
     include FileUtils
-
-    def initialize(config_map)
-      super(config_map)
-      @svnurl = config_map["svnurl"] || required_config_param("svnurl", config_map)
-      @svnprefix = config_map["svnprefix"] || required_config_param("svnprefix", config_map)
-    end
-  
-    def web_url_to_change(change)
-      view_cvs_url = config_map["view_cvs_url"]
-      return super if view_cvs_url.nil? || view_cvs_url == "" 
-
-      view_cvs_url_patched = ensure_trailing_slash(view_cvs_url)
-      url = "#{view_cvs_url_patched}#{change.path}"
-      url << "?r1=#{change.previous_revision}&r2=#{change.revision}" if(change.previous_revision)
-      url
-    end
+    
+    attr_accessor :svnurl
+    attr_accessor :svnprefix
 
     def checkout(time = nil, &proc)
       if(checked_out?)
@@ -47,12 +34,12 @@ module DamageControl
         end
       end
 
-      parser = SVNLogParser.new(StringIO.new(log), @svnprefix)
+      parser = SVNLogParser.new(StringIO.new(log), svnprefix)
       parser.parse_changesets
     end
 
     def working_dir
-      "#{checkout_dir}/#{@svnprefix}"
+      "#{checkout_dir}/#{svnprefix}"
     end
 
   private
@@ -62,11 +49,11 @@ module DamageControl
     end
 
     def checkout_command(time)
-      "checkout #{@svnurl}"
+      "checkout #{svnurl}"
     end
 
     def update_command(time)
-      "-d#{@cvsroot} update -d -P"
+      "-d#{svnroot} update -d -P"
     end
     
     def commit_command(message)
@@ -74,8 +61,8 @@ module DamageControl
     end
     
     def changes_command(from_time, to_time)
-#      "log -v -r {\"#{svndate(from_time)}\"}:{\"#{svndate(to_time)}\"} #{@svnurl}"
-      "log -v -r HEAD #{@svnurl}"
+#      "log -v -r {\"#{svndate(from_time)}\"}:{\"#{svndate(to_time)}\"} #{svnurl}"
+      "log -v -r HEAD #{svnurl}"
     end
 
     def svndate(time)
@@ -100,23 +87,25 @@ module DamageControl
   ##################################################################################
 
   class LocalSVN < SVN
+    attr_accessor :svnrootdir
+    attr_accessor :project_url
+  
     def initialize(basedir, svnprefix)
-      @svnrootdir = "#{basedir}/svnroot"
+      self.svnrootdir = "#{basedir}/svnroot"
       hack = "/" if windows?
       hack = "" unless hack
-      @repo_url = "file://#{hack}#{@svnrootdir}"
-      @project_url = "#{@repo_url}/#{svnprefix}"
-      super("svnurl" => @project_url, "svnprefix" => svnprefix, "checkout_dir" => "#{basedir}/checkout")
-      @svnprefix = svnprefix
+      self.svnurl = "file://#{hack}#{svnrootdir}/#{svnprefix}"
+      self.svnprefix = svnprefix
+      self.checkout_dir = "#{basedir}/checkout"
     end
 
     def create
-      svnadmin(@svnrootdir, "create #{@svnrootdir}")
+      svnadmin(svnrootdir, "create #{svnrootdir}")
     end
 
     def import(dir)
       basename = File.basename(dir)
-      svn(dir, "import #{dir} #{@svnurl} -m \"initial import\"")
+      svn(dir, "import #{dir} #{svnurl} -m \"initial import\"")
     end
 
     def add_file(relative_filename, content, is_new)
@@ -135,7 +124,7 @@ module DamageControl
     end
     
     def hookdir
-      "#{@svnrootdir}/hooks"
+      "#{svnrootdir}/hooks"
     end
     
     def trigger_command(project_name, dc_url)

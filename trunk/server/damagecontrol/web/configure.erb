@@ -58,10 +58,29 @@ function showScm(scm) {
   <td class="setting-name">JIRA url</td>
   <td><input class="setting-input" name="jira_url" id="jira_url" type="text" value="<%= project_config['jira_url'] %>"/></td>
 </tr>
+
+<tr>
+  <td>ViewCVS/Fisheye URL</td>
+  <td><input class="setting-input" name="cvs_web_url" id="cvs_web_url" type="text" value="<%= project_config['cvs_web_url'] %>"></td>
+</tr>
+<tr>
+  <td>&nbsp;</td>
+  <td class="setting-description">
+    The base url to ViewCVS or Fisheye. For example: <tt>http://cvs.damagecontrol.codehaus.org/</tt>.
+  </td>
+</tr>
+
 <tr>
   <td class="setting-name">Next build number</td>
   <td><input class="setting-input" name="next_build_number" id="next_build_number" type="text" value="<%= next_build_number %>"/></td>
 </tr>
+<tr>
+  <td>&nbsp;</td>
+  <td class="setting-description">
+    The number that the next successful build will have. If you already have a number of labelled builds before you can override this here.
+  </td>
+</tr>
+
 <tr>
   <td class="setting-name">Child builds</td>
   <td><input class="setting-input" name="dependent_projects" id="dependent_projects" type="text" value="<%= dependent_projects %>"/></td>
@@ -98,11 +117,12 @@ function showScm(scm) {
     Archived files are accessible from the build page. May contain wildcards.
   </td>
 </tr>
+
 <tr>
   <td>Source control</td>
   <td>
     <% scm_configurators.each do |scm_configurator| %>
-      <input id="<%= scm_configurator.scm_id %>radio" type="radio" value="<%= scm_configurator.scm_id %>" name="scm_type" onClick="javascript:showScm('<%= scm_configurator.scm_id %>')"<%if(scm_configurator.selected?)%>checked="true"<%end%>/> <%= scm_configurator.scm_display_name %>
+      <input id="<%= scm_configurator.scm_id %>radio" type="radio" value="<%= scm_configurator.scm_id %>" name="scm_id" onClick="javascript:showScm('<%= scm_configurator.scm_id %>')"<%if(scm_configurator.selected?)%>checked="true"<%end%>/> <%= scm_configurator.scm_display_name %>
     <% end %>
   </td>
 </tr>

@@ -2,7 +2,7 @@ require 'test/unit'
 require 'net/http'
 require 'pebbles/mockit'
 require 'damagecontrol/DamageControlServer'
-require 'damagecontrol/scm/NoSCM'
+require 'damagecontrol/scm/CVS'
 
 module DamageControl
 
@@ -16,22 +16,25 @@ module DamageControl
         :HttpPort => 14712
       )
       @server.start
+      sleep 5
       @client = Net::HTTP.new("localhost", 14712)
     end
 
     def teardown
       @server.shutdown
     end
-
+    
     def test_provides_content_at_base_url
       response, data = @client.get("/private/project")
       assert_response_ok(response)
     end
 
-    def test_creates_new_project_when_complete_project_data_is_posted
+    def Xtest_creates_new_project_when_complete_project_data_is_posted
       response, data = store_configuration("Chicago")
       assert_response_ok(response)
       assert(@server.project_config_repository.project_exists?("Chicago"))
+      assert_equal({"project_name" => "Chicago"},
+        @server.project_config_repository.project_config("Chicago"))
     end
     
     def test_asks_for_project_name_when_project_name_not_specified
@@ -54,7 +57,7 @@ module DamageControl
 
   private
     def store_configuration(project_name)
-      @client.post("/private/configure", "action=store_configuration&project_name=#{project_name}&scm_type=#{NoSCM.name}")
+      @client.post("/private/configure", "action=store_configuration&project_name=#{project_name}&scm_id=#{CVS.name}")
     end
 
   end

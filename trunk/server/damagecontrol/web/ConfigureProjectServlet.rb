@@ -11,7 +11,7 @@ module DamageControl
       result = []
       unless project_name.nil?
         if(private?)
-          scm = project_config_repository.create_scm(project_name)
+          scm = project_config["scm"]
           if(scm.can_create? && !scm.exists?)
             result +=
               [
@@ -62,9 +62,7 @@ module DamageControl
       project_config['dependent_projects'] = to_array(request.query['dependent_projects'])
       project_config['logs_to_merge'] = to_array(request.query['logs_to_merge'])
       project_config['artifacts_to_archive'] = to_array(request.query['artifacts_to_archive'])
-      scm_configurators(project_config).each do |scm_configurator|
-        scm_configurator.store_configuration_from_request(request)
-      end
+      scm_configurators(project_config).find{|c| c.scm_id == request.query['scm_id'] }.store_configuration_from_request(request)
 
       @project_config_repository.modify_project_config(project_name, project_config)
       @project_config_repository.set_next_build_number(project_name, request.query["next_build_number"].chomp.to_i) if request.query["next_build_number"]
@@ -94,7 +92,7 @@ module DamageControl
       "trigger", 
       "nag_email", 
       "jira_url", 
-      "scm_type"
+      "scm_web_url"
     ]
     
     def from_array(array)
@@ -105,7 +103,7 @@ module DamageControl
       if array then array.split(",").collect{|e| e.strip} else [] end
     end
     
-    def scm_configurators(project_config = project_config)
+    def scm_configurators(project_config = self.project_config)
       @scm_configurator_classes.collect {|cls| cls.new(project_config, project_config_repository)}
     end
     

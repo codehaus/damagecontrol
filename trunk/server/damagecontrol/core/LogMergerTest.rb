@@ -23,7 +23,8 @@ module DamageControl
       })
       
       build.xml_log_file = "#{basedir}/project/log/#{build_timestamp}.xml"
-      build.scm = NoSCM.new("checkout_dir" => "#{basedir}/checkout")
+      build.scm = NoSCM.new
+      build.scm.checkout_dir = "#{basedir}/checkout"
       
       mkdir_p("#{basedir}/checkout/target/test-reports")
       touch("#{basedir}/checkout/target/test-reports/TEST-com.thoughtworks.Test.xml")

@@ -34,7 +34,7 @@ module DamageControl
       assert_equal(
         {
           "project_name" => "newproject",
-          "checkout_dir" => "#{@basedir}/newproject/checkout"
+          "scm" => create_default_scm
         },
         @pcr.project_config("newproject"))
     end
@@ -45,10 +45,13 @@ module DamageControl
       assert_equal(
         {
           "project_name" => "newproject",
-          "checkout_dir" => "#{@basedir}/newproject/checkout",
-          "scm_type" => NoSCM.name
+          "scm" => create_default_scm
         },
         @pcr.project_config("newproject"))
+    end
+    
+    def create_default_scm
+      NoSCM.new
     end
 
     def test_can_create_build_from_project_config
@@ -60,8 +63,7 @@ module DamageControl
       assert_equal(
         {
           "project_name" => "newproject",
-          "checkout_dir" => "#{@basedir}/newproject/checkout",
-          "scm_type" => NoSCM.name
+          "scm" => create_default_scm
         },
         build.config)
       assert_equal("http://localhost/public/project?action=build_details&project_name=newproject&timestamp=20040615120000", build.url)

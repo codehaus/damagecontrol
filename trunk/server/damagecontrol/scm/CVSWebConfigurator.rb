@@ -18,12 +18,12 @@ module DamageControl
       "distributeCvsrootFields()"
     end
 
-    def javascript_declarations
-      erb("cvs_declarations.js", binding)
+    def javascript_declarations_template
+      "cvs_declarations.js"
     end
 
-    def config_form
-      erb("cvs_configure_form.erb", binding)
+    def config_form_template
+      "cvs_configure_form.erb"
     end
 
   protected
@@ -33,7 +33,6 @@ module DamageControl
         "cvsroot", 
         "cvsmodule", 
         "cvspassword", 
-        "cvs_web_url",
         "rsh_client"
       ]
     end

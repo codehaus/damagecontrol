@@ -40,7 +40,7 @@ module Pebbles
         raise "stderr stuff still does not work" unless join_stdout_and_stderr?
         @pid = fork do
           # in subprocess
-          Dir.chdir(working_dir)
+          Dir.chdir(working_dir) if working_dir
           environment.each {|key, val| ENV[key] = val}
           # both processes now have these open
           # it will not close entirely until both have closed them, which will make the child process hang
@@ -213,7 +213,7 @@ module FileUtils
       ret = p.execute do |stdout, stdin|
         if proc.arity == 1 then proc.call(p.stdout) else proc.call(p.stdout, p.stdin) end
       end
-      logger.debug("successfully executed #{cmd}")
+      logger.debug("successfully executed #{cmd.inspect} in directory #{dir.inspect}")
       ret
     rescue NotImplementedError
       puts "DamageControl only runs in Cygwin on Windows"

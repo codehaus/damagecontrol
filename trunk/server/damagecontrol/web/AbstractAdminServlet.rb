@@ -27,7 +27,7 @@ module DamageControl
     end
     
     def project_config
-      return {} unless @project_config_repository.project_exists?(project_name)
+      return @project_config_repository.default_project_config unless @project_config_repository.project_exists?(project_name)
       @project_config_repository.project_config(project_name)
     end
     

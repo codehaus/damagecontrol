@@ -14,13 +14,17 @@ module DamageControl
     def test_can_build_a_cvs_rdiff_command_for_retrieving_the_changes_between_two_dates
       time_before = Time.utc(2004,01,01,12,00,00) 
       time_after = Time.utc(2004,01,01,13,00,00)
-      cvs = CVS.new({"cvsroot" => ":local:repo", "cvsmodule" => "module", "checkout_dir" => "."})
+      cvs = create_cvs(":local:repo", "module")
       assert_equal("log -N -S -d\"2004-01-01 12:00:00 UTC<=2004-01-01 13:00:00 UTC\"",
         cvs.changes_command(time_before, time_after))
     end
     
     def create_cvs(cvsroot, cvsmodule, checkout_dir=new_temp_dir)
-      CVS.new("cvsroot" => cvsroot, "cvsmodule" => cvsmodule, "checkout_dir" => checkout_dir)
+      cvs = CVS.new
+      cvs.cvsroot = cvsroot
+      cvs.cvsmodule = cvsmodule
+      cvs.checkout_dir = checkout_dir
+      cvs
     end
     
     def jons_birthday
