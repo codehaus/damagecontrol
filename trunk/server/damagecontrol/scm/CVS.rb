@@ -59,6 +59,8 @@ module DamageControl
     end
     
     def changes(from_time, to_time)
+      # exclude commits that occured on from_time
+      from_time = from_time + 1
       all_changes = with_working_dir(working_dir) do
         command = changes_command(from_time, to_time)
         log = ""
