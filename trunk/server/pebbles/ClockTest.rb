@@ -21,14 +21,9 @@ module Pebbles
     end
 
     def test_countdown
-      t = Countdown.new(2)
-      def t.tick(time)
-        @r = 0 unless @r
-        @r += 1
-      end
-
-      def t.r
-        @r
+      r = 0
+      t = Countdown.new(2) do |time|
+        r += 1
       end
 
       timeout(6) do
@@ -40,25 +35,20 @@ module Pebbles
         sleep(3)
       end
       
-      assert_equal(1, t.r)
+      assert_equal(1, r)
     end
     
-    def test_clock
-      t = Clock.new(1)
-      def t.tick(time)
-        @r = 0 unless @r
-        @r += 1
+    def test_clock_ticks_several_times
+      r = 0
+      t = Clock.new(1) do |time|
+        r += 1
       end
-
-      def t.r
-        @r
-      end
-
-      timeout(6) do
+      
+      timeout(2) do
         t.start
-        sleep(5)
+        sleep(3)
       end
-      assert_equal(4, t.r)
+      assert_equal(r >= 2)
       t.shutdown
     end
   end

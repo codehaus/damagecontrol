@@ -1,5 +1,7 @@
 #!/usr/bin/env ruby
 
+$damagecontrol_home = File.expand_path("#{File.dirname(__FILE__)}/../..")
+
 require 'xmlrpc/server'
 require 'socket'
 require 'webrick'
@@ -37,7 +39,7 @@ require 'damagecontrol/scm/NoSCMWebConfigurator'
 require 'damagecontrol/web/ConsoleOutputReport'
 require 'damagecontrol/web/BuildArtifactsReport'
 require 'damagecontrol/web/ChangesReport'
-require 'damagecontrol/web/cruisecontrol/TestsReport'
+ require 'damagecontrol/web/cruisecontrol/TestsReport'
 
 # patch webrick so that it displays files it doesn't recognize as text
 module WEBrick
@@ -53,42 +55,6 @@ module WEBrick
 end
 
 module DamageControl
-
-  class WarningServer
-    def start
-      @t = Thread.new do
-        begin
-          @server = TCPServer.new(4711)          
-          while (socket = @server.accept)
-            socket.print("WARNING WARNING WARNING WARNING\r\n")
-            socket.print("DamageControl does not support trigging over port 4711 anymore\r\n")
-            socket.print("DamageControlled projects are now configured\r\n")
-            socket.print("via http://builds.codehaus.org/private/dashboard\r\n")
-            socket.print("Contact Jon or Aslak on #codehaus on irc.codehaus.org or\r\n")
-            socket.print("jon@tirsen.com or aslak@thoughtworks.net\r\n")
-            socket.print("to get a password so you can reconfigure your project.\r\n")
-            socket.print("Sorry for the inconvenience.\r\n")
-            socket.close
-          end
-        rescue => e
-        ensure
-          puts "Stopped SocketTrigger listening on port #{port}"
-        end
-      end
-    end
-    
-    def shutdown
-      begin
-        @server.shutdown
-      rescue => e
-      end
-      begin
-        @t.kill
-      rescue => e
-      end
-    end
-  end
-
   class DamageControlServer
     include FileUtils
     include Logging
@@ -170,7 +136,6 @@ module DamageControl
     def init_components
       init_config_services
       
-      component(:warning_server, WarningServer.new())
       component(:host_verifier, if allow_ips.nil? then OpenHostVerifier.new else HostVerifier.new(allow_ips) end)
       
       init_build_scheduler

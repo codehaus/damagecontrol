@@ -1,8 +1,5 @@
 #!/usr/bin/env ruby
 
-$damagecontrol_home = File::expand_path("#{File.dirname(__FILE__)}/..")
-$:.push("#{$damagecontrol_home}/server")
-
 require 'damagecontrol/DamageControlServer'
 
 include DamageControl

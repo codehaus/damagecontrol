@@ -2,9 +2,10 @@ module Pebbles
   class Clock
     attr_reader :exception
   
-    def initialize(seconds, callback=self)
+    def initialize(seconds, callback=self, &proc)
       @seconds = seconds
       @callback = callback
+      @proc = proc
       @run = true
     end
     
@@ -35,6 +36,7 @@ module Pebbles
     end
     
     def tick(time)
+      @proc.call(time) if @proc
     end
     
     def exception(e)

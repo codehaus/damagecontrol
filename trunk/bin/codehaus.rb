@@ -1,8 +1,5 @@
 #!/usr/bin/env ruby
 
-$damagecontrol_home = File::expand_path("#{File.dirname(__FILE__)}/..") 
-$:.push("#{$damagecontrol_home}/server")
-
 require 'damagecontrol/DamageControlServer'
 
 include DamageControl
@@ -30,7 +27,45 @@ def server.init_build_executors
   build_scheduler.add_executor(BuildExecutor.new(hub, build_history_repository))
 end
 
+
+class WarningServer
+  def start
+    @t = Thread.new do
+      begin
+        @server = TCPServer.new(4711)
+        while (socket = @server.accept)
+          socket.print("WARNING WARNING WARNING WARNING\r\n")
+          socket.print("DamageControl does not support trigging over port 4711 anymore\r\n")
+          socket.print("DamageControlled projects are now configured\r\n")
+          socket.print("via http://builds.codehaus.org/private/dashboard\r\n")
+          socket.print("Contact Jon or Aslak on #codehaus on irc.codehaus.org or\r\n")
+          socket.print("jon@tirsen.com or aslak@thoughtworks.net\r\n")
+          socket.print("to get a password so you can reconfigure your project.\r\n")
+          socket.print("Sorry for the inconvenience.\r\n")
+          socket.close
+        end
+      rescue => e
+      ensure
+        puts "Stopped SocketTrigger listening on port #{port}"
+      end
+    end
+  end
+  
+  def shutdown
+    begin
+      @server.shutdown
+    rescue => e
+    end
+    begin
+      @t.kill
+    rescue => e
+    end
+  end
+end
+
 def server.init_custom_components
+  
+  component(:warning_server, WarningServer.new)
   
   require 'damagecontrol/publisher/IRCPublisher'
   component(:irc_publisher, IRCPublisher.new(hub, "irc.codehaus.org", '#damagecontrol', "short_text_build_result_with_link.erb"))

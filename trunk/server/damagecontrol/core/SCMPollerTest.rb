@@ -36,7 +36,6 @@ module DamageControl
         true
       }
       should_not_poll_scm = new_mock
-      should_not_poll_scm.__expect_not_called(:changesets)
       
       poller = SCMPoller.new(hub,
         1,
@@ -52,7 +51,6 @@ module DamageControl
     def test_request_build_without_checking_if_there_is_no_completed_build
       hub = new_mock
       should_not_poll_scm = new_mock
-      should_not_poll_scm.__expect_not_called(:changesets)
       
       build_history_repository = new_mock
       build_history_repository.__expect(:last_completed_build) {|project_name|
@@ -77,7 +75,6 @@ module DamageControl
     def test_should_not_poll_projects_where_polling_hasnt_been_specified
       hub = new_mock
       should_not_poll_scm = new_mock
-      should_not_poll_scm.__expect_not_called(:changesets)
       
       poller = SCMPoller.new(hub,
         1,
@@ -93,7 +90,6 @@ module DamageControl
     def test_should_not_poll_outside_polling_interval
       hub = new_mock
       should_not_poll_scm = new_mock
-      should_not_poll_scm.__expect_not_called(:changesets)
       
       poller = SCMPoller.new(hub,
         10,

@@ -7,13 +7,8 @@ module MockIt
     def initialize
       @expected_methods=[]
       @expected_validation_procs=[]
-      @expect_not_called=[]
       @setup_call_procs={}
-    end
-    
-    # What's this method needed for? (AH)
-    def __expect_not_called(method)
-      @expect_not_called<<method
+      @unexpected_calls = []
     end
     
     def __expect(method, &validation_proc)
@@ -28,16 +23,21 @@ module MockIt
     end
     
     def __verify
-      assert_all_expected_methods_called
+      begin
+        assert_no_unexpected_calls
+        assert_all_expected_methods_called
+      ensure
+        initialize
+      end
     end
     
     def method_missing(method, *args, &proc)
-      if(is_expected_not_to_be_called(method)) then
-        flunk("#{method} expected to never be called")
-      elsif(is_setup_call(method)) then
+      if(is_expected_call(method))
+        handle_expected_call(method, *args, &proc)
+      elsif(is_setup_call(method))
         handle_setup_call(method, *args, &proc)
       else
-        handle_expected_call(method, *args, &proc)
+        handle_unexpected_call(method)
       end
     end
     
@@ -56,12 +56,16 @@ module MockIt
       if string.is_a? String then string.intern else string end
     end
     
+    def assert_no_unexpected_calls
+      assert_equal([], @unexpected_calls, "got unexpected call")
+    end
+    
     def assert_all_expected_methods_called
       assert(@expected_validation_procs.empty?, "not all expected methods called, calls left: #{@expected_methods.inspect}")
     end
     
-    def is_expected_not_to_be_called(method)
-      @expect_not_called.index(method)
+    def is_expected_call(method)
+      @expected_methods.index(method)
     end
     
     def is_setup_call(method)
@@ -77,6 +81,11 @@ module MockIt
       validation_proc = current_validation_proc
       next_call
       validation_proc.call(*args, &proc)
+    end
+    
+    def handle_unexpected_call(method)
+      @unexpected_calls << method
+      flunk("#{method} expected to never be called")
     end
     
     def currently_expected_method

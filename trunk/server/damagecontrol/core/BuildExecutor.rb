@@ -131,6 +131,11 @@ module DamageControl
       end
     end
     
+    # overload to specify more clever scheduling mechanism, like some executors are reserved for some builds etc
+    def can_execute?(build)
+      !busy?
+    end
+    
     def busy?
       !@current_build.nil?
     end

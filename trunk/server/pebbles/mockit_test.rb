@@ -13,8 +13,7 @@ module MockIt
       end
     end
     
-    def test_call_to_expect_not_called_call_fails
-      @mock.__expect_not_called(:expected_not_called)
+    def test_call_to_unexpected_call_fails
       assert_raises(Test::Unit::AssertionFailedError) do
         @mock.expected_not_called
       end
@@ -91,6 +90,26 @@ module MockIt
       assert(@mock.respond_to?("expected_method"))
       assert(!@mock.respond_to?(:other_method))
       assert(!@mock.respond_to?("other_method"))
+    end
+    
+    def test_can_verify_several_times_with_different_excepts
+      @mock.__expect(:expected_method)
+      @mock.expected_method
+      @mock.__verify
+      @mock.__expect(:another_expected_method)
+      @mock.another_expected_method
+      @mock.__verify
+    end
+    
+    def test_verify_fails_if_got_unexpected_call
+      assert_raises(Test::Unit::AssertionFailedError) do
+        @mock.unexpected_call
+      end
+      assert_raises(Test::Unit::AssertionFailedError) do
+        @mock.__verify
+      end
+      # should reset state after __verify
+      @mock.__verify
     end
     
   end

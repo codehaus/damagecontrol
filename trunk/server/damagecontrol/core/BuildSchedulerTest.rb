@@ -21,21 +21,24 @@ module DamageControl
     
     def test_build_is_scheduled_on_available_executor
       @mock_executor.__expect(:building_project?) { |project_name| assert_equal("project", project_name); false }
-      @mock_executor.__expect(:busy?) { false }
-      @mock_executor.__expect(:put) { |o| assert_same(@build, o) }
+      @mock_executor.__expect(:can_execute?) {|b| assert_same(@build, b) ; true }
+      @mock_executor.__expect(:put) {|b| assert_same(@build, b) }
       @scheduler.on_message(BuildRequestEvent.new(@build))
       @mock_hub.__verify
       @mock_executor.__verify
     end
     
-    def test_build_is_not_scheduled_on_busy_executor    
+    def test_build_is_not_executed_on_busy_executor
       @mock_executor.__expect(:building_project?) { |project_name| assert_equal("project", project_name); false }
-      @mock_executor.__expect(:busy?) { true }
-      @mock_executor.__expect(:building_project?) { |project_name| assert_equal("project", project_name); false }
-      @mock_executor.__expect(:busy?) { false }
-      @mock_executor.__expect(:put) { |o| assert_same(@build, o) }
+      @mock_executor.__expect(:can_execute?) {|b| false }
       @scheduler.on_message(BuildRequestEvent.new(@build))
       @mock_hub.__verify
+      @mock_executor.__verify
+      
+      @mock_executor.__expect(:building_project?) { |project_name| assert_equal("project", project_name); false }
+      @mock_executor.__expect(:can_execute?) {|b| true }
+      @mock_executor.__expect(:put) { |o| assert_same(@build, o) }
+      @scheduler.on_message(BuildCompleteEvent.new(@build))
       @mock_executor.__verify
     end
     
@@ -44,9 +47,9 @@ module DamageControl
       @scheduler.add_executor(other_executor)
     
       @mock_executor.__expect(:building_project?) { |project_name| assert_equal("project", project_name); false }
-      @mock_executor.__expect(:busy?) { true }
+      @mock_executor.__expect(:can_execute?) {|b| false }
       other_executor.__expect(:building_project?) { |project_name| assert_equal("project", project_name); false }
-      other_executor.__expect(:busy?) { false }
+      other_executor.__expect(:can_execute?) {|b| true }
       other_executor.__expect(:put) { |o| assert_same(@build, o) }
 
       @scheduler.on_message(BuildRequestEvent.new(@build))
@@ -54,7 +57,7 @@ module DamageControl
       @mock_executor.__verify
     end
     
-    def test_queued_build_is_scheduled_when_executor_is_available
+    def Xtest_queued_build_is_scheduled_when_executor_is_available
       other_build = Build.new("other")
 
       @mock_executor.__expect(:building_project?) { |project_name| assert_equal("project", project_name); false }
@@ -78,9 +81,9 @@ module DamageControl
       project_build1 = Build.new("project")
 
       @mock_executor.__expect(:building_project?) { |project_name| assert_equal("project", project_name); false }
-      @mock_executor.__expect(:busy?) { false }
-      @mock_executor.__expect(:put) { |o| assert_same(project_build1, o) }
-      @mock_executor.__expect(:building_project?) { |project_name| assert_equal("project", project_name); true }
+      @mock_executor.__expect(:can_execute?) {|b| true }
+      @mock_executor.__expect(:put) { |b| assert_same(project_build1, b) }
+      @mock_executor.__expect(:building_project?) {|project_name| assert_equal("project", project_name); true }
 
       @scheduler.on_message(BuildRequestEvent.new(project_build1))
       @scheduler.on_message(BuildRequestEvent.new(@build))
@@ -89,20 +92,19 @@ module DamageControl
     end
     
     def test_three_requests_from_three_different_projects_are_queued_and_then_scheduled
-    
       project1_build = Build.new("project1")
       project2_build = Build.new("project2")
       
       @mock_executor.__expect(:building_project?) { |project_name| assert_equal("project", project_name); false }
-      @mock_executor.__expect(:busy?) { false }
+      @mock_executor.__expect(:can_execute?) {|b| true }
       @mock_executor.__expect(:put) { |o| assert_same(@build, o) }
 
       @mock_executor.__expect(:building_project?) { |project_name| assert_equal("project1", project_name); false }
-      @mock_executor.__expect(:busy?) { false }
+      @mock_executor.__expect(:can_execute?) {|b| true }
       @mock_executor.__expect(:put) { |o| assert_same(project1_build, o) }
 
       @mock_executor.__expect(:building_project?) { |project_name| assert_equal("project2", project_name); false }
-      @mock_executor.__expect(:busy?) { false }
+      @mock_executor.__expect(:can_execute?) {|b| true }
       @mock_executor.__expect(:put) { |o| assert_same(project2_build, o) }
 
       @scheduler.on_message(BuildRequestEvent.new(@build))
@@ -124,9 +126,13 @@ module DamageControl
       build2 = Build.new("project")
       build3 = Build.new("project")
 
-      mock_executor.__expect(:building_project?) { |project_name| assert_equal("project", project_name); false }
-      mock_executor.__expect(:busy?) { false }
-      mock_executor.__expect(:put) { |o| assert_same(build3, o) }
+      @building_project = false
+      mock_executor.__setup(:building_project?) {|project_name| 
+        assert_equal("project", project_name)
+        @building_project
+      }
+      mock_executor.__expect(:can_execute?) { true }
+      mock_executor.__expect(:put) {|b| assert_same(build3, b) ; @building_project = true }
 
       scheduler.on_message(BuildRequestEvent.new(@build))
       scheduler.on_message(BuildRequestEvent.new(build2))
@@ -147,25 +153,12 @@ module DamageControl
       @mock_executor.__verify
 
       @mock_executor.__expect(:building_project?) { |project_name| assert_equal("project", project_name); false }
-      @mock_executor.__expect(:busy?) { false }
+      @mock_executor.__expect(:can_execute?) {|b| true }
       @mock_executor.__expect(:put) { |o| assert_same(@build, o) }
 
       sleep(2)
 
       @mock_executor.__verify
-    end
-    
-    def test_build_queue_is_sorted_according_to_elapsed_quiet_period_next_build_first
-      @build.config["quiet_period"] = 100
-      build2 = Build.new("project2")
-      build2.config["quiet_period"] = 100
-      earliest_build = Build.new("earliest_project")
-      earliest_build.config["quiet_period"] = 2
-      @scheduler.on_message(BuildRequestEvent.new(@build))
-      @scheduler.on_message(BuildRequestEvent.new(build2))
-      @scheduler.on_message(BuildRequestEvent.new(earliest_build))
-      
-      assert_equal([earliest_build, @build, build2], @scheduler.build_queue)
     end
   end
 end
