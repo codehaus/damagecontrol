@@ -5,7 +5,7 @@ require 'ftools'
 
 module RSCM
 
-  class CVSLogParser < AbstractLogParser
+  class CvsLogParser < AbstractLogParser
     REVISION_SEPARATOR = /^----------------------------$/
     ENTRY_SEPARATOR = /^=============================================================================$/
     
