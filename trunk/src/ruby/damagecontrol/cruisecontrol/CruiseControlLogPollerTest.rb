@@ -1,6 +1,6 @@
 require 'test/unit'
 require 'damagecontrol/HubTestHelper'
-require 'damagecontrol/CruiseControlLogPoller'
+require 'damagecontrol/cruisecontrol/CruiseControlLogPoller'
 require 'ftools'
 
 module DamageControl

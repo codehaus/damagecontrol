@@ -6,8 +6,7 @@ require 'damagecontrol/BuildExecutor'
 require 'damagecontrol/Hub'
 require 'damagecontrol/FileUtils'
 require 'damagecontrol/BuildBootstrapper'
-require 'damagecontrol/CVS'
-require 'ftools'
+require 'damagecontrol/scm/CVS'
 
 include DamageControl
 

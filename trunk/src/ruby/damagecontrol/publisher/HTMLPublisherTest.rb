@@ -1,5 +1,5 @@
 require 'test/unit'
-require 'damagecontrol/HTMLPublisher'
+require 'damagecontrol/publisher/HTMLPublisher'
 require 'damagecontrol/BuildEvents'
 require 'damagecontrol/SocketTrigger'
 require 'ftools'
@@ -10,11 +10,6 @@ module DamageControl
 	
 		Testfile = "dc/kingsley/website/buildresult.html"
 				
-		def teardown
-			puts "deleting #{@testfile}"
-			File.delete(Testfile) if File.exists?(Testfile)
-		end
-
 		def test_buildresults_is_written_in_correct_location_upon_build_complete_event
 			hp = HTMLPublisher.new
 

@@ -26,5 +26,4 @@ module DamageControl
 			schedule_next_tick
 		end
 	end
-	
 end

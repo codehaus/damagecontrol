@@ -24,13 +24,4 @@ module DamageControl
 			@received_message = message
 		end
 	end
-	
-	def InOutQueue
-	end
-
-	def InOutQueueTest
-		def test_published_message_is_put_on_out_queue
-		end
-	end
-
 end

@@ -1,5 +1,5 @@
 require 'test/unit'
-require 'damagecontrol/WebsitePublisher'
+require 'damagecontrol/publisher/WebsitePublisher'
 require 'damagecontrol/FileUtils'
 require 'ftools'
 

@@ -23,9 +23,9 @@ module DamageControl
 	
 		attr_accessor :port
 		
-		def initialize(hub)
+		def initialize(hub, port=4711)
 			@hub = hub
-			@port = 4711
+			@port = port
 		end
 		
 		def do_accept(payload)

@@ -1,9 +1,8 @@
 require 'mock_with_returns'
 require 'test/unit'
+require 'damagecontrol/publisher/IRCPublisher'
 require 'damagecontrol/Hub'
 require 'damagecontrol/Build'
-require 'damagecontrol/IRCPublisher'
-require 'damagecontrol/HubTestHelper'
 require 'damagecontrol/FileUtils'
 
 module DamageControl

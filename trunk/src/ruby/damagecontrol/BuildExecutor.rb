@@ -1,17 +1,7 @@
 require 'damagecontrol/BuildEvents'
+require 'damagecontrol/scm/SCM'
 
 module DamageControl
-	
-	class SCM
-		def handles_path?(path)
-			false
-		end
-		
-		# checks out (or updates) scm_path to directory
-		def checkout(path, directory)
-			raise "can't check out #{scm_path}"
-		end
-	end
 	
 	class NilSCM < SCM
 		def handles_path?(path)

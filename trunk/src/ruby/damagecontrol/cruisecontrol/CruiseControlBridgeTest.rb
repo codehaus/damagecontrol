@@ -1,5 +1,5 @@
-require 'test\unit'
-require 'damagecontrol\CruiseControlBridge'
+require 'test/unit'
+require 'damagecontrol/cruisecontrol/CruiseControlBridge'
 
 module DamageControl
 
