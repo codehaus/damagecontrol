@@ -35,7 +35,10 @@ module DamageControl
 
     def on_message(event)
       if event.is_a?(DoCheckoutEvent)
-        checked_out_event = CheckedOutEvent.new(event.project_name, checkout(event.project_name), event.force_build)
+        logger.info("Received checkout request for #{project_name}")
+        changesets = checkout(event.project_name)
+        logger.info("Changesets for #{project_name}: #{changesets}")
+        checked_out_event = CheckedOutEvent.new(event.project_name, changesets, event.force_build)
         @channel.put(checked_out_event)
       end
     end
