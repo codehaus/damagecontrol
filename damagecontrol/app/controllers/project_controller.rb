@@ -69,8 +69,8 @@ class ProjectController < ApplicationController
 
   def save
     project = instantiate_from_hash(DamageControl::Project, @params[DamageControl::Project.name])
-    project.scm = selected("scms")
-    project.tracker = selected("trackers")
+    project.scm = find_selected("scms")
+    project.tracker = find_selected("trackers")
     project.publishers = instantiate_array_from_hashes(@params["publishers"])
 
     project.save
