@@ -36,6 +36,16 @@ module RSCM
     end
     module_function :changesets_rss_file
 
+    # TODO: we should store the diff file on disk instead,
+    # and generate individual sub-htmls on the fly for specific
+    # diffs inside it, using hashes (md5) to identify individual diffs
+    # witin the diff file. RSS should maybe be generated on the fly
+    # too if we want to have colour html in them (not sure if we want that tho).
+    def changeset_html_file(project_name, changeset_id)
+      "#{changesets_dir(project_name)}/#{changeset_id}/changeset.html"
+    end
+    module_function :changeset_html_file
+
     def trigger_checkout_dir(project_name)
       "#{project_dir(project_name)}/trigger_checkout"
     end

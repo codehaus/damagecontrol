@@ -5,6 +5,8 @@ require 'rscm/time_ext'
 
 module RSCM
 
+  # TODO: add a hook to get committers from a separate class - to support registered pairs
+  # We'll be able to do lots of cool analysis with visitors later -> graphs. mmmmm.
   # A collection of changesets.
   class ChangeSets
     include Enumerable
@@ -151,6 +153,10 @@ module RSCM
       ChangeSets.ids(changesets_dir)[-1]
     end
 
+    # Yields an IO containing a unified diff.
+    # The diff can be handed to DiffParser to create an array
+    # of Diff objects which in turn can be turned into HTML
+    # with a DiffHtmlizer.
     def diff(checkout_dir, scm, &block)
       each { |changeset| changeset.diff(checkout_dir, scm, &block) }
     end
@@ -267,7 +273,8 @@ module RSCM
     
     def save(changesets_dir)
       changeset_file = "#{changesets_dir}/#{id}/changeset.yaml"
-      FileUtils.mkdir_p(File.dirname(changeset_file))
+      dir = File.dirname(changeset_file)
+      FileUtils.mkdir_p(dir)
       File.open(changeset_file, "w") do |io|
         YAML::dump(self, io)
       end

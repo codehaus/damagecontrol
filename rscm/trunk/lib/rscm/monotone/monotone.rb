@@ -75,7 +75,9 @@ module RSCM
     def checkout_silent(checkout_dir)
       monotone("checkout #{checkout_dir}", @branch, @key) do |stdout|
         stdout.each_line do |line|
-          # TODO: checkout prints nothing to stdout - may be fixed in a future monotone...
+          # TODO: checkout prints nothing to stdout - may be fixed in a future monotone.
+          # When/if it happens we may want to do a kosher implementation of checkout
+          # to get yields as checkouts happen.
           yield line if block_given?
         end
       end
@@ -87,7 +89,7 @@ module RSCM
       branch_opt = branch ? "--branch=\"#{branch}\"" : ""
       key_opt = key ? "--key=\"#{key}\"" : ""
       cmd = "monotone --db=\"#{@db_file}\" #{branch_opt} #{key_opt} #{monotone_cmd}"
-puts "COMMAND: #{cmd}"
+puts "MONOTONE COMMAND: #{cmd}"
       safer_popen(cmd, "r+") do |io|
         if(block_given?)
           return(yield(io))

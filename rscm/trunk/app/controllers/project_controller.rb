@@ -2,8 +2,6 @@ require 'rscm'
 
 class ProjectController < ApplicationController
 
-  layout 'rscm'
-
   def initialize
     super
     @navigation_name = "changesets_list"

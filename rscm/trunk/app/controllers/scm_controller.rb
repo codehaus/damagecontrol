@@ -2,14 +2,13 @@ require 'rscm/directories'
 
 class ScmController < ApplicationController
 
-  layout 'rscm'
-
   # Checks out a working copy into the project's checkout dir.
   def checkout
     load_project
 
     # Do this asynch to give a fast response
     # TODO: guard against multiple concurrent checkouts
+    # TODO: put the thread on the daemon side instead
     Thread.new do
       @project.checkout
     end
@@ -32,6 +31,14 @@ class ScmController < ApplicationController
     else
       render_text("No files checked out yet")
     end
+  end
+  
+  def diff
+    changeset_id = @params["changeset"]
+    #@path = @params["path"]
+    project_name = @params["id"]
+    @diff_html = RSCM::Directories.changeset_html_file(project_name, changeset_id)
+    #render_text(File.open("C:/scm/dc_svn/rscm/trunk/target/work/RSCM/changesets/1274/changeset.html").read)
   end
 
   # Creates the SCM repo

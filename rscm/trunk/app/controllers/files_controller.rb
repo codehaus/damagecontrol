@@ -2,8 +2,6 @@ require 'rscm/directories'
 
 class FilesController < ApplicationController
 
-  layout 'rscm'
-
   def list
     load_project
     

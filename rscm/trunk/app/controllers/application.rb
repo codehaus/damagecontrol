@@ -9,6 +9,8 @@ Rscm = DRbObject.new(nil, 'druby://localhost:9000')
 
 class ApplicationController < ActionController::Base
 
+  layout 'rscm'
+
   def initialize
     @sidebar_links = [
       {

@@ -1,6 +1,7 @@
 module RSCM
 
   # Visitor that can visit an array of diffs and produce nice HTML
+  # TODO: add line numbers.
   class DiffHtmlizer
     # Creates a new DiffHtmlizer that will write HTML
     # to the IO object +io+ when visiting an array of diffs.

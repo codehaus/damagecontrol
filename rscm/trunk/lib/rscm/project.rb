@@ -3,6 +3,8 @@ require 'drb'
 require 'fileutils'
 require 'rscm/directories'
 require 'rscm/changes'
+require 'rscm/diff_parser'
+require 'rscm/diff_htmlizer'
 
 class String
   # Turns a String into a new int or time, representing the next changeset id
@@ -84,10 +86,31 @@ module RSCM
     def poll(from_if_first_poll=Time.epoch)
       from = next_changeset_identifier || from_if_first_poll
       
+puts "Getting changesets for #{name} from #{from}"
       # TODO: Use a yield model here so we don't have to cache as much in memory.
       changesets = @scm.changesets(checkout_dir, from)
-      if(!changesets.empty?)
+      if(changesets.empty?)
+puts "No changesets for #{name} from #{from}"
+      else
         changesets.save(changesets_dir)
+
+# !!!! TODO: pass in an array of changeset visitors, like [cs_saver, cs_diff_writer, cs_rss_writer]
+# While at it introduce logger.rb and replace puts statements across the codebase.
+
+        # Get the diffs and make HTML diffs
+        # TODO: maybe only save diff to disk and generate
+        # HTML on the fly later
+#        dp = DiffParser.new
+#        changesets.each do |changeset|
+#          changeset_html_file = changeset_html_file(changeset.id)
+#puts "Writing HTML diff to #{changeset_html_file}"
+#          File.open(changeset_html_file, "w") do |html|
+#            diff_htmlizer = DiffHtmlizer.new(html)
+#            changeset.diff(checkout_dir, @scm) do |diff_io|
+#              dp.parse_diffs(diff_io).accept(diff_htmlizer)
+#            end
+#          end
+#        end
 
         # Now we need to update the RSS. The RSS spec says max 15 items in a channel,
         # So we'll get upto the latest 15 changesets and RSS it..
@@ -149,6 +172,10 @@ module RSCM
 
     def changesets_dir
       Directories.changesets_dir(name)
+    end
+    
+    def changeset_html_file(changeset_id)
+      Directories.changeset_html_file(name, changeset_id)
     end
     
     def changesets(changeset_id, prior)

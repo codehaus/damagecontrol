@@ -6,7 +6,7 @@ which is described in AbstractSCM.
 = Feature overview
 
 * API support for several high level operations such as checkout, get changesets, check for uptodate etc.
-* Built-in admin server based on Rails (http://www.rubyonrails.org/)
+* Web interface based on Rails (http://www.rubyonrails.org/)
 * Generation of colourised HTML diffs.
 * Generation of RSS feeds.
 * Generation of URL links to diffs for several popular SCM web front-ends.
@@ -36,11 +36,17 @@ You also need to launch (in a separate console) the RSCM daemon process:
   
 The daemon process is the core of RSCM, that performs SCM access. The web app communicates with this process
 over Drb. The reason why two processes are needed is due to the fact that Dir.chdir may happen in various threads,
-which will confuse the webapp. We tried with forking, but this is not supported on Windows.
+which would confuse the webapp if they ran in the same Ruby process. We tried with forking, but this is not 
+supported on Windows. We may support a fork-based one-process alternative for Linux/Cygwin in the future.
 
 Once the two servers are started, you can access the web app on:
 
   http://localhost:4712/
+
+== Colourised HTML
+
+The web interface will present changesets as colourised diffs. Even for SCMs you never thought would support
+that kind of feature. (As long as there is an RSCM plugin for it).
 
 == RSS Support
 

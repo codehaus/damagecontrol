@@ -26,7 +26,7 @@
         <td width="5%"><%= tag("img", :src => change.icon) %></td>
         <td width="5%"><%= change.revision %></td>
         <td width="90%">
-          <%= change.path %>
+          <%= link_to(change.path, :controller => "scm", :action => "diff", :id => @project.name, :params => {"path" => change.path, "changeset" => changeset.id}) %>
         </td>
       </tr>
     <% end %>

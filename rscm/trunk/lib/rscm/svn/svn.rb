@@ -113,7 +113,8 @@ module RSCM
 
     def diff(checkout_dir, change, &block)
       with_working_dir(checkout_dir) do
-        safer_popen("svn diff -r #{change.previous_revision}:#{change.revision} #{change.path}") do |io|
+        cmd = "svn diff -r #{change.previous_revision}:#{change.revision} #{change.path}"
+        safer_popen(cmd) do |io|
           return(yield(io))
         end
       end

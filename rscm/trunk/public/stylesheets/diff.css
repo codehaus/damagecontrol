@@ -17,7 +17,7 @@ tr.alt #removed {background-color:#f7cccc;}
 td {padding-left:.3em;padding-right:.3em;}
 tr.head {border-bottom-width:1px;border-bottom-style:solid;}
 tr.head td {padding:0;padding-top:.2em;}
-.task {background-color:#ffff00;}
+.code_task {background-color:#ffff00;}
 .comment {padding:4px;border:1px dashed #000000;background-color:#ffffdd}
 .error {color:red;}
 hr {border-width:0px;height:2px;background:black;}
