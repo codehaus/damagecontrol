@@ -1,7 +1,7 @@
 require 'test/unit'
 require 'mockit'
 
-require 'FileUtils'
+require 'fileutils'
 
 require 'damagecontrol/Build'
 require 'damagecontrol/Hub'
