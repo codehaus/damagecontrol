@@ -32,7 +32,7 @@ module DamageControl
         build_history_repository
       )
       
-      xp.on_message(BuildCompleteEvent.new(b))
+      xp.put(BuildCompleteEvent.new(b))
       assert_equal(File.open("#{damagecontrol_home}/testdata/myproject/build/build_history.xml").read.length, File.open(build_history_xml).read.length)
       assert_equal(File.open("#{damagecontrol_home}/testdata/myproject/stats/build_history_stats.xml").read.length, File.open(build_history_stats_xml).read.length)
     end

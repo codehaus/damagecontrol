@@ -12,22 +12,17 @@ end
 
 module DamageControl
 
-  class BuildHistoryStatsPublisher < Pebbles::Space
+  class BuildHistoryStatsPublisher
     include XSLT
     include FileUtils
 
     def initialize(channel, build_history_repository)
-      super
-      channel.add_consumer(self)
+      @channel = channel
+      @channel.add_consumer(self)
       @build_history_repository = build_history_repository
     end
   
-    def start
-      logger.info("starting #{self}")
-      super
-    end
-
-    def on_message(message)
+    def put(message)
       if message.is_a? BuildCompleteEvent
         build = message.build
         build_history = @build_history_repository.history(build.project_name, false)
@@ -38,7 +33,8 @@ module DamageControl
         end
         stats_file = "#{@build_history_repository.project_dir(build.project_name)}/stats/build_history_stats.xml"
         mkdir_p(File.dirname(stats_file))
-        puts xslt(xml_history_file, "#{damagecontrol_home}/server/damagecontrol/publisher/build_history_to_stats.xsl", stats_file)
+        xslt(xml_history_file, "#{damagecontrol_home}/server/damagecontrol/publisher/build_history_to_stats.xsl", stats_file)
+        @channel.put(StatProducedEvent.new(build.project_name, stats_file))
       end
     end
   end

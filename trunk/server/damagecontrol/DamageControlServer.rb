@@ -52,12 +52,14 @@ require 'damagecontrol/web/ErrorsReport'
 require 'damagecontrol/web/cruisecontrol/TestsReport'
 
 require 'damagecontrol/publisher/BuildHistoryStatsPublisher'
+require 'damagecontrol/publisher/StatsXSLTPublisher'
 
 # patch webrick so that it displays files it doesn't recognize as text
 module WEBrick
   module HTTPUtils
     def mime_type(filename, mime_tab)
       if suffix = (/\.(\w+)$/ =~ filename && $1)
+        mime_tab["svg"] = "image/svg+xml"
         mtype = mime_tab[suffix.downcase]
       end
       mtype || "text/plain"
@@ -344,6 +346,14 @@ module DamageControl
     
     def init_build_history_stats_publisher
       component(:build_history_stats_publisher, BuildHistoryStatsPublisher.new(hub, build_history_repository))
+
+      sxp = StatsXSLTPublisher.new(
+        hub,
+        {
+          "#{damagecontrol_home}/server/damagecontrol/publisher/stats_to_svg.xsl" => "build_duration.svg"
+        }
+      )
+      component(:stats_xslt_publisher, sxp)
     end
     
     def log4r_config_file
