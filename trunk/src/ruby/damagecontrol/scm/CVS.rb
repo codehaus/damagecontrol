@@ -117,7 +117,7 @@ module DamageControl
       Dir.chdir("#{directory}/CVSROOT")
       File.open("#{directory}/CVSROOT/loginfo", File::WRONLY | File::APPEND) do |file|
         script = SocketTrigger.new(nil,nil,nil).trigger_command(project_name, spec, build_command_line, relative_path, nc_command(spec), dc_host, dc_port)
-        file.puts("#{mod(spec)} #{script} %{sVv}")
+        file.puts("#{mod(spec)} #{script}")
       end
 
       if(windows?)
