@@ -29,7 +29,7 @@ module DamageControl
       build.successful = false
       build.label = "99"
       mod = Modification.new()
-      mod.developer = "tirsen"
+      mod.developer = "damagecontrol"
       build.modification_set <<  mod
       
       @jira_publisher.process_message(BuildCompleteEvent.new(build))
@@ -41,7 +41,7 @@ module DamageControl
       summary="Fix broken build"
       description="BUILD FAILED test_project 99"
       project-key="DC" 
-      assignee="tirsen"
+      assignee="damagecontrol"
       issue-type="Task"
       priority="Major"
       />
