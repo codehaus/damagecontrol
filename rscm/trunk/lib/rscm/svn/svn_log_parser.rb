@@ -12,16 +12,15 @@ module RSCM
     # we need to pass in dates, since the log may contain changes outside the desired dates.
     # this is because the svn log command strangely includes the first changeset before the start date.
     # this is probably an svn bug, or at least a very odd feature.
-    def parse_changesets(start_date=nil, end_date=nil, &line_proc)
+    def parse_changesets(start_identifier=nil, end_identifier=nil, &line_proc)
       # skip over the first ------
       @changeset_parser.parse(@io, true, &line_proc)
       changesets = ChangeSets.new
       while(!@io.eof?)
         changeset = @changeset_parser.parse(@io, &line_proc)
         if(changeset)
-          # have to strip the last newline before -------
-          after_required = start_date.nil? || start_date < changeset.time
-          before_required = end_date.nil? || changeset.time <= end_date
+          after_required = start_identifier.nil? || changeset.id.to_i >= start_identifier.to_i
+          before_required = end_identifier.nil? || changeset.id.to_i <= end_identifier.to_i
           if(after_required && before_required)
             changesets.add(changeset)
           end

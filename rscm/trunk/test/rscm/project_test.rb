@@ -28,6 +28,11 @@ module RSCM
 
       a = Time.new.utc
       FileUtils.mkdir_p("#{p.changesets_dir}/#{a.ymdHMS}")
+      File.open("#{p.changesets_dir}/#{a.ymdHMS}/changeset.yaml", "w") do |io|
+        cs = ChangeSet.new
+        cs << Change.new("path", "aslak", "hello", "55", Time.new.utc)
+        YAML::dump(cs, io)
+      end
       p.scm = new_mock
       p.scm.__expect(:changesets) do |checkout_dir, from|
         assert_equal(a+1, from)
@@ -39,16 +44,19 @@ module RSCM
     end
     
     def test_should_look_at_folders_to_determine_next_changeset_time
-      changes_dir = RSCM.new_temp_dir
+      changesets_dir = RSCM.new_temp_dir
       a = Time.new.utc
       b = a + 1
       c = b + 1
-      FileUtils.mkdir_p("#{changes_dir}/#{a.ymdHMS}")
-      FileUtils.mkdir_p("#{changes_dir}/#{c.ymdHMS}")
-      FileUtils.mkdir_p("#{changes_dir}/#{b.ymdHMS}")
+      FileUtils.mkdir_p("#{changesets_dir}/#{a.ymdHMS}")
+      FileUtils.touch("#{changesets_dir}/#{a.ymdHMS}/changeset.yaml")
+      FileUtils.mkdir_p("#{changesets_dir}/#{c.ymdHMS}")
+      FileUtils.touch("#{changesets_dir}/#{c.ymdHMS}/changeset.yaml")
+      FileUtils.mkdir_p("#{changesets_dir}/#{b.ymdHMS}")
+      FileUtils.touch("#{changesets_dir}/#{b.ymdHMS}/changeset.yaml")
       
       p = Project.new
-      assert_equal(c+1, p.next_changeset_time(changes_dir))
+      assert_equal(c+1, p.next_changeset_identifier(changesets_dir))
     end
   end
 end

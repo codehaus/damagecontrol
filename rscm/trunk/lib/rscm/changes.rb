@@ -129,14 +129,14 @@ module RSCM
 
       changesets = ChangeSets.new
       ids[first..last].each do |id|
-        changesets.add(YAML::load_file("#{changesets_dir}/#{id}/changesets.yaml"))
+        changesets.add(YAML::load_file("#{changesets_dir}/#{id}/changeset.yaml"))
       end
       changesets
     end
 
     # Returns a sorted array of ints representing the changeset directories.
     def ChangeSets.ids(changesets_dir)
-      dirs = Dir["#{changesets_dir}/*"].find_all {|f| File.directory?(f) && File.exist?("#{f}/changesets.yaml")}
+      dirs = Dir["#{changesets_dir}/*"].find_all {|f| File.directory?(f) && File.exist?("#{f}/changeset.yaml")}
       # Turn them into ints so they can be sorted.
       dirs.collect { |dir| File.basename(dir).to_i }.sort
     end
@@ -249,9 +249,9 @@ module RSCM
     end
     
     def save(changesets_dir)
-      changesets_file = "#{changesets_dir}/#{id}/changesets.yaml"
-      FileUtils.mkdir_p(File.dirname(changesets_file))
-      File.open(changesets_file, "w") do |io|
+      changeset_file = "#{changesets_dir}/#{id}/changeset.yaml"
+      FileUtils.mkdir_p(File.dirname(changeset_file))
+      File.open(changeset_file, "w") do |io|
         YAML::dump(self, io)
       end
     end

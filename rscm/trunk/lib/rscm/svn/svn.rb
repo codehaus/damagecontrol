@@ -168,6 +168,9 @@ module RSCM
     end
 
     def changesets(checkout_dir, from_identifier, to_identifier=Time.infinity, files=nil)
+      # Return empty changeset if the requested revision doesn't exist yet.
+      return ChangeSets.new if(from_identifier.is_a?(Integer) && head_revision(checkout_dir) < from_identifier)
+
       checkout_dir = PathConverter.filepath_to_nativepath(checkout_dir, false)
       changesets = nil
       command = "svn #{changes_command(from_identifier, to_identifier, files)}"
@@ -263,7 +266,10 @@ module RSCM
       # http://svnbook.red-bean.com/svnbook-1.1/svn-book.html#svn-ch-3-sect-3.3
       # file_list = files.join('\n')
 # WEIRD cygwin bug garbles this!?!?!?!
-      "log --verbose #{revision_option(from_identifier, to_identifier)} #{url}"
+      cmd = "log --verbose #{revision_option(from_identifier, to_identifier)} #{url}"
+puts from_identifier
+puts cmd
+      cmd
     end
 
     def revision_option(from_identifier, to_identifier)

@@ -103,7 +103,9 @@ EOF
         # revisions r16, r17 and r18
         start_date = Time.utc(2004,04,14,14,17,35,0) # same as r15
         end_date = Time.utc(2004,05,10,22,36,25,0) # same as r18
-        changesets = parser.parse_changesets(start_date, end_date) {|line|}
+        first = 16
+        last = 18
+        changesets = parser.parse_changesets(first, last) {|line|}
         assert_equal(3, changesets.length)
 
         assert_equal("18", changesets[0].revision)

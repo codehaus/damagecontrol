@@ -6,7 +6,7 @@
 <% @projects.each do |project| %>
   <tr>
     <td align="left"><%= link_to(project.name, {:controller => "project", :action => "view", :id => project.name}) %></td>
-    <td align="left"><%= link_to_image("rssbadge.gif", :action => "rss", :id => project.name) %></td>
+    <td align="left"><%= link_to_image("rss.gif", :action => "rss", :id => project.name) %></td>
   </tr>
 <% end %>
 </table>

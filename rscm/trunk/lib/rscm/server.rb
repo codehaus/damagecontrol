@@ -11,6 +11,10 @@ module RSCM
       project.save
     end
 
+    def delete_project(project)
+      project.delete
+    end
+
     def checkout_project(project)
       project.checkout
     end

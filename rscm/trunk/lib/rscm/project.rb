@@ -4,6 +4,19 @@ require 'fileutils'
 require 'rscm/directories'
 require 'rscm/changes'
 
+class String
+  # Turns a String into a new int or time, representing the next changeset id
+  def next_changeset_id
+    if(self =~ /20\d\d\d\d\d\d\d\d\d\d\d\d/)
+      # It's a timestamp string - convert to time.
+      Time.parse_ymdHMS(self) + 1
+    else
+      # It's an arbitrary integer.
+      self.to_i + 1
+    end
+  end
+end
+
 module RSCM
   # Represents a project with associated SCM, Tracker and SCMWeb
   class Project
@@ -69,8 +82,7 @@ module RSCM
     # been previously stored on disk), then changesets since +from_if_first_poll+
     # will be retrieved.
     def poll(from_if_first_poll=Time.epoch)
-      from = next_changeset_time || from_if_first_poll
-
+      from = next_changeset_identifier || from_if_first_poll
       changesets = @scm.changesets(checkout_dir, from)
       if(!changesets.empty?)
         changesets.save(changesets_dir)
@@ -94,16 +106,14 @@ module RSCM
       end
     end
 
-    # Returns the time that should be used to get the next (unrecorded)
-    # changeset. This is the time of the latest recorded changeset +1. 
-    # This time is determined by looking at the directory names under 
+    # Returns the id (string label or time) that should be used to get the next (unrecorded)
+    # changeset. This is the id *following* the latest recorded changeset. 
+    # This id is determined by looking at the directory names under 
     # +changesets_dir+. If there are none, this method returns nil.
-    def next_changeset_time(d=changesets_dir)
-      changestet_dirs = Dir["#{d}/*"]
-      latest_dir = changestet_dirs.sort.reverse.find {|f| File.directory?(f)}
-      return nil unless latest_dir
-      latest = File.basename(latest_dir)
-      Time.parse_ymdHMS(latest) + 1
+    def next_changeset_identifier(d=changesets_dir)
+      # See String extension at top of this file.
+      latest_id = ChangeSets.latest_id(d)
+      latest_id ? latest_id.to_s.next_changeset_id : nil
     end
     
     # Where RSS is written.
@@ -141,6 +151,10 @@ module RSCM
 
     def changeset_ids
       ChangeSets.ids(changesets_dir)
+    end
+    
+    def delete
+      File.delete(Directories.project_dir(name))
     end
 
   private

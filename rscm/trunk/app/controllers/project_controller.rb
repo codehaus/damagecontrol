@@ -40,9 +40,13 @@ class ProjectController < ApplicationController
   end
 
   def delete
-    # TODO: delete it
-    render "project/view"
-    redirect_to(:controller => "admin", :action => "list")
+    load_project
+    begin
+      Rscm.delete_project(project)
+    rescue => e
+      return render_text("Couldn't connect to RSCM server. Please make sure it's running.<br>" + e.message)
+    end
+    index
   end
 
   def save
