@@ -1,8 +1,7 @@
+require 'socket'
 require 'damagecontrol/BuildEvents'
 require 'damagecontrol/Hub'
 require 'damagecontrol/Build'
-
-require 'socket'
 
 module DamageControl
 
@@ -19,6 +18,14 @@ module DamageControl
 		end
 	end
 
+	# This class listens for incoming connections. For each connection
+	# it reads one line of payload which is sent to the hub wrapped in
+	# a SocketRequestEvent object. Then it closes the connection and
+	# listens for new connections.
+	#
+	# Consumes:
+	# Emits: BuildRequestEvent
+	#
 	class SocketTrigger
 	
 		attr_accessor :port
@@ -35,18 +42,13 @@ module DamageControl
 		def start
 			Thread.new {
 				begin
-					puts "starting #{self}"
-					$stdout.flush
-					
 					@server = TCPServer.new(port)
-					puts "Server started"				
+					puts "Starting SocketTrigger listening on port #{port}"
 					$stdout.flush
 					
 					while (session = @server.accept)
 						begin
-							puts "got request"
 							payload = session.gets
-							puts "got request on socket: #{payload}"
 							do_accept(payload)
 							session.print("got your message\r\n\r\n")
 						ensure
@@ -60,22 +62,11 @@ module DamageControl
 					$stderr.print "\n"
 					@error = $!
 				ensure
-					puts "stopping #{self}"
+					puts "Stopped SocketTrigger listening on port #{port}"
 				end
 			}
 		end
 
 	end
-
-	#TODO - How do we start a server like this?
-	def start_server()
-		puts "Starting..."
-		hub = Hub.new()
-		s = SocketTrigger.new(hub, Build.new("Foo"))
-		s.start_listening()
-	
-		sleep()
-	end
-
 end
 

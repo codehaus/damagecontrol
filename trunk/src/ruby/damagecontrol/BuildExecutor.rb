@@ -12,13 +12,17 @@ module DamageControl
 		end
 	end
 	
+	#
+	# Consumes: BuildRequestEvent
+	# Emits: BuildProgressEvent, BuildCompleteEvent
+	#
 	class BuildExecutor
 		attr_accessor :scm
 				
 		def initialize(hub, scm=NilSCM.new)
 			@hub = hub
-			hub.add_subscriber(self)
 			@scm = scm
+			hub.add_subscriber(self)
 		end
 		
 		def receive_message(message)

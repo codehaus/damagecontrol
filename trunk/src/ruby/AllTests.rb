@@ -10,6 +10,8 @@ require 'damagecontrol/BuildExecutorTest'
 require 'damagecontrol/TimerTest'
 require 'damagecontrol/LogWriterTest'
 
+require 'damagecontrol/scm/CVSTest'
+
 require 'damagecontrol/publisher/IRCPublisherTest'
 require 'damagecontrol/publisher/WebsitePublisherTest'
 require 'damagecontrol/publisher/HTMLPublisherTest'
