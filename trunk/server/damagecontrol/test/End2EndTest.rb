@@ -237,7 +237,7 @@ class End2EndTest < Test::Unit::TestCase
     #FileUtils.rm_rf(basedir)
   end
   
-  def TEMPtest_damagecontrol_works_with_cvs
+  def test_damagecontrol_works_with_cvs
     cvs = LocalCVS.new(@basedir, "e2e_testproject")
     test_build_and_log_and_irc(cvs)
   end
@@ -259,7 +259,9 @@ class End2EndTest < Test::Unit::TestCase
       # We're ignoring this failure until we have
       # figured out what causes this 
       test_build_and_log_and_irc(svn)
-    rescue
+    rescue Exception => e
+      # While we are investigating, print to stdout
+      puts e.backtrace.join("\n")
     end
   end
   
