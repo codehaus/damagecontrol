@@ -12,4 +12,8 @@ class DependencyGraph
 		@projects << project
 		project
 	end
+	
+	def get_project(name)
+		@projects.find {|project| project.name == name }
+	end
 end
