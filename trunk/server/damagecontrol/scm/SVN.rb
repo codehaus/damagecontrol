@@ -9,6 +9,7 @@ module DamageControl
 
   class SVN < AbstractSCM
     include FileUtils
+    include Pebbles
     include Pebbles::Pathutils
     include Pebbles::LineEditor
     
@@ -148,38 +149,34 @@ module DamageControl
     def changesets(checkout_dir, scm_from_time, scm_to_time, files, &line_proc)
       changesets = nil
 
-      outproc = Proc.new { |io| 
-        parser = SVNLogParser.new(io, svnpath)
-        changesets = parser.parse_changesets(scm_from_time, scm_to_time, &line_proc)
-      }
-
       command = "svn #{changes_command(scm_from_time, scm_to_time, files)}"
       yield command if block_given?
 
-      Pebbles::AsyncProcess.new(checkout_dir, command, nil, outproc, nil, nil, 60*10).waitfor
+      execute(command, checkout_dir) do |stdin, stdout, stderr, pid|
+        parser = SVNLogParser.new(stdout, svnpath)
+        changesets = parser.parse_changesets(scm_from_time, scm_to_time, &line_proc)
+      end
       changesets
     end
 
     def svn(dir, cmd, &line_proc)
       command_line = "svn #{cmd}"
 
-      outproc = Proc.new do |io| 
-        io.each_line do |progress|
-          if block_given? then yield progress else logger.debug(progress) end
+      execute(command_line, dir) do |stdin, stdout, stderr, pid|
+        stdout.each_line do |progress|
+            if block_given? then yield progress else logger.debug(progress) end
         end
       end
-      Pebbles::AsyncProcess.new(dir, command_line, nil, outproc, nil, nil, 60*10).waitfor
     end
 
     def svnadmin(dir, cmd, &line_proc)
       command_line = "svnadmin #{cmd}"
 
-      outproc = Proc.new do |io| 
-        io.each_line do |progress|
-          if block_given? then yield progress else logger.debug(progress) end
+      execute(command_line, dir) do |stdin, stdout, stderr, pid|
+        stdout.each_line do |progress|
+            if block_given? then yield progress else logger.debug(progress) end
         end
       end
-      Pebbles::AsyncProcess.new(dir, command_line, nil, outproc, nil, nil, 60*10).waitfor
     end
     
     def checked_out?(checkout_dir)

@@ -1,4 +1,5 @@
 require 'pebbles/Space'
+require 'pebbles/AsyncProcess'
 require 'damagecontrol/core/Build'
 require 'damagecontrol/core/BuildEvents'
 require 'damagecontrol/scm/Changes'
@@ -16,6 +17,7 @@ module DamageControl
   #
   class BuildExecutor < Pebbles::Space
   
+    include Pebbles
     include FileUtils
     include Logging
     
@@ -35,7 +37,7 @@ module DamageControl
       if(build.is_a?(Build))
         @current_build = build
         begin
-          execute(build)
+          execute_build(build)
         rescue Exception => e
           message = format_exception(e)
           logger.error("build failed: #{message}")
@@ -49,7 +51,7 @@ module DamageControl
     end
     
     def kill_build_process
-      @build_process.kill
+      Process.kill("SIGHUP", @pid)
       @was_killed = true
       #doesn't seem to work properly if two different threads are waiting. workaround: sleep a bit to ensure it dies
       #build_process.wait
@@ -67,7 +69,7 @@ module DamageControl
     end
     
     def build_process_executing?
-      @build_process && @build_process.executing?
+      !@pid.nil?
     end
     
     def building_project?(project_name)
@@ -89,7 +91,7 @@ module DamageControl
     
   private
     
-    def execute(build)
+    def execute_build(build)
       build.dc_start_time = Time.now.utc
       
       build.status = Build::BUILDING
@@ -114,7 +116,7 @@ module DamageControl
           build.status = Build::FAILED
         end
       ensure
-        @build_process = nil
+        @pid = nil
       end
       
       # set the label
@@ -134,21 +136,13 @@ module DamageControl
         io.each_line {|line| report_progress(line) }
       }
 
-      @build_process = Pebbles::AsyncProcess.new(checkout_dir, build.build_command_line, nil, outproc, errproc, nil, 60*30)
-      @build_process.waitfor
-      build.status = Build::SUCCESSFUL
-    end
-    
-    def external_process_old(build)
-      @build_process = Pebbles::Process.new
-      @build_process.working_dir = checkout_dir
-      @build_process.environment = environment
-      @was_killed = false
-      @build_process.execute(build.build_command_line) do |stdin, stdout, stderr|
-        threads = []
-        threads << Thread.new { stdout.each_line {|line| report_progress(line) } }
-        threads << Thread.new { stderr.each_line {|line| report_error(line) } }
-        threads.each{|t| t.join}
+      execute(build.build_command_line, checkout_dir) do |stdin, stdout, stderr, @pid|
+        stdout.each_line {|line| report_progress(line) }
+        
+        # ok, stderr doesn't get output till the end, but that's ok - one less thread to worry about
+        stderr.each_line {|line| report_progress(line) }
+
+        @pid = nil
       end
       build.status = Build::SUCCESSFUL
     end

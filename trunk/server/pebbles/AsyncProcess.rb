@@ -28,207 +28,153 @@ module Pebbles
   #
   # The reason why all threads are managed internally is to be able to shut them down properly
   #
-  class AsyncProcess
-    include FileTest
+  def execute(cmd, dir=".", environment={})
 
-    def initialize(dir, cmd, stdin_proc, stdout_proc, stderr_proc, environment, timeout)
-      @executing = true
-      @mutex = Mutex.new
+    stdin_pipe = IO::pipe
+    stdout_pipe = IO::pipe
+    stderr_pipe = IO::pipe
 
-      @threads = []
-    
-      @stdin_pipe = IO::pipe
-      @stdout_pipe = IO::pipe
-      @stderr_pipe = IO::pipe
+    pid = fork do
+      environment.each { |key, val| ENV[key] = val } if environment
+      stdin_pipe[1].close
+      STDIN.reopen(stdin_pipe[0])
+      stdin_pipe[0].close
 
-      @pid = fork do
-        environment.each { |key, val| ENV[key] = val } if environment
-        @stdin_pipe[1].close
-        STDIN.reopen(@stdin_pipe[0])
-        @stdin_pipe[0].close
+      stdout_pipe[0].close
+      STDOUT.reopen(stdout_pipe[1])
+      stdout_pipe[1].close
 
-        @stdout_pipe[0].close
-        STDOUT.reopen(@stdout_pipe[1])
-        @stdout_pipe[1].close
+      stderr_pipe[0].close
+      STDERR.reopen(stderr_pipe[1])
+      stderr_pipe[1].close
 
-        @stderr_pipe[0].close
-        STDERR.reopen(@stderr_pipe[1])
-        @stderr_pipe[1].close
-
-        current_dir = Dir.pwd
-        begin
-          if dir
-            raise "No such directory: #{dir}" unless exist?(dir)
-            Dir.chdir(dir) 
-          end
-          exec(cmd)
-        rescue Errno::ENOENT
-          raise SystemCallError.new("Command not found:\n#{cmd}\n")
-        ensure
-          Dir.chdir(current_dir)
+      current_dir = Dir.pwd
+      begin
+        if dir
+          raise "No such directory: #{dir}" unless File.exist?(dir)
+          Dir.chdir(dir) 
         end
-      end
-
-      @stdin_pipe[0].close
-      @stdout_pipe[1].close
-      @stderr_pipe[1].close
-
-      # Need to sync here so this method returns only after the thread has started
-      init = ConditionVariable.new
-      
-      @mutex.synchronize do
-        @t = Thread.new do
-          timeout(timeout) do
-            begin
-              @threads << stdout_thread = Thread.new { stdout_proc.call(@stdout_pipe[0]) } if stdout_proc
-              @threads << stdin_thread = Thread.new { stdin_proc.call(@stdin_pipe[1]) } if stdin_proc
-              @threads << stderr_thread = Thread.new { stderr_proc.call(@stderr_pipe[0]) } if stderr_proc
-
-              # It's ok to return now that the thread has started
-              init.signal
-              # FixNum, Process::ProcessStatus
-              pid, process_status = Process.waitpid2(@pid)
-              if(process_status.exitstatus != 0)
-                # read the rest of the output
-                raise ProcessError.new("Process failed:\n#{cmd}\nExit code: #{process_status}", process_status)
-              end
-            rescue Timeout::Error => e
-              kill
-              raise e
-            ensure
-              @threads.each { |thread| thread.join }
-              @stdin_pipe[1].close unless @stdin_pipe[1].closed?
-              @stdout_pipe[0].close unless @stdout_pipe[1].closed?
-              @stderr_pipe[0].close unless @stderr_pipe[1].closed?
-              @executing = false
-            end
-          end
-        end
-      end
-      
-      @mutex.synchronize do
-        init.wait(@mutex)
+        exec(cmd)
+      rescue Errno::ENOENT
+        raise SystemCallError.new("Command not found:\n#{cmd}\n")
+      ensure
+        Dir.chdir(current_dir)
       end
     end
-    
-    def waitfor
-      @t.join
+
+    stdin_pipe[0].close
+    stdout_pipe[1].close
+    stderr_pipe[1].close
+
+    begin
+      # FixNum, Process::ProcessStatus
+      yield stdin_pipe[1], stdout_pipe[0], stderr_pipe[0], pid if block_given?
+      pid, process_status = Process.waitpid2(pid)
+      if(process_status.exitstatus != 0)
+        # read the rest of the output
+        raise ProcessError.new("Process failed:\n#{cmd}\nExit code: #{process_status}", process_status)
+      end
+      return process_status.exitstatus
+    rescue Timeout::Error => e
+      Process.kill("SIGHUP", pid)
+      raise e
+    ensure
+      stdin_pipe[1].close unless stdin_pipe[1].closed?
+      stdout_pipe[0].close unless stdout_pipe[0].closed?
+      stderr_pipe[0].close unless stderr_pipe[0].closed?
     end
-    
-    def executing?
-      @executing
-    end
-    
-    def kill
-      Process.kill("SIGHUP", @pid)
-      @threads.each { |thread| thread.kill }
-      @stdin_pipe[1].close unless @stdin_pipe[1].closed?
-      @stdout_pipe[0].close unless @stdout_pipe[1].closed?
-      @stderr_pipe[0].close unless @stderr_pipe[1].closed?
-    end
-    
+    module_function :execute
   end
-  
+     
 end  
 
 if $0 == __FILE__
 
-require 'test/unit'
-require 'pebbles/mockit'
+  require 'test/unit'
+  require 'pebbles/mockit'
 
-class AsyncProcessTest < Test::Unit::TestCase
-  include MockIt
-  
-  def test_should_return_zero_for_successful_command
-    out = new_mock.__expect(:stdout) {|out| assert_equal("BAR\n", out)}
-    p = Pebbles::AsyncProcess.new(
-      ".",
-      "echo $FOO",
-      nil,
-      Proc.new{|io| out.stdout(io.read)},
-      nil,
-      {"FOO" => "BAR"},
-      2
-    )
-    p.waitfor
-  end
+  class AsyncProcessTest < Test::Unit::TestCase
+    include MockIt
+    include Pebbles
 
-  def test_should_throw_exception_for_nonexisting_command
-    p = Pebbles::AsyncProcess.new(
-      ".",
-      "jalla",
-      nil,
-      nil,
-      nil,
-      nil,
-      2
-    )
-    assert_raises(ProcessError) do
-      p.waitfor
+    def test_should_return_zero_for_successful_command
+      ret = execute("echo $FOO", ".", {"FOO" => "BAR"}) do |stdin, stdout, stderr, pid|
+        assert_equal("BAR\n", stdout.read)
+      end
+      assert_equal(0, ret)
+    end
+
+    def test_should_read_nothing_and_throw_exception_for_nonexisting_command
+      m = new_mock.__expect(:out) {|o| assert_equal("", o)}
+      assert_raises(ProcessError) do
+        execute("jalla") do |stdin, stdout, stderr|
+          m.out(stdout.read)
+        end
+      end
+    end
+
+    def test_should_read_something_and_throw_exception_for_nonexisting_second_command
+      out = new_mock.__expect(:print) {|o| 
+        assert_equal("CVS\ncl\ndamagecontrol\ngplot\njabber4r\nlog4r\nlog4r.rb\nnqxml\nopen4.rb\npebbles\nrexml\nrica\nxmlrpc\n", o)
+      }
+      err = new_mock.__expect(:print) {|o| 
+        assert_equal("jalla: not found\n", o)
+      }
+      assert_raises(ProcessError) do
+        execute("ls server; jalla") do |stdin, stdout, stderr, pid|
+          out.print(stdout.read)
+          err.print(stderr.read)
+        end
+      end
+    end
+
+    def test_should_suicicde_on_timeout
+      pid = nil
+      begin
+        timeout(1) do
+          execute("cat") do |stdin, stdout, stderr, pid|
+            # This will block too
+            stdout.read
+          end
+        end
+        flunk
+      rescue TimeoutError => expected
+        begin
+          Process.kill("SIGHUP", pid)
+          flunk
+        rescue Errno::EPERM => expected
+          # process should already be killed
+        end
+      end
+    end
+
+    def test_should_be_able_to_kill_long_running_command
+      timeout(2) do
+        begin
+          execute("cat") do |stdin, stdout, stderr, pid|
+            sleep(1)
+            Process.kill("SIGHUP", pid)
+          end
+        rescue ProcessError => expected
+          assert_equal(nil, expected.process_status.exitstatus)
+        end
+      end
+    end
+
+    def test_should_fail_if_command_fails
+      m = new_mock.__expect(:out) {|o| 
+        assert_equal("ln: missing file argument\nTry `ln --help' for more information.\n", o)
+      }
+      begin
+        execute("ln") do |stdin, stdout, stderr, pid|
+          o = stderr.read
+          m.out(o)
+        end
+        flunk
+      rescue ProcessError => expected
+        assert_equal(1, expected.process_status.exitstatus)
+      end
     end
   end
-
-  def test_should_time_out_and_return_non_zero_for_long_running_command
-    p = Pebbles::AsyncProcess.new(
-      ".",
-      "cat",
-      nil,
-      nil,
-      nil,
-      nil,
-      1
-    )
-    assert_raises(TimeoutError) do
-      p.waitfor
-    end
-  end
-
-  def test_should_time_out_and_return_non_zero_for_long_running_command2
-    p = Pebbles::AsyncProcess.new(
-      ".",
-      "cat",
-      nil,
-      Proc.new{|io| puts(io.read)},
-      Proc.new{|io| puts(io.read)},
-      nil,
-      1
-    )
-    assert_raises(TimeoutError) do
-      p.waitfor
-    end
-  end
-
-  def test_should_fail_if_one_command_is_bad
-    p = Pebbles::AsyncProcess.new(
-      ".",
-      "ls; jalla",
-      nil,
-      nil,
-      nil,
-      nil,
-      1
-    )
-    assert_raises(ProcessError) do
-      p.waitfor
-    end
-  end
-
-  def test_should_fail_if_command_fails
-    err = new_mock.__expect(:stderr) {|err| assert_equal("ln: missing file argument\nTry `ln --help' for more information.\n", err)}
-    p = Pebbles::AsyncProcess.new(
-      ".",
-      "ln",
-      nil,
-      nil,
-      Proc.new{|io| err.stderr(io.read)},
-      nil,
-      1
-    )
-    assert_raises(ProcessError) do
-      p.waitfor
-    end
-  end
-end
-
 
 end

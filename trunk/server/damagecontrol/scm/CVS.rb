@@ -13,6 +13,7 @@ module DamageControl
   class CVS < AbstractSCM
     include ParseDate
     include FileUtils
+    include Pebbles
     include Pebbles::Pathutils
     include Pebbles::LineEditor
 
@@ -217,15 +218,13 @@ module DamageControl
     def parse_log(checkout_dir, cmd, &proc)
       changesets = nil
 
-      outproc = Proc.new { |io| 
-        parser = CVSLogParser.new(io)
+      execed_command_line = "cvs -d#{cvsroot_with_password(cvspassword)} #{cmd}"      
+      execute(execed_command_line, checkout_dir, environment) do |stdin, stdout, stderr, pid|
+        parser = CVSLogParser.new(stdout)
         parser.cvspath = path
         parser.cvsmodule = cvsmodule
         changesets = parser.parse_changesets
-      }
-
-      execed_command_line = "cvs -d#{cvsroot_with_password(cvspassword)} #{cmd}"      
-      Pebbles::AsyncProcess.new(checkout_dir, execed_command_line, nil, outproc, nil, environment, 60*10).waitfor
+      end
       changesets
     end
     
@@ -238,13 +237,12 @@ module DamageControl
       end
 
       execed_command_line = "cvs -d#{cvsroot_with_password(cvspassword)} #{cmd}"
-      outproc = Proc.new { 
-        |io| io.each_line { 
-          |progress|
+
+      execute(execed_command_line, dir, environment) do |stdin, stdout, stderr, pid|
+        stdout.each_line do |progress|
             if block_given? then yield progress else logger.debug(progress) end
-        }
-      }
-      Pebbles::AsyncProcess.new(dir, execed_command_line, nil, outproc, nil, environment, 60*10).waitfor
+        end
+      end
     end
 
   protected
