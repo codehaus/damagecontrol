@@ -1,6 +1,8 @@
 #!/usr/bin/env ruby
 
-require 'simple' 
+$damagecontrol_home = File::expand_path('../..') 
+$:<<"#{$damagecontrol_home}/src/ruby" 
+ 
 require 'damagecontrol/Hub' 
 require 'damagecontrol/SocketTrigger' 
 require 'damagecontrol/BuildExecutor' 
