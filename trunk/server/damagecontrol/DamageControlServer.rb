@@ -190,7 +190,7 @@ module DamageControl
       httpd.mount("/public/dashboard", DashboardServlet.new(:public, build_history_repository, project_config_repository, build_scheduler))
       httpd.mount("/public/project", ProjectServlet.new(:public, build_history_repository, project_config_repository, nil, build_scheduler))
       httpd.mount("/public/log", LogFileServlet.new(project_directories))
-      httpd.mount("/public/root", WEBrick::HTTPServlet::FileHandler, rootdir, :FancyIndexing => true)
+      httpd.mount("/public/root", indexing_file_handler)
       
       httpd.mount("/public/images", WEBrick::HTTPServlet::FileHandler, "#{webdir}/images")
       httpd.mount("/public/icons", WEBrick::HTTPServlet::FileHandler, "#{webdir}/icons/24x24/plain")
@@ -199,6 +199,19 @@ module DamageControl
       httpd.mount("/public/images/lastcompletedstatus", LastCompletedImageServlet.new(build_history_repository, build_scheduler))
       httpd.mount("/public/images/timestampstatus", TimestampImageServlet.new(build_history_repository, build_scheduler))
       httpd.mount("/public/css", WEBrick::HTTPServlet::FileHandler, "#{webdir}/css")
+    end
+    
+    def indexing_file_handler
+      fh = WEBrick::HTTPServlet::FileHandler.new(httpd, rootdir, :FancyIndexing => true)
+      # <HACK>
+      # patch it to show directories even if there's a index.html in the directory
+      fh.instance_eval("@config = @config.dup")
+      fh.instance_eval("@config[:DirectoryIndex] = []")
+      def fh.get_instance(*args)
+        self
+      end
+      # </HACK>
+      fh
     end
     
     def init_private_web
@@ -213,7 +226,7 @@ module DamageControl
       httpd.mount("/private/install_trigger", InstallTriggerServlet.new(project_config_repository, trig_xmlrpc_url))
       httpd.mount("/private/configure", ConfigureProjectServlet.new(project_config_repository, scm_configurator_classes))
       httpd.mount("/private/log", LogFileServlet.new(project_directories))
-      httpd.mount("/private/root", WEBrick::HTTPServlet::FileHandler, rootdir, :FancyIndexing => true)
+      httpd.mount("/private/root", indexing_file_handler)
       
       httpd.mount("/private/images", WEBrick::HTTPServlet::FileHandler, "#{webdir}/images")
       httpd.mount("/private/icons", WEBrick::HTTPServlet::FileHandler, "#{webdir}/icons/24x24/plain")

@@ -2,6 +2,8 @@ Release 0.3
 ===========
 
 * Much better performance under Windows (with Cygwin build of Ruby instead of mswin32).
+* JIRA integration: clicking a JIRA issue key in a changeset message takes you to that issue in JIRA.
+* Clone project: for easier way of configuring multiple projects with similar config.
 
 Release 0.2
 ===========
