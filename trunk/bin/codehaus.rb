@@ -12,7 +12,7 @@ server = DamageControlServer.new(
   :HttpsPort => 4713,
   :AllowIPs => [ "127.0.0.1", "64.7.141.17" ],
   :AccessLog => File.expand_path("~/access.log"),
-  :PollingInterval => 10 # 10 * 60, # every 10 minutes (don't want to overload servers)
+  :PollingInterval => 10 * 60, # every 10 minutes (don't want to overload servers)
   :TrigXmlrpcUrl => "http://builds.codehaus.org:4712/private/xmlrpc",
   :ExternalWebUrl => "http://builds.codehaus.org/damagecontrol"
   )
