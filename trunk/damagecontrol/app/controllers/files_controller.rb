@@ -1,4 +1,4 @@
-require 'rscm/directories'
+require 'damagecontrol/directories'
 
 class FilesController < ApplicationController
 
