@@ -72,8 +72,7 @@ module DamageControl
       end
 
       history << build unless history.index(build)
-      # optimization: only save when build is completed
-      if(build.completed? && @project_directories)
+      if(@project_directories)
         dump(history, build.project_name)
       end
     end

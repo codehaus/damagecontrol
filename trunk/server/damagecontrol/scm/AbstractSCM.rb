@@ -1,5 +1,6 @@
 require 'damagecontrol/util/Logging'
 require 'damagecontrol/util/FileUtils'
+require 'damagecontrol/scm/Changes'
 
 module DamageControl
   class AbstractSCM
@@ -29,6 +30,10 @@ module DamageControl
     end
     
     def checkout(time = nil, &proc)
+    end
+
+    def changesets(from_time, to_time, &proc)
+      ChangeSets.new
     end
 
   protected

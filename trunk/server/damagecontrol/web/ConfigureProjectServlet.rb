@@ -27,6 +27,7 @@ module DamageControl
     def configure
       action = "store_configuration"
       next_build_number = project_config_repository.peek_next_build_number(project_name)
+      dependent_projects = if project_config['dependent_projects'] then project_config['dependent_projects'].join(', ') else nil end
       render("configure.erb", binding)
     end
         
@@ -40,6 +41,8 @@ module DamageControl
       KEYS.each do |key|
         project_config[key] = request.query[key]
       end
+      dependent_projects = request.query['dependent_projects']
+      project_config['dependent_projects'] = dependent_projects.split(",").collect{|p| p.chomp } if dependent_projects
       scm_configurators(project_config).each do |scm_configurator|
         scm_configurator.store_configuration_from_request(request)
       end

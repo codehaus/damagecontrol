@@ -63,6 +63,10 @@ function showScm(scm) {
   <td><input class="scm_info" name="next_build_number" id="next_build_number" type="text" value="<%= next_build_number %>"/></td>
 </tr>
 <tr>
+  <td>Child builds (will be trigged on success)</td>
+  <td><input class="scm_info" name="dependent_projects" id="dependent_projects" type="text" value="<%= dependent_projects %>"/></td>
+</tr>
+<tr>
   <td>Source control</td>
   <td>
     <% scm_configurators.each do |scm_configurator| %>

@@ -104,7 +104,7 @@ EOF
     
     def test_invalid_cvs_command_raises_error
       cvs = create_cvs("cvsroot", "cvsmodule")
-      assert_raises(Exception, "invalid cvs command did not raise error") do
+      assert_raises(FileUtils::ProcessFailedException, "invalid cvs command did not raise error") do
         cvs.cvs(cvs.checkout_dir, "invalid_command") { |line| }
       end
     end

@@ -3,6 +3,9 @@ require 'ftools'
 
 module FileUtils
 
+  class ProcessFailedException < StandardError
+  end
+
   def new_temp_dir(identifier = self)
     identifier = identifier.to_s
     identifier.gsub!(/\(|:|\)/, '_')
@@ -88,7 +91,7 @@ module FileUtils
       parent_rd.close
       parent_wr.close
       Process::waitpid(pid)
-      raise Exception.new("'#{cmd}' in directory '#{Dir.pwd}' failed with code #{$?.to_s}") if $? != 0
+      raise ProcessFailedException.new("'#{cmd}' in directory '#{Dir.pwd}' failed with code #{$?.to_s}") if $? != 0
       logger.debug("successfully executed #{cmd}")
       ret
     rescue NotImplementedError

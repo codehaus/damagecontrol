@@ -125,8 +125,12 @@ module DamageControl
       File.mkpath(tempdir)
 
       mock_project_directories.__expect(:build_history_file) { |project_name|
-        assert_equal("apple", project_name)
+        assert_equal("pear", project_name)
         "#{tempdir}/pear.yaml"
+      }
+      mock_project_directories.__expect(:build_history_file) { |project_name|
+        assert_equal("apple", project_name)
+        "#{tempdir}/apple.yaml"
       }
       bhp = BuildHistoryRepository.new(Hub.new, mock_project_directories)
       bhp.register(@pear1) # should not save, build not complete
@@ -134,6 +138,8 @@ module DamageControl
 
       mock_project_directories.__verify
       assert(File.exists?("#{tempdir}/pear.yaml"))
+      assert(File.exists?("#{tempdir}/apple.yaml"))
+
     end
     
     def teardown

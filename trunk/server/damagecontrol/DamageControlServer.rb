@@ -8,6 +8,7 @@ require 'damagecontrol/Version'
 require 'damagecontrol/core/Hub'
 require 'damagecontrol/core/BuildExecutor'
 require 'damagecontrol/core/BuildScheduler'
+require 'damagecontrol/core/DependentBuildTrigger'
 require 'damagecontrol/core/SCMPoller'
 require 'damagecontrol/core/HostVerifyingHandler'
 require 'damagecontrol/core/LogWriter'
@@ -251,7 +252,8 @@ module DamageControl
     end
     
     def init_build_scheduler
-      component(:build_scheduler, BuildNumberIncreaser.new(hub, project_config_repository))
+      component(:build_number_increaser, BuildNumberIncreaser.new(hub, project_config_repository))
+      component(:dependent_build_trigger, DependentBuildTrigger.new(hub, project_config_repository))
       component(:build_scheduler, BuildScheduler.new(hub))
       init_build_executors
     end
@@ -297,6 +299,8 @@ module DamageControl
       init_components
 
       at_exit { shutdown }
+      trap("INT") { shutdown }
+      trap("TERM") { shutdown }
       @threads = []
       components.each do |component|
         @threads << Thread.new { component.start } if(component.respond_to?(:start))
