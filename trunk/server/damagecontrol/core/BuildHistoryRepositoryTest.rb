@@ -25,6 +25,22 @@ module DamageControl
       @bhp.register(build2)
       assert_equal(build2, @bhp.current_build("project_name"))
     end
+    
+    def test_ignores_queued_builds_when_requesting_current_build
+      assert_equal(nil, @bhp.current_build("project_name"))
+      
+      build1 = Build.new("project_name")
+      build1.timestamp = Time.utc(2004, 04, 02, 12, 00, 00)
+      build1.status = Build::BUILDING
+      @bhp.register(build1)
+      assert_equal(build1, @bhp.current_build("project_name"))
+      
+      build2 = Build.new("project_name")
+      build2.timestamp = Time.utc(2004, 04, 02, 13, 00, 00)
+      build2.status = Build::QUEUED
+      @bhp.register(build2)
+      assert_equal(build1, @bhp.current_build("project_name"))
+    end
   
     def test_can_get_last_completed_build_of_a_project
       assert_equal(nil, @bhp.last_completed_build("project_name"))

@@ -34,7 +34,7 @@ module DamageControl
     def current_build(project_name)
       history = history(project_name)
       return nil unless history
-      history[-1]
+      history.reverse.find {|b| b.status != Build::QUEUED }
     end
     
     def last_completed_build(project_name)
