@@ -3,7 +3,8 @@ $VERBOSE = nil
 handle = 'ant'
 server = 'zebedee'
 channel = "#build"
-logdir = 'D:\cruise\cruiselogs'
+#logdir = 'D:\cruise\cruiselogs'
+logdir = '.'
 
 $damagecontrol_home = '../..'
 $:<<"#{$damagecontrol_home}/src/ruby"

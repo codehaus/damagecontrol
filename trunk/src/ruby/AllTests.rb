@@ -16,7 +16,7 @@ require 'damagecontrol/SocketTriggerTest'
 require 'damagecontrol/publisher/IRCPublisherTest'
 require 'damagecontrol/publisher/FilePublisherTest'
 
-require 'damagecontrol/templates/HTMLTemplateTest'
+require 'damagecontrol/template/HTMLTemplateTest'
 
 #require 'damagecontrol/CVSPollerTest'
 require 'damagecontrol/dependency/AllTraverserTest'

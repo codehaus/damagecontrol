@@ -4,7 +4,7 @@ require 'damagecontrol/publisher/IRCPublisher'
 require 'damagecontrol/Hub'
 require 'damagecontrol/Build'
 require 'damagecontrol/FileUtils'
-require 'damagecontrol/templates/MockTemplate'
+require 'damagecontrol/template/MockTemplate'
 
 module DamageControl
 

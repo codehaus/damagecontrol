@@ -1,5 +1,5 @@
 require 'test/unit'
-require 'damagecontrol/templates/HTMLTemplate'
+require 'damagecontrol/template/HTMLTemplate'
 
 module DamageControl
   class HTMLTemplateTest < Test::Unit::TestCase
