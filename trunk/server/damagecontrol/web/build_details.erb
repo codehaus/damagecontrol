@@ -71,7 +71,7 @@
       %>
 
         <tr class="pane">
-          <td colspan="3" class="changeset"><%= changeset.developer %> : <%= changeset.message %></td>
+          <td colspan="3" class="changeset"><%= changeset.developer %> : <%= html_quote(changeset.message) %></td>
         </tr>
         <%
         changeset.each do |change|

@@ -42,7 +42,7 @@ module Pebbles
     
     # TODO: use the standard CGI class for this (might be something is WebRick too)
     def html_quote(text)
-      text.gsub(/</, "&lt;")
+      text.gsub(/</, "&lt;").gsub("\n", "<br/>")
     end
 
     def redirect(url)
