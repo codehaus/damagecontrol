@@ -1,5 +1,5 @@
-*.ipr
 *.log
+*.ipr
 *.iml
 *.iws
 .project
