@@ -11,41 +11,45 @@
 <table class="main-table">
 
   <%
-  previous_successful_build = build_history_repository.previous_successful_build(selected_build)
-  previous_successful_build_link = "<a href=\"#{build_url(previous_successful_build)}\">(##{previous_successful_build.label})</a>" if previous_successful_build
-  %>
-
-  <%
-  # =============== next/prev links pane
+  # =============== previous/next build pane
   prev_build = build_history_repository.prev(selected_build)
   next_build = build_history_repository.next(selected_build)
-  
-  prev_link = "&lt;&lt;&nbsp;No previous build"
-  prev_link = "&lt;&lt;&nbsp;<a href=\"#{build_url(prev_build)}\">#{build_description(prev_build)}</a>" if prev_build
-  
-  next_link = "No next build &nbsp;&gt;&gt;"
-  next_link = "<a href=\"#{build_url(next_build)}\">#{build_description(next_build)}</a>&nbsp;&gt;&gt;" if next_build
   %>
+  
+  <tr><td>
+    <% if prev_build then %>
+    <a href="<%= build_url(prev_build) %>\"><img src="icons/navigate_left.png" /></a>
+    <% end %>
+    <% if next_build then %>
+    <a href="<%= build_url(next_build) %>"><img src="icons/navigate_right.png" /></a>
+    <% end %>
+  </td></tr>
+  
 
   <%
   # =============== console output link pane
   log_url = "log?project_name=#{project_name}&timestamp=#{selected_build.timestamp}"
   %>
+  <tr><td>
   <table class="console-output">
     <tr><td class="console-output">
-    <a href="<%= log_url %>"><image src="icons/console_network.png"/></a> <a href="<%= log_url %>">Console output</a>
+    <a href="<%= log_url %>"><image src="icons/console_network.png"/></a>
+    <a href="<%= log_url %>">Console output</a>
     </td></tr>
   </table>
-
-
-  <tr><td>
-  
+  </td></tr>
   
   <%
   # =============== changes pane
   %>
   
+  <tr><td>  
   <% if selected_build then %>
+
+  <%
+  previous_successful_build = build_history_repository.previous_successful_build(selected_build)
+  previous_successful_build_link = "<a href=\"#{build_url(previous_successful_build)}\">(##{previous_successful_build.label})</a>" if previous_successful_build
+  %>
 
   <table class="pane">
     <tr><td class="pane-header" colspan="3">
@@ -91,9 +95,9 @@
   
   <% end %>
 
-
-
 </td></tr>
+
+</table>
 
 
 </body></html>

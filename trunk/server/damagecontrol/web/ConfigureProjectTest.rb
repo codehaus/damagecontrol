@@ -28,19 +28,19 @@ module DamageControl
     end
 
     def test_creates_new_project_when_complete_project_data_is_posted
-      response, data = @client.post("/private/project", "action=store_configuration&project_name=Chicago")
+      response, data = @client.post("/private/configure", "action=store_configuration&project_name=Chicago")
       assert_response_ok(response)
       assert(@server.project_config_repository.project_exists?("Chicago"))
     end
     
     def test_asks_for_project_name
-      response, data = @client.get("/private/project?action=configure")
+      response, data = @client.get("/private/configure")
       assert_response_ok(response)
       assert_match(/Project name/, data)
     end
 
     def test_fills_in_project_name_if_specified_in_url
-      response, data = @client.get("/private/project?project_name=Milano")
+      response, data = @client.get("/private/configure?project_name=Milano")
       assert_response_ok(response)
       assert_match(/Milano/, data)
     end

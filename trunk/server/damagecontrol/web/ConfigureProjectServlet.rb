@@ -11,7 +11,7 @@ module DamageControl
     def tasks
       unless project_name.nil?
         task(:icon => "icons/navigate_left.png", :name => "Back to project", :url => "project?project_name=#{project_name}")
-      end
+      end 
     end
 
     def default_action
