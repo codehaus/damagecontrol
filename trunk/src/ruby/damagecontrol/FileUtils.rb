@@ -11,6 +11,10 @@ module DamageControl
       false
     end
   
+    def path_separator
+      windows? ? '\\' : '/'
+    end
+  
     def is_special_filename(filename)
       filename == '.' || filename == '..'
     end

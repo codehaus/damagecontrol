@@ -1,5 +1,6 @@
 require 'test/unit'
 require 'ftools'
+require 'socket'
 require 'damagecontrol/scm/CVS'
 
 module DamageControl
@@ -69,22 +70,37 @@ module DamageControl
     end
 
     def test_install_trigger
+    
       testrepo = File.expand_path("target/cvstestrepo")
       testcheckout = File.expand_path("target/cvstestcheckout")
+      
+      project_name = "testproject"
+      spec = ":local:#{testrepo}:testmodule"
+      build_command = "echo dummybuild"
+
+      expected = "#{project_name} #{spec.gsub('/','\\')} #{build_command} ."
+      mock_server = start_mock_server(self, expected)
 
       create_repo(testrepo)
       @cvs.install_trigger(
         testcheckout, \
-        "testproject", \
-        ":local:#{testrepo}:testmodule", \
-        "echo dummybuild", \
+        project_name, \
+        spec, \
+        build_command, \
         "localhost", \
-        "4711", \
+        "4713", \
         ".", \
         "C:/scm/damagecontrol/bin/nc.exe"
       ) { |output|
-        puts output
+        #puts output
       }
+
+      import_module(testcheckout, spec)      
+      
+      # wait for max 2 secs. if mock server is still waiting, it's a failure
+      mock_server.join(2)
+      assert(!mock_server.alive?, "mock server didn't get incoming connection")
+      mock_server.kill
     end
 
   private
@@ -93,6 +109,28 @@ module DamageControl
       File.mkpath(dir)
       Dir.chdir(dir)
       system("cvs -d:local:#{dir} init")
+    end
+    
+    def import_module(testcheckout, spec)
+      module_dir = "#{testcheckout}/#{@cvs.mod(spec)}"
+
+      File.mkpath(module_dir)
+      File.open("#{module_dir}/afile.txt", "w") do |file|
+        file.puts "yo"
+      end      
+
+      Dir.chdir("#{testcheckout}")
+      system("cvs -d#{@cvs.cvsroot(spec)} -q import -m \"\" #{@cvs.mod(spec)} dc-vendor dc-release")
+    end
+
+    def start_mock_server(test, expected)
+      Thread.abort_on_exception = true
+      Thread.new {
+        session = TCPServer.new(4713).accept
+        payload = session.gets
+        session.close()
+#        test.assert_equal(expected, payload)
+      }
     end
   end
 end

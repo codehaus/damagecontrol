@@ -7,7 +7,7 @@ module DamageControl
     attr_reader :project_name, :scm, :scm_path, :build_command_line, :build_command_relative_dir
     
     # these should be set after execution
-    attr_accessor :label, :timestamp, :error_message, :successful
+    attr_accessor :label, :timestamp, :error_message, :successful, :developers, :modification
 
     def initialize(
       project_name=nil, \

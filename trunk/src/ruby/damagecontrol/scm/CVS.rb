@@ -84,13 +84,13 @@ module DamageControl
     #
     # @param directory where to temporarily check out during install
     # @param project_name a human readable name for the module
-    # @param path full SCM spec (example: :local:/cvsroot/picocontainer:pico)
+    # @param spec full SCM spec (example: :local:/cvsroot/picocontainer:pico)
     # @param build_command_line command line that will run the build
     # @param relative_path relative path in dc's checkout where build
     #        command will be executed from
     # @param host where the dc server is running
     # @param port where the dc server is listening
-    # @param path where nc.exe file can be copied from (only needed for windows)
+    # @param nc_exe_file where nc.exe file can be copied from (only needed for windows)
     #
     def install_trigger(
       directory, \
@@ -107,8 +107,8 @@ module DamageControl
       checkout("#{cvsroot(spec)}:CVSROOT", directory, &proc)
       Dir.chdir("#{directory}/CVSROOT")
       File.open("#{directory}/CVSROOT/loginfo", File::WRONLY | File::APPEND) do |file|
-        file.puts
-        file.puts("#{mod(spec)} echo #{project_name} #{spec} #{build_command_line} #{build_command_line} #{relative_path} | #{nc_command} #{dc_host} #{dc_port}")
+        script = trigger_command(project_name, spec, build_command_line, relative_path, nc_command(spec), dc_host, dc_port, path_separator)
+        file.puts("#{mod(spec)} #{script}")
       end
 
       if(windows?)
@@ -118,17 +118,16 @@ module DamageControl
 
         # tell cvs to keep a non-,v file in the central repo
         File.open("checkoutlist", File::WRONLY | File::APPEND) do |file|
-          file.puts
           file.puts("nc.exe")
         end
         Dir.chdir("#{directory}/CVSROOT")
         system("cvs com -m \"added damagecontrol\"")
       end
     end
-
-    def nc_command
+    
+    def nc_command(spec)
       if(windows?)
-        "%~dp0nc.exe"
+        "#{path(spec)}/CVSROOT/nc.exe".gsub('/',path_separator)
       else
         "nc"
       end
