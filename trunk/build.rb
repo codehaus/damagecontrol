@@ -3,7 +3,6 @@ $VERBOSE = nil
 
 #$:<<'lib'
 
-
 #require 'damagecontrol/FileUtils'
 #include DamageControl::FileUtils
 #require 'damagecontrol/CruiseControlBridge'
