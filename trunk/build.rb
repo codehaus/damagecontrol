@@ -142,9 +142,10 @@ class Project
       @echo off
       set DAMAGECONTROL_HOME=%~dp0..
       cd %DAMAGECONTROL_HOME%
-      set RUBY_HOME="%DAMAGECONTROL_HOME%\\ruby"
-      set PATH="%RUBY_HOME%\\bin";%PATH%
-      ruby -I"%DAMAGECONTROL_HOME%\\server" "%DAMAGECONTROL_HOME%\\#{win_target}" %1 %2 %3 %4 %5 %6 %7 %8 %9  
+      set CYGWIN_HOME="%DAMAGECONTROL_HOME%\cygwin"
+      set PATH="%CYGWIN_HOME%\bin";%PATH%
+      bash -c "/bin/ruby -I server #{target} %1 %2 %3 %4 %5 %6 %7 %8 %9"
+      pause
     })
     write_file(script, %{
       \#!/bin/sh
@@ -158,7 +159,7 @@ class Project
   
   def windows?
     require 'rbconfig.rb'
-    !Config::CONFIG["host"].index("win").nil?
+    !Config::CONFIG["host"].index("mswin32").nil?
   end
   
   def installer

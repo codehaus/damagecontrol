@@ -95,9 +95,14 @@ module DamageControl
       @startup_time = Time.now if @startup_time.nil?
       @startup_time
     end
+    
+    def ruby_version
+      require 'rbconfig.rb'
+      "ruby #{Config::CONFIG['MAJOR']}.#{Config::CONFIG['MINOR']}.#{Config::CONFIG['TEENY']} #{Config::CONFIG['host']}"
+    end
   
     def startup_message
-      message = "Starting #{DamageControl::VERSION_TEXT} at #{startup_time}, root directory = #{rootdir.inspect}, damagecontrol home = #{damagecontrol_home.inspect}, config = #{params.inspect}"
+      message = "Starting #{DamageControl::VERSION_TEXT} at #{startup_time}, ruby version = #{ruby_version}, root directory = #{rootdir.inspect}, damagecontrol home = #{damagecontrol_home.inspect}, config = #{params.inspect}"
       root_logger.info(message)
     end
     

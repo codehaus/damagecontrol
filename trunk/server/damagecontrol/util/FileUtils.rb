@@ -21,12 +21,8 @@ module FileUtils
   end
 
   def windows?
-    $:.each{ |line|
-      if(line =~ /.*msvcrt.*/)
-        return true
-      end
-    }
-    false
+    require 'rbconfig.rb'
+    !Config::CONFIG["host"].index("mswin32").nil?
   end
     
   def username
@@ -68,16 +64,32 @@ module FileUtils
   end
   
   def cmd_with_io(dir, cmd, &proc)
-    with_working_dir(dir) do
-      logger.debug("in directory #{dir}")
+    begin
+      parent, child = IO.pipe
+      pid = fork
       logger.debug("executing #{cmd}")
-      ret = nil
-      io = IO.popen("#{cmd}") do |io|
-        ret = yield io
+      if pid
+        # in parent process
+        child.close
+        ret = yield parent
+        parent.close
+        Process::waitpid(pid)
+        raise Exception.new("'#{cmd}' in directory '#{Dir.pwd}' failed with code #{$?.to_s}") if $? != 0
+        logger.debug("successfully executed #{cmd}")
+        ret
+      else
+        # in subprocess
+        File.mkpath(dir)
+        Dir.chdir(dir)
+        parent.close
+        $stdin.reopen(child)
+        $stdout.reopen(child)
+        $stderr.reopen(child)
+        exec(cmd)
       end
-      raise Exception.new("'#{cmd}' in directory '#{Dir.pwd}' failed with code #{$?.to_s}") if $? != 0
-      logger.debug("successfully executed #{cmd}")
-      ret
+    rescue NotImplementedError
+      puts "DamageControl only runs in Cygwin on Windows"
+      exit!
     end
   end
 

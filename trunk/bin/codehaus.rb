@@ -17,7 +17,7 @@ server = DamageControlServer.new(
   :AllowIPs => [ "127.0.0.1", "64.7.141.17" ],
   :PollingInterval => 5 * 60, # every five minutes (don't want to overload servers)
   :TrigXmlrpcUrl => "http://builds.codehaus.org:4712/private/xmlrpc",
-  :DamageControlUrl => "http://builds.codehaus.org/"
+  :ExternalWebUrl => "http://builds.codehaus.org/"
   )
 
 def server.logging_level

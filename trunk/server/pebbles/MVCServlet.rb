@@ -6,8 +6,16 @@ module Pebbles
   module SimpleERB
     protected
     
+    # save the absolute path to the template directory
+    # DamageControl is playing around with the working dir quite a bit because there's yet no fork implementation on Win32
+    # usually __FILE__ is relative so it makes the web gui completely borked
+    def absolute_template_dir
+      @absolute_template_dir = File.expand_path(template_dir) unless defined?(@absolute_template_dir)
+      @absolute_template_dir
+    end
+    
     def file_content(file)
-      template_path = File.expand_path("#{template_dir}/#{file}")
+      template_path = File.expand_path("#{absolute_template_dir}/#{file}")
       template = File.new(template_path).read.untaint
     end
     
@@ -106,7 +114,7 @@ module Pebbles
     def render(erb_template, binding)
       response.body = erb(erb_template, binding)
       unless ritemesh_template.nil?
-        ritemesh_template_content = File.new("#{template_dir}/#{ritemesh_template}").read.untaint
+        ritemesh_template_content = File.new("#{absolute_template_dir}/#{ritemesh_template}").read.untaint
         response.body = mesh(response.body, ritemesh_template_content, binding)
       end
     end

@@ -9,7 +9,7 @@ include DamageControl
 
 server = DamageControlServer.new(
   :RootDir => "#{$damagecontrol_home}/work",
-  :HttpPort => 4712
+  :HttpPort => 4712,
   :PollingInterval => 60 # specified in seconds
   # to allow access only from localhost then uncomment line below (when running behind an Apache proxy for example)
   #:AllowIPs => [ "127.0.0.1" ],
