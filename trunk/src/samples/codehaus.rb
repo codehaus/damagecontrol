@@ -27,11 +27,11 @@ buildRoot = File.expand_path(".")
  
 start_simple_server(
   :BuildsDir => "#{buildRoot}/checkout", 
+  :LogsDir => "#{buildRoot}/log", 
   :SocketTriggerPort => 4711, 
   :WebPort => 4712, 
   :AllowIPs => ["127.0.0.1", "66.216.68.111", "81.5.134.59", "217.158.24.17" ])
 
-LogWriter.new(@hub, "#{buildRoot}/log")
 FilePublisher.new(@hub, "#{buildRoot}/report", HTMLTemplate.new).start 
 IRCPublisher.new(@hub, "irc.codehaus.org", "\#damagecontrol", ShortTextTemplate.new).start
 EmailPublisher.new(@hub, ShortTextTemplate.new, HTMLTemplate.new, "dcontrol@builds.codehaus.org").start

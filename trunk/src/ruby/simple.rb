@@ -17,7 +17,8 @@ require 'damagecontrol/publisher/XMLRPCStatusPublisher'
 include DamageControl 
 
 def start_simple_server(params = {})
-  buildsdir = params[:BuildsDir] || "builds"
+  logsdir = params[:LogsDir] || File.expand_path("log")
+  buildsdir = params[:BuildsDir] || File.expand_path("build")
   allow_ips = params[:AllowIPs] || ["127.0.0.1"]
   port = params[:SocketTriggerPort] || 4711
   web_port = params[:WebPort] || 8080
@@ -30,6 +31,8 @@ def start_simple_server(params = {})
   XMLRPCTrigger.new(xmlrpc_servlet, @hub)
   XMLRPCStatusPublisher.new(xmlrpc_servlet, @hub)
 
+  LogWriter.new(@hub, logsdir)
+  
   scheduler = BuildScheduler.new(@hub)
   scheduler.add_executor(BuildExecutor.new(@hub, buildsdir))
   scheduler.start

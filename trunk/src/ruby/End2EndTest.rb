@@ -41,7 +41,7 @@ class End2EndTest < Test::Unit::TestCase
     
     install_damagecontrol_into_cvs(execute_script_commandline("build"))
     
-    join_irc_channel
+    start_logging_irc_channel
     
     add_and_commit_file
     
@@ -51,16 +51,17 @@ class End2EndTest < Test::Unit::TestCase
     wait_for_build_to_complete
     assert_build_produced_correct_output
     assert_build_successful_on_irc_channel
+    assert_log_output_written_out
   end
   
   attr_reader :irc_listener
   
-  def join_irc_channel
+  def start_logging_irc_channel
     @irc_listener = IRCListener.new
-    irc_listener.connect("irc.codehaus.org", "dctest")
+    irc_listener.connect("irc.codehaus.org", "testsuite")
     sleep 10
     assert(irc_listener.connected?)
-    irc_listener.join_channel("#damagecontrol")
+    irc_listener.join_channel("#dce2e")
     puts "joined"
     sleep 1
     assert(irc_listener.in_channel?)
@@ -68,6 +69,10 @@ class End2EndTest < Test::Unit::TestCase
     sleep 1
     irc_listener.send_message_to_channel("I expect DamageControl to pop by soon and notify me of the build status, please ignore this.")
     sleep 1
+  end
+  
+  def assert_log_output_written_out
+    assert_equal(1, Dir["#{logdir}/e2eproject/*.log"].size)
   end
   
   def assert_build_successful_on_irc_channel
@@ -84,41 +89,37 @@ class End2EndTest < Test::Unit::TestCase
   
   include FileUtils
   
-  def initialize(someparam)
-      super(someparam)
-      @@damagecontrol_started = false
+  attr_accessor :basedir
   
-      # Should be in setup, but we can't run DamageControl twice (it doesn't
-      # shut down cleanly and can't rebind the port). If we change the temp
-      # dir, all our builds will happen in the old one and the second (SVN)
-      # test will fail.
-      @basedir = damagecontrol_home
-      @tempdir = "#{@basedir}/target/temp_e2e_#{Time.new.to_i}"
-      File.mkpath(@tempdir)
-  end
-        
   def setup
-    Dir.chdir(@tempdir)
+    # Should be in setup, but we can't run DamageControl twice (it doesn't
+    # shut down cleanly and can't rebind the port). If we change the temp
+    # dir, all our builds will happen in the old one and the second (SVN)
+    # test will fail.
+    @basedir = "#{damagecontrol_home}/target/temp_e2e_#{Time.new.to_i}"
+    File.mkpath(basedir)
     
-    @cvsrootdir = "#{@tempdir}/repository"
+    Dir.chdir(basedir)
+    
+    @cvsrootdir = "#{basedir}/repository"
     @cvsroot = ":local:#{@cvsrootdir}"
     @project = "e2eproject"
     
-    @svn_repo_dir = "#{@tempdir}/repo";
+    @svn_repo_dir = "#{basedir}/repo";
     @svn_hooks_dir = "#{@svn_repo_dir}/hooks";
     @svn_url = "file:///#{@svn_repo_dir}";
-    @svn_wc_checkout_dir = "#{@tempdir}/wc";
+    @svn_wc_checkout_dir = "#{basedir}/wc";
     @svn_wc_usage_dir = "#{@svn_wc_checkout_dir}/repo"
   end
 	
   def Xteardown
-    Dir.chdir(@tempdir)
+    Dir.chdir(basedir)
     rmdir(@project)
     rmdir(@cvsrootdir)
     rmdir(@svn_repo_dir)
   end
 
-  def create_cvs_repository()
+  def create_cvs_repository
     system("cvs -d#{@cvsroot} init")
   end
 		
@@ -147,25 +148,26 @@ class End2EndTest < Test::Unit::TestCase
     end
   end
   
-  def buildsdir
-    "#{@tempdir}/builds"
+  def builddir
+    "#{basedir}/build"
   end
-	
+  
+  def logdir
+    "#{basedir}/log"
+  end
+  
   def start_damagecontrol
-    if(@@damagecontrol_started == false) then
-      start_damagecontrol_forked
-      @@damagecontrol_started = true
-    end
+    start_damagecontrol_forked
   end
         
   def start_damagecontrol_forked
     Thread.new {
-      system("ruby #{damagecontrol_home}/src/ruby/start_damagecontrol_forked.rb #{buildsdir}")
+      system("ruby #{damagecontrol_home}/src/ruby/start_damagecontrol_forked.rb #{basedir}")
     }
   end
 	
   def create_cvsmodule(project)
-    Dir.chdir(@tempdir)
+    Dir.chdir(basedir)
     File.mkpath(@project)
     Dir.chdir(@project)
     system("cvs -d#{@cvsroot} import -m 'message' #{project} VENDOR START")
@@ -174,7 +176,7 @@ class End2EndTest < Test::Unit::TestCase
   def install_damagecontrol_into_cvs(build_command_line)
     cvs = CVS.new
     cvs.install_trigger(
-          "#{@tempdir}/install_trigger_cvs_tmp",
+          "#{basedir}/install_trigger_cvs_tmp",
           @project,
           "#{@cvsroot}:#{@project}",
           build_command_line,
@@ -186,13 +188,13 @@ class End2EndTest < Test::Unit::TestCase
 	
 	
   def checkout_cvs_project(project)
-    Dir.chdir(@tempdir)
+    Dir.chdir(basedir)
     rmdir(project)
     system("cvs -d#{@cvsroot} co #{project}")
   end
 	
   def add_file_to_cvs_project(project, file)
-    Dir.chdir("#{@tempdir}/#{project}")
+    Dir.chdir("#{basedir}/#{project}")
     system("cvs add #{file}")
     system("cvs com -m 'comment'")
   end
@@ -215,7 +217,7 @@ class End2EndTest < Test::Unit::TestCase
   
   def nc_exe_location
     if windows?
-      "#{@basedir}/bin/#{nc_file}"
+      "#{damagecontrol_home}/bin/#{nc_file}"
     else
       nil
     end
@@ -230,7 +232,7 @@ class End2EndTest < Test::Unit::TestCase
 	end
 	
 	def delete_checked_out_project(project)
-		Dir.chdir(@tempdir)
+		Dir.chdir(basedir)
 		rmdir(project)
 	end
 
@@ -244,7 +246,7 @@ class End2EndTest < Test::Unit::TestCase
 
   def verify_output_of_svn_build
 		assert_file_content('"Hello world from DamageControl" ', 
-			"#{buildsdir}/repo/buildresult.txt", 
+			"#{builddir}/repo/buildresult.txt", 
 			"build not executed")
   end
   
@@ -263,7 +265,7 @@ class End2EndTest < Test::Unit::TestCase
   end
   
   def build_result
-    "#{buildsdir}/e2eproject/buildresult.txt"
+    "#{builddir}/e2eproject/buildresult.txt"
   end
   
   def assert_not_built_yet

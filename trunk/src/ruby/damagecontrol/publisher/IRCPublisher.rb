@@ -32,9 +32,12 @@ module DamageControl
       ensure_in_channel
     end
     
-    def wait_until
+    def wait_until(timeout=nil)
+      time_waited = 0
       while !yield
         sleep 1
+        time_waited += 1
+        raise "time out" if(!timeout.nil? && time_waited > timeout)
       end
     end
     
@@ -42,13 +45,13 @@ module DamageControl
       if !@irc.connected?
         logger.info("connecting to #{server}")
         @irc.connect(server, handle)
-        wait_until { @irc.connected? }
+        wait_until(10) { @irc.connected? }
       end
       
       if @irc.connected? && !@irc.in_channel?
         logger.info("joining channel #{@server_channel}")
         @irc.join_channel(@irc_channel)
-        wait_until { @irc.in_channel? }
+        wait_until(10) { @irc.in_channel? }
       end
     end
   
@@ -74,6 +77,10 @@ module DamageControl
     
     include Logging
     
+    def default_action(msg)
+      logger.debug(msg) if logger.debug?
+    end
+
     def on_link_established(msg)
       @current_server=msg.server
       @current_channel=nil
