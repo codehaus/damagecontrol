@@ -170,7 +170,7 @@ EOF
       expected_change = Change.new
       expected_change.path = "server/damagecontrol/scm/CVS.rb"
       expected_change.developer = "tirsen"
-      expected_change.message = "fixed some stuff in the log parser"
+      expected_change.message = "fixed some stuff in the log parser\n"
       expected_change.revision = "1.18"
       expected_change.time = Time.utc(2004, 7, 5, 9, 38, 21)
       
@@ -331,7 +331,7 @@ EOF
       changeset_delete = changesets[0]
       assert_equal("MAIN:rinkrank:20031013000454", changeset_delete.revision)
       assert_equal(Time.utc(2003,10,13,00,04,54,0), changeset_delete.time)
-      assert_equal("Obsolete", changeset_delete.message)
+      assert_equal("Obsolete\n", changeset_delete.message)
       assert_equal("rinkrank", changeset_delete.developer)
       assert_equal(1, changeset_delete.length)
       assert_equal("build.xml", changeset_delete[0].path)
@@ -342,7 +342,7 @@ EOF
       changeset_fix_url = changesets[1]
       assert_equal("MAIN:rinkrank:20030725163239", changeset_fix_url.revision)
       assert_equal(Time.utc(2003,07,25,16,32,39,0), changeset_fix_url.time)
-      assert_equal("fixed broken url (NANO-8)", changeset_fix_url.message)
+      assert_equal("fixed broken url (NANO-8)\n", changeset_fix_url.message)
       assert_equal("rinkrank", changeset_fix_url.developer)
       assert_equal(1, changeset_fix_url.length)
       assert_equal("build.xml", changeset_fix_url[0].path)

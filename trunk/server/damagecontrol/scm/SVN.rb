@@ -1,5 +1,7 @@
 require 'ftools'
+require 'stringio'
 require 'damagecontrol/scm/AbstractSCM'
+require 'damagecontrol/scm/SVNLogParser'
 
 module DamageControl
 
@@ -8,6 +10,7 @@ module DamageControl
     def initialize(config_map)
       super(config_map)
       @svnurl = config_map["svnurl"] || required_config_param("svnurl")
+      @svnprefix = config_map["svnprefix"] || required_config_param("svnprefix")
     end
   
     def checkout(time = nil, &proc)
@@ -23,17 +26,22 @@ module DamageControl
     end
 
     def changesets(from_time, to_time)
+      log = ""
+      yield command if block_given?
       svn(working_dir, changes_command(from_time, to_time)) do |io|
         io.each_line do |line|
-          puts line
+          log << line
+          yield line if block_given?
         end
       end
+
+      parser = SVNLogParser.new(@svnprefix)
+      parser.parse_changesets_from_log(StringIO.new(log))
     end
 
     def working_dir
       # yeah, @svnurl is not a file path, but this works
-      subdir = File.basename(@svnurl)
-      "#{checkout_dir}/#{subdir}"
+      "#{checkout_dir}/#{@svnprefix}"
     end
 
   private
@@ -64,11 +72,11 @@ module DamageControl
     end
 
     def svn(dir, cmd, &proc)
-      cmd(dir, "svn #{cmd}")
+      cmd(dir, "svn #{cmd}", &proc)
     end
 
     def svnadmin(dir, cmd, &proc)
-      cmd(dir, "svnadmin #{cmd}")
+      cmd(dir, "svnadmin #{cmd}", &proc)
     end
     
     def cmd(dir, cmd, &proc)
@@ -85,14 +93,14 @@ module DamageControl
   ##################################################################################
 
   class LocalSVN < SVN
-    def initialize(basedir, subdir)
+    def initialize(basedir, svnprefix)
       @svnrootdir = "#{basedir}/svnroot"
       hack = "/" if windows?
       hack = "" unless hack
       @repo_url = "file://#{hack}#{@svnrootdir}"
-      @project_url = "#{@repo_url}/#{subdir}"
-      super("svnurl" => @project_url, "checkout_dir" => "#{basedir}/checkout")
-      @subdir = subdir
+      @project_url = "#{@repo_url}/#{svnprefix}"
+      super("svnurl" => @project_url, "svnprefix" => svnprefix, "checkout_dir" => "#{basedir}/checkout")
+      @svnprefix = svnprefix
     end
 
     def create

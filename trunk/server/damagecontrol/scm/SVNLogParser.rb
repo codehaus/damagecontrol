@@ -5,6 +5,10 @@ module DamageControl
   class SVNLogParser
     PARSING_CHANGES = 0
     PARSING_MESSAGE = 1
+    
+    def initialize(prefix)
+      @path_regexp = Regexp.new("   (.) \/#{prefix}\/(.*)")
+    end
 
     def parse_changesets_from_log(io)
       changesets = ChangeSets.new
@@ -17,8 +21,10 @@ module DamageControl
           changeset.revision = $1
           changeset.developer = $2
           changeset.time = parse_time($3)
-        elsif(line =~ /   (.) \/(.*)/)
+        elsif(@path_regexp.match(line))
           change = Change.new
+          change.revision = changeset.revision
+          change.previous_revision = previous_revision(change.revision)
           status = $1
           path = $2
           if(path =~ /(.*) \(from (.*)\)/)
@@ -71,6 +77,10 @@ module DamageControl
       end
     end
     
+    def previous_revision(revision)
+      prev = revision[1..-1].to_i - 1
+      "r#{prev}"
+    end
   end
 
 end

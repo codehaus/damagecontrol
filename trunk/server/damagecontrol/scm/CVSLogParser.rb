@@ -117,7 +117,7 @@ module DamageControl
       
       state = extract_match(change_entry[1], /state: (.*?);/)
       change.status = STATES[state]
-      change.message = change_entry[2..-1].join("\n")
+      change.message = change_entry[2..-1].join("\n") << "\n"
          
       change
     end

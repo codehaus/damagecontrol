@@ -1,8 +1,8 @@
+require 'ftools'
+require 'stringio'
 require 'damagecontrol/scm/AbstractSCM'
 require 'damagecontrol/scm/CVSLogParser'
 require 'damagecontrol/scm/Changes'
-require 'ftools'
-require 'stringio'
 
 module DamageControl
 
