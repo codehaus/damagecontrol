@@ -35,6 +35,7 @@ module DamageControl
             socket.print("jon@tirsen.com or aslak@thoughtworks.net\r\n")
             socket.print("to get a password so you can reconfigure your project.\r\n")
             socket.print("Sorry for the inconvenience.\r\n")
+            socket.close
           end
         rescue => e
         ensure
