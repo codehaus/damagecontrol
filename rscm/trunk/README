@@ -19,13 +19,27 @@ which is described in AbstractSCM.
 Integrate with CVSSpam so that all supported SCMs (not only CVS) can benefit from its awesome coloured diff capabilities.
 This would provide a very nice alternative to SCM web front-ends.
 
-== Admin Server
+== RSCM Server
 
-RSCM ships with a web interface based on Rails (which you have to install separately). To launch, just run the script/server script:
+RSCM ships with a web app based on Rails (which you have to install separately). To launch:
 
   ruby script/server
   
-Please refer to the Rails doco for further details. (TODO: improve this part of the doco).
+You also need to launch (in a separate console) the RSCM daemon process:
+
+  ruby -Ilib lib/rscm/server.rv
+  
+The daemon process is the core of RSCM, that performs SCM access. The web app communicates with this process
+over Drb. The reason why two processes are needed is due to the fact that Dir.chdir may happen in various threads,
+which will confuse the webapp. We tried with forking, but this is not supported on Windows.
+
+Once the two servers are started, you can access the web app on:
+
+  http://localhost:3000/project
+  
+Create new projects by going to:
+
+  http://localhost:3000/project/view
 
 === IMPORTANT WINDOWS NOTE
 
@@ -44,17 +58,13 @@ If you're using CVS or Subversion with RSCM, these should be native win32 binari
 Finally, you may also have to install rubygems from http://rubyforge.org/projects/rubygems
 since this is currently not included in the Cygwin build of Ruby.
 
-== RSS Server
+== RSS Support
 
-RSCM can generate RSS feeds for all supported SCMs. The RSS feeds will have one item per changeset.
+The RSCM daemon can generate RSS feeds for all supported SCMs. The RSS feeds will have one item per changeset.
 Each RSS item's description contains the changeset's commit message, optionally with HTML links to
 issue/bug tracker issues (if detected in the changeset's commit message). The item's description
 will also contain a list of all the modified files, optionally with HTML links to a diff page
 in an SCM web front-end.
-
-A daemon-like utility for periodically generating RSS feeds (and writing to a disk) is underway.
-It will be customisable with a simple YAML file. It will also come with its ownb embedded web server
-(WEBrick) that can be used to serve the RSS, as well as configure the settings for the feeds.
 
 == Supported SCMs
 

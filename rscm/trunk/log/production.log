@@ -5012,3 +5012,303 @@ Processing ProjectController#rss (for 127.0.0.1 at Fri Jan 21 00:22:49 Eastern S
   Parameters: {"action"=>"rss", "id"=>"RSCM", "controller"=>"project"}
 Completed in 0.040000 (25 reqs/sec)
 Streaming file C:/scm/dc_svn/rscm/trunk/target/work/RSCM/rss.xml
+
+
+Processing ProjectController#index (for 127.0.0.1 at Fri Jan 21 00:54:20 Eastern Standard Time 2005)
+  Parameters: {"action"=>"index", "controller"=>"project"}
+Rendering project/index within layouts/rscm
+Rendering layouts/rscm (200 OK)
+Completed in 0.020000 (50 reqs/sec) | Rendering: 0.010000 (50%)
+
+
+Processing ProjectController#view (for 127.0.0.1 at Fri Jan 21 00:54:48 Eastern Standard Time 2005)
+  Parameters: {"action"=>"view", "controller"=>"project"}
+Rendering project/view within layouts/rscm
+Rendering layouts/rscm (200 OK)
+Completed in 0.110000 (9 reqs/sec) | Rendering: 0.100000 (90%)
+
+
+Processing ProjectController#view (for 127.0.0.1 at Fri Jan 21 00:55:19 Eastern Standard Time 2005)
+  Parameters: {"timezone"=>"300", "action"=>"view", "id"=>"RSCM", "controller"=>"project"}
+Rendering project/view within layouts/rscm
+Rendering layouts/rscm (200 OK)
+Completed in 1.072000 (0 reqs/sec) | Rendering: 1.062000 (99%)
+
+
+Processing ProjectController#rss (for 127.0.0.1 at Fri Jan 21 00:55:28 Eastern Standard Time 2005)
+  Parameters: {"timezone"=>"300", "action"=>"rss", "id"=>"RSCM", "controller"=>"project"}
+Completed in 0.010000 (100 reqs/sec)
+Streaming file C:/scm/dc_svn/rscm/trunk/target/work/RSCM/rss.xml
+
+
+Processing ProjectController#rss (for 127.0.0.1 at Fri Jan 21 00:55:39 Eastern Standard Time 2005)
+  Parameters: {"action"=>"rss", "id"=>"RSCM", "controller"=>"project"}
+Completed in 0.010000 (100 reqs/sec)
+Streaming file C:/scm/dc_svn/rscm/trunk/target/work/RSCM/rss.xml
+
+
+Processing ProjectController#view (for 127.0.0.1 at Fri Jan 21 00:56:03 Eastern Standard Time 2005)
+  Parameters: {"action"=>"view", "controller"=>"project"}
+Rendering project/view within layouts/rscm
+Rendering layouts/rscm (200 OK)
+Completed in 0.030000 (33 reqs/sec) | Rendering: 0.030000 (100%)
+
+
+Processing ProjectController#save (for 127.0.0.1 at Fri Jan 21 00:57:12 Eastern Standard Time 2005)
+  Parameters: {"RSCM::SVN[path]"=>nil, "RSCM::StarTeam[project_name]"=>nil, "RSCM::Tracker::RubyForge[group_id]"=>nil, "RSCM::Tracker::Scarab[baseurl]"=>nil, "RSCM::Tracker::Bugzilla"=>{"url"=>""}, "RSCM::SVN"=>{"url"=>"", "path"=>""}, "RSCM::CVS[mod]"=>"java", "RSCM::Tracker::Bugzilla[url]"=>nil, "RSCM::StarTeam[user_name]"=>nil, "RSCM::Tracker::JIRA[baseurl]"=>"http://jira.codehaus.org/", "RSCM::Tracker::SourceForge"=>{"group_id"=>"", "tracker_id"=>""}, "RSCM::Project[description]"=>"This is pico", "RSCM::CVS[root]"=>":pserver:anonymous@cvs.picocontainer.codehaus.org:/home/projects/picocontainer/scm", "RSCM::CVS[branch]"=>nil, "project"=>"RSCM::Project", "RSCM::Project"=>{"name"=>"Pico", "home_page"=>"http://www.picocontainer.org/", "description"=>"This is pico", "rss_enabled"=>"on"}, "RSCM::Project[rss_enabled]"=>"on", "RSCM::Tracker::RubyForge[tracker_id]"=>nil, "action"=>"save", "RSCM::StarTeam"=>{"server_name"=>"", "view_name"=>"", "folder_name"=>"", "project_name"=>"", "server_port"=>"", "password"=>"", "user_name"=>""}, "RSCM::Tracker::RubyForge"=>{"group_id"=>"", "tracker_id"=>""}, "RSCM::Tracker::Scarab"=>{"module_key"=>"", "baseurl"=>""}, "RSCM::Project[name]"=>"Pico", "RSCM::Project[home_page]"=>"http://www.picocontainer.org/", "RSCM::StarTeam[password]"=>nil, "RSCM::StarTeam[server_name]"=>nil, "RSCM::StarTeam[server_port]"=>nil, "RSCM::Tracker::Scarab[module_key]"=>nil, "RSCM::StarTeam[folder_name]"=>nil, "RSCM::Tracker::JIRA[project_id]"=>"PICO", "RSCM::Tracker::SourceForge[group_id]"=>nil, "controller"=>"project", "tracker"=>"RSCM::Tracker::JIRA", "RSCM::StarTeam[view_name]"=>nil, "scm"=>"RSCM::CVS", "RSCM::SVN[url]"=>nil, "RSCM::Tracker::SourceForge[tracker_id]"=>nil, "RSCM::Tracker::JIRA"=>{"project_id"=>"PICO", "baseurl"=>"http://jira.codehaus.org/"}, "RSCM::CVS[password]"=>nil, "RSCM::CVS"=>{"mod"=>"java", "root"=>":pserver:anonymous@cvs.picocontainer.codehaus.org:/home/projects/picocontainer/scm", "branch"=>"", "password"=>""}}
+Redirected to http://localhost:3000/project/view/Pico
+Completed in 0.030000 (33 reqs/sec)
+
+
+Processing ProjectController#view (for 127.0.0.1 at Fri Jan 21 00:57:12 Eastern Standard Time 2005)
+  Parameters: {"action"=>"view", "id"=>"Pico", "controller"=>"project"}
+Rendering project/view within layouts/rscm
+Rendering layouts/rscm (200 OK)
+Completed in 0.030000 (33 reqs/sec) | Rendering: 0.020000 (66%)
+
+
+Processing ProjectController#rss (for 127.0.0.1 at Fri Jan 21 01:01:41 Eastern Standard Time 2005)
+  Parameters: {"action"=>"rss", "id"=>"Pico", "controller"=>"project"}
+Completed in 0.000100 (10000 reqs/sec)
+Streaming file C:/scm/dc_svn/rscm/trunk/target/work/Pico/rss.xml
+
+
+Processing ProjectController#rss (for 127.0.0.1 at Fri Jan 21 01:01:59 Eastern Standard Time 2005)
+  Parameters: {"action"=>"rss", "id"=>"Pico", "controller"=>"project"}
+Completed in 0.010000 (100 reqs/sec)
+Streaming file C:/scm/dc_svn/rscm/trunk/target/work/Pico/rss.xml
+
+
+Processing ProjectController#rss (for 127.0.0.1 at Fri Jan 21 01:02:01 Eastern Standard Time 2005)
+  Parameters: {"action"=>"rss", "id"=>"Pico", "controller"=>"project"}
+Completed in 0.000100 (10000 reqs/sec)
+Streaming file C:/scm/dc_svn/rscm/trunk/target/work/Pico/rss.xml
+
+
+Processing ProjectController#view (for 127.0.0.1 at Fri Jan 21 01:03:33 Eastern Standard Time 2005)
+  Parameters: {"action"=>"view", "id"=>"Pico", "controller"=>"project"}
+Rendering project/view within layouts/rscm
+Rendering layouts/rscm (200 OK)
+Completed in 0.070000 (14 reqs/sec) | Rendering: 0.070000 (100%)
+
+
+Processing ProjectController#view (for 127.0.0.1 at Fri Jan 21 01:03:34 Eastern Standard Time 2005)
+  Parameters: {"action"=>"view", "id"=>"Pico", "controller"=>"project"}
+Rendering project/view within layouts/rscm
+Rendering layouts/rscm (200 OK)
+Completed in 0.030000 (33 reqs/sec) | Rendering: 0.020000 (66%)
+
+
+Processing ProjectController#view (for 127.0.0.1 at Fri Jan 21 01:03:36 Eastern Standard Time 2005)
+  Parameters: {"action"=>"view", "id"=>"Pico", "controller"=>"project"}
+Rendering project/view within layouts/rscm
+Rendering layouts/rscm (200 OK)
+Completed in 0.030000 (33 reqs/sec) | Rendering: 0.030000 (100%)
+
+
+Processing ProjectController#view (for 127.0.0.1 at Fri Jan 21 01:03:37 Eastern Standard Time 2005)
+  Parameters: {"action"=>"view", "id"=>"Pico", "controller"=>"project"}
+Rendering project/view within layouts/rscm
+Rendering layouts/rscm (200 OK)
+Completed in 0.030000 (33 reqs/sec) | Rendering: 0.030000 (100%)
+
+
+Processing ProjectController#view (for 127.0.0.1 at Fri Jan 21 01:06:24 Eastern Standard Time 2005)
+  Parameters: {"action"=>"view", "id"=>"Pico", "controller"=>"project"}
+Rendering project/view within layouts/rscm
+Rendering layouts/rscm (200 OK)
+Completed in 0.080000 (12 reqs/sec) | Rendering: 0.070000 (87%)
+
+
+Processing ProjectController#view (for 127.0.0.1 at Fri Jan 21 01:08:42 Eastern Standard Time 2005)
+  Parameters: {"action"=>"view", "id"=>"Pico", "controller"=>"project"}
+Rendering project/view within layouts/rscm
+Rendering layouts/rscm (200 OK)
+Completed in 0.040000 (25 reqs/sec) | Rendering: 0.040000 (100%)
+
+
+Processing ProjectController#view (for 127.0.0.1 at Fri Jan 21 01:10:02 Eastern Standard Time 2005)
+  Parameters: {"action"=>"view", "id"=>"Pico", "controller"=>"project"}
+Rendering project/view within layouts/rscm
+Rendering layouts/rscm (200 OK)
+Completed in 0.050000 (20 reqs/sec) | Rendering: 0.050000 (100%)
+
+
+Processing ProjectController#view (for 127.0.0.1 at Fri Jan 21 01:10:37 Eastern Standard Time 2005)
+  Parameters: {"action"=>"view", "id"=>"Pico", "controller"=>"project"}
+Rendering project/view within layouts/rscm
+Rendering layouts/rscm (200 OK)
+Completed in 0.061000 (16 reqs/sec) | Rendering: 0.061000 (100%)
+
+
+Processing ProjectController#view (for 127.0.0.1 at Fri Jan 21 01:11:04 Eastern Standard Time 2005)
+  Parameters: {"action"=>"view", "id"=>"Pico", "controller"=>"project"}
+Rendering project/view within layouts/rscm
+Rendering layouts/rscm (200 OK)
+Completed in 0.090000 (11 reqs/sec) | Rendering: 0.090000 (100%)
+
+
+Processing ProjectController#rss (for 127.0.0.1 at Fri Jan 21 01:11:36 Eastern Standard Time 2005)
+  Parameters: {"timezone"=>"300", "action"=>"rss", "id"=>"Pico", "controller"=>"project"}
+Completed in 0.000100 (10000 reqs/sec)
+Streaming file C:/scm/dc_svn/rscm/trunk/target/work/Pico/rss.xml
+
+
+Processing ProjectController#view (for 127.0.0.1 at Fri Jan 21 01:14:42 Eastern Standard Time 2005)
+  Parameters: {"timezone"=>"300", "action"=>"view", "id"=>"Pico", "controller"=>"project"}
+Rendering project/view within layouts/rscm
+Rendering layouts/rscm (200 OK)
+Completed in 0.030000 (33 reqs/sec) | Rendering: 0.030000 (100%)
+
+
+Processing ProjectController#view (for 127.0.0.1 at Fri Jan 21 01:14:44 Eastern Standard Time 2005)
+  Parameters: {"timezone"=>"300", "action"=>"view", "id"=>"Pico", "controller"=>"project"}
+Rendering project/view within layouts/rscm
+Rendering layouts/rscm (200 OK)
+Completed in 0.040000 (25 reqs/sec) | Rendering: 0.040000 (100%)
+
+
+Processing ProjectController#view (for 127.0.0.1 at Fri Jan 21 01:14:45 Eastern Standard Time 2005)
+  Parameters: {"timezone"=>"300", "action"=>"view", "id"=>"Pico", "controller"=>"project"}
+Rendering project/view within layouts/rscm
+Rendering layouts/rscm (200 OK)
+Completed in 0.070000 (14 reqs/sec) | Rendering: 0.070000 (100%)
+
+
+Processing ProjectController#view (for 127.0.0.1 at Fri Jan 21 01:14:47 Eastern Standard Time 2005)
+  Parameters: {"timezone"=>"300", "action"=>"view", "id"=>"Pico", "controller"=>"project"}
+Rendering project/view within layouts/rscm
+Rendering layouts/rscm (200 OK)
+Completed in 0.030000 (33 reqs/sec) | Rendering: 0.030000 (100%)
+
+
+Processing ProjectController#view (for 127.0.0.1 at Fri Jan 21 01:14:53 Eastern Standard Time 2005)
+  Parameters: {"timezone"=>"300", "action"=>"view", "id"=>"Pico", "controller"=>"project"}
+Rendering project/view within layouts/rscm
+Rendering layouts/rscm (200 OK)
+Completed in 0.030000 (33 reqs/sec) | Rendering: 0.030000 (100%)
+
+
+Processing ProjectController#save (for 127.0.0.1 at Fri Jan 21 01:15:07 Eastern Standard Time 2005)
+  Parameters: {"RSCM::SVN[path]"=>nil, "RSCM::StarTeam[project_name]"=>nil, "RSCM::Tracker::RubyForge[group_id]"=>nil, "RSCM::Tracker::Scarab[baseurl]"=>nil, "RSCM::Tracker::Bugzilla"=>{"url"=>""}, "RSCM::SVN"=>{"url"=>"", "path"=>""}, "RSCM::CVS[mod]"=>"java", "RSCM::Tracker::Bugzilla[url]"=>nil, "RSCM::StarTeam[user_name]"=>nil, "RSCM::Tracker::JIRA[baseurl]"=>"http://jira.codehaus.org/", "RSCM::Tracker::SourceForge"=>{"group_id"=>"", "tracker_id"=>""}, "RSCM::Project[description]"=>"This is pico", "RSCM::CVS[root]"=>":pserver:anonymous@cvs.picocontainer.codehaus.org:/home/projects/picocontainer/scm", "RSCM::CVS[branch]"=>nil, "project"=>"RSCM::Project", "RSCM::Project"=>{"name"=>"Pico", "home_page"=>"http://www.picocontainer.org/", "description"=>"This is pico", "rss_enabled"=>"on"}, "RSCM::Project[rss_enabled]"=>"on", "RSCM::Tracker::RubyForge[tracker_id]"=>nil, "action"=>"save", "RSCM::StarTeam"=>{"server_name"=>"", "view_name"=>"", "folder_name"=>"", "project_name"=>"", "server_port"=>"", "password"=>"", "user_name"=>""}, "RSCM::Tracker::RubyForge"=>{"group_id"=>"", "tracker_id"=>""}, "RSCM::Tracker::Scarab"=>{"module_key"=>"", "baseurl"=>""}, "RSCM::Project[name]"=>"Pico", "RSCM::Project[home_page]"=>"http://www.picocontainer.org/", "RSCM::StarTeam[password]"=>nil, "RSCM::StarTeam[server_name]"=>nil, "RSCM::StarTeam[server_port]"=>nil, "RSCM::Tracker::Scarab[module_key]"=>nil, "RSCM::StarTeam[folder_name]"=>nil, "RSCM::Tracker::JIRA[project_id]"=>"PICO", "RSCM::Tracker::SourceForge[group_id]"=>nil, "controller"=>"project", "tracker"=>"RSCM::Tracker::JIRA", "RSCM::StarTeam[view_name]"=>nil, "scm"=>"RSCM::CVS", "RSCM::SVN[url]"=>nil, "RSCM::Tracker::SourceForge[tracker_id]"=>nil, "RSCM::Tracker::JIRA"=>{"project_id"=>"PICO", "baseurl"=>"http://jira.codehaus.org/"}, "RSCM::CVS[password]"=>nil, "RSCM::CVS"=>{"mod"=>"java", "root"=>":pserver:anonymous@cvs.picocontainer.codehaus.org:/home/projects/picocontainer/scm", "branch"=>"", "password"=>""}}
+Redirected to http://localhost:3000/project/view/Pico
+Completed in 9.151000 (0 reqs/sec)
+
+
+Processing ProjectController#view (for 127.0.0.1 at Fri Jan 21 01:15:16 Eastern Standard Time 2005)
+  Parameters: {"action"=>"view", "id"=>"Pico", "controller"=>"project"}
+Rendering project/view within layouts/rscm
+Rendering layouts/rscm (200 OK)
+Completed in 0.030000 (33 reqs/sec) | Rendering: 0.030000 (100%)
+
+
+Processing ProjectController#view (for 127.0.0.1 at Fri Jan 21 01:15:19 Eastern Standard Time 2005)
+  Parameters: {"action"=>"view", "id"=>"Pico", "controller"=>"project"}
+Rendering project/view within layouts/rscm
+Rendering layouts/rscm (200 OK)
+Completed in 0.041000 (24 reqs/sec) | Rendering: 0.041000 (100%)
+
+
+Processing ProjectController#view (for 127.0.0.1 at Fri Jan 21 01:15:21 Eastern Standard Time 2005)
+  Parameters: {"action"=>"view", "id"=>"Pico", "controller"=>"project"}
+Rendering project/view within layouts/rscm
+Rendering layouts/rscm (200 OK)
+Completed in 0.050000 (20 reqs/sec) | Rendering: 0.040000 (80%)
+
+
+Processing ProjectController#view (for 127.0.0.1 at Fri Jan 21 01:17:26 Eastern Standard Time 2005)
+  Parameters: {"action"=>"view", "id"=>"Pico", "controller"=>"project"}
+Rendering project/view within layouts/rscm
+Rendering layouts/rscm (200 OK)
+Completed in 0.040000 (25 reqs/sec) | Rendering: 0.040000 (100%)
+
+
+Processing ProjectController#index (for 127.0.0.1 at Fri Jan 21 01:17:31 Eastern Standard Time 2005)
+  Parameters: {"action"=>"index", "controller"=>"project"}
+Rendering project/index within layouts/rscm
+Rendering layouts/rscm (200 OK)
+Completed in 0.010000 (100 reqs/sec) | Rendering: 0.000000 (0%)
+
+
+Processing ProjectController#view (for 127.0.0.1 at Fri Jan 21 01:18:09 Eastern Standard Time 2005)
+  Parameters: {"action"=>"view", "controller"=>"project"}
+Rendering project/view within layouts/rscm
+Rendering layouts/rscm (200 OK)
+Completed in 0.020000 (50 reqs/sec) | Rendering: 0.020000 (100%)
+
+
+Processing ProjectController#save (for 127.0.0.1 at Fri Jan 21 01:18:35 Eastern Standard Time 2005)
+  Parameters: {"RSCM::SVN[path]"=>nil, "RSCM::StarTeam[project_name]"=>nil, "RSCM::Tracker::RubyForge[group_id]"=>nil, "RSCM::Tracker::Scarab[baseurl]"=>nil, "RSCM::Tracker::Bugzilla"=>{"url"=>""}, "RSCM::SVN"=>{"url"=>"", "path"=>""}, "RSCM::CVS[mod]"=>nil, "RSCM::Tracker::Bugzilla[url]"=>nil, "RSCM::StarTeam[user_name]"=>nil, "RSCM::Tracker::JIRA[baseurl]"=>nil, "RSCM::Tracker::SourceForge"=>{"group_id"=>"", "tracker_id"=>""}, "RSCM::Project[description]"=>nil, "RSCM::CVS[root]"=>nil, "RSCM::CVS[branch]"=>nil, "project"=>"RSCM::Project", "RSCM::Project"=>{"name"=>"", "home_page"=>"", "description"=>""}, "RSCM::Tracker::RubyForge[tracker_id]"=>nil, "action"=>"save", "RSCM::StarTeam"=>{"server_name"=>"", "view_name"=>"", "folder_name"=>"", "project_name"=>"", "server_port"=>"", "password"=>"", "user_name"=>""}, "RSCM::Tracker::RubyForge"=>{"group_id"=>"", "tracker_id"=>""}, "RSCM::Tracker::Scarab"=>{"module_key"=>"", "baseurl"=>""}, "RSCM::Project[name]"=>nil, "RSCM::Project[home_page]"=>nil, "RSCM::StarTeam[password]"=>nil, "RSCM::StarTeam[server_name]"=>nil, "RSCM::StarTeam[server_port]"=>nil, "RSCM::Tracker::Scarab[module_key]"=>nil, "RSCM::StarTeam[folder_name]"=>nil, "RSCM::Tracker::JIRA[project_id]"=>nil, "RSCM::Tracker::SourceForge[group_id]"=>nil, "controller"=>"project", "RSCM::StarTeam[view_name]"=>nil, "RSCM::SVN[url]"=>nil, "RSCM::Tracker::SourceForge[tracker_id]"=>nil, "RSCM::Tracker::JIRA"=>{"project_id"=>"", "baseurl"=>""}, "RSCM::CVS[password]"=>nil, "RSCM::CVS"=>{"mod"=>"", "root"=>"", "branch"=>"", "password"=>""}}
+
+
+TypeError (cannot convert nil into String):
+    /app/controllers/project_controller.rb:68:in `eval'
+    /app/controllers/project_controller.rb:68:in `instantiate_from_params'
+    /app/controllers/project_controller.rb:55:in `save'
+    c:/ruby/lib/ruby/gems/1.8/gems/actionpack-1.2.0/lib/action_controller/base.rb:588:in `send'
+    c:/ruby/lib/ruby/gems/1.8/gems/actionpack-1.2.0/lib/action_controller/base.rb:588:in `perform_action_without_filters'
+    c:/ruby/lib/ruby/gems/1.8/gems/actionpack-1.2.0/lib/action_controller/filters.rb:236:in `perform_action_without_benchmark'
+    c:/ruby/lib/ruby/gems/1.8/gems/actionpack-1.2.0/lib/action_controller/benchmarking.rb:30:in `perform_action_without_rescue'
+    c:/ruby/lib/ruby/gems/1.8/gems/actionpack-1.2.0/lib/action_controller/benchmarking.rb:30:in `measure'
+    c:/ruby/lib/ruby/gems/1.8/gems/actionpack-1.2.0/lib/action_controller/benchmarking.rb:30:in `perform_action_without_rescue'
+    c:/ruby/lib/ruby/gems/1.8/gems/actionpack-1.2.0/lib/action_controller/rescue.rb:75:in `perform_action'
+    c:/ruby/lib/ruby/gems/1.8/gems/actionpack-1.2.0/lib/action_controller/base.rb:263:in `send'
+    c:/ruby/lib/ruby/gems/1.8/gems/actionpack-1.2.0/lib/action_controller/base.rb:263:in `process'
+    c:/ruby/lib/ruby/gems/1.8/gems/actionpack-1.2.0/lib/action_controller/base.rb:241:in `process'
+    c:/ruby/lib/ruby/gems/1.8/gems/rails-0.9.3/lib/dispatcher.rb:39:in `dispatch'
+    C:/scm/dc_svn/rscm/trunk/public/dispatch.rb:10
+    c:/ruby/lib/ruby/gems/1.8/gems/rails-0.9.3/lib/webrick_server.rb:101:in `load'
+    c:/ruby/lib/ruby/gems/1.8/gems/rails-0.9.3/lib/webrick_server.rb:101:in `handle_dispatch'
+    c:/ruby/lib/ruby/gems/1.8/gems/rails-0.9.3/lib/webrick_server.rb:80:in `handle_mapped'
+    c:/ruby/lib/ruby/gems/1.8/gems/rails-0.9.3/lib/webrick_server.rb:34:in `do_GET'
+    c:/ruby/lib/ruby/1.8/webrick/httpservlet/abstract.rb:35:in `__send__'
+    c:/ruby/lib/ruby/1.8/webrick/httpservlet/abstract.rb:35:in `service'
+    c:/ruby/lib/ruby/1.8/webrick/httpserver.rb:104:in `service'
+    c:/ruby/lib/ruby/1.8/webrick/httpserver.rb:65:in `run'
+    c:/ruby/lib/ruby/1.8/webrick/server.rb:155:in `start_thread'
+    c:/ruby/lib/ruby/1.8/webrick/server.rb:144:in `start'
+    c:/ruby/lib/ruby/1.8/webrick/server.rb:144:in `start_thread'
+    c:/ruby/lib/ruby/1.8/webrick/server.rb:94:in `start'
+    c:/ruby/lib/ruby/1.8/webrick/server.rb:89:in `each'
+    c:/ruby/lib/ruby/1.8/webrick/server.rb:89:in `start'
+    c:/ruby/lib/ruby/1.8/webrick/server.rb:79:in `start'
+    c:/ruby/lib/ruby/1.8/webrick/server.rb:79:in `start'
+    c:/ruby/lib/ruby/gems/1.8/gems/rails-0.9.3/lib/webrick_server.rb:19:in `dispatch'
+    script/server:49
+
+
+Rendering c:/ruby/lib/ruby/gems/1.8/gems/actionpack-1.2.0/lib/action_controller/templates/rescues/layout.rhtml (500 Internal Error)
+
+
+Processing ProjectController#index (for 127.0.0.1 at Fri Jan 21 01:18:59 Eastern Standard Time 2005)
+  Parameters: {"action"=>"index", "controller"=>"project"}
+Rendering project/index within layouts/rscm
+Rendering layouts/rscm (200 OK)
+Completed in 0.010000 (100 reqs/sec) | Rendering: 0.010000 (100%)
+
+
+Processing ProjectController#index (for 127.0.0.1 at Fri Jan 21 01:20:39 Eastern Standard Time 2005)
+  Parameters: {"action"=>"index", "controller"=>"project"}
+Rendering project/index within layouts/rscm
+Rendering layouts/rscm (200 OK)
+Completed in 0.010000 (99 reqs/sec) | Rendering: 0.010000 (100%)
+
+
+Processing ProjectController#view (for 127.0.0.1 at Fri Jan 21 01:20:56 Eastern Standard Time 2005)
+  Parameters: {"timezone"=>"300", "action"=>"view", "id"=>"Pico", "controller"=>"project"}
+Rendering project/view within layouts/rscm
+Rendering layouts/rscm (200 OK)
+Completed in 0.030000 (33 reqs/sec) | Rendering: 0.030000 (100%)
+
+
+Processing ProjectController#view (for 127.0.0.1 at Fri Jan 21 01:21:14 Eastern Standard Time 2005)
+  Parameters: {"timezone"=>"300", "action"=>"view", "id"=>"RSCM", "controller"=>"project"}
+Rendering project/view within layouts/rscm
+Rendering layouts/rscm (200 OK)
+Completed in 5.468000 (0 reqs/sec) | Rendering: 5.468000 (100%)
+
+
+Processing ProjectController#rss (for 127.0.0.1 at Fri Jan 21 01:21:25 Eastern Standard Time 2005)
+  Parameters: {"timezone"=>"300", "action"=>"rss", "id"=>"Pico", "controller"=>"project"}
+Completed in 0.010000 (100 reqs/sec)
+Streaming file C:/scm/dc_svn/rscm/trunk/target/work/Pico/rss.xml
