@@ -55,7 +55,7 @@ module DamageControl
         previous_label = @build_history_repository.prev(current_build, false).label
 
         # We need to append a sub label to distinguish the builds
-        if(previous_label && previous_label =~ /([0-9]*)[\.]?([0-9]*)/ && $1.to_i == scm_label.to_i)
+        if(previous_label && previous_label =~ /([0-9]+)[\.]?([0-9]*)/ && $1.to_i == scm_label.to_i)
           sub_label = $2 ? $2.to_i + 1 : 1
           scm_label = "#{$1}.#{sub_label}"
         end
