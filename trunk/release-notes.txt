@@ -1,4 +1,4 @@
-The DamageControl Team (Jon Tirsen and Aslak Hellesoy) are proud to release DamageControl 0.2 (this rerelease is for Windows only).
+The DamageControl Team (Jon Tirsen and Aslak Hellesoy) are proud to release DamageControl 0.2.
 
 <a href="http://damagecontrol.codehaus.org/">http://damagecontrol.codehaus.org/</a>
 
@@ -16,9 +16,9 @@ DamageControl is a Continuous Integration server with the follwoing main feature
 <li> Integration with <a href="http://viewcvs.sourceforge.net/">ViewCVS</a> and <a href="http://www.cenqua.com/fisheye/">Fisheye</a>
 </ul>
 
-You can look at a live deployment here: <a href="http://builds.codehaus.org/public/dashboard">http://builds.codehaus.org/public/dashboard</a> (Yes, DamageControl runs on Linux too)
+You can look at a live deployment here: <a href="http://builds.codehaus.org/public/dashboard">http://builds.codehaus.org/public/dashboard</a>
 If you want to add a project, go here: <a href="http://builds.codehaus.org/private/dashboard">http://builds.codehaus.org/private/dashboard</a> (ask Jon or Aslak for username/password)
-N.B! Due to a misconfiguration of the Apache proxy on Codehaus, this doesn't work with IE yet. Use a real browser like Firfox or Opera.
+N.B! Due to a misconfiguration of the Apache proxy on Codehaus, this doesn't work with IE yet. Use a real browser like Firefox or Opera.
 You can also monitor these Codehaus DamageControl server's activity on irc://irc.codehaus.org/damagecontrol
 
 Things that didn't go into this release, but will go into one of the upcoming releases:
@@ -27,8 +27,8 @@ Things that didn't go into this release, but will go into one of the upcoming re
 <li> Subversion support (nearly there!).
 <li> Perforce suport.
 <li> Support for poll based builds (in addition to trigged builds)
-<li> Better layout (once we grok div and css properly).
-<li> RPM packages for linux
+<li> Better design of the web-pages (volunteers needed!).
+<li> Easy-to-use installers for Linux (apt, rpm etc)
 <li> More notification channels (RSS, Yahoo! messenger, Jabber, Eclipse plugin, IDEA plugin, Apple dock)
 </ul>
 
