@@ -41,9 +41,9 @@ module DamageControl
       @build_executor.process_next_scheduled_build
       # what happens for bad_command is different on windows and linux
       if(windows?)
-        assert(messages_from_hub[-2].is_a?(BuildStartedEvent))
-      else
         assert(messages_from_hub[-2].is_a?(BuildProgressEvent))
+      else
+        assert(messages_from_hub[-2].is_a?(BuildStartedEvent))
       end
       assert(messages_from_hub[-1].is_a?(BuildCompleteEvent))
       assert(!messages_from_hub[-1].build.successful)
