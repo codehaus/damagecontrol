@@ -66,25 +66,28 @@ module DamageControl
     def process_message(message)
       ensure_in_channel
       
-      if send_message_on_build_request && message.is_a?(BuildRequestEvent)
-        @irc.send_message_to_channel("#{prefix(message)} BUILD REQUESTED")
-      end
-      
-      if message.is_a?(BuildStartedEvent)
-        url = if build.url then ": #{build.url}" else "" end
-        @irc.send_message_to_channel("#{prefix(message)} BUILD STARTED#{url}")
-        message.build.changesets.each do |changeset|
-          @irc.send_message_to_channel("#{prefix(message)} (by #{changeset.developer} #{changeset.time_difference} ago) : #{changeset.message}")
-          changeset.each do |change|
-            @irc.send_message_to_channel("#{prefix(message)} #{change.path} #{change.revision}")
+      if (message.is_a?(BuildEvent))
+        build = message.build
+        
+        if send_message_on_build_request && message.is_a?(BuildRequestEvent)
+          @irc.send_message_to_channel("#{prefix(message)} BUILD REQUESTED")
+        end
+        
+        if message.is_a?(BuildStartedEvent)
+          url = if build.url then ": #{build.url}" else "" end
+          @irc.send_message_to_channel("#{prefix(message)} BUILD STARTED#{url}")
+          build.changesets.each do |changeset|
+            @irc.send_message_to_channel("#{prefix(message)} (by #{changeset.developer} #{changeset.time_difference} ago) : #{changeset.message}")
+            changeset.each do |change|
+              @irc.send_message_to_channel("#{prefix(message)} #{change.path} #{change.revision}")
+            end
           end
         end
-      end
-      
-      if message.is_a?(BuildCompleteEvent)
-        build = message.build
-        msg = erb(@template, binding)
-        @irc.send_message_to_channel(msg)
+        
+        if message.is_a?(BuildCompleteEvent)
+          msg = erb(@template, binding)
+          @irc.send_message_to_channel(msg)
+        end
       end
 
       if message.is_a?(UserMessage)
