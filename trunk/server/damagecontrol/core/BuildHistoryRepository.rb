@@ -1,9 +1,13 @@
 require 'damagecontrol/core/Build'
 require 'damagecontrol/core/AsyncComponent'
 require 'damagecontrol/core/BuildEvents'
+require 'damagecontrol/core/ProjectDirectories'
 require 'pebbles/TimeUtils'
 
-# Captures and persists build history
+# Captures and persists build history.
+# All reads are from memory, which is populated from files at startup.
+# Writes will update memory as well as files.
+#
 # Instances of this class can also be reached
 # through XML-RPC - See xmlrpc/StatusPublisher.rb
 # 
@@ -12,44 +16,32 @@ module DamageControl
 
   class BuildHistoryRepository < AsyncComponent
 
-    def initialize(channel, filename=nil)
+    def initialize(channel, project_directories=nil)
       super(channel)
-      @builds = Hash.new
-      if(filename != nil)
-        expanded = File.expand_path(filename)
-        if(File.exist?(expanded))
-          file = File.new(expanded)
-          @builds = YAML::load(file.read)
-          file.close
-
-          if(!@builds.is_a?(Hash))
-            raise "#{expanded} should be the YAML representation of a Ruby Hash!"
-          end
-        end
-        @filename = expanded
+      @project_directories = project_directories
+      @history = {}
+      
+      if(@project_directories)
+        populate_cache_from_files
       end
-    end
-
-    # HACK OF DEATH:
-    # some xmlrpc implementations gets very confused by an empty struct
-    # so we'll patch it by adding a pointless property in it
-    # (did that take me like on day to figure out?!)
-    # -- Jon Tirsen
-    def patch_build(build)
-      build.config["apa"]="banan" unless build.nil?
-      build
     end
     
     def current_build(project_name)
-      patch_build(build_history(project_name).reverse[0])
+      history = history(project_name)
+      return nil unless history
+      patch_build(history[-1])
     end
     
     def last_completed_build(project_name)
-      patch_build(build_history(project_name).reverse.find {|build| build.completed?})
+      history = history(project_name)
+      return nil unless history
+      patch_build(history.reverse.find {|build| build.completed?})
     end
     
-    def last_succesful_build(project_name)
-      build_history(project_name).reverse.find {|build| build.status == Build::SUCCESSFUL}
+    def last_successful_build(project_name)
+      history = history(project_name)
+      return nil unless history
+      patch_build(history.reverse.find {|build| build.status == Build::SUCCESSFUL})
     end
 
     def process_message(message)
@@ -57,71 +49,35 @@ module DamageControl
         register(message.build)
       end
     end
-
+    
+    def history(project_name)
+      return [] unless @history.has_key?(project_name)
+      result = @history[project_name]
+      result
+    end
+    
     def register(build)
-      build_array = @builds[build.project_name]
-      if(build_array == nil)
-        build_array = []
-        @builds[build.project_name]=build_array
-      end
-      build_array << build unless build_array.index(build)
-      build_array.sort! {|b1, b2| b1.timestamp_as_time <=> b2.timestamp_as_time }
-      if(@filename != nil)
-        out = File.new(@filename, "w")
-        YAML::dump(@builds, out)
-        out.close
-      end
-    end
-    
-    # Returns a map of array of build, project name as key. if project_name 
-    # is nil then all the builds, otherwise only for the specified name
-    # If number_of_builds is specified, each list will contain maximum
-    # that number of builds - from the end of the original list
-    def get_build_list_map(project_name=nil, number_of_builds=nil)
-      result_map = nil
-      if(project_name != nil)
-        if(build_history(project_name) != [])
-          result_map = {project_name => build_history(project_name)}
-        else
-          return Hash.new
-        end
-      else
-        result_map = @builds
+      history = history(build.project_name)
+      if(history.empty?)
+        @history[build.project_name] = history
       end
 
-      if(number_of_builds != nil)
-        #filter out the end of each list
-        result = Hash.new
-        @builds.each_pair{ |project_name, build_list|
-          length = number_of_builds > build_list.length ? build_list.length : number_of_builds
-          result[project_name] = build_list[-length, length]
-        }
-        return result
-      else
-        return result_map
+      history << build unless history.index(build)
+      if(@project_directories)
+        dump(history, build.project_name)
       end
-    end
-    
-    def build_history(project_name)
-      return [] unless @builds.has_key?(project_name)
-      @builds[project_name]
     end
     
     def project_names
-      get_project_names
+      @history.keys.sort
     end
-
-    # TODO: get_xxx is not idiomatic to ruby
-    def get_project_names
-      @builds.keys
-    end
-
+    
     # Returns a map of time -> [build]
     # The time represents a time period of a day, week or month
     # date_field should be :day, :week or :month
     def group_by_period(project_name, interval)
       build_periods = {}
-      build_list = get_build_list_map(project_name)[project_name]
+      build_list = history(project_name)
       build_list.each do |build|
         timestamp = build.timestamp_as_time
         period_number, period_start_date = timestamp.get_period_info(interval)
@@ -136,5 +92,50 @@ module DamageControl
       build_periods
     end
 
+  private
+
+    def populate_cache_from_files
+      @project_directories.project_names.each do |project_name|
+        builds = load(project_name)
+        @history[project_name] = builds unless builds.nil?
+      end
+    end
+
+    def load(project_name)
+      builds = nil
+      filename = history_file(project_name)
+      if(File.exist?(filename))
+        file = File.new(filename)
+        yaml = file.read
+        builds = YAML::load(yaml)
+        file.close
+
+        if(!builds.is_a?(Array))
+          raise "#{expanded} should be the YAML representation of a Ruby Array of Build!"
+        end
+      end
+      builds
+    end
+    
+    # HACK OF DEATH:
+    # some xmlrpc implementations get very confused by an empty struct
+    # so we'll patch it by adding a pointless property in it
+    # (did that take me like on day to figure out?!)
+    # -- Jon Tirsen
+    def patch_build(build)
+      build.config["apa"]="banan" unless build.nil?
+      build
+    end
+    
+    def dump(history, project_name)
+      out = File.new(history_file(project_name), "w")
+      YAML::dump(history, out)
+      out.close
+    end
+
+    def history_file(project_name)
+      File.expand_path(@project_directories.build_history_file(project_name))
+    end
+    
   end
 end

@@ -125,7 +125,7 @@ module DamageControl
       
       component(:project_directories, @project_directories)
       component(:project_config_repository, ProjectConfigRepository.new(project_directories))
-      component(:build_history_repository, BuildHistoryRepository.new(hub, "#{rootdir}/build_history.yaml"))
+      component(:build_history_repository, BuildHistoryRepository.new(hub, @project_directories))
     end
     
     def init_components

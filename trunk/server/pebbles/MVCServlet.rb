@@ -15,7 +15,7 @@ module Pebbles
       response["Content-Type"] = content_type
     end
     
-    protected
+  protected
     
     def required_parameter(parameter)
       raise WEBrick::HTTPStatus::BadRequest, "parameter required `#{parameter}'."
@@ -26,7 +26,6 @@ module Pebbles
     end
 
     def redirect(url)
-      #dump_headers
       response["Location"] = url
       response.status = WEBrick::HTTPStatus::Found.code
     end
@@ -41,17 +40,6 @@ module Pebbles
     
     def content_type
       "text/html"
-    end
-    
-    def dump_headers
-      puts "================ dump_headers"
-      puts "request:"
-      p request
-      puts "header:"
-      p request.header
-      puts "meta:"
-      p request.meta_vars
-      puts "==============="
     end
     
   end
@@ -101,7 +89,7 @@ module Pebbles
       end
     end
     
-    protected
+  protected
     
     def templatedir
       "."

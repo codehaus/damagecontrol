@@ -17,7 +17,7 @@ module DamageControl
       res.body = open(path, "rb")
     end
   
-    protected
+  protected
     
     def content_type
       "image/gif"
@@ -27,7 +27,7 @@ module DamageControl
       raise "should override"
     end
     
-    private
+  private
     
     # last_completed_or_current must be :last_completed_build or :current_build
     def status_image(project_name)

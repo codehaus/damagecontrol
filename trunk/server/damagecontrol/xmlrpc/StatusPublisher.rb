@@ -14,10 +14,11 @@ module XMLRPC
   class StatusPublisher
   
     INTERFACE = ::XMLRPC::interface("status") {
-      meth 'struct get_build_list_map(string)', 'returns a map of builds, project name as key.', 'get_build_list_map'
-      meth 'array get_project_names()', 'returns an array of project names.', 'get_project_names'
-      meth 'struct get_current_build(string)', '', 'current_build'
-      meth 'struct get_last_completed_build(string)', '', 'last_completed_build'
+      meth 'array history(string)', 'returns an array of build.', 'history'
+      meth 'array project_names()', 'returns an array of project names.', 'project_names'
+      meth 'struct current_build(string)', 'current_build', 'current_build'
+      meth 'struct last_completed_build(string)', 'last_completed_build', 'last_completed_build'
+      meth 'struct last_successful_build(string)', 'last_successful_build', 'last_successful_build'
     }
 
     def initialize(xmlrpc_servlet, build_history_repository)

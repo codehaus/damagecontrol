@@ -4,6 +4,7 @@ module DamageControl
 
   class ProjectDirectories
     CONFIG_FILE_NAME = "conf.yaml"
+    HISTORY_FILE_NAME = "build_history.yaml"
       
     attr_reader :basedir
   
@@ -34,7 +35,11 @@ module DamageControl
 
     def project_config_file(project_name)
       "#{project_dir(project_name)}/#{CONFIG_FILE_NAME}"
-    end
+    end    
+
+    def build_history_file(project_name)
+      "#{project_dir(project_name)}/#{HISTORY_FILE_NAME}"
+    end    
     
     def log_timestamps(project_name)
       Dir["#{log_dir(project_name)}/*.log"].collect {|f| File.basename(f, ".log") }.sort
@@ -43,6 +48,7 @@ module DamageControl
     def log_file(project_name, timestamp)
       "#{log_dir(project_name)}/#{timestamp}.log"
     end
+
   end
   
 end

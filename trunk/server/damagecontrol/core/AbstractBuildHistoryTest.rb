@@ -1,10 +1,13 @@
 require 'damagecontrol/core/Hub'
+require 'pebbles/mockit'
 require 'damagecontrol/core/BuildHistoryRepository'
 
 module DamageControl
 
   class AbstractBuildHistoryTest < Test::Unit::TestCase
     
+    include FileUtils
+
     def test_dummy
     end
     

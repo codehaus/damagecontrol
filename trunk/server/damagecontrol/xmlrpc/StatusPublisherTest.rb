@@ -20,7 +20,7 @@ module XMLRPC
     XMLRPC_CALL_DATA = <<-EOF
     <?xml version="1.0" encoding="ISO-8859-1"?>
     <methodCall>
-      <methodName>status.get_build_list_map</methodName>
+      <methodName>status.history</methodName>
       <params>
         <param>
           <value>
@@ -60,7 +60,7 @@ module XMLRPC
       REXML::Document.new( File.new("#{damagecontrol_home}/testdata/expected_xmlrpc_fetch_all_reply.xml"), pref).write(b)
       # Just compare the lengths. Not 100% foolproof, but if they're not equal, compare the actual content
       if(a.length != b.length)
-        assert_equal(a,b)      
+        assert_equal(b,a)      
       end
     end
   end

@@ -50,7 +50,7 @@
     <td class="pane-column-header">Time</td>
   </tr>
 <%
-  builds = build_history_repository.build_history(project_name).reverse
+  builds = build_history_repository.history(project_name).reverse
   builds.each do |build|
     color = if build.successful? then "green" else "red" end
     color = "grey" if !build.completed?
