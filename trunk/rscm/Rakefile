@@ -11,7 +11,7 @@ require 'lib/rubyforge_file_publisher'
 
 PKG_BUILD     = ENV['PKG_BUILD'] ? '.' + ENV['PKG_BUILD'] : ''
 PKG_NAME      = 'rscm'
-PKG_VERSION   = '0.1.0' + PKG_BUILD
+PKG_VERSION   = '0.2.0' + PKG_BUILD
 PKG_FILE_NAME = "#{PKG_NAME}-#{PKG_VERSION}"
 
 desc "Default Task"
@@ -108,15 +108,15 @@ else
   end
 end
 
-task :publish do
+task :publish => [:rdoc] do
   publisher = Rake::CompositePublisher.new
   publisher.add Rake::RubyForgePublisher.new('rscm', 'aslak_hellesoy')
   publisher.upload
 
-  RUBYFORGE_GROUP_ID = 490
-  RUBYFORGE_PACKAGE_ID = 552
-  RUBYFORGE_RELEASE_NAME = "rakedrelease"
-
+#  RUBYFORGE_GROUP_ID = 490
+#  RUBYFORGE_PACKAGE_ID = 552
+#  RUBYFORGE_RELEASE_NAME = "rakedrelease"
+#
 #  Rake::RubyForgeFilePublisher.new(
 #    RUBYFORGE_GROUP_ID, 
 #    "aslak_hellesoy", 

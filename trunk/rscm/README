@@ -1,6 +1,6 @@
-= RSCM - Ruby Source Control Management
+= RSCM - Ruby Source Control Management (0.2.0)
 
-RSCM is to SCM what ODBC/JDBC is to databases - a common API to access a wide variety of SCMs. The features are roughly:
+RSCM is to SCM what DBI/JDBC/ODBC are to databases - an SCM-independent API for accessing a wide variety of SCMs. The features are roughly:
 
 * Check out a working copy (with possibility to specify branch/date/label)
 * Get changesets (changesets are emulated for non-transactional SCMs like CVS and StarTeam)
@@ -27,6 +27,7 @@ If you want the latest and greatest, you can get the sources, which live alongsi
 
 In progress:
 
+* ClearCase -http://www-306.ibm.com/software/awdtools/clearcase (half way there)
 * Darcs - http://www.abridgegame.org/darcs (very incomplete)
 * Monotone - http://www.venge.net/monotone (half way there)
 

@@ -175,8 +175,8 @@ module RSCM
       changesets
     end
 
-    # Whether the working copy in +checkout_dir+ is uptodate with the repository
-    # since +from_identifier+.
+    # Whether the working copy in +checkout_dir+ is in synch with the central
+    # repository since +from_identifier+.
     #
     def uptodate?(checkout_dir, from_identifier)
       # Suboptimal algorithm that works for all SCMs.
@@ -185,7 +185,7 @@ module RSCM
       changesets(checkout_dir, from_identifier).empty?
     end
 
-    # Whether the project is checked out or not.
+    # Whether the project is checked out from the central repository or not.
     # Subclasses should override this to check for SCM-specific administrative
     # files if appliccable
     def checked_out?(checkout_dir)
