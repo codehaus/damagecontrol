@@ -124,6 +124,10 @@ module DamageControl
       max_number_of_builds = params[:max_number_of_builds] || default_number_of_builds
       erb("components/builds_table.erb", binding)
     end
+
+    def rss_url
+      nil
+    end
     
     def default_number_of_builds
       30

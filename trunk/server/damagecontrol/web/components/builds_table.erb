@@ -3,6 +3,11 @@
   <tr>
     <td class="pane-header">
       <%= header_text %>
+      <% unless rss_url.nil? then%>
+        <a href="<%= rss_url %>">
+          <img src="images/rssbadge.gif" width="36" height="14" alt="RSS"/>
+        </a>
+      <% end %>
     </td>
   </tr>
   
@@ -80,7 +85,7 @@
         </form>
       </td>
     </tr>
-  <% end %>  
+  <% end %>
 
 <% end %>
 

@@ -32,7 +32,7 @@ module DamageControl
 
     def current_etag(project_name)
       build = build_history_repository.last_completed_build(project_name)
-      'W/"' + build.label.gsub('"', '\\"') + '"'
+      'W/"' + build.timestamp.gsub('"', '\\"') + '"'
     end
     
   end

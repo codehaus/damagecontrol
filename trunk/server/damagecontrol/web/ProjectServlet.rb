@@ -5,10 +5,11 @@ module DamageControl
   class ProjectServlet < AbstractAdminServlet
     include FileUtils
   
-    def initialize(type, build_history_repository, project_config_repository, trigger, build_scheduler, report_classes)
+    def initialize(type, build_history_repository, project_config_repository, trigger, build_scheduler, report_classes, rss_url)
       super(type, build_scheduler, build_history_repository, project_config_repository)
       @trigger = trigger
       @report_classes = report_classes
+      @rss_url = rss_url
     end
     
     def default_action
@@ -59,6 +60,10 @@ module DamageControl
     
     def extra_css
       selected_report.extra_css
+    end
+
+    def rss_url
+      @rss_url + "?project_name=" + CGI.escape(project_name)
     end
 
     def tasks    

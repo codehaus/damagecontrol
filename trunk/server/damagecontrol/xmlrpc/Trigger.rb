@@ -15,10 +15,10 @@ module XMLRPC
     
     include Logging
 
-    def initialize(xmlrpc_server, channel, project_configuration_repository, checkout_manager, public_web_url)
+    def initialize(xmlrpc_server, channel, project_config_repository, checkout_manager, public_web_url)
       xmlrpc_server.add_handler(INTERFACE, self)
       @channel = channel
-      @project_configuration_repository = project_configuration_repository
+      @project_config_repository = project_config_repository
       @checkout_manager = checkout_manager
       @public_web_url = public_web_url
     end
@@ -30,7 +30,7 @@ module XMLRPC
 
     def request(project_name)
       begin
-        build = @project_configuration_repository.create_build(project_name)
+        build = @project_config_repository.create_build(project_name)
         build.status = Build::CHECKING_OUT
         @channel.publish_message(BuildRequestEvent.new(build))
 

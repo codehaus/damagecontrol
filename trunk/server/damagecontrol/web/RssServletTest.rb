@@ -31,7 +31,7 @@ module DamageControl
 
     def test_rss
       build = Build.new("myproject")
-      build.label = "42"
+      build.timestamp = "20041007160000"
       build_history_repository = FakeBuildHistoryRepository.new(build)
       servlet = RssServlet.new(build_history_repository, "http://builds.codehaus.org/rss")
       result = do_request("project_name" => "myproject") do
@@ -41,28 +41,28 @@ module DamageControl
       assert_equal("<rss/>", result)
     end
 
-    def test_rss_returns_not_modified_when_given_an_etag_with_current_label
+    def test_rss_returns_not_modified_when_given_an_etag_with_current_timestamp
       build = Build.new("myproject")
-      build.label = "42"
+      build.timestamp = "20041007160000"
       build_history_repository = FakeBuildHistoryRepository.new(build)
       servlet = RssServlet.new(build_history_repository, "http://builds.codehaus.org/rss")
       result = do_request("project_name" => "myproject") do
-        Thread.current["request"]["If-None-Match"] = 'W/"42"'
+        Thread.current["request"]["If-None-Match"] = 'W/"20041007160000"'
         servlet.default_action
         assert_equal(WEBrick::HTTPStatus::NotModified.code, Thread.current["response"].status)
       end
       assert_equal("", result)
     end
 
-    def test_rss_returns_content_when_given_an_etag_with_an_old_label
+    def test_rss_returns_content_when_given_an_etag_with_an_old_timestamp
       build = Build.new("myproject")
-      build.label = "42"
+      build.timestamp = "20041007160000"
       build_history_repository = FakeBuildHistoryRepository.new(build)
       servlet = RssServlet.new(build_history_repository, "http://builds.codehaus.org/rss")
       result = do_request("project_name" => "myproject") do
-        Thread.current["request"]["If-None-Match"] = 'W/"41"'
+        Thread.current["request"]["If-None-Match"] = 'W/"20041004100000"'
         servlet.default_action
-        assert_equal('W/"42"', Thread.current["response"]["ETag"])
+        assert_equal('W/"20041007160000"', Thread.current["response"]["ETag"])
       end
       assert_equal("<rss/>", result)
     end

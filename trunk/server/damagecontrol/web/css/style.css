@@ -173,6 +173,10 @@ pre.console {
   padding: 3px 4px 3px 4px;
 }
 
+.build-rss-cell {
+  text-align: right;
+}
+
 .task-header {
   display: block;
   border-bottom: 1px #090 solid;

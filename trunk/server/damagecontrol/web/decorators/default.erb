@@ -2,6 +2,9 @@
 <head>
 <link rel="stylesheet" href="css/style.css" type="text/css">
 <link rel="stylesheet" href="css/color.css" type="text/css">
+<% unless rss_url.nil? %>
+  <link rel="alternate" type="application/rss+xml" title="RSS" href="<%= rss_url %>"/>
+<% end %>
 <% extra_css.each do |css| %>
   <link rel="stylesheet" href="<%= css %>" type="text/css">
 <% end %>
