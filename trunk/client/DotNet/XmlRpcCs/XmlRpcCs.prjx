@@ -28,13 +28,13 @@
   </References>
   <DeploymentInformation target="" script="" strategy="File" />
   <Configuration runwithwarnings="False" name="Debug">
-    <CodeGeneration runtime="MsNet" compiler="Csc" warninglevel="4" nowarn="" includedebuginformation="True" optimize="False" unsafecodeallowed="False" generateoverflowchecks="False" mainclass="" target="Library" definesymbols="" generatexmldocumentation="False" win32Icon="" />
+    <CodeGeneration runtime="MsNet" compiler="Csc" warninglevel="4" nowarn="" includedebuginformation="True" optimize="False" unsafecodeallowed="False" generateoverflowchecks="False" mainclass="" target="Library" definesymbols="__MONO__" generatexmldocumentation="False" win32Icon="" />
     <Execution commandlineparameters="" consolepause="True" />
     <Output directory="./bin/Debug" assembly="XmlRpcCs" executeScript="" executeBeforeBuild="" executeAfterBuild="" />
   </Configuration>
   <Configurations active="Debug">
     <Configuration runwithwarnings="False" name="Debug">
-      <CodeGeneration runtime="MsNet" compiler="Csc" warninglevel="4" nowarn="" includedebuginformation="True" optimize="False" unsafecodeallowed="False" generateoverflowchecks="False" mainclass="" target="Library" definesymbols="" generatexmldocumentation="False" win32Icon="" />
+      <CodeGeneration runtime="MsNet" compiler="Csc" warninglevel="4" nowarn="" includedebuginformation="True" optimize="False" unsafecodeallowed="False" generateoverflowchecks="False" mainclass="" target="Library" definesymbols="__MONO__" generatexmldocumentation="False" win32Icon="" />
       <Execution commandlineparameters="" consolepause="True" />
       <Output directory="./bin/Debug" assembly="XmlRpcCs" executeScript="" executeBeforeBuild="" executeAfterBuild="" />
     </Configuration>
