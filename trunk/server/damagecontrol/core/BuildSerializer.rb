@@ -80,7 +80,7 @@ module DamageControl
         puts "Failed to parse changesets with YAML:"
         puts e.message
         puts e.backtrace.join("\n")
-        Changesets.new
+        ChangeSets.new
       end
     end
 
