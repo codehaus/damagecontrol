@@ -114,6 +114,9 @@ module Rake
     def package_id=(s)
       @form_data["package_id"] = s
     end
+    def package_id
+      @form_data["package_id"]
+    end
     def release_name=(s)
       @form_data["release_name"] = s
     end
@@ -138,29 +141,28 @@ module Rake
 
     def upload
       Net::HTTP.start('rubyforge.org', 80) do |http|
-        http.set_debug_output $stderr
     
         # log in so we get a cookie. we need it to post the upload form.
         password = ENV['RUBYFORGE_PASSWORD']
         raise "The RUBYFORGE_PASSWORD environment variable is not set.\n" +
               "It can be passed on the Rake command line with RUBYFORGE_PASSWORD=<your password>" if password.nil?
 
-        login_form_uri = "/account/login.php"
-        response, data = http.post(login_form_uri, "form_loginname=#{@user}&form_pw=#{password}&login=Login")
+        response, data = http.post("/account/login.php", "form_loginname=#{@user}&form_pw=#{password}&login=Login")
         cookie = CGI::Cookie.parse(response['set-cookie'])['session_ser'].to_s
         header = {"Cookie" => cookie, "Host" => "rubyforge.org"}
 
-        login_redirect = response['location']
-        response, data = http.get(login_redirect, header)
+        response, data = http.get(response['location'], header)
 
-        upload_form_uri = "/frs/admin/qrs.php?group_id=#{@group_id}"
+        upload_form = "/frs/admin/qrs.php?package=#{package_id}&group_id=#{@group_id}"
+        response, data = http.get(upload_form, header)
+
         params = []
         @form_data.each do |k, v|
           params << Net::Param.new(k,v)
         end
         params << Net::FileParam.new("userfile", @file, @types[0])
-
-        response, data = http.post_multipart(upload_form_uri, params, header)
+        header["Referer"] = "http://rubyforge.org#{upload_form}"
+        response, data = http.post_multipart(upload_form, params, header)
         
         File.open("rf.html", "w") { |io|
           io.write data
