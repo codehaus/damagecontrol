@@ -34,7 +34,6 @@ module DamageControl
     end
 
     def test_enqueued_message_processed_on_tick
-    fail
       comp = SucceedingAsyncComponent.new(hub)
       @messages.each {|message|
         hub.publish_message(message)
