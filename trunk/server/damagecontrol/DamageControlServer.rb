@@ -278,5 +278,7 @@ module DamageControl
 end
 
 if __FILE__ == $0
-  DamageControl::DamageControlServer.new.start.wait_for_shutdown
+  DamageControl::DamageControlServer.new{
+    :RootDir => ENV["DAMAGECONTROL_WORK"]
+  }.start.wait_for_shutdown
 end

@@ -23,7 +23,7 @@ module DamageControl
       result["Checked out files..."] = "root/#{project_name}/checkout"
       if(private?)
         result["Configure"] = "?project_name=#{project_name}&action=configure"
-        result["Trig build now"] = "?project_name=#{project_name}&action=trig_build"
+        result["Nudge build now"] = "?project_name=#{project_name}&action=trig_build"
       end
       result
     end
