@@ -4,14 +4,14 @@ require 'rscm/annotations'
 
 module DamageControl
   module Publisher
-    class Execute < Base
+    class Yahoo < Base
       register self
     
       def initialize
       end
 
       def name
-        "Execute"
+        "Yahoo"
       end    
 
       def publish(build)
