@@ -25,6 +25,7 @@ module DamageControl
       @irc_channel = irc_channel
       @template = template
       @handle = 'dcontrol'
+      @send_message_on_build_request = true
     end
     
     def start

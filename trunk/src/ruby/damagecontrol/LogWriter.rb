@@ -1,9 +1,12 @@
 require 'ftools'
 require 'damagecontrol/BuildEvents'
+require 'damagecontrol/Logging'
 
 module DamageControl
 
   class LogWriter
+    
+    include Logging
   
     def initialize(channel, logs_base_dir)
       @log_files = {}
@@ -29,6 +32,7 @@ module DamageControl
       
       if message.is_a? BuildCompleteEvent
         begin
+          logger.debug("closing file #{log_file_name(build)}") if logger.debug?
           log_file(build).flush
           log_file(build).close
         rescue => e
@@ -46,6 +50,7 @@ module DamageControl
       file_name = log_file_name(build)
       file = @log_files[file_name]
       if(!file)
+        logger.debug("opening file #{file_name}") if logger.debug?
         File.makedirs(File.dirname(file_name))
         file = File.open(file_name, "w")
         @log_files[file_name] = file
