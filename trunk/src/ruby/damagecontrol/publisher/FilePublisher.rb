@@ -11,22 +11,21 @@ module DamageControl
 
   class FilePublisher < AsyncComponent
 
-    def initialize(hub, basedir, template, filesystem=FileSystem.new)
+    def initialize(hub, template, filesystem=FileSystem.new)
       super(hub)
-      @basedir = basedir
       @template = template
       @filesystem = filesystem
     end
   
-    def process_message(event)
-      if event.is_a? BuildCompleteEvent
-        filedir = "#{@basedir}/#{event.build.label}"
-        @filesystem.makedirs(filedir)
+    def process_message(message)
+      if message.is_a? BuildCompleteEvent
+        filepath = "#{message.build.reports_dir}/#{@template.file_name(message.build)}"
+        @filesystem.makedirs(File.dirname(filepath))
 
-        filepath = "#{filedir}/#{@template.file_name}"
-        content = @template.generate(event.build)
+        content = @template.generate(message.build)
         file = @filesystem.newFile(filepath, "w")
         file.print(content)
+        file.flush
         file.close
       end
     end

@@ -1,5 +1,3 @@
-require 'rexml/pullparser'
-
 module DamageControl
 
   class HTMLTemplate
@@ -17,6 +15,10 @@ module DamageControl
   </body>
 </html>
 }
+    end
+    
+    def file_name(build)
+      "#{build.label}.html"
     end
   end
 end

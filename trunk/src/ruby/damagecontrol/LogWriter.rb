@@ -18,6 +18,7 @@ module DamageControl
       end
 
       if message.is_a? BuildCompleteEvent
+        log_file(message).flush
         log_file(message).close
       end
     end
