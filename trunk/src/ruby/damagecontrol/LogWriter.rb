@@ -1,4 +1,4 @@
-require 'damagecontrol/FileSystem'
+require 'ftools'
 require 'damagecontrol/Hub'
 require 'damagecontrol/BuildEvents'
 
@@ -6,8 +6,7 @@ module DamageControl
 
   class LogWriter
   
-    def initialize (hub, file_system=FileSystem.new)
-      @file_system = file_system
+    def initialize (hub)
       @log_files = Hash.new      
       hub.add_subscriber(self)      
     end
@@ -26,7 +25,9 @@ module DamageControl
     def log_file(message)
       file = @log_files[message.build.log_file]
       if(!file)
-        file = @file_system.newFile(message.build.log_file, "rw")
+        dir = File.dirname(message.build.log_file)
+        File.makedirs(dir)
+        file = File.open(message.build.log_file, "w")
         @log_files[message.build.log_file] = file
       end
       file

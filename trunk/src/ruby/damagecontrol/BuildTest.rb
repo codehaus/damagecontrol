@@ -15,7 +15,7 @@ module DamageControl
       build = Build.new( \
         "DamageControlled", \
         ":local:/foo/bar:zap", \
-        "ant compile", \
+        "ant.bat compile", \
         ".", \
         nil)
 

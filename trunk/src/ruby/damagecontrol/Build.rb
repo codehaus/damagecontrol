@@ -43,9 +43,7 @@ module DamageControl
     def execute(&proc)
       puts "Changing dir to #{absolute_build_path}"
       @filesystem.chdir("#{absolute_build_path}")
-      cmdline = translate_command_to_ruby(build_command_line)
-      puts "Executing build command line #{cmdline}"
-      IO.popen(cmdline) do |output|
+      IO.popen(build_command_line) do |output|
         output.each_line do |line|
           yield line
         end
@@ -76,15 +74,6 @@ module DamageControl
 
     def branch_dir
       "#{@global_checkout_root_dir}/#{project_name}/#{@scm.mod(scm_spec)}/#{@scm.branch(scm_spec)}"
-    end
-
-    include Ant
-
-    def translate_command_to_ruby(build_command_line)
-      tokens = build_command_line.split(" ")
-      if(tokens[0] == "ant")
-        ant_commandline(tokens[1..-1].join(" "))
-      end
     end
   end
 end
