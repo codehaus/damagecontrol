@@ -10,6 +10,7 @@ module DamageControl
     end
     
     def publish_message(message)
+      puts "publishing #{message}"
       put(message)
     end
   end

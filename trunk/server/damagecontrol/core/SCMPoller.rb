@@ -3,6 +3,9 @@ require 'damagecontrol/core/BuildEvents'
 require 'damagecontrol/core/Build'
 require 'damagecontrol/util/Logging'
 
+require 'damagecontrol/core/ProjectConfigRepository'
+require 'damagecontrol/core/BuildScheduler'
+
 module DamageControl
 
 
@@ -15,14 +18,13 @@ module DamageControl
   class SCMPoller < Pebbles::Clock
     include Logging
     
-    def initialize(hub, polling_interval, project_config_repository, build_scheduler, checkout_manager)
+    def initialize(channel, polling_interval, project_config_repository, build_scheduler)
       super(polling_interval)
       @polling_interval = polling_interval
-      @hub = hub
+      @channel = channel
       @polling_interval = polling_interval
       @project_config_repository = project_config_repository
       @build_scheduler = build_scheduler
-      @checkout_manager = checkout_manager
       @poll_times = {}
     end
     
@@ -36,22 +38,11 @@ module DamageControl
         now = Time.at(time)
         if should_poll?(project_name, now)
           @poll_times[project_name] = now
-          poll_project(project_name)
+          @channel.publish_message(DoCheckoutEvent.new(project_name, true))
         end
       end
     end
     
-    def poll_project(project_name)
-      changesets_or_last_commit_time = @checkout_manager.checkout(project_name)
-      if(changesets_or_last_commit_time)
-        build = @project_config_repository.create_build(project_name)
-        if(changesets_or_last_commit_time.is_a?(ChangeSets))
-          build.changesets = changesets_or_last_commit_time
-        end
-        @hub.publish_message(BuildRequestEvent.new(build))        
-      end
-    end
-
   private
 
     def should_poll?(project_name, time)

@@ -1,4 +1,6 @@
 require 'damagecontrol/util/Logging'
+require 'damagecontrol/core/BuildEvents'
+require 'pebbles/Space'
 
 module DamageControl
 
@@ -8,15 +10,25 @@ module DamageControl
   #
   # The two classes that typically use this class are SCMPoller and Trigger
   #
-  class CheckoutManager
+  class CheckoutManager < Pebbles::Space
     include Logging
     
-    def initialize(hub, project_directories, project_config_repository, build_history_repository)
+    def initialize(hub, project_directories, project_config_repository)
+      super
+      hub.add_subscriber(self)
       @hub = hub
       @project_directories = project_directories
       @project_config_repository = project_config_repository
-      @build_history_repository = build_history_repository
     end
+
+    def on_message(event)
+      if event.is_a?(DoCheckoutEvent)
+        checked_out_event = CheckedOutEvent.new(event.project_name, checkout(event.project_name), event.force_build)
+        @hub.publish_message(checked_out_event)
+      end
+    end
+
+  private
 
     # Checks out and updates project config's latest commit time. Returns one of the following:
     #
@@ -28,7 +40,6 @@ module DamageControl
     #
     def checkout(project_name)
       scm = @project_config_repository.create_scm(project_name)
-      last_completed_build = @build_history_repository.last_completed_build(project_name)
 
       project_config = @project_config_repository.project_config(project_name)
       checkout_dir = @project_directories.checkout_dir(project_name)
@@ -63,8 +74,6 @@ module DamageControl
         return changesets_or_last_commit_time
       end
     end
-
-  private
 
     def update_last_commit_time(project_name, last_commit_time, project_config)
       project_config["last_commit_time"] = last_commit_time

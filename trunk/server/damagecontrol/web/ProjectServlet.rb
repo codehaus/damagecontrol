@@ -5,11 +5,12 @@ module DamageControl
   class ProjectServlet < AbstractAdminServlet
     include FileUtils
   
-    def initialize(type, build_history_repository, project_config_repository, trigger, build_scheduler, report_classes, rss_url)
+    def initialize(type, build_history_repository, project_config_repository, trigger, build_scheduler, report_classes, rss_url, trig_xmlrpc_url)
       super(type, build_scheduler, build_history_repository, project_config_repository)
       @trigger = trigger
       @report_classes = report_classes
       @rss_url = rss_url
+      @trig_xmlrpc_url = trig_xmlrpc_url
     end
     
     def default_action
@@ -70,6 +71,7 @@ module DamageControl
       result = super
       unless project_name.nil?
         if(private?)
+          # Standard private operations
           result +=
             [
               task(:icon => "largeicons/box_into.png", :name => "Clone project", :url => "configure?project_name=#{project_name}&action=clone_project"),
@@ -77,6 +79,33 @@ module DamageControl
               task(:icon => "largeicons/gears_run.png", :name => "Trig build now", :url => "?project_name=#{project_name}&action=trig_build"),
               task(:icon => "largeicons/garbage.png", :name => "Clean out working files", :url => "?project_name=#{project_name}&action=clean_out_working_files"),
             ]
+
+          scm = project_config["scm"]
+
+          # Create repo
+          if(scm.can_create? && !scm.exists?)
+            result +=
+              [
+                task(:icon => "largeicons/package_new.png", :name => "Create repository", :url => "configure?project_name=#{project_name}&action=create_scm")
+              ]
+          end
+          # Install/uninstall trigger
+          if(scm.exists?)
+            trigger_command = DamageControl::XMLRPC::Trigger.trigger_command(damagecontrol_home, project_name, @trig_xmlrpc_url)
+            trigger_files_checkout_dir = project_config_repository.trigger_checkout_dir(project_name)
+            if(scm.supports_trigger? && scm.trigger_installed?(trigger_command, trigger_files_checkout_dir))
+              result +=
+                [
+                  task(:icon => "largeicons/gear_delete.png", :name => "Uninstall trigger", :url => "install_trigger?project_name=#{project_name}&install=false"),
+                ]
+            elsif(scm.supports_trigger?)
+              result +=
+                [
+                  task(:icon => "largeicons/gear_connection.png", :name => "Install trigger", :url => "install_trigger?project_name=#{project_name}&install=true"),
+                ]
+            end
+          end
+
         end
         result +=
           [

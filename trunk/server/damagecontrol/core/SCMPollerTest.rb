@@ -1,4 +1,5 @@
 require 'damagecontrol/core/SCMPoller'
+require 'damagecontrol/core/BuildEvents'
 
 require 'test/unit'
 require 'pebbles/mockit'
@@ -27,16 +28,15 @@ module DamageControl
         hub,
         1,
         mock_project_config_repository(project_config_with_polling(last_commit), 10), 
-        build_scheduler,
-        new_mock
+        build_scheduler
       )
         
       poller.tick(10)
 
     end
     
-    def test_request_build_without_checking_if_there_is_no_completed_build
-      hub = new_mock
+    def test_should_request_build_without_checking_if_there_is_no_completed_build
+      hub = new_mock.__expect(:publish_message) {|m| m.is_a?(DoCheckoutEvent)}
       
       build_history_repository = new_mock
       
@@ -44,13 +44,9 @@ module DamageControl
         hub,
         1,
         mock_project_config_repository(project_config_with_polling(Time.new.utc), 10), 
-        mock_build_scheduler,
-        new_mock.__expect(:checkout){Time.new.utc}
+        mock_build_scheduler
       )
-        
-      hub.__expect(:publish_message) do |message| 
-        assert(message.is_a?(BuildRequestEvent))
-      end
+
       poller.tick(10)
     end
     
@@ -61,8 +57,7 @@ module DamageControl
         hub,
         1,
         mock_project_config_repository(project_config_without_polling(nil), 30), 
-        mock_build_scheduler,
-        new_mock
+        mock_build_scheduler
       )
         
       poller.tick(30)
@@ -76,8 +71,7 @@ module DamageControl
         hub,
         30,
         mock_project_config_repository(project_config_with_polling(nil, 40), 35), 
-        mock_build_scheduler,
-        new_mock
+        mock_build_scheduler
       )
         
       poller.tick(35)
@@ -91,8 +85,7 @@ module DamageControl
         hub,
         40,
         mock_project_config_repository(project_config_with_polling(nil, nil), 35), 
-        mock_build_scheduler,
-        new_mock
+        mock_build_scheduler
       )
         
       poller.tick(35)
@@ -100,14 +93,13 @@ module DamageControl
     end
     
     def test_should_poll_during_project_polling_interval
-      hub = new_mock
+      hub = new_mock.__expect(:publish_message) {|m| m.is_a?(DoCheckoutEvent)}
       
       poller = SCMPoller.new(
         hub,
         40,
         mock_project_config_repository(project_config_with_polling(nil, 30), 35),
-        mock_build_scheduler,
-        new_mock.__expect(:checkout){nil}
+        mock_build_scheduler
       )
         
       poller.tick(35)
@@ -115,14 +107,13 @@ module DamageControl
     end
     
     def test_should_poll_during_default_polling_interval
-      hub = new_mock
+      hub = new_mock.__expect(:publish_message) {|m| m.is_a?(DoCheckoutEvent)}
       
       poller = SCMPoller.new(
         hub,
         30,
         mock_project_config_repository(project_config_with_polling(nil, nil), 35),
-        mock_build_scheduler,
-        new_mock.__expect(:checkout){nil}
+        mock_build_scheduler
       )
         
       poller.tick(35)
@@ -133,11 +124,10 @@ module DamageControl
       last_commit = Time.new.utc
     
       poller = SCMPoller.new(
-        new_mock,
+        new_mock.__expect(:publish_message) {|m| m.is_a?(DoCheckoutEvent)},
         1,
         mock_project_config_repository(project_config_with_polling(last_commit), 10),
-        mock_build_scheduler,
-        new_mock.__expect(:checkout){nil}
+        mock_build_scheduler
       )
       
       poller.tick(10)
@@ -147,20 +137,15 @@ module DamageControl
     def test_sends_build_request_when_changes_since_last_completed_build
       last_commit = Time.new.utc
             
-      hub = new_mock
+      hub = new_mock.__expect(:publish_message) {|m| m.is_a?(DoCheckoutEvent)}
       poller = SCMPoller.new(
         hub, 
         1,
         mock_project_config_repository(project_config_with_polling(last_commit), 10),
-        new_mock,
-        new_mock.__expect(:checkout){Time.new.utc}
+        mock_build_scheduler
       )
         
-      hub.__expect(:publish_message) do |message| 
-        assert(message.is_a?(BuildRequestEvent))
-      end
-
-      poller.poll_project("project")
+      poller.tick(10)
       
     end
     

@@ -38,9 +38,6 @@ module DamageControl
     end
   end
 
-  class BuildRequestEvent < BuildEvent
-  end
-
   class BuildStartedEvent < BuildEvent
   end
 
@@ -54,4 +51,24 @@ module DamageControl
       @message = message
     end
   end
+
+  class DoCheckoutEvent
+    attr_reader :project_name
+    attr_reader :force_build
+
+    def initialize(project_name, force_build)
+      @project_name, @force_build = project_name, force_build
+    end
+  end
+
+  class CheckedOutEvent
+    attr_reader :project_name
+    attr_reader :changesets_or_last_commit_time
+    attr_reader :force_build
+
+    def initialize(project_name, changesets_or_last_commit_time, force_build)
+      @project_name, @changesets_or_last_commit_time, @force_build = project_name, changesets_or_last_commit_time, force_build
+    end
+  end
+
 end

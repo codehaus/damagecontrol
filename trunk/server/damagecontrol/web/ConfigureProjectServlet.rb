@@ -15,32 +15,6 @@ module DamageControl
     def tasks
       result = []
       unless project_name.nil?
-        if(private?)
-          scm = project_config["scm"]
-          if(scm.can_create? && !scm.exists?)
-            result +=
-              [
-                task(:icon => "largeicons/package_new.png", :name => "Create repository", :url => "configure?project_name=#{project_name}&action=create_scm")
-              ]
-          end
-
-          if(scm.exists?)
-            trigger_command = DamageControl::XMLRPC::Trigger.trigger_command(damagecontrol_home, project_name, @trig_xmlrpc_url)
-            trigger_files_checkout_dir = project_config_repository.trigger_checkout_dir(project_name)
-            if(scm.supports_trigger? && scm.trigger_installed?(trigger_command, trigger_files_checkout_dir))
-              result +=
-                [
-                  task(:icon => "largeicons/gear_delete.png", :name => "Uninstall trigger", :url => "install_trigger?project_name=#{project_name}&install=false"),
-                ]
-            elsif(scm.supports_trigger?)
-              result +=
-                [
-                  task(:icon => "largeicons/gear_connection.png", :name => "Install trigger", :url => "install_trigger?project_name=#{project_name}&install=true"),
-                ]
-            end
-          end
-        end
-
         result += [
           task(:icon => "largeicons/navigate_left.png", :name => "Back to project", :url => "project?project_name=#{project_name}"),
         ]

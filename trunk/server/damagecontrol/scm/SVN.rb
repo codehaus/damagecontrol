@@ -127,7 +127,8 @@ module DamageControl
 
   private
     def svnrootdir
-      result = svnurl["file://".length..-(svnpath.length)-2]
+      last = svnpath.nil? ? -1 : -(svnpath.length)-2
+      result = svnurl["file://".length..last]
       # for windows, turn /c:/blabla into c:/blabla"
       if(result =~ /^\/[a-zA-Z]:/)
         result = result[1..-1]

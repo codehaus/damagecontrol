@@ -18,9 +18,10 @@ module DamageControl
     attr_reader :default_quiet_period
     attr_reader :build_queue
     
-    def initialize(multicast_space, default_quiet_period=DEFAULT_QUIET_PERIOD, exception_logger=nil)
+    def initialize(multicast_space, project_config_repository, default_quiet_period=DEFAULT_QUIET_PERIOD, exception_logger=nil)
       super
       @channel = multicast_space
+      @project_config_repository = project_config_repository
       @default_quiet_period = default_quiet_period
       @exception_logger = exception_logger
 
@@ -30,9 +31,14 @@ module DamageControl
     end
   
     def on_message(event)
-      if event.is_a?(BuildRequestEvent)
-        event.build.status = Build::QUEUED
-        schedule_build(event.build)
+      if event.is_a?(CheckedOutEvent)
+        build = @project_config_repository.create_build(event.project_name)
+        if(event.changesets_or_last_commit_time.is_a?(ChangeSets))
+          build.changesets = event.changesets_or_last_commit_time
+        end
+
+        build.status = Build::QUEUED
+        schedule_build(build)
       end
       if event.is_a?(BuildCompleteEvent)
         try_to_execute_builds
