@@ -317,7 +317,7 @@
 						<div id="searchform">
 							<img width="24" height="24" src="largeicons/find.png"/>
 							<b>Search:</b>
-							<input id="searchterm" onkeyup="showmatches()" name="search" size="12"/>
+							<input id="searchterm" onkeyup="showmatches()" name="search" size="12" autocomplete="off"/>
 							<input type="submit" value="Go"/>
 							<div id="resultate">
 							</div>
@@ -521,8 +521,6 @@ function go() {
 	window.location.href=topHit;
 	return false;
 }
-
-document.onkeypress = pressed;
 
 //-----------------------------------------------------------
 
