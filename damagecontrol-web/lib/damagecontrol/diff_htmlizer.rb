@@ -1,4 +1,4 @@
-module RSCM
+module DamageControl
 
   # Visitor that can visit an array of diffs and produce nice HTML
   # TODO: add line numbers.

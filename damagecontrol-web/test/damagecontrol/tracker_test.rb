@@ -1,7 +1,9 @@
 require 'test/unit'
-require 'rscm/tracker'
+require 'rubygems'
+require_gem 'rscm'
+require 'damagecontrol/tracker'
 
-module RSCM
+module DamageControl
   module Tracker
     class TrackerTest < Test::Unit::TestCase
 

@@ -2,7 +2,7 @@ require 'drb'
 require 'rscm'
 require 'needle'
 
-module RSCM
+module DamageControl
   # The Server is an object that is bound as a Drb top-level
   # object, and can be accessed by the web app. It should run
   # within a separate Ruby interpreter from the one running

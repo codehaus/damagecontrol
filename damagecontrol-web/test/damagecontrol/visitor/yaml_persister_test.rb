@@ -1,13 +1,17 @@
+require 'rubygems'
+require_gem 'rscm'
 require 'rscm/changes_fixture'
-require 'rscm/visitor/yaml_persister'
 require 'rscm/tempdir'
+require 'damagecontrol/visitor/yaml_persister'
 
-module RSCM
+module DamageControl
   module Visitor
     class YamlPersisterTest < Test::Unit::TestCase
+      include RSCM::ChangesFixture
 
       def test_should_write_several_changesets_on_save_and_reload_them
-        changesets = ChangeSets.new
+        setup_changes
+        changesets = RSCM::ChangeSets.new
         changesets.add(@change1)
         changesets.add(@change2)
         changesets.add(@change3)
@@ -16,7 +20,7 @@ module RSCM
         changesets.add(@change6)
         changesets.add(@change7)
 
-        changesets_dir = "#{RSCM.new_temp_dir}/changesets"
+        changesets_dir = RSCM.new_temp_dir("changesets")
         yp = YamlPersister.new(changesets_dir)
 
         changesets.accept(yp)

@@ -1,10 +1,12 @@
 require 'test/unit'
+require 'rubygems'
+require_gem 'rscm'
 require 'rscm/tempdir'
-require 'rscm/diff_parser'
-require 'rscm/diff_htmlizer'
-require 'rscm/file_ext.rb'
+require 'damagecontrol/diff_parser'
+require 'damagecontrol/diff_htmlizer'
+require 'damagecontrol/file_ext.rb'
 
-module RSCM
+module DamageControl
   class DiffHtmlizerTest < Test::Unit::TestCase
     def test_should_parse_diff_to_object_model
       p = DiffParser.new

@@ -1,15 +1,16 @@
 require 'yaml'
 require 'test/unit'
-require 'rscm/changes'
-require 'rscm/scm_web'
+require 'rubygems'
+require_gem 'rscm'
+require 'damagecontrol/scm_web'
 
-module RSCM
+module DamageControl
   module SCMWeb
 
     class SCMWebTest < Test::Unit::TestCase
     
       def setup
-        @change = Change.new("path/one", "aslak", "Fixed CATCH-22", "2.4", Time.utc(2004,7,5,12,0,2))
+        @change = RSCM::Change.new("path/one", "aslak", "Fixed CATCH-22", "2.4", Time.utc(2004,7,5,12,0,2))
       end
 
       def test_view_cvs

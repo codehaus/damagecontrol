@@ -1,9 +1,11 @@
 require 'test/unit'
+require 'rubygems'
+require_gem 'rscm'
 require 'rscm/tempdir'
 require 'rscm/mockit'
-require 'rscm'
+require 'damagecontrol/project'
 
-module RSCM
+module DamageControl
   class ProjectTest < Test::Unit::TestCase
     include MockIt
     

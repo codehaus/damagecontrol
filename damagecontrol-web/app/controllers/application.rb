@@ -1,7 +1,8 @@
 # The filters added to this controller will be run for all controllers in the application.
 # Likewise will all the methods added be available for all controllers.
 
-require 'rscm'
+require 'rubygems'
+require_gem 'rscm'
 
 # Start Drb - this is how we communicate with the daemon.
 DRb.start_service()
@@ -107,7 +108,7 @@ module ActionView
   end
 end
 
-module RSCM
+module DamageControl
 
   # Add some generic web capabilities to the RSCM classes
   module Web
@@ -127,13 +128,13 @@ module RSCM
 end
 
 class RSCM::AbstractSCM
-  include RSCM::Web::Configuration
+  include DamageControl::Web::Configuration
 end
 
-class RSCM::Tracker::Base
-  include RSCM::Web::Configuration
+class DamageControl::Tracker::Base
+  include DamageControl::Web::Configuration
 end
 
-class RSCM::Project
-  include RSCM::Web::Configuration
+class DamageControl::Project
+  include DamageControl::Web::Configuration
 end

@@ -56,6 +56,7 @@ class ProjectController < ApplicationController
     begin
       Rscm.save_project(project)
     rescue => e
+      $stderr.puts(e.backtrace.join("\n"))
       return render_text("Couldn't connect to RSCM server. Please make sure it's running.<br>" + e.message)
     end
 

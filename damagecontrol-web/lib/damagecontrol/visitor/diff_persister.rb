@@ -1,7 +1,7 @@
 require 'rscm/changes'
-require 'rscm/directories'
+require 'damagecontrol/directories'
 
-module RSCM
+module DamageControl
   module Visitor
 
     # Visitor that persists unified diffs to disk.

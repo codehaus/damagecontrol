@@ -3,6 +3,11 @@ require 'rscm/changes_fixture'
 
 module RSCM
   class ChangesTest < Test::Unit::TestCase
+    include ChangesFixture
+    
+    def setup
+      setup_changes
+    end
     
     def test_convert_changes_to_changesets_should_match_user_message_and_timestamp_
       changesets = ChangeSets.new

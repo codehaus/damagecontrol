@@ -1,4 +1,4 @@
-module RSCM
+module DamageControl
   module Visitor
     # Visitor that writes RSS for ChangeSets.
     class RssWriter

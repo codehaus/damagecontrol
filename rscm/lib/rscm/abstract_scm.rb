@@ -1,7 +1,6 @@
 require 'fileutils'
 require 'rscm/changes'
 require 'rscm/path_converter'
-require 'xmlrpc/utils'
 
 class Time
   class << self
@@ -217,23 +216,6 @@ module RSCM
     def to_relative(dir, absolute_paths)
       dir = File.expand_path(dir)
       absolute_paths.collect{|p| File.expand_path(p)[dir.length+1..-1]}
-    end
-
-    # TODO: move to more generic place - will be used by DC to run builds too.
-    def with_working_dir(dir)
-      # Can't use Dir.chdir{ block } - will fail with multithreaded code.
-      # http://www.ruby-doc.org/core/classes/Dir.html#M000790
-      #
-      # Therefore we have threadfile.rb
-      prev = Dir.pwd
-      begin
-        mkdir_p(dir)
-        Dir.chdir(dir)
-puts "In #{dir}"
-        yield
-      ensure
-        Dir.chdir(prev)
-      end
     end
 
   end

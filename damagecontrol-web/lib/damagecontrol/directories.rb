@@ -1,5 +1,5 @@
 require 'fileutils'
-module RSCM
+module DamageControl
 
   # This class knows about locations of various files and directories.
   #
