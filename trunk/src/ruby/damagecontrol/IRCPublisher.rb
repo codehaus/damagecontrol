@@ -79,8 +79,8 @@ module DamageControl
 					end
 					@irc.send_message_to_channel(message)
 				else
-					@irc.connect(server) unless @irc.connected?
-					@irc.join_channel(channel, handle) if @irc.connected? && !@irc.in_channel?
+					@irc.connect(server, handle) unless @irc.connected?
+					@irc.join_channel(channel) if @irc.connected? && !@irc.in_channel?
 					raise "not in channel yet"
 				end
 			end
