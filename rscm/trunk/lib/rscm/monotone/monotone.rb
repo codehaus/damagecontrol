@@ -42,6 +42,7 @@ E5Gmoe9b1EiXWdReHjUGpc6k0LQ0PPXAwqrcGdwYbOLDZ5xsQ5AsEYSFtyTS60D1nHBcdNmW
 M0eOUJFdJf/uNe/2EApc3a8TyEkZtVqiYtOVV3qDB9NmU4bVOkDqzl1F7zJwATWbmasSdkM3
 6lxDkczBfCrEjH5p5Y8DU+ge4e4LRtknY9oBOJ7EQO0twYJg3k0=
 [end]
+
 EOF
         io.close_write
       }
@@ -69,6 +70,7 @@ puts
             yield line if block_given?
           end
         end
+        # FIXME: enter passphrase here: 'tester@test.net'
         safer_popen(commit_cmd) do |stdout|
           stdout.each_line do |line|
             yield line if block_given?
@@ -77,8 +79,32 @@ puts
       end
     end
 
-    def checkout(checkout_dir)
+    def checked_out?(checkout_dir)
+      monotone_dir = File.expand_path("#{checkout_dir}/MT")
+      File.exists?(monotone_dir)
+    end
 
+    def uptodate?(checkout_dir, from_identifier)
+      if (!checked_out?(checkout_dir))
+        false
+      else
+      end
+    end
+
+    def checkout(checkout_dir)
+      checkout_dir = PathConverter.filepath_to_nativepath(checkout_dir, false)
+      mkdir_p(checkout_dir)
+      checked_out_files = []
+      if (checked_out?(checkout_dir))
+        # update
+      else
+        checkout_cmd = "monotone --db=\"#{@db_file}\" --branch=\"#{@branch}\" --key=\"#{@key}\" checkout #{checkout_dir}"
+        safer_popen(checkout_cmd) do |stdout|
+          stdout.each_line do |line|
+            yield line if block_given?
+          end
+        end
+      end
     end
   end
 end
