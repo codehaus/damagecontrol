@@ -123,6 +123,7 @@ EOF
     end
     
     def time_difference(format_time=Time.new.utc)
+      return "UNKNOWN" unless time
       time_difference = format_time.difference_as_text(time)
     end
     
