@@ -80,7 +80,7 @@ module DamageControl
     end
 
     def head_revision(checkout_dir)
-      cmd = "svn log #{svnurl} -r HEAD"
+      cmd = "svn log #{repourl} -r HEAD"
       logger.info(cmd)
       cmd_with_io(checkout_dir, cmd) do |io|
         parser = SVNLogParser.new(io, svnpath)
@@ -179,11 +179,17 @@ module DamageControl
       end
       changesets
     end
+    
+    # url pointing to the root of the repo
+    def repourl
+      last = (svnpath.nil? || svnpath == "") ? -1 : -(svnpath.length)-2
+      svnurl[0..last]
+    end
 
   private
 
     def svnrootdir
-      last = svnpath.nil? ? -1 : -(svnpath.length)-2
+      last = (svnpath.nil? || svnpath == "") ? -1 : -(svnpath.length)-2
       result = svnurl["file://".length..last]
       # for windows, turn /c:/blabla into c:/blabla"
       if(result =~ /^\/[a-zA-Z]:/)
@@ -200,7 +206,7 @@ module DamageControl
         begin
           logger.info("Reading stdout")
           stdout.each_line do |progress|
-              if block_given? then yield progress else logger.debug(progress) end
+            if block_given? then yield progress else logger.debug(progress) end
           end
         end
       end

@@ -43,5 +43,18 @@ module DamageControl
       )
     end
     
+    def test_repourl
+      svn = SVN.new
+      svn.svnurl = "svn+ssh://mooky/bazooka/baluba"
+      svn.svnpath = "bazooka/baluba"
+      assert_equal("svn+ssh://mooky", svn.repourl)
+
+      svn.svnpath = nil
+      assert_equal(svn.svnurl, svn.repourl)
+
+      svn.svnpath = ""
+      assert_equal(svn.svnurl, svn.repourl)
+    end
+    
   end
 end
