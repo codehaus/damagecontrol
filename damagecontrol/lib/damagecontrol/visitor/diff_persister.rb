@@ -1,4 +1,5 @@
 require 'rscm/changes'
+require 'rscm/logging'
 require 'damagecontrol/directories'
 
 module DamageControl
@@ -18,12 +19,12 @@ module DamageControl
 
       def visit_changeset(changeset)
         @changeset = changeset
-puts "Writing diffs for #{@project_name} changeset #{changeset.id}"
+        Log.info "Writing diffs for #{@project_name} changeset #{changeset.id}"
       end
 
       def visit_change(change)
         diff_file = Directories.diff_file(@project_name, @changeset, change)
-puts " Writing diff for #{change.path} -> #{diff_file}"
+        Log.info " Writing diff for #{change.path} -> #{diff_file}"
         checkout_dir = Directories.checkout_dir(@project_name)
         @scm.diff(checkout_dir, change) do |diff_io|
           FileUtils.mkdir_p(File.dirname(diff_file))

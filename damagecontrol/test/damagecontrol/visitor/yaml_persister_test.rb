@@ -1,5 +1,4 @@
 require 'rubygems'
-require_gem 'rscm'
 require 'rscm/changes_fixture'
 require 'rscm/tempdir'
 require 'damagecontrol/visitor/yaml_persister'
@@ -26,13 +25,14 @@ module DamageControl
         changesets.accept(yp)
 
         latest_id = yp.latest_id
+        assert_equal(Time.utc(2004,7,5,12,0,14), latest_id)
         all_reloaded = yp.load_upto(latest_id, 100)
         assert_equal(changesets, all_reloaded)
 
-        some_reloaded = yp.load_upto("20040705120008", 2)
+        some_reloaded = yp.load_upto(Time.utc(2004,7,5,12,0,14), 2)
         assert_equal(2, some_reloaded.length)
-        assert_equal(@change3, some_reloaded[0][0])
-        assert_equal(@change4, some_reloaded[1][0])
+        assert_equal(@change4, some_reloaded[0][0])
+        assert_equal(@change6, some_reloaded[1][1])
       end
 
     end

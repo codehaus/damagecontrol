@@ -1,6 +1,4 @@
 require 'test/unit'
-require 'rubygems'
-require_gem 'rscm'
 require 'rscm/tempdir'
 require 'damagecontrol/diff_parser'
 require 'damagecontrol/diff_htmlizer'

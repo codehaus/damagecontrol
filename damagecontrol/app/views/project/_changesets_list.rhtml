@@ -1,18 +1,17 @@
 <table nowrap="nowrap" class="pane" nowrap="nowrap">
 
 <%
-  changeset_ids = @project.changeset_ids.reverse
-  if changeset_ids.empty?
+  if @linkable_changesets.nil?
 %>
-
+<%
+  elsif @linkable_changesets.empty?
+%>
   <tr class="pane">
     <td class="pane">
       No Changesets
     </td>
   </tr>
-  
 <% else %>
-
   <%
     @linkable_changesets.reverse.each do |changeset|
   %>
@@ -21,7 +20,6 @@
       <%= link_to("#{changeset.id} (#{changeset.developer})", :action => "changesets", :id => @project.name, :params => {"changeset" => changeset.id}) %>
     </td>
   </tr>
-  
   <% end %>
 
   <% if(!@select_changeset_ids.empty?) %>

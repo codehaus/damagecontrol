@@ -37,11 +37,11 @@ module RSCM
 
     # The extra simulate parameter is not in accordance with the AbstractSCM API,
     # but it's optional and is only being used from within this class (uptodate? method).
-    def checkout(checkout_dir, simulate=false)
+    def checkout(checkout_dir, to_identifier=nil, simulate=false)
       checked_out_files = []
       if(checked_out?(checkout_dir))
         path_regex = /^[U|P] (.*)/
-        cvs(checkout_dir, update_command, simulate) do |line|
+        cvs(checkout_dir, update_command(to_identifier), simulate) do |line|
           if(line =~ path_regex)
             path = $1.chomp
             yield path if block_given?
@@ -56,7 +56,7 @@ module RSCM
         target_dir = File.basename(checkout_dir)
         run_checkout_command_dir = File.dirname(checkout_dir)
         # -D is sticky, but subsequent updates will reset stickiness with -A
-        cvs(run_checkout_command_dir, checkout_command(target_dir), simulate) do |line|
+        cvs(run_checkout_command_dir, checkout_command(target_dir, to_identifier), simulate) do |line|
           if(line =~ path_regex)
             path = $1.chomp
             yield path if block_given?
@@ -85,7 +85,7 @@ module RSCM
       end
 
       # simulate a checkout
-      files = checkout(checkout_dir, true)
+      files = checkout(checkout_dir, nil, true)
       files.empty?
     end
 
@@ -222,10 +222,6 @@ module RSCM
       end
     end
 
-    def checkout_command(target_dir)
-      "checkout #{branch_option} -d #{target_dir} #{mod}"
-    end
-
     def parse_log(checkout_dir, cmd, &proc)
       logged_command_line = command_line(cmd, hidden_password)
       yield logged_command_line if block_given?
@@ -258,11 +254,14 @@ module RSCM
       branch_specified? ? "-r#{branch}" : ""
     end
 
-    def update_command
-      # get a clean copy
-      "update #{branch_option} -d -P -A"
+    def update_command(to_identifier)
+      "update #{branch_option} -d -P -A #{revision_option(to_identifier)}"
     end
 
+    def checkout_command(target_dir, to_identifier)
+      "checkout #{branch_option} -d #{target_dir} #{mod} #{revision_option(to_identifier)}"
+    end
+    
     def old_changes_command(from_identifier, to_identifier, files)
       # Many servers don't support the new -S option
       "log #{branch_option} -N #{period_option(from_identifier, to_identifier)}"

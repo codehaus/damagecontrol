@@ -134,6 +134,30 @@ module RSCM
       end
     end
 
+    def test_checkout_changeset_id
+      work_dir = RSCM.new_temp_dir("label")
+      checkout_dir = "#{work_dir}/checkout"
+      repository_dir = "#{work_dir}/repository"
+      scm = create_scm(repository_dir, "damagecontrolled")
+      scm.create
+
+      import_damagecontrolled(scm, "#{work_dir}/damagecontrolled")
+      scm.checkout(checkout_dir)
+      add_or_edit_and_commit_file(scm, checkout_dir, "before.txt", "Before label")
+      before_cs = scm.changesets(checkout_dir, Time.epoch)
+
+      add_or_edit_and_commit_file(scm, checkout_dir, "after.txt", "After label")
+      next_id = before_cs.latest.id + 1
+      after_cs = scm.changesets(checkout_dir, next_id)
+      assert_equal(1, after_cs.length)
+      assert_equal("after.txt", after_cs[0][0].path)
+
+      scm.checkout(checkout_dir, before_cs.latest.id)
+
+      assert(File.exist?("#{checkout_dir}/before.txt"))
+      assert(!File.exist?("#{checkout_dir}/after.txt"))
+    end
+
     def test_should_allow_creation_with_empty_constructor
       scm = create_scm(RSCM.new_temp_dir, ".")
       scm2 = scm.class.new
@@ -183,7 +207,6 @@ module RSCM
       scm.commit(checkout_dir, "Modified file to diff again")
       
       changesets = scm.changesets(checkout_dir, Time.epoch)
-
     end
 
   private
@@ -251,25 +274,7 @@ module RSCM
     end
   end
 
-
   module ApplyLabelTest
-    def test_apply_label
-      work_dir = RSCM.new_temp_dir("label")
-      checkout_dir = "#{work_dir}/checkout"
-      repository_dir = "#{work_dir}/repository"
-      scm = create_scm(repository_dir, "damagecontrolled")
-      scm.create
-
-      import_damagecontrolled(scm, "#{work_dir}/damagecontrolled")
-      scm.checkout(checkout_dir)
-
-      add_or_edit_and_commit_file(scm, checkout_dir, "before.txt", "Before label")
-      scm.apply_label(checkout_dir, "MY_LABEL")
-      add_or_edit_and_commit_file(scm, checkout_dir, "after.txt", "After label")
-      scm.checkout(checkout_dir, "MY_LABEL")
-      assert(File.exist?("#{checkout_dir}/before.txt"))
-#      assert(!File.exist?("#{checkout_dir}/after.txt"))
-    end
 
   end
 end

@@ -1,7 +1,6 @@
 require 'yaml'
 require 'test/unit'
-require 'rubygems'
-require_gem 'rscm'
+require 'rscm/changes'
 require 'damagecontrol/scm_web'
 
 module DamageControl
@@ -15,7 +14,6 @@ module DamageControl
 
       def test_view_cvs
         view_cvs = ViewCVS.new("http://cvs.damagecontrol.codehaus.org/")
-
         assert_equal("http://cvs.damagecontrol.codehaus.org/path/one?rev=2.4&r=2.4", view_cvs.change_url(@change))
       end
     end

@@ -7,12 +7,12 @@ var jira_project_id_tip = "<div class='tp1'>The id of the JIRA project.</div>";
   <tr>
     <td width="25%" class="setting-name">Base URL</td>
     <td><%= tip(:txt => 'jira_baseurl_tip') %></td>
-    <td width="75%"><%= text_or_input(@edit, :name => "RSCM::Tracker::JIRA[baseurl]", :value => jira.baseurl) %></td>
+    <td width="75%"><%= text_or_input(@edit, :name => "DamageControl::Tracker::JIRA[baseurl]", :value => jira.baseurl) %></td>
   </tr>
   <tr>
     <td class="setting-name">Project id</td>
     <td><%= tip(:txt => 'jira_project_id_tip') %></td>
-    <td width="75%"><%= text_or_input(@edit, :name => "RSCM::Tracker::JIRA[project_id]", :value => jira.project_id) %></td>
+    <td width="75%"><%= text_or_input(@edit, :name => "DamageControl::Tracker::JIRA[project_id]", :value => jira.project_id) %></td>
   </tr>
 </table>
 

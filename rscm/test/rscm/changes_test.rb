@@ -103,6 +103,27 @@ module RSCM
       assert_equal(Time.utc(2005), changeset.time)
     end
 
+    def test_should_sort_changesets
+      changesets = ChangeSets.new
+      changesets.add(@change1)
+      changesets.add(@change4)
+      changesets.add(@change2)
+      changesets.add(@change7)
+      changesets.add(@change5)
+      changesets.add(@change3)
+      changesets.add(@change6)
+      
+      cs0 = changesets[0]
+      cs1 = changesets[1]
+      cs2 = changesets[2]
+      cs3 = changesets[3]
+      
+      reversed = changesets.reverse
+      assert_equal(cs0, reversed[3])
+      assert_equal(cs1, reversed[2])
+      assert_equal(cs2, reversed[1])
+      assert_equal(cs3, reversed[0])
+    end
   end
 
 end

@@ -33,13 +33,13 @@ module RSCM
       true
     end
 
-    def checkout(checkout_dir)
+    def checkout(checkout_dir, to_identifier=nil)
       checkout_dir = PathConverter.filepath_to_nativepath(checkout_dir, false)
       mkdir_p(checkout_dir)
       checked_out_files = []
       path_regex = /^[A|D|U]\s+(.*)/
       if(checked_out?(checkout_dir))
-        svn(checkout_dir, update_command) do |line|
+        svn(checkout_dir, update_command(to_identifier)) do |line|
           if(line =~ path_regex)
             absolute_path = "#{checkout_dir}/#{$1}"
             relative_path = $1.chomp
@@ -49,7 +49,7 @@ module RSCM
           end
         end
       else
-        svn(checkout_dir, checkout_command(checkout_dir)) do |line|
+        svn(checkout_dir, checkout_command(checkout_dir, to_identifier)) do |line|
           if(line =~ path_regex)
             native_absolute_path = $1
             native_checkout_dir = $1
@@ -265,13 +265,13 @@ module RSCM
       end
     end
     
-    def checkout_command(checkout_dir)
+    def checkout_command(checkout_dir, to_identifier)
       checkout_dir = "\"#{checkout_dir}\""
-      "checkout #{url} #{checkout_dir}"
+      "checkout #{url} #{checkout_dir} #{revision_option(nil,to_identifier)}"
     end
 
-    def update_command
-      "update"
+    def update_command(to_identifier)
+      "update #{revision_option(nil,to_identifier)}"
     end
     
     def changes_command(from_identifier, to_identifier, files)

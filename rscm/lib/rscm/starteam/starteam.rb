@@ -48,7 +48,8 @@ module RSCM
       changesets
     end
 
-    def checkout(checkout_dir, &proc)
+    def checkout(checkout_dir, to_identifier, &proc)
+      # TODO: Take the to_identifier arg into consideration
       files = java("checkout(\"#{checkout_dir}\")", &proc)
       files
     end
