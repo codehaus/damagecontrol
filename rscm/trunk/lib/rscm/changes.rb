@@ -19,12 +19,12 @@ module RSCM
       @changesets[change]
     end
 
-    # Iterates over changesets in reverse order of creation
-    # This is because we want to have the most recent at the top
     def each(&block)
-      # Umm - seems to go into infinite loop!?!?!
-      # @changesets.reverse.each(&block)
       @changesets.each(&block)
+    end
+    
+    def reverse
+      ChangeSets.new(@changesets.reverse)
     end
     
     def length
@@ -116,15 +116,34 @@ module RSCM
       end
     end
 
-    # Loads +upto+ number of changesets from the +changesets+ dir. 
-    def ChangeSets.load_upto(changesets_dir, upto)
-      dirs = Dir["#{changesets_dir}/*"].find_all {|f| File.directory?(f) && File.exist?("#{f}/changesets.yaml")}
+    # Loads +prior+ number of changesets upto +last_changeset_id+ 
+    # from the +changesets+ dir. +last_changeset_id+ should be the 
+    # dirname of the folder containing the last changeset.
+    def ChangeSets.load_upto(changesets_dir, last_changeset_id, prior)
+      last_changeset_id = last_changeset_id.to_i
+      ids = ChangeSets.ids(changesets_dir)
+      last = ids.index(last_changeset_id)
+      raise "No occurrence of #{last_changeset_id.inspect} in #{ids.inspect}" unless last
+      first = last - prior + 1
+      first = 0 if first < 0
+
       changesets = ChangeSets.new
-      start = [upto, dirs.length].min
-      dirs[-start..-1].each do |f|
-        changesets.add(YAML::load_file("#{f}/changesets.yaml"))
+      ids[first..last].each do |id|
+        changesets.add(YAML::load_file("#{changesets_dir}/#{id}/changesets.yaml"))
       end
       changesets
+    end
+
+    # Returns a sorted array of ints representing the changeset directories.
+    def ChangeSets.ids(changesets_dir)
+      dirs = Dir["#{changesets_dir}/*"].find_all {|f| File.directory?(f) && File.exist?("#{f}/changesets.yaml")}
+      # Turn them into ints so they can be sorted.
+      dirs.collect { |dir| File.basename(dir).to_i }.sort
+    end
+
+    # Returns the id of the latest changeset.
+    def ChangeSets.latest_id(changesets_dir)
+      ChangeSets.ids(changesets_dir)[-1]
     end
 
   private
@@ -230,11 +249,16 @@ module RSCM
     end
     
     def save(changesets_dir)
-      changesets_file = "#{changesets_dir}/#{time.ymdHMS}/changesets.yaml"
+      changesets_file = "#{changesets_dir}/#{id}/changesets.yaml"
       FileUtils.mkdir_p(File.dirname(changesets_file))
       File.open(changesets_file, "w") do |io|
         YAML::dump(self, io)
       end
+    end
+    
+    # Returns the id of the changeset or +time+ in ymdHMS format if undefined.
+    def id
+      @revision || @time.ymdHMS
     end
   end
 

@@ -45,7 +45,6 @@ trackers = [
   <li><a href="javascript:setTab('projects')"><img src="/images/16x16/wrench.png"> General</a></li>
   <li><a href="javascript:setTab('scms')"><img src="/images/16x16/safe.png"> Source Control</a></li>
   <li><a href="javascript:setTab('trackers')"><img src="/images/16x16/scroll_information.png"> Issue Tracker</a></li>
-  <li><a href="javascript:setTab('changesets')"><img src="/images/16x16/scroll_information.png"> Changesets</a></li>
 </ul>
 
 <form action="/project/save">
@@ -60,10 +59,6 @@ trackers = [
 
 <div id="trackers" style="display:none">
   <%= render_partial("trackers", @trackers) %>
-</div>
-
-<div id="changesets" style="display:none">
-  <%= render_partial("changesets", @changesets) %>
 </div>
 
   <input type="submit" value="Save"/>

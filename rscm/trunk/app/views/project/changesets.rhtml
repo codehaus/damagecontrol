@@ -1,4 +1,4 @@
-<% if(changesets.length == 0)then %>
+<% if(@changesets.length == 0)then %>
   <table class="pane">
     <tr>
       <td colspan="3">
@@ -8,7 +8,7 @@
   </table>
 <% else %>
   <%
-  changesets.each do |changeset|
+  @changesets.each do |changeset|
   %>
   <table class="pane">
     <tr class="pane">

@@ -9,10 +9,14 @@ module RSCM
   class ChangesTest < Test::Unit::TestCase
     
     def setup
+      #1
       @change1 = Change.new("path/one",   "jon",   "Fixed CATCH-22", "1.1", Time.utc(2004,7,5,12,0,2))
       @change2 = Change.new("path/two",   "jon",   "Fixed CATCH-22", "1.2", Time.utc(2004,7,5,12,0,4))
+      #2
       @change3 = Change.new("path/three", "jon",   "hipp hurra",  "1.3", Time.utc(2004,7,5,12,0,6))
+      #3
       @change4 = Change.new("path/four",  "aslak", "hipp hurraX", "1.4", Time.utc(2004,7,5,12,0,8))
+      #4
       @change5 = Change.new("path/five",  "aslak", "hipp hurra",  "1.5", Time.utc(2004,7,5,12,0,10))
       @change6 = Change.new("path/six",   "aslak", "hipp hurra",  "1.6", Time.utc(2004,7,5,12,0,12))
       @change7 = Change.new("path/seven", "aslak", "hipp hurra",  "1.7", Time.utc(2004,7,5,12,0,14))
@@ -138,14 +142,20 @@ module RSCM
       changesets.add(@change1)
       changesets.add(@change2)
       changesets.add(@change3)
+      changesets.add(@change4)
+      changesets.add(@change5)
+      changesets.add(@change6)
+      changesets.add(@change7)
       changesets.save(changesets_dir)
       
-      all_reloaded = ChangeSets.load_upto(changesets_dir, 4)
+      latest_id = ChangeSets.latest_id(changesets_dir)
+      all_reloaded = ChangeSets.load_upto(changesets_dir, latest_id, 100)
       assert_equal(changesets, all_reloaded)
 
-      some_reloaded = ChangeSets.load_upto(changesets_dir, 1)
-      assert_equal(1, some_reloaded.length)
+      some_reloaded = ChangeSets.load_upto(changesets_dir, "20040705120008", 2)
+      assert_equal(2, some_reloaded.length)
       assert_equal(@change3, some_reloaded[0][0])
+      assert_equal(@change4, some_reloaded[1][0])
     end
   end
 

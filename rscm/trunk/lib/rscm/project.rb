@@ -78,16 +78,19 @@ module RSCM
         # Now we need to update the RSS. The RSS spec says max 15 items in a channel,
         # So we'll get upto the latest 15 changesets and RSS it..
         # (http://www.chadfowler.com/ruby/rss/)
-        last_changesets = ChangeSets.load_upto(changesets_dir, 15)
-        title = "Changesets for #{@name}"
-        last_changesets.write_rss(
-          title,
-          changesets_rss_file,
-          "http://localhost:4712/", # TODO point to web version of changeset
-          @description || title, 
-          @tracker || Tracker::Null.new, 
-          @scm_web || SCMWeb::Null.new        
-        )
+        latest_changeset_id = ChangeSets.latest_id(changesets_dir)
+        if(latest_changeset_id)
+          last_changesets = ChangeSets.load_upto(changesets_dir, latest_changeset_id, 15)
+          title = "Changesets for #{@name}"
+          last_changesets.write_rss(
+            title,
+            changesets_rss_file,
+            "http://localhost:4712/", # TODO point to web version of changeset
+            @description || title, 
+            @tracker || Tracker::Null.new, 
+            @scm_web || SCMWeb::Null.new        
+          )
+        end
       end
     end
 
@@ -132,8 +135,12 @@ module RSCM
       Directories.changesets_dir(name)
     end
     
-    def changesets
-      ChangeSets.load_upto(changesets_dir, 5)
+    def changesets(last_changeset_id, prior)
+      ChangeSets.load_upto(changesets_dir, last_changeset_id, prior)
+    end
+
+    def changeset_ids
+      ChangeSets.ids(changesets_dir)
     end
 
   private

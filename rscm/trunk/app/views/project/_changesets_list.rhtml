@@ -1,0 +1,52 @@
+<table nowrap="nowrap" class="pane" nowrap="nowrap">
+
+<%
+  changeset_ids = @project.changeset_ids.reverse
+  if changeset_ids.empty?
+%>
+
+  <tr class="pane">
+    <td class="pane">
+      No Changesets
+    </td>
+  </tr>
+  
+<% else %>
+
+  <%
+    max_changeset_ids = 20
+    visible_changeset_ids = changeset_ids[0..max_changeset_ids - 1]
+    select_changeset_ids = changeset_ids[max_changeset_ids..-1]
+    visible_changeset_ids.each do |changeset|
+  %>
+  <tr class="build-row">
+    <td nowrap="nowrap">
+      <%= link_to(changeset, :action => "changesets", :id => @project.name, :params => {"changeset" => changeset}) %>
+    </td>
+  </tr>
+  
+  <% end %>
+
+  <% if(select_changeset_ids && !select_changeset_ids.empty?) %>
+    <tr class="build-row">
+      <td class="build-cell-even">
+        <form method="get" action="<%= url_for(:action => "changesets", :id => @project.name) %>">
+          <input type="hidden" name="project_name" value="<%= "bar" %>" />
+          <select name="changeset" onchange="submit()">
+          
+          <%
+            select_changeset_ids.each do |changeset|
+          %>
+            <option value="<%= changeset %>"><%= changeset %></option>      
+          <% end %>
+          
+          </select>
+        </form>
+      </td>
+    </tr>
+  <% end %>
+
+<% end %>
+
+</table>
+

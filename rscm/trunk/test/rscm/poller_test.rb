@@ -3,11 +3,11 @@ require 'rscm/mockit'
 require 'rscm'
 
 module RSCM
-  class RssServiceTest < Test::Unit::TestCase
+  class PollerTest < Test::Unit::TestCase
     include MockIt
   
     def test_should_not_add_feeds_twice
-      s = RssService.new
+      s = Poller.new
       s.add_project("a")
       assert_equal(["a"], s.projects)
       s.add_project("a")
@@ -18,7 +18,7 @@ module RSCM
       p = new_mock
       p.__expect(:poll)
 
-      s = RssService.new
+      s = Poller.new
       s.add_project(p)
       s.poll
     end
@@ -28,7 +28,7 @@ module RSCM
       p.__expect(:poll)
       p.__expect(:poll)
 
-      s = RssService.new
+      s = Poller.new
       s.add_project(p)
       s.start(2)
       sleep 3
