@@ -1,15 +1,19 @@
 require 'damagecontrol/core/BuildEvents'
 require 'damagecontrol/util/FileUtils'
 require 'damagecontrol/util/XMLMerger'
+require 'pebbles/XSLT'
 
 module DamageControl
   class XSLTReport < Report
+    include XSLT
+  
     def available?
       selected_build.xml_log_file && File.exists?(selected_build.xml_log_file)
     end
     
     def content
-      xslt(stylesheet_file(stylesheet))
+      xslt(stylesheet_file(stylesheet), selected_build.xml_log_file, "#{selected_build.xml_log_file}.html")
+      read "#{selected_build.xml_log_file}.html"
     end
     
     protected
@@ -22,26 +26,6 @@ module DamageControl
       
       def stylesheet_file(name)
         File.expand_path("#{template_dir}/#{name}")
-      end
-      
-      def xslt(stylesheet_file)
-        result = ""
-        begin
-          cmd_with_io("#{damagecontrol_home}/bin", "xsltproc '#{stylesheet_file}' '#{selected_build.xml_log_file}'") do |io|
-            io.each_line do |line|
-              result += line
-            end
-          end
-        rescue Pebbles::ProcessFailedException => e
-          logger.error(format_exception(e))
-          result += "Error executing XSLT process: #{e.message}\n"
-          result += %{
-This could happen for the following reasons:
-  xsltproc is not installed properly, or
-  might not be on the path, or
-  might be of a version that is incompatible with DamageControl.}
-        end
-        result
       end
       
   end
