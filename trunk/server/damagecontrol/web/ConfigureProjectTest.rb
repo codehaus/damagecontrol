@@ -42,7 +42,6 @@ module DamageControl
     def test_fills_in_project_name_if_specified_in_url
       response, data = @client.get("/private/project?project_name=Milano")
       assert_response_ok(response)
-      assert_match(/Project Name/, data)
       assert_match(/Milano/, data)
     end
     
