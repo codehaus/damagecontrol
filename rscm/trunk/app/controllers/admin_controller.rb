@@ -2,61 +2,104 @@ require 'rscm'
 require 'erb'
 require 'yaml'
 
-# Add some generic web capabilities to the SCM classes
-class RSCM::AbstractSCM
+# Add some generic web capabilities to the RSCM classes
 
-  def javascript_on_load
-    ""
-  end
+module RSCM
+  module Web
+    module Configuration
 
-  def javascript
-    ""
-  end
-  
-  def selected?
-    false
-  end
-  
-  def config_form
-    if(respond_to?(:form_file) && File.exist?(form_file))
-      template = File.read(File.expand_path(form_file))
-      erb = ERB.new(template, nil, '-')
-      erb.result(binding)
-    else
-      ""
+      def javascript
+        template(:javascript_file)
+      end
+
+      def selected?
+        false
+      end
+
+      # Returns the configured form to be inlined in the HTML
+      def config_form
+        template(:form_file)
+      end
+
+    private
+
+      def template(symbol)
+        if(respond_to?(symbol) && File.exist?(send(symbol)))
+          template = File.read(File.expand_path(send(symbol)))
+          erb = ERB.new(template, nil, '-')
+          erb.result(binding)
+        else
+          "<!-- No template for #{self.class.name}.{symbol.to_s} -->"
+        end
+      end
+
     end
   end
+end
+
+class RSCM::AbstractSCM
+  include RSCM::Web::Configuration
+end
+
+class RSCM::Tracker::Base
+  include RSCM::Web::Configuration
+end
+
+class RSCM::Project
+  include RSCM::Web::Configuration
 end
 
 class AdminController < ApplicationController
 
   layout 'rscm'
-  SCMS = [RSCM::CVS, RSCM::SVN, RSCM::StarTeam]
 
-  def add
-    init
-
-    render "admin/project"
-  end
-  
-  def show
-    # TODO: YAML load from file based on project id
-
-    init
-
-    # TODO: loop through query params and override the selected?
-    # method for the one that has matching class name to the scm_name param
-
+  def add # user will post to save
+    @project = RSCM::Project.new
+    @scms = RSCM::SCMS.dup
+    @trackers = RSCM::TRACKERS.dup
     render "admin/project"
   end
   
   def save
-    scm = instantiate_from_params("scm")
-    # TODO instantiate more objects and YAML everything to file...
+    project         = instantiate_from_params("project")
+    project.scm     = instantiate_from_params("scm")
+    project.tracker = instantiate_from_params("tracker")
     
-    redirect_to(:action => "show")
+    File.open("#{project.name}.yaml", "w") do |io|
+      YAML::dump(project, io)
+    end
+
+    redirect_to(:action => "show", :id => project.name)
   end
 
+  def show
+    project_name = @id
+    File.open("#{project_name}.yaml") do |io|
+      @project = YAML::load(io)
+    end
+    
+    scm = @project.scm
+    def scm.selected?
+      true
+    end
+
+    tracker = @project.tracker
+    def tracker.selected?
+      true
+    end
+    
+    # Make a dupe of the scm/tracker lists and substitute with project's value
+    @scms = RSCM::SCMS.dup
+    @scms.each_index {|i| @scms[i] = @project.scm if @scms[i].class == @project.scm.class}
+    
+    @trackers = RSCM::TRACKERS.dup
+    @trackers.each_index {|i| @trackers[i] = @project.tracker if @trackers[i].class == @project.tracker.class}
+    
+    # TODO: loop through query params and override the selected?
+    # method for the one that has matching class name to the scm_name param
+    render "admin/project"
+  end
+  
   def list
   end
   
@@ -67,29 +110,11 @@ private
     class_name = @params[param]
     clazz = eval(class_name)
     ob = clazz.new
-    attribs = @params[class_name]
+    attribs = @params[class_name] || {}
     attribs.each do |k,v|
       ob.send("#{k}=", v)
     end
     ob
-  end
-
-  def init
-    @scm_map = {}
-    @scms = []
-    SCMS.each do |c|
-      scm = c.new
-      @scm_map[c] = scm
-      @scms << scm
-    end
-
-    # TODO similar
-    @tracking_configurators = []
-
-    # TODO replace with Project class
-    @project_name = ""
-    @project_config = {}
-    
   end
 
 end

@@ -12,6 +12,7 @@ which is described in AbstractSCM.
 * Generation of URL links to bugs/issues for several popular bug/issue trackers.
 * Changeset emulation for SCMs that don't support it natively (like CVS and StarTeam)
 * RSCM objects are easily serializable to YAML.
+* Uses UTC times according to the SCM server's clock, not the machine running RSCM.
 
 === Wish:
 
@@ -40,10 +41,15 @@ It will be customisable with a simple YAML file. It will also come with its ownb
 
 == Supported SCMs
 
-* CVS
-* StarTeam
-* Subversion
-* P4 (in progress)
+* CVS - http://www.cvshome.org/
+* StarTeam - http://www.borland.com/starteam/
+* Subversion - http://subversion.tigris.org/
+
+In progress:
+
+* Darcs - http://www.abridgegame.org/darcs/
+* Monotone - http://www.venge.net/monotone/
+* Perforce - http://www.perforce.com/
 
 == Supported Issue trackers
 

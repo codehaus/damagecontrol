@@ -10,14 +10,14 @@ module RSCM
     end
 
     class ViewCVS
-      attr_accessor :view_cvs_url
+      attr_accessor :url
 
-      def initialize(view_cvs_url)
-        @view_cvs_url = view_cvs_url
+      def initialize(url)
+        @url = url
       end
 
       def url
-        PathConverter.ensure_trailing_slash(view_cvs_url)
+        PathConverter.ensure_trailing_slash(url)
       end
 
       def change_url(change, anchor=false)

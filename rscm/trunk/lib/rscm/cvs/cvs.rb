@@ -27,6 +27,14 @@ module RSCM
       "CVS"
     end
     
+    def javascript_on_load
+      "distributeCvsrootFields();"
+    end
+
+    def javascript_file
+      File.dirname(__FILE__) + "/cvs_declarations.js"
+    end
+    
     def form_file
       File.dirname(__FILE__) + "/form.html"
     end

@@ -163,7 +163,13 @@ module RSCM
       end
       true
     end
- 
+
+    # The Javascript function that should be called when the page
+    # is loaded, to initialise the web ui.
+    def javascript_on_load
+      ""
+    end
+
   protected
 
     def with_working_dir(dir)

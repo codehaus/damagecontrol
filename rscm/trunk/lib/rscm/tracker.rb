@@ -3,29 +3,38 @@ require 'rscm/path_converter'
 module RSCM
   module Tracker
 
-    class Null
+    # Simple superclass so we can easily include mixins
+    # for all subclasses in one fell swoop.
+    class Base #:nodoc:
+      def form_file
+        basename = $1 if (self.class.name =~ /RSCM::Tracker::(.*)/)
+        File.dirname(__FILE__) + "/tracker/#{basename}_form.rhtml"
+      end
+    end
+
+    class Null < Base
+      def name
+        "No Tracker"
+      end
+
       def highlight(s)
         s
       end
     end
 
-    class Bugzilla
-      attr_accessor :bugzilla_url
+    class Bugzilla < Base
+      attr_accessor :url
 
-      def initialize(bugzilla_url=nil)
-        @bugzilla_url = bugzilla_url
+      def initialize(url=nil)
+        @url = url
       end
       
       def name
         "Bugzilla"
       end
 
-      def url
-        bugzilla_url
-      end
-
       def highlight(s)
-        url = PathConverter.ensure_trailing_slash(bugzilla_url)
+        url = PathConverter.ensure_trailing_slash(url)
         if (url)
           s.gsub(/#([0-9]+)/, "<a href=\"#{url}show_bug.cgi?id=\\1\">#\\1</a>")
         else
@@ -34,12 +43,12 @@ module RSCM
       end
     end
 
-    class JIRA
-      attr_accessor :jira_url
-      attr_accessor :jira_project_id
+    class JIRA < Base
+      attr_accessor :baseurl
+      attr_accessor :project_id
 
-      def initialize(jira_url=nil, jira_project_id=nil)
-        @jira_url, @jira_project_id = jira_url, jira_project_id
+      def initialize(baseurl=nil, project_id=nil)
+        @baseurl, @project_id = baseurl, project_id
       end
 
       def name
@@ -47,11 +56,11 @@ module RSCM
       end
 
       def url
-        "#{PathConverter.ensure_trailing_slash(jira_url)}browse/#{jira_project_id}"
+        "#{PathConverter.ensure_trailing_slash(baseurl)}browse/#{project_id}"
       end
 
       def highlight(s)
-        url = PathConverter.ensure_trailing_slash(jira_url)
+        url = PathConverter.ensure_trailing_slash(baseurl)
         if(url)
           s.gsub(/([A-Z]+-[0-9]+)/, "<a href=\"#{url}browse/\\1\">\\1</a>")
         else
@@ -60,33 +69,14 @@ module RSCM
       end
     end
 
-    class RubyForge
-      attr_accessor :rf_group_id
-      attr_accessor :rf_tracker_id
+    class SourceForge < Base
+      PATTERN = /#([0-9]+)/
+    
+      attr_accessor :group_id
+      attr_accessor :tracker_id
 
-      def initialize(rf_group_id=nil, rf_tracker_id=nil)
-        @rf_group_id, @rf_tracker_id = rf_group_id, rf_tracker_id
-      end
-
-      def name
-        "RubyForge"
-      end
-
-      def url
-        "http://rubyforge.org/tracker/?group_id=#{rf_group_id}"
-      end
-
-      def highlight(message)
-        message.gsub(/#([0-9]+)/,"<a href=\"http://rubyforge.org/tracker/index.php?func=detail&aid=\\1&group_id=#{rf_group_id}&atid=#{rf_tracker_id}\">#\\1</a>")
-      end
-    end
-
-    class SourceForge
-      attr_accessor :sf_group_id
-      attr_accessor :sf_tracker_id
-
-      def initialize(sf_group_id=nil, sf_tracker_id=nil)
-        @sf_group_id, @sf_tracker_id = sf_group_id, sf_tracker_id
+      def initialize(group_id=nil, tracker_id=nil)
+        @group_id, @tracker_id = group_id, tracker_id
       end
 
       def name
@@ -94,20 +84,37 @@ module RSCM
       end
 
       def url
-        "http://sourceforge.net/tracker/?group_id=#{sf_group_id}"
+        "http://sourceforge.net/tracker/?group_id=#{group_id}"
       end
 
       def highlight(message)
-        message.gsub(/#([0-9]+)/,"<a href=\"http://sourceforge.net/tracker/index.php?func=detail&aid=\\1&group_id=#{sf_group_id}&atid=#{sf_tracker_id}\">#\\1</a>")
+        message.gsub(PATTERN,"<a href=\"http://sourceforge.net/tracker/index.php?func=detail&aid=\\1&group_id=#{group_id}&atid=#{tracker_id}\">#\\1</a>")
       end
     end
 
-    class Scarab
-      attr_accessor :scarab_url
-      attr_accessor :scarab_module_key
+    class RubyForge < SourceForge
 
-      def initialize(scarab_url=nil, scarab_module_key=nil)
-        @scarab_url, @scarab_module_key = scarab_url, scarab_module_key
+      # TODO: share the same rhtml template
+
+      def name
+        "RubyForge"
+      end
+
+      def url
+        "http://rubyforge.org/tracker/?group_id=#{group_id}"
+      end
+
+      def highlight(message)
+        message.gsub(PATTERN,"<a href=\"http://rubyforge.org/tracker/index.php?func=detail&aid=\\1&group_id=#{group_id}&atid=#{tracker_id}\">#\\1</a>")
+      end
+    end
+
+    class Scarab < Base
+      attr_accessor :baseurl
+      attr_accessor :module_key
+
+      def initialize(baseurl=nil, module_key=nil)
+        @baseurl, @module_key = baseurl, module_key
       end
 
       def name
@@ -115,13 +122,13 @@ module RSCM
       end
 
       def url
-        scarab_url
+        baseurl
       end
 
       def highlight(s)
-        url = PathConverter.ensure_trailing_slash(scarab_url)
+        url = PathConverter.ensure_trailing_slash(baseurl)
         if (url)
-          s.gsub(/(#{scarab_module_key}[0-9]+)/, "<a href=\"#{url}issues/id/\\1\">\\1</a>")
+          s.gsub(/(#{module_key}[0-9]+)/, "<a href=\"#{url}issues/id/\\1\">\\1</a>")
         else
           s
         end
