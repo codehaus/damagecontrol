@@ -126,6 +126,19 @@ function showScm(scm) {
 </tr>
 
 <tr>
+  <td class="setting-name">Polling</td>
+  <td><input name="polling" id="polling" type="checkbox" <%= if project_config['polling'] then "checked=true" else "" end %> /></td>
+</tr>
+<tr>
+  <td>&nbsp;</td>
+  <td class="setting-description">
+    Polling will at a specified interval check the SCM for changes. If there are any changes a build will be trigged.
+    The polling interval is currently specified at the server level and can't be changed on a project level,
+    this <a href="http://jira.codehaus.org/browse/DC-260">will be fixed in the future</a>.
+  </td>
+</tr>
+
+<tr>
   <td>Source control</td>
   <td>
     <% scm_configurators.each do |scm_configurator| %>

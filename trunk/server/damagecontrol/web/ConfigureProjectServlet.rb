@@ -62,6 +62,7 @@ module DamageControl
       project_config['dependent_projects'] = to_array(request.query['dependent_projects'])
       project_config['logs_to_merge'] = to_array(request.query['logs_to_merge'])
       project_config['artifacts_to_archive'] = to_array(request.query['artifacts_to_archive'])
+      project_config['polling'] = to_boolean(request.query['polling'])
       scm_configurators(project_config).find{|c| c.scm_id == request.query['scm_id'] }.store_configuration_from_request(request)
 
       @project_config_repository.modify_project_config(project_name, project_config)
@@ -100,6 +101,10 @@ module DamageControl
     
     def to_array(array)
       if array then array.split(",").collect{|e| e.strip} else [] end
+    end
+    
+    def to_boolean(param)
+      if param then true else false end
     end
     
     def scm_configurators(project_config = self.project_config)

@@ -64,6 +64,10 @@ module DamageControl
       status == SUCCESSFUL
     end
     
+    def failed?
+      status == FAILED
+    end
+    
     def initialize(project_name = nil, timestamp = Time.new.utc, config={})
       @project_name = project_name
       @config = config

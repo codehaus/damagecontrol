@@ -9,28 +9,28 @@ module DamageControl
     include Logging
     
     def initialize(hub, polling_interval, project_config_repository, build_history_repository, build_scheduler)
+      super(polling_interval)
       @hub = hub
       @polling_interval = polling_interval
       @project_config_repository = project_config_repository
       @build_history_repository = build_history_repository
       @build_scheduler = build_scheduler
     end
+    
+    def start
+      logger.info("starting poller #{self}")
+      super
+    end
   
     def tick(time)
       @project_config_repository.project_names.each {|project_name| poll_project(project_name, Time.at(time))}
-    end
-    
-    def polling_interval(project_name)
-      # implement project specific polling intervals here
-      @polling_interval
     end
     
     def should_poll?(project_name, time)
       return false if @build_scheduler.project_scheduled?(project_name)
       return false if @build_scheduler.project_building?(project_name)
       return false unless project_config(project_name)["polling"]
-      return false unless eval(project_config(project_name)["polling"])
-      time.to_i % polling_interval(project_name) == 0
+      true
     end
     
     def project_config(project_name)

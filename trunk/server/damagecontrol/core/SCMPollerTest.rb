@@ -87,14 +87,14 @@ module DamageControl
       verify_all
     end
 
-    def test_should_not_poll_outside_polling_interval
+    def TODO_test_should_not_poll_outside_polling_interval
       hub = new_mock
       should_not_poll_scm = new_mock
       
       poller = SCMPoller.new(hub,
-        10,
+        30,
         mock_project_config_repository(project_config_with_polling, 0, should_not_poll_scm), 
-        mock_build_history_repository(10),
+        mock_build_history_repository(0),
         mock_build_scheduler)
         
       poller.tick(15)
@@ -170,11 +170,11 @@ module DamageControl
     end
     
     def project_config_with_polling
-      { "polling" => "true" }
+      { "polling" => true }
     end
     
     def project_config_without_polling
-      { "polling" => "false" }
+      { "polling" => false }
     end
     
     def mock_build_scheduler

@@ -52,6 +52,10 @@ module DamageControl
       @executors.find {|e| e.building_project?(project_name) }
     end
     
+    def project_scheduled?(project_name)
+      build_queue.find{|b| b.project_name == project_name}
+    end
+    
     def kill_named_executor(executor_name)
       executor = executors.find{|e| e.name == executor_name}
       executor.kill_build_process

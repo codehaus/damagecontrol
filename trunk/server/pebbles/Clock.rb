@@ -14,6 +14,7 @@ module Pebbles
     end
 
     def start
+      raise "interval can't be null" unless @seconds
       shutdown
       @run = true
       return increase if @seconds == 0

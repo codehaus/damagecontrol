@@ -1,3 +1,5 @@
+ONLINE=true
+
 require 'test/unit'
 
 require 'xmlrpc/client'
@@ -73,10 +75,12 @@ class IRCDriver
     irc_listener.send_message_to_channel("Test ended. Thank you for your cooperation.")
   end
   
-  def wait_for_output(output, timeout=60)
-    wait_for do
-      irc_listener.received_text =~ /#{output}/
-    end
+  def wait_for_successful_build
+    wait_for_output("BUILD SUCCESSFUL")
+  end
+
+  def wait_for_failed_build  
+    wait_for_output("BUILD FAILED")
   end
   
   def assert_build_successful_on_channel(project_name)
@@ -88,6 +92,37 @@ class IRCDriver
     assert_match(/#{username}/, irc_listener.received_text)
   end
 
+  private
+  
+  def wait_for_output(output, timeout=60)
+    wait_for do
+      irc_listener.received_text =~ /#{output}/
+    end
+  end
+  
+end
+
+class OfflineIRCDriver
+  def setup
+  end
+  
+  def teardown
+  end
+  
+  def wait_for_successful_build
+  end
+  
+  def wait_for_failed_build  
+  end
+  
+  def assert_build_successful_on_channel(project_name)
+  end
+  
+  def assert_build_failed_and_changes_on_channel(username, project_name)
+  end
+  
+  def reset_log
+  end
 end
 
 class Driver
@@ -136,7 +171,7 @@ class DamageControlServerDriver < Driver
   def start_damagecontrol_forked
     Thread.new {
       @server_startup_result = nil
-      @server_startup_result = system("ruby -I#{damagecontrol_home}/server #{startup_script} #{basedir} #{timeout}")
+      @server_startup_result = system("ruby -I#{damagecontrol_home}/server #{startup_script} #{basedir} #{timeout} #{ONLINE}")
     }
     wait_for(15) { server_running? }
     assert_server_running
@@ -150,7 +185,7 @@ class DamageControlServerDriver < Driver
     system("ruby #{bindir}/newproject.rb --rootdir #{basedir} --projectname #{project}")
   end
   
-  def setup_project_config(project, scm, build_command_line)
+  def setup_project_config(project, scm, build_command_line, polling)
     new_project(project)
     
     pd = ProjectDirectories.new(basedir)
@@ -159,6 +194,7 @@ class DamageControlServerDriver < Driver
 
     project_config["build_command_line"] = build_command_line
     project_config["scm"] = scm
+    project_config["polling"] = true if polling
     
     project_config_repo.modify_project_config(project, project_config)
   end
@@ -213,6 +249,45 @@ class DamageControlServerDriver < Driver
   end
 end
 
+class XMLRPCDriver < Driver
+  def initialize(project_name, publicurl)
+    @project_name = project_name
+    client = ::XMLRPC::Client.new2(publicurl)
+    @status = client.proxy("status")
+  end
+  
+  def build_status?(status)
+    begin
+      last_completed_build = @status.last_completed_build(@project_name)
+      last_completed_build && last_completed_build.status == status
+    rescue ::XMLRPC::FaultException => e
+      flunk(e.faultString)
+    end
+  end
+  
+  def assert_build_successful
+    assert(build_status?(Build::SUCCESSFUL), "build was not successful")
+  end
+  
+  def assert_build_failed
+    assert(build_status?(Build::FAILED), "build did not fail")
+  end
+  
+  def wait_for_successful_build
+    wait_for do
+      build_status?(Build::SUCCESSFUL)
+    end
+    assert_build_successful
+  end
+  
+  def wait_for_failed_build
+    wait_for do
+      build_status?(Build::FAILED)
+    end
+    assert_build_failed
+  end
+end
+
 class End2EndTest < Test::Unit::TestCase
 
   include FileUtils
@@ -223,6 +298,7 @@ class End2EndTest < Test::Unit::TestCase
   attr_reader :svn
   attr_reader :scm
   attr_reader :server
+  attr_reader :xmlrpc
   
   def setup
     @basedir = new_temp_dir("e2e")
@@ -231,15 +307,16 @@ class End2EndTest < Test::Unit::TestCase
   
   def teardown
     @server.teardown
-    @irc.teardown
-    @scm.teardown unless @scm.nil?
+    @irc.teardown if @irc
+    @scm.teardown if @scm
+    @xmlrpc.teardown if @xmlrpc
     
     #FileUtils.rm_rf(basedir)
   end
   
   def test_damagecontrol_works_with_cvs
     cvs = LocalCVS.new(@basedir, "e2e_testproject")
-    test_build_and_log_and_irc(cvs)
+    test_build_and_log_and_irc(cvs, false)
   end
   
   # I have debugged further. The problem isn't that the post-commit
@@ -253,12 +330,12 @@ class End2EndTest < Test::Unit::TestCase
   #
   # WEIRD STUFF! -Aslak
   #
-  def FIXMEtest_damagecontrol_works_with_svn
+  def test_damagecontrol_works_with_svn
     svn = LocalSVN.new(@basedir, "e2e_testproject")
-    test_build_and_log_and_irc(svn)
+    test_build_and_log_and_irc(svn, true)
   end
   
-  def test_build_and_log_and_irc(scm)
+  def test_build_and_log_and_irc(scm, polling)
     # prepare local scm
     scm.create
     importdir = "#{@basedir}/e2e_testproject"
@@ -284,11 +361,12 @@ class End2EndTest < Test::Unit::TestCase
     scm.install_trigger(damagecontrol_home, project_name, "http://127.0.0.1:14712/private/xmlrpc")
 
     @server = DamageControlServerDriver.new("#{basedir}/serverroot")
-    @server.setup    
-    @irc = IRCDriver.new
+    @server.setup
+    @irc = if(ONLINE) then IRCDriver.new else OfflineIRCDriver.new end
     @irc.setup
+    @xmlrpc = XMLRPCDriver.new(project_name, @server.publicurl)
 
-    server.setup_project_config(project_name, scm, execute_script_commandline("build"))
+    server.setup_project_config(project_name, scm, execute_script_commandline("build"), polling)
     
     # add build.bat file and commit it (will trigger build)
     scm.checkout
@@ -326,13 +404,15 @@ class End2EndTest < Test::Unit::TestCase
   def wait_less_time_than_default_quiet_period
     sleep BuildScheduler::DEFAULT_QUIET_PERIOD - 1
   end
-
+  
   def wait_for_build_to_succeed
-    irc.wait_for_output("BUILD SUCCESSFUL")
+    irc.wait_for_successful_build
+    xmlrpc.wait_for_successful_build
   end
 
   def wait_for_build_to_fail
-    irc.wait_for_output("BUILD FAILED")
+    irc.wait_for_failed_build
+    xmlrpc.wait_for_failed_build
   end
 
   def execute_script_commandline(name)
