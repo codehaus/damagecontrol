@@ -19,8 +19,10 @@ task :default => [ :all ]
 fl = FileList.new('test/**/*_test.rb')
 # TODO: figure out how to add all the stuff in app.
 Rake::TestTask.new { |t|
-  # We need some of the test utils from rscm
-  t.libs << "test" << File.expand_path(File.dirname(__FILE__) + "/../rscm/test") << File.expand_path(File.dirname(__FILE__) + "/../rscm/lib")
+  t.libs << "test" 
+  # We need some of the test utils from rscm. add them in 2 ways so they can be found when built by dc too.
+  t.libs << File.expand_path(File.dirname(__FILE__) + "/../rscm/test") << File.expand_path(File.dirname(__FILE__) + "/../rscm/lib")
+  t.libs << File.expand_path(File.dirname(__FILE__) + "/../../RSCM/checkout/test") << File.expand_path(File.dirname(__FILE__) + "/../../RSCM/checkout/lib")
   t.test_files = fl
   t.verbose = true
 }
