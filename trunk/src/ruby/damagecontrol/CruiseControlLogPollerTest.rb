@@ -16,7 +16,7 @@ module DamageControl
 			@ccpoller.new_file(damagecontrol_file("testdata/log20030929145347.xml"))
 			assert_message_types("DamageControl::BuildCompleteEvent")
 			assert_equal('dxbranch', messages[0].project.name)
-			assert_equal('label', messages[0].build.label)
+			assert_equal('build.698', messages[0].build.label)
 		end
 		
 		def test_parse_log_file

@@ -28,10 +28,11 @@ module DamageControl
 			projectname = info.elements["property[@name='projectname']/@value"].to_s
 			project = Project.new(projectname)
 
-			build = Build.new
-			build.label = info.elements["property[@name='label']/@value"].to_s
+			evt = BuildCompleteEvent.new(project)
+			evt.build = Build.new
+			evt.build.label = info.elements["property[@name='label']/@value"].to_s
 			
-			BuildCompleteEvent.new(project)
+			evt
 		end
 	end
 end

@@ -2,7 +2,6 @@
 require 'test/unit'
 require 'damagecontrol/FilePoller'
 require 'damagecontrol/FileUtils'
-require 'damagecontrol/FakeClock'
 
 module DamageControl
 	

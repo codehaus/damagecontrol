@@ -4,7 +4,6 @@ require 'damagecontrol/BuildRequestEvent'
 require 'damagecontrol/SocketTrigger'
 require 'damagecontrol/Hub'
 require 'damagecontrol/Project'
-require 'damagecontrol/FakeClock'
 require 'damagecontrol/BuildDelayer'
 
 module DamageControl
@@ -59,6 +58,11 @@ module DamageControl
 			@b.tick(11000)
 			assert_not_nil(@received_message)
 			assert_equal( @msg, @received_message )
+		end
+		
+		def test_reschedules_on_tick
+			@b.tick(@b.clock.current_time)
+			assert_equal(@b.clock.current_time + 1000, @b.next_tick)
 		end
 
 	end
