@@ -1,5 +1,4 @@
 require 'damagecontrol/util/FileUtils'
-require 'damagecontrol/core/BuildBootstrapper'
 require 'damagecontrol/util/Logging'
 require 'ftools'
 
