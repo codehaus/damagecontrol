@@ -1,9 +1,13 @@
 $:<<"../../lib/rica"
 
 require 'rica'
+<<<<<<< IRCPublisher.rb
+require 'damagecontrol/Timer'
+=======
 
 require 'damagecontrol/Timer'
 require 'damagecontrol/FileUtils'
+>>>>>>> 1.5
 
 module DamageControl
 
@@ -92,8 +96,28 @@ module DamageControl
 
 	class IRCPublisher < AsyncComponent
 	
+<<<<<<< IRCPublisher.rb
+	#require 'mock'
+	#require 'test/unit'
+=======
 		attr_accessor :irc
+>>>>>>> 1.5
 	
+<<<<<<< IRCPublisher.rb
+	#class IRCPublisherTest < Test::Unit::TestCase
+	#	def test_if_connected_and_in_channel_sends_message_on_build_complete
+	#		hub = Hub.new
+	#		publisher = IRCPublisher.new(hub, "server", "channel")
+	#		irc = Mock.new
+	#		publisher.irc = irc
+	#		
+	#		irc.__next(:is_connected?) {|| true}
+	#		irc.__next(:connect) {|server|}
+	#		irc.connect("server")
+	#		irc.__verify
+	#	end
+	#end
+=======
 		def initialize(hub, server, channel)
 			super(hub)
 			@irc = IRCConnection.new()
@@ -114,5 +138,6 @@ module DamageControl
 		end
 
 	end
+>>>>>>> 1.5
 
 end
