@@ -7,39 +7,7 @@
 
 <table class="main-table">
 <tr><td>
-<h1 class="pane"><img src="images/lastcompletedstatus?project_name=<%= project_name %>"/> <%= project_name %></h1>
-</td></tr>
-
-<tr><td>
-<table class="pane" width="100%">
-  <tr>
-    <td class="pane-header">Last completed build</td>
-  </tr>
-  <tr>
-    <td class="pane"><%= last_status %></td>
-  </tr>
-</table>
-</td></tr>
-
-<% if(last_completed_build != current_build) %>
-<tr><td>
-<table class="pane" width="100%">
-  <tr>
-    <td class="pane-header">Current build</td>
-  </tr>
-  <tr>
-    <td class="pane"><%= current_status %></td>
-  </tr>
-</table>
-</td></tr>
-<% end %>
-
-<tr><td>
-<table class="pane" width="100%">
-  <tr>
-    <td class="pane-header"><a href="root/<%= project_name %>/checkout">Checked out files...</a></td>
-  </tr>
-</table>
+<h1 class="pane"><img src="images/lastcompletedstatus?project_name=<%= project_name %>"/> <%= project_name %> <%= current_status %></h1>
 </td></tr>
 
 <tr><td>
@@ -56,17 +24,11 @@
 %>
 
   <tr class="pane">
-    <td class="pane" colspan="3">Never built</td>
+    <td class="pane" colspan="1">Never built</td>
   </tr>
   
 <% else %>
 
-  <tr class="pane">
-    <td class="pane-column-header">Timestamp</td>
-    <td class="pane-column-header">Status</td>
-    <td class="pane-column-header">Time</td>
-  </tr>
-  
   <%
     builds.each do |build|
       color = if build.successful? then "green" else "red" end
@@ -74,9 +36,8 @@
       image = "images/#{color}-16.gif"
   %>
   <tr class="pane">
-    <td class="pane"><a href="log?project_name=<%= project_name %>&timestamp=<%= build.timestamp %>"><%= build.timestamp_as_time %></a></td>
-    <td class="pane"><img src="<%= image %>" />&nbsp;<%= build.status %></td>
-    <td class="pane"><%= build.duration_formatted %></td>
+    <% label = "##{build.label}"; label = build.status if label == "#" %>
+    <td class="pane"><img src="<%= image %>" />&nbsp;<a href="log?project_name=<%= project_name %>&timestamp=<%= build.timestamp %>"><%= build.timestamp_for_humans %> (<%= label %>)</a></td>
   </tr>
   <% end %>
 

@@ -93,6 +93,12 @@ module DamageControl
         b.timestamp = last_build_time
         b
       }
+      mock_build_history.__expect(:last_successful_build) { |project_name|
+        assert_equal("damagecontrolled", project_name)
+        b = Build.new("damagecontrolled")
+        b.timestamp = last_build_time
+        b
+      }
       mock_scm = MockIt::Mock.new
       mock_scm.__setup(:working_dir) { checkoutdir }
       mock_scm.__expect(:changes) {|from_time, to_time|

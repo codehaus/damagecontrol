@@ -14,13 +14,6 @@
 
 <div class="top-panel">
 <img class="logo" src="images/damagecontrol-logo.png" />
-</div>
-
-<div class="task-panel">
-
-<div class="task-header">Navigation</div>
-<div class="task-entry"><a href="dashboard">Dashboard</a></div>
-<div class="task-entry">
 <% if auto_refresh? %>
   <a href="<%= auto_refresh_url_prefix %>auto_refresh=false">Turn auto refresh off</a>
 <% else %>
@@ -28,28 +21,32 @@
 <% end %>
 </div>
 
-<% if !tasks.empty? then %>
-	<div class="task-entry">&nbsp;</div>
-
-	<div class="task-header">Actions</div>
-	<% tasks.each do |name, url| %>
-		<div class='task-entry'><a href="<%= url %>"><%= name %></a></div>
-	<% end %>
-<% end %>
-
+<div class="top-nav">
+	<div class="left-top-nav">
+	<%= breadcrumbs %>
+	</div>
+	<div class="right-top-nav">
+	<%= right_top_nav %>
+	</div>
 </div>
 
+<div>
 <div class="main-panel">
 <%= body %>
-<% if false then %>
-bla bla bla bla bla bla bla bla bla bla bla bla bla bla bla bla bla bla 
-bla bla bla bla bla bla bla bla bla bla bla bla bla bla bla bla bla bla 
-bla bla bla bla bla bla bla bla bla bla bla bla bla bla bla bla bla bla 
-bla bla bla bla bla bla bla bla bla bla bla bla bla bla bla bla bla bla 
-bla bla bla bla bla bla bla bla bla bla bla bla bla bla bla bla bla bla 
-bla bla bla bla bla bla bla bla bla bla bla bla bla bla bla bla bla bla 
-bla bla bla bla bla bla bla bla bla bla bla bla bla bla bla bla bla bla 
-<% end %>
+</div>
+
+<div class="task-panel">
+
+	<% if !tasks.empty? then %>
+		<div class="task-entry">&nbsp;</div>
+	
+		<div class="task-header">Actions</div>
+		<% tasks.each do |name, url| %>
+			<div class='task-entry'><a href="<%= url %>"><%= name %></a></div>
+		<% end %>
+	<% end %>
+
+</div>
 </div>
 
 <div class="footer">

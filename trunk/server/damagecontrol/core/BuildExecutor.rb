@@ -57,8 +57,11 @@ module DamageControl
       working_dir = if current_scm.nil? then project_base_dir else current_scm.working_dir end
       with_working_directory(working_dir) do
         # set up some environment variables the build can use
+
         ENV["DAMAGECONTROL_CHANGES"] = 
           current_build.modification_set.collect{|m| "\"#{m.path}\"" }.join(" ") unless current_build.modification_set.nil?
+
+        ENV["DAMAGECONTROL_BUILD_LABEL"] = current_build.potential_label.to_s
 
         IO.foreach("|#{current_build.build_command_line} 2>&1") do |line|
           report_progress(line)
@@ -67,6 +70,11 @@ module DamageControl
           current_build.status = Build::SUCCESSFUL
         else
           current_build.status = Build::FAILED
+        end
+
+        # set the label
+        if(current_build.successful? && current_build.potential_label)
+          current_build.label = current_build.potential_label
         end
       end
 
@@ -148,6 +156,15 @@ module DamageControl
       next_scheduled_build
       begin
         current_build.start_time = Time.now.to_i
+
+        # set potential label
+        last_successful_build = @build_history.last_successful_build(current_build.project_name)
+        if(last_successful_build && last_successful_build.label)
+          current_build.potential_label = last_successful_build.label + 1
+        else
+          current_build.potential_label = 0
+        end
+
         @channel.publish_message(BuildStartedEvent.new(current_build))
 
         determine_changeset

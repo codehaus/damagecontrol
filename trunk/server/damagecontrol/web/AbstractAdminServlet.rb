@@ -47,6 +47,16 @@ module DamageControl
       @type == :private
     end
     
+    def breadcrumbs
+      result = "<a href=\"dashboard\">Dashboard</a>"
+      result << " > #{request.query['project_name']}" if request.query['project_name']
+      result
+    end
+    
+    def right_top_nav
+      "<a href=\"root/<%= project_name %>/checkout\">Checked out files...</a>"
+    end
+    
   private
     
     attr_reader :build_history_repository

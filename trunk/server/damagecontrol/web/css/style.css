@@ -1,9 +1,7 @@
-body {
-  color: #000000;
-  background-color: #ffffff;
+body, table, form, input, td, th, p, textarea, select
+{
   font-family: Verdana, Helvetica, sans serif;
-  font-size: 10pt;
-  text-align: left;
+  font-size: 11px;
 }
 
 a:link {
@@ -26,13 +24,29 @@ img {
 
 .top-panel {
   float: top;
+  padding-bottom: 3pt;
+  margin-bottom: 3pt;
+}
+
+.top-nav {
+  float: top;
+  height: 16px;
+  border-top: 1px #7f7f7f solid;
   border-bottom: 1px #7f7f7f solid;
   padding-bottom: 3pt;
   margin-bottom: 3pt;
 }
 
-.task-panel {
+.left-top-nav {
   float: left;
+}
+
+.right-top-nav {
+  float: right;
+}
+
+.task-panel {
+  float: right;
   width: 200px;
   margin-right: -1px;
   padding: 3px;
@@ -42,7 +56,8 @@ img {
 }
 
 .main-panel {
-  margin-left: 220px;
+  float: left;
+  clear: left;
 }
 
 .task-header {
@@ -53,6 +68,7 @@ img {
 }
 
 .footer {
+  float: bottom;
   font-size: 8pt;
   text-align: center;
   margin-top: 5em

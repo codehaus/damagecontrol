@@ -52,7 +52,8 @@ module DamageControl
 
     attr_accessor :start_time
     attr_accessor :end_time
-    
+    attr_accessor :potential_label
+
     def duration_seconds
       return 0 if end_time.nil? || start_time.nil?
       end_time - start_time
@@ -88,6 +89,10 @@ module DamageControl
     
     def timestamp_as_time
       Build.timestamp_to_time(timestamp)
+    end
+    
+    def timestamp_for_humans
+      timestamp_as_time.strftime("%d %b %Y %H:%M:%S")
     end
     
     def Build.format_timestamp(time)
