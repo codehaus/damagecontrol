@@ -12,7 +12,7 @@ module DamageControl
       @server = DamageControlServer.new(
         :RootDir => buildRoot,
         :SocketTriggerPort => 14711,
-        :HttpPort => 14712,
+        :HttpPort => 14712
       )
       @server.start
     end
