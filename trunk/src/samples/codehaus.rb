@@ -2,6 +2,7 @@
 
 $damagecontrol_home = File::expand_path('../..') 
 $:<<"#{$damagecontrol_home}/src/ruby" 
+$:<<"#{$damagecontrol_home}/lib" 
 
 require 'simple' 
 require 'damagecontrol/Hub' 
@@ -31,7 +32,7 @@ start_simple_server(
   :SocketTriggerPort => 4711, 
   :HttpPort => 4712,
   :HttpsPort => 4713,
-  :AllowIPs => ["127.0.0.1", "66.216.68.111", "81.5.134.59", "217.158.24.17" ])
+  :AllowIPs => ["127.0.0.1", "64.7.141.17", "66.216.68.111", "81.5.134.59", "217.158.24.17" ])
 
 FilePublisher.new(@hub, "#{buildRoot}/report", HTMLTemplate.new).start 
 IRCPublisher.new(@hub, "irc.codehaus.org", "\#damagecontrol", ShortTextTemplate.new).start
