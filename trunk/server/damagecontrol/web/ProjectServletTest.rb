@@ -29,6 +29,7 @@ module DamageControl
         assert_equal('blahblah<br/>blah<br/>blah <a href="http://jira.codehaus.org/browse/DC-148">DC-148</a>', @servlet.instance_eval("quote_message('blahblah\nblah\nblah DC-148')"))
         assert_equal('blahblah<br/>blah <a href="http://jira.codehaus.org/browse/DC-148">DC-148</a> blah<br/>blah', @servlet.instance_eval("quote_message('blahblah\nblah DC-148 blah\nblah')"))
         assert_equal('blahblah<br/>blah <a href="http://jira.codehaus.org/browse/DC-148">DC-148</a> blah<br/>blah', @servlet.instance_eval("quote_message('blahblah\nblah DC-148 blah\nblah')"))
+        assert_equal('<a href="http://jira.codehaus.org/browse/DC-150">DC-150</a>', @servlet.instance_eval("quote_message('DC-150')"))
       end
     end
     
