@@ -1,5 +1,6 @@
 require 'test/unit'
 require 'damagecontrol/BuildBootstrapper'
+require 'damagecontrol/FileUtils'
 
 module DamageControl
 
@@ -12,7 +13,7 @@ module DamageControl
       scm_spec = ":local:/cvsroot/picocontainer:pico"
       build_command_line = "\"echo damagecontrol rocks\""
       build_path = "src"
-      nc_command = "C:\\scm\\damagecontrol\\bin\\cat.exe" # behaves like ncat without the network
+      nc_command = cat_command # behaves like ncat without the network
       dc_host = ""
       dc_port = ""
       
@@ -34,6 +35,19 @@ module DamageControl
           assert_equal("/usr/local/builds/picocontainer/pico/MAIN", build.checkout_dir)
           assert_equal("/usr/local/builds/picocontainer/pico/MAIN/pico/src", build.absolute_build_path)
         end
+      end
+      
+      assert_equal("0", $?.to_s)
+    end
+
+  private
+    include FileUtils
+  
+    def cat_command    
+      if(windows?)
+        File.expand_path("../../bin/cat.exe").gsub('/','\\')
+      else
+        "cat"
       end
     end
 
