@@ -17,10 +17,7 @@ module DamageControl
     
     def tasks
       result = super
-      result +=
-        [
-          global_search_form
-        ]
+      result += [ global_search_form ]
       result
     end
     

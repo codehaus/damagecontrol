@@ -51,6 +51,7 @@ module DamageControl
           task(:icon => "icons/box_new.png", :name => "New project", :url => "project?action=configure")
         ]
       end
+      result
     end
     
     def ritemesh_template

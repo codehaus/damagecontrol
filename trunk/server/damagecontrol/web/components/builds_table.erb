@@ -19,15 +19,21 @@
 <% else %>
 
   <%
+    i = -1
     builds.reverse.each do |build|
+      i = i + 1
       color = if build.successful? then "green" else "red" end
       color = "grey" if !build.completed?
       image = "images/#{color}-16.gif"
       prefix = ""
       prefix = "#{build.project_name} " if prefix_with_project_name
   %>
-  <tr class="pane">
-    <td class="pane">
+  <tr class="build-row">
+    <% if((i%2) == 0) %>
+    <td class="build-cell-even">
+    <% else %>
+    <td class="build-cell-odd">
+    <% end %>
       <img src="<%= image %>" />&nbsp;
       <a class="tip" href="<%= build_url(build) %>">
         <% if selected_build == build then %><b><% end %>
