@@ -6,7 +6,7 @@ require 'damagecontrol/BuildExecutor'
 require 'damagecontrol/Hub'
 require 'damagecontrol/FileUtils'
 require 'damagecontrol/BuildBootstrapper'
-require 'damagecontrol/scm/CVS'
+require 'damagecontrol/scm/SCM'
 
 include DamageControl
 
@@ -30,40 +30,10 @@ class End2EndTest < Test::Unit::TestCase
 		rmdir(@cvsrootdir)
 	end
 
-	def create_repository()
+	def create_cvs_repository()
 		system("cvs -d#{@cvsroot} init")
 	end
-	
-	class SCMRegistry < SCM
-		attr_reader :scms
 		
-		def initialize
-			@scms = []
-		end
-		
-		def find_scm(path)
-			scms.find {|scm| scm.handles_path?(path) }
-		end
-	
-		def handles_path?(path)
-			find_scm(path)
-		end
-		
-		def add_scm(scm)
-			scms<<scm
-		end
-		
-		# checks out (or updates) path to directory
-		def checkout(path, directory, &proc)
-			scm = find_scm(path)
-			if scm
-				scm.checkout(path, directory, &proc)
-			else
-				super(path, directory, &proc)
-			end
-		end
-	end
-	
 	class SysOutProgressReporter
 		def initialize(hub)
 			hub.add_subscriber(self)
@@ -93,13 +63,11 @@ class End2EndTest < Test::Unit::TestCase
 		"#{@tempdir}/builds"
 	end
 	
-	def start_damagecontrol(build_command_line)
+	def start_damagecontrol()
 		hub = Hub.new
-		scm = SCMRegistry.new
-		scm.add_scm(CVS.new)
 		SocketTrigger.new(hub).start
 		BuildBootstrapper.new(hub, buildsdir).start
-		BuildExecutor.new(hub, scm)
+		BuildExecutor.new(hub)
 	end
 	
 	def create_cvsmodule(project)
@@ -109,7 +77,7 @@ class End2EndTest < Test::Unit::TestCase
 		system("cvs -d#{@cvsroot} import -m 'message' #{project} VENDOR START")
 	end
 	
-	def install_damagecontrol
+	def install_damagecontrol_into_cvs
 		# install the trigger script
 		Dir.chdir(@tempdir)
 		system("cvs -d#{@cvsroot} co CVSROOT")
@@ -130,7 +98,7 @@ class End2EndTest < Test::Unit::TestCase
 		system("cvs com -m 'message'")
 	end
 
-	def activate_damagecontrol
+	def activate_damagecontrol_in_cvs
 		Dir.chdir(@tempdir)
 		Dir.chdir("CVSROOT")
 		File.open("loginfo", File::WRONLY | File::APPEND) do |file|
@@ -144,13 +112,13 @@ class End2EndTest < Test::Unit::TestCase
 		script_file("#{@basedir}/src/script/damagecontrol")
 	end
 
-	def checkout(project)
+	def checkout_cvs_project(project)
 		Dir.chdir(@tempdir)
 		rmdir(project)
 		system("cvs -d#{@cvsroot} co #{project}")
 	end
 	
-	def add_file(project, file)
+	def add_file_to_cvs_project(project, file)
 		Dir.chdir("#{@tempdir}/#{project}")
 		system("cvs add #{file}")
 		system("cvs com -m 'comment'")
@@ -177,30 +145,40 @@ class End2EndTest < Test::Unit::TestCase
 		rmdir(project)
 	end
 
-	def test_builds_on_cvs_add
-		
-		create_repository
-		start_damagecontrol(script_file("build"))
-		create_cvsmodule("e2eproject")
-		install_damagecontrol
-		activate_damagecontrol
+        def wait_for_build_to_complete
+            sleep 3
+        end
 
-		# add build.bat file and commit it (will trigger build)
-		checkout("e2eproject")
-		File.open("e2eproject/build.bat", "w") do |file|
-			file.puts('echo "Hello world from DamageControl" > buildresult.txt')
-		end
-		add_file("e2eproject", "build.bat")
-		
-		#delete checked out project (should be checked out by bootstrapper)
-		delete_checked_out_project("e2eproject")
-		
-		# wait for build to complete
-		sleep 3
-		
-		# verify output of build
+        def verify_output_of_build
 		assert_file_content('"Hello world from DamageControl" ', 
 			"#{buildsdir}/e2eproject/buildresult.txt", 
 			"build not executed")
+        end
+
+	def test_builds_on_cvs_add
+		
+		create_cvs_repository
+		start_damagecontrol
+		create_cvsmodule("e2eproject")
+		install_damagecontrol_into_cvs
+		activate_damagecontrol_in_cvs
+                
+		# add build.bat file and commit it (will trigger build)
+		checkout_cvs_project("e2eproject")
+		File.open("e2eproject/build.bat", "w") do |file|
+			file.puts('echo "Hello world from DamageControl" > buildresult.txt')
+		end
+		add_file_to_cvs_project("e2eproject", "build.bat")
+		
+		delete_checked_out_project("e2eproject") # will be checked out by bootstrapper
+		
+		wait_for_build_to_complete
+		
+                verify_output_of_build
+                
 	end
+        
+        def test_builds_on_svn_add
+            fail("Mike Mason has promised to do this!")
+        end
 end

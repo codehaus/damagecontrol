@@ -11,6 +11,7 @@ module DamageControl
 	# prior to starting damagecontrol
 	class CVS < SCM
 		def handles_path?(path)
+                        print "cvs handles path: #{path}"
 			parse_path(path)
 		end
 		

@@ -3,6 +3,7 @@ require 'damagecontrol/Hub'
 require 'damagecontrol/BuildExecutor'
 require 'damagecontrol/Build'
 require 'damagecontrol/HubTestHelper'
+require 'damagecontrol/scm/MockSCM'
 
 module DamageControl
 
@@ -12,7 +13,7 @@ module DamageControl
 	
 		def setup
 			create_hub
-			@builder = BuildExecutor.new(hub)
+			@builder = BuildExecutor.new(hub, MockSCM.new)
 			@build = Build.new("Aslak", nil, nil)
 			@build.build_command_line = "echo Hello Aslak!"
 		end

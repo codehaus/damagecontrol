@@ -11,6 +11,7 @@ require 'damagecontrol/TimerTest'
 require 'damagecontrol/LogWriterTest'
 
 require 'damagecontrol/scm/CVSTest'
+require 'damagecontrol/scm/SVNTest'
 
 require 'damagecontrol/publisher/IRCPublisherTest'
 require 'damagecontrol/publisher/WebsitePublisherTest'

@@ -1,5 +1,5 @@
 require 'damagecontrol/BuildEvents'
-require 'damagecontrol/scm/SCM'
+require 'damagecontrol/scm/DefaultSCMRegistry'
 
 module DamageControl
 	
@@ -21,7 +21,7 @@ module DamageControl
 	class BuildExecutor
 		attr_accessor :scm
 				
-		def initialize(hub, scm=NilSCM.new)
+		def initialize(hub, scm=DefaultSCMRegistry.new)
 			@hub = hub
 			@scm = scm
 			hub.add_subscriber(self)
