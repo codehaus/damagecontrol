@@ -1,0 +1,93 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<project name="damagecontrol" default="all" basedir=".">
+	<property file="build.properties"/>
+	<!-- Project name and version info -->
+	<property name="project.name" value="${ant.project.name}"/>
+	<!-- Source directories -->
+	<property name="dir.src.java" value="${basedir}/src/java"/>
+	<property name="dir.src.test" value="${basedir}/src/test"/>
+	<property name="dir.src.lib" value="${basedir}/lib"/>
+	<!-- Destination directories -->
+	<property name="dir.build" value="${basedir}/build"/>
+	<property name="dir.build.classes" value="${dir.build}/classes"/>
+	<property name="dir.build.dist" value="${dir.build}/dist"/>
+	<property name="dir.build.docs" value="${dir.build}/docs"/>
+	<!-- Compiler settings -->
+	<property name="compile.debug" value="on"/>
+	<path id="compile.classpath">
+		<fileset dir="${dir.src.lib}">
+			<include name="*.jar"/>
+		</fileset>
+	</path>
+	<!-- Creates directories -->
+	<target name="init">
+		<tstamp/>
+		<tstamp>
+			<format property="year" pattern="yyyy"/>
+		</tstamp>
+		<tstamp>
+			<format property="month" pattern="MM"/>
+		</tstamp>
+		<tstamp>
+			<format property="day" pattern="dd"/>
+		</tstamp>
+		<mkdir dir="${dir.build.classes}"/>
+		<mkdir dir="${dir.build.dist}"/>
+		<mkdir dir="${dir.build.docs}"/>
+	</target>
+	<!-- Clean up  -->
+	<target name="clean" description="Deletes the build directory.">
+		<delete dir="${dir.build}"/>
+	</target>
+	<!-- Compile, Build jar and javadoc -->
+	<target name="all" depends="clean, jar" description="Compiles, builds jar file and javadoc."/>
+	<!-- Compiles java only -->
+	<target name="compile.java" depends="init" description="Compiles java source files">
+		<javac srcdir="${dir.src.java}" destdir="${dir.build.classes}" debug="${compile.debug}">
+			<classpath refid="compile.classpath"/>
+		</javac>
+	</target>
+	<!-- Compiles tests only -->
+	<target name="compile.tests" depends="init, compile.java" description="Compiles tests">
+		<javac srcdir="${dir.src.test}" destdir="${dir.build.classes}" debug="${compile.debug}">
+			<classpath refid="compile.classpath"/>
+		</javac>
+	</target>
+	<!-- Compile both tests and java -->
+	<target name="compile" depends="compile.java, compile.tests" description="Compiles java and tests"/>
+	<!-- Unit tests -->
+	<target name="test" depends="compile" description="Unit tests">
+		<junit fork="yes" printsummary="on" haltonfailure="true" haltonerror="true">
+			<classpath>
+				<pathelement location="${dir.build.classes}"/>
+				<path refid="compile.classpath"/>
+			</classpath>
+			<batchtest fork="yes">
+				<!-- Do logging test first, since it relies on some statics -->
+				<fileset dir="${dir.build.classes}">
+					<include name="**/LoggingTest.class"/>
+				</fileset>
+				<fileset dir="${dir.build.classes}">
+					<include name="**/*Test.class"/>
+					<exclude name="**/LoggingTest.class"/>
+				</fileset>
+				<formatter type="plain"/>
+			</batchtest>
+		</junit>
+	</target>
+	<!-- Builds the jar file  -->
+	<target name="jar" depends="init, compile, test, buildjar"/>
+	<target name="buildjar" depends="compile">
+		<property name="dist.jar" value="${dir.build.dist}/${project.name}.jar"/>
+		<jar jarfile="${dist.jar}">
+			<fileset dir="${dir.build.classes}" excludes="**/*Test.class"/>
+		</jar>
+	</target>
+	<!-- Builds the javadoc for the project   -->
+	<target name="javadoc" depends="init" description="Builds the javadoc">
+		<javadoc packagenames="*" sourcepath="${dir.src}" destdir="${dir.build.docs}" private="true" author="true" version="true" use="true" failonerror="false" windowtitle="${project.name} API" doctitle="${project.name}">
+			<classpath refid="compile.classpath"/>
+			<link href="http://java.sun.com/products/jdk/1.4/docs/api"/>
+		</javadoc>
+	</target>
+</project>
