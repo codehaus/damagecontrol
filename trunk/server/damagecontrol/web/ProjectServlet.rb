@@ -101,7 +101,7 @@ module DamageControl
           :empty_text => "Never built", 
           :css_class => "pane",
           :selected_build => selected_build,
-          :builds => builds)
+          :builds => build_history)
     end
   
   private
@@ -136,11 +136,14 @@ module DamageControl
     end
     
     def last_build
-      builds[-1]
+      build_history_repository.history(project_name)[-1]
     end
     
-    def builds
-      build_history_repository.history(project_name)
+    def build_history
+      history = build_history_repository.history(project_name)
+      current_build = build_history_repository.current_build(project_name)
+      history.delete_if {|b| b != current_build && !b.completed?}
+      history
     end
     
   end
