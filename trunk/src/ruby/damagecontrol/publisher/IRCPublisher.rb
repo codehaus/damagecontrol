@@ -20,12 +20,15 @@ module DamageControl
       @server = server
       @channel = channel
       @template = template
-      @handle = 'dcontrol'
+      @handle = "dcontrol"
     end
   
     def process_message(event)
+      puts "MESSAGE!!!!!!!!!!!!"
       if event.is_a? BuildCompleteEvent
+        puts "POSTING!!!!!!!!!!!!"
         post_irc_message(event.build)
+        puts "CONSUMING!!!!!!!!!!!!"
       end
     end
 
@@ -39,19 +42,11 @@ module DamageControl
 
   end
 
-
   # Simplification on top of Rica, supports one channel at the same time only
   class IRCConnection < Rica::MessageProcessor
     
-    def on_link_established(msg)
-      @current_server=msg.server
-      @current_channel=nil
-      puts(msg.string("%T %s Link Established"))
-    end
-
-    def on_link_closed(msg)
-      @current_server=nil
-      @current_channel=nil
+    def connect(server, handle)
+      self.open(server,['damagecontrol','DamageControl'], handle)
     end
 
     def join_channel(channel)
@@ -60,10 +55,10 @@ module DamageControl
       end
     end
 
-    def on_recv_cmnd_join(msg)
-      @current_channel=msg.to
+    def send_message_to_channel(message)
+      cmnd_privmsg(@current_server, @current_channel, message)
     end
-    
+  
     def connected?
       !@current_server.nil?
     end
@@ -72,14 +67,22 @@ module DamageControl
       !@current_channel.nil?
     end
     
-    def send_message_to_channel(message)
-      cmnd_privmsg(@current_server, @current_channel, message)
-    end
-  
-    def connect(server, handle)
-      self.open(server,['damagecontrol','DamageControl'], handle)
+    # callbacks
+
+    def on_link_established(msg)
+      @current_server=msg.server
+      @current_channel=nil
     end
 
+    def on_link_closed(msg)
+      @current_server=nil
+      @current_channel=nil
+    end
+
+    def on_recv_cmnd_join(msg)
+      @current_channel=msg.to
+    end
+    
   end
 
 end

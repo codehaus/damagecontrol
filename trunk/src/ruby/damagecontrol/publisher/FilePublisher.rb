@@ -18,27 +18,29 @@ module DamageControl
   
     def process_message(event)
       if event.is_a? BuildCompleteEvent
-        write_file(event.build)
+        filedir = "#{@basedir}/#{event.build.label}"
+        makedirs(filedir)
+
+        filepath = "#{filedir}/#{@template.file_name}"
+        content = @template.generate(event.build)
+        write_to_file(filepath, content)
       end
     end
 
   private
 
     def write_file(build_result)
-      filedir = "#{@basedir}/#{build_result.label}"
-      makedirs(filedir)
 
-      filepath = "#{filedir}/#{@template.file_name}"
-      invoke_template(filepath, build_result)
+      write_to_file(file, content)
     end
 
     def makedirs(dir)
       File.makedirs(dir)
     end
 
-    def invoke_template(filepath, build_result)
-      file = File.new(filepath, "w")
-      file.print(@template.generate(build_result))
+    def write_to_file(filepath, content)
+      File.new(filepath, "w")
+      file.print(content)
       file.close
     end
       

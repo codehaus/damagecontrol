@@ -3,7 +3,7 @@ require 'damagecontrol/BuildEvents'
 require 'damagecontrol/BuildResult'
 require 'damagecontrol/Hub'
 require 'damagecontrol/publisher/FilePublisher'
-require 'damagecontrol/template/MockTemplate'
+require 'damagecontrol/templates/MockTemplate'
 require 'damagecontrol/SocketTrigger'
 require 'ftools'
 
@@ -20,13 +20,13 @@ module DamageControl
         @dir = dir
       end
 
-      def @file_publisher.invoke_template(filepath, build_result)
+      def @file_publisher.write_to_file(filepath, content)
         @filepath = filepath
       end
     end
   
     def test_file_is_written_in_correct_location_upon_build_complete_event
-      @mock_tamplate.expected_to_generate = true
+      @mock_template.expected_to_generate = true
     
       build_result = BuildResult.new
       build_result.label = "123"
@@ -38,11 +38,11 @@ module DamageControl
       
       @file_publisher.process_message(BuildCompleteEvent.new(build_result))
 #      @file_publisher.verify(self)
-      @mock_template.verify
+      @mock_template.verify(self)
     end
     
     def test_nothing_is_written_unless_build_complete_event
-      @mock_tamplate.expected_to_generate = false
+      @mock_template.expected_to_generate = false
       
       def @file_publisher.verify(test)
         test.assert_nil(@dir)
@@ -52,7 +52,7 @@ module DamageControl
       @file_publisher.process_message(SocketRequestEvent.new(nil))
       @file_publisher.verify(self)
 
-      @mock_template.verify
+      @mock_template.verify(self)
     end
     
   end

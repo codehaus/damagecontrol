@@ -1,3 +1,5 @@
+require 'test/unit'
+
 module DamageControl
   class MockTemplate    
 
@@ -20,8 +22,8 @@ DamageControl
       "trash.txt"
     end
 
-    def verify
-      assert_equal(@did_generate, expected_to_generate)
+    def verify(test)
+      test.assert_equal(expected_to_generate, @did_generate)
     end
   end
 end
