@@ -5,13 +5,14 @@ require 'damagecontrol/core/AsyncComponent'
 require 'damagecontrol/core/BuildEvents'
 require 'damagecontrol/util/Logging'
 require 'damagecontrol/util/Timer'
+require 'pebbles/MVCServlet'
 
 module DamageControl
 
   class IRCPublisher < AsyncComponent
 
     include Logging
-    inlude SimpleERB
+    include Pebbles::SimpleERB
   
     attr_reader :channel
     attr_reader :irc_server
