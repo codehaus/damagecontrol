@@ -116,7 +116,7 @@ protected
     if(@project.exists? && @project.checked_out?)
       @sidebar_links << {
         :controller => "files", 
-        :action     => "dir",
+        :action     => "list",
         :id         => @project.name,
         :image      => "/images/24x24/folders.png",
         :name       => "Browse working copy"

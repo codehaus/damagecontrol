@@ -1,0 +1,4 @@
+<H1>WARNING: This is a little quirky.</H1>
+<% @relative_paths.each do |f| %>
+  <%= link_to(f, :controller => "files", :action => "list", :id => @project.name, :params => {"path" => f}) %><br>
+<% end %>
