@@ -14,7 +14,8 @@ class ActionController::Base
   def instantiate_from_hash(clazz, attr_hash)
     object = clazz.new
     attr_hash.each do |attr_name, attr_value|
-      object.instance_variable_set(attr_name, attr_value)
+      setter = attr_name[1..-1] + "="
+      object.__send__(setter.to_sym, attr_value) if object.respond_to?(setter.to_sym)
     end
     object
   end
@@ -55,12 +56,6 @@ protected
     @headers.update(headers);
   end
 
-  # Sets the links to display in the sidebar. Override this method in other controllers
-  # To change what to display.
-  def set_sidebar_links
-
-  end
-  
 end
 
 module ActionView
@@ -112,7 +107,7 @@ module ActionView
         values.find {|v| v.selected?}.name
       end
     end
-
+    
     # Renders a tab pane where each tab contains rendered objects
     def tab_pane(name, array)
       select(array)
@@ -183,6 +178,31 @@ module ActionView
       options[:onmouseout] = "Tooltip.hide()"
 
       tag("img", options)
+    end
+    
+    # Renders a Calendar widget
+    # The view (or layout) must load the jscalendar and dateFormat javascripts
+    # Note that the value is posted back as a ymdHMS string
+    #
+    # * <tt>:name</tt> - The name of the (hidden) field containing the date
+    # * <tt>:time</tt> - The time to initialise the widget with
+    # * <tt>:editable</tt> - Whether or not to make the widget editable
+    def calendar(options)
+      t = options[:time]
+      name = options[:name]
+      js_function = "change" + name.gsub(/:/, '_').gsub(/@/, '_').gsub(/\[/, '_').gsub(/\]/, '_')
+      js_format = "format('%yyyy%%mm%%dd%%hh%%nn%%ss%')"
+      js_date = "new Date(#{t.year}, #{t.month - 1}, #{t.day}, #{t.hour}, #{t.min}, #{t.sec})"
+      <<EOF
+<input type="hidden" id="#{options[:name]}" name="#{options[:name]}" value="">
+<div id="#{options[:name]}_calendar"></div>
+<script type="text/javascript">
+  document.getElementById('#{options[:name]}').value = #{js_date}.#{js_format}
+  function #{js_function}(calendar) {    if (calendar.dateClicked) {      document.getElementById('#{options[:name]}').value = calendar.date.#{js_format};
+    }  };  Calendar.setup(    {      flat         : "#{options[:name]}_calendar", // ID of the parent element      flatCallback : #{js_function},           // our callback function
+      showsTime    : true,
+      date         : #{js_date}    }  );</script>
+EOF
     end
   end
 end

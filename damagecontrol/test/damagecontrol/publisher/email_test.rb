@@ -3,6 +3,7 @@ require 'rscm/mockit'
 require 'rscm/changes'
 require 'damagecontrol/publisher/base'
 require 'damagecontrol/build'
+require 'damagecontrol/project'
 
 module DamageControl
   module Publisher
@@ -10,11 +11,12 @@ module DamageControl
       include MockIt
   
       def test_should_send_email_on_publish
-        BuildMailer.template_root = File.expand_path(File.dirname(__FILE__))
-        publisher = Email.new
-
         project = new_mock
-        project.__expect(:name) { "mooky" }
+        project.__setup(:name) { "mooky" }
+
+        BuildMailer.template_root = File.expand_path(File.dirname(__FILE__))
+        publisher = Email.new(project)
+
         build = new_mock
         build.__expect(:project) { project }
         

@@ -24,7 +24,7 @@ module RSCM
     ann :tip => "This is the relative path from the start of the repository <br>to the end of the URL. For example, if your URL is <br>svn://your.server/path/to/repository/path/within/repository <br>then this value should be path/within/repository."
     attr_accessor :path
 
-    def initialize(url="", path="")
+    def initialize(url="", path="trunk")
       @url, @path = url, path
     end
 

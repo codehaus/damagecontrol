@@ -47,5 +47,7 @@ module RSCM
       assert_equal("tip", Other.zap[:tip])
 
     end
+
+    # TODO: write more tests especially involving sub classes. Seems to be broken.
   end
 end

@@ -6,19 +6,19 @@ module RSCM
     register self
 
     ann :description => "Database file"
-    attr_reader :db_file
+    attr_accessor :db_file
 
     ann :description => "Branch"
-    attr_reader :branch
+    attr_accessor :branch
 
     ann :description => "Key"
-    attr_reader :key
+    attr_accessor :key
 
     ann :description => "Passphrase"
-    attr_reader :passphrase
+    attr_accessor :passphrase
 
     ann :description => "Keys file"
-    attr_reader :keys_file
+    attr_accessor :keys_file
 
     def initialize(db_file="keys", branch="", key="", passphrase="", keys_file="")
       @db_file = File.expand_path(db_file)

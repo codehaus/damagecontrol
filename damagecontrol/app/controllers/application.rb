@@ -39,60 +39,7 @@ class ApplicationController < ActionController::Base
 #    subpaths.collect { |p| link_to_unless_current(p) }.links.join(" ")
   end
 
-  # Instantiates an Array of object from +class_name_2_attr_hash_hash+
-  # which should be a hash where the keys are class names and the values
-  # a Hash containing {attr_name => attr_value} pairs.
-  def instantiate_array_from_hashes(class_name_2_attr_hash_hash)
-    result = []
-    class_name_2_attr_hash_hash.each do |class_name, attr_hash|
-      result << instantiate_from_hash(eval(class_name), attr_hash)
-    end
-    result
-  end
-
-  def instantiate_from_hash(clazz, attr_hash)
-    object = clazz.new
-    attr_hash.each do |attr_name, attr_value|
-      object.instance_variable_set(attr_name, attr_value)
-    end
-    object
-  end
-
-  # Returns an object from a select_pane
-  def selected(name)
-    array = instantiate_array_from_hashes(@params[name])
-    selected = @params["#{name}_selected"]
-    array.find { |o| o.class.name == selected }
-  end
-    
 protected
-
-  # Override so we can get rid of the Content-Disposition
-  # headers by specifying :no_disposition => true in options
-  # This is needed when we want to send big files that are
-  # *not* intended to pop up a save-as dialog in the browser,
-  # such as content to display in iframes (logs and files)
-  def send_file_headers!(options)
-    options.update(DEFAULT_SEND_FILE_OPTIONS.merge(options))
-    [:length, :type, :disposition].each do |arg|
-      raise ArgumentError, ":#{arg} option required" if options[arg].nil?
-    end
-
-    headers = {
-      'Content-Length'            => options[:length],
-      'Content-Type'              => options[:type]
-    }
-    unless(options[:no_disposition])
-      disposition = options[:disposition].dup || 'attachment'
-      disposition <<= %(; filename="#{options[:filename]}") if options[:filename]
-      headers.merge!(
-        'Content-Disposition'       => disposition,
-        'Content-Transfer-Encoding' => 'binary'
-      )
-    end
-        
-    @headers.update(headers);
-  end
 
   # Sets the links to display in the sidebar. Override this method in other controllers
   # To change what to display.

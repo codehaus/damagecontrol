@@ -15,13 +15,13 @@ module DamageControl
       @p.name = "blabla"
     end
     
-    def test_poll_should_get_changesets_from_epoch_if_last_change_time_unknown
-      ENV["DAMAGECONTROL_HOME"] = RSCM.new_temp_dir("epoch")
+    def test_poll_should_get_changesets_from_start_time_if_last_change_time_unknown
+      ENV["DAMAGECONTROL_HOME"] = RSCM.new_temp_dir("start_time")
       @p.scm = new_mock
       changesets = new_mock
       changesets.__expect(:empty?) {true}
       @p.scm.__expect(:changesets) do |checkout_dir, from|
-        assert_equal(Time.epoch, from)
+        assert_equal(@p.start_time, from)
         changesets
       end
       @p.poll do |cs|
@@ -36,16 +36,16 @@ module DamageControl
       @p.scm = new_mock
       @p.scm.__setup(:name) {"mooky"}
       @p.scm.__expect(:changesets) do |checkout_dir, from|
-        assert_equal(Time.epoch, from)
+        assert_equal(@p.start_time, from)
         "foo"
       end
       @p.scm.__expect(:transactional?) {false}
       @p.scm.__expect(:changesets) do |checkout_dir, from|
-        assert_equal(Time.epoch, from)
+        assert_equal(@p.start_time, from)
         "bar"
       end
       @p.scm.__expect(:changesets) do |checkout_dir, from|
-        assert_equal(Time.epoch, from)
+        assert_equal(@p.start_time, from)
         "bar"
       end
       @p.poll do |cs|
@@ -159,6 +159,12 @@ module DamageControl
       p.publishers << publisher_2
 
       p.publish(build)
+    end
+    
+    def test_should_convert_start_time_string_to_time
+      p = Project.new
+      p.start_time = "19710228234533"
+      assert_equal(Time.utc(1971,2,28,23,45,33), p.start_time)
     end
     
     def TODO_test_should_support_template_cloning
