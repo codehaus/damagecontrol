@@ -164,6 +164,11 @@ module RSCM
         end
       end
     end
-  
+
+    def monotone_date(time)
+      return nil unless time
+      time.utc.strftime("%Y-%m-%dT%H:%M:%S")
+    end
+    
   end
 end
