@@ -43,6 +43,7 @@ module DamageControl
     end
     
     def process_payload(payload)
+      puts payload
       build = @build_bootstrapper.create_build(payload)
       @channel.publish_message(BuildRequestEvent.new(build))
     end

@@ -37,7 +37,7 @@ module DamageControl
       create_hub
       @socket_trigger = SocketTrigger.new(hub)
       @project_name = "picocontainer"
-      @socket_triggercm_spec = ":local:/cvsroot/picocontainer:pico"
+      @socket_trigger_scm_spec = ":local:/cvsroot/picocontainer:pico"
       @build_command_line = "echo damagecontrol rocks"
       @nag_email = "damagecontrol@codehaus.org"
     end
@@ -64,19 +64,28 @@ module DamageControl
     end
     
     def test_fires_build_request_on_socket_accept
+      build_yaml = BuildBootstrapper.build_spec(
+              @project_name, \
+              @socket_trigger_scm_spec, \
+              @build_command_line, \
+        @nag_email)
       
-      build = @socket_trigger.process_payload(BuildBootstrapper.build_spec(
-        @project_name, \
-        @socket_triggercm_spec, \
-        @build_command_line, \
-        @nag_email))
+      @socket_trigger.process_payload(build_yaml)
 
       assert_got_message(BuildRequestEvent)
       build = messages_from_hub[0].build
-      assert_equal(@project_name,       build.project_name)
-      assert_equal(@socket_triggercm_spec,           build.scm_spec)
+      assert_equal(@project_name, build.project_name)
+      assert_equal(@socket_trigger_scm_spec, build.scm_spec)
       assert_equal(@build_command_line, build.build_command_line)
       
+    end
+
+    def TODO_FAILS_test_string_starting_with_colon_can_be_yamled
+      map = ["foo" => ":bar:zap"]
+      map_yaml = YAML::dump(map)
+      puts map_yaml
+      yamled_map = YAML::load(map_yaml)
+      assert_equal(map, yamled_map)
     end
   end
   

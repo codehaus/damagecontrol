@@ -1,4 +1,4 @@
-require 'log4r'
+require 'logger'
 
 module DamageControl
   
@@ -6,8 +6,7 @@ module DamageControl
     @@logger = nil
     
     def init_logger
-      @@logger = Log4r::Logger.new "DamageControl"
-      @@logger.outputters = Log4r::Outputter.stdout
+      @@logger = Logger.new(STDOUT)
       
       # redefine accessor to increase performance
       Logging.module_eval <<-EOF
@@ -26,12 +25,12 @@ module DamageControl
     module_function :logger
 
     def quiet
-      logger.level = Log4r::INFO
+      logger.level = Logger::Severity::INFO
     end
     module_function :quiet
     
     def silent
-      logger.level = Log4r::FATAL
+      logger.level = Logger::Severity::FATAL
     end
     module_function :silent
 

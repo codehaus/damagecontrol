@@ -11,11 +11,25 @@ module DamageControl
         if(line.chomp == "...")
           break
         else
+          # Workaround for new Ruby symbol semantics in YAML.
+          # A String that starts with a colon will be converted
+          # to a symbol, which is not what we want.
+          # Therefore, prepend a magic "__" and take it out afterwards.
+          line.gsub!(/:pserver:/, "_pserver:")
+          line.gsub!(/:local:/, "_local:")
+          line.gsub!(/:ext:/, "_ext:")
+
           eof_stripped << line
         end
       }
-      yaml_doc = YAML::load(eof_stripped)
-      Build.new(yaml_doc["project_name"], yaml_doc)
+      map = YAML::load(eof_stripped)
+      map.each{ |key, value|
+        value.gsub!(/_pserver:/, ":pserver:")
+        value.gsub!(/_local:/, ":local:")
+        value.gsub!(/_ext:/, ":ext:")
+      }
+      
+      Build.new(map["project_name"], map)
     end
 
     def BuildBootstrapper.conf_file(project_name)
@@ -37,9 +51,9 @@ module DamageControl
     def BuildBootstrapper.build_spec(project_name, scm_spec, build_command_line, nag_email, path_sep="/")
       {
         "project_name" => project_name,
-       "scm_spec" => scm_spec.gsub('/', path_sep),
-       "build_command_line" => build_command_line,
-       "nag_email" => nag_email
+        "scm_spec" => scm_spec.gsub('/', path_sep),
+        "build_command_line" => build_command_line,
+        "nag_email" => nag_email
       }.to_yaml << "\n...\n"
     end
 end
