@@ -12,16 +12,6 @@
 		border="0" /> <%= project_title %> - <%= build_description(selected_build) %>
 </h1>
 
-<% if(project_config["scm_web_url"]) %>
-  <a href="#{project_config['scm_web_url']}"><img src="largeicons/safe.png"></a>
-  <a href="#{project_config['scm_web_url']}">#{project_config['scm'].name}</a>
-<% end %>
-
-<% if(project_config["tracking"]) %>
-  <a href="#{project_config['tracking'].url}"><img src="largeicons/scroll_information.png"></a>
-  <a href="#{project_config['tracking'].url}">#{project_config['tracking'].name}</a>
-<% end %>
-
 <div style="padding-top: 5px">
 <ul id="foldertab">
     <% reports.each do |report| 

@@ -110,6 +110,28 @@ module DamageControl
           end
 
         end
+        
+        if(project_config["scm_web_url"])
+          result +=
+            [
+              task(:icon => "largeicons/safe.png", :name => project_config["scm"].name, :url => project_config["scm_web_url"]),
+            ]          
+        end
+        
+        if(project_config["tracking"])
+          result +=
+            [
+              task(:icon => "largeicons/scroll_information.png", :name => project_config["tracking"].name, :url => project_config["tracking"].url),
+            ]          
+        end
+
+        if(project_config["home_page"])
+          result +=
+            [
+              task(:icon => "largeicons/home.png", :name => "Home page", :url => project_config["home_page"]),
+            ]          
+        end
+
         result +=
           [
             task(:icon => "largeicons/folders.png", :name => "Working files", :url => "../root/#{project_name}/checkout"),
