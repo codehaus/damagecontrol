@@ -39,13 +39,17 @@ module RSCM
       # test twice - to verify that uptodate? doesn't check out.      
       assert(!scm.uptodate?(checkout_dir, Time.new.utc))
       assert(!scm.uptodate?(checkout_dir, Time.new.utc))
-      files = scm.checkout(checkout_dir) 
+      yielded_files = []
+      files = scm.checkout(checkout_dir) do |file_name|
+        yielded_files << file_name
+      end
 
       assert_equal(4, files.length)
       assert_equal("build.xml", files[0])
       assert_equal("project.xml", files[1])
       assert_equal("src/java/com/thoughtworks/damagecontrolled/Thingy.java", files[2])
       assert_equal("src/test/com/thoughtworks/damagecontrolled/ThingyTestCase.java", files[3])
+      assert_equal(files, yielded_files)
       initial_changesets = scm.changesets(checkout_dir, nil, nil, files)
 
       assert_equal(1, initial_changesets.length)

@@ -108,9 +108,6 @@ public class StarTeam implements RSCM {
         Date from = parseRfc822(fromSpecifier);
         Date to = parseRfc822(toSpecifier);
 
-System.err.println("(java) from: " + from);
-System.err.println("(java) to: " + to);
-
         ChangeSets changeSets = new ChangeSets();
 
         Server server = null;
@@ -242,6 +239,9 @@ System.err.println("(java) to: " + to);
                             String starTeamPath = (String) checkedOutStarTeamFileToFileSystemFiles.remove(fileSystemPath);
                             if(starTeamPath != null) {
                                 checkedOutFiles.add(starTeamPath);
+                                // Print to stdout so it can be intercepted
+                                // by Ruby and yielded.
+                                System.out.println(starTeamPath);
                             }
                         }
                     }

@@ -19,6 +19,13 @@ module RSCM
     end
     module_function :checkout_dir
 
+    # File containing list of files *currently* being
+    # checked out.
+    def checkout_list_file(project_name)
+      "#{project_dir(project_name)}/checkout_list.txt"
+    end
+    module_function :checkout_list_file
+
     def rss_file(project_name)
       "#{project_dir(project_name)}/rss.xml"
     end

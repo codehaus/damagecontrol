@@ -33,13 +33,13 @@ module RSCM
       File.dirname(__FILE__) + "/form.html"
     end
 
-    def changesets(checkout_dir, from_identifier=Time.epoch, to_identifier=Time.infinity, files=nil)
+    def changesets(checkout_dir, from_identifier=Time.epoch, to_identifier=Time.infinity, files=nil, &proc)
       # just assuming it is a Time for now, may support labels later.
       # the java class really wants rfc822 and not rfc2822, but this works ok anyway.
       from = from_identifier.to_rfc2822
       to = to_identifier.to_rfc2822      
 
-      changesets = java("getChangeSets(\"#{from}\";\"#{to}\")")
+      changesets = java("getChangeSets(\"#{from}\";\"#{to}\")", &proc)
       raise "changesets must be of type #{ChangeSets.name} - was #{changesets.class.name}" unless changesets.is_a?(::RSCM::ChangeSets)
 
       # Just a little sanity check
@@ -52,8 +52,8 @@ module RSCM
       changesets
     end
 
-    def checkout(checkout_dir)
-      files = java("checkout(\"#{checkout_dir}\")")
+    def checkout(checkout_dir, &proc)
+      files = java("checkout(\"#{checkout_dir}\")", &proc)
       files
     end
     
@@ -68,7 +68,7 @@ module RSCM
       "java -Djava.library.path=\"#{ENV['RSCM_STARTEAM']}#{File::SEPARATOR}Lib\" -classpath \"#{classpath}\" org.rubyforge.rscm.Main"
     end
 
-    def java(m)
+    def java(m, &proc)
       raise "The RSCM_STARTEAM environment variable must be defined and point to the StarTeam SDK directory" unless ENV['RSCM_STARTEAM']
       raise "The ANT_HOME environment variable must be defined and point to the Ant installation directory" unless ENV['ANT_HOME']
 
@@ -84,17 +84,17 @@ module RSCM
       tf.puts(command)
       tf.close 
       cmdline = "#{cmd} #{tf.path}"
-#puts "------------"
-#puts command
-#puts "------------"
-#puts cmdline
-#puts "------------"
       IO.popen(cmdline) do |io|
-#        io = io.read
-#        puts io
-#        File.open("aslak.yml", "w") {|f| f.puts io}
-#puts "------------"
-        YAML::load(io)
+        yaml_source = io
+        if(block_given?)
+          yaml_source = ""
+          io.each_line do |line|
+            yield line
+            yaml_source << line << "\n"
+          end
+        else
+        end
+        YAML::load(yaml_source)
       end
     end
 

@@ -51,6 +51,10 @@ In progress:
 * Monotone - http://www.venge.net/monotone/
 * Perforce - http://www.perforce.com/
 
+Planned:
+
+Loads! How to add support for a new one is described further down in this file.
+
 == Supported Issue trackers
 
 RSCM can recognise bug/issue numbers (in commit messages) fom a number of popular issue 
@@ -58,15 +62,16 @@ tracking systems. It can also convert a simple textual SCM commit message to inc
 links that can be displayed on web pages, emails and other systems. The built-in RSS generator
 uses this. Currently supported trackers are:
 
-* Bugzilla
-* JIRA
-* RubyForge
-* Scarab
-* SourceForge
+* Bugzilla - http://www.bugzilla.org/
+* JIRA - http://www.atlassian.com/software/jira/
+* RubyForge - http://rubyforge.org/
+* Scarab - http://scarab.tigris.org/
+* SourceForge - http://sourceforge.net/
 
 Planned:
 
-* Trac
+* Trac - http://www.edgewall.com/trac/
+* RT - http://fsck.com/projects/rt/
 
 == SCM web front-ends
 
@@ -102,6 +107,14 @@ Here is an example of how to use RSCM to get a list of changes with Subversion:
 
 = Implementing support for a new SCM
 
+We'd be happy to receive contributions for more SCMs. You can always
+file a JIRA issue and hope for someone to implement it for you, or
+you can do it yourself. The rest of this file should get you started.
+
+N.B. IF YOU START IMPLEMENTING A NEW RSCM PLUGIN, PLEASE SUBMIT YOUR CODE
+TO JIRA AT AN EARLY STAGE (BEFORE IT'S COMPLETE). THIS WAY IT'S EASIER
+FOR EXISTING DEVELOPERS TO PROVIDE TIPS AND HELP UNDERWAY.
+
 Let's write an RSCM implementation for the imaginary SCM called Mooky.
 
 == Writing the API
@@ -116,7 +129,7 @@ help when developing the Mooky class.
 
 Let's start implementing the Mooky class too. Take a look at.
 
- lib/rscm/mooky/mooky.rb
+  lib/rscm/mooky/mooky.rb
 
 Try running Mooky's test:
 
