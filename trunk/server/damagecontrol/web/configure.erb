@@ -231,9 +231,11 @@ function configureAction() {
 </div>
 
 <div id="tracker_tab" style="display:none">
+Issue tracking. By specifying an issue tracker, DamageControl will detect issue numbers/ids in developers' SCM commit messages
+and create links to the issues on the changeset pages. This way people browsing the changesets for a build can easily navigate
+to any issues related to the commits that went into the build.
 <table width="100%">
 <tr>
-  <td>Issue Tracking</td>
   <td>
     <% tracking_configurators.each do |tracking_configurator| %>
       <input 

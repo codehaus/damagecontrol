@@ -306,7 +306,7 @@ module DamageControl
     
     def init_build_scheduler
       component(:log_writer, LogWriter.new(hub, build_history_repository))
-      component(:log_merger, LogMerger.new(hub, project_directories))
+      component(:log_merger, LogMerger.new(hub, build_history_repository))
       component(:artifact_archiver, ArtifactArchiver.new(hub, project_directories))
       component(:build_number_increaser, BuildNumberIncreaser.new(hub, project_config_repository))
       component(:dependent_build_trigger, DependentBuildTrigger.new(hub, project_config_repository))
