@@ -91,14 +91,21 @@ class Project
     execute_ruby("server/damagecontrol/test/AllTests.rb")
   end
 
-  def integration_test
+  def integration_test    
     execute_ruby("server/damagecontrol/test/End2EndTest.rb")
   end
   
   def test
     clean
+    fix_permissions
     unit_test
     integration_test
+  end
+
+  def fix_permissions
+    unless windows?
+      system("chmod a+x bin/*")
+    end
   end
   
   def existing_file(file)
