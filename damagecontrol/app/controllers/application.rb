@@ -11,7 +11,7 @@ require 'rails_ext'
 
 class ApplicationController < ActionController::Base
 
-  layout 'rscm'
+  layout 'default'
 
   def initialize
     @sidebar_links = [
@@ -29,11 +29,6 @@ class ApplicationController < ActionController::Base
   def load_project
     project_name = @params["id"]
     @project = DamageControl::Project.load(project_name)
-  end
-
-  def breadcrumbs
-    subpaths = @request.path.split(/\//)
-#    subpaths.collect { |p| link_to_unless_current(p) }.links.join(" ")
   end
 
 protected

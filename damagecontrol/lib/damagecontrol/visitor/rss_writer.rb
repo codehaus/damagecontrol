@@ -19,7 +19,7 @@ module DamageControl
         @rss.channel.title = @title
         @rss.channel.link = @link
         @rss.channel.description = @description
-        @rss.channel.generator = "RSCM - Ruby Source Control Management"
+        @rss.channel.generator = "DamageControl"
       end
 
       def visit_changeset(changeset)

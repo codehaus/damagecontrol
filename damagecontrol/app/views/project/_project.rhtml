@@ -25,11 +25,6 @@ var project_start_time_tip = "<div class='tp1'>Date from which changesets will b
   <td><%= text_or_input(@edit, :name => "DamageControl::Project[@build_command]", :value => project.build_command) %></td>
 </tr>
 <tr>
-  <td>Project description</td>
-  <td><%= tip(:txt => 'project_description_tip') %></td>
-  <td><%= text_or_input(@edit, :name => "DamageControl::Project[@description]", :value => project.description) %></td>
-</tr>
-<tr>
   <td>Project home page</td>
   <td><%= tip(:txt => 'project_home_page_tip') %></td>
   <td><%= text_or_input(@edit, :name => "DamageControl::Project[@home_page]", :value => project.home_page) %></td>

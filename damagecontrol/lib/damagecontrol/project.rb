@@ -19,7 +19,6 @@ module DamageControl
     DEFAULT_QUIET_PERIOD = 10 unless defined? DEFAULT_QUIET_PERIOD
 
     attr_accessor :name
-    attr_accessor :description
     attr_accessor :home_page
     attr_accessor :start_time
 

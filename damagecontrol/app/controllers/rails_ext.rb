@@ -87,6 +87,10 @@ module ActionView
   class Base
     include Inflector
 
+    def breadcrumbs
+      link_to_unless_current("Dashboard", :controller => "project", :action => "index")
+    end
+
     # Renders plain text (if +input+ is true) or a text field if not.
     def text_or_input(input, options)
       if(input)
