@@ -116,18 +116,16 @@ module RSCM
       changesets.add(@change2)
       changesets.add(@change3)
 
-      jira = Tracker::JIRA.new
-      jira.jira_url = "http://jira.codehaus.org/"
-
-      view_cvs = SCMWeb::ViewCVS.new
-      view_cvs.view_cvs_url = "http://cvs.damagecontrol.codehaus.org/"
-
+      # TODO: we should compare this with an expected XML
+      # or perhaps better: use mocks to expect the correct methods to be called
+      # on the rss maker (pass it in as optional last arg)
       puts changesets.to_rss(
         "DamageControl Changesets", 
         "http://damagecontrol.codehaus.org/", 
         "This feed contains SCM changes for the DamageControl project", 
-        jira, 
-        view_cvs)
+        Tracker::JIRA.new("http://jira.codehaus.org/", "DC"), 
+        SCMWeb::ViewCVS.new("http://cvs.damagecontrol.codehaus.org/")
+      )
     end
 
   end

@@ -10,16 +10,11 @@ module RSCM
     include LabelTest
 
     def create_scm(repository_root_dir, path)
-      svn = SVN.new
-      svn.svnurl = PathConverter.filepath_to_nativeurl("#{repository_root_dir}/#{path}")
-      svn.svnpath = path
-      svn
+      SVN.new(PathConverter.filepath_to_nativeurl("#{repository_root_dir}/#{path}"), path)
     end
 
     def test_repourl
-      svn = SVN.new
-      svn.svnurl = "svn+ssh://mooky/bazooka/baluba"
-      svn.svnpath = "bazooka/baluba"
+      svn = SVN.new("svn+ssh://mooky/bazooka/baluba", "bazooka/baluba")
       assert_equal("svn+ssh://mooky", svn.repourl)
 
       svn.svnpath = nil

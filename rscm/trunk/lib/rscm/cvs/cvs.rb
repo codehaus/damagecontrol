@@ -286,11 +286,7 @@ module RSCM
     end
 
     def create_cvsroot_cvs
-      cvs = CVS.new
-      cvs.cvsroot = self.cvsroot
-      cvs.cvsmodule = "CVSROOT"
-      cvs.cvspassword = self.cvspassword
-      cvs
+      CVS.new(self.cvsroot, "CVSROOT", nil, self.cvspassword)
     end
 
     def to_option(to_identifier)
@@ -340,10 +336,7 @@ module RSCM
 
   # Convenience factory method used in testing
   def CVS.local(cvsroot_dir, cvsmodule)
-    cvs = CVS.new
     cvsroot_dir = RSCM::PathConverter.filepath_to_nativepath(cvsroot_dir, true)
-    cvs.cvsroot = ":local:#{cvsroot_dir}"
-    cvs.cvsmodule = cvsmodule
-    cvs
+    CVS.new(":local:#{cvsroot_dir}", cvsmodule)
   end
 end

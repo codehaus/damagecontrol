@@ -6,7 +6,7 @@ module RSCM
     class Bugzilla
       attr_accessor :bugzilla_url
 
-      def initialize(bugzilla_url=nil)
+      def initialize(bugzilla_url)
         @bugzilla_url = bugzilla_url
       end
 
@@ -28,7 +28,7 @@ module RSCM
       attr_accessor :jira_url
       attr_accessor :jira_project_id
 
-      def initialize(jira_url=nil, jira_project_id=nil)
+      def initialize(jira_url, jira_project_id)
         @jira_url, @jira_project_id = jira_url, jira_project_id
       end
 
@@ -50,6 +50,10 @@ module RSCM
       attr_accessor :rf_group_id
       attr_accessor :rf_tracker_id
 
+      def initialize(rf_group_id, rf_tracker_id)
+        @rf_group_id, @rf_tracker_id = rf_group_id, rf_tracker_id
+      end
+
       def url
         "http://rubyforge.org/tracker/?group_id=#{rf_group_id}"
       end
@@ -63,6 +67,10 @@ module RSCM
       attr_accessor :sf_group_id
       attr_accessor :sf_tracker_id
 
+      def initialize(sf_group_id, sf_tracker_id)
+        @sf_group_id, @sf_tracker_id = sf_group_id, sf_tracker_id
+      end
+
       def url
         "http://sourceforge.net/tracker/?group_id=#{sf_group_id}"
       end
@@ -75,6 +83,10 @@ module RSCM
     class Scarab
       attr_accessor :scarab_url
       attr_accessor :scarab_module_key
+
+      def initialize(scarab_url, scarab_module_key)
+        @scarab_url, @scarab_module_key = scarab_url, scarab_module_key
+      end
 
       def url
         scarab_url

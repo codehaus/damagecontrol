@@ -18,7 +18,7 @@ module RSCM
     attr_accessor :svnurl
     attr_accessor :svnpath
 
-    def initialize(svnurl=nil, svnpath=nil)
+    def initialize(svnurl, svnpath="")
       @svnurl, @svnpath = svnurl, svnpath
     end
 

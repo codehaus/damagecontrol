@@ -13,8 +13,7 @@ module RSCM
       end
 
       def test_view_cvs
-        view_cvs = ViewCVS.new
-        view_cvs.view_cvs_url = "http://cvs.damagecontrol.codehaus.org/"
+        view_cvs = ViewCVS.new("http://cvs.damagecontrol.codehaus.org/")
 
         assert_equal("http://cvs.damagecontrol.codehaus.org/path/one?rev=2.4&r=2.4", view_cvs.change_url(@change))
       end
