@@ -15,6 +15,7 @@ module DamageControl
       create_hub
       @build_executor = BuildExecutor.new(hub, File.expand_path("#{damagecontrol_home}/testdata"))
       @build = Build.new("damagecontrolled", {"build_command_line" => "echo Hello world from DamageControl!"})
+      @quiet_period = 10
     end
   
     def test_executes_process_and_sends_build_complete_on_build_request
@@ -41,7 +42,7 @@ module DamageControl
     end
 
     def build_request_at_time(time)
-      build = Build.new
+      build = Build.new("project", { "quiet_period" => "#{@quiet_period}" })
       build.timestamp = 0
       hub.publish_message(BuildRequestEvent.new(build))
     end
@@ -54,9 +55,7 @@ module DamageControl
       def @build_executor.execute
         # stub it
       end
-      quiet_period = 10
       @build_executor.clock = FakeClock.new
-      @build_executor.quiet_period = quiet_period
 
       @build_executor.clock.change_time(0)
       build_request_at_time(0)
@@ -64,7 +63,7 @@ module DamageControl
       @build_executor.force_tick
       assert_message_types([BuildRequestEvent])
       
-      @build_executor.clock.advance(quiet_period)
+      @build_executor.clock.advance(@quiet_period)
       assert(@build_executor.quiet_period_elapsed)
       @build_executor.force_tick
       assert_message_types([BuildRequestEvent, BuildCompleteEvent])

@@ -15,22 +15,18 @@ module DamageControl
     attr_reader :current_build
     attr_reader :builds_dir
     attr_writer :checkout
-    attr_accessor :quiet_period
+    attr_accessor :default_quiet_period
     
     attr_accessor :last_build_request
 
-    def initialize(channel, builds_dir, scm = DefaultSCMRegistry.new, quiet_period=default_quiet_period)
+    def initialize(channel, builds_dir, scm = DefaultSCMRegistry.new)
       @channel = channel
       channel.add_subscriber(self)
       @builds_dir = builds_dir
       @scm = scm
       @filesystem = FileSystem.new
       @checkout = true
-      @quiet_period = quiet_period
-    end
-    
-    def default_quiet_period
-      0
+      @default_quiet_period = 0
     end
     
     def checkout
@@ -66,6 +62,10 @@ module DamageControl
     
     def quiet_period_elapsed
       !last_build_request.nil? && (clock.current_time - quiet_period) >= last_build_request
+    end
+    
+    def quiet_period
+      @current_build.quiet_period || default_quiet_period
     end
     
     def tick(time)

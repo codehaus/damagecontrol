@@ -20,7 +20,7 @@ module DamageControl
     # <year><month><day><hour><min><sec>
     # Always in timezone UTC
     attr_accessor :timestamp
-
+    
     attr_accessor :config
     attr_accessor :modification_set
     attr_accessor :label
@@ -63,6 +63,10 @@ module DamageControl
 
     def build_command_line
       config["build_command_line"]
+    end
+
+    def quiet_period
+      if config["quiet_period"].nil? then nil else config["quiet_period"].to_i end
     end
   end
 end
