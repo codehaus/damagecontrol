@@ -78,18 +78,17 @@ module DamageControl
       scm_spec = to_os_path(scm_spec)
       directory = to_os_path(File.expand_path(directory))
       if(checked_out?(directory, scm_spec))
-        File.makedirs(directory)
+        File.makedirs(directory) unless File.exists?(directory)
         Dir.chdir(directory)
         cvs(update_command(scm_spec), &proc)
       else
-        File.makedirs(directory + "/..")
-        Dir.chdir(directory + "/..")
+        topdir = to_os_path(File.expand_path(directory + "/.."))
+        File.makedirs(topdir) unless File.exists?(topdir)
+        Dir.chdir(topdir)
         cvs(checkout_command(scm_spec, directory), &proc)
         # Now just move the directory. Fix for http://jira.codehaus.org/secure/ViewIssue.jspa?key=DC-44
         mod_directory = to_os_path(File.expand_path(mod(scm_spec)))
-
-        moved = File.move(mod_directory, directory)
-puts "#{moved} MOVINNG #{mod_directory} --> #{directory}"
+        File.move(mod_directory, directory)
       end
     end
 
