@@ -18,7 +18,7 @@ module DamageControl
                 task(:icon => "icons/package_new.png", :name => "Create repository", :url => "configure?project_name=#{project_name}&action=create_scm")
               ]
           end
-          if(scm.can_install_trigger? && !scm.trigger_installed?(project_name))
+          if(scm.can_install_trigger?)
             result +=
               [
                 task(:icon => "icons/gear_connection.png", :name => "Install trigger", :url => "install_trigger?project_name=#{project_name}"),
@@ -42,7 +42,7 @@ module DamageControl
       action = "store_configuration"
       next_build_number = 1
       dependent_projects = from_array(project_config['dependent_projects'])
-      logs_to_archive = from_array(project_config['logs_to_archive'])
+      logs_to_merge = from_array(project_config['logs_to_merge'])
       project_name = ""
       render("configure.erb", binding)
     end
@@ -51,7 +51,7 @@ module DamageControl
       action = "store_configuration"
       next_build_number = project_config_repository.peek_next_build_number(project_name)
       dependent_projects = from_array(project_config['dependent_projects'])
-      logs_to_archive = from_array(project_config['logs_to_archive'])
+      logs_to_merge = from_array(project_config['logs_to_merge'])
       render("configure.erb", binding)
     end
         
@@ -70,7 +70,7 @@ module DamageControl
         end
       end
       project_config['dependent_projects'] = to_array(request.query['dependent_projects'])
-      project_config['logs_to_archive'] = to_array(request.query['logs_to_archive'])
+      project_config['logs_to_merge'] = to_array(request.query['logs_to_merge'])
       scm_configurators(project_config).each do |scm_configurator|
         scm_configurator.store_configuration_from_request(request)
       end

@@ -33,7 +33,8 @@ module DamageControl
         "cvsroot", 
         "cvsmodule", 
         "cvspassword", 
-        "cvs_web_url"
+        "cvs_web_url",
+        "rsh_client"
       ]
     end
   end

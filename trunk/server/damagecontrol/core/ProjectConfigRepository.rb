@@ -83,6 +83,7 @@ module DamageControl
       build.scm = create_scm(project_name)
       build.potential_label = peek_next_build_number(project_name).to_s
       build.log_file = "#{log_dir(project_name)}/#{build.timestamp_as_s}.log"
+      build.xml_log_file = "#{log_dir(project_name)}/#{build.timestamp_as_s}.xml"
       build.archive_dir = @project_directories.archive_dir(project_name, build.timestamp_as_s)
       build
     end

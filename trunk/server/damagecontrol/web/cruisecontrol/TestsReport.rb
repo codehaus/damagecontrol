@@ -5,7 +5,7 @@ require 'damagecontrol/util/XMLMerger'
 module DamageControl
   class XSLTReport < Report
     def available?
-      selected_build.archive_dir && File.exists?(selected_build.archive_dir) && !xml_files.empty?
+      selected_build.xml_log_file && File.exists?(selected_build.xml_log_file)
     end
     
     def content
@@ -24,47 +24,17 @@ module DamageControl
         File.expand_path("#{template_dir}/#{name}")
       end
       
-      def xml_files
-        Dir["#{selected_build.archive_dir}/*.xml"]
-      end
-      
-      def merged_file
-        "#{selected_build.archive_dir}.xml"
-      end
-      
-      def is_out_of_date?(output, inputs)
-        return true unless File.exists?(output)
-        newest_input = inputs.collect{|f| File.mtime(f)}.max
-        newest_input > File.mtime(output)
-      end 
-      
-      def if_out_of_date(output, inputs)
-        yield if is_out_of_date?(output, inputs)
-      end
-      
-      def create_merged_file
-        if_out_of_date(merged_file, xml_files) do
-          XMLMerger.open("damagecontrol", File.open(merged_file, "w+")) do |m|
-            xml_files.each do |file|
-              File.open(file) do |xml_io|
-                m.merge(xml_io)
-              end
-            end
+      def xslt(stylesheet_file)
+        result = ""
+        cmd_with_io(Dir.pwd, "xsltproc #{stylesheet_file} #{selected_build.xml_log_file}") do |io|
+          io.each_line do |line|
+            #puts line
+            result += line
           end
         end
-    end
-    
-    def xslt(stylesheet_file)
-      create_merged_file
-      result = ""
-      cmd_with_io(Dir.pwd, "xsltproc #{stylesheet_file} #{merged_file}") do |io|
-        io.each_line do |line|
-          #puts line
-          result += line
-        end
+        result
       end
-      result
-    end
+      
   end
   
   class CruiseControlReport < XSLTReport

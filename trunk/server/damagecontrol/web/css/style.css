@@ -156,13 +156,23 @@ pre.console {
   overflow: auto;
 }
 
+.setting-name {
+}
+
+.setting-input {
+  width: 100%;
+}
+
+.setting-description {
+  font-size: 0.8em;
+  margin-top: 0;
+  padding-top: 0;
+}
+
 .scm_info {
   width: 480px;
 }
 
-.config_cell {
-  width: 160px;
-}
 .build-row {
   padding: 3px 4px 3px 4px;
 }

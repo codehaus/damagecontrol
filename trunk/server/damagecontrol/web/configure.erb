@@ -33,10 +33,10 @@ function showScm(scm) {
 // --></script>
 
 <form>
-<table>
+<table width="100%">
 <tr>
-  <td class="config_cell">Project name</td>
-  <td><input class="scm_info" name="project_name" type="text" value="<%= project_name %>"/></td>
+  <td class="setting-name">Project name</td>
+  <td width="75%"><input class="setting-input" name="project_name" type="text" value="<%= project_name %>"/></td>
 </tr>
 <tr>
   <% 
@@ -45,30 +45,45 @@ function showScm(scm) {
     # it will also add " " around the string so it is not needed in the actual html
     build_command_line_attrib_value = project_config['build_command_line'] ? project_config['build_command_line'].inspect : "\"\""
   %>
-  <td>Build command</td>
-  <td><input class="scm_info" name="build_command_line" type="text" value=<%= build_command_line_attrib_value %>/></td>
+  <td class="setting-name">Build command</td>
+  <td><input class="setting-input" name="build_command_line" type="text" value=<%= build_command_line_attrib_value %>/></td>
 </tr>
 <tr>
 </tr>
 <tr>
-  <td>Nag email</td>
-  <td><input class="scm_info" name="nag_email" id="nag_email" type="text" value="<%= project_config['nag_email'] %>"/></td>
+  <td class="setting-name">Nag email</td>
+  <td><input class="setting-input" name="nag_email" id="nag_email" type="text" value="<%= project_config['nag_email'] %>"/></td>
 </tr>
 <tr>
-  <td>JIRA url</td>
-  <td><input class="scm_info" name="jira_url" id="jira_url" type="text" value="<%= project_config['jira_url'] %>"/></td>
+  <td class="setting-name">JIRA url</td>
+  <td><input class="setting-input" name="jira_url" id="jira_url" type="text" value="<%= project_config['jira_url'] %>"/></td>
 </tr>
 <tr>
-  <td>Next build number</td>
-  <td><input class="scm_info" name="next_build_number" id="next_build_number" type="text" value="<%= next_build_number %>"/></td>
+  <td class="setting-name">Next build number</td>
+  <td><input class="setting-input" name="next_build_number" id="next_build_number" type="text" value="<%= next_build_number %>"/></td>
 </tr>
 <tr>
-  <td>Child builds (will be trigged on success)</td>
-  <td><input class="scm_info" name="dependent_projects" id="dependent_projects" type="text" value="<%= dependent_projects %>"/></td>
+  <td class="setting-name">Child builds</td>
+  <td><input class="setting-input" name="dependent_projects" id="dependent_projects" type="text" value="<%= dependent_projects %>"/></td>
 </tr>
 <tr>
-  <td>Log-files to archive (are archived after build, can contain wildcards)</td>
-  <td><input class="scm_info" name="logs_to_archive" id="logs_to_archive" type="text" value="<%= logs_to_archive %>"/></td>
+  <td>&nbsp;</td>
+  <td class="setting-description">
+    Comma separated list of child projects, builds of these projects will be trigged after successful build of this project.
+    See <a href="http://damagecontrol.codehaus.org/Build+dependencies">Build dependencies</a>
+  </td>
+</tr>
+<tr>
+  <td class="setting-name">Log-files to merge</td>
+  <td><input class="setting-input" name="logs_to_merge" id="logs_to_archive" type="text" value="<%= logs_to_merge %>"/></td>
+</tr>
+<tr>
+  <td>&nbsp;</td>
+  <td class="setting-description">
+    Merged into one log file, reports work on the content of this log-file. Can contain wildcards anywhere.
+    For example: To see JUnit tests from Maven specify <tt>target/test-reports/*.xml</tt>, for multiple Maven modules <tt>*/target/test-reports/*.xml</tt>.
+    See <a href="http://damagecontrol.codehaus.org/Viewing+build+results+from+build+tools">Viewing build results from build tools</a>
+  </td>
 </tr>
 <tr>
   <td>Source control</td>

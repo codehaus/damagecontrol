@@ -18,6 +18,7 @@ module DamageControl
       @cvsroot = config_map["cvsroot"] || required_config_param("cvsroot", config_map)
       @mod = config_map["cvsmodule"] || required_config_param("cvsmodule", config_map)
       @password = config_map["cvspassword"]
+      @rsh_client = config_map['rsh_client']
     end
     
     def changesets(from_time, to_time)
@@ -177,8 +178,10 @@ module DamageControl
     def cvs(dir, cmd, &proc)
       cmd_with_password = "cvs -q -d'#{cvsroot}' #{cmd}"
       cmd_without_password = "cvs -q -d'#{cvsroot('********')}' #{cmd}"
+      env = {}
+      env["CVS_RSH"] = @rsh_client if @rsh_client && @rsh_client != ""
       if block_given? then yield "#{cmd_without_password}\n" else logger.debug("#{cmd_without_password}\n") end
-      cmd_with_io(dir, cmd_with_password) do |io|
+      cmd_with_io(dir, cmd_with_password, env) do |io|
         io.each_line do |progress|
           if block_given? then yield progress else logger.debug(progress) end
         end

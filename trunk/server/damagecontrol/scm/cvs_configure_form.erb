@@ -1,19 +1,19 @@
 <img src="http://www.wincvs.org/cvs.png"/>
-<table>
+<table width="100%">
   <tr>
-    <td class="config_cell">CVSROOT</td>
+    <td class="setting-name">CVSROOT</td>
     <% 
       # Hackish/Neat trick:
       # the inspect will convert backslashes to double backslashes and do all sorts of nice things
       # it will also add " " around the string so it is not needed in the actual html
       cvsroot_attrib_value = project_config['cvsroot'] ? project_config['cvsroot'].inspect : "\"\""
     %>
-    <td><input class="scm_info" name="cvsroot" id="cvsroot" onKeyUp="distributeCvsrootFields()" type="text" value=<%=  cvsroot_attrib_value %>></td>
+    <td width="75%"><input class="setting-input" name="cvsroot" id="cvsroot" onKeyUp="distributeCvsrootFields()" type="text" value=<%=  cvsroot_attrib_value %>></td>
   </tr>
   <tr>
     <td>Protocol</td>
     <td>
-      <select class="scm_info" id="cvsprotocol" onchange="updateCvsRootField()">
+      <select class="setting-input" id="cvsprotocol" onchange="updateCvsRootField()">
         <option value=""></option>
         <option value="ext" selected>Secure shell (:ext:)</option>
         <option value="pserver">Password server (:pserver:)</option>
@@ -23,42 +23,53 @@
   </tr>
   <tr>
     <td>User name</td>
-    <td><input class="scm_info" id="cvsuser" onKeyUp="updateCvsRootField()" type="text"></td>
+    <td><input class="setting-input" id="cvsuser" onKeyUp="updateCvsRootField()" type="text"></td>
   </tr>
   <tr>
     <td>Password</td>
-    <td><input class="scm_info" name="cvspassword" id="cvspassword" value="<%= project_config['cvspassword'] %>" type="password"></td>
+    <td><input class="setting-input" name="cvspassword" id="cvspassword" value="<%= project_config['cvspassword'] %>" type="password"></td>
+  </tr>
+  <tr>
+    <td>&nbsp;</td>
+    <td class="setting-description">
+      <b>Warning!</b> Password will be shown in cleartext in configuration files.
+    </td>
   </tr>
   <tr>
     <td>Server</td>
-    <td><input class="scm_info" id="cvsserver" onKeyUp="updateCvsRootField()" type="text"></td>
+    <td><input class="setting-input" id="cvsserver" onKeyUp="updateCvsRootField()" type="text"></td>
   </tr>
   <tr>
     <td>Port</td>
-    <td><input class="scm_info" id="cvsport" onKeyUp="updateCvsRootField()" type="text"></td>
+    <td><input class="setting-input" id="cvsport" onKeyUp="updateCvsRootField()" type="text"></td>
   </tr>
   <tr>
     <td>Repository directory</td>
-    <td><input class="scm_info" id="cvsrepodir" onKeyUp="updateCvsRootField()" type="text"></td>
+    <td><input class="setting-input" id="cvsrepodir" onKeyUp="updateCvsRootField()" type="text"></td>
+  </tr>
+  <tr>
+    <td>&nbsp;</td>
+    <td class="setting-description">
+      <b>For CVS NT users:</b> Please ensure that there are no backslashes for the path to the repository as the Cygwin build of the CVS client which 
+      DamageControl by default uses does not recognize that as a valid path spec (no Unix builds of the CVS client recognizes 
+      backslashes).
+    </td>
   </tr>
   <tr>
     <td>Module</td>
-    <td><input class="scm_info" name="cvsmodule" id="cvsmodule" type="text" value="<%= project_config['cvsmodule'] %>"></td>
+    <td><input class="setting-input" name="cvsmodule" id="cvsmodule" type="text" value="<%= project_config['cvsmodule'] %>"></td>
   </tr>
   <tr>
     <td>ViewCVS/Fisheye base URL</td>
-    <td><input class="scm_info" name="cvs_web_url" id="cvs_web_url" type="text" value="<%= project_config['cvs_web_url'] %>"></td>
+    <td><input class="setting-input" name="cvs_web_url" id="cvs_web_url" type="text" value="<%= project_config['cvs_web_url'] %>"></td>
+  </tr>
+  <tr>
+    <td class="setting-name">RSH client</td>
+    <td><input class="setting-input" name="rsh_client" id="cvs_web_url" type="text" value="<%= project_config['rsh_client'] %>"></td>
+  </tr>
+  <tr>
+    <td>&nbsp;</td>
+    <td class="setting-description">For example <tt>ssh</tt> or <tt>plink.exe</tt></td>
   </tr>
 </table>
 
-<h4>Warning!</h4>
-<p>
-Password will be shown in cleartext in configuration files.
-</p>
-
-<h4>For CVS NT users:</h4>
-<p>
-Please ensure that there are no backslashes for the path to the repository as the Cygwin build of the CVS client which 
-DamageControl by default uses does not recognize that as a valid path spec (no Unix builds of the CVS client recognizes 
-backslashes).
-</p>
