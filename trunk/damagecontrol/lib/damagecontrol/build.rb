@@ -51,13 +51,13 @@ module DamageControl
       raise "ChangeSet's project can't be nil" if @changeset.project.nil?
       raise "ChangeSet's dir can't be nil" if @changeset.dir.nil?
 
-      dir = File.expand_path("#{@changeset.dir}/builds/#{identifier}")
-      @stdout_file = "#{dir}/stdout.log"
-      @stderr_file = "#{dir}/stderr.log"
+      @dir = File.expand_path("#{@changeset.dir}/builds/#{identifier}")
+      @stdout_file = "#{@dir}/stdout.log"
+      @stderr_file = "#{@dir}/stderr.log"
 
-      @exit_code_file = "#{dir}/exit_code"
-      @pid_file = "#{dir}/pid"
-      @command_file ="#{dir}/command"
+      @exit_code_file = "#{@dir}/exit_code"
+      @pid_file = "#{@dir}/pid"
+      @command_file ="#{@dir}/command"
     end
 
     # Our unique id within the changeset
@@ -74,11 +74,11 @@ module DamageControl
 
       Log.debug "Executing build. Command file: #{@command_file}"
       raise BuildException.new("This build has already been executed and cannot be re-executed. It was executed with '#{File.open(@command_file).read}'") if File.exist?(@command_file)
-      FileUtils.mkdir_p(File.dirname(@command_file))
+      FileUtils.mkdir_p(@dir) unless File.exist?(@dir)
       File.open(@command_file, "w") do |io|
         io.write(command)
       end
-      command_line = "#{command} > #{@stdout_file} 2> #{@stderr_file}"
+      command_line = "#{command} > \"#{@stdout_file}\" 2> \"#{@stderr_file}\""
 
       begin
         with_working_dir(execute_dir) do
