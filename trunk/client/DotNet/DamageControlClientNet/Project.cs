@@ -57,8 +57,10 @@ namespace ThoughtWorks.DamageControl.DamageControlClientNet
 
 		public Project()
 		{
+		    //Console.WriteLine("new Project");
 			this.installationurl = "http://192.168.0.2/";
 			this.pollinginterval = 10000;
+			this.projectname = "";
 			this.thread = new Thread(new ThreadStart(DoPolling));
 			thread.Start();
 			thread.Suspend();
@@ -80,10 +82,18 @@ namespace ThoughtWorks.DamageControl.DamageControlClientNet
 		#region polling control
 		public void StartPolling() 
 		{
-
+		    Console.WriteLine("Starting polling on project " + this.projectname);
 			if ((pollinginterval > 0)&&(!thread.IsAlive)) 
 			{
 				this.thread.Resume();
+			}
+			else
+			{
+			     //this.thread.Start();
+			     if (thread.IsAlive)
+			         Console.WriteLine("Thread is still alive");
+			     if (pollinginterval <= 0)
+			         Console.WriteLine("Interval is too short");
 			}
 		}
 
@@ -174,9 +184,13 @@ namespace ThoughtWorks.DamageControl.DamageControlClientNet
 			}
 			set 
 			{
-				thread.Suspend();
+			    bool wasalive = false;
+			    if (thread.IsAlive) {
+			         wasalive = true;
+			         thread.Suspend();
+			    }
 				this.pollinginterval = value;
-				if (pollinginterval>0)
+				if ((pollinginterval>0)&&(wasalive))
 				{
 					thread.Resume();
 				}
@@ -234,6 +248,7 @@ namespace ThoughtWorks.DamageControl.DamageControlClientNet
 		#region polling
 		private void Poll()
 		{
+		    Console.WriteLine("Polling on project " + this.projectname);
 			try
 			{
 				ProjectStatus latestProjectStatus = GetRemoteProjectStatus();
@@ -277,6 +292,7 @@ namespace ThoughtWorks.DamageControl.DamageControlClientNet
 		#region damagecontrol communication
 		Hashtable CallDamageControlServer(string methodName)
 		{
+		    UpdateCredentials();
 			XmlRpcRequest client = new XmlRpcRequest();
 			client.MethodName = methodName;
 			client.Params.Add(this.projectname);
@@ -292,7 +308,8 @@ namespace ThoughtWorks.DamageControl.DamageControlClientNet
 			{
 				throw new Exception(string.Format("Project '{0}' does not exist", this.projectname));
 			}
-			Hashtable ret = response.Value as Hashtable;
+
+						Hashtable ret = response.Value as Hashtable;
 			if (ret == null)
 			{
 				throw new Exception("XMLRPC connection not compatible");
@@ -407,7 +424,7 @@ namespace ThoughtWorks.DamageControl.DamageControlClientNet
 				if (response.IsFault)
 				{
 					//ShowError(response.FaultString);
-					return response.FaultString;
+					return "Cannot ping, " + response.FaultString;
 				}
 				
 				// trying a simple echo
@@ -417,11 +434,11 @@ namespace ThoughtWorks.DamageControl.DamageControlClientNet
 				response = client.Send(url);
 				if (response.IsFault) 
 				{
-					return response.FaultString;
+					return "Cannot echo: " + response.FaultString;
 				}
 				if ((string) response.Value != "This is a test from DamageControl Monitor") 
 				{
-					return "XMLRPC connection is not compatible";
+					return "Cannot echo: XMLRPC connection is not compatible";
 				}
 				
 				// checking whether that project exists
@@ -431,18 +448,18 @@ namespace ThoughtWorks.DamageControl.DamageControlClientNet
 				response = client.Send(url);
 				if (response.IsFault) 
 				{
-					return response.FaultString;
+					return "Cannot get status: " + response.FaultString;
 				}
 				if (response.Value == null)
 				{
-					return string.Format("Project '{0}' does not exist", this.projectname);
+					return string.Format("Cannot get status: Project '{0}' does not exist", this.projectname);
 				}
 				return null;
 			}
 			catch (Exception ex)
 			{
-				System.Diagnostics.Debug.WriteLine(ex.StackTrace);
-				return ex.Message;
+				Console.WriteLine(ex.StackTrace);
+				return "Generic error: " + ex.Message;
 			}
 		}
 	}

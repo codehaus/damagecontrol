@@ -1,5 +1,5 @@
 <Combine fileversion="1.0" name="DamageControlClient" description="">
-  <StartMode startupentry="WindowsTray" single="True">
+  <StartMode startupentry="MonoTray" single="True">
     <Execute entry="WindowsTray" type="None" />
     <Execute entry="DamageControlConsoleMonitor" type="None" />
     <Execute entry="DamageControlClientNet" type="None" />

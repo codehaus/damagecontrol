@@ -13,7 +13,7 @@ clean: Makefile.XmlRpcCs.clean Makefile.DamageControlClientNet.clean Makefile.Wi
 depcheck: Makefile.XmlRpcCs.depcheck Makefile.DamageControlClientNet.depcheck Makefile.WindowsTray.depcheck Makefile.DamageControlConsoleMonitor.depcheck Makefile.MonoTray.depcheck 
 
 run: all
-	cd $(OUTPUTDIR) && mono WindowsTray.exe
+	cd $(OUTPUTDIR) && mono MonoTray.exe
 
 Makefile.XmlRpcCs.%:
 	@cd ./XmlRpcCs && $(MAKE) -f $(subst .$*,,$@) $*

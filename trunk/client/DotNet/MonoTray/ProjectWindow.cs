@@ -1,15 +1,18 @@
 using System;
 using Gtk;
+using GtkSharp;
 using Glade;
+using GLib;
 using ThoughtWorks.DamageControl.DamageControlClientNet;
 
 namespace ThoughtWorks.DamageControl.MonoTray {
 
 	public class ProjectWindow 
 	{
-	
+	   public event EventHandler OnProjectChanged;
+	   
 	   private Project project;
-	   [Widget] Window projectWindow;
+	   [Widget] public Window projectWindow;
 	   [Widget] Button closeProjectButton;
 	   [Widget] Entry projectnameEntry;
 	   [Widget] Entry urlEntry;
@@ -17,6 +20,14 @@ namespace ThoughtWorks.DamageControl.MonoTray {
 	   [Widget] Entry usernameEntry;
 	   [Widget] Entry passwordEntry;
 	   [Widget] SpinButton pollingEntry;
+	   
+	   private void ProjectChanged()
+	   {
+	       if (this.OnProjectChanged!=null) 
+		   {
+		      OnProjectChanged(this.project, new EventArgs());
+		   } 
+	   }
 	   
 	   public ProjectWindow():this(new Project())
 	   {
@@ -35,7 +46,7 @@ namespace ThoughtWorks.DamageControl.MonoTray {
             Glade.XML gxml = new Glade.XML (null, "gui.glade", "projectWindow", null);
             gxml.Autoconnect (this);
             this.project = p;
-            
+            p.StopPolling();
             
             if ((this.project.Projectname==null))
                 this.projectnameEntry.Text = "";
@@ -89,16 +100,20 @@ namespace ThoughtWorks.DamageControl.MonoTray {
 	   private void hideWindow(object source, EventArgs args)
 	   {
 	       this.projectWindow.Hide();
+	       this.project.StartPolling();
+	       ProjectChanged();
 	   }
 	   
 	   private void updateAuthentification(object o, StateChangedArgs s)
 	   {
 	       updateAuthentification();
+	       ProjectChanged();
 	   }
 	   
 	   private void updateAuthentification(object o, EventArgs a)
 	   {
 	       updateAuthentification();
+	       ProjectChanged();
 	   }
 	   
 	   
@@ -132,16 +147,19 @@ namespace ThoughtWorks.DamageControl.MonoTray {
 	   private void updatePolling(object source, EventArgs args)
 	   {
 	       this.project.Interval = (int) this.pollingEntry.Value;
+	       ProjectChanged();
 	   }
 	   
 	   private void updateProjectname(object source, EventArgs args)
 	   {
 	       this.project.Projectname = this.projectnameEntry.Text;
+	       ProjectChanged();
 	   }
 	   
 	   private void updateUrl(object source, EventArgs args)
 	   {
 	       this.project.InstallationUrl = this.urlEntry.Text;
+	       ProjectChanged();
 	   }
 	   
 	   public void Show()
