@@ -1,0 +1,242 @@
+require 'rubygems'
+require 'rake'
+require 'rake/testtask'
+
+require 'server/damagecontrol/Version'
+
+$VERBOSE = nil
+
+DC_BUILD_NUMBER = ENV['DAMAGECONTROL_BUILD_LABEL'] || ENV['build'] || ENV['build_number'] || DamageControl::BUILD
+DC_RELEASE_NAME = DamageControl::RELEASE
+DC_VERSION = "#{DC_RELEASE_NAME}-#{DC_BUILD_NUMBER}"
+DC_DIST_NAME = "damagecontrol-#{DC_VERSION}"
+DC_TARGET_DIR = ENV['target_dir'] || "target"
+DC_DIST_DIR = ENV['dist_dir'] || "#{DC_TARGET_DIR}/dist"
+
+RUBY_HOME = ENV['ruby_home']
+CVS_EXECUTABLE = ENV['cvs_executable']
+
+def windows
+  require 'rbconfig.rb'
+  windows = (not Config::CONFIG["host"].index("mswin32").nil?)
+  if block_given? and windows then
+    yield
+  else
+    return windows
+  end
+end
+
+def not_windows
+  if block_given? and not windows then
+    yield
+  else
+    return (not windows)
+  end
+end
+  
+def shutdown_server(message)
+  require 'xmlrpc/client'
+  client = ::XMLRPC::Client.new2 "http://localhost:4712/private/xmlrpc"
+  #info client.proxy("control").shutdown_with_message_and_time(message, 10) # FIXME log this
+rescue XMLRPC::FaultException => e
+  raise e.faultString
+end
+
+def makensis_executable
+  File.exists? ENV['makensis_executable'] rescue nil or
+  File.exists? '/cygdrive/c/Program Files/NSIS/makensis.exe' or
+  File.exists? 'C:\Program Files\NSIS\makensis.exe' or
+  raise "Could not find makensis.exe\nYou can download it from http://nsis.sf.net"
+end
+
+CLEAN = Rake::FileList["target", "dist"]
+CLEAN.clear_exclude
+
+##
+# Targets
+##
+
+task :default => [ :test ]
+
+desc "Run the tests"
+task :test => [
+  :clean,
+  :fix_permissions,
+  :unit_test,
+  :integration_test
+]
+
+desc "Clean build directories"
+task :clean do
+  CLEAN.each do |fn|
+    rm_r fn rescue nil
+  end
+end
+
+desc "Fix file permissions"
+task :fix_permissions do
+  Dir["bin/*"].each do |file|
+    File.chmod 0755, file
+  end
+end
+
+desc "Run Unit Tests"
+Rake::TestTask.new :unit_test do |t|
+  t.libs << "server"
+  t.pattern = "server/damagecontrol/test/AllTests.rb"
+  t.verbose = true
+end
+
+desc "Run Integration Tests"
+Rake::TestTask.new :integration_test do |t|
+  t.libs << "server"
+  t.pattern = "server/damagecontrol/test/End2EndTest.rb"
+  t.verbose = true
+end
+
+desc "DamageControl Current Build Number"
+task :build_number do puts DC_BUILD_NUMBER end
+
+desc "DamageControl Release Name"
+task :release_name do puts DC_RELEASE_NAME end
+
+desc "DamageControl Version"
+task :version do puts DC_VERSION end
+
+desc "DamageControl Distribution Name"
+task :dist_name do puts dist_name end
+
+desc "DamageControl Target Directory"
+task :target_dir do puts DC_TARGET_DIR end
+
+desc "DamageControl Distribution Directory"
+task :dist_dir do puts DC_DIST_DIR end
+
+desc "Build DamageControl"
+task :dc_build => [
+  :clean, :test, :dist_nodeps, :archive_nodeps, :upload_nodeps, :self_upgrade
+]
+
+desc "Build DamageControl Distribution"
+task :dist => [ :dist_nodeps ]
+
+desc "Build DamageControl Distribution Without Dependencies"
+task :dist_nodeps do
+    mkdir_p "#{DC_TARGET_DIR}/#{DC_DIST}"
+    cp "license.txt", DC_DIST_DIR
+    cp "release-notes.txt", DC_DIST_DIR
+    cp_r "bin", "#{DC_DIST_DIR}/bin"
+    cp_r "server", "#{DC_DIST_DIR}/server"
+    generate_version_info
+end
+
+desc "Generate Version Information"
+task :generate_version_info do
+  require 'server/damagecontrol/Version'
+  File.open "#{DC_DIST_DIR}/server/damagecontrol/Version.rb", 'w' do |fp|
+    fp.puts %{module DamageControl
+  PRODUCT_NAME = "#{DamageControl::PRODUCT_NAME}"
+  BUILD_NUMBER = "#{DC_BUILD_NUMBER}"
+  RELEASE = "#{DC_RELEASE_NAME}"
+  VERSION = "\#{RELEASE}-\#{BUILD_NUMBER}"
+  
+  VERSION_TEXT = "\#{PRODUCT_NAME} version \#{VERSION}"
+end
+}
+  end
+end
+
+desc "Run the DamageControl Server"
+task :run_server do
+  ruby "-Iserver server/damagecontrol/DamageControlServer.rb"
+end
+
+desc "Build an Archive"
+task :archive => [ :dist, :archive_nodeps ]
+
+desc "Build an Archive Without Dependencies"
+task :archive_nodeps do
+  mkdir_p "target/archive"
+  cp_r DC_DIST_DIR, "target/archive" # FIXME -a? not in my cp(1)
+  mv "target/archive/dist", "target/archive/dist_name"
+  begin
+    sh "tar cf target/damagecontrol-#{DC_VERSION}.tar"
+    sh "gzip target/damagecontrol-#{DC_VERSION}.tar"
+  rescue
+    raise "Could not execute tar or gzip.\nIf you're on Windows install this: http://unxutils.sourceforge.net/"
+  end
+end
+
+desc "Upload Archive"
+task :upload => [ :upload_nodeps ] # FIXME make dependent upon archive
+
+desc "Upload Archive Without Dependencies"
+task :upload_nodeps do
+  sh "scp target/DamageControl-#{DC_VERSION}.exe", :noop => true
+  sh "scp target/damagecontrol-#{DC_VERSION}.tar.gz", :noop => true
+end
+
+desc "Upgrade DamageControl"
+task :self_upgrade do
+  not_windows do
+    home =    "/home/services/dcontrol"
+    old =     "#{home}/damagecontrol.old"
+    current = "#{home}/damagecontrol"
+    new =     "#{home}/damagecontrol.new"
+
+    mkdir_p new
+    cp_r "#{DC_DIST_DIR}/*", new # FIXME -a? not in my cp(1)
+    rm_rf old
+    mv current, old
+    mv new, current
+  end
+
+  shutdown_server "DamageControl is restarting (self upgrade" rescue nil # FIXME log failure
+end
+
+desc "Location of makensis.exe"
+task :makensis_executable do
+  puts makensis_executable
+end
+
+desc "Build Installer from Local Build"
+task :installer_from_local_build => [ :dist_nodeps, :installer_nodeps ]
+
+desc "Build Installer from Codehaus Build"
+task :installer_from_codehaus_build do
+  dist_file = "#{DC_DIST_NAME}.tar.gz"
+  unless File.exists? "#{DC_TARGET_DIR}/#{dist_file}" then
+    mkdir_p DC_TARGET_DIR unless File.exists? DC_TARGET_DIR
+    Dir.chdir DC_TARGET_DIR do
+      sh "wget http://dist.codehaus.org/damagecontrol/distributions/#{dist_file}"
+    end
+  end
+
+  sh "tar xzvf #{DC_TARGET_DIR}/#{dist_file}"
+  sh "mv #{DC_DIST_NAME} #{DC_DIST_DIR}"
+end
+
+desc "Build Installer Without Dependencies"
+task :installer_nodeps do
+  raise "ruby_home undefined" if RUBY_HOME.nil? or RUBY_HOME.empty?
+  raise "cvs_executable undefined" if CVS_EXECUTABLE.nil? or CVS_EXECUTABLE.empty?
+
+  sh "#{makensis_executable} /DVERSION=#{DC_VERSION} /DSVN_BIN=xx /DCVS_EXECUTABLE=#{CVS_EXECUTABLE} /DRUBY_HOME=#{RUBY_HOME} installer/windows/nsis/DamageControl.nsi"
+end
+
+desc "Upload Release from Local Build"
+task :upload_release_from_local => [
+  :clean,
+#  :test,
+  :installer_from_local_build,
+  :upload_nodeps
+]
+
+desc "Upload Release from Codehaus Build"
+task :upload_release_from_codehaus => [
+  :clean,
+#  :test,
+  :installer_from_codehaus_build,
+  :upload_nodeps
+]
+
