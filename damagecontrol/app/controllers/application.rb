@@ -18,7 +18,7 @@ class ApplicationController < ActionController::Base
   layout 'default'
   before_filter :init_sidebar_links
 
-  protected
+protected
 
   def init_sidebar_links
     @sidebar_links = [

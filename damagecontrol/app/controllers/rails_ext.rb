@@ -103,6 +103,8 @@ module ActionView
       if(input)
         options[:class] = "setting-input" unless options[:class]
         tag("input", options)
+      elsif(:type == "password")
+        "********"
       elsif(options[:value] =~ /^http?:\/\//)
         content_tag("a", options[:value], "href" => options[:value] ? options[:value] : "")
       else
