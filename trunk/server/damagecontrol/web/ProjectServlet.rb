@@ -140,7 +140,11 @@ module DamageControl
     end
     
     def search_form
-      project_search_form(:project_name => project_name)
+      if project_name
+        project_search_form(:project_name => project_name)
+      else
+        super
+      end
     end
     
     def quote_message(message)
