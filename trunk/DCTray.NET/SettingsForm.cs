@@ -695,7 +695,7 @@ namespace ThoughtWorks.DamageControl.DCTray
 
 				// checking whether that project exists
 				client = new XmlRpcRequest();
-				client.MethodName = "status.get_current_build";
+				client.MethodName = "status.current_build";
 				client.Params.Add(txtProjectName.Text);
 				response = client.Send(txtServerUrl.Text);
 				if (response.IsFault) 

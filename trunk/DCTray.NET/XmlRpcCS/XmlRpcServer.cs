@@ -1,21 +1,18 @@
+using System;
+using System.Collections;
+using System.IO;
+using System.Net;
+using System.Net.Sockets;
+using System.Threading;
+
 namespace Nwc.XmlRpc
 {
-  using System;
-  using System.Collections;
-  using System.IO;
-  using System.Net;
-  using System.Net.Sockets;
-  using System.Text;
-  using System.Threading;
-  using System.Xml;
-
-  /// <summary>A restricted HTTP server for use with XML-RPC.</summary>
+	/// <summary>A restricted HTTP server for use with XML-RPC.</summary>
   /// <remarks>It only handles POST requests, and only POSTs representing XML-RPC calls.
   /// In addition to dispatching requests it also provides a registry for request handlers. 
   /// </remarks>
 public class XmlRpcServer : IEnumerable
   {
-    const int RESPONDER_COUNT = 10;
     private TcpListener _myListener;
     private int _port;
     private IPAddress _address;

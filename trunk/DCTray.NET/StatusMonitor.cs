@@ -1,8 +1,8 @@
 using System;
-using System.ComponentModel;
-using System.Runtime.Remoting;
-using System.Windows.Forms;
 using System.Collections;
+using System.ComponentModel;
+using System.Diagnostics;
+using System.Windows.Forms;
 using Nwc.XmlRpc;
 
 namespace ThoughtWorks.DamageControl.DCTray
@@ -30,14 +30,14 @@ namespace ThoughtWorks.DamageControl.DCTray
 		Timer pollTimer;
 		IContainer components;
 
-		ProjectStatus _currentProjectStatus = new ProjectStatus("unknown", BuildStatus.Unknown, BuildStatus.Unknown, "http://damagecontrol.codehaus.org", DateTime.MinValue, "unknown");
+		ProjectStatus _currentProjectStatus = new ProjectStatus("unknown", BuildStatus.Unknown, BuildStatus.Unknown, "http://damagecontrol.codehaus.org", DateTime.MinValue, 0);
 		Settings _settings;
 
 		#endregion
 
 		#region Constructors
 
-		public StatusMonitor(System.ComponentModel.IContainer container)
+		public StatusMonitor(IContainer container)
 		{
 			container.Add(this);
 			InitializeComponent();
@@ -232,14 +232,14 @@ namespace ThoughtWorks.DamageControl.DCTray
 		
 		ProjectStatus GetRemoteProjectStatus(string projectName)
 		{
-			Hashtable buildStatusRaw = CallDamageControlServer("status.get_last_completed_build", projectName);
+			Hashtable buildStatusRaw = CallDamageControlServer("status.last_completed_build", projectName);
 			DumpHashtable("last", buildStatusRaw);
 			BuildStatus buildStatus = ToBuildStatus((string) buildStatusRaw["status"]);
-			string label = (string) buildStatusRaw["label"];
+			int label = (int) buildStatusRaw["label"];
 			string url = (string) buildStatusRaw["url"];
 			DateTime lastBuildDate = TimestampToDate((string) buildStatusRaw["timestamp"]);
 
-			Hashtable currentBuildStatusRaw = CallDamageControlServer("status.get_current_build", projectName);
+			Hashtable currentBuildStatusRaw = CallDamageControlServer("status.current_build", projectName);
 			DumpHashtable("current", currentBuildStatusRaw);
 			BuildStatus currentBuildStatus = ToBuildStatus((string) currentBuildStatusRaw["status"]);
 
@@ -254,25 +254,25 @@ namespace ThoughtWorks.DamageControl.DCTray
 			}
 			catch (Exception e)
 			{
-				System.Diagnostics.Debug.WriteLine("could not parse date '" + timestamp + "': " + e);
+				Debug.WriteLine("could not parse date '" + timestamp + "': " + e);
 				return DateTime.Today;
 			}
 		}
 
 		void DumpHashtable(string name, Hashtable table)
 		{
-			System.Diagnostics.Debug.WriteLine("============== " + name);
+			Debug.WriteLine("============== " + name);
 			foreach(Object key in table.Keys) 
 			{
-				System.Diagnostics.Debug.WriteLine(string.Format("{0} = {1}", key, table[key]));
+				Debug.WriteLine(string.Format("{0} = {1}", key, table[key]));
 			}
-			System.Diagnostics.Debug.WriteLine("");
+			Debug.WriteLine("");
 		}
 
 		Hashtable CallDamageControlServer(string methodName, string projectName)
 		{
 			XmlRpcRequest client = new XmlRpcRequest();
-			client.MethodName = "status.get_current_build";
+			client.MethodName = "status.last_completed_build";
 			client.Params.Add(projectName);
 			XmlRpcResponse response = client.Send(Settings.RemoteServerUrl);
 			if (response.IsFault) 
