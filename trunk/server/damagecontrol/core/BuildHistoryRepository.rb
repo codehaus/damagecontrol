@@ -21,6 +21,10 @@ module DamageControl
           file = File.new(expanded)
           @builds = YAML::load(file.read)
           file.close
+
+          if(!@builds.is_a?(Hash))
+            raise "#{expanded} should be the YAML representation of a Ruby Hash!"
+          end
         end
         @filename = expanded
       end
