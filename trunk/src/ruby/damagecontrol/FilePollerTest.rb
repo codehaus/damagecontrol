@@ -11,7 +11,6 @@ module DamageControl
     include FileUtils
 
     def setup
-      fail
       @dir = File.expand_path("#{damagecontrol_home}/target/polltest/FilePoller#{Time.now.to_i}")
       File.makedirs(@dir)
       
