@@ -19,6 +19,9 @@ module Pebbles
     def initialize(cmd, stderr_file=nil, env={}, timeout=nil)
       @cmd, @stderr_file, @env, @timeout = cmd, stderr_file, env, timeout
       @cmd2 = stderr_file ? "#{@cmd} 2> \"#{@stderr_file}\"" : @cmd
+      
+      niceness = ENV['DC_NICE']
+      @cmd2 = "nice --adjustment=#{niceness} #{@cmd2}" if niceness
     end
     
     def execute(&proc)
