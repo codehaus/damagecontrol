@@ -5,7 +5,6 @@ require 'damagecontrol/scm/Changes'
 require 'damagecontrol/core/Hub'
 require 'damagecontrol/core/Build'
 require 'damagecontrol/util/FileUtils'
-require 'damagecontrol/template/ShortTextTemplate'
 
 module DamageControl
 
