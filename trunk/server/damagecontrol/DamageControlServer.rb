@@ -118,7 +118,7 @@ module DamageControl
       # For public unauthenticated XML-RPC connections like getting status
       httpd.mount("/public/xmlrpc", public_xmlrpc_servlet)
       
-      httpd.mount("/public/dashboard", DashboardServlet.new(build_history_repository, project_config_repository, :public))
+      httpd.mount("/public/dashboard", DashboardServlet.new(build_history_repository, project_config_repository, build_scheduler, :public))
       httpd.mount("/public/project", ProjectServlet.new(build_history_repository, nil, nil, :public))
       
       httpd.mount("/public/images", WEBrick::HTTPServlet::FileHandler, "#{webdir}/images")
@@ -132,7 +132,7 @@ module DamageControl
       # For private authenticated and encrypted (with eg an Apache proxy) XML-RPC connections like triggering a build
       httpd.mount("/private/xmlrpc", private_xmlrpc_servlet)
 
-      httpd.mount("/private/dashboard", DashboardServlet.new(build_history_repository, project_config_repository, :private))
+      httpd.mount("/private/dashboard", DashboardServlet.new(build_history_repository, project_config_repository, build_scheduler, :private))
       httpd.mount("/private/project", ProjectServlet.new(build_history_repository, project_config_repository, trigger, :private))
       
       httpd.mount("/private/images", WEBrick::HTTPServlet::FileHandler, "#{webdir}/images")
@@ -148,13 +148,13 @@ module DamageControl
     end
     
     def init_build_scheduler
-      component(:scheduler, BuildScheduler.new(hub))
+      component(:build_scheduler, BuildScheduler.new(hub))
       init_build_executors
     end
     
     def init_build_executors
       # Only use one build executor (don't allow parallel builds)
-      scheduler.add_executor(BuildExecutor.new(hub, build_history_repository, project_directories))
+      build_scheduler.add_executor(BuildExecutor.new(hub, build_history_repository, project_directories))
     end
     
     def init_custom_components

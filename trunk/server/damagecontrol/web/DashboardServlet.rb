@@ -2,10 +2,11 @@ require 'damagecontrol/web/AbstractAdminServlet'
 
 module DamageControl  
   class DashboardServlet < AbstractAdminServlet
-    def initialize(build_history_repository, project_config_repository, type)
+    def initialize(build_history_repository, project_config_repository, build_scheduler, type)
       super(type)
       @build_history_repository = build_history_repository
       @project_config_repository = project_config_repository
+      @build_scheduler = build_scheduler
     end
     
     def templatedir
@@ -33,6 +34,7 @@ module DamageControl
     
     attr_reader :build_history_repository
     attr_reader :project_config_repository
+    attr_reader :build_scheduler
     
   end
 end

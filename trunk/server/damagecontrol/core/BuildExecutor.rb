@@ -26,8 +26,12 @@ module DamageControl
       @build_history = build_history
     end
     
+    def checkout?
+      !current_build.scm_spec.nil? && current_build.scm_spec != ""
+    end
+    
     def checkout
-      return if current_build.scm_spec.nil? || current_build.scm_spec == ""
+      return unless checkout?
       
       current_build.status = Build::CHECKING_OUT
       
@@ -71,10 +75,6 @@ module DamageControl
       @project_directories.checkout_dir(current_build.project_name)
     end
     
-    def checkout?
-      !current_build.scm_spec.nil?
-    end
-    
     def scheduled_build
       if busy? then @scheduled_build_slot.get else nil end
     end
@@ -93,7 +93,7 @@ module DamageControl
     
     def build_started
       current_build.start_time = Time.now.to_i
-      determine_changeset
+      determine_changeset if checkout?
       @channel.publish_message(BuildStartedEvent.new(current_build))
     end
     
