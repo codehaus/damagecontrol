@@ -9,10 +9,10 @@ module DamageControl
   # infinite loop script as in damagecontrol/src/samples/codehaus
   class SelfUpgrader < AsyncComponent
     def process_message(message)
-@hub.publish_message("MESSAGE TYPE:" + UserMessage.new(message.class.name))
+channel.publish_message("MESSAGE TYPE:" + UserMessage.new(message.class.name))
       if message.is_a? BuildCompleteEvent
-@hub.publish_message(UserMessage.new(message.build.status))
-@hub.publish_message(UserMessage.new(message.build.project_name))
+channel.publish_message(UserMessage.new(message.build.status))
+channel.publish_message(UserMessage.new(message.build.project_name))
         if((Build::SUCCESSFUL == message.build.status) && message.build.project_name == "damagecontrol")
           do_exit
         end
@@ -20,7 +20,7 @@ module DamageControl
     end
     
     def do_exit
-      @hub.publish_message(UserMessage.new("SHUTTING DOWN FOR SELF UPGRADE"))
+      channel.publish_message(UserMessage.new("SHUTTING DOWN FOR SELF UPGRADE"))
       # let the publishers get a chance to publish before we die
       sleep(5)
       exit
