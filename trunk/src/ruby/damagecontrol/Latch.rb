@@ -7,8 +7,12 @@ module DamageControl
 			@mutex = Mutex.new
 			@cv = ConditionVariable.new
 		end
+    
+    def closed?
+      @closed
+    end
 		
-		def wait ()
+		def wait
 			if @closed
 				@mutex.synchronize {
 					Thread.pass # technically this shouldn't be here, but sporadic deadlocks show up otherwise
@@ -19,10 +23,10 @@ module DamageControl
 			end
 		end
 		
-		def release ()
+		def release
 			@closed = false
 			@mutex.synchronize {
-				@cv.broadcast()
+				@cv.broadcast
 			}
 		end
 	end

@@ -3,6 +3,7 @@ require 'ftools'
 require 'damagecontrol/Build'
 require 'damagecontrol/SocketTrigger'
 require 'damagecontrol/BuildExecutor'
+require 'damagecontrol/BuildScheduler'
 require 'damagecontrol/Hub'
 require 'damagecontrol/FileUtils'
 require 'damagecontrol/scm/SCM'
@@ -82,9 +83,8 @@ class End2EndTest < Test::Unit::TestCase
 	
 	def start_damagecontrol
     if(@@damagecontrol_started == false) then
-      @hub = Hub.new
-      SocketTrigger.new(@hub).start
-      BuildExecutor.new(@hub, buildsdir).start
+      load("#{damagecontrol_home}/src/samples/simple.rb")
+      start_simple_server(buildsdir)
       @@damagecontrol_started = true
     end
 	end

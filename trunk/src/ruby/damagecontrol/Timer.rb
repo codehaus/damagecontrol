@@ -2,18 +2,17 @@ require 'damagecontrol/Clock'
 
 module DamageControl
 
-	module TimerMixin
-		attr_accessor :interval
-		attr_accessor :next_tick
-		attr_reader :error
-		attr_reader :stopped
-		attr_accessor :clock
-	
-		def clock
-			@clock = Clock.new if @clock == nil
-			@clock
-		end
-    
+  module Threading
+    def new_thread
+			Thread.new do
+        puts "starting #{self}"
+        
+        yield
+
+        puts "stopping #{self}"
+			end
+    end
+
     def protect
       begin
         yield
@@ -26,19 +25,31 @@ module DamageControl
       end
     end
 		
-		def start
-			Thread.new {
-        puts "starting #{self}"
+  end
 
+	module TimerMixin
+		attr_accessor :interval
+		attr_accessor :next_tick
+		attr_reader :error
+		attr_reader :stopped
+		attr_accessor :clock
+    
+    include Threading
+	
+		def clock
+			@clock = Clock.new if @clock == nil
+			@clock
+		end
+    
+		def start
+       new_thread do
         protect { first_tick(clock.current_time) }
         time = clock.current_time
         while (!stopped && next_tick > time)
           sleep( (next_tick - time)/1000 )
           protect { force_tick }
         end
-
-        puts "stopping #{self}"
-			}
+      end
 		end
 		
 		def interval

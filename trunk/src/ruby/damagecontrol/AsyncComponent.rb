@@ -21,13 +21,10 @@ module DamageControl
     
     def process_messages
       # process copy of array so that process_message can remove entries via consume
-      @inq.clone.each do |message| 
-        begin
+      @inq.clone.each do |message|
+        protect do
           process_message(message)
           consume_message(message)
-        rescue => detail
-          puts "error processing message #{message}: " + $!
-          print detail.backtrace.join("\n")
         end
       end
     end

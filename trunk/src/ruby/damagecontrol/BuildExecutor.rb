@@ -2,6 +2,7 @@ require 'damagecontrol/BuildEvents'
 require 'damagecontrol/AsyncComponent'
 require 'damagecontrol/scm/DefaultSCMRegistry'
 require 'damagecontrol/FileSystem'
+require 'damagecontrol/Slot'
 
 module DamageControl
   
@@ -9,24 +10,22 @@ module DamageControl
   # progress as events back to the channel
   #
   class BuildExecutor
-    
-    include TimerMixin
   
+    include Threading
+    
     attr_reader :current_build
     attr_reader :builds_dir
     attr_writer :checkout
-    attr_accessor :default_quiet_period
     
     attr_accessor :last_build_request
 
-    def initialize(channel, builds_dir, scm = DefaultSCMRegistry.new)
+    def initialize(channel, builds_dir = "builds", scm = DefaultSCMRegistry.new)
       @channel = channel
-      channel.add_subscriber(self)
       @builds_dir = builds_dir
       @scm = scm
       @filesystem = FileSystem.new
       @checkout = true
-      @default_quiet_period = 0
+      @scheduled_build_slot = Slot.new
     end
     
     def checkout
@@ -56,42 +55,49 @@ module DamageControl
       @checkout && !current_build.scm_spec.nil?
     end
     
-    def quiet_period_elapsed
-      !last_build_request.nil? && (clock.current_time - quiet_period) >= last_build_request
+    def scheduled_build
+      if busy? then @scheduled_build_slot.get else nil end
+    end
+  
+    def schedule_build(build)
+      @scheduled_build_slot.set(build)
     end
     
-    def quiet_period
-      @current_build.quiet_period || default_quiet_period
+    def busy?
+      !@scheduled_build_slot.empty?
     end
     
-    def reset_last_build_request
-      @last_build_request = nil
-    end
-    
-    def tick(time)
-        if quiet_period_elapsed
-          reset_last_build_request
-          begin
-            checkout if checkout?
-            execute
-          rescue Exception => e
-            stacktrace = e.backtrace.join("\n")
-            report_progress("Build failed due to: #{stacktrace}")
-            current_build.successful = false
-          end
-          @channel.publish_message(BuildCompleteEvent.new(current_build))
-        end
+    def build_done
+      @channel.publish_message(BuildCompleteEvent.new(current_build))
+      @scheduled_build_slot.clear
     end
 
-    def receive_message(message)
-      if message.is_a? BuildRequestEvent
-        @current_build = message.build
-        @last_build_request = Build.timestamp_to_i(message.build.timestamp)
+    def next_scheduled_build
+      @scheduled_build_slot.get
+    end
+    
+    def process_next_scheduled_build
+      @current_build = next_scheduled_build
+      begin
+        checkout if checkout?
+        execute
+      rescue Exception => e
+        stacktrace = e.backtrace.join("\n")
+        report_progress("Build failed due to: #{stacktrace}")
+        current_build.successful = false
+      ensure
+        build_done
       end
     end
-
-  private
-
+    
+    def start
+      new_thread do
+        while(true)
+          protect { process_next_scheduled_build }
+        end
+      end
+    end
+    
     def report_progress(progress)
       @channel.publish_message(BuildProgressEvent.new(current_build, progress))
     end
