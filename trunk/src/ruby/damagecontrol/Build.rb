@@ -1,7 +1,12 @@
+require 'ftools'
+require 'damagecontrol/FileUtils'
 
 module DamageControl
 
 	class Build
+	
+		include FileUtils
+
 		attr_reader :project_name
 		attr_accessor :website_directory
 		attr_accessor :logs_directory
@@ -12,8 +17,11 @@ module DamageControl
 		attr_accessor :error_message
 		attr_accessor :scm_path
 	
-		def initialize (project_name)
+		def initialize (basedir, project_name, build_command_line)
+			@basedir = basedir
 			@project_name = project_name
+			@build_command_line = build_command_line
+			
 			@website_directory = "website"
 			@logs_directory = "logs"
 		end
@@ -59,12 +67,17 @@ module DamageControl
 		end
 		
 		def build
-			Dir.chdir(basedir) unless basedir.nil?
+			cd_base_dir
 			IO.popen(build_command_line) do |output|
 				output.each_line do |progress|
 					yield progress
 				end
 			end
+		end
+		
+		def cd_base_dir
+			File.makedirs(basedir)
+			Dir.chdir(basedir) unless basedir.nil?
 		end
 		
 		def ==(other)

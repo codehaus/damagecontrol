@@ -16,7 +16,7 @@ module DamageControl
 		end
 
 		def setup
-			build = Build.new("foo")
+			build = Build.new("foo", nil, nil)
 			@fake_clock = FakeClock.new()
 
 			@b = BuildDelayer.new(self)

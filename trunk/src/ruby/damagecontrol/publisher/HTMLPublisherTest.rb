@@ -22,7 +22,7 @@ module DamageControl
 				test.assert_equal(Testfile, @file_name)
 			end
 			
-			build = Build.new("kingsley")
+			build = Build.new(nil, "kingsley", nil)
 			hp.process_message(BuildCompleteEvent.new(build))
 			hp.verify(self)
 		end

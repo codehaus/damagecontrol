@@ -12,7 +12,7 @@ module DamageControl
 		def setup
 			@hub = Hub.new
 			@publisher = WebsitePublisher.new(@hub)
-			@build = Build.new("Bob")
+			@build = Build.new(nil, "Bob", nil)
 			@build.logs_directory = "logs"
 			@build.website_directory = "out"
 			@result = ""

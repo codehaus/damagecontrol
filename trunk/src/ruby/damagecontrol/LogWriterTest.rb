@@ -9,7 +9,7 @@ module DamageControl
 		def setup
 			@hub = Hub.new
 			@writer = LogWriter.new(@hub)
-			@build = Build.new("project")
+			@build = Build.new(nil, "project", nil)
 			@build.logs_directory = "logs"
 			@clock = FakeClock.new
 			@writer.clock = @clock

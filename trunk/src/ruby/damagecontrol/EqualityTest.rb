@@ -6,26 +6,26 @@ module DamageControl
 	class EqualityTest < Test::Unit::TestCase
 		def test_build
 			do_test_same {
-				Build.new("name")
+				Build.new(nil, "name", nil)
 			}
 		end
 		
 		def test_build_complete_event
-			build = Build.new("name")
+			build = Build.new(nil, "name", nil)
 			do_test_equal {
 				BuildCompleteEvent.new(build)
 			}
 		end
 		
 		def test_build_progress_event
-			build = Build.new("name")
+			build = Build.new(nil, "name", nil)
 			do_test_equal {
 				BuildProgressEvent.new(build, "output")
 			}
 		end
 		
 		def test_build_request_event
-			build = Build.new("name")
+			build = Build.new(nil, "name", nil)
 			do_test_equal {
 				BuildProgressEvent.new(build, "output")
 			}

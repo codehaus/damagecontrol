@@ -14,7 +14,7 @@ module DamageControl
 			@dir = "test#{Time.new.to_i}"
 			File.mkpath(@dir)
 			create_hub
-			@log_file = damagecontrol_file("testdata/log20030929145347.xml")
+			@log_file = damagecontrol_file("../testdata/log20030929145347.xml")
 			@ccpoller = CruiseControlLogPoller.new(@hub, @dir)
 		end
 		

@@ -42,7 +42,7 @@ module DamageControl
 				puts "could not parse xml-log-file #{file}: #{$!}"
 			end
 		    
-			build = Build.new(projectname)
+			build = Build.new(nil, projectname, nil)
 			evt = BuildCompleteEvent.new(build)
 			build.label = label
 			build.successful = successful

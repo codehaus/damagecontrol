@@ -13,7 +13,7 @@ module DamageControl
 		def setup
 			create_hub
 			@builder = BuildExecutor.new(hub)
-			@build = Build.new("Aslak")
+			@build = Build.new("Aslak", nil, nil)
 			@build.build_command_line = "echo Hello Aslak!"
 		end
 	

@@ -17,19 +17,12 @@ module DamageControl
 			consume_message(message)
 		end
 
-		private
+	private
 
 		def bootstrap_build(build_spec)
 			command, project_name, scm_path, build_command_line = build_spec.split
 			
-			puts command
-			puts project_name
-			puts scm_path
-			puts "build_command_line #{build_command_line}"
-			
-			build = Build.new(project_name)
-			build.basedir = "#{@basedir}/#{project_name}"
-			build.build_command_line = build_command_line
+			build = Build.new("#{@basedir}/#{project_name}", project_name, build_command_line)
 			build.scm_path = scm_path
 			build
 		end

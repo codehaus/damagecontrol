@@ -13,7 +13,7 @@ module DamageControl
 			@publisher = IRCPublisher.new(Hub.new, "server", "channel")
 			@irc_mock = Mock.new
 			@publisher.irc = @irc_mock
-			@event = BuildCompleteEvent.new(Build.new("project"))
+			@event = BuildCompleteEvent.new(Build.new(nil, "project", nil))
 		end
 		
 		def test_sends_message_on_build_complete_if_connected_and_in_channel

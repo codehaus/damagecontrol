@@ -12,6 +12,8 @@ module DamageControl
 		end
 	end
 	
+	# This class asks the SCM to check out latest, then
+	# executes the build command.
 	#
 	# Consumes: BuildRequestEvent
 	# Emits: BuildProgressEvent, BuildCompleteEvent
@@ -27,7 +29,6 @@ module DamageControl
 		
 		def receive_message(message)
 			if message.is_a? BuildRequestEvent
-				puts "building #{message.build.project_name}"
 				@current_build = message.build
 				scm.checkout(@current_build.scm_path, @current_build.basedir) do |progress|
 					report_progress(progress)
@@ -38,7 +39,9 @@ module DamageControl
 				report_complete
 			end
 		end
-		
+	
+	private
+	
 		def report_complete
 			@hub.publish_message(BuildCompleteEvent.new(@current_build))
 		end
