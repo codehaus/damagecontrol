@@ -26,7 +26,7 @@ module DamageControl
       from_time = from_time + 1
       
       cmd = changes_command(from_time, to_time)
-      if block_given? then yield "#{cvs_cmd_without_password(cmd)}\n" else logger.debug("#{cmd_without_cvspassword}\n") end
+      if block_given? then yield "#{cvs_cmd_without_password(cmd)}\n" else logger.debug("#{cvs_cmd_without_password(cmd)}\n") end
       cmd_with_io(working_dir, cvs_cmd_with_password(cmd, cvspassword), environment) do |stdout|
         parser = CVSLogParser.new(stdout)
         parser.cvspath = path
@@ -269,6 +269,7 @@ module DamageControl
         when cvsroot =~ /^:local:/   then [md[1], nil, nil, md[2]]
         when cvsroot =~ /^:ext:/     then md[1..4]
         when cvsroot =~ /^:pserver:/ then md[1..4]
+        else ["local", nil, nil, cvsroot]
       end
     end
   end
@@ -279,7 +280,7 @@ module DamageControl
 
   class LocalCVS < CVS
     def initialize(basedir, cvsmodule)
-      super
+      super()
       self.cvsroot = ":local:#{basedir}/cvsroot"
       self.cvsmodule = cvsmodule
       self.checkout_dir = "#{basedir}/checkout"
