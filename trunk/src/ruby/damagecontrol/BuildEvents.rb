@@ -34,7 +34,7 @@ module DamageControl
   class BuildCompleteEvent < BuildEvent
   end
 
-  class UserMessage < BuildEvent
+  class UserMessage
     attr_reader :message
     
     def initialize(message)

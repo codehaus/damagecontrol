@@ -9,10 +9,7 @@ module DamageControl
   # infinite loop script as in damagecontrol/src/samples/codehaus
   class SelfUpgrader < AsyncComponent
     def process_message(message)
-channel.publish_message("MESSAGE TYPE :" + message.class.name) unless message.is_a?(UserMessage)
       if message.is_a? BuildCompleteEvent
-channel.publish_message(UserMessage.new(message.build.status))
-channel.publish_message(UserMessage.new(message.build.project_name))
         if((Build::SUCCESSFUL == message.build.status) && message.build.project_name == "damagecontrol")
           do_exit
         end
