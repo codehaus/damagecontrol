@@ -1,6 +1,8 @@
 require 'damagecontrol/DamageControlServer'
 require 'getoptlong'
 
+module DamageControl
+
 def symbol(string)
   if string=="" then return nil end
   if string.is_a? String then string.intern else string end
@@ -115,4 +117,6 @@ class XMLRPCClientTask < Task
     client.proxy(name)
   end
   
+end
+
 end

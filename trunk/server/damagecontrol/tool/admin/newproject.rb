@@ -1,5 +1,6 @@
 require 'damagecontrol/tool/Task'
 
+module DamageControl
 class NewProjectTask < ConfigTask
   commandline_option :projectname
   
@@ -9,6 +10,7 @@ class NewProjectTask < ConfigTask
     # sanity check
     server.project_config_repository.project_config(projectname)
   end
+end
 end
 
 NewProjectTask.new.run
