@@ -364,6 +364,7 @@ module DamageControl
       cvs(checkout_dir, "add #{relative_filename}") unless(existed)
 
       message = existed ? "editing" : "adding"
+
       cvs(checkout_dir, "com -m \"#{message} #{relative_filename}\"")
     end
   end
