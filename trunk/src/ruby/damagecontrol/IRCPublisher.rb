@@ -26,6 +26,11 @@ module DamageControl
 				join_channel
 			end
 	
+			def on_link_closed(msg)
+				@current_server=nil
+				@current_channel=nil
+			end
+
 			def join_channel
 				if(!in_channel?)
 					cmnd_join(@current_server, @channel)
