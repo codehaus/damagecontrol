@@ -36,7 +36,7 @@ module DamageControl
     end
     
     def recipients(build)
-      ["jon_tirsen", "joejoejoewalnes"]
+      ["jon_tirsen", "joejoejoewalnes", "aslak_hellesoy"]
     end
 
     def send_message_to_recipient(recipient, content)
