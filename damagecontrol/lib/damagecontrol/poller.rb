@@ -1,5 +1,6 @@
 require 'rscm/logging'
 require 'rscm/time_ext'
+require 'damagecontrol/project'
 
 module DamageControl
   # Polls all projects in intervals.
@@ -39,7 +40,7 @@ module DamageControl
                 # Get the diff for each change and save them.
                 # They may be turned into HTML on the fly later (quick)
                 Log.info "Getting diffs for #{project.name}"
-                dp = RSCM::Visitor::DiffPersister.new(project.scm, project.name)
+                dp = DamageControl::Visitor::DiffPersister.new(project.scm, project.name)
                 changesets.accept(dp)
                 Log.info "Saved diffs for #{project.name} in #{Time.now.difference_as_text(start)}"
                 start = Time.now
@@ -48,11 +49,11 @@ module DamageControl
                 # (http://www.chadfowler.com/ruby/rss/)
                 # We'll get upto the latest 15 changesets and turn them into RSS.
                 Log.info "Generating RSS for #{project.name}"
-                last_15_changesets = project.changesets_persister.load_upto(changesets_persister.latest_id, 15)
+                last_15_changesets = project.changesets_persister.load_upto(project.changesets_persister.latest_id, 15)
                 RSS::Maker.make("2.0") do |rss|
                   FileUtils.mkdir_p(File.dirname(project.changesets_rss_file))
-                  File.open(changesets_rss_file, "w") do |io|
-                    rss_writer = RSCM::Visitor::RssWriter.new(
+                  File.open(project.changesets_rss_file, "w") do |io|
+                    rss_writer = DamageControl::Visitor::RssWriter.new(
                       rss,
                       "Changesets for #{@name}",
                       "http://localhost:4712/", # TODO point to web version of changeset
@@ -64,6 +65,7 @@ module DamageControl
                     io.write(rss.to_rss)
                   end
                 end
+                Log.info "Done generating RSS for #{project.name} in #{Time.now.difference_as_text(start)}"
               end
             end
           end

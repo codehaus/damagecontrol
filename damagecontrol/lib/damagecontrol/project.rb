@@ -189,7 +189,7 @@ module DamageControl
     end
 
     def changesets_persister
-      RSCM::Visitor::YamlPersister.new(changesets_dir)
+      DamageControl::Visitor::YamlPersister.new(changesets_dir)
     end
 
   private

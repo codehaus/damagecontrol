@@ -3,6 +3,9 @@
 
 require 'rubygems'
 require_gem 'rscm'
+require 'damagecontrol/project'
+require 'damagecontrol/tracker'
+require 'damagecontrol/scm_web'
 
 # Start Drb - this is how we communicate with the daemon.
 DRb.start_service()
@@ -27,7 +30,7 @@ class ApplicationController < ActionController::Base
   # Loads the project specified by the +id+ parameter and places it into the @project variable  
   def load_project
     project_name = @params["id"]
-    @project = RSCM::Project.load(project_name)
+    @project = DamageControl::Project.load(project_name)
   end
 
   def breadcrumbs
