@@ -12,7 +12,9 @@ function showScm(scm) {
 	if(!oldScmDiv) {
 		oldScmDiv = document.getElementById(initialScm)
 	}
-	oldScmDiv.style.display = 'none'
+	if(oldScmDiv) {
+		oldScmDiv.style.display = 'none'
+	}
 	newScmDiv = document.getElementById(scm)
 	newScmDiv.style.display = 'block'
 	oldScmDiv = newScmDiv
