@@ -19,6 +19,7 @@ require 'damagecontrol/xmlrpc/ServerControl'
 require 'damagecontrol/core/HostVerifier'
 require 'damagecontrol/web/ProjectServlet'
 require 'damagecontrol/web/DashboardServlet'
+require 'damagecontrol/web/StatusImageServlet'
 
 module DamageControl
 
@@ -159,6 +160,8 @@ module DamageControl
       httpd.mount("/public/project", ProjectServlet.new(build_history_repository, nil, nil, :public, build_scheduler, @project_directories, nudge_xmlrpc_url))
       
       httpd.mount("/public/images", WEBrick::HTTPServlet::FileHandler, "#{webdir}/images")
+      httpd.mount("/public/images/currentstatus", CurrentStatusImageServlet.new(build_history_repository, build_scheduler))
+      httpd.mount("/public/images/lastcompletedstatus", LastCompletedImageServlet.new(build_history_repository, build_scheduler))
       httpd.mount("/public/css", WEBrick::HTTPServlet::FileHandler, "#{webdir}/css")
     end
     
@@ -173,6 +176,8 @@ module DamageControl
       httpd.mount("/private/project", ProjectServlet.new(build_history_repository, project_config_repository, trigger, :private, build_scheduler, @project_directories, nudge_xmlrpc_url))
       
       httpd.mount("/private/images", WEBrick::HTTPServlet::FileHandler, "#{webdir}/images")
+      httpd.mount("/private/images/currentstatus", CurrentStatusImageServlet.new(build_history_repository, build_scheduler))
+      httpd.mount("/private/images/lastcompletedstatus", LastCompletedImageServlet.new(build_history_repository, build_scheduler))
       httpd.mount("/private/css", WEBrick::HTTPServlet::FileHandler, "#{webdir}/css")
     end
     

@@ -6,12 +6,12 @@
 <table>
   <tr class="dashboard">
     <td class="dashboard">Last completed build</td>
-    <td class="dashboard"><img src="<%= self.status_image(:last_completed_build, project_name) %>"/> <%= last_status %></td>
+    <td class="dashboard"><img src="	images/lastcompletedstatus?project_name=<%= project_name %>"/> <%= last_status %></td>
   </tr>
 <% if(last_completed_build != current_build) %>
   <tr class="dashboard">
     <td class="dashboard">Current build</td>
-    <td class="dashboard"><img src="<%= self.status_image(:current_build, project_name) %>"/> <%= current_status %></td>
+    <td class="dashboard"><img src="images/currentstatus?project_name=<%= project_name %>"/> <%= current_status %></td>
   </tr>
 <% end %>
 </table>

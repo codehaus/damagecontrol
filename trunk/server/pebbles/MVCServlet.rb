@@ -8,6 +8,19 @@ module Pebbles
       self
     end
     
+    def service(req, res)
+      Thread.current["request"] = req
+      Thread.current["response"] = res
+
+      response["Content-Type"] = content_type
+    end
+    
+    protected
+    
+    def required_parameter(parameter)
+      raise WEBrick::HTTPStatus::BadRequest, "parameter required `#{parameter}'."
+    end
+    
     def html_quote(text)
       text.gsub(/</, "&lt;")
     end
@@ -18,6 +31,18 @@ module Pebbles
       response.status = WEBrick::HTTPStatus::Found.code
     end
 
+    def request
+      Thread.current["request"]
+    end
+    
+    def response
+      Thread.current["response"]
+    end
+    
+    def content_type
+      "text/html"
+    end
+    
     def dump_headers
       puts "================ dump_headers"
       puts "request:"
@@ -36,16 +61,17 @@ module Pebbles
     
     include RiteMesh
     
-    def templatedir
-      "."
-    end
-    
-    def get_instance(config, *options)
-      self
-    end
-
-    def content_type
-      "text/html"
+    def service(req, res)
+      super(req, res)
+      
+      action = req.query['action'] || "default_action"
+      
+      begin
+        raise "no such action: #{action}" unless actions.index(action)
+        self.send(action.untaint)
+      rescue Exception => e
+        response.body = "<html><body><pre>" + e.class.name + ": " + e.message + "\n" + e.backtrace.join("\n\t") + "</pre></body></html>" 
+      end
     end
     
     def actions
@@ -57,35 +83,11 @@ module Pebbles
       super(method, *args)
     end
     
-    def service(req, res)
-      Thread.current["request"] = req
-      Thread.current["response"] = res
-
-      action = req.query['action'] || "default_action"
-      
-      response["Content-Type"] = content_type
-      
-      begin
-        raise "no such action: #{action}" unless actions.index(action)
-        self.send(action.untaint)
-      rescue Exception => e
-        response.body = "<html><body><pre>" + e.class.name + ": " + e.message + "\n" + e.backtrace.join("\n\t") + "</pre></body></html>" 
-      end
-    end
-    
     def action_redirect(action_name, params)
       params_enc = params.collect {|key, value| "#{key}=#{value}" }.join("&")
       redirect("#{request.path}?action_name=#{action_name}&#{params_enc}")
     end
         
-    def request
-      Thread.current["request"]
-    end
-    
-    def response
-      Thread.current["response"]
-    end
-    
     def erb(template, binding)
       template = File.new("#{templatedir}/#{template}").read.untaint
       ERB.new(template).result(binding)
@@ -100,6 +102,10 @@ module Pebbles
     end
     
     protected
+    
+    def templatedir
+      "."
+    end
     
     def ritemesh_template
       # disabled by default
