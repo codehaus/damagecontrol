@@ -24,6 +24,10 @@ module DamageControl
     attr_accessor :rsh_client
     attr_accessor :cvs_executable
     
+    def name
+      "CVS"
+    end
+    
     # TODO: refactor. This is ugly!
     def add_or_edit_and_commit_file(checkout_dir, relative_filename, content)
       existed = false
@@ -84,48 +88,11 @@ module DamageControl
       cvs(checkout_dir, commit_command(message), &proc)
     end
 
-    def can_install_trigger?
-      begin
-        exists?
-      rescue
-        false
-      end
-    end
-    
     def changesets(checkout_dir, scm_from_time, scm_to_time, files, &line_proc)
       begin
         parse_log(checkout_dir, new_changes_command(scm_from_time, scm_to_time, files), &line_proc)
       rescue Pebbles::ProcessFailedException => e
         parse_log(checkout_dir, old_changes_command(scm_from_time, scm_to_time, files), &line_proc)
-      end
-    end
-    
-    def new_process(checkout_dir)
-      p = Pebbles::Process.new
-      p.working_dir = checkout_dir
-      p.environment = environment
-      p
-    end
-    
-    def parse_log(checkout_dir, cmd, &proc)
-      if block_given? then yield "#{cvs_cmd_without_password(cmd)}\n" else logger.debug("#{cvs_cmd_without_password(cmd)}\n") end
-      
-      new_process(checkout_dir).execute(cvs_cmd_with_password(cmd, cvspassword)) do |stdin, stdout, stderr|
-        threads = []
-        threads << Thread.new do
-          stderr.each_line do |line|
-            if block_given? then yield line else logger.debug(line) end
-          end
-        end
-        changesets = nil
-        threads << Thread.new do
-          parser = CVSLogParser.new(stdout)
-          parser.cvspath = path
-          parser.cvsmodule = cvsmodule
-          changesets = parser.parse_changesets
-        end
-        threads.each{|t| t.join}
-        changesets
       end
     end
     
@@ -135,11 +102,16 @@ module DamageControl
       cvsroot_cvs = create_cvsroot_cvs
       cvsroot_cvs.checkout(trigger_files_checkout_dir, nil, nil, &line_proc)
       with_working_dir(trigger_files_checkout_dir) do
-        # install trigger command
+        trigger_line = "#{cvsmodule} #{trigger_command}"
         File.open("loginfo", File::WRONLY | File::APPEND) do |file|
-          file.puts("#{cvsmodule} #{trigger_command}")
+          file.puts(trigger_line)
         end
-        system("#{cvs_executable} commit -m \"Installed trigger for CVS module '#{cvsmodule}'\"")
+        begin
+          commit(trigger_files_checkout_dir, "Installed trigger for CVS module '#{cvsmodule}'")
+        rescue
+          raise "Couldn't commit the trigger back to CVS. Try to manually check out CVSROOT/loginfo, " +
+          "add the following line and commit it back:\n\n#{trigger_line}"
+        end
       end
     end
     
@@ -180,7 +152,7 @@ module DamageControl
     def create
       raise "Can't create CVS repository for #{cvsroot}" unless can_create?
       File.mkpath(path)
-      cvs(path, "-d#{cvsroot} init")
+      cvs(path, "init")
     end
     
     def can_create?
@@ -189,6 +161,10 @@ module DamageControl
       rescue
         false
       end
+    end
+
+    def supports_trigger?
+      true
     end
 
     def exists?
@@ -202,26 +178,6 @@ module DamageControl
 
   # NOT PART OF PUBLIC API. EXPOSED JUST TO MAKE TESTING EASIER
   # SHOULD IDEALLY BE MOVED TO protected OR private.
-
-    def trigger_in_string?(loginfo_content, project_name)
-      disable_trigger_from_string(loginfo_content, project_name, Time.new.utc) != loginfo_content
-    end
-    
-    def disable_trigger_from_string(loginfo_content, project_name, date)
-      modified = ""
-      loginfo_content.each_line do |line|
-        # TODO: couldn't find out how to express this with a single regexp.
-        matches = line[0..0] != "#" && line =~ /requestbuild/
-        if(matches)
-          formatted_date = date.strftime("%B %d, %Y")
-          modified << "# Disabled by DamageControl on #{formatted_date}\n"
-          modified << "##{line}"
-        else
-          modified << line
-        end
-      end
-      modified
-    end
     
     def new_changes_command(scm_from_time, scm_to_time, files)
       # https://www.cvshome.org/docs/manual/cvs-1.11.17/cvs_16.html#SEC144
@@ -251,24 +207,38 @@ module DamageControl
       "checkout #{branch_option}#{to_time_option(scm_to_time)} -d #{target_dir} #{cvsmodule}"
     end
     
-    def cvs_cmd_with_password(cmd, password)
-      result = "#{cvs_executable} -q -d'#{cvsroot_with_password(password)}' #{cmd}"
-      result
-    end
-    
-    def cvs_cmd_without_password(cmd)
-      cvs_cmd_with_password(cmd, '********')
-    end
-    
     def environment
       env = {}
       env["CVS_RSH"] = rsh_client if rsh_client && rsh_client != ""
       env
     end
     
+    def cvs(dir, cmd, &line_proc)
+      cmd(dir, cmd, &line_proc)
+    end
+
+    def parse_log(checkout_dir, cmd, &proc)
+      execed_command_line = "cvs -d#{cvsroot_with_password(cvspassword)} #{cmd}"
+      cmd_with_io(checkout_dir, execed_command_line, environment) do |io|
+        parser = CVSLogParser.new(io)
+        parser.cvspath = path
+        parser.cvsmodule = cvsmodule
+        changesets = parser.parse_changesets
+      end
+
+    end
+    
     def cvs(dir, cmd)
-      if block_given? then yield "#{cvs_cmd_without_password(cmd)}\n" else logger.debug("#{cvs_cmd_without_password(cmd)}\n") end
-      cmd_with_io(dir, cvs_cmd_with_password(cmd, cvspassword), environment) do |io|
+      logged_command_line = "cvs -d#{cvsroot_with_password(hidden_password)} #{cmd}"
+      if block_given?
+        yield logged_command_line
+      else 
+        logger.debug(logged_command_line) 
+      end
+
+      execed_command_line = "cvs -d#{cvsroot_with_password(cvspassword)} #{cmd}"
+
+      cmd_with_io(dir, execed_command_line, environment) do |io|
         io.each_line do |progress|
           if block_given? then yield progress else logger.debug(progress) end
         end
@@ -276,6 +246,15 @@ module DamageControl
     end
 
   protected
+
+    def hidden_password
+      if(cvspassword && cvspassword != "")
+        "********"
+      else
+        ""
+      end
+    end
+  
     def period_option(scm_from_time, scm_to_time)
       if(scm_from_time.nil? && scm_to_time.nil?)
         ""
@@ -296,14 +275,18 @@ module DamageControl
     end
         
     def cvsroot_with_password(password)
+      result = nil
       if local?
-        cvsroot
+        result = cvsroot
       elsif password && password != ""
         protocol, user, host, path = parse_cvsroot(cvsroot)
-        ":#{protocol}:#{user}:#{password}@#{host}:#{path}"
+        result = ":#{protocol}:#{user}:#{password}@#{host}:#{path}"
       else
-        cvsroot
+        result = cvsroot
       end
+      
+      # convert backslashes before running in shell
+      result.gsub(/\\/, '\\\\\\\\')
     end
     
   private

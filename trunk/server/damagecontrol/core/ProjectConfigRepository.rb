@@ -73,6 +73,10 @@ module DamageControl
       @project_directories.checkout_dir(project_name)
     end
     
+    def trigger_checkout_dir(project_name)
+      @project_directories.trigger_checkout_dir(project_name)
+    end
+    
     def log_dir(project_name)
       @project_directories.log_dir(project_name)
     end

@@ -53,7 +53,23 @@ module DamageControl
     # If this is the fisrst checkout, null can be returned (to minimise size)
     def checkout(checkout_dir, scm_from_time, scm_to_time, &line_proc)
     end
-        
+
+    def can_create?
+      false
+    end
+
+    def supports_trigger?
+      false
+    end
+    
+    def local?
+      false
+    end
+
+    def name
+      raise "Must be overridden"
+    end
+
     def label(checkout_dir, &line_proc)
     end
     

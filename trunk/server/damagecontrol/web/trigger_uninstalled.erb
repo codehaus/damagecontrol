@@ -1,0 +1,23 @@
+<html>
+<head>
+<title><%= project_name %> trigger uninstallation</title>
+<link type="text/css" rel="stylesheet" href="css/style.css">
+</head>
+<body>
+  <% if error.nil? then %>
+  
+    <p>
+      Trigger was successfully uninstalled from <%= scm.name %>.
+    </p>
+        
+  <% else %>
+  
+    Trigger uninstallation failed.
+    <pre>
+    <%= error.message %>
+    <%= error.backtrace.join("\n") %>
+    </pre>
+    
+  <% end %>
+</body>
+</html>

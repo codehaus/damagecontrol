@@ -9,8 +9,8 @@ module DamageControl
     include FileUtils
     include GenericSCMTests
     
-    def create_scm(repository_dir, path)
-      LocalCVS.new(repository_dir, path)
+    def create_scm(repository_root_dir, path)
+      LocalCVS.new(repository_root_dir, path)
     end
   
     def test_can_build_a_cvs_rdiff_command_for_retrieving_the_changes_between_two_dates

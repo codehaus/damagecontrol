@@ -348,7 +348,9 @@ class End2EndTest < Test::Unit::TestCase
   def test_damagecontrol_works_with_svn
     @project_name = "SVN_TestingProject"
 
-    central_svn = LocalSVN.new(@repo_dir, @relative_project_root)
+    central_svn = SVN.new
+    central_svn.svnurl = filepath_to_nativeurl("#{@repo_dir}/#{@relative_project_path}")
+    central_svn.svnpath = "#{@relative_project_path}"
     import_sources(central_svn)
 
     remote_svn = SVN.new

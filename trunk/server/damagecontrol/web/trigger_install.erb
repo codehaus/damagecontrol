@@ -4,43 +4,54 @@
 <link type="text/css" rel="stylesheet" href="css/style.css">
 </head>
 <body>
-  <% if scm.can_install_trigger? then %>
+  <% if scm.supports_trigger? %>
   
     <form>
-      <input type="hidden" name="action" value="do_install_trigger" />
       <input type="hidden" name="project_name" value="<%= project_name %>" />
-      Congratulations! DamageControl can automatically install the trigger into your source control system.
-      Follow these three simple steps:
+      
+      <% if install %>
+      Follow these three steps to install the trigger:
+      <input type="hidden" name="action" value="do_install_trigger" />
+      <% else %>
+      Follow these two steps to uninstall the trigger:
+      <input type="hidden" name="action" value="do_uninstall_trigger" />
+      <% end %>
       <ol>
+      <% if install %>
         <li>
           <b>Install DamageControl on the source control server</b><br/>
           If the source-control server is not in the same server as your DamageControl server then you
           need to install the DamageControl distribution on the source control server.
         </li>
+      <% end %>
         <li>
           <b>Specify installation directory</b><br/>
           Specify the directory on the source control server where the DamageControl distribution was installed:<br/>
           <input size="50" type="input" name="damagecontrol_install_dir" value="<%= damagecontrol_install_dir %>" />
         </li>
+      <% if install %>
         <li>
           <b>Install it</b><br/>
-          The trigger will be automatically installed by clicking this button:<br/>
+          The trigger will be installed by clicking this button:<br/>
           <input type="submit" name="submit" value="Install trigger" />
         </li>
+      <% else %>
+        <li>
+          <b>Uninstall it</b><br/>
+          The trigger will be uninstalled by clicking this button:<br/>
+          <input type="submit" name="submit" value="Uninstall trigger" />
+        </li>
+      <% end %>
       </ol>
     </form>
     
   <% else %>
   
     <p>
-    Unfortunately DamageControl can not automatically install the trigger into your source-control system.
+    Unfortunately DamageControl can't manipulate triggers for the current <%= scm.name %> configuration. 
+    Enable polling from the project configuration page instead.
     </p>
-    
-    <p>
-    Refer to the documentation on how to manually install the trigger: <br/>
-    <a href="http://damagecontrol.codehaus.org/How+to+install+the+DamageControl+trigger+into+your+SCM">How to install the DamageControl trigger into your SCM</a>, <br/>
-    or use <a href="http://damagecontrol.codehaus.org/Polling">polling</a>.
-    
+        
   <% end %>
 </body>
 </html>

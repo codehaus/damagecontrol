@@ -1,10 +1,15 @@
+require 'damagecontrol/util/FileUtils'
 require 'damagecontrol/web/AbstractAdminServlet'
+require 'damagecontrol/xmlrpc/Trigger'
 
 module DamageControl
   class ConfigureProjectServlet < AbstractAdminServlet
-    def initialize(project_config_repository, scm_configurator_classes)
+    include FileUtils
+
+    def initialize(project_config_repository, scm_configurator_classes, trig_xmlrpc_url)
       super(:private, nil, nil, project_config_repository)
       @scm_configurator_classes = scm_configurator_classes
+      @trig_xmlrpc_url = trig_xmlrpc_url
     end
     
     def tasks
@@ -12,17 +17,27 @@ module DamageControl
       unless project_name.nil?
         if(private?)
           scm = project_config["scm"]
-          if(scm.respond_to?(:create) && !scm.exists?)
+          if(scm.can_create? && !scm.exists?)
             result +=
               [
                 task(:icon => "largeicons/package_new.png", :name => "Create repository", :url => "configure?project_name=#{project_name}&action=create_scm")
               ]
           end
-          if(scm.respond_to?(:install_trigger))
-            result +=
-              [
-                task(:icon => "largeicons/gear_connection.png", :name => "Install trigger", :url => "install_trigger?project_name=#{project_name}"),
-              ]
+
+          if(scm.exists?)
+            trigger_command = DamageControl::XMLRPC::Trigger.trigger_command(damagecontrol_home, project_name, @trig_xmlrpc_url)
+            trigger_files_checkout_dir = project_config_repository.trigger_checkout_dir(project_name)
+            if(scm.supports_trigger? && scm.trigger_installed?(trigger_command, trigger_files_checkout_dir))
+              result +=
+                [
+                  task(:icon => "largeicons/gear_delete.png", :name => "Uninstall trigger", :url => "install_trigger?project_name=#{project_name}&install=false"),
+                ]
+            elsif(scm.supports_trigger?)
+              result +=
+                [
+                  task(:icon => "largeicons/gear_connection.png", :name => "Install trigger", :url => "install_trigger?project_name=#{project_name}&install=true"),
+                ]
+            end
           end
         end
 

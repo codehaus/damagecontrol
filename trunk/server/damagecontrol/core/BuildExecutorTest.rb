@@ -93,7 +93,7 @@ module DamageControl
       build_executor = BuildExecutor.new(
         'executor1', 
         mock_hub, 
-        new_mock.__setup(:checkout_dir) {"some_dir"}
+        new_mock.__setup(:checkout_dir) {"target"}
       )
       build_executor.on_message(@build)
     end
@@ -106,10 +106,11 @@ module DamageControl
       build_executor = BuildExecutor.new(
         'executor1', 
         mock_hub, 
-        new_mock.__setup(:checkout_dir) {"some_dir"}
+        new_mock.__setup(:checkout_dir) {"target"}
       )
 
       @build = Build.new("damagecontrolled", Time.now, { "build_command_line" => "bad_command"})
+      @build.scm = new_mock.__expect(:label) {"a_label"}
       build_executor.on_message(@build)
       # what happens for bad_command is different on windows and linux
       # windows? returns false on cygwin, so this doesn't work

@@ -14,6 +14,14 @@ module DamageControl
     attr_accessor :svnurl
     attr_accessor :svnpath
 
+    # set to true if the local svn binaries (for trigger installation) is native windows
+    # triggers don't work with cygwin svn (svn bug)
+    attr_accessor :native_windows
+
+    def name
+      "Subversion"
+    end
+    
     # TODO: refactor. This is ugly! Should go to the generic tests
     def add_or_edit_and_commit_file(checkout_dir, relative_filename, content, &line_proc)
       existed = false
@@ -70,8 +78,62 @@ module DamageControl
       revision
     end
 
+    def can_create?
+      local?
+    end
+
+    def exists?
+      if(local?)
+        File.exists?("#{svnrootdir}/db")
+      else
+        # don't know. assume yes.
+        false
+      end
+    end
+
+    def supports_trigger?
+      local?
+    end
+
+    def create(&line_proc)
+      native_path = filepath_to_nativepath(svnrootdir, true)
+      svnadmin(svnrootdir, "create #{native_path}", &line_proc)
+    end
+
+    def install_trigger(trigger_command, damagecontrol_install_dir, &proc)
+      post_commit_exists = File.exists?(post_commit_file)
+      mode = post_commit_exists ? File::APPEND|File::WRONLY : File::CREAT|File::WRONLY
+      File.open(post_commit_file, mode) do |file|
+        file.puts("#!/bin/sh") unless post_commit_exists 
+        file.puts(trigger_command)
+      end
+      system("chmod g+x #{post_commit_file}")
+    end
+    
+    def uninstall_trigger(trigger_command, trigger_files_checkout_dir)
+      File.comment_out(post_commit_file, /#{trigger_command}/, "# ")
+    end
+    
+    def trigger_installed?(trigger_command, trigger_files_checkout_dir)
+      return false unless File.exist?(post_commit_file)
+      in_post_commit = comment_out(File.new(post_commit_file), /#{trigger_command}/, "# ", "")
+      in_post_commit
+    end
+    
+    def import(dir, &line_proc)
+      import_cmd = "import #{svnurl} -m \"initial import\""
+      svn(dir, import_cmd, &line_proc)
+    end
+
   private
-  
+    def svnrootdir
+      if(svnurl =~ /file:\/\/\//)
+        svnurl["file:///".length..-(svnpath.length)-2]
+      else
+        svnurl["file://".length..-(svnpath.length)-2]
+      end
+    end
+
     def changesets(checkout_dir, scm_from_time, scm_to_time, files, &line_proc)
       command = changes_command(scm_from_time, scm_to_time, files)
       yield command if block_given?
@@ -137,79 +199,13 @@ module DamageControl
       "commit -m \"#{message}\""
     end
     
-    def install_trigger(*args)
-      raise "can't automatically install trigger for Subversion, you need to install it manually"
-    end
-  end
-
-  class LocalSVN < SVN
-    attr_accessor :svnrootdir
-    attr_accessor :project_url
-    # set to true if the local svn binaries (for trigger installation) is native windows
-    # triggers don't work with cygwin svn (svn bug)
-    attr_accessor :native_windows
-  
-    def initialize(svnrootdir, svnpath)
-      self.svnrootdir = svnrootdir
-      self.svnurl = "#{filepath_to_nativeurl(svnrootdir)}/#{svnpath}"
-      self.svnpath = svnpath
-    end
-
-    def create(&line_proc)
-      native_path = filepath_to_nativepath(svnrootdir, true)
-      svnadmin(svnrootdir, "create #{native_path}", &line_proc)
-    end
-
-    def import(dir, &line_proc)
-#      mkdir_cmd = "mkdir #{filepath_to_nativepath(dir, true)} #{svnurl} -m \"creating directories\""
-#      svn(dir, import_cmd, &line_proc)
-#      import_cmd = "import #{filepath_to_nativepath(dir, true)} #{svnurl} -m \"initial import\""
-puts "Importing #{dir}"
-      import_cmd = "import #{svnurl} -m \"initial import\""
-      svn(dir, import_cmd, &line_proc)
-    end
-
-    def can_install_trigger?
-      true
-    end
-
-    def install_trigger(trigger_command, damagecontrol_install_dir, &proc)
-      post_commit_exists = File.exists?(post_commit_file)
-      mode = post_commit_exists ? File::APPEND|File::WRONLY : File::CREAT|File::WRONLY
-      File.open(post_commit_file, mode) do |file|
-        file.puts("#!/bin/sh") unless post_commit_exists 
-        file.puts(trigger_command)
-      end
-      system("chmod g+x #{post_commit_file}")
-    end
-    
-    def uninstall_trigger(trigger_command, trigger_files_checkout_dir)
-      File.comment_out(post_commit_file, /#{trigger_command}/, "# ")
-    end
-    
-    def trigger_installed?(trigger_command, trigger_files_checkout_dir)
-      return false unless File.exist?(post_commit_file)
-      in_post_commit = comment_out(File.new(post_commit_file), /#{trigger_command}/, "# ", "")
-      in_post_commit
-    end
-    
-    def add_file(relative_filename, content, is_new)
-      with_checkout_dir(checkout_dir) do
-        File.mkpath(File.dirname(relative_filename))
-        File.open(relative_filename, "w") do |file|
-          file.puts(content)
-        end
-
-        if(is_new)
-          svn(checkout_dir, "add #{relative_filename}", &line_proc)
-        end
-
-        commit("adding #{relative_filename}", &line_proc)
+    def local?
+      if(svnurl =~ /^file:/)
+        return true
+      else
+        return false
       end
     end
-    
-
-  private
 
     def post_commit_file
       # We actualy need to use the .cmd when on cygwin. The cygwin svn post-commit

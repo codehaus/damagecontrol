@@ -42,55 +42,6 @@ module DamageControl
     end
   end
   
-  class XXXSVNInfoLogParser < Pebbles::Parser
-    include DamageControl
-    include ParseDate
-
-    def initialize(from_time)
-      super(/Checksum: (.*)/)
-      raise("from_time can't be nil") unless from_time
-      @from_time = from_time
-    end
-  
-  protected
-
-    def parse_line(line)
-      if(line =~ /Path: (.*)/)
-        @path = $1.gsub(/\\/, "/")
-      elsif(line =~ /Name: (.*)/)
-        @is_file = true
-      elsif(line =~ /Last Changed Date: (.*) (\+|\-)([0-9]*) \(/ && @is_file)
-        date = parsedate($1)
-        timestamp = Time.utc(*date[0,6]).utc
-        @timestamp = adjust_offset(timestamp, $2, $3)
-      end
-    end
-    
-    def next_result
-      if(@is_file)
-        @is_file = false
-        Entry.new(@path, @timestamp) unless @timestamp < @from_time
-      else
-        @is_file = false
-        nil
-      end
-    end
-
-    def parse_entries(info_log)
-      most_recent = nil
-      changed_regexp = /Last Changed Date: (.*) (\+|\-)([0-9]*) \(/
-      last_time = nil
-      info_log.each_line do |line|
-        if(line =~ changed_regexp)
-          most_recent = timestamp unless most_recent
-          most_recent = timestamp if most_recent < timestamp
-        end
-      end
-      most_recent
-    end
-    
-  end
-
   class SVNLogEntryParser < Pebbles::Parser
     include DamageControl
 

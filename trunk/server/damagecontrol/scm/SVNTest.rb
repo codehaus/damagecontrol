@@ -1,5 +1,6 @@
 require 'test/unit'
 require 'stringio'
+require 'pebbles/Pathutils'
 require 'damagecontrol/scm/GenericSCMTests'
 require 'damagecontrol/scm/SVN'
 require 'damagecontrol/scm/Changes'
@@ -8,11 +9,15 @@ require 'damagecontrol/util/FileUtils'
 module DamageControl
   class SVNTest < Test::Unit::TestCase
   
+    include Pebbles::Pathutils
     include FileUtils
     include GenericSCMTests
 
-    def create_scm(repository_dir, path)
-      LocalSVN.new(repository_dir, path)
+    def create_scm(repository_root_dir, path)
+      svn = SVN.new
+      svn.svnurl = filepath_to_nativeurl("#{repository_root_dir}/#{path}")
+      svn.svnpath = path
+      svn
     end
 
     def test_label

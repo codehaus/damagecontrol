@@ -23,7 +23,7 @@ module Pebbles
       p = "/cygdrive/c/scm/damagecontrol"
       nurl = "file:///cygdrive/c/scm/damagecontrol"
       if(CYGWIN)
-        nurl = "file:///scm/damagecontrol"
+        nurl = "file:///c:/scm/damagecontrol"
       end
       assert_equal(nurl, filepath_to_nativeurl(p))
     end

@@ -14,7 +14,7 @@ module DamageControl
 
     def test_configure
       project_config_repository = ProjectConfigRepository.new(ProjectDirectories.new(new_temp_dir), "")
-      servlet = ConfigureProjectServlet.new(project_config_repository, [])
+      servlet = ConfigureProjectServlet.new(project_config_repository, [], "a_url")
       result = do_request("project_name" => "myprojectname") do
         servlet.default_action
       end
@@ -22,7 +22,7 @@ module DamageControl
 
     def test_store_configuration
       project_config_repository = ProjectConfigRepository.new(ProjectDirectories.new(new_temp_dir), "")
-      servlet = ConfigureProjectServlet.new(project_config_repository, [NoSCMWebConfigurator, CVSWebConfigurator])
+      servlet = ConfigureProjectServlet.new(project_config_repository, [NoSCMWebConfigurator, CVSWebConfigurator], "a_url")
       result = do_request("project_name" => "myprojectname", "scm_id" => CVS.name, "cvsroot" => "mycvsroot") do
         servlet.store_configuration
       end

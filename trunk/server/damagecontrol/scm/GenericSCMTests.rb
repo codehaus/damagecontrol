@@ -4,7 +4,7 @@ module DamageControl
   module GenericSCMTests
     include FileUtils
 
-    def create_scm(repository_dir, path)
+    def create_scm(repository_root_dir, path)
       raise "including classes must implement this method"
     end
 

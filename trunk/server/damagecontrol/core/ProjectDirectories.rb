@@ -28,6 +28,10 @@ module DamageControl
       "#{project_dir(project_name)}/checkout"
     end
     
+    def trigger_checkout_dir(project_name)
+      "#{project_dir(project_name)}/trigger/checkout"
+    end
+    
     def log_dir(project_name)
       FileUtils.mkdir_p("#{project_dir(project_name)}/log")
     end

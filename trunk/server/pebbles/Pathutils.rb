@@ -15,7 +15,8 @@ module Pebbles
 
     def filepath_to_nativeurl(path)
       if(CYGWIN)
-        path = IO.popen("cygpath --type mixed #{path}").read.chomp[2..-1]
+        urlpath = filepath_to_nativepath(path, false).gsub(/\\/, "/")
+        path = "/#{urlpath}"
       end
       "file://#{path}"
     end

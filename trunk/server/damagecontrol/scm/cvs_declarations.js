@@ -1,6 +1,6 @@
-cvs_port   = new RegExp("^:(.*):(.*)@([^:]*):([0-9]*):([a-zA-Z]?.*)")
-cvs_noport = new RegExp("^:(.*):(.*)@([^:]*):([a-zA-Z]?.*)")
-cvs_local  = new RegExp("^:(local):([^:]*)")
+cvs_port   = new RegExp("^:([^:]*):(.*)@([^:]*):([0-9]*):([a-zA-Z]?.*)")
+cvs_noport = new RegExp("^:([^:]*):(.*)@([^:]*):([a-zA-Z]?.*)")
+cvs_local  = new RegExp("^:(local):(.*)")
 
 function distributeCvsrootFields() {
 	cvsroot = document.getElementById('cvsroot').value

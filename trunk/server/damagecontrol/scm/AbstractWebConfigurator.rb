@@ -34,7 +34,7 @@ module DamageControl
     end
     
     def javascript_declarations
-      erb(javascript_declarations_template, bind_keys(binding))
+      erb(javascript_declarations_template, bind_keys(binding)) if javascript_declarations_template
     end
     
     def quote(text)

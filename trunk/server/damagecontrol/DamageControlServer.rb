@@ -220,7 +220,7 @@ module DamageControl
       httpd.mount("/private/dashboard", DashboardServlet.new(:private, build_history_repository, project_config_repository, build_scheduler))
       httpd.mount("/private/project", ProjectServlet.new(:private, build_history_repository, project_config_repository, trigger, build_scheduler, report_classes, public_web_url + "rss"))
       httpd.mount("/private/install_trigger", InstallTriggerServlet.new(project_config_repository, trig_xmlrpc_url))
-      httpd.mount("/private/configure", ConfigureProjectServlet.new(project_config_repository, scm_configurator_classes))
+      httpd.mount("/private/configure", ConfigureProjectServlet.new(project_config_repository, scm_configurator_classes, trig_xmlrpc_url))
       httpd.mount("/private/search", SearchServlet.new(build_history_repository))
       httpd.mount("/private/log", LogFileServlet.new(project_directories))
       httpd.mount("/private/root", indexing_file_handler)

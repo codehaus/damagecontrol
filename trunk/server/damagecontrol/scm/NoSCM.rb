@@ -4,6 +4,10 @@ module DamageControl
   require 'damagecontrol/scm/AbstractSCM'
   
   class NoSCM < AbstractSCM
+    def name
+      "NoSCM"
+    end
+
     def method_missing(*args)
       "NoSCM does nothing :-)"
     end

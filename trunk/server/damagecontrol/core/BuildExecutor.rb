@@ -146,7 +146,7 @@ module DamageControl
     end
     
     def build_complete(build)
-      logger.info("Build complete #{build.project_name}")
+      logger.info("Build complete #{build.project_name}: #{build.status}")
       build.end_time = Time.now.utc
       @channel.publish_message(BuildCompleteEvent.new(build))
 
