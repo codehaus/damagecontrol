@@ -94,7 +94,8 @@ module FileUtils
       end
       logger.debug("successfully executed #{cmd.inspect} in directory #{dir.inspect}")
       ret
-    rescue NotImplementedError
+    rescue NotImplementedError => e
+      puts e.backtrace.join("\n")
       puts "DamageControl only runs in Cygwin on Windows"
       exit!
     end

@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="utf-8"?>
+<DamageControlMonitor xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="http://damagecontrol.codehaus.org">
+  <NotificationBalloon ShowBalloon="true" />
+  <Projects />
+  <Sounds>
+    <AnotherSuccessfulBuildSound Play="true" FileName="extremely_well.wav" />
+    <AnotherFailedBuildSound Play="true" FileName="human_error.wav" />
+    <BrokenBuildSound Play="true" FileName="fault.wav" />
+    <FixedBuildSound Play="true" FileName="feeling_better.wav" />
+  </Sounds>
+  <Messages>
+    <AnotherSuccess>
+      <Message>Yet another succesful build!</Message>
+    </AnotherSuccess>
+    <AnotherFailure>
+      <Message>The build is still broken...</Message>
+    </AnotherFailure>
+    <Fixed>
+      <Message>Recent checkins have fixed the build.</Message>
+    </Fixed>
+    <Broken>
+      <Message>Recent checkins have broken the build.</Message>
+    </Broken>
+  </Messages>
+  <ShowExceptions>true</ShowExceptions>
+  <ProxyPort>0</ProxyPort>
+</DamageControlMonitor>

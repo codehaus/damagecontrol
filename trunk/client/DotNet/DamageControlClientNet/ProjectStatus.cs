@@ -4,19 +4,27 @@ namespace ThoughtWorks.DamageControl.DamageControlClientNet
 {
 	public enum BuildStatus
 	{
-		Idle, Successful, Failed, Queued, Building, Killed, DeterminingChangesets, CheckingOut
-}
+		Idle,
+		Successful,
+		Failed,
+		Queued,
+		Building,
+		Killed,
+		DeterminingChangesets,
+		CheckingOut
+	}
 
 	public class ProjectStatus
 	{
-		string projectName;
-		
-		BuildStatus lastCompletedBuildStatus;
-		string lastCompletedBuildUrl;
-		DateTime lastCompletedBuildDate;
-		string lastCompletedBuildLabel;
+		private readonly int lastCompletedBuildDuration;
+		private string projectName;
 
-		BuildStatus currentBuildStatus;
+		private BuildStatus lastCompletedBuildStatus;
+		private string lastCompletedBuildUrl;
+		private DateTime lastCompletedBuildDate;
+		private string lastCompletedBuildLabel;
+
+		private BuildStatus currentBuildStatus;
 
 		public ProjectStatus()
 		{
@@ -27,7 +35,7 @@ namespace ThoughtWorks.DamageControl.DamageControlClientNet
 			this.lastCompletedBuildLabel = "Unknown - never polled";
 		}
 
-		public ProjectStatus(string projectName, BuildStatus currentBuildStatus, BuildStatus lastCompletedBuildStatus, string lastCompletedBuildUrl, DateTime lastCompletedBuildDate, string lastCompletedBuildLabel)
+		public ProjectStatus(string projectName, BuildStatus currentBuildStatus, BuildStatus lastCompletedBuildStatus, string lastCompletedBuildUrl, DateTime lastCompletedBuildDate, string lastCompletedBuildLabel, int lastCompletedBuildDuration)
 		{
 			this.projectName = projectName;
 			this.currentBuildStatus = currentBuildStatus;
@@ -35,53 +43,45 @@ namespace ThoughtWorks.DamageControl.DamageControlClientNet
 			this.lastCompletedBuildUrl = lastCompletedBuildUrl;
 			this.lastCompletedBuildDate = lastCompletedBuildDate;
 			this.lastCompletedBuildLabel = lastCompletedBuildLabel;
+			this.lastCompletedBuildDuration = lastCompletedBuildDuration;
 		}
 
 		public string Name
 		{
-			get
-			{
-				return projectName;
-			}
+			get { return projectName; }
 		}
 
 		public string BuildStatusUrl
 		{
-			get 
-			{
-				return lastCompletedBuildUrl;
-			}
+			get { return lastCompletedBuildUrl; }
 		}
 
 		public DateTime LastBuildDate
 		{
-			get
-			{
-				return lastCompletedBuildDate;
-			}
+			get { return lastCompletedBuildDate; }
 		}
 
-		public BuildStatus BuildStatus 
+		public BuildStatus BuildStatus
 		{
-			get
-			{
-				return lastCompletedBuildStatus;
-			}
+			get { return lastCompletedBuildStatus; }
 		}
 
-		public BuildStatus CurrentBuildStatus 
+		public BuildStatus CurrentBuildStatus
 		{
-			get
-			{
-				return currentBuildStatus;
-			}
+			get { return currentBuildStatus; }
 		}
 
 		public string LastBuildLabel
 		{
+			get { return lastCompletedBuildLabel; }
+		}
+
+		public String DurationAsString
+		{
 			get
 			{
-				return lastCompletedBuildLabel;
+				TimeSpan span = new TimeSpan(0, 0, lastCompletedBuildDuration);
+				return span.ToString();
 			}
 		}
 	}

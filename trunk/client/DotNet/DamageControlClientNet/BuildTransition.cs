@@ -5,16 +5,16 @@ namespace ThoughtWorks.DamageControl.DamageControlClientNet
 {
 	public enum BuildTransition
 	{
-		[BuildTransition("Broken build", ErrorLevel.Error)]
+		[BuildTransition("Build Broken", ErrorLevel.Error)]
 		Broken,
 
-		[BuildTransition("Fixed build", ErrorLevel.Info)]
+		[BuildTransition("Build Fixed", ErrorLevel.Info)]
 		Fixed,
 
-		[BuildTransition("Build successful", ErrorLevel.Info)]
+		[BuildTransition("Build Successful", ErrorLevel.Info)]
 		StillSuccessful,
 
-		[BuildTransition("Build still failing", ErrorLevel.Warning)]
+		[BuildTransition("Build Still Broken", ErrorLevel.Warning)]
 		StillFailing
 	}
 

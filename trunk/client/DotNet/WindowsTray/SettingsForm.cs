@@ -4,7 +4,6 @@ using System.Diagnostics;
 using System.Windows.Forms;
 using System.Collections;
 using DamageControlClientNet;
-using Nwc.XmlRpc;
 using ThoughtWorks.DamageControl.DamageControlClientNet;
 
 namespace ThoughtWorks.DamageControl.WindowsTray
@@ -43,7 +42,6 @@ namespace ThoughtWorks.DamageControl.WindowsTray
 		private System.Windows.Forms.ListView projectListView;
 		private System.Windows.Forms.Button addProjectButton;
 		private System.Windows.Forms.Button removeProjectButton;
-		private System.Windows.Forms.Button testConnectionButton;
 		private System.Windows.Forms.Button proxyConfigurationButton;
 		private System.Windows.Forms.ColumnHeader projectName;
 		private System.Windows.Forms.ColumnHeader projectStatus;
@@ -68,6 +66,7 @@ namespace ThoughtWorks.DamageControl.WindowsTray
 
 			InitializeComponent();
 			ExtraInitialisation();
+			refreshButtons(null, null);
 		}
 
 		/// <summary>
@@ -108,7 +107,7 @@ namespace ThoughtWorks.DamageControl.WindowsTray
 				}
 				ProjectMenuItem projectMenuItem = new ProjectMenuItem(p);
 				this.monitor.ContextMenu.MenuItems.Add(0, projectMenuItem);
-				ListViewItem item = new ListViewItem(p.Projectname, imageindex);
+				ListViewItem item = new ListViewItem(p.Name, imageindex);
 				this.projectListView.Items.Add(item);
 			}
 		}
@@ -144,6 +143,7 @@ namespace ThoughtWorks.DamageControl.WindowsTray
 			this.components = new System.ComponentModel.Container();
 			System.Resources.ResourceManager resources = new System.Resources.ResourceManager(typeof(SettingsForm));
 			this.grpGlobal = new System.Windows.Forms.GroupBox();
+			this.balloonCheckBox = new System.Windows.Forms.CheckBox();
 			this.btnFindAudioSuccess = new System.Windows.Forms.Button();
 			this.txtAudioFileSuccess = new System.Windows.Forms.TextBox();
 			this.chkAudioSuccessful = new System.Windows.Forms.CheckBox();
@@ -164,19 +164,17 @@ namespace ThoughtWorks.DamageControl.WindowsTray
 			this.okButton = new System.Windows.Forms.Button();
 			this.cancelButton = new System.Windows.Forms.Button();
 			this.projectListView = new System.Windows.Forms.ListView();
-			this.addProjectButton = new System.Windows.Forms.Button();
-			this.removeProjectButton = new System.Windows.Forms.Button();
-			this.testConnectionButton = new System.Windows.Forms.Button();
-			this.proxyConfigurationButton = new System.Windows.Forms.Button();
 			this.projectName = new System.Windows.Forms.ColumnHeader();
 			this.projectStatus = new System.Windows.Forms.ColumnHeader();
-			this.smallImageList = new System.Windows.Forms.ImageList(this.components);
-			this.largeImageList = new System.Windows.Forms.ImageList(this.components);
 			this.projectListContextMenu = new System.Windows.Forms.ContextMenu();
 			this.propertiesMenuItem = new System.Windows.Forms.MenuItem();
 			this.removeMenuItem = new System.Windows.Forms.MenuItem();
+			this.largeImageList = new System.Windows.Forms.ImageList(this.components);
+			this.smallImageList = new System.Windows.Forms.ImageList(this.components);
+			this.addProjectButton = new System.Windows.Forms.Button();
+			this.removeProjectButton = new System.Windows.Forms.Button();
+			this.proxyConfigurationButton = new System.Windows.Forms.Button();
 			this.propertyButton = new System.Windows.Forms.Button();
-			this.balloonCheckBox = new System.Windows.Forms.CheckBox();
 			this.grpGlobal.SuspendLayout();
 			this.SuspendLayout();
 			// 
@@ -207,6 +205,16 @@ namespace ThoughtWorks.DamageControl.WindowsTray
 			this.grpGlobal.TabStop = false;
 			this.grpGlobal.Text = "Notification Settings";
 			// 
+			// balloonCheckBox
+			// 
+			this.balloonCheckBox.Checked = true;
+			this.balloonCheckBox.CheckState = System.Windows.Forms.CheckState.Checked;
+			this.balloonCheckBox.Location = new System.Drawing.Point(16, 24);
+			this.balloonCheckBox.Name = "balloonCheckBox";
+			this.balloonCheckBox.Size = new System.Drawing.Size(328, 24);
+			this.balloonCheckBox.TabIndex = 3;
+			this.balloonCheckBox.Text = "use balloon notifications";
+			// 
 			// btnFindAudioSuccess
 			// 
 			this.btnFindAudioSuccess.Image = ((System.Drawing.Image)(resources.GetObject("btnFindAudioSuccess.Image")));
@@ -227,6 +235,8 @@ namespace ThoughtWorks.DamageControl.WindowsTray
 			// 
 			// chkAudioSuccessful
 			// 
+			this.chkAudioSuccessful.Checked = true;
+			this.chkAudioSuccessful.CheckState = System.Windows.Forms.CheckState.Checked;
 			this.chkAudioSuccessful.FlatStyle = System.Windows.Forms.FlatStyle.System;
 			this.chkAudioSuccessful.Location = new System.Drawing.Point(16, 56);
 			this.chkAudioSuccessful.Name = "chkAudioSuccessful";
@@ -236,6 +246,8 @@ namespace ThoughtWorks.DamageControl.WindowsTray
 			// 
 			// chkAudioBroken
 			// 
+			this.chkAudioBroken.Checked = true;
+			this.chkAudioBroken.CheckState = System.Windows.Forms.CheckState.Checked;
 			this.chkAudioBroken.FlatStyle = System.Windows.Forms.FlatStyle.System;
 			this.chkAudioBroken.Font = new System.Drawing.Font("Verdana", 8.25F);
 			this.chkAudioBroken.Location = new System.Drawing.Point(16, 104);
@@ -246,6 +258,8 @@ namespace ThoughtWorks.DamageControl.WindowsTray
 			// 
 			// chkAudioFixed
 			// 
+			this.chkAudioFixed.Checked = true;
+			this.chkAudioFixed.CheckState = System.Windows.Forms.CheckState.Checked;
 			this.chkAudioFixed.FlatStyle = System.Windows.Forms.FlatStyle.System;
 			this.chkAudioFixed.Font = new System.Drawing.Font("Verdana", 8.25F);
 			this.chkAudioFixed.Location = new System.Drawing.Point(16, 80);
@@ -256,6 +270,8 @@ namespace ThoughtWorks.DamageControl.WindowsTray
 			// 
 			// chkAudioStillFailing
 			// 
+			this.chkAudioStillFailing.Checked = true;
+			this.chkAudioStillFailing.CheckState = System.Windows.Forms.CheckState.Checked;
 			this.chkAudioStillFailing.FlatStyle = System.Windows.Forms.FlatStyle.System;
 			this.chkAudioStillFailing.Font = new System.Drawing.Font("Verdana", 8.25F);
 			this.chkAudioStillFailing.Location = new System.Drawing.Point(16, 128);
@@ -392,37 +408,9 @@ namespace ThoughtWorks.DamageControl.WindowsTray
 			this.projectListView.Size = new System.Drawing.Size(288, 216);
 			this.projectListView.SmallImageList = this.smallImageList;
 			this.projectListView.TabIndex = 7;
-			// 
-			// addProjectButton
-			// 
-			this.addProjectButton.Location = new System.Drawing.Point(304, 16);
-			this.addProjectButton.Name = "addProjectButton";
-			this.addProjectButton.TabIndex = 8;
-			this.addProjectButton.Text = "Add...";
-			this.addProjectButton.Click += new System.EventHandler(this.addProjectButton_Click);
-			// 
-			// removeProjectButton
-			// 
-			this.removeProjectButton.Location = new System.Drawing.Point(304, 48);
-			this.removeProjectButton.Name = "removeProjectButton";
-			this.removeProjectButton.TabIndex = 9;
-			this.removeProjectButton.Text = "Remove";
-			this.removeProjectButton.Click += new System.EventHandler(this.removeProjectButton_Click);
-			// 
-			// testConnectionButton
-			// 
-			this.testConnectionButton.Location = new System.Drawing.Point(304, 112);
-			this.testConnectionButton.Name = "testConnectionButton";
-			this.testConnectionButton.TabIndex = 10;
-			this.testConnectionButton.Text = "Test";
-			// 
-			// proxyConfigurationButton
-			// 
-			this.proxyConfigurationButton.Location = new System.Drawing.Point(304, 208);
-			this.proxyConfigurationButton.Name = "proxyConfigurationButton";
-			this.proxyConfigurationButton.TabIndex = 11;
-			this.proxyConfigurationButton.Text = "Proxy...";
-			this.proxyConfigurationButton.Click += new System.EventHandler(this.proxyConfigurationButton_Click);
+			this.projectListView.Leave += new System.EventHandler(this.refreshButtons);
+			this.projectListView.Enter += new System.EventHandler(this.refreshButtons);
+			this.projectListView.SelectedIndexChanged += new System.EventHandler(this.refreshButtons);
 			// 
 			// projectName
 			// 
@@ -431,18 +419,6 @@ namespace ThoughtWorks.DamageControl.WindowsTray
 			// projectStatus
 			// 
 			this.projectStatus.Text = "Status";
-			// 
-			// smallImageList
-			// 
-			this.smallImageList.ImageSize = new System.Drawing.Size(16, 16);
-			this.smallImageList.ImageStream = ((System.Windows.Forms.ImageListStreamer)(resources.GetObject("smallImageList.ImageStream")));
-			this.smallImageList.TransparentColor = System.Drawing.Color.Transparent;
-			// 
-			// largeImageList
-			// 
-			this.largeImageList.ImageSize = new System.Drawing.Size(32, 32);
-			this.largeImageList.ImageStream = ((System.Windows.Forms.ImageListStreamer)(resources.GetObject("largeImageList.ImageStream")));
-			this.largeImageList.TransparentColor = System.Drawing.Color.Transparent;
 			// 
 			// projectListContextMenu
 			// 
@@ -462,6 +438,42 @@ namespace ThoughtWorks.DamageControl.WindowsTray
 			this.removeMenuItem.Text = "Remove";
 			this.removeMenuItem.Click += new System.EventHandler(this.removeMenuItem_Click);
 			// 
+			// largeImageList
+			// 
+			this.largeImageList.ImageSize = new System.Drawing.Size(32, 32);
+			this.largeImageList.ImageStream = ((System.Windows.Forms.ImageListStreamer)(resources.GetObject("largeImageList.ImageStream")));
+			this.largeImageList.TransparentColor = System.Drawing.Color.Transparent;
+			// 
+			// smallImageList
+			// 
+			this.smallImageList.ImageSize = new System.Drawing.Size(16, 16);
+			this.smallImageList.ImageStream = ((System.Windows.Forms.ImageListStreamer)(resources.GetObject("smallImageList.ImageStream")));
+			this.smallImageList.TransparentColor = System.Drawing.Color.Transparent;
+			// 
+			// addProjectButton
+			// 
+			this.addProjectButton.Location = new System.Drawing.Point(304, 16);
+			this.addProjectButton.Name = "addProjectButton";
+			this.addProjectButton.TabIndex = 8;
+			this.addProjectButton.Text = "Add...";
+			this.addProjectButton.Click += new System.EventHandler(this.addProjectButton_Click);
+			// 
+			// removeProjectButton
+			// 
+			this.removeProjectButton.Location = new System.Drawing.Point(304, 48);
+			this.removeProjectButton.Name = "removeProjectButton";
+			this.removeProjectButton.TabIndex = 9;
+			this.removeProjectButton.Text = "Remove";
+			this.removeProjectButton.Click += new System.EventHandler(this.removeProjectButton_Click);
+			// 
+			// proxyConfigurationButton
+			// 
+			this.proxyConfigurationButton.Location = new System.Drawing.Point(304, 208);
+			this.proxyConfigurationButton.Name = "proxyConfigurationButton";
+			this.proxyConfigurationButton.TabIndex = 11;
+			this.proxyConfigurationButton.Text = "Proxy...";
+			this.proxyConfigurationButton.Click += new System.EventHandler(this.proxyConfigurationButton_Click);
+			// 
 			// propertyButton
 			// 
 			this.propertyButton.Location = new System.Drawing.Point(304, 80);
@@ -469,16 +481,6 @@ namespace ThoughtWorks.DamageControl.WindowsTray
 			this.propertyButton.TabIndex = 12;
 			this.propertyButton.Text = "Properties...";
 			this.propertyButton.Click += new System.EventHandler(this.propertiesMenuItem_Click);
-			// 
-			// balloonCheckBox
-			// 
-			this.balloonCheckBox.Checked = true;
-			this.balloonCheckBox.CheckState = System.Windows.Forms.CheckState.Checked;
-			this.balloonCheckBox.Location = new System.Drawing.Point(16, 24);
-			this.balloonCheckBox.Name = "balloonCheckBox";
-			this.balloonCheckBox.Size = new System.Drawing.Size(328, 24);
-			this.balloonCheckBox.TabIndex = 3;
-			this.balloonCheckBox.Text = "use balloon notifications";
 			// 
 			// SettingsForm
 			// 
@@ -489,7 +491,6 @@ namespace ThoughtWorks.DamageControl.WindowsTray
 			this.ControlBox = false;
 			this.Controls.Add(this.propertyButton);
 			this.Controls.Add(this.proxyConfigurationButton);
-			this.Controls.Add(this.testConnectionButton);
 			this.Controls.Add(this.removeProjectButton);
 			this.Controls.Add(this.addProjectButton);
 			this.Controls.Add(this.projectListView);
@@ -507,6 +508,8 @@ namespace ThoughtWorks.DamageControl.WindowsTray
 			this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
 			this.Text = "DamageControl Monitor Settings";
 			this.Load += new System.EventHandler(this.SettingsForm_Load);
+			this.Activated += new System.EventHandler(this.refreshButtons);
+			this.Deactivate += new System.EventHandler(this.refreshButtons);
 			this.grpGlobal.ResumeLayout(false);
 			this.ResumeLayout(false);
 
@@ -660,15 +663,6 @@ namespace ThoughtWorks.DamageControl.WindowsTray
 
 		#endregion
 
-		#region Testing connection
-
-		private void ShowError(string message) 
-		{
-			MessageBox.Show(this, message, "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
-		}
-
-		#endregion
-
 		private void addProjectButton_Click(object sender, System.EventArgs e)
 		{
 			ProjectForm form = new ProjectForm(new Project());
@@ -745,6 +739,13 @@ namespace ThoughtWorks.DamageControl.WindowsTray
 		{
 			project.OnPolled += new PolledEventHandler(Project_OnPolled);
 		}
+
+	    private void refreshButtons(object sender, System.EventArgs e)
+	    {
+	    	bool shouldEnable = projectListView.SelectedIndices.Count == 1;
+			removeProjectButton.Enabled = shouldEnable;
+			propertyButton.Enabled = shouldEnable;
+	    }
 	}
 	public class ProjectMenuItem : MenuItem 
 	{
@@ -752,7 +753,7 @@ namespace ThoughtWorks.DamageControl.WindowsTray
 		public ProjectMenuItem(Project p) 
 		{
 			this.project = p;
-			base.Text = p.Projectname;
+			base.Text = p.Name;
 			
 			MenuItem lauchUrl = new MenuItem("open build page");
 			lauchUrl.Click +=new EventHandler(lauchUrl_Click);
@@ -767,7 +768,7 @@ namespace ThoughtWorks.DamageControl.WindowsTray
 			String url = project.ProjectStatus.BuildStatusUrl;
 
 			if (url==null || url.Trim().Length==0)
-				url = project.InstallationUrl + "/public/project/" + project.Projectname;
+				url = project.RootUrl + "/public/project/" + project.Name;
 			if (!(url==null || url.Trim().Length==0))
 				Process.Start(url);
 		}

@@ -37,7 +37,7 @@ namespace ThoughtWorks.DamageControl.DamageControlConsoleMonitor
 		{
 			project = p;
 			project.OnPolled +=new PolledEventHandler(justPolled);
-			project.OnError += new ErrorEventHandler(pollingError);
+			project.OnError += new PollingErrorEventHandler(pollingError);
 			project.OnBuildOccurred +=new BuildOccurredEventHandler(buildOccurred);
 
 			project.StartPolling();
@@ -48,7 +48,7 @@ namespace ThoughtWorks.DamageControl.DamageControlConsoleMonitor
 			Console.Write(".");
 		}
 
-		private void pollingError(object sauce, ErrorEventArgs e)
+		private void pollingError(object sauce, PollingErrorEventArgs e)
 		{
 			Console.WriteLine(e.Exception.Message);
 		}

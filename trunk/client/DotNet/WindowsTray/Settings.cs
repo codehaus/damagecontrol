@@ -187,10 +187,10 @@ namespace ThoughtWorks.DamageControl.WindowsTray
 		public static Sounds CreateDefaultSettings()
 		{
 			Sounds defaults = new Sounds();
-			defaults.AnotherSuccessfulBuildSound = new Sound("still-successful.wav");
-			defaults.AnotherFailedBuildSound = new Sound("still-failing.wav");
-			defaults.BrokenBuildSound = new Sound("broken.wav");
-			defaults.FixedBuildSound = new Sound("fixed.wav");
+			defaults.AnotherSuccessfulBuildSound = new Sound("extremely_well.wav");
+			defaults.AnotherFailedBuildSound = new Sound("human_error.wav");
+			defaults.BrokenBuildSound = new Sound("fault.wav");
+			defaults.FixedBuildSound = new Sound("feeling_better.wav");
 			return defaults;
 		}
 
@@ -259,7 +259,7 @@ namespace ThoughtWorks.DamageControl.WindowsTray
 
 		public Sound(string fileName)
 		{
-			Play = false;
+			Play = true;
 			FileName = fileName;
 		}
 	}

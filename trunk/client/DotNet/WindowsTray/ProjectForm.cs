@@ -1,7 +1,4 @@
 using System;
-using System.Drawing;
-using System.Collections;
-using System.ComponentModel;
 using System.Windows.Forms;
 using ThoughtWorks.DamageControl.DamageControlClientNet;
 
@@ -49,8 +46,8 @@ namespace ThoughtWorks.DamageControl.WindowsTray
 			this.project = p;
 			this.project.StopPolling();
 			InitializeComponent();
-			this.urlTextBox.Text = this.project.InstallationUrl;
-			this.projectNameTextBox.Text = this.project.Projectname;
+			this.urlTextBox.Text = this.project.RootUrl;
+			this.projectNameTextBox.Text = this.project.Name;
 			this.intervalUpDown.Value = this.project.Interval;
 			if ((this.project.Username==null)&&(this.project.Password==null))
 			{
@@ -337,12 +334,12 @@ namespace ThoughtWorks.DamageControl.WindowsTray
 
 		private void UpdateProjectFromForm()
 		{
-			this.project.InstallationUrl = this.urlTextBox.Text;
-			this.project.Projectname = this.projectNameTextBox.Text;
+			this.project.RootUrl = this.urlTextBox.Text;
+			this.project.Name = this.projectNameTextBox.Text;
 			this.project.Interval = (int) this.intervalUpDown.Value;
 			Console.WriteLine("ok button clicked");
 			this.project.OnPolled += new PolledEventHandler(project_OnPolled);
-			this.project.OnError += new ErrorEventHandler(project_OnError);
+			this.project.OnError += new PollingErrorEventHandler(project_OnError);
 			if (this.httpAuthCheckBox.Checked) 
 			{
 				this.project.Password = this.passwordTextBox.Text;
@@ -367,7 +364,7 @@ namespace ThoughtWorks.DamageControl.WindowsTray
 			Console.WriteLine(e.ProjectStatus.BuildStatusUrl);
 		}
 
-		private void project_OnError(object sauce, ErrorEventArgs e)
+		private void project_OnError(object sauce, PollingErrorEventArgs e)
 		{
 			Console.WriteLine(e.Exception.Message);
 		}

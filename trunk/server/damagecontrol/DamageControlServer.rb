@@ -12,6 +12,7 @@ require 'damagecontrol/core/Build'
 require 'damagecontrol/core/BuildExecutor'
 require 'damagecontrol/core/BuildScheduler'
 require 'damagecontrol/core/DependentBuildTrigger'
+require 'damagecontrol/core/FixedTimeScheduler'
 require 'damagecontrol/core/SCMPoller'
 require 'damagecontrol/core/HostVerifyingHandler'
 require 'damagecontrol/core/LogWriter'
@@ -200,6 +201,7 @@ module DamageControl
       
       init_build_scheduler
       init_scm_poller
+      init_fixed_time_scheduler
       init_webserver
       init_custom_components
     end
@@ -370,6 +372,11 @@ module DamageControl
       end
     end
     
+    def init_fixed_time_scheduler
+      component(:fixed_time_scheduler, 
+        FixedTimeScheduler.new(hub, 10, project_config_repository, build_scheduler))
+    end
+
     def init_custom_components
     end
     

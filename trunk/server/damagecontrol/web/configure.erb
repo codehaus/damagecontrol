@@ -176,6 +176,18 @@ function configureAction() {
 </tr>
 
 <tr>
+  <td class="setting-name">Fixed Time Scheduling</td>
+  <td><input class="setting-input" name="fixed_build_time_hhmm" id="fixed_build_time_hhmm" type="text" value="<%= fixed_build_time_hhmm %>"/></td>
+</tr>
+<tr>
+  <td>&nbsp;</td>
+  <td class="setting-description">
+    Fixed Time Scheduling will trigger a build at a specific time each day.  The time must be in the format HH:MM and should be specified according to UTC.
+    For example, if your DC server is in Minneapolis and you want to trigger a build at 2:00 AM CST every morning, then you should specify 08:00.  Note that UTC does not adjust for Daylight Savings Time.
+  </td>
+</tr>
+
+<tr>
   <td>Source control</td>
   <td>
     <% scm_configurators.each do |scm_configurator| %>

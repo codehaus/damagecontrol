@@ -5,7 +5,7 @@ echo **************************************************
 echo DamageControl's working files will be stored under
 echo %DAMAGECONTROL_WORK%
 echo This can be changed in 
-echo %DAMAGECONTROL_WORK%\server.cmd
+echo %DAMAGECONTROL_WORK%server.cmd
 echo **************************************************
 
 cd %DAMAGECONTROL_HOME%

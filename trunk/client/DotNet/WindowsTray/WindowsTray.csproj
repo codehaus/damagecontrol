@@ -9,7 +9,7 @@
             <Settings
                 ApplicationIcon = "App.ico"
                 AssemblyKeyContainerName = ""
-                AssemblyName = "WindowsTray"
+                AssemblyName = "DCWindowsTray"
                 AssemblyOriginatorKeyFile = ""
                 DefaultClientScript = "JScript"
                 DefaultHTMLPageLayout = "Grid"
@@ -190,19 +190,19 @@
                     BuildAction = "EmbeddedResource"
                 />
                 <File
-                    RelPath = "Audio\broken.wav"
+                    RelPath = "Audio\extremely_well.wav"
                     BuildAction = "Content"
                 />
                 <File
-                    RelPath = "Audio\fixed.wav"
+                    RelPath = "Audio\fault.wav"
                     BuildAction = "Content"
                 />
                 <File
-                    RelPath = "Audio\still-failing.wav"
+                    RelPath = "Audio\feeling_better.wav"
                     BuildAction = "Content"
                 />
                 <File
-                    RelPath = "Audio\still-successful.wav"
+                    RelPath = "Audio\human_error.wav"
                     BuildAction = "Content"
                 />
                 <File

@@ -76,12 +76,10 @@ module DamageControl
     # try to execute build, taking quiet period and available suitable executors into consideration
     def try_to_execute_build(build)
       if project_building?(build.project_name)
-puts "Project is building"
         return
       end
 
       if(!quiet_period_elapsed?(build))
-puts "Quiet period not yet elapsed"
         return
       end
       
@@ -90,7 +88,6 @@ puts "Quiet period not yet elapsed"
         build_queue.delete(build)
         executor.put(build)
       else
-puts "No available executor"
       end
     end
     
@@ -109,17 +106,13 @@ puts "No available executor"
     end
         
     def schedule_build(build)
-puts "Scheduling build for #{build.project_name}"
       build_queue.delete_if{|b| b.project_name == build.project_name}
       build_queue << build
       
       c = Pebbles::Countdown.new(quiet_period(build)) do |time|
         begin
-puts "Trying"
           try_to_execute_build(build)
-puts "Tried"
         rescue
-puts "Ouch"
           exception($!)
         end
       end
@@ -128,7 +121,6 @@ puts "Ouch"
     
     def quiet_period(build)
       result = build.quiet_period ? build.quiet_period : @default_quiet_period
-puts "QP: #{result}"
       result
     end
     

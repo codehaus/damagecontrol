@@ -134,9 +134,9 @@ Section "DamageControl Server" SecServer
   !insertmacro MUI_STARTMENU_WRITE_BEGIN Application
     
     CreateDirectory "$SMPROGRAMS\$STARTMENU_FOLDER"
-    CreateShortCut "$SMPROGRAMS\$STARTMENU_FOLDER\Start DamageControl Server.lnk" "%DAMAGECONTROL_WORK%\damagecontrol.cmd" "%DAMAGECONTROL_WORK%\server.rb"
-    CreateShortCut "$SMPROGRAMS\$STARTMENU_FOLDER\Stop DamageControl Server.lnk" "%DAMAGECONTROL_WORK%\damagecontrol.cmd" "%DAMAGECONTROL_HOME%\bin\shutdownserver.rb --url http://localhost:4712/private/xmlrpc"
-    CreateShortCut "$SMPROGRAMS\$STARTMENU_FOLDER\Modify DamageControl settings.lnk" "$WINDIR\notepad.exe" "%DAMAGECONTROL_WORK%\server.rb"
+    CreateShortCut "$SMPROGRAMS\$STARTMENU_FOLDER\Start DamageControl Server.lnk" "$PROFILE\.damagecontrol\damagecontrol.cmd" "$PROFILE\.damagecontrol\server.rb"
+    ;CreateShortCut "$SMPROGRAMS\$STARTMENU_FOLDER\Stop DamageControl Server.lnk" "$PROFILE\.damagecontrol\damagecontrol.cmd" "%DAMAGECONTROL_HOME%\bin\shutdownserver.rb --url http://localhost:4712/private/xmlrpc"
+    CreateShortCut "$SMPROGRAMS\$STARTMENU_FOLDER\Modify DamageControl settings.lnk" "$WINDIR\notepad.exe" "$PROFILE\.damagecontrol\server.rb"
     CreateShortCut "$SMPROGRAMS\$STARTMENU_FOLDER\DamageControl Dashboard.lnk" "http://localhost:4712/private/dashboard"
     CreateShortCut "$SMPROGRAMS\$STARTMENU_FOLDER\DamageControl Website.lnk" "http://damagecontrol.codehaus.org"
     CreateShortCut "$SMPROGRAMS\$STARTMENU_FOLDER\Uninstall DamageControl.lnk" "$INSTDIR\Uninstall.exe"
@@ -180,13 +180,18 @@ SectionEnd
 
 Section "DCTray.NET" SecDCTray
   SetOutPath "$INSTDIR\DCTray.NET"
-  File ${ROOTDIR}\DCTray.NET\bin\Release\dctray.exe
-  File ${ROOTDIR}\DCTray.NET\readme.txt
+  File ${ROOTDIR}\client\DotNet\WindowsTray\bin\Release\DCWindowsTray.exe
+  File ${ROOTDIR}\client\DotNet\WindowsTray\bin\Release\DamageControlClientNet.dll
+  File ${ROOTDIR}\client\DotNet\WindowsTray\bin\Release\XmlRpcCs.dll
+  File ${ROOTDIR}\client\DotNet\WindowsTray\bin\Release\extremely_well.wav
+  File ${ROOTDIR}\client\DotNet\WindowsTray\bin\Release\fault.wav
+  File ${ROOTDIR}\client\DotNet\WindowsTray\bin\Release\feeling_better.wav
+  File ${ROOTDIR}\client\DotNet\WindowsTray\bin\Release\human_error.wav
   
   !insertmacro MUI_STARTMENU_WRITE_BEGIN Application
   
     CreateDirectory "$SMPROGRAMS\$STARTMENU_FOLDER"
-    CreateShortCut "$SMPROGRAMS\$STARTMENU_FOLDER\DCTray.NET Systray Monitor.lnk" "$INSTDIR\DCTray.NET\dctray.exe"
+    CreateShortCut "$SMPROGRAMS\$STARTMENU_FOLDER\DCTray.NET Systray Monitor.lnk" "$INSTDIR\DCTray.NET\DCWindowsTray.exe"
     
   !insertmacro MUI_STARTMENU_WRITE_END
 SectionEnd

@@ -454,8 +454,8 @@ namespace ThoughtWorks.DamageControl.WindowsTray
 
 		public void Project_OnBuildOccurred(object sauce, BuildOccurredEventArgs e)
 		{
-			string caption = e.ProjectStatus.Name + ": " + e.BuildTransitionInfo.Caption;
-			string description = settings.Messages.GetMessageForTransition(e.BuildTransition);
+			string caption = e.BuildTransitionInfo.Caption + ": " + e.ProjectStatus.Name;
+			string description = "Total time: " + e.ProjectStatus.DurationAsString;
 			NotifyInfoFlags icon = GetNotifyInfoFlag(e.BuildTransitionInfo.ErrorLevel);
 
 			HandleBalloonNotification(caption, description, icon);
@@ -498,10 +498,22 @@ namespace ThoughtWorks.DamageControl.WindowsTray
 			}
 		}
 
+		public void Project_OnError(object sender, PollingErrorEventArgs e)
+		{
+			Project project = e.Project;
+			string caption = "Connection Failed for " + project.Name;
+			string description = "URL: " + project.XmlRpcUrl;
+			NotifyInfoFlags icon = NotifyInfoFlags.Error;
+ 
+			HandleBalloonNotification(caption, description, icon);
+		}
+ 
+
 		public void visitProject(Project project)
 		{
 			project.OnPolled += new PolledEventHandler(Project_OnPolled);
 			project.OnBuildOccurred += new BuildOccurredEventHandler(Project_OnBuildOccurred);
+			project.OnError += new PollingErrorEventHandler(Project_OnError);
 		}
 	}
 }

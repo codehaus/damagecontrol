@@ -70,6 +70,7 @@ module DamageControl
       dependent_projects = from_array(project_config['dependent_projects'])
       logs_to_merge = from_array(project_config['logs_to_merge'])
       artifacts_to_archive = from_array(project_config['artifacts_to_archive'])
+      fixed_build_time_hhmm = project_config['fixed_build_time_hhmm']
       render("configure.erb", binding)
     end
   
@@ -77,8 +78,8 @@ module DamageControl
       "build_command_line", 
       "trigger", 
       "nag_email", 
-      #"jira_url", 
-      "scm_web_url"
+      "scm_web_url",
+      "fixed_build_time_hhmm"
     ]
     
     def from_array(array)
