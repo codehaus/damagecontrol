@@ -216,8 +216,11 @@ class Project
   end
   
   def self_upgrade
-    mv("~/damagecontrol", "~/damagecontrol.bak")
-    cp_a("target/dist", "~/damagecontrol")
+    unless windows?
+      mv("~/damagecontrol", "~/damagecontrol.bak") rescue
+      mkdir_p("~/damagecontrol")
+      system("cp -a target/dist/* ~/damagecontrol")
+    end
     shutdown_server("DamageControl is restarting (self upgrade)") rescue info("could not shutdown server")
     # daemontools should automatically start it again
   end
