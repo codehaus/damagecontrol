@@ -4,7 +4,6 @@
     <th>Project</th>
     <th>Last Success</th>
     <th>Last Duration</th>
-    <th>Current Duration</th>
     <th>&nbsp;</th>
 </tr>
 
@@ -16,7 +15,6 @@ project_statuses.each do |project|
     <td><a href="<%= project.href %>"><%= project.name %><%= project.label %></a></td>
     <td><%= project.time_since_last_success %></td>
     <td><%= project.last_duration %></td>
-    <td><%= project.current_duration %></td>
     <% if private? %>
     <td align="center" style="border-left: 1px solid #bbb; color: #bbb;"> <a href="configure?project_name=<%= project.name %>&action=configur
 e" title="Configure <%= project.name %>"><img src="icons/wrench.png" width="24" height="24"/></a>
