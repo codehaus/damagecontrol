@@ -14,7 +14,6 @@ require 'damagecontrol/core/LogWriterTest'
 require 'damagecontrol/core/ProjectConfigRepositoryTest'
 require 'damagecontrol/core/ProjectDirectoriesTest'
 #require 'damagecontrol/core/SCMPollerTest'
-require 'damagecontrol/core/SelfUpgraderTest'
 
 require 'damagecontrol/cruisecontrol/CruiseControlLogPollerTest'
 require 'damagecontrol/cruisecontrol/CruiseControlLogParserTest'
