@@ -15,7 +15,7 @@ module DamageControl
     end
   end
 
-  class BuilderExecutorTest < Test::Unit::TestCase
+  class BuildExecutorTest < Test::Unit::TestCase
   
     include HubTestHelper
     include FileUtils
@@ -39,8 +39,9 @@ module DamageControl
       @build = Build.new("damagecontrolled", { "build_command_line" => "bad_command"})
       @build_executor.schedule_build(@build)
       @build_executor.process_next_scheduled_build
-      assert_message_types_from_hub([BuildProgressEvent, BuildProgressEvent, BuildCompleteEvent])
-      assert(!messages_from_hub[1].build.successful)
+      assert(message_from_hub[-2] instanceof BuildCompleteEvent)
+      assert(message_from_hub[-1] instanceof BuildProgressEvent)
+      assert(!messages_from_hub[-1].build.successful)
     end
     
     def test_succesful_ant_build

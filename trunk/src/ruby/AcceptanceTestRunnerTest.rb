@@ -159,7 +159,7 @@ def test_task_converted_to_method_name_with_underscores
   end
   
   def test_executing_test_step_runs_method_on_test_driver
-    driver = Mock.new
+    driver = MockIt::Mock.new
     
     driver.__expect(:test_step1) {}
     driver.__expect(:test_step2) {|*args|  assert_equal(["arg1", "arg2"], args) }
@@ -200,9 +200,9 @@ end
 
 class AcceptanceTestRunnerTest < Test::Unit::TestCase
   def test_runs_stories_and_is_successful
-    story1 = Mock.new
+    story1 = MockIt::Mock.new
     story1.__expect(:run) { }
-    story2 = Mock.new
+    story2 = MockIt::Mock.new
     story2.__expect(:run) { }
 
     runner = AcceptanceTestRunner.new
@@ -216,7 +216,7 @@ class AcceptanceTestRunnerTest < Test::Unit::TestCase
   end
 
   def test_run_failing_test_and_successful_returns_false
-    story = Mock.new
+    story = MockIt::Mock.new
     story.__expect(:run) { fail }
     runner = AcceptanceTestRunner.new
     runner.add_story(story)

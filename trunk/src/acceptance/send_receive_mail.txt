@@ -1,0 +1,13 @@
+STORY: I want to be able send and receive mails in my tests.
+
+TEST: Send mail and check it arrives.
+Send email : smtp.mail.yahoo.com jon_tirsen potatohair101
+     From: jon_tirsen@yahoo.com
+     To: jon_tirsen@yahoo.com
+     Subject: Test subject
+
+     Test body
+Check for email : pop.mail.yahoo.com jon_tirsen potatohair101
+      Subject: Test subject
+
+      Test body

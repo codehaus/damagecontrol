@@ -1,5 +1,5 @@
 require 'test/unit'
-require 'mock_with_returns'
+require 'mockit'
 require 'damagecontrol/BuildEvents'
 require 'damagecontrol/Build'
 require 'damagecontrol/Hub'
@@ -12,8 +12,8 @@ module DamageControl
   class FilePublisherTest < Test::Unit::TestCase
   
     def setup
-      @filesystem = Mock.new
-      @template = Mock.new
+      @filesystem = MockIt::Mock.new
+      @template = MockIt::Mock.new
       @file_publisher = FilePublisher.new(Hub.new, "/path/to/reports", @template)
       @file_publisher.filesystem = @filesystem
     end
@@ -22,22 +22,22 @@ module DamageControl
       build = Build.new("project_name")
       build.timestamp = "19770614002000"
       
-      @template.__return(:file_type, "html")
-      @template.__next(:generate) { |build2|
+      @template.__setup(:file_type) { "html" }
+      @template.__expect(:generate) { |build2|
         "some content"
       }
 
-      @filesystem.__next(:makedirs) { |dir|
+      @filesystem.__expect(:makedirs) { |dir|
         assert_equal("/path/to/reports/project_name", dir)
       }
-      @filesystem.__next(:newFile) { |file_name, modifiers|
+      @filesystem.__expect(:newFile) { |file_name, modifiers|
         assert_equal("/path/to/reports/project_name/#{build.timestamp}.html", file_name)
-        file = Mock.new
-        file.__next(:print) { |content|
+        file = MockIt::Mock.new
+        file.__expect(:print) { |content|
           assert_equal("some content", content)
         }
-        file.__next(:flush) {}
-        file.__next(:close) {}
+        file.__expect(:flush) {}
+        file.__expect(:close) {}
         return file
       }
       

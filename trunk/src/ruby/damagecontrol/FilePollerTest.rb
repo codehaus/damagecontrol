@@ -14,7 +14,7 @@ module DamageControl
       @dir = File.expand_path("#{damagecontrol_home}/target/polltest/FilePoller#{Time.now.to_i}")
       File.makedirs(@dir)
       
-      @file_handler = Mock.new
+      @file_handler = MockIt::Mock.new
       @poller = FilePoller.new(@dir, @file_handler)
     end
 
