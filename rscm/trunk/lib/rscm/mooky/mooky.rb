@@ -2,8 +2,8 @@ require 'rscm/abstract_scm'
 
 module RSCM
   class Mooky < AbstractSCM
-    attr_reader :foo
-    attr_reader :bar
+    attr_accessor :foo
+    attr_accessor :bar
   
     def name
       "Mooky"

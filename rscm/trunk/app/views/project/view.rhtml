@@ -1,6 +1,9 @@
 <script><!--
 
 function executeOnLoad() {
+<% @scms.each do |scm| %>
+  <%= scm.short %>_init();
+<% end %>
 }
 
 function showElement(selected, elements) {
@@ -61,7 +64,7 @@ trackers = [
 
   <% @scms.each do |scm| %>
     <div id="<%= scm.class.name %>" style="<% if(scm.selected?)%>display:block<%else%>display:none<%end%>">
-      <%= render_partial(scm.form, scm) %>
+      <%= render_partial(scm.short, scm) %>
     </div>
   <% end %>
   
@@ -89,7 +92,7 @@ This way people browsing changesets can easily navigate to related issues.
 
   <% @trackers.each do |tracker| %>
     <div id="<%= tracker.class.name %>" style="<% if(tracker.selected?)%>display:block<%else%>display:none<%end%>">
-      <%= render_partial(tracker.form, tracker) %>
+      <%= render_partial(tracker.short, tracker) %>
     </div>
   <% end %>
 </div>

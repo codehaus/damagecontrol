@@ -1,0 +1,17 @@
+<script>
+function mooky_init() {
+  alert("Mooky! You'll find me under the 'Source Control' tab.")
+}
+</script>
+
+<img src="images/mooky.png"/>
+<table width="100%">
+  <tr>
+    <td class="config_cell">Foo</td>
+    <td width="75%"><input class="setting-input" name="RSCM::Mooky[foo]" type="text" value="<%= mooky.foo %>"></td>
+  </tr>
+  <tr>
+    <td class="config_cell">Bar</td>
+    <td><input class="setting-input" name="RSCM::Mooky[bar]" type="text" value="<%= mooky.bar %>"></td>
+  </tr>
+</table>

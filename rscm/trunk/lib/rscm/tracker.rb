@@ -34,7 +34,7 @@ module RSCM
       end
 
       def highlight(s)
-        url = PathConverter.ensure_trailing_slash(url)
+        url = PathConverter.ensure_trailing_slash(@url)
         if (url)
           s.gsub(/#([0-9]+)/, "<a href=\"#{url}show_bug.cgi?id=\\1\">#\\1</a>")
         else

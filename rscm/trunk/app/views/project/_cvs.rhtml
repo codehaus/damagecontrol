@@ -3,7 +3,8 @@ cvs_port   = new RegExp("^:([^:]*):(.*)@([^:]*):([0-9]*):([a-zA-Z]?.*)")
 cvs_noport = new RegExp("^:([^:]*):(.*)@([^:]*):([a-zA-Z]?.*)")
 cvs_local  = new RegExp("^:(local):(.*)")
 
-function distributeCvsrootFields() {
+// distributes fields from the value of cvsroot. called on load and on edit of cvsroot field
+function cvs_init() {
 	cvsroot = document.getElementById('cvsroot').value
 
 	protocolIndex = 1
@@ -108,7 +109,7 @@ function enableOrDisableCvsFields() {
 <table width="100%">
   <tr>
     <td class="setting-name">CVSROOT</td>
-    <td width="75%"><input class="setting-input" name="RSCM::CVS[root]" id="cvsroot" onKeyUp="distributeCvsrootFields()" type="text" value="<%= cvs.root %>"></td>
+    <td width="75%"><input class="setting-input" name="RSCM::CVS[root]" id="cvsroot" onKeyUp="cvs_init()" type="text" value="<%= cvs.root %>"></td>
   </tr>
   <tr>
     <td>Protocol</td>

@@ -19,8 +19,8 @@ module RSCM
         false
       end
 
-      # Returns the partial form name
-      def form
+      # Returns the short lowercase name
+      def short
         $1.downcase if self.class.name =~ /.*::(.*)/
       end
 

@@ -6,6 +6,9 @@ require 'rake/packagetask'
 require 'rake/gempackagetask'
 require 'rake/contrib/rubyforgepublisher'
 
+require File.dirname(__FILE__) + '/config/environment'
+require 'code_statistics'
+
 PKG_BUILD     = ENV['PKG_BUILD'] ? '.' + ENV['PKG_BUILD'] : ''
 PKG_NAME      = 'rscm'
 PKG_VERSION   = '0.1.0' + PKG_BUILD
@@ -22,7 +25,7 @@ fl.exclude('test/**/darcs*.rb')    # Incomplete/unsupported for now - reactivate
 fl.exclude('test/**/perforce*.rb') # Incomplete/unsupported for now - reactivate when more complete!
 fl.exclude('test/**/starteam*.rb') # Too bloody hard to test without a StarTeam server license! Tested ad-hoc.
 Rake::TestTask.new { |t|
-  t.libs << "test"
+  t.libs << "test" << "app/controllers"
   t.test_files = fl
   t.verbose = true
 }
