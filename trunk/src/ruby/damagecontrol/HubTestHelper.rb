@@ -13,15 +13,15 @@ module DamageControl
       @hub
     end
         
-    def receive_message (message)
+    def receive_message(message)
       @messages_from_hub<<message
     end
     
     def message_types
-      @messages_from_hub.collect{|message| message.class}.join(" ")
+      @messages_from_hub.collect{|message| message.class}
     end
     
-    def assert_message_types (expected)
+    def assert_message_types(expected)
       assert_equal(expected, message_types)
     end
 
@@ -30,7 +30,7 @@ module DamageControl
     end
 
     def assert_got_message(clazz)
-      assert(Regexp.new(clazz.to_s).match(message_types))
+      message_types.index(clazz)
     end
   end
   

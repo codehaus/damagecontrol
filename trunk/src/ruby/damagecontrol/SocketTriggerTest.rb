@@ -11,10 +11,11 @@ module DamageControl
 
   class SocketTriggerTest < Test::Unit::TestCase
     include FileUtils
+    include HubTestHelper
     
     def setup
-      @hub = Hub.new()
-      @s = SocketTrigger.new(@hub, "/usr/local/builds")
+      create_hub
+      @s = SocketTrigger.new(hub, "/usr/local/builds")
       @project_name = "picocontainer"
       @scm_spec = ":local:/cvsroot/picocontainer:pico"
       @build_command_line = "echo damagecontrol rocks"
@@ -23,23 +24,22 @@ module DamageControl
     def test_fires_build_request_on_socket_accept
 
       @s.do_accept(cvs_trigger_command)
-
-      assert("picocontainer", @hub.last_message.build.project_name)
       
     end
         
-    def test_trigger_command_for_cvs
+    def test_fires_build_request_on_socket_accept
       
       tc = cvs_trigger_command
 
       io = IO.popen(tc) do |io|
         io.each_line do |output|
-          build = @s.create_build(output)
+          build = @s.do_accept(output)
           
+          assert_got_message(BuildRequestEvent)
+          build = messages_from_hub[0].build
           assert_equal(@project_name,       build.project_name)
           assert_equal(@scm_spec,           build.scm_spec)
           assert_equal(@build_command_line, build.build_command_line)
-          assert_equal("/usr/local/builds/picocontainer/pico/MAIN/checkout", build.absolute_checkout_path)
         end
       end
       

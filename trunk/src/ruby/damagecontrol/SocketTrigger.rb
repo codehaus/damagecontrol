@@ -28,8 +28,6 @@ module DamageControl
     # @param project_name a logical name for the project (no spaces please)
     # @param path full SCM spec (example: :local:/cvsroot/picocontainer:pico)
     # @param build_command_line command line that will run the build
-    # @param relative_path relative path in dc's checkout where build
-    #        command will be executed from
     # @param host where the dc server is running
     # @param port where the dc server is listening
     # @param replace_string what to replace "/" with (needed for CVS on windows)
@@ -39,11 +37,11 @@ module DamageControl
 
     def create_build(build_spec)
       project_name, scm_spec, build_command_line = build_spec.split(",")
-      Build.new(project_name.chomp, scm_spec.chomp, build_command_line.chomp, @root_dir.chomp)
+      Build.new(project_name.chomp, scm_spec.chomp, build_command_line.chomp)
     end
 
     def do_accept(payload)
-      build = create_build(payload);
+      build = create_build(payload)
       @channel.publish_message(BuildRequestEvent.new(build))
     end
     
@@ -60,7 +58,7 @@ module DamageControl
               do_accept(payload)
               session.print("got your message\r\n\r\n")
             ensure
-              session.close()
+              session.close
             end
           end
         rescue

@@ -28,7 +28,7 @@ module DamageControl
       
       File.copy(@log_file, "#{@dir}/log.xml")
       @ccpoller.force_tick
-      assert_message_types("DamageControl::BuildCompleteEvent")
+      assert_message_types([BuildCompleteEvent])
       assert_equal('build.698', messages_from_hub[0].build.label)
       assert_equal('20030929145347', messages_from_hub[0].build.timestamp)
       assert_equal(false, messages_from_hub[0].build.successful)

@@ -17,8 +17,8 @@ module DamageControl
 }
     end
     
-    def file_name(build)
-      "#{build.label}.html"
+    def file_type
+      "html"
     end
   end
 end

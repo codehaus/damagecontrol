@@ -5,30 +5,32 @@ module DamageControl
 
   class LogWriter
   
-    def initialize(channel)
-      @log_files = Hash.new      
-      channel.add_subscriber(self)      
+    def initialize(channel, logs_base_dir)
+      @log_files = {}      
+      channel.add_subscriber(self)
+      @logs_base_dir = logs_base_dir
     end
     
     def receive_message(message)
       
       if message.is_a? BuildProgressEvent
-        log_file(message).puts(message.output)
+        log_file(message.build).puts(message.output)
       end
 
       if message.is_a? BuildCompleteEvent
-        log_file(message).flush
-        log_file(message).close
+        log_file(message.build).flush
+        log_file(message.build).close
       end
     end
 
-    def log_file(message)
-      file = @log_files[message.build.absolute_log_file_path]
+    def log_file(build)
+      file_name = "#{@logs_base_dir}/#{build.project_name}/#{build.timestamp}.log"
+      file = @log_files[file_name]
       if(!file)
-        dir = File.dirname(message.build.absolute_log_file_path)
+        dir = File.dirname(file_name)
         File.makedirs(dir)
-        file = File.open(message.build.absolute_log_file_path, "w")
-        @log_files[message.build.absolute_log_file_path] = file
+        file = File.open(file_name, "w")
+        @log_files[file_name] = file
       end
       file
     end

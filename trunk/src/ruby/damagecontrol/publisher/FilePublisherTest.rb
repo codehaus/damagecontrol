@@ -14,23 +14,24 @@ module DamageControl
     def setup
       @filesystem = Mock.new
       @template = Mock.new
-      @file_publisher = FilePublisher.new(Hub.new, @template)
+      @file_publisher = FilePublisher.new(Hub.new, "/path/to/reports", @template)
       @file_publisher.filesystem = @filesystem
     end
   
     def test_file_is_written_in_correct_location_upon_build_complete_event    
-      build = Build.new("xyz", ":local:/foo/bar:zap", nil, "/some/where")
+      build = Build.new("project_name", ":local:/foo/bar:zap", nil)
+      build.timestamp = "19770614002000"
       
-      @template.__return(:file_name, "trash.txt")
+      @template.__return(:file_type, "html")
       @template.__next(:generate) { |build2|
         "some content"
       }
 
       @filesystem.__next(:makedirs) { |dir|
-        assert_equal("/some/where/xyz/zap/MAIN/reports", dir)
+        assert_equal("/path/to/reports/project_name", dir)
       }
       @filesystem.__next(:newFile) { |file_name, modifiers|
-        assert_equal("/some/where/xyz/zap/MAIN/reports/trash.txt", file_name)
+        assert_equal("/path/to/reports/project_name/#{build.timestamp}.html", file_name)
         file = Mock.new
         file.__next(:print) { |content|
           assert_equal("some content", content)

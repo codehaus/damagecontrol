@@ -9,6 +9,10 @@ module DamageControl
       "BUILD #{success_message} #{build.project_name} #{build.label}"
     end
 
+    def file_type
+      "txt"
+    end
+
     #def webpath(build)
     #  @webpath ? @webpath : "http://#{build.scm.host(build.scm_spec)"
     #end
