@@ -139,11 +139,11 @@ Section "DamageControl Server" SecServer
   !insertmacro MUI_STARTMENU_WRITE_BEGIN Application
     
     CreateDirectory "$SMPROGRAMS\$STARTMENU_FOLDER"
-    CreateShortCut "$SMPROGRAMS\$STARTMENU_FOLDER\Start DamageControl Server.lnk" "$PROFILE\.damagecontrol\damagecontrol.cmd" "$PROFILE\.damagecontrol\server.rb"
+    CreateShortCut "$SMPROGRAMS\$STARTMENU_FOLDER\Start DamageControl Server.lnk" "$PROFILE\.damagecontrol\damagecontrol.cmd" "$PROFILE\.damagecontrol\server.rb" "$INSTDIR\server\damagecontrol\web\icons\ico\damagecontrol-icon-square.ico"
     ;CreateShortCut "$SMPROGRAMS\$STARTMENU_FOLDER\Stop DamageControl Server.lnk" "$PROFILE\.damagecontrol\damagecontrol.cmd" "%DAMAGECONTROL_HOME%\bin\shutdownserver.rb --url http://localhost:4712/private/xmlrpc"
     CreateShortCut "$SMPROGRAMS\$STARTMENU_FOLDER\Modify DamageControl settings.lnk" "$WINDIR\notepad.exe" "$PROFILE\.damagecontrol\server.rb"
-    CreateShortCut "$SMPROGRAMS\$STARTMENU_FOLDER\DamageControl Dashboard.lnk" "http://localhost:4712/private/dashboard"
-    CreateShortCut "$SMPROGRAMS\$STARTMENU_FOLDER\DamageControl Website.lnk" "http://damagecontrol.codehaus.org"
+    CreateShortCut "$SMPROGRAMS\$STARTMENU_FOLDER\DamageControl Dashboard.lnk" "http://localhost:4712/private/dashboard"  "$INSTDIR\server\damagecontrol\web\icons\ico\damagecontrol-icon-square.ico"
+    CreateShortCut "$SMPROGRAMS\$STARTMENU_FOLDER\DamageControl Website.lnk" "http://damagecontrol.codehaus.org"  "$INSTDIR\server\damagecontrol\web\icons\ico\damagecontrol-icon-square.ico"
     CreateShortCut "$SMPROGRAMS\$STARTMENU_FOLDER\Uninstall DamageControl.lnk" "$INSTDIR\Uninstall.exe"
   
   !insertmacro MUI_STARTMENU_WRITE_END
