@@ -171,7 +171,7 @@ module DamageControl
       httpd.mount("/public/xmlrpc", public_xmlrpc_servlet)
       
       httpd.mount("/public/dashboard", DashboardServlet.new(build_history_repository, project_config_repository, build_scheduler, :public))
-      httpd.mount("/public/project", ProjectServlet.new(build_history_repository, nil, nil, :public, build_scheduler, project_directories, nudge_xmlrpc_url))
+      httpd.mount("/public/project", ProjectServlet.new(build_history_repository, project_config_repository, nil, :public, build_scheduler, project_directories, nudge_xmlrpc_url))
       httpd.mount("/public/log", LogFileServlet.new(project_directories))
       httpd.mount("/public/root", WEBrick::HTTPServlet::FileHandler, rootdir, :FancyIndexing => true)
       
