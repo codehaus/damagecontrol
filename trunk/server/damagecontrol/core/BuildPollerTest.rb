@@ -2,6 +2,7 @@ require 'test/unit'
 require 'pebbles/mockit'
 require 'damagecontrol/util/HubTestHelper'
 require 'damagecontrol/core/Build'
+require 'damagecontrol/core/BuildPoller'
 require 'damagecontrol/core/BuildEvents'
 
 module DamageControl
