@@ -35,9 +35,11 @@ module DamageControl
       @port = port
     end
     
-    # creates a trigger command
+    # Creates a trigger command that is compatible with the create_build
+    # method. This method is used to create a command string that can
+    # be installed in various SCM's trigger mechanisms.
     #
-    # @param project_name a human readable name for the module
+    # @param project_name a logical name for the project (no spaces please)
     # @param path full SCM spec (example: :local:/cvsroot/picocontainer:pico)
     # @param build_command_line command line that will run the build
     # @param relative_path relative path in dc's checkout where build
