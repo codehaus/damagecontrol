@@ -9,35 +9,38 @@
 </tr>
 
 <%
-projects = project_config_repository.project_names
-projects.each do |project|
-  href = "project?project_name=#{project}"
-  
-  image = "images/lastcompletedstatus?project_name=#{project}"
-  last_successful_build = build_history_repository.last_successful_build(project)
-  last_completed_build = build_history_repository.last_completed_build(project)
-  current_build = build_history_repository.current_build(project)
-  current_build = nil if current_build.completed?
-  label = ""
-  label = " (##{last_successful_build.label})" if(last_successful_build)
-  ago = if last_successful_build then last_successful_build.time_since_for_humans else "Never built" end
-  last_duration = if last_completed_build then last_completed_build.duration_for_humans else "Never built" end
-  current_duration = if current_build then current_build.duration_for_humans else "No ongoing build" end
+project_statuses.each do |project|
 %>
 <tr>
-    <td><img width="32" height="32" src="<%= image %>" /></td>
-    <td><a href="<%= href %>"><%= project %><%= label %></a></td>
-    <td><%= ago %></td>
-    <td><%= last_duration %></td>
-    <td><%= current_duration %></td>
+    <td rowspan="2"><img width="32" height="32" src="<%= project.image %>" /></td>
+    <td rowspan="2"><a href="<%= project.href %>"><%= project.name %><%= project.label %></a></td>
+    <td><%= project.time_since_last_success %></td>
+    <td><%= project.last_duration %></td>
+    <td><%= project.current_duration %></td>
     <% if private? %>
-    <td align="center" style="border-left: 1px solid #bbb; color: #bbb;"> <a href="configure?project_name=<%=project%>&action=configur
-e" title="Configure <%=project%>"><img src="icons/wrench.png" width="24" height="24"/></a>
-        | <a href="project?project_name=<%=project%>&action=trig_build" title="Trigger build for <%=project%>"><img src="icons/gears_run.png
+    <td rowspan="2" align="center" style="border-left: 1px solid #bbb; color: #bbb;"> <a href="configure?project_name=<%= project.name %>&action=configur
+e" title="Configure <%= project.name %>"><img src="icons/wrench.png" width="24" height="24"/></a>
+        | <a href="project?project_name=<%= project.name %>&action=trig_build" title="Trigger build for <%= project.name %>"><img src="icons/gears_run.png
 " width="24" height="24"/></a></td>
     <% else %>
        <td>&nbsp;</td>
     <% end %>
+</tr>
+<tr>
+    <td>&nbsp;</td>
+    <td>&nbsp;</td>
+    <td>
+      <% if project.percentage_left != 0 then %>
+      <table class="progress-bar">
+        <tr>
+          <td width="<%= project.percentage_done %>" class="progress-bar-done">&nbsp;</td>
+          <td width="<%= project.percentage_left %>" class="progress-bar-left">&nbsp;</td>
+        </tr>
+      </table>
+      <% else %>
+      &nbsp;
+      <% end %>
+    </td>
 </tr>
 <%
 end

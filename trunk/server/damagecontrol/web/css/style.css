@@ -135,6 +135,18 @@ td.tab {
   background: #f0f0f0;
 }
 
+table.progress-bar {
+  border-collapse: collapse;
+}
+
+td.progress-bar-done {
+  background-color: #009900;
+}
+
+td.progress-bar-left {
+  background-color: #cc0000;
+}
+
 .dashboard td {
   padding: 4px 4px 4px 4px;
 }

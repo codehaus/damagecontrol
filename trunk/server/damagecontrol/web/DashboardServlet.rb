@@ -1,4 +1,5 @@
 require 'damagecontrol/web/AbstractAdminServlet'
+require 'damagecontrol/web/ProjectStatus'
 
 module DamageControl  
   class DashboardServlet < AbstractAdminServlet
@@ -14,6 +15,7 @@ module DamageControl
   protected
   
     def project_status
+      project_statuses = project_config_repository.project_names.collect {|n| ProjectStatus.new(n, build_history_repository)}
       erb("components/project_status.erb", binding)
     end
     

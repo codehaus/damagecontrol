@@ -48,6 +48,7 @@ require 'damagecontrol/web/InstallTriggerServletTest'
 require 'damagecontrol/web/ProjectServletTest'
 require 'damagecontrol/web/ChangesReportTest'
 require 'damagecontrol/web/SearchServletTest'
+require 'damagecontrol/web/ProjectStatusTest'
 
 require 'damagecontrol/test/IntegrationTests'
 

@@ -39,6 +39,10 @@ module DamageControl
     attr_accessor :end_time
     attr_accessor :potential_label
 
+    def duration
+      duration_seconds
+    end
+
     def duration_seconds
       return 0 if end_time.nil? || start_time.nil?
       end_time - start_time
