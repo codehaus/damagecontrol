@@ -1,0 +1,100 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+	<head>
+		<script id="clientEventHandlersJS" language="javascript">
+<!--
+
+function protocol_onblur() {
+
+}
+
+function cvsserver_onblur() {
+
+}
+
+//-->
+		</script>
+	</head>
+	<body>
+		<P><FONT face="Verdana"> Add a new project to DamageControl<br>
+			</FONT>
+		</P>
+		<P><FONT face="Verdana">Project name: </FONT><INPUT id="project_name" type="text" name="Text1"><FONT face="Verdana">
+			</FONT>
+		</P>
+		<P><FONT face="Verdana">Build command line:&nbsp;</FONT><INPUT id="build_command_line" type="text" name="Text1"><FONT face="Verdana">
+			</FONT>
+		</P>
+		<P><FONT face="Verdana">Relative path to build execution directory </FONT><INPUT id="relative_path" type="text" name="Text1"></P>
+		<P>
+			<TABLE id="Table1" cellSpacing="1" cellPadding="1" width="416" border="1" height="268">
+				<TR>
+					<TD colspan="2">
+						<P align="center"><FONT face="Verdana">CVS Settings</FONT></P>
+					</TD>
+				</TR>
+				<TR>
+					<TD width="179">
+						<P><FONT face="Verdana">CVSROOT: </FONT>
+						</P>
+					</TD>
+					<TD><INPUT id="cvsroot" onblur="return Text4_onblur()" type="text" size="30" name="Text2"><FONT face="Verdana"></FONT></TD>
+				</TR>
+				<TR>
+					<TD height="25" width="179">
+						<P><FONT face="Verdana">Protocol: </FONT>
+						</P>
+					</TD>
+					<TD height="25"><SELECT id="cvsprotocol" onblur="return protocol_onblur()" name="cvs_protocol">
+							<OPTION value="ext" selected>ext</OPTION>
+							<OPTION value="pserver">pserver</OPTION>
+							<OPTION value="local">local</OPTION>
+						</SELECT><FONT face="Verdana"></FONT></TD>
+				</TR>
+				<TR>
+					<TD width="179">
+						<P><FONT face="Verdana">Server: </FONT>
+						</P>
+					</TD>
+					<TD><INPUT id="cvsserver" onblur="return cvsserver_onblur()" type="text" size="30" name="Text2"><FONT face="Verdana"></FONT></TD>
+				</TR>
+				<TR>
+					<TD width="179">
+						<P><FONT face="Verdana">Port: </FONT>
+						</P>
+					</TD>
+					<TD><INPUT id="cvsport" type="text" name="Text2" size="30"><FONT face="Verdana"></FONT></TD>
+				</TR>
+				<TR>
+					<TD width="179">
+						<P><FONT face="Verdana">Repository directory:&nbsp; </FONT>
+						</P>
+					</TD>
+					<TD><INPUT id="cvsrepodir" type="text" name="Text2" size="30"><FONT face="Verdana"></FONT></TD>
+				</TR>
+				<TR>
+					<TD width="179">
+						<P><FONT face="Verdana">User name: </FONT>
+						</P>
+					</TD>
+					<TD><INPUT id="cvsuser" type="text" name="Text2" size="30"><FONT face="Verdana"></FONT></TD>
+				</TR>
+				<TR>
+					<TD width="179">
+						<P><FONT face="Verdana">Module:&nbsp;&nbsp;&nbsp;</FONT></P>
+					</TD>
+					<TD><INPUT id="cvsmodule" type="text" name="Text6" size="30"><FONT face="Verdana"></FONT></TD>
+				</TR>
+				<TR>
+					<TD width="179"><FONT face="Verdana"></FONT></TD>
+					<TD><INPUT id="Submit1" type="submit" value="Submit" name="Submit1"><FONT face="Verdana"></FONT></TD>
+				</TR>
+			</TABLE>
+		</P>
+		<P><FONT face="Verdana">&nbsp;&nbsp;
+				<br>
+				<br>
+			</FONT>
+		</P>
+	</body>
+</html>
