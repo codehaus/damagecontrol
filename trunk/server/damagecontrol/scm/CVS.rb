@@ -236,7 +236,7 @@ module DamageControl
       changesets = nil
 
       execed_command_line = command_line(cvspassword, cmd)
-      cmd_with_io(checkout_dir, execed_command_line, environment) do |stdout, stderr|
+      cmd_with_io(checkout_dir, execed_command_line, environment) do |stdin, stdout|
         parser = CVSLogParser.new(stdout)
         parser.cvspath = path
         parser.cvsmodule = cvsmodule
@@ -255,8 +255,8 @@ module DamageControl
 
       execed_command_line = command_line(cvspassword, cmd)
 
-      cmd_with_io(dir, execed_command_line, environment) do |io|
-        io.each_line do |progress|
+      cmd_with_io(dir, execed_command_line, environment) do |stdin, stdout|
+        stdout.each_line do |progress|
           if block_given? then yield progress else logger.debug(progress) end
         end
       end

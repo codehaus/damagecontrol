@@ -81,6 +81,20 @@ module FileUtils
     end
   end
   
+  # Executes a command in a directory with the given environment.
+  #
+  # Can be used in the following way:
+  #
+  # a) cmd_with_io(...) { |stdout| ... }
+  # b) cmd_with_io(...) { |stdin, stdout| ... }
+  # c) cmd_with_io(...) { |stdin, stdout, stderr| ... }
+  #
+  # If option a) or b) is used, an internal thread will read (and discard)
+  # stderr - to avoid that the stderr buffer fills up.
+  #
+  # If option c) is used, it is the callers responsibility to read all streams,
+  # typically in a separate thread for each.
+  #
   def cmd_with_io(dir, cmd, environment = {}, &proc)
     begin
       File.mkpath(dir)
@@ -88,11 +102,21 @@ module FileUtils
       p.command_line = cmd
       p.environment = environment
       p.working_dir = dir
-			p.join_stdout_and_stderr = false unless proc.arity == 1
-      p.join_stdout_and_stderr = true if proc.arity == 1
-      ret = p.execute do |stdout, stdin|
-        if proc.arity == 1 then proc.call(p.stdout) else proc.call(p.stdout, p.stdin) end
+      err_thread = nil
+      ret = p.execute do |stdin, stdout, stderr|
+        if(proc.arity == 3)
+          proc.call(stdin, stdout, stderr)
+        else
+          # see http://jira.codehaus.org/browse/DC-312
+          err_thread = Thread.new { stderr.read }
+          if(proc.arity == 2)
+            proc.call(stdin, stdout)
+          else # 1
+            proc.call(stdout)
+          end
+        end
       end
+      err_thread.join if err_thread
       logger.debug("successfully executed #{cmd.inspect} in directory #{dir.inspect}")
       ret
     rescue NotImplementedError => e

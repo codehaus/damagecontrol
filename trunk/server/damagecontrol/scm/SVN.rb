@@ -180,10 +180,8 @@ module DamageControl
       yield command if block_given?
 
       cmd_with_io(checkout_dir, command) do |stdout|
-        logger.info("Reading changeset log from stdout")
         parser = SVNLogParser.new(stdout, svnpath)
         changesets = parser.parse_changesets(scm_from_time, scm_to_time, &line_proc)
-        logger.info("DONE Reading changeset log from stdout")
       end
       changesets
     end

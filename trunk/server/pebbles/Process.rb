@@ -1,3 +1,5 @@
+#require 'win32/process'
+
 module Pebbles
 
   at_exit do
@@ -14,7 +16,6 @@ module Pebbles
     attr_accessor :command_line
     attr_accessor :environment
     attr_accessor :working_dir
-    attr_writer :join_stdout_and_stderr
     attr_reader :pid
     attr_reader :exit_code
 
@@ -24,50 +25,6 @@ module Pebbles
       @stderr_pipe = IO.pipe
 
       @environment = {}
-      @join_stdout_and_stderr = false
-    end
-
-    def stdout
-      parent_stdout_read
-    end
-
-    def stderr
-      parent_stderr_read
-    end
-
-    def stdin
-      parent_write
-    end
-
-    def start
-      @pid = fork do
-        # in subprocess
-        cleanup
-        Dir.chdir(working_dir) if working_dir
-        environment.each {|key, val| ENV[key] = val}
-        # both processes now have these open
-        # it will not close entirely until both have closed them, which will make the child process hang
-        # so we'll close these now in this process since we are not going to use them
-        parent_stdout_read.close
-        parent_stderr_read.close
-        parent_write.close
-        $stdin.reopen(child_read)
-        $stdout.reopen(child_stdout_write)
-        if join_stdout_and_stderr?
-          $stderr.reopen(child_stdout_write) 
-        else
-          $stderr.reopen(child_stderr_write)
-        end
-        exec(command_line)
-      end
-      @executing = true
-      # both processes now have these open
-      # it will not close entirely until both have closed them, which will make the child process hang
-      # so we'll close these now in this process since we are not going to use them
-      child_read.close
-      child_stdout_write.close
-      child_stderr_write.close
-      parent_stderr_read.close if join_stdout_and_stderr?
     end
 
     def execute(cmd=nil)
@@ -75,11 +32,7 @@ module Pebbles
       ret = nil
       begin
         start
-        if join_stdout_and_stderr?
-          ret = yield stdin, stdout
-        else
-          ret = yield stdin, stdout, stderr
-        end
+        ret = yield stdin, stdout, stderr
       ensure
         wait
       end
@@ -105,24 +58,49 @@ module Pebbles
       @executing = false
     end
 
+  private
+
+    def start
+      @pid = fork do
+        # in subprocess
+        Dir.chdir(working_dir) if working_dir
+        environment.each {|key, val| ENV[key] = val}
+        # both processes now have these open
+        # it will not close entirely until both have closed them, which will make the child process hang
+        # so we'll close these now in this process since we are not going to use them
+        parent_stdout_read.close
+        parent_stderr_read.close
+        parent_write.close
+        $stdin.reopen(child_read)
+        $stdout.reopen(child_stdout_write)
+        $stderr.reopen(child_stderr_write)
+        exec(command_line)
+      end
+      @executing = true
+      # both processes now have these open
+      # it will not close entirely until both have closed them, which will make the child process hang
+      # so we'll close these now in this process since we are not going to use them
+      child_read.close
+      child_stdout_write.close
+      child_stderr_write.close
+    end
+
     def close_all_streams
       stdin.close unless stdin.closed?
       stdout.close unless stdout.closed?
       stderr.close unless stderr.closed?
     end
 
-  private
-
-    def cleanup
-      # Segmentation fault on Ruby v1.8.1
-      # !!!
-      #if(defined?(BasicSocket))
-      #  ObjectSpace.each_object(::BasicSocket) {|s| s.close unless s.closed? }
-      #end
+    def stdin
+      parent_write
     end
 
-    def join_stdout_and_stderr?
-      @join_stdout_and_stderr
+    def stdout
+      parent_stdout_read
+    end
+
+    def stderr
+      parent_stderr_read
     end
 
     def parent_stdout_read
