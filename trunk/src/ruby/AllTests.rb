@@ -24,6 +24,7 @@ require 'damagecontrol/HostVerifyingHandlerTest'
 require 'damagecontrol/publisher/IRCPublisherTest'
 require 'damagecontrol/publisher/FilePublisherTest'
 require 'damagecontrol/publisher/EmailPublisherTest'
+require 'damagecontrol/publisher/XMLRPCStatusPublisherTest'
 # JIRA publisher disabled, Aslak doesn't like it ;-) --jon
 #require 'damagecontrol/publisher/JIRAPublisherTest'
 

@@ -12,6 +12,7 @@ require 'damagecontrol/BuildScheduler'
 require 'damagecontrol/SocketTrigger'
 require 'damagecontrol/HostVerifyingHandler'
 require 'damagecontrol/XMLRPCTrigger'
+require 'damagecontrol/publisher/XMLRPCStatusPublisher'
 
 include DamageControl 
 
@@ -27,6 +28,7 @@ def start_simple_server(params = {})
 
   xmlrpc_servlet = XMLRPC::WEBrickServlet.new
   XMLRPCTrigger.new(xmlrpc_servlet, @hub)
+  XMLRPCStatusPublisher.new(xmlrpc_servlet, @hub)
 
   scheduler = BuildScheduler.new(@hub)
   scheduler.add_executor(BuildExecutor.new(@hub, buildsdir))
