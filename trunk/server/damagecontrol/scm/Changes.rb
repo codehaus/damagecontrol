@@ -161,8 +161,9 @@ EOF
     def to_s
       result = "#{revision} | #{developer} | #{time}\n"
       self.each do |change|
-        result << change.to_s
+        result << "  " change.to_s << "\n"
       end
+      result
     end
 
     def to_rss_description

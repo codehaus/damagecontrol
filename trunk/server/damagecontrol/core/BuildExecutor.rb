@@ -190,12 +190,12 @@ module DamageControl
         last_successful_build = @build_history_repository.last_successful_build(current_build.project_name)
         from_time = last_successful_build ? last_successful_build.scm_commit_time : nil
         from_time = from_time ? from_time + 1 : nil
-        logger.info("Determining changesets for #{current_build.project_name} from #{from_time}")
 
         changesets = current_build.changesets
         if !current_build.changesets.empty?
           logger.info("not determining changeset for #{current_build.project_name} because other component (such as SCMPoller) has already determined it")
         else
+          logger.info("Determining changesets for #{current_build.project_name} from #{from_time}")
           changesets = current_scm.changesets(checkout_dir, from_time, nil, nil) {|p| report_progress(p)}
         end
 
