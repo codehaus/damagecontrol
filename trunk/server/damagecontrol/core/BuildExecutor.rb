@@ -87,6 +87,10 @@ module DamageControl
       !@scheduled_build_slot.empty?
     end
     
+    def building_project?(project_name)
+      busy? && current_build.project_name == project_name
+    end
+    
     def build_started
       current_build.start_time = Time.now.to_i
       determine_changeset

@@ -51,9 +51,13 @@ module DamageControl
       end
     end
     
+    def project_building?(project_name)
+      executors.find {|e| e.building_project?(project_name) }
+    end
+    
     def schedule_build(build)
       available_executor = find_available_executor
-      if quiet_period_elapsed?(build) && !available_executor.nil?
+      if quiet_period_elapsed?(build) && !available_executor.nil? && !project_building?(build.project_name)
         available_executor.schedule_build(build)
       else
         # not quite time for you, back on the queue
