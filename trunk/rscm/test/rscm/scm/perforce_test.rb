@@ -1,6 +1,6 @@
 require 'test/unit'
+require 'rscm'
 require 'rscm/generic_scm_tests'
-require 'rscm/perforce/perforce'
 
 module RSCM
   class PerforceTest < Test::Unit::TestCase

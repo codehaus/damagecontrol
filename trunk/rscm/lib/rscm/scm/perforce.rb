@@ -15,11 +15,14 @@ module RSCM
   # You need the p4/p4d executable on the PATH in order for it to work.
   #
   class Perforce < AbstractSCM
+    AbstractSCM.register(self)
+
     include FileUtils
 
+    ann :description => "Depot path", :tip => "The path to the Perforce depot"
     attr_accessor :depotpath
 
-    def initialize(repository_root_dir = nil)
+    def initialize(repository_root_dir = "")
       @clients = {}
       @depotpath = repository_root_dir
     end

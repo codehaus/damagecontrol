@@ -41,6 +41,21 @@ module RSCM
   class AbstractSCM
     include FileUtils
 
+    @@scm_classes = []
+    def AbstractSCM.register(scm_class) 
+      @@scm_classes << scm_class unless @@scm_classes.index(scm_class)
+    end
+    
+    def AbstractSCM.scm_classes
+      @@scm_classes
+    end
+
+    # Load all sources under scm, so SCM classes can register themselves
+    Dir[File.dirname(__FILE__) + "/scm/*rb"].each do |src|
+      load(src)
+    end
+
+
 # TODO: Make changesets yield changesets as they are determined, to avoid
 # having to load them all into memory before the method exits. Careful not to
 # use yielded changesets to do another scm hit - like get diffs. Some SCMs

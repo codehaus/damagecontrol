@@ -44,7 +44,7 @@ Here is an example of how to use RSCM to get a list of changesets from a CVS rep
 
   require 'rscm'
   
-  scm = RSCM::SVN.new("svn://some.server/some/path/trunk", "trunk")
+  scm = RSCM::Subversion.new("svn://some.server/some/path/trunk", "trunk")
 
   scm.checkout("mycheckout")
   changesets = scm.changesets("mycheckout", Time.utc(2004, 11, 10, 12, 34, 22))

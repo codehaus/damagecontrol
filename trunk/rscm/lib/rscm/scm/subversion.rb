@@ -10,7 +10,7 @@ module RSCM
   # You need the svn/svnadmin executable on the PATH in order for it to work.
   #
   # NOTE: On Cygwin these have to be the win32 builds of svn/svnadmin and not the Cygwin ones.
-  class SVN < AbstractSCM
+  class Subversion < AbstractSCM
     include FileUtils
     include PathConverter
     
@@ -103,7 +103,7 @@ module RSCM
       cmd = "svn log #{repourl} -r HEAD"
       with_working_dir(checkout_dir) do
         safer_popen(cmd) do |stdout|
-          parser = SVNLogParser.new(stdout, path, checkout_dir)
+          parser = SubversionLogParser.new(stdout, path, checkout_dir)
           changesets = parser.parse_changesets
           changesets[0].revision.to_i
         end
@@ -195,7 +195,7 @@ module RSCM
 
       with_working_dir(checkout_dir) do
         safer_popen(command) do |stdout|
-          parser = SVNLogParser.new(stdout, path, checkout_dir)
+          parser = SubversionLogParser.new(stdout, path, checkout_dir)
           changesets = parser.parse_changesets
         end
       end

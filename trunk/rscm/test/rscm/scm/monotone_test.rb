@@ -1,6 +1,6 @@
 require 'test/unit'
+require 'rscm'
 require 'rscm/generic_scm_tests'
-require 'rscm/monotone/monotone'
 
 module RSCM
   class MonotoneTest < Test::Unit::TestCase

@@ -3,7 +3,7 @@ require 'rscm/changes'
 
 module RSCM
 
-  class SVNLogParser
+  class SubversionLogParser
     def initialize(io, path, checkout_dir)
       @io = io
       @changeset_parser = SVNLogEntryParser.new(path, checkout_dir)
