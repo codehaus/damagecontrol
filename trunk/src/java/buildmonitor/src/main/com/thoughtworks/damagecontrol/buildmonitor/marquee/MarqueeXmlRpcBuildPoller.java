@@ -8,14 +8,14 @@ import marquee.xmlrpc.XmlRpcException;
 import marquee.xmlrpc.XmlRpcParser;
 
 import java.net.URL;
-import java.util.List;
+import java.util.Map;
 
 /**
  * This BuildPoller accesses DamageControl's XML-RPC status
  * server using the Marquee XML-RPC library.
  *
  * @author Aslak Helles&oslash;y
- * @version $Revision: 1.1 $
+ * @version $Revision: 1.2 $
  */
 public class MarqueeXmlRpcBuildPoller implements BuildPoller {
     private final XmlRpcClient xmlRpcClient;
@@ -35,8 +35,8 @@ public class MarqueeXmlRpcBuildPoller implements BuildPoller {
     public void poll() throws PollException {
         try {
             Object result = xmlRpcClient.invoke("status", new Object[0]);
-            List buildList = (List) result;
-            buildListener.update(buildList);
+            Map buildListMap = (Map) result;
+            buildListener.update(buildListMap);
         } catch (XmlRpcException e) {
             throw new PollException(e);
         }

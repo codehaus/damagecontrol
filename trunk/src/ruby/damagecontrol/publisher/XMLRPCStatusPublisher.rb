@@ -2,43 +2,20 @@ require 'xmlrpc/server'
 require 'damagecontrol/Build'
 require 'damagecontrol/BuildEvents'
 
+# Exposes a BuildHistoryPublisher to XML-RPC
+# 
+# Authors: Steven Meyfroidt, Aslak Hellesoy
 module DamageControl
 
   class XMLRPCStatusPublisher
   
     INTERFACE = XMLRPC::interface("status") {
-      meth 'string status(string)', 'Request status of a build, passing in the project name, returns status info', 'status'
+      meth 'struct get_build_list_map(string)', 'returns a map of array of build, project name as key.', 'get_build_list_map'
+      meth 'array get_project_names()', 'returns an array of project names.', 'get_project_names'
     }
 
-    def initialize(xmlrpc_server, channel)
-      xmlrpc_server.add_handler(INTERFACE, self)
-      @channel = channel
-      @channel.add_subscriber(self)
-      @status = {}
-    end
-    
-    def receive_message(message)
-      if (message.is_a?(BuildRequestEvent))
-        @status[message.build.project_name] = "Scheduled"
-      elsif (message.is_a?(BuildStartedEvent))
-        @status[message.build.project_name] = "In progress"
-      elsif (message.is_a?(BuildCompleteEvent))
-        if (message.build.successful)
-          @status[message.build.project_name] = "Built at #{message.build.timestamp}"
-        else
-          @status[message.build.project_name] = "Failed at #{message.build.timestamp}"
-        end
-      end      
-    end
-    
-    def status(project_name)
-      result = @status[project_name]
-      if (result.nil?)
-        "Unknown"
-      else
-        result
-      end
+    def initialize(xmlrpc_servlet, build_history_publisher)
+      xmlrpc_servlet.add_handler(INTERFACE, build_history_publisher)
     end
   end
-
 end

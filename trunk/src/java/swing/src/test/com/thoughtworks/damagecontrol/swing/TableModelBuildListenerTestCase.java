@@ -1,7 +1,6 @@
 package com.thoughtworks.damagecontrol.swing;
 
 import com.thoughtworks.damagecontrol.buildmonitor.BuildConstants;
-import com.thoughtworks.damagecontrol.buildmonitor.BuildListener;
 import junit.framework.TestCase;
 
 import javax.swing.SwingUtilities;
@@ -15,47 +14,52 @@ import java.util.Vector;
 
 /**
  * @author Aslak Helles&oslash;y
- * @version $Revision: 1.1 $
+ * @version $Revision: 1.2 $
  */
 public class TableModelBuildListenerTestCase extends TestCase {
     public void testStatusIsReportedForBuildStarted() throws InvocationTargetException, InterruptedException {
 
-        List buildList = new ArrayList();
-
+        List appleList = new ArrayList();
         Map three = new HashMap();
-        three.put(BuildConstants.NAME_FIELD, "three");
-        three.put(BuildConstants.STATUS_FIELD, BuildConstants.STATUS_FAILED);
-        buildList.add(three);
-
-        Map blind = new HashMap();
-        blind.put(BuildConstants.NAME_FIELD, "blind");
-        blind.put(BuildConstants.STATUS_FIELD, BuildConstants.STATUS_SUCCESSFUL);
-        buildList.add(blind);
+        three.put(BuildConstants.PROJECT_NAME_FIELD, "apple");
+        three.put(BuildConstants.SUCCESSFUL_FIELD, Boolean.TRUE);
+        appleList.add(three);
 
         Map mice = new HashMap();
-        mice.put(BuildConstants.NAME_FIELD, "mice");
-        mice.put(BuildConstants.STATUS_FIELD, BuildConstants.STATUS_QUEUED);
-        buildList.add(mice);
+        mice.put(BuildConstants.PROJECT_NAME_FIELD, "apple");
+        mice.put(BuildConstants.SUCCESSFUL_FIELD, Boolean.FALSE);
+        appleList.add(mice);
+
+        List pearList = new ArrayList();
+        Map blind = new HashMap();
+        blind.put(BuildConstants.PROJECT_NAME_FIELD, "pear");
+        blind.put(BuildConstants.SUCCESSFUL_FIELD, Boolean.TRUE);
+        pearList.add(blind);
 
         TableModelBuildListener buildListener = new TableModelBuildListener();
         final DefaultTableModel tableModel = buildListener.getTableModel();
-        buildListener.update(buildList);
+
+        Map buildListMap = new HashMap();
+        buildListMap.put("apple", appleList);
+        buildListMap.put("pear", pearList);
+
+        buildListener.update(buildListMap);
 
         final Vector expectedVector = new Vector();
 
         Vector rowOne = new Vector();
-        rowOne.add("three");
-        rowOne.add(BuildConstants.STATUS_FAILED);
+        rowOne.add("apple");
+        rowOne.add(Boolean.TRUE);
         expectedVector.add(rowOne);
 
         Vector rowTwo = new Vector();
-        rowTwo.add("blind");
-        rowTwo.add(BuildConstants.STATUS_SUCCESSFUL);
+        rowTwo.add("pear");
+        rowTwo.add(Boolean.TRUE);
         expectedVector.add(rowTwo);
 
         Vector rowThree = new Vector();
-        rowThree.add("mice");
-        rowThree.add(BuildConstants.STATUS_QUEUED);
+        rowThree.add("apple");
+        rowThree.add(Boolean.TRUE);
         expectedVector.add(rowThree);
 
         SwingUtilities.invokeAndWait(new Runnable() {

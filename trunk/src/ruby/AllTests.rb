@@ -24,6 +24,7 @@ require 'damagecontrol/HostVerifyingHandlerTest'
 require 'damagecontrol/publisher/IRCPublisherTest'
 require 'damagecontrol/publisher/FilePublisherTest'
 require 'damagecontrol/publisher/EmailPublisherTest'
+require 'damagecontrol/publisher/BuildHistoryPublisherTest'
 require 'damagecontrol/publisher/XMLRPCStatusPublisherTest'
 require 'damagecontrol/publisher/JabberPublisherTest'
 # JIRA publisher disabled, Aslak doesn't like it ;-) --jon
@@ -41,4 +42,4 @@ require 'damagecontrol/cruisecontrol/CruiseControlLogParserTest'
 
 require 'IntegrationTests'
 
-require 'AcceptanceTestRunnerTest'
+#require 'AcceptanceTestRunnerTest'

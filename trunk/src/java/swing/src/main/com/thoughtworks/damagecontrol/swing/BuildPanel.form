@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <form xmlns="http://www.intellij.com/uidesigner/form/" version="1" bind-to-class="com.thoughtworks.damagecontrol.swing.BuildPanelData">
-  <grid id="bbd95" binding="buildPanel" row-count="2" column-count="2" hgap="-1" vgap="-1">
+  <grid id="bbd95" binding="buildPanel" row-count="3" column-count="3" hgap="-1" vgap="-1">
     <margin top="0" left="0" bottom="0" right="0"/>
     <constraints>
-      <xy x="103" y="113" width="217" height="126"/>
+      <xy x="103" y="113" width="302" height="155"/>
       <grid row="0" column="0" row-span="1" col-span="1" vsize-policy="3" hsize-policy="3" anchor="0" fill="3"/>
     </constraints>
     <properties/>
@@ -11,14 +11,14 @@
     <children>
       <hspacer id="aee8a">
         <constraints>
-          <xy x="0" y="108" width="145" height="11"/>
-          <grid row="1" column="0" row-span="1" col-span="1" vsize-policy="1" hsize-policy="6" anchor="0" fill="1"/>
+          <xy x="0" y="137" width="210" height="11"/>
+          <grid row="2" column="0" row-span="1" col-span="1" vsize-policy="1" hsize-policy="6" anchor="0" fill="1"/>
         </constraints>
       </hspacer>
       <component id="905f4" class="javax.swing.JButton" binding="refreshButton">
         <constraints>
-          <xy x="145" y="102" width="72" height="24"/>
-          <grid row="1" column="1" row-span="1" col-span="1" vsize-policy="0" hsize-policy="3" anchor="0" fill="1"/>
+          <xy x="210" y="131" width="72" height="24"/>
+          <grid row="2" column="1" row-span="1" col-span="1" vsize-policy="0" hsize-policy="3" anchor="0" fill="1"/>
         </constraints>
         <properties>
           <text value="Refresh"/>
@@ -26,7 +26,7 @@
       </component>
       <scrollpane id="6ac66">
         <constraints>
-          <xy x="0" y="0" width="217" height="97"/>
+          <xy x="0" y="0" width="282" height="26"/>
           <grid row="0" column="0" row-span="1" col-span="2" vsize-policy="7" hsize-policy="7" anchor="0" fill="3"/>
         </constraints>
         <properties/>
@@ -38,6 +38,95 @@
           </component>
         </children>
       </scrollpane>
+      <grid id="4dad6" row-count="4" column-count="2" hgap="-1" vgap="-1">
+        <margin top="0" left="0" bottom="0" right="0"/>
+        <constraints>
+          <xy x="0" y="31" width="282" height="95"/>
+          <grid row="1" column="0" row-span="1" col-span="2" vsize-policy="3" hsize-policy="3" anchor="0" fill="3"/>
+        </constraints>
+        <properties/>
+        <border type="none"/>
+        <children>
+          <component id="434e7" class="javax.swing.JLabel">
+            <constraints>
+              <xy x="0" y="3" width="31" height="14"/>
+              <grid row="0" column="0" row-span="1" col-span="1" vsize-policy="0" hsize-policy="0" anchor="8" fill="0"/>
+            </constraints>
+            <properties>
+              <text value="Status"/>
+            </properties>
+          </component>
+          <component id="d6f2a" class="javax.swing.JLabel" binding="status">
+            <constraints>
+              <xy x="152" y="10" width="0" height="0"/>
+              <grid row="0" column="1" row-span="1" col-span="1" vsize-policy="0" hsize-policy="0" anchor="8" fill="0"/>
+            </constraints>
+            <properties>
+              <text value=""/>
+            </properties>
+          </component>
+          <component id="f768" class="javax.swing.JLabel">
+            <constraints>
+              <xy x="0" y="28" width="60" height="14"/>
+              <grid row="1" column="0" row-span="1" col-span="1" vsize-policy="0" hsize-policy="0" anchor="8" fill="0"/>
+            </constraints>
+            <properties>
+              <text value="Time started"/>
+            </properties>
+          </component>
+          <component id="5ce64" class="javax.swing.JLabel" binding="timestamp">
+            <constraints>
+              <xy x="152" y="35" width="0" height="0"/>
+              <grid row="1" column="1" row-span="1" col-span="1" vsize-policy="0" hsize-policy="0" anchor="8" fill="0"/>
+            </constraints>
+            <properties>
+              <text value=""/>
+            </properties>
+          </component>
+          <component id="44f1" class="javax.swing.JLabel">
+            <constraints>
+              <xy x="0" y="53" width="66" height="14"/>
+              <grid row="2" column="0" row-span="1" col-span="2" vsize-policy="0" hsize-policy="0" anchor="8" fill="0"/>
+            </constraints>
+            <properties>
+              <text value="Command line"/>
+            </properties>
+          </component>
+          <component id="7ee5" class="javax.swing.JLabel" binding="build_command_line">
+            <constraints>
+              <xy x="152" y="60" width="0" height="0"/>
+              <grid row="2" column="1" row-span="1" col-span="1" vsize-policy="0" hsize-policy="0" anchor="8" fill="0"/>
+            </constraints>
+            <properties>
+              <text value=""/>
+            </properties>
+          </component>
+          <component id="6dafe" class="javax.swing.JLabel">
+            <constraints>
+              <xy x="0" y="78" width="17" height="14"/>
+              <grid row="3" column="0" row-span="1" col-span="1" vsize-policy="0" hsize-policy="0" anchor="8" fill="0"/>
+            </constraints>
+            <properties>
+              <text value="Log"/>
+            </properties>
+          </component>
+          <component id="b443d" class="javax.swing.JLabel" binding="log">
+            <constraints>
+              <xy x="152" y="78" width="48" height="14"/>
+              <grid row="3" column="1" row-span="1" col-span="1" vsize-policy="0" hsize-policy="0" anchor="8" fill="0"/>
+            </constraints>
+            <properties>
+              <text value="&lt;html&gt;&lt;a href=&quot;http://localhost/&quot;&gt;See log...&lt;/a&gt;&lt;/html&gt;"/>
+            </properties>
+          </component>
+        </children>
+      </grid>
+      <vspacer id="37127">
+        <constraints>
+          <xy x="286" y="0" width="11" height="26"/>
+          <grid row="0" column="2" row-span="1" col-span="1" vsize-policy="6" hsize-policy="1" anchor="0" fill="2"/>
+        </constraints>
+      </vspacer>
     </children>
   </grid>
 </form>

@@ -14,20 +14,31 @@ import java.util.Map;
  * The updating of the table model will happen in the swing thread.
  *
  * @author Aslak Helles&oslash;y
- * @version $Revision: 1.1 $
+ * @version $Revision: 1.2 $
  */
 public class TableModelBuildListener implements BuildListener, BuildConstants {
-    private static final Object[] COLUMNS = new String[]{NAME_FIELD, STATUS_FIELD};
-    private final DefaultTableModel tableModel = new DefaultTableModel(COLUMNS, 0);
+    private static final Object[] COLUMNS = new String[]{PROJECT_NAME_FIELD, "status"};
+    private static final Class[] COLUMN_CLASSES = new Class[]{String.class, List.class};
+    private final DefaultTableModel tableModel = new DefaultTableModel(COLUMNS, 0) {
+        public Class getColumnClass(int columnIndex) {
+            return COLUMN_CLASSES[columnIndex];
+        }
 
-    public void update(List buildList) {
-        final Object[][] data = new Object[buildList.size()][2];
+        public void setValueAt(Object aValue, int row, int column) {
+            super.setValueAt(aValue, row, column);
+        }
+    };
+
+    public void update(Map buildListMap) {
+        final Object[][] data = new Object[buildListMap.size()][2];
         int row = 0;
-        for (Iterator iterator = buildList.iterator(); iterator.hasNext();) {
-            Map buildMap = (Map) iterator.next();
+        for (Iterator iterator = buildListMap.keySet().iterator(); iterator.hasNext();) {
+            String projectName = (String) iterator.next();
+            List buildList = (List) buildListMap.get(projectName);
+            BuildSet buildSet = new BuildSet(buildList);
             data[row] = new Object[] {
-                buildMap.get(NAME_FIELD),
-                buildMap.get(STATUS_FIELD)
+                projectName,
+                buildSet
             };
             row++;
         }

@@ -7,17 +7,18 @@
 package com.thoughtworks.damagecontrol.buildmonitor;
 
 import java.util.List;
+import java.util.Map;
 
 /**
  * @author Aslak Helles&oslash;y
- * @version $Revision: 1.1 $
+ * @version $Revision: 1.2 $
  */
 public interface BuildListener {
 
     /**
      * Updates the build status
-     * @param buildList a list of {@link java.util.Map}. Each map may have a key-value pair using
-     * fields from {@link com.thoughtworks.damagecontrol.buildmonitor.BuildConstants}.
+     * @param buildListMap a list of {@link java.util.Map}. Each map may have a key-value pair using
+     * fields from {@link BuildConstants}.
      */
-    void update(List buildList);
+    void update(Map buildListMap);
 }

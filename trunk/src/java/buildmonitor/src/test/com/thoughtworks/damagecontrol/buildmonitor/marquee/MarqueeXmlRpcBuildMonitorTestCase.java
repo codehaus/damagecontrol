@@ -20,10 +20,12 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-
+import java.util.Collections;
+//TODO refactor to an abstract test so we can subclass an integration test
+//that goes against the ruby server
 /**
  * @author Aslak Helles&oslash;y
- * @version $Revision: 1.2 $
+ * @version $Revision: 1.3 $
  */
 public class MarqueeXmlRpcBuildMonitorTestCase extends TestCase {
     private IOException serverEx;
@@ -48,8 +50,7 @@ public class MarqueeXmlRpcBuildMonitorTestCase extends TestCase {
 
         final String payload = header + xmlrpc;
 
-        System.out.println(payload);
-
+        // TODO: Use Jetty here. Will hopefully handle HTTPS
         Thread serverThread = new Thread(new Runnable() {
             public void run() {
                 boolean waiting = true;
@@ -72,7 +73,7 @@ public class MarqueeXmlRpcBuildMonitorTestCase extends TestCase {
                                 data += (char) i;
                             }
                         } catch (SocketTimeoutException te) {
-//                            System.out.println("data = " + data);
+                            System.out.println("data = " + data);
                         }
 
                         System.out.println("data = " + data);
@@ -96,34 +97,44 @@ public class MarqueeXmlRpcBuildMonitorTestCase extends TestCase {
                 } catch (IOException e) {
                     e.printStackTrace();
                 }
-                System.out.println("Server us dying now");
+                System.out.println("Server is dying now");
             }
         });
         serverThread.start();
 
+        final Map expectedBuildListMap = new HashMap();
+
         final List expectedBuildList = new ArrayList();
 
-        Map three = new HashMap();
-        three.put(BuildConstants.NAME_FIELD, "three");
-        three.put(BuildConstants.LAST_BUILD_RESULT_FIELD, BuildConstants.STATUS_FAILED);
-        three.put(BuildConstants.CURRENT_BUILD_STATUS_FIELD, BuildConstants.STATUS_SUCCESSFUL);
-        expectedBuildList.add(three);
+        Map apple1 = new HashMap();
+        apple1.put(BuildConstants.PROJECT_NAME_FIELD, "apple");
+        apple1.put(BuildConstants.CONFIG_FIELD, Collections.singletonMap("build_command_line", "Apple1"));
+        apple1.put(BuildConstants.MODIFICATION_SET_FIELD, Collections.EMPTY_LIST);
+        apple1.put(BuildConstants.TIMESTAMP_FIELD, "20040316225946");
+        apple1.put(BuildConstants.SUCCESSFUL_FIELD, Boolean.TRUE);
+        apple1.put("___class___", "DamageControl::Build");
+        expectedBuildList.add(apple1);
 
-        Map blind = new HashMap();
-        blind.put(BuildConstants.NAME_FIELD, "blind");
-        blind.put(BuildConstants.LAST_BUILD_RESULT_FIELD, BuildConstants.STATUS_SUCCESSFUL);
-        blind.put(BuildConstants.CURRENT_BUILD_STATUS_FIELD, BuildConstants.STATUS_FAILED);
-        expectedBuildList.add(blind);
+        Map apple2 = new HashMap();
+        apple2.put(BuildConstants.PROJECT_NAME_FIELD, "apple");
+        apple2.put(BuildConstants.CONFIG_FIELD, Collections.singletonMap("build_command_line", "Apple2"));
+        apple2.put(BuildConstants.MODIFICATION_SET_FIELD, Collections.EMPTY_LIST);
+        apple2.put(BuildConstants.TIMESTAMP_FIELD, "20040316225948");
+        apple2.put(BuildConstants.SUCCESSFUL_FIELD, Boolean.FALSE);
+        apple2.put("___class___", "DamageControl::Build");
+        expectedBuildList.add(apple2);
+
+        expectedBuildListMap.put("apple", expectedBuildList);
 
         Mock mockBuildListener = new Mock(BuildListener.class);
         mockBuildListener.expect("update", new Constraint() {
             public boolean eval(Object o) {
-                assertEquals(expectedBuildList, o);
+                assertEquals(expectedBuildListMap, o);
                 return true;
             }
         });
 
-        BuildPoller buildMonitor = new MarqueeXmlRpcBuildPoller(new URL("http://localhost:4315/"));
+        BuildPoller buildMonitor = new MarqueeXmlRpcBuildPoller(new URL("https://localhost:4315/"));
         buildMonitor.addBuildListener((BuildListener) mockBuildListener.proxy());
         buildMonitor.poll();
 

@@ -1,61 +1,75 @@
-$:<<'../../lib'
+#$:<<'../../../../lib'
+#$:<<'../..'
 
 require 'test/unit' 
 require 'mockit' 
-require 'xmlrpc/server' 
+require 'xmlrpc/server'
+require 'xmlrpc/parser'
 require 'damagecontrol/BuildScheduler'
 require 'damagecontrol/BuildExecutor'
 require 'damagecontrol/HubTestHelper'
 require 'damagecontrol/publisher/XMLRPCStatusPublisher'
+require 'damagecontrol/publisher/BuildHistoryPublisher'
+require 'damagecontrol/publisher/AbstractBuildHistoryTest'
 
 module DamageControl
 
-  class XMLRPCStatusPublisherTest < Test::Unit::TestCase
-    
-    include HubTestHelper
-
-    def setup
-      create_hub
-      @executor = BuildExecutor.new(hub)
-      @scheduler = BuildScheduler.new(hub)
-      @scheduler.default_quiet_period = 0
-      @scheduler.add_executor(@executor)
-      @build = Build.new("test", {"build_command_line" => "echo Hello"})
+  # add eq? methods to DamageControl::Build so we can compare builds
+  class Build
+    def ==(o)
+      project_name == o.project_name &&
+      successful == o.successful &&
+      config == o.config &&
+      timestamp == o.timestamp
     end
-
-    def test_adds_handler_for_status_request
-      rpc_servlet = MockIt::Mock.new
-      rpc_servlet.__expect(:add_handler) do |interface, object|
-        assert_equal(XMLRPCStatusPublisher::INTERFACE, interface)
-        assert(object.is_a?(XMLRPCStatusPublisher))
-      end
-      XMLRPCStatusPublisher.new(rpc_servlet, hub)
-      rpc_servlet.__verify
-    end
-    
-    def test_status_for_unknown_build
-      t = XMLRPCStatusPublisher.new(XMLRPC::WEBrickServlet.new, hub)
-      val = t.status("unknown_project_name")
-      assert_equal("Unknown", val);
-    end
-
-    def test_request_build_updates_status
-      t = XMLRPCStatusPublisher.new(XMLRPC::WEBrickServlet.new, hub)
-      hub.publish_message(BuildRequestEvent.new(@build))
-      @scheduler.force_tick
-      val = t.status(@build.project_name)
-      assert_equal("Scheduled", val);
-    end
-
-    def test_execute_build_updates_status
-      t = XMLRPCStatusPublisher.new(XMLRPC::WEBrickServlet.new, hub)
-      hub.publish_message(BuildRequestEvent.new(@build))
-      @scheduler.force_tick
-      @executor.process_next_scheduled_build
-      val = t.status(@build.project_name)
-      assert_match(val, /Built.*/);
-    end
-
   end
+  
+  class XMLRPCStatusPublisherTest < AbstractBuildHistoryTest
+    
+    XMLRPC_CALL_DATA = <<-EOF
+    <?xml version="1.0" encoding="ISO-8859-1"?>
+      <methodCall>
+        <methodName>status.get_build_list_map</methodName>
+      <params>
+        <param>
+          <value>
+            <string>apple</string>
+          </value>
+        </param>
+      </params>
+    </methodCall>
+    EOF
 
+    include FileUtils
+
+    # This is an acceptance test
+    def test_xml_rpc_response_is_of_expected_format
+      xmlrpc_servlet = XMLRPC::WEBrickServlet.new
+      XMLRPCStatusPublisher.new(xmlrpc_servlet, @bhp)
+
+      httpserver = WEBrick::HTTPServer.new(:Port => 4719)
+      httpserver.mount("/test", xmlrpc_servlet)
+      at_exit { httpserver.shutdown }
+      Thread.new { httpserver.start }
+      
+      # Do a raw post so we can compare the XML that comes back
+      header = {  
+        "User-Agent"     =>  "Just a test",
+        "Content-Type"   => "text/xml",
+        "Content-Length" => XMLRPC_CALL_DATA.size.to_s, 
+        "Connection"     => "close"
+      }
+      h = Net::HTTP.new('localhost', 4719)
+      resp, data = h.post2('/test', XMLRPC_CALL_DATA, header)
+      
+      parser = XMLRPC::XMLParser::XMLTreeParser.new
+      actual_build_list_map = parser.parseMethodResponse(data)
+
+      # Read the expected file and make it one line (the xml rpc client is a bit flaky)
+      expected_data = File.new("#{damagecontrol_home}/testdata/expected_xmlrpc_fetch_all_reply.xml").read.gsub(/[ \r\n]/, "").sub(/xmlversion/, "xml version")
+      expected_build_list_map = parser.parseMethodResponse(expected_data)      
+      
+      assert_equal(expected_build_list_map, actual_build_list_map)
+    end
+  end
 end
