@@ -156,6 +156,10 @@ module DamageControl
       changesets_persister.load_upto(changeset_identifier, prior)
     end
 
+    def changeset(changeset_identifier)
+      changesets(changeset_identifier, 1)[0]
+    end
+
     def changeset_identifiers
       changesets_persister.identifiers
     end
@@ -177,21 +181,26 @@ module DamageControl
       DamageControl::Visitor::YamlPersister.new(changesets_dir)
     end
     
-    # Creates, persists and executes a build for the changeset with the given 
+    # Creates, persists and executes a Build for the changeset with the given 
     # +changeset_identifier+.
     # Should be called with a block of arity 1 that will receive the build.
-    def build(changeset_identifier)
+    def execute_build(changeset_identifier)
       scm.checkout(checkout_dir, changeset_identifier)
       build = Build.new(name, changeset_identifier, Time.now.utc)
       yield build
     end
 
-    # Returns an array of existing builds for the given +changeset+.
+    # Returns an array of existing Build s for the given +changeset_identifier+.
     def builds(changeset_identifier)
       Directories.build_dirs(name, changeset_identifier).collect do |dir|
         # The dir's basename will always be a Time
         Build.new(name, changeset_identifier, File.basename(dir).to_identifier)
       end
+    end
+
+    # Returns the Build for the given +changeset_identifier+ and +build_time+
+    def build(changeset_identifier, build_time)
+      Build.new(name, changeset_identifier, build_time)
     end
 
     # Returns the latest build.

@@ -17,7 +17,7 @@
   %>
   <tr class="build-row">
     <td nowrap="nowrap">
-      <%= link_to("#{changeset.identifier} (#{changeset.developer})", :action => "changesets", :id => @project.name, :params => {"changeset" => changeset.identifier}) %>
+      <%= link_to("#{changeset.identifier} (#{changeset.developer})", :action => "changeset", :id => @project.name, :params => {"changeset" => changeset.identifier}) %>
     </td>
     <td width="100%">
       <% @project.builds(changeset.identifier).each do |build| %>
