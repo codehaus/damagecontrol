@@ -89,15 +89,19 @@ module DamageControl
       project_directories.project_names.each do |project_name|
         history = build_history_repository.history(project_name)
         history.each do |build|
-          # transform old to new
-          if build.timestamp
-            build.dc_creation_time = Time.parse_ymdHMS(build.timestamp)
+          # transform old fields to new ones
+          if(!build.dc_creation_time)
+            if build.timestamp
+              build.dc_creation_time = Time.parse_ymdHMS(build.timestamp)
+            end
           end
 
-          if build.start_time
-            build.dc_start_time = build.start_time if build.start_time
-          else
-            build.dc_start_time = build.dc_creation_time
+          if(!build.dc_start_time)
+            if build.start_time
+              build.dc_start_time = build.start_time if build.start_time
+            else
+              build.dc_start_time = build.dc_creation_time
+            end
           end
           
           if(!build.duration)
