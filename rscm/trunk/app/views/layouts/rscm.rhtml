@@ -34,9 +34,18 @@ function intercept(a) {
     <% @sidebar_links.each do |link| 
       image = link.delete(:image)
       name  = link.delete(:name)
+      href  = link.delete(:href)
+      if(href)
     %>
-      <div class="task"><%= link_to_image(image, link) %> <%= link_to(name, link) %></div>
+      <div class="task">
+        <%= content_tag("a", tag("img", :src => image), {:href => href}) %> <%= content_tag("a", name, {:href => href}) %>
+      </div>
+    <% else %>  
+      <div class="task">
+        <%= link_to_image(image, link) %> <%= link_to(name, link) %>
+      </div>
     <% end %>  
+  <% end %>  
   </div>
 </td>
 

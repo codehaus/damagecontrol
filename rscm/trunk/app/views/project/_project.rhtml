@@ -5,6 +5,9 @@
   <td class="setting-name">Project name</td>
   <td width="75%">
     <%= text_or_input(@new_project, :name => "RSCM::Project[name]", :value => project.name) %>
+    <% if(@edit) %>
+      <%= tag("input", :type => "hidden", :name => "RSCM::Project[name]", :value => project.name) %>
+    <% end %>
   </td>
 </tr>
 <tr>
@@ -26,9 +29,5 @@
 <tr>
   <td>Project home page</td>
   <td><%= text_or_input(@edit, :name => "RSCM::Project[home_page]", :value => project.home_page) %></td>
-</tr>
-<tr>
-  <td>Enable RSS generation</td>
-  <td><input name="RSCM::Project[rss_enabled]" type="checkbox" <%= project.rss_enabled ? "checked=true" : "" %> /></td>
 </tr>
 </table>

@@ -10,7 +10,6 @@ module RSCM
     attr_accessor :name
     attr_accessor :description
     attr_accessor :home_page
-    attr_accessor :rss_enabled
 
     attr_accessor :scm
     attr_accessor :tracker
@@ -44,9 +43,7 @@ module RSCM
         YAML::dump(self, io)
       end
       
-      if(rss_enabled)
-        RSS_SERVICE.add_project(self)
-      end
+      RSS_SERVICE.add_project(self)
 
     end
     
@@ -104,6 +101,10 @@ module RSCM
     
     def delete_working_copy
       File.delete(checkout_dir)
+    end
+
+    def rss_exists?
+      File.delete(rss_file)
     end
 
   private

@@ -116,6 +116,24 @@ protected
       }
     end
 
+    if(@project.exists?)
+      @sidebar_links << {
+        :href       => @project.tracker.url, 
+        :image      => "/images/24x24/scroll_information.png",
+        :name       => @project.tracker.name
+      }
+    end
+
+    if(@project.rss_exists?)
+      @sidebar_links << {
+        :controller => "project", 
+        :action     => "rss", 
+        :id         => @project.name,
+        :image      => "/images/rss.gif",
+        :name       => "Changesets RSS"
+      }
+    end
+
   end
 
 private
