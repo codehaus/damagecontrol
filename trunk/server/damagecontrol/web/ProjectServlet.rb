@@ -41,7 +41,18 @@ module DamageControl
       render("configure.erb", binding)
     end
     
-    KEYS = ["build_command_line", "project_name", "unix_groups", "trigger", "scm_type", "cvsroot", "cvsmodule", "cvspassword", "svnurl"]
+    KEYS = [
+      "build_command_line", 
+      "project_name", 
+      "unix_groups", 
+      "trigger", 
+      "nag_email", 
+      "scm_type", 
+      "cvsroot", 
+      "cvsmodule", 
+      "cvspassword", 
+      "svnurl"
+    ]
     
     def store_configuration
       assert_private

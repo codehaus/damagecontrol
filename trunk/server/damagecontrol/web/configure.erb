@@ -231,6 +231,10 @@ function enableOrDisableCvsFieldsAndUpdateScmSpec() {
   <td><input name="unix_groups" id="unix_groups" type="text" value="<%= project_config['unix_groups'] %>"/></td>
 </tr-->
 <tr>
+  <td>Nag email</td>
+  <td><input name="nag_email" id="nag_email" type="text" value="<%= project_config['nag_email'] %>"/></td>
+</tr>
+<tr>
   <td>Source control</td>
   <td>
     <input id="cvsradio" type="radio" value="cvs" name="scm" onClick="showScm('cvs')"<% if(project_config['scm_type']=="cvs") %> checked="true"<%end%>/> CVS
