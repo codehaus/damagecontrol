@@ -1,6 +1,7 @@
 // created on 11/6/2004 at 4:24 PM
 using System;
 using Egg;
+using System.Collections;
 
 namespace ThoughtWorks.DamageControl.MonoTray 
 {
@@ -8,6 +9,7 @@ namespace ThoughtWorks.DamageControl.MonoTray
     {
         private TrayIcon icon;
         private Gtk.Menu menu;
+        public ArrayList projects;
         
         private void InitializeSettings()
         {
@@ -98,6 +100,7 @@ namespace ThoughtWorks.DamageControl.MonoTray
             eb.Add(new Gtk.Image(new Gdk.Pixbuf(null, "gray-24.png")));
             
             this.menu = new Gtk.Menu();
+            this.projects = new ArrayList();
             
             Gtk.AccelGroup ac_quit = new Gtk.AccelGroup();
             Gtk.ImageMenuItem it_quit  = new Gtk.ImageMenuItem (Gtk.Stock.Quit, ac_quit);
@@ -121,6 +124,8 @@ namespace ThoughtWorks.DamageControl.MonoTray
 
     	 private void IconClicked(object source, Gtk.ButtonPressEventArgs args)
 	     {
+	          //ProjectWindow pw = new ProjectWindow();
+	          //pw.Show();
 		      menu.ShowAll();
 		      menu.Popup (null, null, null, IntPtr.Zero, args.Event.Button, args.Event.Time); 
 	     }
@@ -132,7 +137,7 @@ namespace ThoughtWorks.DamageControl.MonoTray
 	     
 	     private void SettingsSelected(object source, EventArgs args)
 	     {
-	           SettingsWindow sw = new SettingsWindow();
+	           SettingsWindow sw = new SettingsWindow(this.projects);
 	     } 
     }
 }

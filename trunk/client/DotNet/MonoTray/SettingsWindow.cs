@@ -1,21 +1,27 @@
 // created on 11/6/2004 at 3:29 PM
 using System;
-using ThoughtWorks.DamageControl.MonoTray;
+using ThoughtWorks.DamageControl.DamageControlClientNet;
 using Gtk;
 using Glade;
+using System.Collections;
 
 namespace ThoughtWorks.DamageControl.MonoTray {
 
 	public class SettingsWindow
 	{
+	
+	    private ArrayList projects;
+	    
 		[Widget] Button closeSettingsButton;
 		[Widget] Button newButton;
 		[Widget] Window settingsWindow;
 		
-		public SettingsWindow ()
+		public SettingsWindow (ArrayList p)
 		{
 			Glade.XML gxml = new Glade.XML (null, "gui.glade", "settingsWindow", null);
 			gxml.Autoconnect (this);
+			
+			this.projects = p;
 			
 			GConf.PropertyEditors.EditorShell shell = 
 			  new GConf.PropertyEditors.EditorShell (gxml);
@@ -38,8 +44,7 @@ namespace ThoughtWorks.DamageControl.MonoTray {
 		
 		public void OnWindowDeleteEvent (object o, DeleteEventArgs args) 
 		{
-			Application.Quit ();
-			args.RetVal = true;
+			closeSettings(o, args);
 		}
 		
 		public void Show()
@@ -55,8 +60,11 @@ namespace ThoughtWorks.DamageControl.MonoTray {
 		
 		private void newProject(object source, EventArgs args)
 		{
-		  ProjectWindow pw = new ProjectWindow();
+		  Project p = new Project(); 
+		  ProjectWindow pw = new ProjectWindow(p);
 		  pw.Show();
+		  
+		  this.projects.Add(p);
 		}
 
 	}
