@@ -1,6 +1,6 @@
-require 'damagecontrol/FileSystem'
-require 'damagecontrol/BuildEvents'
-require 'damagecontrol/AsyncComponent'
+require 'damagecontrol/core/BuildEvents'
+require 'damagecontrol/util/FileUtils'
+require 'damagecontrol/core/AsyncComponent'
 require 'damagecontrol/tool/gnuplot/BuildHistoryReportGenerator'
 require 'ftools'
 
@@ -8,11 +8,8 @@ module DamageControl
 
   class GraphPublisher < AsyncComponent
   
-    attr_writer :filesystem
-
     def initialize(channel, target_base_dir, build_history_repository)
       super(channel)
-      @filesystem = FileSystem.new
       @target_base_dir = target_base_dir
       @bhrg = DamageControl::Tool::Plot::BuildHistoryReportGenerator.new(build_history_repository)
     end
@@ -21,7 +18,7 @@ module DamageControl
       if message.is_a? BuildCompleteEvent
         build = message.build
         dir = "#{@target_base_dir}/#{build.project_name}"
-        @filesystem.makedirs(dir)
+        FileUtils.mkpath(dir)
         @bhrg.generate(dir, build.project_name)
       end
     end

@@ -1,13 +1,14 @@
-$damagecontrol_home = File::expand_path('#{File.dirname($0)}/../../../../../..') 
-
-$:<<"#{$damagecontrol_home}/src/ruby" 
-$:<<"#{$damagecontrol_home}/lib" 
+if __FILE__ == $0
+  $damagecontrol_home = File::expand_path('#{File.dirname($0)}/../../../../..') 
+  
+  $:<<"#{$damagecontrol_home}/server"
+end
 
 require 'gplot/Gnuplot'
-require 'damagecontrol/Build'
-require 'damagecontrol/AsyncComponent'
-require 'damagecontrol/BuildHistoryRepository'
-require 'damagecontrol/pebbles/TimeUtils'
+require 'damagecontrol/core/Build'
+require 'damagecontrol/core/AsyncComponent'
+require 'damagecontrol/core/BuildHistoryRepository'
+require 'pebbles/TimeUtils'
 
 module DamageControl
 module Tool

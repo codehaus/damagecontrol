@@ -10,11 +10,11 @@ $damagecontrol_home = File::expand_path('../..')
 $:<<"#{$damagecontrol_home}/server" 
 
 require 'damagecontrol/simple' 
-require 'damagecontrol/Hub'
-require 'damagecontrol/SocketTrigger'
-require 'damagecontrol/BuildExecutor'
-require 'damagecontrol/LogWriter'
-require 'damagecontrol/SelfUpgrader'
+require 'damagecontrol/core/Hub'
+require 'damagecontrol/core/SocketTrigger'
+require 'damagecontrol/core/BuildExecutor'
+require 'damagecontrol/core/LogWriter'
+require 'damagecontrol/core/SelfUpgrader'
 require 'damagecontrol/template/ShortTextTemplate'
 require 'damagecontrol/template/HTMLTemplate'
 require 'damagecontrol/publisher/IRCPublisher'
@@ -23,7 +23,7 @@ require 'damagecontrol/publisher/GraphPublisher'
 require 'damagecontrol/publisher/EmailPublisher'
 require 'damagecontrol/publisher/JIRAPublisher'
 require 'damagecontrol/cruisecontrol/CruiseControlLogPoller'
-require 'damagecontrol/Logging'
+require 'damagecontrol/util/Logging'
 
 include DamageControl
 
