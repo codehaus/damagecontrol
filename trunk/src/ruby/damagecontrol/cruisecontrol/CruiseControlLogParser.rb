@@ -1,4 +1,13 @@
-require 'rexml/pullparser'
+# some ruby distros include an old crappy REXML-version
+begin
+  require 'rexml/pullparser'
+rescue
+end
+begin
+  require 'rexml/parsers/pullparser'
+rescue
+end
+
 
 module DamageControl
 
