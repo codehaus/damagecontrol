@@ -19,11 +19,13 @@ module DamageControl
     end
     
     def tasks
-      return {} unless private?
-      {
-        "Configure" => "?project_name=#{project_name}&action=configure",
-        "Trig build now" => "?project_name=#{project_name}&action=trig_build"
-      }
+      result = {}
+      result["Checked out files..."] = "root/#{project_name}/checkout"
+      if(private?)
+        result["Configure"] = "?project_name=#{project_name}&action=configure"
+        result["Trig build now"] = "?project_name=#{project_name}&action=trig_build"
+      end
+      result
     end
   
     def default_action

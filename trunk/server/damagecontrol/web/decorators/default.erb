@@ -48,10 +48,11 @@
 		</form>
 	</div>
 
-	<% tasks.each do |name, url| %>
-		<div class='task-entry'><a href="<%= url %>"><%= name %></a></div>
+	<% if(tasks) %>
+		<% tasks.each do |name, url| %>
+			<div class='task-entry'><a href="<%= url %>"><%= name %></a></div>
+		<% end %>
 	<% end %>
-	<div class='task-entry'><a href="root/<%= project_name %>/checkout\">Checked out files...</a></div>
 
 </div>
 </div>
