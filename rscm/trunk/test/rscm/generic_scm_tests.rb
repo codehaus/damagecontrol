@@ -60,8 +60,8 @@ module RSCM
       initial_changesets = scm.changesets(checkout_dir, nil, nil, files)
       assert_equal(1, initial_changesets.length)
       initial_changeset = initial_changesets[0]
-      assert_equal(4, initial_changeset.length)
       assert_equal("imported\nsources", initial_changeset.message)
+      assert_equal(4, initial_changeset.length)
       assert(scm.uptodate?(checkout_dir, initial_changesets.latest.time + 1))
 
       # modify file and commit it
