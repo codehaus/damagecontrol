@@ -33,7 +33,7 @@
     </mkdir>
     <javac destdir="${classesdir}" deprecation="true" debug="true" optimize="false" excludes="**/package.html">
       <src>
-        <pathelement location="C:\scm\damagecontrol\testdata\damagecontrolled\src\java">
+        <pathelement location="${basedir}/src/java">
         </pathelement>
       </src>
       <classpath>
