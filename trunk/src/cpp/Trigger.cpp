@@ -70,16 +70,19 @@ void Trigger::Process()
     int port = 80;
     char * path;
 
-	int len = strlen(Url);
+    char urlCopy[80];
+    strcpy(urlCopy, Url);
+
+	int len = strlen(urlCopy);
 	for(int i=7; i<len; i++) {
-		switch(Url[i]) {
+		switch(urlCopy[i]) {
 			case ':':
-				Url[i] = 0;
+				urlCopy[i] = 0;
 				port_start = i + 1;
 				break;
 			case '/':
 				if(path_start == -1) {
-					Url[i] = 0;
+					urlCopy[i] = 0;
 					path_start = i + 1;				}
 				break;
 			default:
@@ -88,15 +91,15 @@ void Trigger::Process()
 	}
 	if(path_start == -1)
 	{
-		fprintf(stderr,"bad url %s\n", Url );
+		fprintf(stderr,"Bad URL: %s\n", Url );
 		exit(1);
 	}
 	if(port_start != -1)
 	{
-		port = atoi (Url + port_start);
+		port = atoi (urlCopy + port_start);
 	}
-	path = Url + path_start;
-    host = Url + 7;
+	path = urlCopy + path_start;
+    host = urlCopy + 7;
 
 	// current time in utc (ISO-8601)
 	time_t timestamp;
@@ -114,7 +117,7 @@ void Trigger::Process()
 	hostent * entry = gethostbyname(host);
 
 	if( !entry ) {
-		fprintf(stderr,"bad hostname %s\n", host );
+		fprintf(stderr,"Bad hostname: %s\n", host );
 		exit(1);
 	}
 
@@ -157,7 +160,7 @@ void Trigger::Process()
 			int http_code;
 			http_code = atoi(buffer + 9);
 			if(http_code != 200) {
-				fprintf(stdout,"XML-RPC error: %d.\n", http_code);
+				fprintf(stdout,"XML-RPC error: %d. URL: %s\n", http_code, Url);
 			}
 
 			// Look for content between <string></string>
@@ -176,7 +179,7 @@ void Trigger::Process()
 		}
 		else
 		{
-			fprintf(stdout,"Socket error on send.\n");
+			fprintf(stdout,"Socket error on send. URL: %s\n", Url);
 		}
 
 		#ifdef _WIN32
@@ -188,7 +191,7 @@ void Trigger::Process()
 	}
 	else
 	{
-		fprintf(stdout,"Socket error on connect.\n");
+		fprintf(stdout,"Socket error on connect. URL: %s\n", Url);
 	}
 }
 
