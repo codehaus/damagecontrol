@@ -1,16 +1,13 @@
 # The filters added to this controller will be run for all controllers in the application.
 # Likewise will all the methods added be available for all controllers.
 
-require 'rscm_ext'
-require 'rails_ext'
 require 'damagecontrol/project'
 require 'damagecontrol/build'
 require 'damagecontrol/tracker'
 require 'damagecontrol/scm_web'
-# TODO: find a way so we don't have to explicitly load these
-require 'damagecontrol/publisher/email'
-require 'damagecontrol/publisher/irc'
-require 'damagecontrol/publisher/growl'
+require 'damagecontrol/publisher/base'
+require 'rscm_ext'
+require 'rails_ext'
 
 class ApplicationController < ActionController::Base
 

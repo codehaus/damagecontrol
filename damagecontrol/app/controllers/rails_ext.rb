@@ -1,3 +1,5 @@
+require 'rscm/annotations'
+
 class ActionController::Base
 
   # Instantiates an Array of object from +class_name_2_attr_hash_hash+
@@ -12,6 +14,9 @@ class ActionController::Base
   end
 
   def instantiate_from_hash(clazz, attr_hash)
+STDERR.puts clazz.name
+STDERR.puts attr_hash.inspect
+STDERR.puts "----------"
     object = clazz.new
     attr_hash.each do |attr_name, attr_value|
       setter = attr_name[1..-1] + "="
@@ -89,6 +94,24 @@ module ActionView
         options[:value] ? options[:value] : ""
       end
     end
+
+    # Renders an editable or read-only element describing a boolean value.
+    #
+    # Options:
+    # * <tt>:name</tt> - The name of the variable/attribute.
+    # * <tt>:value</tt> - True or False
+    # * <tt>:editable</tt> - True or False
+    def text_or_checkbox(options)
+      value = options.delete(:value)
+      if(options.delete(:editable))
+        options[:type] = "checkbox"
+        options[:value] = "true"
+        options[:checked] = "true" if value
+        tag("input", options)
+      else
+        value ? "on" : "off"
+      end
+    end
     
     def text_or_select(input, options)
       values = options.delete(:values)
@@ -145,6 +168,9 @@ module ActionView
     end
 
     # Creates a table rendering +o+'s attributes.
+    # Uses a default rendering, but a custom template
+    # will be used if there is a "_<underscored_class_name>.rhtml"
+    # under the project directory
     def render_object(o, collection_name, edit)
       underscored_name = underscore(demodulize(o.class.name))
       template = File.expand_path(File.dirname(__FILE__) + "/../views/project/_#{underscored_name}.rhtml")
@@ -152,14 +178,17 @@ module ActionView
         render_partial(underscored_name, o)
       else
         r = "<table>\n"
-        o.instance_variables.each do |attr_name| 
-          attr_value = o.instance_variable_get(attr_name)
+        o.instance_variables.each do |attr_name|
           attr_anns = o.class.send(attr_name[1..-1])
-          r << "  <tr>\n"
-          r << "    <td width='25%'>#{attr_anns[:description]}</td>\n"
-          html_value = text_or_input(edit, :name => "#{collection_name}[#{o.class.name}][#{attr_name}]", :value => attr_value)
-          r << "    <td width='75%'>#{html_value}</td>\n"
-          r << "  </tr>\n"
+          if(attr_anns && attr_anns[:description])
+            # Only render attributes with :description annotations
+            attr_value = o.instance_variable_get(attr_name)
+            r << "  <tr>\n"
+            r << "    <td width='25%'>#{attr_anns[:description]}</td>\n"
+            html_value = text_or_input(edit, :name => "#{collection_name}[#{o.class.name}][#{attr_name}]", :value => attr_value)
+            r << "    <td width='75%'>#{html_value}</td>\n"
+            r << "  </tr>\n"
+          end
         end
         r << "</table>"
         r

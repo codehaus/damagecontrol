@@ -21,6 +21,9 @@ module RSCM
     ann :desc => "desc", :tip => "tip"
     attr_accessor :bar, :zap
   end
+  
+  class Subclass < Other
+  end
 
   class AnnotationsTest < Test::Unit::TestCase
     def test_should_handle_annotations_really_well
@@ -34,8 +37,6 @@ module RSCM
       assert_equal("bang bang", Whatever.zap[:desc])
       assert_equal("a top tip", Whatever.zap[:tip])
 
-      assert_nil(Whatever.barf[:pip])
-
       assert_equal("boo", Other.foo[:boo])
       assert_equal("pip", Other.foo[:pip])
 
@@ -45,9 +46,12 @@ module RSCM
 
       assert_equal("desc", Other.zap[:desc])
       assert_equal("tip", Other.zap[:tip])
-
     end
 
-    # TODO: write more tests especially involving sub classes. Seems to be broken.
+    def test_should_inherit_attribute_annotations
+      assert_equal("boo", Subclass.foo[:boo])
+      assert_equal({:boo => "boo", :pip => "pip"}, Subclass.send("foo"))
+      assert_nil(Whatever.send("no_annotation"))
+    end
   end
 end

@@ -18,6 +18,7 @@ REGISTRY = Needle::Registry.define do |b|
       b.persister.save_rss(project)
       changeset = changesets.latest
       project.execute_build(changeset.identifier, "Detected changes by polling #{project.scm.name}") do |build|
+        # TODO: we want to reuse this in other places (Execute publisher)
         env = {
           'PKG_BUILD' => changeset.identifier.to_s, # Rake standard
           'DAMAGECONTROL_BUILD_LABEL' => changeset.identifier.to_s, # For others

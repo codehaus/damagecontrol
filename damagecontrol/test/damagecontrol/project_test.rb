@@ -110,7 +110,7 @@ module DamageControl
         assert(build.time <= now)
         build.execute("some command")
 
-        assert_equal("some command", File.open("#{home}/mooky/changesets/boo/builds/#{build.time.to_s}/command").read)
+        assert_equal("some command", File.open("#{home}/projects/mooky/changesets/boo/builds/#{build.time.to_s}/command").read)
       end
       
     end
@@ -123,9 +123,9 @@ module DamageControl
       changeset_identifier = Time.new.utc
       build_1_time = changeset_identifier + 10
       build_2_time = changeset_identifier + 20
-      FileUtils.mkdir_p("#{home}/mooky/changesets/#{changeset_identifier.ymdHMS}/builds/#{build_1_time.ymdHMS}")
-      FileUtils.touch("#{home}/mooky/changesets/#{changeset_identifier.ymdHMS}/builds/#{build_1_time.ymdHMS}/command")
-      FileUtils.mkdir_p("#{home}/mooky/changesets/#{changeset_identifier.ymdHMS}/builds/#{build_2_time.ymdHMS}")
+      FileUtils.mkdir_p("#{home}/projects/mooky/changesets/#{changeset_identifier.ymdHMS}/builds/#{build_1_time.ymdHMS}")
+      FileUtils.touch("#{home}/projects/mooky/changesets/#{changeset_identifier.ymdHMS}/builds/#{build_1_time.ymdHMS}/command")
+      FileUtils.mkdir_p("#{home}/projects/mooky/changesets/#{changeset_identifier.ymdHMS}/builds/#{build_2_time.ymdHMS}")
 
       builds = p.builds(changeset_identifier)
       assert_equal(2, builds.length)
@@ -146,17 +146,18 @@ module DamageControl
       
       build = new_mock
 
-      publisher_1 = new_mock
-      publisher_1.__expect(:publish) do |b|
+      enabled_publisher = new_mock
+      enabled_publisher.__setup(:name) {"I am enabled"}
+      enabled_publisher.__expect(:enabled) {true}
+      enabled_publisher.__expect(:publish) do |b|
         assert_equal(build, b)
       end
-      p.publishers << publisher_1
+      p.publishers << enabled_publisher
       
-      publisher_2 = new_mock
-      publisher_2.__expect(:publish) do |b|
-        assert_equal(build, b)
-      end
-      p.publishers << publisher_2
+      disabled_publisher = new_mock
+      disabled_publisher.__setup(:name) {"I am disabled"}
+      disabled_publisher.__expect(:enabled) {false}
+      p.publishers << disabled_publisher
 
       p.publish(build)
     end

@@ -6,17 +6,23 @@ module DamageControl
 
   # This class knows about locations of various files and directories.
   #
+  # TODO: Add templates, logs(global)
   module Directories
     include FileUtils
 
     def project_names
-      result = Dir["#{basedir}/*/project.yaml"].collect do |f| 
+      result = Dir["#{basedir}/projects/*/project.yaml"].collect do |f| 
         File.basename(File.dirname(f))
       end
       result.sort
     end
     module_function :project_names
     
+    def project_dir(project_name)
+      "#{basedir}/projects/#{project_name}"
+    end
+    module_function :project_dir
+
     def checkout_dir(project_name)
       "#{project_dir(project_name)}/checkout"
     end
@@ -104,11 +110,6 @@ module DamageControl
       "#{project_dir(project_name)}/project.yaml"
     end
     module_function :project_config_file
-
-    def project_dir(project_name)
-      "#{basedir}/#{project_name}"
-    end
-    module_function :project_dir
 
     def basedir
       if(ENV['DAMAGECONTROL_HOME'])
