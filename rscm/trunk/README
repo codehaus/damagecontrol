@@ -16,8 +16,12 @@ which is described in AbstractSCM.
 
 === Wish:
 
-Integrate with CVSSpam so that all supported SCMs (not only CVS) can benefit from its awesome coloured diff capabilities.
-This would provide a very nice alternative to SCM web front-ends.
+Implement coloured diffs simliar to CVSSpam/SVN::Notify so that all supported SCMs 
+(not only CVS) can benefit from its awesome coloured diff capabilities. This would 
+provide a very nice alternative to SCM web front-ends.
+
+Implement import/export functionality to allow migrating from one SCM to another while
+keeping the history. Great for migration from archaic SCMs!
 
 == RSCM Server
 
@@ -143,7 +147,7 @@ Let's start implementing the Mooky class too. Take a look at.
 
 Try running Mooky's test:
 
-  rake test TEST=test/mooky/mooky_test.rb
+  rake test TEST=test/rscm/mooky/mooky_test.rb
   
 Whoops - we got some failures! It failed because our checkout method returned 
 nothing (nil). Let'see if we can get the a little further by implementing this

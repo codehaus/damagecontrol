@@ -1,5 +1,6 @@
 require 'fileutils'
 require 'rscm/changes'
+require 'rscm/path_converter'
 require 'xmlrpc/utils'
 
 class Time
@@ -12,13 +13,6 @@ class Time
       Time.utc(2038)
     end
   end
-end
-
-def safer_popen(cmd, mode="r", &proc)
-  ret = IO.popen(cmd, mode="r", &proc)
-  exit_code = $? >> 8
-  raise "#{cmd} failed with code #{exit_code}" if exit_code != 0
-  ret
 end
 
 module RSCM
@@ -168,6 +162,11 @@ module RSCM
     # The command line to run in order to update a working copy.
     #
     def update_commandline(to_identifier=Time.infinity)
+    end
+
+    # Returns/yields an IO containing the unified diff of the change.
+    def diff(checkout_dir, change, &block)
+      return(yield("Diff not implemented"))
     end
 
     def ==(other_scm)

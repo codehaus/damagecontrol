@@ -16,15 +16,15 @@ module RSCM
     end
 
     def [](change)
-      @changesets[change]
+      sorted[change]
     end
 
     def each(&block)
-      @changesets.each(&block)
+      sorted.each(&block)
     end
     
     def reverse
-      ChangeSets.new(@changesets.reverse)
+      ChangeSets.new(sorted.reverse)
     end
     
     def length
@@ -148,7 +148,15 @@ module RSCM
       ChangeSets.ids(changesets_dir)[-1]
     end
 
+    def diff(checkout_dir, scm, &block)
+      each { |changeset| changeset.diff(checkout_dir, scm, &block) }
+    end
+
   private
+
+    def sorted
+      @changesets.sort!
+    end
 
     def to_rss(title, link, description, message_linker, change_linker)
       raise "title" unless title
@@ -226,6 +234,10 @@ module RSCM
       @changes == other.changes
     end
 
+    def <=>(other)
+      @time <=> other.time
+    end
+
     def can_contain?(change)
       self.developer == change.developer &&
       self.message == change.message &&
@@ -261,6 +273,10 @@ module RSCM
     # Returns the id of the changeset or +time+ in ymdHMS format if undefined.
     def id
       @revision || @time.ymdHMS
+    end
+    
+    def diff(checkout_dir, scm, &block)
+      each { |change| change.diff(checkout_dir, scm, &block) }
     end
   end
 
@@ -325,6 +341,10 @@ module RSCM
     def time=(time)
       raise "time must be a Time object" unless time.is_a?(Time)
       @time = time
+    end
+
+    def diff(checkout_dir, scm, &block)
+      scm.diff(checkout_dir, self, &block)
     end
 
     def ==(other)

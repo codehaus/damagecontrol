@@ -30,7 +30,6 @@ module RSCM
     end
 
     def checkout(checkout_dir)
-
       checkout_dir = PathConverter.filepath_to_nativepath(checkout_dir, false)
       mkdir_p(checkout_dir)
       checked_out_files = []
@@ -110,6 +109,14 @@ module RSCM
 
     def label(checkout_dir)
       local_revision(checkout_dir).to_s
+    end
+
+    def diff(checkout_dir, change, &block)
+      with_working_dir(checkout_dir) do
+        safer_popen("svn diff -r #{change.revision}:#{change.previous_revision} #{change.path}") do |io|
+          return(yield(io))
+        end
+      end
     end
 
     def can_create?

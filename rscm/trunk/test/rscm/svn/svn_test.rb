@@ -1,6 +1,6 @@
 require 'test/unit'
-require 'rscm/generic_scm_tests'
 require 'rscm/svn/svn'
+require 'rscm/generic_scm_tests'
 require 'rscm/path_converter'
 
 module RSCM

@@ -1,5 +1,5 @@
 require 'fileutils'
-require 'tempdir'
+require 'rscm/tempdir'
 
 module RSCM
 
@@ -137,6 +137,75 @@ module RSCM
       scm = create_scm(RSCM.new_temp_dir, ".")
       scm2 = scm.class.new
       assert_same(scm.class, scm2.class)
+    end
+
+EXPECTED_DIFF = <<-EOF
+===================================================================
+--- afile.txt   (revision 2)
++++ afile.txt   (revision 1)
+@@ -1,2 +1 @@
+-one two three four
+-five six
++
+Index: afile.txt
+===================================================================
+--- afile.txt   (revision 3)
++++ afile.txt   (revision 2)
+@@ -1,3 +1,2 @@
+-one to threee
+-hello
+-four five six
++one two three four
++five six
+EOF
+
+    def test_diff
+      work_dir = RSCM.new_temp_dir
+      path = "diffing"
+      checkout_dir = "#{work_dir}/#{path}/checkout"
+      repository_dir = "#{work_dir}/repository"
+      import_dir = "#{work_dir}/import/diffing"
+      scm = create_scm(repository_dir, path)
+      scm.create
+      
+      mkdir_p(import_dir)
+      File.open("#{import_dir}/afile.txt", "w") do |io|
+        io.puts("one two three")
+        io.puts("four five six")
+      end
+      File.open("#{import_dir}/afile.txt", "w") do |io|
+        io.puts("")
+      end
+      
+      scm.import(import_dir, "Imported a file to diff against")
+      scm.checkout(checkout_dir)
+
+      File.open("#{checkout_dir}/afile.txt", "w") do |io|
+        io.puts("one two three four")
+        io.puts("five six")
+      end
+      File.open("#{checkout_dir}/anotherfile.txt", "w") do |io|
+        io.puts("one quick brown")
+        io.puts("fox jumped over")
+      end
+      scm.commit(checkout_dir, "Modified file to diff")
+
+      File.open("#{checkout_dir}/afile.txt", "w") do |io|
+        io.puts("one to threee")
+        io.puts("hello")
+        io.puts("four five six")
+      end
+      File.open("#{checkout_dir}/anotherfile.txt", "w") do |io|
+        io.puts("one quick brown")
+        io.puts("fox jumped over the lazy dog")
+      end
+      scm.commit(checkout_dir, "Modified file to diff again")
+      
+      changesets = scm.changesets(checkout_dir, Time.epoch)
+
+      changesets.diff(checkout_dir, scm) do |io|
+        puts io.read
+      end
     end
 
   private

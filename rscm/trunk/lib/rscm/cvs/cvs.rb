@@ -68,7 +68,7 @@ module RSCM
     end
     
     def checkout_commandline(to_identifier=Time.infinity)
-      "cvs checkout #{branch_option} #{to_option(to_identifier)} #{mod}"
+      "cvs checkout #{branch_option} #{revision_option(to_identifier)} #{mod}"
     end
 
     def update_commandline
@@ -95,6 +95,22 @@ module RSCM
         parse_log(checkout_dir, new_changes_command(from_identifier, to_identifier, files))
       rescue => e
         parse_log(checkout_dir, old_changes_command(from_identifier, to_identifier, files))
+      end
+    end
+    
+    def diff(checkout_dir, change, &block)
+      with_working_dir(checkout_dir) do
+        opts = case change.status
+          when /#{Change::MODIFIED}/; "#{revision_option(change.previous_revision)} #{revision_option(change.revision)}"
+          when /#{Change::DELETED}/; "#{revision_option(change.previous_revision)}"
+          when /#{Change::ADDED}/; "#{revision_option(Time.epoch)} #{revision_option(change.revision)}"
+        end
+        # IPORTANT! CVS NT has a bug in the -N diff option
+        # http://www.cvsnt.org/pipermail/cvsnt-bugs/2004-November/000786.html
+        cmd = command_line("diff -Nu #{opts} #{change.path}")
+        safer_popen(cmd, "r", 1) do |io|
+          return(yield(io))
+        end
       end
     end
     
@@ -196,7 +212,7 @@ module RSCM
     def cvs(dir, cmd, simulate=false)
       dir = PathConverter.nativepath_to_filepath(dir)
       dir = File.expand_path(dir)
-      execed_command_line = command_line(password, cmd, simulate)
+      execed_command_line = command_line(cmd, password, simulate)
       with_working_dir(dir) do
         safer_popen(execed_command_line) do |stdout|
           stdout.each_line do |progress|
@@ -211,14 +227,13 @@ module RSCM
     end
 
     def parse_log(checkout_dir, cmd, &proc)
-puts cmd
-      logged_command_line = command_line(hidden_password, cmd)
+      logged_command_line = command_line(cmd, hidden_password)
       yield logged_command_line if block_given?
 
-      execed_command_line = command_line(password, cmd)
+      execed_command_line = command_line(cmd, password)
       changesets = nil
       with_working_dir(checkout_dir) do
-        safer_popen(execed_command_line) do |stdout, process|
+        safer_popen(execed_command_line) do |stdout|
           parser = CVSLogParser.new(stdout)
           parser.cvspath = path
           parser.cvsmodule = mod
@@ -287,7 +302,7 @@ puts cmd
       end
     end
   
-    def command_line(password, cmd, simulate=false)
+    def command_line(cmd, password=nil, simulate=false)
       cvs_options = simulate ? "-n" : ""
       "cvs \"-d#{root_with_password(password)}\" #{cvs_options} -q #{cmd}"
     end
@@ -296,12 +311,12 @@ puts cmd
       CVS.new(self.root, "CVSROOT", nil, self.password)
     end
 
-    def to_option(to_identifier)
+    def revision_option(identifier)
       option = nil
-      if(to_identifier.is_a?(Time))
-        option = "-D \"#{cvsdate(to_identifier)}\""
-      elsif(to_identifier.is_a?(String))
-        option = "-r #{to_identifier}"
+      if(identifier.is_a?(Time))
+        option = "-D\"#{cvsdate(identifier)}\""
+      elsif(identifier.is_a?(String))
+        option = "-r#{identifier}"
       else
         ""
       end

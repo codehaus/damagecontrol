@@ -1,6 +1,6 @@
 require 'yaml'
 require 'test/unit'
-require 'tempdir'
+require 'rscm/tempdir'
 require 'rscm/changes'
 require 'rscm/tracker'
 require 'rscm/scm_web'

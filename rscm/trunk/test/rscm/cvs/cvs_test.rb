@@ -1,7 +1,6 @@
 require 'test/unit'
-require 'rscm/generic_scm_tests'
 require 'rscm/cvs/cvs'
-require 'rscm/threadfile'
+require 'rscm/generic_scm_tests'
 
 module RSCM
   class CVSTest < Test::Unit::TestCase

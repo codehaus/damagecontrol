@@ -29,8 +29,8 @@ module RSCM
         changesets = @parser.parse_changesets
         
         assert_equal(24, changesets.length)
-        assert_match(/o YAML config \(BuildBootstrapper\)/, changesets[2].message)
-        assert_match(/failure/, changesets[17].message)
+        assert_match(/o YAML config \(BuildBootstrapper\)/, changesets[1].message)
+        assert_match(/failure/, changesets[8].message)
       end
     end
     
@@ -49,7 +49,7 @@ module RSCM
       @parser.parse_changes(LOG_ENTRY, changesets)
       assert_equal(4, changesets.length)
       assert_equal("src/ruby/damagecontrol/BuildExecutorTest.rb", changesets[0][0].path)
-      assert_match(/linux-windows galore/, changesets[2][0].message)
+      assert_match(/linux-windows galore/, changesets[1][0].message)
     end
     
     def test_sets_previous_revision_to_one_before_the_current
@@ -112,8 +112,8 @@ EOF
       @parser = CVSLogParser.new(StringIO.new(LOG_FROM_E2E_TEST))
       changesets = @parser.parse_changesets
       assert_equal(2, changesets.length)
-      assert_match(/foo/, changesets[0].message)
-      assert_match(/bar/, changesets[1].message)
+      assert_match(/foo/, changesets[1].message)
+      assert_match(/bar/, changesets[0].message)
     end
     
     LOG_FROM_E2E_TEST = <<-EOF
@@ -207,7 +207,7 @@ EOF
       expected_change.revision = "1.19"
       expected_change.time = Time.utc(2004, 7, 5, 9, 41, 51)
       
-      assert_equal(expected_change, changesets[0][0])
+      assert_equal(expected_change, changesets[9][0])
     end
 
 LOG_FROM_05_07_2004_19_41 = <<-EOF
@@ -362,7 +362,7 @@ EOF
       changesets = @parser.parse_changesets
       assert_equal(2, changesets.length)
 
-      changeset_delete = changesets[0]
+      changeset_delete = changesets[1]
 #      assert_equal("MAIN:rinkrank:20031013000454", changeset_delete.revision)
       assert_equal(Time.utc(2003,10,13,00,04,54,0), changeset_delete.time)
       assert_equal("Obsolete", changeset_delete.message)
@@ -373,7 +373,7 @@ EOF
       assert_equal("1.10", changeset_delete[0].previous_revision)
       assert(Change::DELETED, changeset_delete[0].status)
 
-      changeset_fix_url = changesets[1]
+      changeset_fix_url = changesets[0]
 #      assert_equal("MAIN:rinkrank:20030725163239", changeset_fix_url.revision)
       assert_equal(Time.utc(2003,07,25,16,32,39,0), changeset_fix_url.time)
       assert_equal("fixed broken url (NANO-8)", changeset_fix_url.message)

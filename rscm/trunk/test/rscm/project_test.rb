@@ -1,5 +1,5 @@
 require 'test/unit'
-require 'tempdir'
+require 'rscm/tempdir'
 require 'rscm/mockit'
 require 'rscm'
 

@@ -2,10 +2,10 @@ WIN32 = RUBY_PLATFORM == "i386-mswin32"
 CYGWIN = RUBY_PLATFORM == "i386-cygwin"
 WINDOWS = WIN32 || CYGWIN
 
-def safer_popen(cmd, mode="r", &proc)
+def safer_popen(cmd, mode="r", expected_exit=0, &proc)
   ret = IO.popen(cmd, mode="r", &proc)
   exit_code = $? >> 8
-  raise "#{cmd} failed with code #{exit_code}" if exit_code != 0
+  raise "#{cmd} failed with code #{exit_code} in #{Dir.pwd}. Expected exit code: #{expected_exit}" if exit_code != expected_exit
   ret
 end
 
