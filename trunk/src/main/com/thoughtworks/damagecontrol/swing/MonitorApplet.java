@@ -1,12 +1,16 @@
 package com.thoughtworks.damagecontrol.swing;
 
+import com.thoughtworks.damagecontrol.monitor.TextAdder;
+import com.thoughtworks.damagecontrol.monitor.BuildClient;
+
 import javax.swing.*;
 import java.net.URL;
 import java.awt.*;
+import java.io.IOException;
 
 /**
  * @author Aslak Helles&oslash;y
- * @version $Revision: 1.1 $
+ * @version $Revision: 1.2 $
  */
 public class MonitorApplet extends JApplet {
 
@@ -19,11 +23,18 @@ public class MonitorApplet extends JApplet {
     public void init() {
         super.init();
 
+        TextAdder textAdder = guiBuilder.buildPanel();
+
         URL url = getCodeBase();
         String host = url.getHost();
         int port = Integer.parseInt(getParameter("port"));
 
-        guiBuilder.buildPanel(host, port);
+        BuildClient buildClient = new BuildClient(host, port, textAdder);
+        try {
+            buildClient.connect();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
 
     }
 }

@@ -9,7 +9,7 @@ import java.io.IOException;
 
 /**
  * @author Aslak Helles&oslash;y
- * @version $Revision: 1.1 $
+ * @version $Revision: 1.2 $
  */
 public class GuiBuilder {
     private BuildPanel buildPanel = new BuildPanel();
@@ -19,24 +19,26 @@ public class GuiBuilder {
         this.container = container;
     }
 
-    public void buildPanel(String host, int port) {
+    public TextAdder buildPanel() {
         TextAdder textAdder = new DocumentUpdater(buildPanel.getProgressDocument());
-        BuildClient buildClient = new BuildClient(host, port, textAdder);
-        try {
-            buildClient.connect();
-            container.add(buildPanel);
-        } catch (IOException e) {
-            container.removeAll();
-            container.add(new JLabel(e.getMessage()));
-        }
+        container.add(buildPanel);
+        return textAdder;
     }
 
     public static void main(String[] args) {
         JFrame f = new JFrame();
         GuiBuilder b = new GuiBuilder(f.getContentPane());
-        b.buildPanel("localhost", 4712);
+        TextAdder textAdder = b.buildPanel();
         f.pack();
         f.show();
         System.out.println("SHOWED FRAME");
+
+        BuildClient buildClient = new BuildClient("localhost", 4712, textAdder);
+        try {
+            buildClient.connect();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
     }
 }

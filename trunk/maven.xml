@@ -1,0 +1,14 @@
+<project 
+  default="make-site"
+  xmlns:j="jelly:core">
+
+  <goal name="make-site">
+    <attainGoal name="jar:install"/>
+    <mkdir dir="${basedir}/target/site"/>
+    <copy todir="${basedir}/target/site">
+      <fileset dir="${basedir}/docs"/>
+    </copy>
+    <copy file="${basedir}/target/${maven.final.name}.jar" todir="${basedir}/target/site"/>
+  </goal>
+
+</project>
