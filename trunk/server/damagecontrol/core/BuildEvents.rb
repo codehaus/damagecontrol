@@ -55,7 +55,7 @@ module DamageControl
     end
   end
 
-  class XMLProducedEvent
+  class StatProducedEvent
     attr_reader :project_name
     attr_reader :xml_file
 

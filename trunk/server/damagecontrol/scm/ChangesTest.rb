@@ -1,8 +1,11 @@
-require 'damagecontrol/scm/Changes'
+require 'yaml'
 require 'test/unit'
+require 'damagecontrol/scm/Changes'
+require 'damagecontrol/util/FileUtils'
 
 module DamageControl
   class ChangesTest < Test::Unit::TestCase
+    include FileUtils
     
     def setup
       @change1 = Change.new("path/one",   "jon",   "tjo bing",    "1.1", Time.utc(2004,7,5,12,0,2))
@@ -147,6 +150,13 @@ EOF
 
       assert_equal(@change1.time, changesets[0].time)
       assert_equal(@change7.time, changesets[-1].time)
+    end
+    
+    def test_can_parse_changesets_from_yaml
+      changesets = File.open("#{damagecontrol_home}/testdata/changesets.yaml") do |io|
+        YAML::load(io)
+      end
+      assert_equal("rinkrank", changesets[0][1].developer)
     end
 
   end

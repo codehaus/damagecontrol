@@ -1,0 +1,33 @@
+--- !ruby/object:DamageControl::ChangeSets 
+changesets: 
+  - !ruby/object:DamageControl::ChangeSet 
+    changes: 
+      - !ruby/object:DamageControl::Change 
+        developer: rinkrank
+        message: "Disable searching - it doesn't work after the build history was refactored (it
+          would probably work, but it would be too i/o/cpu hungry)
+
+          "
+        path: server/damagecontrol/web/AbstractAdminServlet.rb
+        previous_revision: "1.42"
+        revision: "1.43"
+        status: MODIFIED
+        time: 2004-11-30 04:52:24 Z
+      - !ruby/object:DamageControl::Change 
+        developer: rinkrank
+        message: "Disable searching - it doesn't work after the build history was refactored (it
+          would probably work, but it would be too i/o/cpu hungry)
+
+          "
+        path: server/damagecontrol/web/ProjectServlet.rb
+        previous_revision: "1.71"
+        revision: "1.72"
+        status: MODIFIED
+        time: 2004-11-30 04:52:24 Z
+    developer: rinkrank
+    message: "Disable searching - it doesn't work after the build history was refactored (it
+      would probably work, but it would be too i/o/cpu hungry)
+
+      "
+    revision: MAIN:rinkrank:20041130045224
+    time: 2004-11-30 04:52:24 Z

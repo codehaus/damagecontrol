@@ -1,6 +1,7 @@
 require 'yaml'
 require 'fileutils'
 require 'damagecontrol/core/Build'
+require 'damagecontrol/scm/Changes'
 
 module DamageControl
 
@@ -65,8 +66,23 @@ module DamageControl
     end
     
     def changesets(build_dir)
-      File.open("#{build_dir}/changesets.yaml") do |io|
-        YAML::load(io)
+      # Sometimes YAML parsing fails - WTF?? (AH)
+      # http://builds.codehaus.org/damagecontrol/private/project/damagecontrol?dc_creation_time=20041130053221
+      # The bad file:
+      # http://builds.codehaus.org/damagecontrol/private/root/damagecontrol/build/20041130053221/changesets.yaml
+      begin
+        changesets_file = "#{build_dir}/changesets.yaml"
+puts "parsing #{changesets_file}"
+        changesets = File.open(changesets_file) do |io|
+          YAML::load(io)
+        end
+puts "done parsing #{changesets_file}"
+        changesets
+      rescue Exception => e
+        puts "Failed to parse changesets with YAML:"
+        puts e.message
+        puts e.backtrace.join("\n")
+        Changesets.new
       end
     end
 
