@@ -1,4 +1,0 @@
-STORY: The AcceptanceTestRunner must fail with a failing acceptance test.
-
-TEST: This test should fail.
-Fail
