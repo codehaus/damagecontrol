@@ -3,9 +3,10 @@ require 'fileutils'
 
 module RSCM
   class Monotone < AbstractSCM
-    def initialize(db_file=nil, branch=nil)
+    def initialize(db_file=nil, branch=nil, key=nil)
       @db_file = File.expand_path(db_file) if db_file
       @branch = branch
+      @key = key
     end
 
     def name
@@ -32,7 +33,7 @@ puts relative_dirs.join("\n")
 puts
 
       add_cmd = "monotone --db=\"#{@db_file}\" add #{relative_dirs.join(' ')}"
-      commit_cmd = "monotone --db=\"#{@db_file}\" --branch=\"#{@branch}\" commit '#{message}'"
+      commit_cmd = "monotone --db=\"#{@db_file}\" --branch=\"#{@branch}\" --key=\"#{@key}\" commit '#{message}'"
 
       puts "IMPORTING: #{add_cmd}"
       with_working_dir(dir) do

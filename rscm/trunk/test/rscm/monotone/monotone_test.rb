@@ -8,7 +8,9 @@ module RSCM
     include GenericSCMTests
 
     def create_scm(repository_root_dir, path)
-      Monotone.new("#{repository_root_dir}/MT.db", "com.example.testproject")
+      mt = Monotone.new("#{repository_root_dir}/MT.db",
+          "com.example.testproject",
+          "tester@test.net")
     end
   end
 end
