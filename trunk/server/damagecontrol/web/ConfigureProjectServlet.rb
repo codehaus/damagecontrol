@@ -57,6 +57,7 @@ module DamageControl
       "view_cvs_url",
       "trigger", 
       "nag_email", 
+      "jira_url", 
       "scm_type"
     ]
     

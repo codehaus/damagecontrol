@@ -41,6 +41,7 @@ require 'damagecontrol/xmlrpc/TriggerTest'
 
 require 'damagecontrol/web/ConfigureProjectTest'
 require 'damagecontrol/web/InstallTriggerServletTest'
+require 'damagecontrol/web/ProjectServletTest'
 
 require 'damagecontrol/test/IntegrationTests'
 

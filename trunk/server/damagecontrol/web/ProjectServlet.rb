@@ -76,6 +76,16 @@ module DamageControl
     def search_form
       project_search_form(:project_name => project_name)
     end
+    
+    def quote_message(message)
+      m = html_quote(message)
+      jira_url = project_config["jira_url"]
+      if(jira_url)
+        m.gsub(/([A-Z]+-[1-9]+)/, "<a href=\"#{jira_url}/browse/\\1\">\\1</a>")
+      else
+        m
+      end
+    end
 
     def project_search_form(params)
       project_name = params[:project_name] || required_param(:project_name)
