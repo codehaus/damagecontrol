@@ -89,11 +89,11 @@ module DamageControl
       init_config_services
       
       component(:log_writer, LogWriter.new(hub, logdir))
-    
+      
       component(:host_verifier, if allow_ips.nil? then OpenHostVerifier.new else HostVerifier.new(allow_ips) end)
       
       component(:socket_trigger, SocketTrigger.new(@hub, socket_trigger_port, host_verifier))
-          
+      
       init_build_scheduler
       
       init_webserver
