@@ -15,7 +15,7 @@ class ProjectController < ApplicationController
   end
 
   def index
-    @projects = DamageControl::Project.find_all
+    @projects = ::DamageControl::Project.find_all
     @navigation_name = "null"
   end
 

@@ -116,7 +116,7 @@ module RSCM
       assert("src/java/com/thoughtworks/damagecontrolled/Hello.txt", scm.checkout(other_checkout_dir).sort[0])
     end
     
-    def Xtest_trigger
+    def test_trigger
       work_dir = RSCM.new_temp_dir("trigger")
       path = "OftenModified"
       checkout_dir = "#{work_dir}/#{path}/checkout"
@@ -134,7 +134,7 @@ module RSCM
       end
     end
 
-    def Xtest_checkout_changeset_identifier
+    def test_checkout_changeset_identifier
       work_dir = RSCM.new_temp_dir("label")
       checkout_dir = "#{work_dir}/checkout"
       repository_dir = "#{work_dir}/repository"
@@ -158,13 +158,13 @@ module RSCM
       assert(!File.exist?("#{checkout_dir}/after.txt"))
     end
 
-    def Xtest_should_allow_creation_with_empty_constructor
+    def test_should_allow_creation_with_empty_constructor
       scm = create_scm(RSCM.new_temp_dir, ".")
       scm2 = scm.class.new
       assert_same(scm.class, scm2.class)
     end
 
-    def Xtest_diff
+    def test_diff
       work_dir = RSCM.new_temp_dir("diff")
       path = "diffing"
       checkout_dir = "#{work_dir}/#{path}/checkout"
@@ -250,7 +250,7 @@ module RSCM
   end
     
   module LabelTest
-    def Xtest_label
+    def test_label
       work_dir = RSCM.new_temp_dir("label")
       checkout_dir = "#{work_dir}/LabelTest"
       repository_dir = "#{work_dir}/repository"

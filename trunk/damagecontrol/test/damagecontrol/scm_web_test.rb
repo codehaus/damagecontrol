@@ -9,7 +9,7 @@ module DamageControl
     class SCMWebTest < Test::Unit::TestCase
     
       def setup
-        @change = RSCM::Change.new("path/one", "aslak", "Fixed CATCH-22", "2.4", Time.utc(2004,7,5,12,0,2))
+        @change = RSCM::Change.new("path/one", RSCM::Change::MODIFIED, "aslak", "Fixed CATCH-22", "2.4", Time.utc(2004,7,5,12,0,2))
       end
 
       def test_view_cvs

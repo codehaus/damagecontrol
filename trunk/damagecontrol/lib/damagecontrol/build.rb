@@ -48,6 +48,7 @@ module DamageControl
     # This will prevent the same build from being executed in the future.
     def execute(command, env={})
       command_file = Directories.build_command_file(@project_name, @changeset_identifier, @time)
+puts "COMMAND FILE: #{command_file}"
       raise BuildException.new("This build has already been executed and cannot be re-executed. It was executed with '#{File.open(command_file).read}'") if File.exist?(command_file)
       FileUtils.mkdir_p(File.dirname(command_file))
       File.open(command_file, "w") do |io|
