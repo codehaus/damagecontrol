@@ -129,9 +129,9 @@ module DamageControl
         File.open("checkoutlist", File::WRONLY | File::APPEND) do |file|
           file.puts("nc.exe")
         end
-        Dir.chdir("#{directory}")
-        system("cvs commit -m \"added damagecontrol\"")
       end
+      Dir.chdir("#{directory}")
+      system("cvs commit -m \"added damagecontrol\"")
     end
     
     def nc_command(spec)
