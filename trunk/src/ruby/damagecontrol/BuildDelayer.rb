@@ -9,22 +9,25 @@ require 'damagecontrol/FakeClock'
 module DamageControl
 
 	class BuildDelayer
+		attr_accessor :quiet_period
+		attr_accessor :clock
 	
-		def initialize(clock, receiver, safe_delay)
-			@clock = clock
+		def initialize(receiver)
+			@clock = Clock.new
 			@receiver = receiver
-			@safe_delay = safe_delay
-			clock.register(self)
+			@quiet_period = quiet_period
 		end
 		
 		def receive_message(message)
+			clock.register(self)
 			@last_message = message
 			@last_message_time = @clock.current_time
 		end
 		
 		def tick(time)
-			if nil|@last_message && time > @last_message_time + @safe_delay
+			if nil|@last_message && time > @last_message_time + quiet_period
 				@receiver.receive_message( @last_message )
+				clock.unregister(self)
 			end
 		end
 	end

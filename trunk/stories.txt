@@ -1,3 +1,5 @@
+PLANNED
+
 Start process every (say) 10 minutes.
 
 Start process (a build) on (any) incoming request on socket.
@@ -21,16 +23,19 @@ Send build events (start, success, failure) to IRC.
 Start build based on polling:
  - CVS
  - StarTeam
+ - Subversion
 
 Track build number by looking on labels in VCS:
  - CVS
  - StarTeam
+ - Subversion
 
 Pluggable format of build labels.
 
 Figure out changes (file, changed by, comment) since last successful build:
  - CVS
  - StarTeam
+ - Subversion
 
 Include changes (file, changed by, comment) in email.
 
@@ -50,52 +55,4 @@ Save history of build times.
 
 Integrate with intra-project dependency managing builder to trigger downstream builds.Start process (a build) on (any) incoming request on socket.
 
-Capture build output to files.
-
-Wait 10 seconds after request then start process (socket returning immediately).
-
-Archive build output in logs.
-
-Turn archived build logs into nice little website.
-
-Turn archived build logs into rss files.
-
-Email result of build.
-
-Different email subjects for success (zero process exitcode) and failure  (non-zero).
-
-Different email recipients on build success/failure.
-
-Send build events (start, success, failure) to IRC.
-
-Start build based on polling:
- - CVS
- - StarTeam
-
-Track build number by looking on labels in VCS:
- - CVS
- - StarTeam
-
-Pluggable format of build labels.
-
-Figure out changes (file, changed by, comment) since last successful build:
- - CVS
- - StarTeam
-
-Include changes (file, changed by, comment) in email.
-
-Email people with changes in build.
-
-Figure out emails by looking into VCS:
- - CVS
- - StarTeam
-
-"Special formatting" (like CC) of test-results.
-
-Display 20 slowest tests.
-
-Display build time.
-
-Save history of build times.
-
-Integrate with intra-project dependency managing builder to trigger downstream builds.
+FIXED

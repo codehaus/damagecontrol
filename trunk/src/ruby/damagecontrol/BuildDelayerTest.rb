@@ -19,9 +19,11 @@ module DamageControl
 			project = Project.new("foo")
 			@fakeClock = FakeTicker.new()
 
-			@b = BuildDelayer.new(@fakeClock, self, 5000)
+			@b = BuildDelayer.new(self)
+			@b.quiet_period = 5000
+			@b.clock = @fakeClock
 			
-			@msg = BuildRequestEvent.new(project);
+			@msg = BuildRequestEvent.new(project)
 			
 			@fakeClock.set_time(2000)
 			@b.receive_message(@msg)
@@ -30,8 +32,10 @@ module DamageControl
 		
 		def test_delayer_registers_with_clock
 			clock = FakeClock.new()
-			b = BuildDelayer.new(clock, self, 5000)
-			assert_same(b, clock.registered_receiver)
+			b = BuildDelayer.new(self)
+			b.clock = clock
+			b.receive_message("")
+			assert(clock.receivers.index(b) >= 0)
 		end
 
 		def test_fires_if_gone_past_safe_delay
@@ -43,6 +47,14 @@ module DamageControl
 			
 			assert_not_nil(@received_message)
 			assert_equal( @msg, @received_message )
+
+		end
+		
+		def test_unregisters_after_message_passed_on
+			
+			@fakeClock.do_tick(8000)
+			
+			assert_equal([], @fakeClock.receivers)
 
 		end
 		

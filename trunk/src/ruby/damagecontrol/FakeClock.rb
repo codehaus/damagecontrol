@@ -5,6 +5,7 @@ module DamageControl
 	class FakeClock < Clock
 		
 		def initialize
+			super
 			@time = 0
 			@has_waiters = Latch.new
 			@time_changed = Latch.new

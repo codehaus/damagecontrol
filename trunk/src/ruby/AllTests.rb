@@ -1,7 +1,11 @@
+$:<<'../../lib'
+
 require 'test/unit'
 require 'damagecontrol/EqualityTest'
+require 'damagecontrol/CruiseControlBridgeTest'
 require 'damagecontrol/ProjectTest'
 require 'damagecontrol/HubTest'
+require 'damagecontrol/BuildDelayerTest'
 require 'damagecontrol/WebsitePublisherTest'
 require 'damagecontrol/BuildExecutorTest'
 require 'damagecontrol/TimerTest'
