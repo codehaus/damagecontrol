@@ -104,8 +104,8 @@ module RSCM
     end
 
     def changesets(checkout_dir, from_identifier, to_identifier=Time.infinity)
+puts "FROM: #{from_identifier}"
       checkout(checkout_dir, to_identifier)
-      from_identifier = Time.epoch if from_identifier.nil?
       to_identifier = Time.infinity if to_identifier.nil?
       with_working_dir(checkout_dir) do
         monotone("log", @branch, @key) do |stdout|

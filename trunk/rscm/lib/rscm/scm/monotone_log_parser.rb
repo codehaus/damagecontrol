@@ -10,7 +10,7 @@ module RSCM
       # skip first separator
       io.readline
       
-      changesets = ChangeSets.new
+      all_changesets = []
       changeset_string = ""
       
       # hash of path => [array of revisions]
@@ -18,30 +18,34 @@ module RSCM
       io.each_line do |line|
         if(line =~ /-----------------------------------------------------------------/)
           changeset = parse_changeset(StringIO.new(changeset_string), path_revisions)
-          if((from_identifier <= changeset.time) && (changeset.time <= to_identifier))
-            changesets.add(changeset)
-          end
-
+          all_changesets << changeset
           changeset_string = ""
         else
           changeset_string << line
         end
       end
       changeset = parse_changeset(StringIO.new(changeset_string), path_revisions)
-      if((from_identifier <= changeset.time) && (changeset.time <= to_identifier))
-        changesets.add(changeset)
-      end
+      all_changesets << changeset
+      
+      # Filter out the changesets and set the previous revisions, knowing that most recent is at index 0.
 
-      # set the previous revisions. most recent is at index 0.
-      changesets.each do |changeset|
-        changeset.each do |change|
-          current_index = path_revisions[change.path].index(change.revision)
-          change.previous_revision = path_revisions[change.path][current_index + 1]
+      from_time = time(all_changesets, from_identifier, Time.epoch)
+      to_time = time(all_changesets, to_identifier, Time.infinity)
+
+      changesets = ChangeSets.new
+
+      all_changesets.each do |changeset|
+        if((from_time < changeset.time) && (changeset.time <= to_time))
+          changesets.add(changeset)
+          changeset.each do |change|
+            current_index = path_revisions[change.path].index(change.revision)
+            change.previous_revision = path_revisions[change.path][current_index + 1]
+          end
         end
       end
       changesets
     end
-
+    
     def parse_changeset(changeset_io, path_revisions)
       changeset = ChangeSet.new
       state = nil
@@ -80,6 +84,13 @@ module RSCM
     end
     
   private
+
+    def time(changesets, identifier, default)
+      cs = changesets.find do |changeset|
+        changeset.identifier == identifier
+      end
+      cs ? cs.time : (identifier.is_a?(Time) ? identifier : default)
+    end
 
     def add_changes(changeset, line, state, path_revisions)
       paths = line.split(" ")

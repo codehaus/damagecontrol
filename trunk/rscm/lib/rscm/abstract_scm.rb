@@ -4,14 +4,13 @@ require 'rscm/path_converter'
 require 'rscm/annotations'
 
 class String
-  # Turns a String into a Time or an int
+  # Turns a String into a Time if possible
   def to_identifier
     if(self =~ /20\d\d\d\d\d\d\d\d\d\d\d\d/)
       # Assume it's a timestamp string - convert to time.
       Time.parse_ymdHMS(self)
     else
-      # Assume it's an arbitrary integer.
-      self.to_i
+      self
     end
   end
 end
@@ -28,9 +27,10 @@ module RSCM
   #
   # Some of the methods in this API use +from_identifier+ and +to_identifier+.
   # These identifiers can be either a UTC Time (according to the SCM's clock)
-  # or a String representing a label (according to the SCM's label system).
+  # or a String or Integer representing a label/revision 
+  # (according to the SCM's native label/revision scheme).
   #
-  # If +from_identifier+ or +to_identifier+ are +nil+ they respectively represent
+  # If +from_identifier+ or +to_identifier+ are +nil+ they should respectively default to
   # epoch or the infinite future.
   #
   # Most of the methods take a mandatory +checkout_dir+ - even if this may seem
@@ -71,7 +71,7 @@ module RSCM
       true
     end
     
-    # Whether or not this SCM is transactional.
+    # Whether or not this SCM is transactional (atomic).
     #
     def transactional?
       false
@@ -116,13 +116,14 @@ module RSCM
     def edit(file)
     end
 
-    # Checks out or updates contents from an SCM to +checkout_dir+ - a local working copy.
+    # Checks out or updates contents from a central SCM to +checkout_dir+ - a local working copy.
     # If this is a distributed SCM, this method should create a 'working copy' repository
-    # if one doesn't already exist.
+    # if one doesn't already exist. Then the contents of the central SCM should be pulled into
+    # the working copy.
     #
     # The +to_identifier+ parameter may be optionally specified to obtain files up to a
-    # particular time or label. +time_label+ should either be a Time (in UTC - according to
-    # the clock on the SCM machine) or a String - reprsenting a label.
+    # particular time or label. +to_identifier+ should either be a Time (in UTC - according to
+    # the clock on the SCM machine) or a String - reprsenting a label or revision.
     #
     # This method will yield the relative file name of each checked out file, and also return
     # them in an array. Only files, not directories, should be yielded/returned.
@@ -154,8 +155,8 @@ module RSCM
       relative_added_file_paths
     end
   
-    # Returns a ChangeSets object for the period specified by +from_identifier+
-    # and +to_identifier+. See AbstractSCM for details about the parameters.
+    # Returns a ChangeSets object for the period specified by +from_identifier+ (exclusive, i.e. after)
+    # and +to_identifier+ (inclusive).
     #
     def changesets(checkout_dir, from_identifier, to_identifier=Time.infinity)
       # Should be overridden by subclasses
@@ -243,7 +244,7 @@ module RSCM
 
   protected
 
-    # Takes an array of +absolute_path+s and turn them into an array
+    # Takes an array of +absolute_paths+ and turn them into an array
     # of paths relative to +dir+
     # 
     def to_relative(dir, absolute_paths)

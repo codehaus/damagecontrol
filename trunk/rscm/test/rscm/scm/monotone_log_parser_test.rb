@@ -92,11 +92,29 @@ EOF
 
     def test_should_parse_CHANGESETS_to_changesets_before
       parser = MonotoneLogParser.new
-      changesets = parser.parse_changesets(StringIO.new(CHANGESETS), Time.utc(2005,03,02,06,32,43))
+      changesets = parser.parse_changesets(StringIO.new(CHANGESETS), Time.utc(2005,03,02,06,32,42))
       assert_equal(2, changesets.length)
 
-      changesets = parser.parse_changesets(StringIO.new(CHANGESETS), Time.utc(2005,03,02,06,32,44))
+      changesets = parser.parse_changesets(StringIO.new(CHANGESETS), Time.utc(2005,03,02,06,32,43))
       assert_equal(1, changesets.length)
+
+      changesets = parser.parse_changesets(StringIO.new(CHANGESETS), Time.utc(2005,03,02,06,33,00))
+      assert_equal(1, changesets.length)
+
+      changesets = parser.parse_changesets(StringIO.new(CHANGESETS), Time.utc(2005,03,02,06,33,01))
+      assert_equal(0, changesets.length)
+    end
+
+    def test_should_parse_CHANGESETS_to_changesets_before_with_ids
+      parser = MonotoneLogParser.new
+      changesets = parser.parse_changesets(StringIO.new(CHANGESETS), "a2c58e276439de7d9da549870e245776c592c7e8")
+      assert_equal(1, changesets.length)
+      assert_equal("a2c58e276439de7d9da549870e245776c592c7e8", changesets[0][0].previous_revision)
+      assert_equal("abbe1eb8f75bdf9b27d440340ec329816c13985c", changesets[0][0].revision)
+
+
+      changesets = parser.parse_changesets(StringIO.new(CHANGESETS), "abbe1eb8f75bdf9b27d440340ec329816c13985c")
+      assert_equal(0, changesets.length)
     end
 
     def test_should_parse_CHANGESET_to_changesets
