@@ -193,7 +193,7 @@ module DamageControl
     end
     
     def cvs(dir, cmd)
-      if block_given? then yield "#{cvs_cmd_without_password(cmd)}\n" else logger.debug("#{cmd_without_cvspassword}\n") end
+      if block_given? then yield "#{cvs_cmd_without_password(cmd)}\n" else logger.debug("#{cvs_cmd_without_password(cmd)}\n") end
       cmd_with_io(dir, cvs_cmd_with_password(cmd, cvspassword), environment) do |io|
         io.each_line do |progress|
           if block_given? then yield progress else logger.debug(progress) end
