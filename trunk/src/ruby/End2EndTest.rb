@@ -1,4 +1,5 @@
 require 'test/unit'
+require 'ftools'
 require 'damagecontrol/Build'
 require 'damagecontrol/SocketTrigger'
 require 'damagecontrol/BuildExecutor'
@@ -77,14 +78,22 @@ class End2EndTest < Test::Unit::TestCase
 	end
 	
 	def install_damagecontrol
+		# install the trigger script
 		Dir.chdir(@tempdir)
 		system("cvs -d#{@cvsroot} co CVSROOT")
 		Dir.chdir("CVSROOT")
 		copy("#{trigger_script}", script_file("damagecontrol"))
 		system("cvs -d#{@cvsroot} add damagecontrol.bat")
+		
+		# install the nc.exe
+		File.copy( "#{@basedir}/bin/#{nc_file}", "#{@tempdir}/CVSROOT/#{nc_file}" )
+		system("cvs -d#{@cvsroot} add -kb #{nc_file}")
+		
+		# tell cvs to keep a non-,v file in the central repo
 		File.open("checkoutlist", File::WRONLY | File::APPEND) do |file|
 			file.puts
 			file.puts(script_file('damagecontrol'))
+			file.puts(nc_file)
 		end
 		system("cvs com -m 'message'")
 	end
@@ -94,7 +103,7 @@ class End2EndTest < Test::Unit::TestCase
 		Dir.chdir("CVSROOT")
 		File.open("loginfo", File::WRONLY | File::APPEND) do |file|
 			file.puts
-			file.puts("DEFAULT #{trigger_script} #{@project} #(@cvsroot} #{script_file("build")} %{sVv}")
+			file.puts("DEFAULT #{@cvsrootdir}/CVSROOT/#{script_file("damagecontrol")} #{@project} #{@cvsroot} #{script_file("build")} %{sVv}")
 		end
 		system("cvs com -m 'message'")
 	end
@@ -117,6 +126,10 @@ class End2EndTest < Test::Unit::TestCase
 	
 	def script_file(file)
 		"#{file}.bat"
+	end
+
+	def nc_file
+		"nc.exe"
 	end
 
 	def test_builds_on_cvs_add
