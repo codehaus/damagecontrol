@@ -339,6 +339,7 @@ puts "executing #{cmd}"
           file = $1
         end
       end
+      logger.error("could not find path: #{entries[0]}") if 
       
       modifications = []
       
@@ -367,9 +368,9 @@ puts "executing #{cmd}"
       modification_entry = modification_entry.split(/\r?\n/)
       modification = Modification.new
       
-      modification.revision = parse_entry(modification_entry[0], /revision (.*)/)
-      modification.time = parse_cvs_time(parse_entry(modification_entry[1], /date: (.*?);/))
-      modification.developer = parse_entry(modification_entry[1], /author: (.*?);/)
+      modification.revision = extract_match(modification_entry[0], /revision (.*)/)
+      modification.time = parse_cvs_time(extract_match(modification_entry[1], /date: (.*?);/))
+      modification.developer = extract_match(modification_entry[1], /author: (.*?);/)
       modification.message = modification_entry[2..-1].join("\n")
       
       modification
@@ -380,11 +381,11 @@ puts "executing #{cmd}"
       Time.utc(time[0..3], time[5..6], time[8..9], time[11..12], time[14..15], time[17..18])
     end
     
-    def parse_entry(entry, regexp)
-      if entry=~regexp
+    def extract_match(entry_line, regexp)
+      if entry_line=~regexp
         return($1)
       else
-        logger.error("can't parse modification: #{modification_entry}\nexpected to match regexp: #{regexp.to_s}\nline: #{@current_line}\ncvs log:\n#{@log}")
+        logger.error("can't parse modification: #{entry_line}\nexpected to match regexp: #{regexp.to_s}\nline: #{@current_line}\ncvs log:\n#{@log}")
       end
     end
     
