@@ -33,7 +33,6 @@ module Pebbles
       end
     
       def start
-        raise "stderr stuff still does not work" unless join_stdout_and_stderr?
         @pid = fork do
           # in subprocess
           Dir.chdir(working_dir) if working_dir
