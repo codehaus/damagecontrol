@@ -7,10 +7,10 @@ module DamageControl
 
   # File handler to used in conjuction with FilePoller
   class CruiseControlLogPoller < FilePoller
-    def initialize(channel, dir_to_poll)
+    def initialize(channel, dir_to_poll, website_baseurl)
       super(dir_to_poll)
       @channel = channel
-      @ccparser = CruiseControlLogParser.new
+      @ccparser = CruiseControlLogParser.new(website_baseurl)
     end
   
     def new_file(file)

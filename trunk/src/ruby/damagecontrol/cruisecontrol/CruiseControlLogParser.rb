@@ -14,6 +14,12 @@ module DamageControl
   # and calls callback methods (typesafe "SAX" events)
   # on a Build object
   class CruiseControlLogParser
+    
+    attr_reader :website_baseurl
+
+    def initialize(website_baseurl)
+      @website_baseurl = website_baseurl
+    end
 
     def parse(cc_log_file, build)
       File.open(cc_log_file) do |io|
@@ -54,9 +60,18 @@ module DamageControl
           build.label = res[1]['value'] if res[1]['name'] == 'label'
           build.timestamp = res[1]['value'] if res[1]['name'] == 'cctimestamp'
           build.project_name = res[1]['value'] if res[1]['name'] == 'projectname'
+	  build.url = logfile_to_url(res[1]['value']) if res[1]['name'] == 'logfile'
         end
                 
         return if res.end_element? and res[0] == 'info'
+      end
+    end
+
+    def logfile_to_url(logfile)
+      if logfile=~/^(\/|\\)(.*)\.xml$/
+	"#{website_baseurl}?log=#{$2}"
+      else
+        "<unknown url>"
       end
     end
  

@@ -4,6 +4,7 @@ irc_handle = 'rant'
 irc_server = '164.38.224.177'
 irc_channel = "#build"
 logdir = '/cruise/cruiselogs'
+website_baseurl = 'http://164.38.244.63:8080/cruisecontrol/buildresults'
 
 $damagecontrol_home = File::expand_path('../..')
 $:.push("#{$damagecontrol_home}/src/ruby")
@@ -38,7 +39,7 @@ start_simple_server(
 irc = IRCPublisher.new(@hub, irc_server, irc_channel, ShortTextTemplate.new)
 irc.handle = irc_handle
 irc.start
-CruiseControlLogPoller.new(@hub, logdir).start
+CruiseControlLogPoller.new(@hub, logdir, website_baseurl).start
 
 # wait until ctrl-c
 @socket_trigger.join

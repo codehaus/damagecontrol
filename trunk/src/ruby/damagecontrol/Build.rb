@@ -49,6 +49,7 @@ module DamageControl
     attr_accessor :label
     attr_accessor :error_message
     attr_accessor :status
+    attr_accessor :url
 
     attr_accessor :start_time
     attr_accessor :end_time

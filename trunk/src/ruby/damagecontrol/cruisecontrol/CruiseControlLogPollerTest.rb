@@ -16,7 +16,7 @@ module DamageControl
       create_hub
       @log_file = "#{damagecontrol_home}/testdata/log20030929145347.xml"
 
-      @ccpoller = CruiseControlLogPoller.new(hub, @dir)
+      @ccpoller = CruiseControlLogPoller.new(hub, @dir, "http://164.38.244.63:8080/cruisecontrol/buildresults")
     end
     
     def teardown
