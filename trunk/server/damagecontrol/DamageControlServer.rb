@@ -220,6 +220,8 @@ module DamageControl
       httpd.mount("/public/css", WEBrick::HTTPServlet::FileHandler, "#{webdir}/css")
       httpd.mount("/public/project/css", WEBrick::HTTPServlet::FileHandler, "#{webdir}/css")
       httpd.mount("/public/search/css", WEBrick::HTTPServlet::FileHandler, "#{webdir}/css")
+			
+			httpd.mount("/favicon.ico", WEBrick::HTTPServlet::FileHandler, "#{webdir}/icons/ico/damagecontrol-icon-square.ico")
     end
     
     def indexing_file_handler
