@@ -98,10 +98,10 @@ module DamageControl
     
   private
     FILE_ICONS = {
-      MODIFIED => "icons/document_edit.png",
-      DELETED  => "icons/document_delete.png",
-      ADDED    => "icons/document_new.png",
-      MOVED    => "icons/document_exchange.png"
+      MODIFIED => "fileicons/document_edit.png",
+      DELETED  => "fileicons/document_delete.png",
+      ADDED    => "fileicons/document_new.png",
+      MOVED    => "fileicons/document_exchange.png"
     }
     
     def build_url(build)
