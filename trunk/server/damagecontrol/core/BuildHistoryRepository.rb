@@ -5,6 +5,7 @@ require 'damagecontrol/core/ProjectDirectories'
 require 'damagecontrol/scm/Changes'
 require 'damagecontrol/util/Logging'
 require 'pebbles/TimeUtils'
+require 'rexml/document'
 require 'yaml'
 
 # Captures and persists build history.
@@ -146,6 +147,22 @@ module DamageControl
       end
     end
 
+    def to_rss(project_name, url)
+      rss = REXML::Document.new
+      rss.add_element("rss")
+      rss.root.add_attribute("version", "2.0")
+      channel = rss.root.add_element("channel")
+      channel.add_element("title").add_text("DamageControl: #{project_name}")
+      channel.add_element("description").add_text("Build results for #{project_name}")
+      channel.add_element("link").add_text(url)
+      history(project_name).reverse.each do |build|
+        if build.completed?
+          channel.add(build.to_rss_item)
+        end
+      end
+      rss
+    end
+
   private
 
     def populate_cache_from_files
@@ -216,6 +233,6 @@ module DamageControl
     def history_file(project_name)
       File.expand_path(@project_directories.build_history_file(project_name))
     end
-    
+        
   end
 end

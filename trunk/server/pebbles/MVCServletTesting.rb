@@ -1,19 +1,34 @@
 module Pebbles
   module MVCServletTesting
-    class FakeHttpRequest
+
+    class FakeHttpMessage
+
+      def initialize()
+        @headers = Hash.new()
+      end
+
+      def [](field)
+        @headers[field.downcase]
+      end
+
+      def []=(field, value)
+        @headers[field.downcase] = value
+      end
+      
+      def method_missing(*args)
+        ""
+      end
+
+    end
+
+    class FakeHttpRequest < FakeHttpMessage
       attr_accessor :query
       
-      def method_missing(*args)
-        ""
-      end
     end
     
-    class FakeHttpResponse
+    class FakeHttpResponse < FakeHttpMessage
       attr_accessor :body
-      
-      def method_missing(*args)
-        ""
-      end
+      attr_accessor :status
     end
     
     def do_request(query)

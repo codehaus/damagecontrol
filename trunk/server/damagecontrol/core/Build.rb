@@ -2,6 +2,7 @@ require 'damagecontrol/core/BuildEvents'
 require 'damagecontrol/scm/Changes'
 require 'pebbles/Matchable'
 require 'xmlrpc/utils'
+require 'rexml/document'
 
 module DamageControl
 
@@ -91,6 +92,10 @@ module DamageControl
     def timestamp_as_time
       Build.timestamp_to_time(timestamp)
     end
+
+    def timestamp_for_rss
+      timestamp_as_time.utc.strftime("%a, %d %b %Y %H:%M:%S %Z")
+    end
     
     def timestamp_for_humans
       timestamp_as_time.localtime.strftime("%d %b %Y %H:%M:%S")
@@ -142,6 +147,17 @@ module DamageControl
 
     def quiet_period
       if config["quiet_period"].nil? then nil else config["quiet_period"].to_i end
+    end
+
+    def to_rss_item
+      item = REXML::Element.new("item")
+      label_text = if successful? then "##{label} " else "" end
+      title = "#{project_name}: Build #{label_text}#{status.downcase}"
+      item.add_element("title").add_text(title)
+      item.add_element("link").add_text(url)
+      item.add_element("pubDate").add_text(timestamp_for_rss)
+      item.add_element("description").add_text(changesets.to_rss_description.to_s())
+      item
     end
 
     def ==(o)

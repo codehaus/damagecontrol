@@ -1,4 +1,5 @@
 require 'erb'
+require 'rexml/document'
 require 'xmlrpc/utils'
 require 'pebbles/TimeUtils'
 require 'pebbles/Matchable'
@@ -83,6 +84,12 @@ EOF
       result
     end
 
+    def to_rss_description
+      div = REXML::Element.new("div")
+      each { |changeset| div.add(changeset.to_rss_description) }
+      div
+    end
+
   end
 
   class ChangeSet
@@ -136,8 +143,20 @@ EOF
       time_difference = format_time.difference_as_text(time)
     end
     
+    def 
+    
     def to_s
       "#{revision} | #{developer} | #{time}"
+    end
+
+    def to_rss_description
+      p = REXML::Element.new("p")
+      p.add_element("strong").add_text(developer)
+      p.add_element("br")
+      p.add_text(message)
+      ul = p.add_element("ul")
+      each { |change| ul.add_element("li").add_text(change.to_rss_description) }
+      p
     end
   end
 
@@ -157,6 +176,11 @@ EOF
   
     def to_s
       "#{path} #{developer} #{revision} #{time}"
+    end
+
+    def to_rss_description
+      status_text = if status.nil? then "" else status.capitalize + " " end
+      status_text + path
     end
   
     attr_accessor :status

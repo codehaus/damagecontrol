@@ -118,5 +118,18 @@ EOF
       changesets.add(@change7)
       assert_equal(allsets, changesets.format(CHANGESET_TEXT_FORMAT, Time.utc(2004,7,5,12,2,2)))
     end
+
+    def test_to_rss_description
+      changesets = ChangeSets.new
+      @change1.status = Change::ADDED
+      changesets.add(@change1)
+      changesets.add(@change4)
+      description = changesets.to_rss_description
+      assert_equal("jon", description.get_text("p[1]/strong").value)
+      assert_equal("Added path/one", description.get_text("p[1]/ul/li").value)
+      assert_equal("aslak", description.get_text("p[2]/strong").value)      
+    end
+
   end
+
 end

@@ -79,15 +79,23 @@ module Pebbles
     include RiteMesh
     include HTMLQuoting
     
+    def cacheable?
+      false
+    end
+
     def service(request, response)
       super(request, response)
 
       # http://lab.artlung.com/other/anti-cache/
-      if(request.query["auto_refresh"] != "true")
+      if(request.query["auto_refresh"] != "true" and !cacheable?)
         # we _do_ want the browser to cache when auto_refresh is enabled, to avoid flickering of images
-        response["CacheControl"] = "no-cache"
+        response["Cache-control"] = "no-cache"
         response["Pragma"] = "no-cache"
         response["Expires"] = "-1"
+      end
+
+      def cacheable?
+        false
       end
       
       action = request.query['action'] || "default_action"

@@ -27,6 +27,7 @@ require 'damagecontrol/web/SearchServlet'
 require 'damagecontrol/web/DashboardServlet'
 require 'damagecontrol/web/StatusImageServlet'
 require 'damagecontrol/web/LogFileServlet'
+require 'damagecontrol/web/RssServlet'
 require 'damagecontrol/xmlrpc/Trigger'
 require 'damagecontrol/xmlrpc/StatusPublisher'
 require 'damagecontrol/xmlrpc/ConnectionTester'
@@ -178,6 +179,7 @@ module DamageControl
       httpd.mount("/public/search", SearchServlet.new(build_history_repository))
       httpd.mount("/public/log", LogFileServlet.new(project_directories))
       httpd.mount("/public/root", indexing_file_handler)
+      httpd.mount("/public/rss", RssServlet.new(build_history_repository, public_web_url + "/project"))
       
       httpd.mount("/public/images", WEBrick::HTTPServlet::FileHandler, "#{webdir}/images")
       httpd.mount("/public/largeicons", WEBrick::HTTPServlet::FileHandler, "#{webdir}/icons/24x24/plain")

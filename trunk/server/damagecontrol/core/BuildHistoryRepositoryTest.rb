@@ -293,5 +293,20 @@ module DamageControl
       assert_equal(nil, @bhp.previous_successful_build(b2))
       assert_equal(nil, @bhp.previous_successful_build(b1))
     end
+
+    def test_to_rss
+      b1 = Build.new("myproject", Time.utc(2004, 9, 3, 15, 0, 0))
+      b1.status = Build::SUCCESSFUL
+      b2 = Build.new("myproject", Time.utc(2004, 9, 4, 15, 0, 0))
+      b2.status = Build::FAILED
+      @bhp.register(b1)
+      @bhp.register(b2)
+
+      rss = @bhp.to_rss("myproject", "http://builds.codehause.org/somewhere")
+      assert_equal("2.0", rss.root.attributes["version"])
+      assert_equal("DamageControl: myproject", rss.get_text("rss/channel/title").value)
+      assert_equal("http://builds.codehause.org/somewhere", rss.get_text("rss/channel/link").value)
+      assert_equal(2, rss.root.get_elements("channel/item").length)
+    end
   end
 end
