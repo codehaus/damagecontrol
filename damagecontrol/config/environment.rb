@@ -44,8 +44,12 @@ require_gem 'rails'
 
 # Configure defaults if the included environment did not.
 begin
-  RAILS_DEFAULT_LOGGER = Logger.new("#{RAILS_ROOT}/log/#{RAILS_ENV}.log")
-rescue StandardError
+#  RAILS_DEFAULT_LOGGER = Logger.new("#{RAILS_ROOT}/log/#{RAILS_ENV}.log")
+  require 'damagecontrol/directories'
+  LOG_DIR = File.expand_path("#{DamageControl::Directories.basedir}/log")
+  FileUtils.mkdir_p(LOG_DIR)
+  RAILS_DEFAULT_LOGGER = Logger.new("#{LOG_DIR}/#{RAILS_ENV}.log")
+rescue StandardError => e
   RAILS_DEFAULT_LOGGER = Logger.new(STDERR)
   RAILS_DEFAULT_LOGGER.level = Logger::WARN
   RAILS_DEFAULT_LOGGER.warn(
