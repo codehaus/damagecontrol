@@ -26,11 +26,27 @@ function showScm(scm) {
   oldScmDiv = newScmDiv
 }
 
-<% scm_configurators.each do |scm_configurator| %>
+initialTracker = "<%= project_config['tracker_type'] %>"
+oldTrackerDiv = null
+
+function showTracker(tracker) {
+  if(!oldTrackerDiv) {
+    oldTrackerDiv = document.getElementById(initialTracker)
+  }
+  if(oldTrackerDiv) {
+    oldTrackerDiv.style.display = 'none'
+  }
+  newTrackerDiv = document.getElementById(tracker)
+  newTrackerDiv.style.display = 'block'
+  oldTrackerDiv = newTrackerDiv
+}
+
+<% scm_configurators.each do |scm_configurator| %> 
   <%= scm_configurator.javascript_declarations %>
 <% end %>
 
-// --></script>
+// -->
+</script>
 
 <form>
 <table width="100%">
@@ -65,6 +81,7 @@ function showScm(scm) {
     Several email addresses can be specified here, separated by a comma or a space charatcter.
   </td>
 </tr>
+<!--
 <tr>
   <td class="setting-name">JIRA url</td>
   <td><input class="setting-input" name="jira_url" id="jira_url" type="text" value="<%= project_config['jira_url'] %>"/></td>
@@ -75,7 +92,7 @@ function showScm(scm) {
     The JIRA URL is the URL to the JIRA installation. (And not the URL to the JIRA project).
   </td>
 </tr>
-
+-->
 <tr>
   <td>ViewCVS/Fisheye URL</td>
   <td><input class="setting-input" name="scm_web_url" id="scm_web_url" type="text" value="<%= project_config['scm_web_url'] %>"></td>
@@ -152,7 +169,25 @@ function showScm(scm) {
   <td>Source control</td>
   <td>
     <% scm_configurators.each do |scm_configurator| %>
-      <input id="<%= scm_configurator.scm_id %>radio" type="radio" value="<%= scm_configurator.scm_id %>" name="scm_id" onClick="javascript:showScm('<%= scm_configurator.scm_id %>')"<%if(scm_configurator.selected?)%>checked="true"<%end%>/> <%= scm_configurator.scm_display_name %>
+      <input 
+				id="<%= scm_configurator.scm_id %>radio" 
+				type="radio" value="<%= scm_configurator.scm_id %>" 
+				name="scm_id" onClick="javascript:showScm('<%= scm_configurator.scm_id %>')"<%if(scm_configurator.selected?)%>checked="true"<%end%>/> 
+				<%= scm_configurator.scm_display_name %>
+    <% end %>
+  </td>
+</tr>
+
+<tr>
+  <td>Issue Tracking</td>
+  <td>
+    <% tracking_configurators.each do |tracking_configurator| %>
+      <input 
+				id="<%= tracking_configurator.tracking_id %>radio" 
+				type="radio" value="<%= tracking_configurator.tracking_id %>" 
+				name="tracking_id" 
+				onClick="javascript:showTracker('<%= tracking_configurator.tracking_id %>')"<% if(tracking_configurator.selected?) %>checked="true"<%end%>/>
+			<%= tracking_configurator.tracking_display_name %>
     <% end %>
   </td>
 </tr>
@@ -161,6 +196,12 @@ function showScm(scm) {
   <% scm_configurators.each do |scm_configurator| %>
     <div id="<%= scm_configurator.scm_id %>" style="<% if(scm_configurator.selected?)%>display:block<%else%>display:none<%end%>">
       <%= scm_configurator.config_form %>
+    </div>
+  <% end %>
+	
+	<% tracking_configurators.each do |tracking_configurator| %>
+    <div id="<%= tracking_configurator.tracking_id %>" style="<% if(tracking_configurator.selected?)%>display:block<%else%>display:none<%end%>">
+      <%= tracking_configurator.config_form %>
     </div>
   <% end %>
 

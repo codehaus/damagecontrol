@@ -39,6 +39,12 @@ require 'damagecontrol/scm/CVSWebConfigurator'
 require 'damagecontrol/scm/SVNWebConfigurator'
 require 'damagecontrol/scm/NoSCMWebConfigurator'
 
+require 'damagecontrol/scm/JiraWebConfigurator'
+require 'damagecontrol/scm/ScarabWebConfigurator'
+require 'damagecontrol/scm/SourceForgeTrackerWebConfigurator'
+require 'damagecontrol/scm/NoTrackerWebConfigurator'
+require 'damagecontrol/scm/BugzillaWebConfigurator'
+
 require 'damagecontrol/web/ConsoleOutputReport'
 require 'damagecontrol/web/BuildArtifactsReport'
 require 'damagecontrol/web/ChangesReport'
@@ -266,7 +272,7 @@ module DamageControl
       httpd.mount("/private/dashboard", DashboardServlet.new(:private, build_history_repository, project_config_repository, build_scheduler))
       httpd.mount("/private/project", ProjectServlet.new(:private, build_history_repository, project_config_repository, trigger, build_scheduler, report_classes, public_web_url + "rss", trig_xmlrpc_url))
       httpd.mount("/private/install_trigger", InstallTriggerServlet.new(project_config_repository, trig_xmlrpc_url))
-      httpd.mount("/private/configure", ConfigureProjectServlet.new(project_config_repository, scm_configurator_classes, trig_xmlrpc_url))
+      httpd.mount("/private/configure", ConfigureProjectServlet.new(project_config_repository, scm_configurator_classes, tracking_configurator_classes, trig_xmlrpc_url))
       httpd.mount("/private/search", SearchServlet.new(build_history_repository))
       httpd.mount("/private/log", LogFileServlet.new(project_directories))
       httpd.mount("/private/root", indexing_file_handler)
@@ -297,6 +303,17 @@ module DamageControl
         DamageControl::SVNWebConfigurator
       ]
     end
+		
+		def tracking_configurator_classes
+			[
+				DamageControl::NoTrackerWebConfigurator,
+				DamageControl::JiraWebConfigurator,
+				DamageControl::ScarabWebConfigurator,
+				DamageControl::SourceForgeTrackerWebConfigurator,
+				DamageControl::BugzillaWebConfigurator
+			]
+			
+		end
     
     def webdir
       "#{damagecontrol_home}/server/damagecontrol/web"
