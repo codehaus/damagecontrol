@@ -50,10 +50,14 @@ module DamageControl
 
       # set the label
       scm_label = current_scm.label(checkout_dir)
-      if(scm_label)
+      custom_label = @project_config_repository.peek_next_build_label(current_build.project_name)
+puts "SCM LABEL: #{scm_label}"
+puts "CUSTOM LABEL: #{custom_label}"
+      if(scm_label && custom_label < 0)
         current_build.label = scm_label
       else
-        current_build.label = @project_config_repository.inc_build_label(current_build.project_name)
+        current_build.label = custom_label
+        @project_config_repository.inc_build_label(current_build.project_name)
       end
     end
     

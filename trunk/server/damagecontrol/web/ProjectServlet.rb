@@ -216,8 +216,12 @@ module DamageControl
     def last_build
       # find it first without changesets
       b = build_history_repository.history(project_name)[-1]
-      # reload it with changesets
-      build_history_repository.lookup(project_name, b.dc_creation_time, true)
+      if(b)
+        # reload it with changesets
+        build_history_repository.lookup(project_name, b.dc_creation_time, true)
+      else
+        nil # never built
+      end
     end
     
     def build_history

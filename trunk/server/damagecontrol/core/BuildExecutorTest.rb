@@ -85,6 +85,7 @@ module DamageControl
 
       project_config_repository = new_mock
       project_config_repository.__setup(:checkout_dir) { |project_name| assert_equal("damagecontrolled", project_name); "some_dir" }
+      project_config_repository.__expect(:peek_next_build_label) {45}
       project_config_repository.__expect(:inc_build_label) {45}
 
       @build_executor = BuildExecutor.new(
@@ -157,7 +158,7 @@ module DamageControl
       @build_executor = BuildExecutor.new(
         'executor1', 
         mock_hub, 
-        new_mock.__setup(:checkout_dir) {"some_dir"}.__expect(:inc_build_label) {23},
+        new_mock.__setup(:checkout_dir) {"some_dir"}.__expect(:peek_next_build_label) {23}.__expect(:inc_build_label) {23},
         mock_build_history
       )
       @build_executor.on_message(@build)
@@ -182,7 +183,7 @@ module DamageControl
       @build_executor = BuildExecutor.new(
         'executor1', 
         mock_hub, 
-        new_mock.__setup(:checkout_dir) {"some_dir"},
+        new_mock.__setup(:checkout_dir) {"some_dir"}.__expect(:peek_next_build_label){-1},
         mock_build_history
       )
 
@@ -248,7 +249,7 @@ module DamageControl
       @build_executor = BuildExecutor.new(
         'executor1', 
         mock_hub, 
-        new_mock.__setup(:checkout_dir) { "some_dir" },
+        new_mock.__setup(:checkout_dir) { "some_dir" }.__expect(:peek_next_build_label){-1},
         mock_build_history
       )
       @build = Build.new("damagecontrolled",
