@@ -32,7 +32,12 @@ public abstract class WriteToFileNotifierTest extends TestCase {
         assertFalse(tempFile.exists());
         builder.build();
         assertTrue(tempFile.isFile());
-        assertEquals("Output", toString(tempFile));
+        assertContains("Output", toString(tempFile));
+    }
+
+    private void assertContains(String substring, String string) {
+        assertTrue("expected string to contain: <" + substring + ">, was: <" + string + ">",
+                string.indexOf(substring) >= 0);
     }
 
     protected abstract WriteToFileNotifier createNotifier(Builder builder);

@@ -1,9 +1,7 @@
 package damagecontrol;
 
-import java.util.List;
-import java.util.LinkedList;
-import java.util.Map;
-import java.util.HashMap;
+import EDU.oswego.cs.dl.util.concurrent.Latch;
+
 
 /**
  * Commits to an SCM are sometimes  done in several operations,
@@ -15,39 +13,22 @@ import java.util.HashMap;
  * a quiet period. A quiet period means that no build requests have been
  * received within a certain period.
  *
- * The requested builds will be queued up. Requesting a build that is already in the
- * queue will push it back in the queue, allowing other builds to be handled before.
- *
  * @author Aslak Helles&oslash;y
- * @version $Revision: 1.2 $
+ * @version $Revision: 1.3 $
  */
-public class QuietPeriodScheduler implements Scheduler {
-    /**
-     * Sync lock used to keep waiting until quiet period is fulfilled.
-     */
-    private final Object lock = new Object();
-    private final List builderQueue = new LinkedList();
-
+public class QuietPeriodScheduler extends DecoratingScheduler {
     private Clock clock;
-    private long pollIntervalMilliseconds;
-    private final long quietPerionMilliseconds;
+    private long quietPeriodMillis;
 
-    private Builder currentlyRunningBuilder;
-
-    public void requestBuild(String builderName) {
-
-    }
-
-    public void registerBuilder(String builderName, Builder builder) {
-        
-    }
     Thread buildThread;
-    private Map buildRequestTimes = new HashMap();
+    private String builderToBuild = null;
+    private long timeToBuild;
+    private Latch buildRequestedLatch = new Latch();
 
-    public QuietPeriodScheduler(Clock clock, long pollIntervalMilliseconds, long quietPerionMilliseconds) {
+    public QuietPeriodScheduler(Clock clock, long quietPerionMilliseconds) {
+        super(new DirectScheduler());
         this.clock = clock;
-        this.pollIntervalMilliseconds = pollIntervalMilliseconds;
-        this.quietPerionMilliseconds = quietPerionMilliseconds;
+        this.quietPeriodMillis = quietPerionMilliseconds;
     }
 
     public void execute() {
@@ -57,51 +38,47 @@ public class QuietPeriodScheduler implements Scheduler {
     public void start() {
         buildThread = new Thread(new Runnable() {
             public void run() {
-                while (!Thread.currentThread().isInterrupted()) {
-                    synchronized(lock) {
-                        try {
-                            if (builderQueue.isEmpty()) {
-                                // Wait forever (until we're notified)
-                                lock.wait();
-                            }else{
-                                // grab the first builder in the queue and see if it has been
-                                // idle (not requested) long enough (for the quiet period)
-                                Builder firstBuilderInQueue = (Builder) builderQueue.get(0);
-                                long lastBuildRequestTime = ((Long) buildRequestTimes.get(firstBuilderInQueue)).longValue();
-                                long elapsedTime = System.currentTimeMillis() - lastBuildRequestTime;
-                                if(elapsedTime > quietPerionMilliseconds) {
-                                    currentlyRunningBuilder = firstBuilderInQueue;
-                                    builderQueue.remove(0);
-                                    currentlyRunningBuilder.build();
-                                    currentlyRunningBuilder = null;
-                                } else {
-                                    lock.wait(pollIntervalMilliseconds);
-                                }
-                            }
-                        } catch (InterruptedException e) {
-                            // shouldn't happen
-                        } finally {
-                            currentlyRunningBuilder = null;
-                        }
+                System.out.println("starting build thread");
+                synchronized (QuietPeriodScheduler.this) {
+                    QuietPeriodScheduler.this.notifyAll();
+                }
+                try {
+                    while (!Thread.currentThread().isInterrupted()) {
+                        waitForBuildRequested();
+                        waitForTimeToBuild();
+                        QuietPeriodScheduler.super.requestBuild(builderToBuild);
                     }
+                } catch (InterruptedException e) {
                 }
             }
         });
         buildThread.start();
     }
 
-    public void requestBuild(Builder requestedBuilder) {
-        clock.waitUntil(clock.currentTimeMillis() + quietPerionMilliseconds);
-
-        // Put the builder in the back of the queue.
-        builderQueue.remove(requestedBuilder);
-        builderQueue.add(requestedBuilder);
-
-        synchronized (lock) {
-            // Register the time build was requested for this builder.
-            buildRequestTimes.put(requestedBuilder, new Long(System.currentTimeMillis()));
-            lock.notify();
+    private void waitForTimeToBuild() throws InterruptedException {
+        while (timeToBuild > clock.currentTimeMillis()) {
+            clock.waitUntil(timeToBuild);
         }
+    }
+
+    private void waitForBuildRequested() throws InterruptedException {
+        buildRequestedLatch.acquire();
+        synchronized (this) {
+            buildRequestedLatch = new Latch();
+        }
+        assert builderToBuild != null;
+    }
+
+    public synchronized void requestBuild(final String builderName) {
+        getBuilder(builderName); // provokes exception as early possible
+        System.out.println("requesting build " + builderName);
+        builderToBuild = builderName;
+        timeToBuild = clock.currentTimeMillis() + quietPeriodMillis;
+        notifyBuildRequested();
+    }
+
+    private void notifyBuildRequested() {
+        buildRequestedLatch.release();
     }
 
     public void stop() throws InterruptedException {
@@ -109,6 +86,10 @@ public class QuietPeriodScheduler implements Scheduler {
             buildThread.interrupt();
             buildThread.join(1000);
         }
+    }
+
+    public void setQuietPeriodMillis(long millis) {
+        this.quietPeriodMillis = millis;
     }
 
 }

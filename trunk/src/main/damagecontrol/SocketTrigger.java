@@ -27,7 +27,7 @@ import java.util.StringTokenizer;
  * <P>
  * @author Aslak Helles&oslash;y
  * @author Jon Tirs&eacute;n
- * @version $Revision: 1.5 $
+ * @version $Revision: 1.6 $
  */
 public class SocketTrigger {
     public static final String BUILD = "BUILD";
@@ -114,6 +114,10 @@ public class SocketTrigger {
                 }
 
                 public void registerBuilder(String name, Builder builder) {
+                }
+
+                public Builder getBuilder(String builderName) {
+                    return null;
                 }
 
             });

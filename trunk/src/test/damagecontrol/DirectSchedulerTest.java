@@ -3,10 +3,10 @@ package damagecontrol;
 /**
  * 
  * @author Aslak Helles&oslash;y
- * @version $Revision: 1.1 $
+ * @version $Revision: 1.2 $
  */
 public class DirectSchedulerTest extends AbstractSchedulerTest {
-    protected Scheduler createScheduler() {
+    protected Scheduler getScheduler() {
         return new DirectScheduler();
     }
 }

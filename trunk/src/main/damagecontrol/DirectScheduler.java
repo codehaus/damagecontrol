@@ -14,11 +14,26 @@ import java.util.HashMap;
  * SCMs supporting attomic commits (like subversion).
  *
  * @author Aslak Helles&oslash;y
- * @version $Revision: 1.1 $
+ * @version $Revision: 1.2 $
  */
-public class DirectScheduler extends AbstractScheduler {
+public class DirectScheduler implements Scheduler {
 
-    public void requestBuild(String builderName) throws NoSuchBuilderException {
+    private final Map builders = new HashMap();
+
+    public Builder getBuilder(String builderName) throws NoSuchBuilderException {
+        Builder builder = (Builder) builders.get(builderName);
+        if (builder == null) {
+            throw new NoSuchBuilderException(builderName);
+        }
+        return builder;
+    }
+
+    public void registerBuilder(String name, Builder builder) {
+        builders.put(name, builder);
+    }
+
+    public void requestBuild(String builderName) {
+        System.out.println("executing build");
         getBuilder(builderName).build();
     }
 

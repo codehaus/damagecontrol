@@ -1,16 +1,17 @@
 package damagecontrol;
 
 import EDU.oswego.cs.dl.util.concurrent.Latch;
+import junit.framework.Assert;
 
 /**
  *
  * @author Aslak Helles&oslash;y
- * @version $Revision: 1.4 $
+ * @version $Revision: 1.5 $
  */
 public class MockBuilder extends AbstractBuilder {
-    private boolean wasBuilt;
-    private Latch nextBuildLatch = new Latch();
+    private boolean wasBuilt = false;
     private String output;
+    private Latch buildLatch = new Latch();
 
     public MockBuilder() {
         super("MockBuilder", new DirectScheduler());
@@ -21,19 +22,21 @@ public class MockBuilder extends AbstractBuilder {
         this.output = output;
     }
 
-    public void build() {
-        synchronized (this) {
-            nextBuildLatch.release();
-            nextBuildLatch = new Latch();
-        }
-        wasBuilt = true;
-        fireBuildFinished(new BuildEvent(this, true, output));
+    public MockBuilder(String name, Scheduler scheduler) {
+        super(name, scheduler);
     }
 
-    public synchronized void waitForBuildComplete() {
+    public synchronized void build() {
+        wasBuilt = true;
+        fireBuildFinished(new BuildEvent(this, true, output));
+        buildLatch.release();
+    }
+
+    public void waitForBuildComplete() {
         try {
-            nextBuildLatch.attempt(1000);
+            Assert.assertTrue("timeout, was never built", buildLatch.attempt(1000));
         } catch (InterruptedException e) {
+            Assert.fail();
         }
     }
 

@@ -7,20 +7,21 @@ import junit.framework.TestCase;
  * Scheduler implementation.
  *
  * @author Aslak Helles&oslash;y
- * @version $Revision: 1.1 $
+ * @version $Revision: 1.2 $
  */
 public abstract class AbstractSchedulerTest extends TestCase {
     public void testRequestBuildWillBeHonouredEventually() throws NoSuchBuilderException {
-        MockBuilder builder = new MockBuilder();
-        Scheduler scheduler = createScheduler();
-        scheduler.registerBuilder("projectName", builder);
+        Scheduler scheduler = getScheduler();
+
+        MockBuilder builder = new MockBuilder("projectName", scheduler);
         scheduler.requestBuild("projectName");
         builder.waitForBuildComplete();
         assertTrue(builder.wasBuilt());
     }
 
     public void testRequestBuildOnNonRegisteredBuilderWillFail() {
-        Scheduler scheduler = createScheduler();
+        Scheduler scheduler = getScheduler();
+
         try {
             scheduler.requestBuild("nonExistentProject");
             fail();
@@ -28,5 +29,5 @@ public abstract class AbstractSchedulerTest extends TestCase {
         }
     }
 
-    protected abstract Scheduler createScheduler();
+    protected abstract Scheduler getScheduler();
 }

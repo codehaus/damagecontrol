@@ -7,7 +7,7 @@ package damagecontrol;
  *
  * @author Aslak Helles&oslash;y
  * @author Jon Tirs&eacute;n
- * @version $Revision: 1.1 $
+ * @version $Revision: 1.2 $
  */
 public interface Scheduler {
     /**
@@ -16,4 +16,6 @@ public interface Scheduler {
     void requestBuild(String builderName) throws NoSuchBuilderException;
 
     void registerBuilder(String builderName, Builder builder);
+
+    Builder getBuilder(String builderName);
 }
