@@ -29,7 +29,7 @@ module RSCM
           $stderr.puts(e.backtrace.join("\n\t"))
         end
       end
-      changesets
+      changesets.sort!
     end
     
     def next_log_entry

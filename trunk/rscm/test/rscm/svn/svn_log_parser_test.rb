@@ -38,14 +38,14 @@ EOF
     def can_parse_simple_log_entry(parser, entry)
       changeset = parser.parse(StringIO.new(entry)) {|line|}
 
-      assert_equal("2", changeset.revision)
+      assert_equal(2, changeset.revision)
       assert_equal("ahelleso", changeset.developer)
       assert_equal(Time.utc(2004,7,11,13,29,35), changeset.time)
       assert_equal("changed something\nelse", changeset.message)
 
       assert_equal(2, changeset.length)
       assert_equal("build.xml", changeset[0].path)
-      assert_equal("2", changeset[0].revision)
+      assert_equal(2, changeset[0].revision)
       assert_equal(Change::MODIFIED, changeset[0].status)
       assert_equal("src/java/com/thoughtworks/damagecontrolled/Thingy.java", changeset[1].path)
       assert_equal(Change::MODIFIED, changeset[1].status)
@@ -63,7 +63,7 @@ EOF
           "DecoratingInvoker now hands off to a SimpleInvoker rather than a DelegatingInvoker if constructed with an Object to decorate.\n" +
           "Added protected getDelegateMethod(name, params)\n", changesets[0].message)
 
-        assert_equal("66", changesets[3].revision)
+        assert_equal(66, changesets[3].revision)
         assert_equal("tastapod", changesets[3].developer)
         assert_equal(Time.utc(2004,05,24,17,06,18,0), changesets[3].time)
         assert_match(/Factored delegating behaviour out/ , changesets[3].message)
@@ -71,8 +71,8 @@ EOF
 
         assert_equal("src/com/thoughtworks/proxy/toys/delegate/DelegatingInvoker.java" , changesets[3][1].path)
         assert_equal(Change::ADDED , changesets[3][1].status)
-        assert_equal("66" , changesets[3][1].revision)
-        assert_equal("65", changesets[3][1].previous_revision)
+        assert_equal(66 , changesets[3][1].revision)
+        assert_equal(65, changesets[3][1].previous_revision)
 
         assert_equal("src/com/thoughtworks/proxy/toys/delegate/ObjectReference.java" , changesets[3][3].path)
         assert_equal(Change::MOVED, changesets[3][3].status)
@@ -105,7 +105,7 @@ EOF
     def test_should_retrieve_head_revision
       parser = SVNLogParser.new(StringIO.new(SVN_R_LOG_HEAD_DATA), "blah", nil)
       changesets = parser.parse_changesets
-      assert_equal("48", changesets[0].revision)
+      assert_equal(48, changesets[0].revision)
     end
   end
 end

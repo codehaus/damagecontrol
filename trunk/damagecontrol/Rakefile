@@ -17,9 +17,10 @@ task :default => [ :all ]
 # Run the unit tests
 # To run a specific test: rake test TEST=path/to/test
 fl = FileList.new('test/**/*_test.rb')
+# TODO: figure out how to add all the stuff in app.
 Rake::TestTask.new { |t|
   # We need some of the test utils from rscm
-  t.libs << "test" << File.expand_path(File.dirname(__FILE__) + "/../rscm/test")
+  t.libs << "test" << File.expand_path(File.dirname(__FILE__) + "/../rscm/test") << File.expand_path(File.dirname(__FILE__) + "/../rscm/lib")
   t.test_files = fl
   t.verbose = true
 }
@@ -38,13 +39,14 @@ task :all => [:gem]
 PKG_FILES = FileList[
   '[A-Z]*',
   'doc/**/*',
+  'bin/**/*',
   'app/**/*',
   'config/**/*',
   'docs/**/*',
-  'lib/**/*.rb', 
+  'lib/**/*', 
   'public/**/*',
-  'script/**/*.*',
-  'test/**/*.*'
+  'script/**/*',
+  'test/**/*'
 ]
 
 if ! defined?(Gem)
@@ -65,7 +67,8 @@ else
 
     s.add_dependency('log4r', '> 1.0.4')
     s.add_dependency('rscm')
-    s.add_dependency('rgl')
+    s.add_dependency('needle')
+#    s.add_dependency('rgl')
     #s.requirements << ""
 
     #### Which files are to be included in this gem?  Everything!  (Except CVS directories.)
@@ -79,11 +82,11 @@ else
     #### Load-time details: library and application (you will need one or both).
 
     s.require_path = 'lib'                         # Use these for libraries.
-    s.autorequire = 'rscm'
+    s.autorequire = 'damagecontrol/app'
 
-    #s.bindir = "bin"                               # Use these for applications.
-    #s.executables = ["rscm"]
-    #s.default_executable = "rscm"
+    s.bindir = "bin"                               # Use these for applications.
+    s.executables = ["damagecontrol", "damagecontrol-webrick"]
+    s.default_executable = "damagecontrol"
 
     #### Documentation and testing.
 
@@ -97,8 +100,8 @@ else
 
     s.author = "Aslak Hellesoy"
     s.email = "dev@damagecontrol.codehaus.org"
-    s.homepage = "http://damagecontrol.codehaus.org/rscm"
-    s.rubyforge_project = "rscm"
+    s.homepage = "http://damagecontrol.codehaus.org/"
+#    s.rubyforge_project = "rscm"
   end
 
   Rake::GemPackageTask.new(spec) do |pkg|

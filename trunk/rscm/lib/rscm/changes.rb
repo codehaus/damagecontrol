@@ -5,8 +5,7 @@ module RSCM
 
   # TODO: add a hook to get committers from a separate class - to support registered pairs
   # We'll be able to do lots of cool analysis with visitors later -> graphs. mmmmm.
-  # TODO: fix the sorting - write a test for it!
-  
+
   # A collection of changesets.
   class ChangeSets
     include Enumerable
@@ -28,21 +27,19 @@ module RSCM
     #
     def accept(visitor)
       visitor.visit_changesets(self)
-      @changesets.each{|changeset| changeset.accept(visitor)}
+      self.each{|changeset| changeset.accept(visitor)}
     end
 
-    # TODO: remove
     def [](change)
-      sorted[change]
+      @changesets[change]
     end
 
-    # TODO: remove
     def each(&block)
-      sorted.each(&block)
+      @changesets.each(&block)
     end
     
     def reverse
-      ChangeSets.new(sorted.reverse)
+      ChangeSets.new(@changesets.dup.reverse)
     end
     
     def length
@@ -70,11 +67,11 @@ module RSCM
     # The latest ChangeSet (with the latest time)
     # or nil if this changeset is empty
     def latest
-      latest = nil
+      result = nil
       each do |changeset|
-        latest = changeset if latest.nil? || latest.time < changeset.time
+        result = changeset if result.nil? || result.time < changeset.time
       end
-      latest
+      result
     end
 
     # Adds a Change or a ChangeSet.
@@ -113,10 +110,9 @@ module RSCM
       time
     end
 
-  private
-
-    def sorted
+    def sort!
       @changesets.sort!
+      self
     end
 
   end
@@ -198,9 +194,9 @@ module RSCM
       result
     end
     
-    # Returns the id of the changeset or +time+ in ymdHMS format if undefined.
+    # Returns the id of the changeset. This is the revision (if defined) or an UTC time if revision is undefined.
     def id
-      @revision || @time.ymdHMS
+      @revision || @time
     end
     
   end

@@ -29,13 +29,13 @@ tabs = ["projects", "scms", "trackers", "changesets"]
 
 scms = [
 <% @scms.each do |scm| %>
-  "<%=scm.class.name %>",
+  "<%= scm.class.name %>",
 <% end %> "" ];
-scm_tip = "<div class='tp1'>If you don't find your SCM here, file a feature request in RSCM's JIRA</div>";
+scm_tip = "<div class='tp1'>If you don't find your SCM here, file a feature request in DamageControl's JIRA</div>";
 
 trackers = [
 <% @trackers.each do |tracker| %>
-  "<%=tracker.class.name %>",
+  "<%= tracker.class.name %>",
 <% end %> "" ];
 
 // -->

@@ -1,8 +1,7 @@
 require 'test/unit'
-require 'rubygems'
-require_gem 'rscm'
 require 'rscm/tempdir'
 require 'rscm/mockit'
+require 'rscm/changes'
 require 'damagecontrol/project'
 
 module DamageControl
@@ -16,9 +15,8 @@ module DamageControl
       @p.name = "blabla"
     end
     
-    def Xtest_poll_should_get_changesets_from_epoch_if_last_change_time_unknown
+    def test_poll_should_get_changesets_from_epoch_if_last_change_time_unknown
       ENV["RSCM_BASE"] = RSCM.new_temp_dir + "/epoch"
-
       @p.scm = new_mock
       changesets = new_mock
       @p.scm.__expect(:changesets) do |checkout_dir, from|
@@ -55,14 +53,14 @@ module DamageControl
       end
     end
 
-    def Xtest_poll_should_get_changesets_from_last_change_time_if_known
+    def test_poll_should_get_changesets_from_last_change_time_if_known
       ENV["RSCM_BASE"] = RSCM.new_temp_dir + "/last"
 
       a = Time.new.utc
       FileUtils.mkdir_p("#{@p.changesets_dir}/#{a.ymdHMS}")
       File.open("#{@p.changesets_dir}/#{a.ymdHMS}/changeset.yaml", "w") do |io|
-        cs = ChangeSet.new
-        cs << Change.new("path", "aslak", "hello", "55", Time.new.utc)
+        cs = RSCM::ChangeSet.new
+        cs << RSCM::Change.new("path", "aslak", "hello", "55", Time.new.utc)
         YAML::dump(cs, io)
       end
       @p.scm = new_mock
@@ -77,8 +75,10 @@ module DamageControl
       end
     end
     
-    def Xtest_should_look_at_folders_to_determine_next_changeset_time
-      changesets_dir = RSCM.new_temp_dir
+    def test_should_look_at_folders_to_determine_next_changeset_time
+      changesets_dir = RSCM.new_temp_dir + "/folders"
+      ENV["RSCM_BASE"] = changesets_dir
+
       a = Time.new.utc
       b = a + 1
       c = b + 1

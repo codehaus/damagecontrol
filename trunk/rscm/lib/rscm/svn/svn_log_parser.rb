@@ -73,7 +73,7 @@ module RSCM
       @changeset = ChangeSet.new
       @changeset.message = ""
       revision, developer, time, the_rest = line.split("|")
-      @changeset.revision = revision.strip[1..-1] unless revision.nil?
+      @changeset.revision = revision.strip[1..-1].to_i unless revision.nil?
       @changeset.developer = developer.strip unless developer.nil?
       @changeset.time = parse_time(time.strip) unless time.nil?
     end
@@ -100,7 +100,7 @@ module RSCM
       end
       change.revision = @changeset.revision
       # http://jira.codehaus.org/browse/DC-204
-      change.previous_revision = "#{change.revision.to_i - 1}";
+      change.previous_revision = change.revision.to_i - 1;
       change
     end
 
@@ -129,11 +129,6 @@ module RSCM
       time
     end
     
-    def previous_revision(revision)
-      prev = revision[1..-1].to_i - 1
-      "r#{prev}"
-    end
-
   end
 
 end

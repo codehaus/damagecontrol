@@ -1,6 +1,4 @@
 require 'stringio'
-require 'rubygems'
-require_gem 'rscm'
 require 'rscm/changes_fixture'
 require 'rscm/tempdir'
 require 'damagecontrol/visitor/diff_persister'

@@ -1,4 +1,6 @@
 require 'fileutils'
+require 'rscm/abstract_scm' # for the modified Time.to_s
+
 module DamageControl
 
   # This class knows about locations of various files and directories.
@@ -36,13 +38,8 @@ module DamageControl
     end
     module_function :changesets_rss_file
 
-    # TODO: we should store the diff file on disk instead,
-    # and generate individual sub-htmls on the fly for specific
-    # diffs inside it, using hashes (md5) to identify individual diffs
-    # witin the diff file. RSS should maybe be generated on the fly
-    # too if we want to have colour html in them (not sure if we want that tho).
     def diff_file(project_name, changeset, change)
-      "#{changesets_dir(project_name)}/#{changeset.id}/#{change.path}.diff"
+      "#{changesets_dir(project_name)}/#{changeset.id.to_s}/#{change.path}.diff"
     end
     module_function :diff_file
 
@@ -62,7 +59,7 @@ module DamageControl
     module_function :project_dir
 
     def basedir
-      @@basedir ||= ENV['RSCM_BASE'] || "#{ENV['HOME']}/.rscm" || "#{ENV['HOMEDIR']}/.rscm"
+      ENV['RSCM_BASE'] || "#{ENV['HOME']}/.rscm" || "#{ENV['HOMEDIR']}/.rscm"
     end
     module_function :basedir
 

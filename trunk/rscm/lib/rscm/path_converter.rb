@@ -7,7 +7,7 @@ WINDOWS = WIN32 || CYGWIN
 # TODO: change to override IO.popen, using that neat trick we
 # used in threadfile.rb (which is now gone)
 def safer_popen(cmd, mode="r", expected_exit=0, &proc)
-  Log.info "Executing command: #{cmd}"
+  Log.info "Executing command: '#{cmd}'"
   ret = IO.popen(cmd, mode, &proc)
   exit_code = $? >> 8
   raise "#{cmd} failed with code #{exit_code} in #{Dir.pwd}. Expected exit code: #{expected_exit}" if exit_code != expected_exit
@@ -22,6 +22,7 @@ def with_working_dir(dir)
   begin
     mkdir_p(dir)
     Dir.chdir(dir)
+    Log.info "In directory: '#{File.expand_path(dir)}'"
     yield
   ensure
     Dir.chdir(prev)

@@ -47,6 +47,7 @@ module RSCM
     def test_parse_changes
       changesets = ChangeSets.new
       @parser.parse_changes(LOG_ENTRY, changesets)
+      changesets.sort!
       assert_equal(4, changesets.length)
       assert_equal("src/ruby/damagecontrol/BuildExecutorTest.rb", changesets[0][0].path)
       assert_match(/linux-windows galore/, changesets[1][0].message)

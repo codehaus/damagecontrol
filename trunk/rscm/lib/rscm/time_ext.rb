@@ -35,6 +35,16 @@ end
 # Time mixin that adds some additional utility methods
 class Time
   include RSCM::TimeExt
+
+  class << self
+    def epoch
+      Time.at(0).utc
+    end
+
+    def infinity
+      Time.utc(2038)
+    end
+  end
   
   def Time.parse_ymdHMS(timestamp_as_ymdHMS)
     Time.utc(

@@ -2,15 +2,22 @@ require 'fileutils'
 require 'rscm/changes'
 require 'rscm/path_converter'
 
-class Time
-  class << self
-    def epoch
-      Time.at(0).utc
+class String
+  # Turns a String into a Time or an int
+  def to_id
+    if(self =~ /20\d\d\d\d\d\d\d\d\d\d\d\d/)
+      # Assume it's a timestamp string - convert to time.
+      Time.parse_ymdHMS(self)
+    else
+      # Assume it's an arbitrary integer.
+      self.to_i
     end
+  end
+end
 
-    def infinity
-      Time.utc(2038)
-    end
+class Time
+  def to_s
+    self.ymdHMS
   end
 end
 
@@ -95,7 +102,7 @@ module RSCM
     # the clock on the SCM machine) or a String - reprsenting a label.
     #
     # This method will yield the relative file name of each checked out file, and also return
-    # them in an array. Only files, not directories, will be yielded/returned.
+    # them in an array. Only files, not directories, should be yielded/returned.
     #
     # This method should be overridden for SCMs that are able to yield checkouts as they happen.
     # For some SCMs this is not possible, or at least very hard. In that case, just override

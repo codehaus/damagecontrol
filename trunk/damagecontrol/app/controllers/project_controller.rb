@@ -6,20 +6,20 @@ require 'damagecontrol/diff_htmlizer'
 class ProjectController < ApplicationController
   SCMS = [
 # Uncomment this to see Mooky in action in the web interface!
-#    Mooky.new,
-    RSCM::CVS.new, 
-    RSCM::SVN.new, 
-    RSCM::StarTeam.new
+#    RSCM::Mooky,
+    RSCM::CVS, 
+    RSCM::SVN, 
+    RSCM::StarTeam
   ]
 
   TRACKERS = [
-    DamageControl::Tracker::Null.new, 
-    DamageControl::Tracker::Bugzilla.new, 
-    DamageControl::Tracker::JIRA.new,
-    DamageControl::Tracker::RubyForge.new,
-    DamageControl::Tracker::SourceForge.new,
-    DamageControl::Tracker::Scarab.new,
-    DamageControl::Tracker::Trac.new
+    DamageControl::Tracker::Null, 
+    DamageControl::Tracker::Bugzilla, 
+    DamageControl::Tracker::JIRA,
+    DamageControl::Tracker::RubyForge,
+    DamageControl::Tracker::SourceForge,
+    DamageControl::Tracker::Scarab,
+    DamageControl::Tracker::Trac
   ]
 
   SCM_WEBS = [
@@ -40,8 +40,16 @@ class ProjectController < ApplicationController
 
   def new
     @project = DamageControl::Project.new
-    @scms = SCMS.dup
-    @trackers = TRACKERS.dup
+    @scms = SCMS.collect {|o| o.new}
+    first_scm = @scms[0]
+    def first_scm.selected?
+      true
+    end
+    @trackers = TRACKERS.collect {|o| o.new}
+    first_tracker = @trackers[0]
+    def first_tracker.selected?
+      true
+    end
     @edit = true
     @new_project = true
     render_action("view")
@@ -92,7 +100,7 @@ class ProjectController < ApplicationController
   def changesets
     load
     last_changeset_id = @params["changeset"]
-    @changesets = @project.changesets(last_changeset_id, 1)    
+    @changesets = @project.changesets(last_changeset_id.to_id, 1)    
     @changesets.accept(HtmlDiffVisitor.new(@project))
   end
 
@@ -150,15 +158,15 @@ protected
       }
     end
 
-    if(@project.exists?)
-      @sidebar_links << {
-        :controller => "project", 
-        :action     => "delete", 
-        :id         => @project.name,
-        :image      => "/images/24x24/box_delete.png",
-        :name       => "Delete #{@project.name} project"
-      }
-    end
+#    if(@project.exists?)
+#      @sidebar_links << {
+#        :controller => "project", 
+#        :action     => "delete", 
+#        :id         => @project.name,
+#        :image      => "/images/24x24/box_delete.png",
+#        :name       => "Delete #{@project.name} project"
+#      }
+#    end
 
     if(@project.exists? && @project.scm && !@project.scm.exists? && @project.scm.can_create?)
       @sidebar_links << {
@@ -170,15 +178,15 @@ protected
       }
     end
 
-    if(@project.exists? && !@project.checked_out?)
-      @sidebar_links << {
-        :controller => "scm", 
-        :action     => "checkout", 
-        :id         => @project.name,
-        :image      => "/images/24x24/safe_out.png",
-        :name       => "Check out from #{@project.scm.name}"
-      }
-    end
+#    if(@project.exists? && !@project.checked_out?)
+#      @sidebar_links << {
+#        :controller => "scm", 
+#        :action     => "checkout", 
+#        :id         => @project.name,
+#        :image      => "/images/24x24/safe_out.png",
+#        :name       => "Check out from #{@project.scm.name}"
+#      }
+#    end
 
     if(@project.exists? && @project.checked_out?)
       @sidebar_links << {
@@ -205,6 +213,14 @@ protected
         :href       => @project.tracker.url, 
         :image      => "/images/24x24/scroll_information.png",
         :name       => @project.tracker.name
+      }
+    end
+
+    if(@project.exists? && @project.home_page && @project.home_page != "")
+      @sidebar_links << {
+        :href       => @project.home_page, 
+        :image      => "/images/24x24/home.png",
+        :name       => "#{@project.name} home page"
       }
     end
 
@@ -236,10 +252,10 @@ private
     end
 
     # Make a dupe of the scm/tracker lists and substitute with project's value
-    @scms = SCMS.dup
+    @scms = SCMS.collect {|o| o.new}
     @scms.each_index {|i| @scms[i] = @project.scm if @scms[i].class == @project.scm.class}
 
-    @trackers = TRACKERS.dup
+    @trackers = TRACKERS.collect {|o| o.new}
     @trackers.each_index {|i| @trackers[i] = @project.tracker if @trackers[i].class == @project.tracker.class}
 
     @linkable_changesets = @project.changesets(@project.latest_changeset_id, 10)

@@ -1,6 +1,4 @@
 require 'test/unit'
-require 'rubygems'
-require_gem 'rscm'
 require 'damagecontrol/tracker'
 
 module DamageControl

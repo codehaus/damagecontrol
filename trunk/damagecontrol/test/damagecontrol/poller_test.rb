@@ -1,6 +1,4 @@
 require 'test/unit'
-require 'rubygems'
-require_gem 'rscm'
 require 'rscm/mockit'
 require 'damagecontrol/project'
 require 'damagecontrol/poller'

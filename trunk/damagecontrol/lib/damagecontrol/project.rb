@@ -1,7 +1,5 @@
-require 'yaml'
-require 'drb'
-require 'rss/maker'
 require 'fileutils'
+require 'yaml'
 require 'rscm/logging'
 require 'rscm/time_ext'
 require 'rscm/changes'
@@ -13,19 +11,6 @@ require 'damagecontrol/diff_htmlizer'
 require 'damagecontrol/visitor/yaml_persister'
 require 'damagecontrol/visitor/diff_persister'
 require 'damagecontrol/visitor/rss_writer'
-
-class String
-  # Turns a String into a new int or time, representing the next changeset id
-  def next_changeset_id
-    if(self =~ /20\d\d\d\d\d\d\d\d\d\d\d\d/)
-      # It's a timestamp string - convert to time.
-      Time.parse_ymdHMS(self) + 1
-    else
-      # It's an arbitrary integer.
-      self.to_i + 1
-    end
-  end
-end
 
 module DamageControl
   # Represents a project with associated SCM, Tracker and SCMWeb
@@ -62,7 +47,7 @@ module DamageControl
       @tracker = Tracker::Null.new
       @scm_web = SCMWeb::Null.new
     end
-
+    
     # Saves the state of this project to persistent store (YAML)
     def save
       f = project_config_file
@@ -82,9 +67,11 @@ module DamageControl
     
     # Checks out files to project's checkout directory.
     # Writes the checked out files to +checkout_list_file+.
-    def checkout
+    # The +changeset_id+ parameter is a String or a Time
+    # representing a changeset.
+    def checkout(changeset_id)
       File.open(checkout_list_file, "w") do |f|
-        scm.checkout(checkout_dir) do |file_name|
+        scm.checkout(checkout_dir, changeset_id) do |file_name|
           f << file_name << "\n"
           f.flush
         end
@@ -96,7 +83,7 @@ module DamageControl
       start = Time.now
       from = next_changeset_identifier || from_if_first_poll
       
-      Log.info "Getting changesets for #{name} from #{from}"
+      Log.info "Getting changesets for #{name} from #{from} (retrieved from #{checkout_dir})"
       changesets = @scm.changesets(checkout_dir, from)
       if(!@scm.transactional?)
         # We're dealing with a non-transactional SCM (like CVS/StarTeam/ClearCase,
@@ -120,14 +107,14 @@ module DamageControl
       yield changesets
     end
 
-    # Returns the id (string label or time) that should be used to get the next (unrecorded)
+    # Returns the id (int label or time) that should be used to get the next (unrecorded)
     # changeset. This is the id *following* the latest recorded changeset. 
     # This id is determined by looking at the directory names under 
     # +changesets_dir+. If there are none, this method returns nil.
     def next_changeset_identifier(d=changesets_dir)
       # See String extension at top of this file.
       latest_id = DamageControl::Visitor::YamlPersister.new(d).latest_id
-      latest_id ? latest_id.to_s.next_changeset_id : nil
+      latest_id ? latest_id + 1 : nil
     end
     
     # Where RSS is written.
