@@ -237,7 +237,7 @@ class End2EndTest < Test::Unit::TestCase
     #FileUtils.rm_rf(basedir)
   end
   
-  def test_damagecontrol_works_with_cvs
+  def TEMP_test_damagecontrol_works_with_cvs
     cvs = LocalCVS.new(@basedir, "testproject")
     test_build_and_log_and_irc(cvs)
   end
@@ -256,7 +256,7 @@ class End2EndTest < Test::Unit::TestCase
   # gets executed)
   #
   # WEIRD STUFF!
-  def TODO_test_damagecontrol_works_with_svn
+  def test_damagecontrol_works_with_svn
     svn = LocalSVN.new(@basedir, "testproject")
     test_build_and_log_and_irc(svn)
   end
