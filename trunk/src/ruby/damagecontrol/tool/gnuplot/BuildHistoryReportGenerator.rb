@@ -98,7 +98,7 @@ module Plot
 
       plot = Gnuplot::Plot.new()
       plot.title "#{project_name} build durations (by build #)" 
-      plot.xlabel "Date"
+      plot.xlabel "Build #"
       plot.ylabel "Build duration (seconds)"
       plot.term "png small"
       plot.grid
