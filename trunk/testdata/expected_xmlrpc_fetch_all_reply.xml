@@ -5,47 +5,33 @@
       <value>
         <struct>
           <member>
-            <name>
-              apple
-            </name>
+            <name>apple</name>
             <value>
               <array>
                 <data>
                 <value>
                   <struct>
                     <member>
-                      <name>
-                        timestamp
-                      </name>
+                      <name>timestamp</name>
                       <value>
-                        <string>
-                          20040316225946
-                        </string>
+                        <string>20040316225946</string>
                       </value>
                     </member>
                     <member>
-                      <name>
-                        config
-                      </name>
+                      <name>config</name>
                       <value>
                         <struct>
                           <member>
-                            <name>
-                              build_command_line
-                            </name>
+                            <name>build_command_line</name>
                             <value>
-                              <string>
-                                Apple1
-                              </string>
+                              <string>Apple1</string>
                             </value>
                           </member>
                         </struct>
                       </value>
                     </member>
                     <member>
-                      <name>
-                        modification_set
-                      </name>
+                      <name>modification_set</name>
                       <value>
                         <array>
                           <data/>
@@ -53,31 +39,21 @@
                       </value>
                     </member>
                     <member>
-                      <name>
-                        successful
-                      </name>
+                      <name>successful</name>
                       <value>
                         <boolean>1</boolean>
                       </value>
                     </member>
                     <member>
-                      <name>
-                        project_name
-                      </name>
+                      <name>project_name</name>
                       <value>
-                        <string>
-                          apple
-                        </string>
+                        <string>apple</string>
                       </value>
                     </member>
                     <member>
-                      <name>
-                        ___class___
-                      </name>
+                      <name>___class___</name>
                       <value>
-                        <string>
-                          DamageControl::Build
-                        </string>
+                        <string>DamageControl::Build</string>
                       </value>
                     </member>
                   </struct>
@@ -85,38 +61,26 @@
                 <value>
                   <struct>
                     <member>
-                      <name>
-                        timestamp
-                      </name>
+                      <name>timestamp</name>
                       <value>
-                        <string>
-                          20040316225948
-                        </string>
+                        <string>20040316225948</string>
                       </value>
                     </member>
                     <member>
-                      <name>
-                        config
-                      </name>
+                      <name>config</name>
                       <value>
                         <struct>
                           <member>
-                            <name>
-                              build_command_line
-                            </name>
+                            <name>build_command_line</name>
                             <value>
-                              <string>
-                                Apple2
-                              </string>
+                              <string>Apple2</string>
                             </value>
                           </member>
                         </struct>
                       </value>
                     </member>
                     <member>
-                      <name>
-                        modification_set
-                      </name>
+                      <name>modification_set</name>
                       <value>
                         <array>
                           <data/>
@@ -124,31 +88,21 @@
                         </value>
                       </member>
                       <member>
-                        <name>
-                          successful
-                        </name>
+                        <name>successful</name>
                         <value>
                           <boolean>0</boolean>
                         </value>
                       </member>
                       <member>
-                        <name>
-                          project_name
-                        </name>
+                        <name>project_name</name>
                         <value>
-                          <string>
-                            apple
-                          </string>
+                          <string>apple</string>
                         </value>
                       </member>
                       <member>
-                        <name>
-                          ___class___
-                        </name>
+                        <name>___class___</name>
                         <value>
-                          <string>
-                            DamageControl::Build
-                          </string>
+                          <string>DamageControl::Build</string>
                         </value>
                       </member>
                     </struct>

@@ -12,16 +12,16 @@ module DamageControl
   class BuildHistoryPublisher < AsyncComponent
   
     def initialize(channel, filename=nil)
+      @builds = Hash.new
       super(channel)
       if(filename != nil)
-        if(File.exist?(filename))
-          file = File.new(filename)
+        expanded = File.expand_path(filename)
+        if(File.exist?(expanded))
+          file = File.new(expanded)
           @builds = YAML::load(file.read)
           file.close
         end
         @filename = filename
-      else
-        @builds = Hash.new
       end
     end
 
@@ -55,12 +55,12 @@ module DamageControl
         if(@builds[project_name] != nil)
           result_map = {project_name => @builds[project_name]}
         else
-          return nil
+          return Hash.new
         end
       else
         result_map = @builds
       end
-      
+
       if(number_of_builds != nil)
         #filter out the end of each list
         result = Hash.new

@@ -20,8 +20,8 @@ module DamageControl
     
     XMLRPC_CALL_DATA = <<-EOF
     <?xml version="1.0" encoding="ISO-8859-1"?>
-      <methodCall>
-        <methodName>status.get_build_list_map</methodName>
+    <methodCall>
+      <methodName>status.get_build_list_map</methodName>
       <params>
         <param>
           <value>
@@ -46,7 +46,7 @@ module DamageControl
       
       # Do a raw post so we can compare the XML that comes back
       header = {  
-        "User-Agent"     =>  "Just a test",
+        "User-Agent"     => "Just a test",
         "Content-Type"   => "text/xml",
         "Content-Length" => XMLRPC_CALL_DATA.size.to_s, 
         "Connection"     => "close"
@@ -54,20 +54,15 @@ module DamageControl
       h = Net::HTTP.new('localhost', 4719)
       resp, data = h.post2('/test', XMLRPC_CALL_DATA, header)
       
-      if(windows?)
-#######################################
-# SUPER UGLY HACK TO WORK AROUND BROKEN
-# REXML IN RUBY 1.8 ON BEAVER
-#######################################
       
-        parser = XMLRPC::XMLParser::XMLTreeParser.new
-        actual_build_list_map = parser.parseMethodResponse(data)
-
-        # Read the expected file and make it one line (the xml rpc client is a bit flaky)
-        expected_data = File.new("#{damagecontrol_home}/testdata/expected_xmlrpc_fetch_all_reply.xml").read.gsub(/[ \r\n]/, "").sub(/xmlversion/, "xml version")
-        expected_build_list_map = parser.parseMethodResponse(expected_data)      
-
-        assert_equal(expected_build_list_map, actual_build_list_map)
+      pref = {:ignore_whitespace_nodes=>:all}
+      a = ""
+      REXML::Document.new( data, pref ).write(a)
+      b = ""
+      REXML::Document.new( File.new("#{damagecontrol_home}/testdata/expected_xmlrpc_fetch_all_reply.xml"), pref).write(b)
+      # Just compare the lengths. Not 100% foolproof, but if they're not equal, compare the actual content
+      if(a.length != b.length)
+        assert_equal(a,b)      
       end
     end
   end

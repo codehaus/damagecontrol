@@ -21,30 +21,49 @@ def start_simple_server(params = {})
   buildsdir = params[:BuildsDir] || File.expand_path("build")
   allow_ips = params[:AllowIPs] || ["127.0.0.1"]
   port = params[:SocketTriggerPort] || 4711
-  web_port = params[:WebPort] || 8080
+  http_port = params[:HttpPort] || 4712
+  https_port = params[:HttpPort] || 4713
+
   @hub = Hub.new
+  LogWriter.new(@hub, logsdir)
 
   host_verifier = HostVerifier.new(allow_ips)
   @socket_trigger = SocketTrigger.new(@hub, port, host_verifier).start
 
-  xmlrpc_servlet = XMLRPC::WEBrickServlet.new
-  XMLRPCTrigger.new(xmlrpc_servlet, @hub)
+  query_servlet = XMLRPC::WEBrickServlet.new
+
+  XMLRPCTrigger.new(query_servlet, @hub)
 
   bhp = BuildHistoryPublisher.new(@hub, "build_history.yaml")
-  XMLRPCStatusPublisher.new(xmlrpc_servlet, bhp)
-
-  LogWriter.new(@hub, logsdir)
+  XMLRPCStatusPublisher.new(query_servlet, bhp)
   
   scheduler = BuildScheduler.new(@hub)
   # Only use one build executor (don't allow parallel builds)
   scheduler.add_executor(BuildExecutor.new(@hub, buildsdir))
   scheduler.start
 
-  httpserver = WEBrick::HTTPServer.new(:Port => web_port, :RequestHandler => HostVerifyingHandler.new(host_verifier))
-  httpserver.mount("/RPC2", xmlrpc_servlet)
-  httpserver.mount("/xmlrpc", xmlrpc_servlet)
-  at_exit { httpserver.shutdown }
-  Thread.new { httpserver.start }
+  # For unsecure XML-RPC connections like getting status
+  httpd = WEBrick::HTTPServer.new(
+    :Port => http_port, 
+    :RequestHandler => HostVerifyingHandler.new(host_verifier)
+  )
+  httpd.mount("/xmlrpc", query_servlet)
+  at_exit { httpd.shutdown }
+  Thread.new { httpd.start }
+
+=begin
+  # For secure XML-RPC connections like registering new projects and requesting builds
+  require "webrick/https"
+  httpsd = WEBrick::HTTPServer.new(
+    :Port           => https_port,
+    :SSLEnable      => true,
+    :SSLPrivateKey  => OpenSSL::PKey::RSA.new(File::read("damagecontrol.key")),
+    :SSLCertificate => OpenSSL::X509::Certificate.new(File::read("damagecontrol.crt"))
+  )
+  at_exit { httpsd.shutdown }
+  Thread.new { httpsd.start }
+=end
+
 end
 
 if __FILE__ == $0

@@ -29,7 +29,8 @@ start_simple_server(
   :BuildsDir => "#{buildRoot}/checkout", 
   :LogsDir => "#{buildRoot}/log", 
   :SocketTriggerPort => 4711, 
-  :WebPort => 4712, 
+  :HttpPort => 4712,
+  :HttpsPort => 4713,
   :AllowIPs => ["127.0.0.1", "66.216.68.111", "81.5.134.59", "217.158.24.17" ])
 
 FilePublisher.new(@hub, "#{buildRoot}/report", HTMLTemplate.new).start 

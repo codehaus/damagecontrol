@@ -50,6 +50,14 @@ module DamageControl
       assert_equal(["apple", "pear"], project_names)
     end
     
+    def test_get_build_list_map_with_empty_history_returns_empty_map
+      bhp = BuildHistoryPublisher.new(Hub.new)
+      should_be_empty = bhp.get_build_list_map()
+      should_also_be_empty = bhp.get_build_list_map("foo")
+      assert_equal(Hash.new, should_be_empty)
+      assert_equal(Hash.new, should_also_be_empty)
+    end
+    
     def test_register_build_saves_as_yaml
       bhp = BuildHistoryPublisher.new(Hub.new, "test.yaml")
 
@@ -66,7 +74,7 @@ module DamageControl
     end
     
     def teardown
-#      File.delete("test.yaml") if File.exist?("test.yaml")
+      File.delete("test.yaml") if File.exist?("test.yaml")
     end
     
     PERSISTED_YAML_DATA = <<-EOF
@@ -116,7 +124,7 @@ pear:
       assert_equal("3", @bhp.get_build_list_map("3")["3"][0].project_name)
 
       @bhp.process_message(BuildProgressEvent.new(Build.new("4"), nil))
-      assert_nil(@bhp.get_build_list_map("4"))
+      assert_equal(Hash.new, @bhp.get_build_list_map("4"))
     end
 
     def TODO_test_register_build_saves_as_yaml_and_filters_out_old_builds_so_the_file_doesnt_grow_too_big

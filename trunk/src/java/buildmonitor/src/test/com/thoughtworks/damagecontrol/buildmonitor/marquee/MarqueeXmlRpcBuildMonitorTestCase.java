@@ -17,15 +17,15 @@ import java.net.Socket;
 import java.net.SocketTimeoutException;
 import java.net.URL;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Collections;
 //TODO refactor to an abstract test so we can subclass an integration test
 //that goes against the ruby server
 /**
  * @author Aslak Helles&oslash;y
- * @version $Revision: 1.4 $
+ * @version $Revision: 1.5 $
  */
 public class MarqueeXmlRpcBuildMonitorTestCase extends TestCase {
     private IOException serverEx;
@@ -134,7 +134,7 @@ public class MarqueeXmlRpcBuildMonitorTestCase extends TestCase {
             }
         });
 
-        BuildPoller buildMonitor = new MarqueeXmlRpcBuildPoller(new URL("http://localhost:4315/"));
+        BuildPoller buildMonitor = new MarqueeXmlRpcBuildPoller(new URL("https://localhost:10443/"));
         buildMonitor.addBuildListener((BuildListener) mockBuildListener.proxy());
         buildMonitor.poll();
 
