@@ -53,20 +53,20 @@ module DamageControl
           puts "Starting SocketTrigger listening on port #{port}"
           $stdout.flush
           
-          while (session = @server.accept)
+          while (socket = @server.accept)
             begin
-              client_hostname = client.addr[2]
-              client_ip = client.addr[3]
+              client_hostname = socket.addr[2]
+              client_ip = socket.addr[3]
               if(allowed?(client_hostname, client_ip))
-                payload = session.gets
+                payload = socket.gets
                 do_accept(payload)
-                session.print("DamageControl got your message\r\n")
-                session.print("http://damagecontrol.codehaus.org/\r\n")
+                socket.print("DamageControl got your message\r\n")
+                socket.print("http://damagecontrol.codehaus.org/\r\n")
               else
-                session.print("Connections are not allowed from #{client_ip}")
+                socket.print("Connections are not allowed from #{client_ip}")
               end
             ensure
-              session.close
+              socket.close
             end
           end
         rescue
