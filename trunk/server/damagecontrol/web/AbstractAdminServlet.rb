@@ -3,6 +3,9 @@ require 'pebbles/MVCServlet'
 
 module DamageControl
   class AbstractAdminServlet < Pebbles::MVCServlet
+    
+    include Logging
+  
     def initialize(type, build_scheduler, build_history_repository, project_config_repository)
       @type = type
       @build_scheduler = build_scheduler

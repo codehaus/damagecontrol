@@ -24,6 +24,7 @@ module DamageControl
         if(private?)
           result["Configure"] = "?project_name=#{project_name}&action=configure"
           result["Nudge build now"] = "?project_name=#{project_name}&action=trig_build"
+          result["Install trigger"] = "?project_name=#{project_name}&action=install_trigger"
         end
       end
       result
@@ -55,6 +56,27 @@ module DamageControl
       "svnurl"
     ]
     
+    def install_trigger
+      # Uninstall the old trigger (if any)
+      project_config = @project_config_repository.project_config(project_name)
+      scm = @scm_factory.get_scm(project_config, @project_directories.checkout_dir(project_name))
+      error = nil
+      begin
+        scm.uninstall_trigger(project_name) if scm.trigger_installed?(project_name)
+  
+        # Install the trigger if trigger=xmlrpc
+        trigger_type = project_config["trigger"]
+        if trigger_type == "xmlrpc"
+          scm.install_trigger(project_name, @nudge_xmlrpc_url)
+        else
+          raise "can't install trigger type: #{trigger_type}"
+        end
+      rescue Exception => e
+        error = e
+      end
+      render("trigger_installed.erb", binding)
+    end
+    
     def store_configuration
       assert_private
       @project_config_repository.new_project(project_name) unless @project_config_repository.project_exists?(project_name)
@@ -67,15 +89,6 @@ module DamageControl
       end
 
       @project_config_repository.modify_project_config(project_name, project_config)
-      
-      # Uninstall the old trigger (if any)
-      scm = @scm_factory.get_scm(project_config, @project_directories.checkout_dir(project_name))
-      if(!scm.nil?)
-        scm.uninstall_trigger(project_name) if scm.trigger_installed?(project_name)
-
-        # Install the trigger if trigger=xmlrpc
-        scm.install_trigger(project_name, @nudge_xmlrpc_url) if project_config["trigger"] == "xmlrpc"
-      end
       
       dashboard_redirect
     end

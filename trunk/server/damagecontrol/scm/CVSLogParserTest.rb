@@ -232,7 +232,7 @@ date: 2003/10/04 12:04:14;  author: tirsen;  state: Exp;
 Cleaned up the end-to-end test, did some more work on the CCLogPoller
 EOF
 
-LOG_ENTRY_FROM_06_07_2004_19_25 = <<EOF
+LOG_ENTRY_FROM_06_07_2004_19_25_1 = <<EOF
 RCS file: /home/projects/jmock/scm/jmock/core/src/test/jmock/core/testsupport/MockInvocationMat
 	V1_0_1: 1.4
 	V1_0_0: 1.4
@@ -245,11 +245,55 @@ description:
 
 EOF
 
-    def test_can_parse_LOG_ENTRY_FROM_06_07_2004_19_25
+    def test_can_parse_LOG_ENTRY_FROM_06_07_2004_19_25_1
       @parser.cvspath = "/home/projects/jmock/scm/jmock"
       @parser.cvsmodule = "core"
-      assert_equal("src/test/jmock/core/testsupport/MockInvocationMat", @parser.parse_path(LOG_ENTRY_FROM_06_07_2004_19_25))
+      assert_equal("src/test/jmock/core/testsupport/MockInvocationMat", @parser.parse_path(LOG_ENTRY_FROM_06_07_2004_19_25_1))
     end
+    
+LOG_ENTRY_FROM_06_07_2004_19_19 = <<EOF
+Working file: lib/xmlrpc/datetime.rb
+head: 1.1
+branch:
+locks: strict
+access list:
+symbolic names:
+	BEFORE_CENTRAL_REFACTORING: 1.1
+keyword substitution: kv
+total revisions: 1;	selected revisions: 0
+description:
+
+EOF
+
+    def test_can_parse_LOG_ENTRY_FROM_06_07_2004_19_19
+      assert_equal("lib/xmlrpc/datetime.rb", @parser.parse_path(LOG_ENTRY_FROM_06_07_2004_19_19))
+    end
+    
+LOG_ENTRY_FROM_06_07_2004_19_25_2 = <<EOF
+RC
+Working file: website/templates/logo.gif
+head: 1.2
+branch:
+locks: strict
+access list:
+symbolic names:
+	steves_easymock: 1.2.0.2
+	Root_steves_easymock: 1.2
+	V1_0_1: 1.2
+	V1_0_0: 1.2
+	V1_0_0_RC1: 1.2
+	before_removing_features_deprecated_pre_1_0_0: 1.2
+	pre-hotmock-syntax-change: 1.2
+keyword substitution: b
+total revisions: 2;	selected revisions: 0
+description:
+
+EOF
+
+  def test_can_parse_LOG_ENTRY_FROM_06_07_2004_19_25_2
+      assert_equal("website/templates/logo.gif", @parser.parse_path(LOG_ENTRY_FROM_06_07_2004_19_25_2))
+  end
+
 
   end
 
