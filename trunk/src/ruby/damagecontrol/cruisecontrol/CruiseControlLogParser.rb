@@ -33,7 +33,7 @@ module DamageControl
         handle_error(res)
                 
         if res.start_element? and res[0] == 'property'
-          build_result.project_name = res[1]['value'] if res[1]['name'] == 'projectname'
+#          build_result.project_name = res[1]['value'] if res[1]['name'] == 'projectname'
           build_result.label = res[1]['value'] if res[1]['name'] == 'label'
           build_result.timestamp = res[1]['value'] if res[1]['name'] == 'cctimestamp'
         end

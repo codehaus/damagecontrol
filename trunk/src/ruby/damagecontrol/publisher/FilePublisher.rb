@@ -1,3 +1,4 @@
+require 'damagecontrol/FileSystem'
 require 'damagecontrol/BuildEvents'
 require 'damagecontrol/AsyncComponent'
 require 'ftools'
@@ -10,39 +11,24 @@ module DamageControl
 
   class FilePublisher < AsyncComponent
 
-    def initialize(hub, basedir, template)
+    def initialize(hub, basedir, template, filesystem=FileSystem.new)
       super(hub)
       @basedir = basedir
       @template = template
+      @filesystem = filesystem
     end
   
     def process_message(event)
       if event.is_a? BuildCompleteEvent
         filedir = "#{@basedir}/#{event.build.label}"
-        makedirs(filedir)
+        @filesystem.makedirs(filedir)
 
         filepath = "#{filedir}/#{@template.file_name}"
         content = @template.generate(event.build)
-        write_to_file(filepath, content)
+        file = @filesystem.newFile(filepath, "w")
+        file.print(content)
+        file.close
       end
     end
-
-  private
-
-    def write_file(build_result)
-
-      write_to_file(file, content)
-    end
-
-    def makedirs(dir)
-      File.makedirs(dir)
-    end
-
-    def write_to_file(filepath, content)
-      File.new(filepath, "w")
-      file.print(content)
-      file.close
-    end
-      
   end
 end

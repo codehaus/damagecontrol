@@ -1,7 +1,7 @@
 require 'damagecontrol/Timer'
 
 module DamageControl
-  # TODO make it an adapter for other components
+  # TODO make it an adapter (instead of a superclass) for other components
   class AsyncComponent
     attr_reader :hub
     

@@ -5,8 +5,7 @@ module DamageControl
   class HTMLTemplateTest < Test::Unit::TestCase
     
     def test_failed_build
-      build_result = BuildResult.new
-      build_result.project_name = "Test Project"
+      build_result = BuildResult.new("Test Project")
       build_result.label = "999"
       build_result.timestamp = "20030929145347"
       build_result.error_message = "Knockout"
