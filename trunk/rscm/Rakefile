@@ -7,6 +7,7 @@ require 'rake/gempackagetask'
 require 'rake/contrib/compositepublisher'
 require 'rake/contrib/sshpublisher'
 require 'rake/contrib/rubyforgepublisher'
+require 'lib/rubyforge_file_publisher'
 
 PKG_BUILD     = ENV['PKG_BUILD'] ? '.' + ENV['PKG_BUILD'] : ''
 PKG_NAME      = 'rscm'
@@ -54,8 +55,9 @@ end
 
 PKG_FILES = FileList[
   '[A-Z]*',
-  'lib/**/*.rb', 
-  'test/**/*.rb',
+  'lib/**/*', 
+  'test/**/*',
+  'testproject/**/*',
   'doc/**/*',
   'ext/rscm.jar'
 ]
@@ -105,14 +107,28 @@ else
   end
 end
 
-task :publish => [:rdoc] do
-  publisher = Rake::CompositePublisher.new  
-  publisher.add Rake::RubyForgePublisher.new('rscm', 'aslak_hellesoy')  
-  #publisher.add Rake::SshFilePublisher.new(  
-  #  'umlcoop',  
-  #  'htdocs/software/rake',  
-  #  '.',  
-  #  'rake.blurb')
+task :publish do
+ # publisher = Rake::CompositePublisher.new
+#  publisher.add Rake::RubyForgePublisher.new('rscm', 'aslak_hellesoy')
 
-  publisher.upload
+  RUBYFORGE_GROUP_ID = 490
+  RUBYFORGE_PACKAGE_ID = 552
+  RUBYFORGE_RELEASE_NAME = "tralalarrqqq"
+
+  Rake::RubyForgeFilePublisher.new(
+    RUBYFORGE_GROUP_ID, 
+    "aslak_hellesoy", 
+    "README",
+    #"pkg/#{PKG_FILE_NAME}.gem", 
+    RUBYFORGE_PACKAGE_ID,
+    RUBYFORGE_RELEASE_NAME
+  ) do |p|
+    p.type_id = 8100
+    p.processor_id = 2000
+    p.preformatted = 1
+    p.release_name = "come on"
+    p.release_changes = "now"
+    p.release_date = Time.utc(2005, 2, 19, 23, 42, 0)
+  end
+
 end
