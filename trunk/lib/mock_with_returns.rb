@@ -55,9 +55,9 @@ class Mock
         @mock_calls.push( [name,test] )
     end
     
-	def __return( name, value )
-		@returns[name] = value
-	end
+  def __return( name, value )
+    @returns[name] = value
+  end
 
     # Call this at the end of a test to ensure that all scheduled calls
     # have been made to the mock
@@ -92,7 +92,7 @@ private
     # arguments.
     #
     def __mock_call( name, args, block )
-    	
+      
         return @returns[name] if !@returns[name].nil?
 
         @calls.push(name)
@@ -119,7 +119,7 @@ private
             if (body.arity+1).abs > args_length 
                 raise RUNIT::AssertionFailedError,
                       "too few arguments to #{name} method of #{@name}; " +
-                          "require #{(body.arity+1).abs}, got #{args.length}",
+                          "require #{(body.arity+1).abs}, got #{args_length}",
                       caller(2)
             end
         else
@@ -127,7 +127,7 @@ private
                 raise RUNIT::AssertionFailedError,
                       "wrong number of arguments to " +
                           "#{name} method of #{@name}; " +
-                          "require #{body.arity}, got #{args.length}",
+                          "require #{body.arity}, got #{args_length}",
                       caller(2)
             end
         end
