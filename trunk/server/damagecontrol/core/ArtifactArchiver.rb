@@ -21,10 +21,10 @@ module DamageControl
         
         artifacts_to_archive = build.config["artifacts_to_archive"]
         if(artifacts_to_archive)
-          logger.info("archiving log files #{artifacts_to_archive} for #{build.project_name} into directory #{archive_dir}")
           artifacts_to_archive.each do |pattern|
             file_pattern = "#{checkout_dir}/#{pattern}"
             Dir[file_pattern].each do |file|
+							logger.info("archiving build artifact: #{file} for #{build.project_name} into directory #{archive_dir}")
               mkdir_p(archive_dir)
               cp_r(file, archive_dir)
             end
