@@ -5,7 +5,6 @@ using Nwc.XmlRpc;
 using System.Collections;
 using System.Net;
 using ThoughtWorks.DamageControl.DamageControlClientNet;
-using Chicken.Gnome.Notification;
 
 namespace ThoughtWorks.DamageControl.MonoTray 
 {
@@ -135,6 +134,7 @@ namespace ThoughtWorks.DamageControl.MonoTray
             UpdateProjectList();
            
             Gtk.Application.Run ();
+            
          }
          
          private void UpdateProjectList() {
@@ -148,10 +148,25 @@ namespace ThoughtWorks.DamageControl.MonoTray
                      
          }
          
+         private void TimerEnded() {}
+         
          public void ProjectPolled(object source, PolledEventArgs args)
 		 {
 		     bool onefailed = false;
 		     bool onesucceeded = false;
+		    //NotificationFactory.ShowMessageNotification
+            //("Header", "Body", NotificationType.Info, new TimerEndedHandler (TimerEnded));
+            /*
+		    NotificationBubble b = new NotificationBubble ("http://www.gnome.org", NotificationSource.Url, NotificationContent.Html);
+            b.TimeOut = 10000;
+            b.TimerEndedEvent += TimerEnded;
+            b.BubbleWidth = 600;
+            b.BubbleHeight = 80;
+            b.Move (5, 30);
+            b.RenderWithTimer ();
+            b.ShowAll ();
+            */
+		     
 		     foreach (Project proj in this.projects)
 		     {
                 if (proj.ProjectStatus.BuildStatus == BuildStatus.Success)
