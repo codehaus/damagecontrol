@@ -65,6 +65,15 @@ module DamageControl
     def mod(scm_spec)
       parse_spec(scm_spec)[4]
     end
+    
+    def commit(directory, message, &proc)
+      Dir.chdir(directory)
+      cvs(commit_command(message), &proc)
+    end
+
+    def commit_command(message)
+      "commit -m \"#{message}\""
+    end
 
     def checkout_command(scm_spec, directory)
       "-d#{cvsroot(scm_spec)} checkout #{mod(scm_spec)}"
@@ -74,8 +83,12 @@ module DamageControl
       "-d#{cvsroot(scm_spec)} update -d -P"
     end
     
+    def is_local_connection_method(scm_spec)
+      scm_spec =~ /^:local:/
+    end
+    
     def checkout(scm_spec, directory, &proc)
-      scm_spec = to_os_path(scm_spec)
+      scm_spec = to_os_path(scm_spec) if is_local_connection_method(scm_spec)
       directory = to_os_path(File.expand_path(directory))
       if(checked_out?(directory, scm_spec))
         File.makedirs(directory) unless File.exists?(directory)
@@ -91,7 +104,7 @@ module DamageControl
         if (mod_directory != directory)
           begin
             File.move(mod_directory, directory)
-          rescue
+          rescue NotImplementedError
             File.rename(mod_directory, directory)
           end
         end

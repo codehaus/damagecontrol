@@ -58,7 +58,7 @@ class Mock
   def __return( name, value )
     @returns[name] = value
   end
-
+  
     # Call this at the end of a test to ensure that all scheduled calls
     # have been made to the mock
     #
@@ -71,8 +71,8 @@ class Mock
                   caller(2)
         end
     end
-    
-    
+
+
 private
     # Dispatches aribtrary method calls to the next mocked behaviour
     # 

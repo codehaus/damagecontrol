@@ -84,10 +84,26 @@ module DamageControl
     end
     
     def get_ip
-      if(windows?)
-        ["(unknown)"]
+      # cache ip to avoid starting a new process each time
+      @myip = fetch_ip if @myip.nil?
+      @myip
+    end
+    
+    def fetch_ip
+      result = if windows?
+        get_ip_from_ipconfig_exe_output(`ipconfig.exe`)
       else
-        [`/sbin/ifconfig eth0|grep inet|cut -d : -f 2|cut -d \  -f 1`.chomp ]
+        `/sbin/ifconfig eth0|grep inet|cut -d : -f 2|cut -d \  -f 1`.chomp
+      end
+      result = "(unknown)" unless $?
+      result
+    end
+    
+    def get_ip_from_ipconfig_exe_output(ipconfig_output)
+      if ipconfig_output =~ /IP Address(. )*: (.*)$/
+        $2.chomp
+      else
+        "(unknown)"
       end
     end
     
