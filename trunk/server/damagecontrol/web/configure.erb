@@ -61,11 +61,13 @@ function showScm(scm) {
   <% scm_configurators.each do |scm_configurator| %>
     <div id="<%= scm_configurator.scm_id %>" style="<% if(scm_configurator.selected?)%>display:block<%else%>display:none<%end%>">
       <%= scm_configurator.config_form %>
-      <input name="action" type="hidden" value="<%= action %>" />
-      <input type="submit" value="Save"/>
     </div>
   <% end %>
 
+  <input name="action" type="hidden" value="<%= action %>" />
+  <input type="submit" value="Save"/>
+  
+</form>
   
 </body>
 </html>
