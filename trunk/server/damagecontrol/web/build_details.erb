@@ -77,8 +77,9 @@ build = build_history_repository.lookup(project_name, request.query["timestamp"]
       <%
       build.changesets.each do |changeset|
       %>
+
         <tr class="pane">
-          <td colspan="2" class="changeset">#{changeset.developer} : #{changeset.message}</td>
+          <td colspan="2" class="changeset"><%= changeset.developer %> : <%= changeset.message %></td>
         </tr>
         <%
         changeset.each do |change|
@@ -94,6 +95,7 @@ build = build_history_repository.lookup(project_name, request.query["timestamp"]
           <td><%= change.revision %></td>
         </tr>
         <% end %>
+
       <% end %>
     <% end %>
   </table>
