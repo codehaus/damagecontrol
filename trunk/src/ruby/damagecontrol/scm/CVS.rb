@@ -71,7 +71,6 @@ module DamageControl
     def changes(spec, checkoutdirectory, time_before, time_after)
       with_working_directory(checkoutdirectory) do
         cvs_with_io(changes_command(time_before, time_after)) do |io|
-          puts io.gets
           CVSLogParser.new.parse_log(io)
         end
       end
