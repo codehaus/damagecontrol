@@ -106,6 +106,23 @@ module DamageControl
       create_scm.web_url_to_change(change)
     end
     
+    def build_description(build)
+      label = "##{build.label}"; 
+      label = build.status if label == "#"
+      "#{build.timestamp_for_humans} (#{label})"
+    end
+
+    def builds_table(params)
+      header_text = params[:header_text] || "Builds"
+      empty_text = params[:empty_text] || "No builds"
+      css_class = params[:css_class] || "builds"
+      builds = params[:builds] || required_param(:builds)
+      selected_build = params[:selected_build] || nil
+      base_url = params[:base_url] || ""
+      prefix_with_project_name = params[:prefix_with_project_name] == true || false
+      erb("components/builds_table.erb", binding)
+    end
+    
     def task(params)
       icon = params[:icon] # || required_param(:icon)
       url = params[:url] || required_param(:url)

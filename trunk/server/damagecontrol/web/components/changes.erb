@@ -21,7 +21,7 @@
       changeset.each do |change|
       %>
       <tr>
-        <td><image src="<%= file_icon(change) %>"/></td>
+        <td><img width="16" height="16" src="<%= file_icon(change) %>"/></td>
         <td><%= change.revision %></td>
         <td>
           <% if scm_url(change) then %>

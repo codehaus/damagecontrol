@@ -52,19 +52,6 @@ module DamageControl
       render("project_dashboard.erb", binding)
     end
   
-    def search
-      search_string = request.query['search']
-      regexp = Regexp.new(search_string, Regexp::IGNORECASE)
-      
-      required_project_name = request.query['project_name']
-      current_build = build_history_repository.current_build(project_name)
-      current_status = build_status(current_build)
-      builds = build_history_repository.search(regexp, required_project_name)
-      find_method = "search"
-      
-      render("search_results.erb", binding)
-    end
-    
     def build_details
       if selected_build
         render("build_details.erb", binding)
@@ -80,7 +67,7 @@ module DamageControl
       if selected_build
         tabs +=
           [
-            Tab.new("changes", "Changes", changes(:changesets => selected_build.changesets))
+            Tab.new("changes", "Changes", changes(:changesets => selected_build.changesets), "icons/document_edit.png")
           ]
       end
       if selected_build.log_file && File.exists?(selected_build.log_file)
@@ -178,24 +165,8 @@ module DamageControl
   
   private
   
-    def build_description(build)
-      label = "##{build.label}"; 
-      label = build.status if label == "#"
-      "#{build.timestamp_for_humans} (#{label})"
-    end
-
     def dashboard_redirect
       action_redirect(:dashboard, { "project_name" => project_name })
-    end
-    
-    def builds_table(params)
-      header_text = params[:header_text] || "Builds"
-      empty_text = params[:empty_text] || "No builds"
-      css_class = params[:css_class] || "builds"
-      builds = params[:builds] || required_param(:builds)
-      selected_build = params[:selected_build] || nil
-      prefix_with_project_name = params[:prefix_with_project_name] == true || false
-      erb("components/builds_table.erb", binding)
     end
     
     def selected_build

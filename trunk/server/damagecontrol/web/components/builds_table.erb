@@ -34,8 +34,8 @@
     <% else %>
     <td class="build-cell-odd">
     <% end %>
-      <img src="<%= image %>" />&nbsp;
-      <a class="tip" href="<%= build_url(build) %>">
+      <img width="16" height="16" src="<%= image %>" />&nbsp;
+      <a class="tip" href="<%= base_url %><%= build_url(build) %>">
         <% if selected_build == build then %><b><% end %>
         
         <%= prefix %><%= build_description(build) %>

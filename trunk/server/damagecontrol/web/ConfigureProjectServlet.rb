@@ -9,7 +9,9 @@ module DamageControl
     
     def tasks
       unless project_name.nil?
-        task(:icon => "icons/navigate_left.png", :name => "Back to project", :url => "project?project_name=#{project_name}")
+        [
+          task(:icon => "icons/navigate_left.png", :name => "Back to project", :url => "project?project_name=#{project_name}")
+        ]
       end 
     end
 
@@ -27,7 +29,8 @@ module DamageControl
     def configure
       action = "store_configuration"
       next_build_number = project_config_repository.peek_next_build_number(project_name)
-      dependent_projects = if project_config['dependent_projects'] then project_config['dependent_projects'].join(', ') else nil end
+      dependent_projects = from_array(project_config['dependent_projects'])
+      logs_to_archive = from_array(project_config['logs_to_archive'])
       render("configure.erb", binding)
     end
         
@@ -45,8 +48,8 @@ module DamageControl
           project_config[key] = nil
         end
       end
-      dependent_projects = request.query['dependent_projects']
-      project_config['dependent_projects'] = dependent_projects.split(",").collect{|p| p.strip } if dependent_projects
+      project_config['dependent_projects'] = to_array(request.query['dependent_projects'])
+      project_config['logs_to_archive'] = to_array(request.query['logs_to_archive'])
       scm_configurators(project_config).each do |scm_configurator|
         scm_configurator.store_configuration_from_request(request)
       end
@@ -69,6 +72,14 @@ module DamageControl
       "jira_url", 
       "scm_type"
     ]
+    
+    def from_array(array)
+      if array then array.join(', ') else nil end
+    end
+    
+    def to_array(array)
+      if array then array.split(",").collect{|e| e.strip} else [] end
+    end
     
     def scm_configurators(project_config = project_config)
       scm_configurator_classes.collect {|cls| cls.new(project_config)}

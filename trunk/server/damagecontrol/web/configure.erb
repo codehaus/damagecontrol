@@ -67,6 +67,10 @@ function showScm(scm) {
   <td><input class="scm_info" name="dependent_projects" id="dependent_projects" type="text" value="<%= dependent_projects %>"/></td>
 </tr>
 <tr>
+  <td>Log-files to archive (are archived after build, can contain wildcards)</td>
+  <td><input class="scm_info" name="logs_to_archive" id="logs_to_archive" type="text" value="<%= logs_to_archive %>"/></td>
+</tr>
+<tr>
   <td>Source control</td>
   <td>
     <% scm_configurators.each do |scm_configurator| %>
