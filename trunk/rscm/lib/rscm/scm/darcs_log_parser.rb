@@ -1,74 +1,50 @@
 require 'rscm'
 require 'time'
 require 'stringio'
+require 'rexml/document'
 
 module RSCM
   class DarcsLogParser
-    def parse_changesets(io, from_identifier=Time.epoch, to_identifier=Time.infinity)
-      changesets = ChangeSets.new
-      changeset_string = ""
-
-      blank_lines = 0
-      io.each_line do |line|
-        if (line =~ /^\s*$/)
-          blank_lines += 1
-        end
-
-        if (blank_lines == 2 or io.eof?)
-          changeset = parse_changeset(StringIO.new(changeset_string))
-          changesets.add(changeset)
-          changeset_string = ""
-          blank_lines = 0
-        end
-
-        changeset_string << line
-      end
-      changesets
-    end
-
     def parse_changeset(changeset_io)
       changeset = ChangeSet.new
-      state = nil
-
       changeset.revision = ''
 
-      changeset_io.each_line do |line|
-        if (line =~ /^(\S{3}) (\S{3}) ([\s|\d]\d) (\d\d):(\d\d):(\d\d) (...) (\d{4})  (.*)$/)
-          month = $2
-          day = $3
-          hour = $4
-          min = $5
-          sec = $6
-          year = $8
-          changeset.developer = $9
+      doc = REXML::Document.new changeset_io
 
-          changeset.time = Time.utc(year, month, day, hour, min, sec)
+      doc.elements.each("patch") { |element|
+        changeset.revision = ''
+        changeset.developer = element.attributes['author']
+        changeset.time = Time.parse(element.attributes['local_date'])
+        changeset.message = element.elements["comment"].text
+        changeset.message.lstrip!
+        changeset.message.rstrip!
+      
 
-          state = :message
-        elsif (state == :message)
-          if (line =~ /^\s*$/)
-            state = :files if line =~ /^\s*$/
-          elsif (changeset.message.nil?)
-            changeset.message = ""
-          elsif (changeset.message)
-            changeset.message << line.lstrip unless line =~ /^ \* .*$/
-          end
-        elsif (state == :files)
-          if (line =~ /^    (\S) (\S*).*$/)
-            if ($1 == 'A')
-              status = Change::ADDED
-            elsif ($1 == 'M')
-              status = Change::MODIFIED
-            end
-            file = $2
+        element.elements["summary"].elements.each("add_file") { |file|
+          changeset << Change.new(file.text.strip, Change::ADDED, changeset.developer, nil, changeset.revision, changeset.time)
+        }
+        element.elements["summary"].elements.each("modify_file") { |file|
+          changeset << Change.new(file.text.strip, Change::MODIFIED, changeset.developer, nil, changeset.revision, changeset.time)
+        }
+      }
 
-            changeset << Change.new(file[2, file.length], status, changeset.developer, nil, changeset.revision, changeset.time) unless line =~ /\/$/
-          end
-        end
-      end
-
-      changeset.message.chomp!
       changeset
+    end
+
+    def parse_changesets(io, from_identifier=Time.epoch, to_identifier=Time.infinity)
+      changesets = ChangeSets.new
+
+      doc = REXML::Document.new io
+
+      doc.elements.each("//patch") { |element|
+        changeset = parse_changeset(element.to_s)
+        if ((from_identifier <= changeset.time) && (changeset.time <= to_identifier))
+          changesets.add(changeset)
+        end
+      }
+
+      changesets
     end
   end
 end
+
