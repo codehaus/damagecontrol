@@ -160,6 +160,7 @@ module DamageControl
       httpd.mount("/public/dashboard", DashboardServlet.new(build_history_repository, project_config_repository, build_scheduler, :public))
       httpd.mount("/public/project", ProjectServlet.new(build_history_repository, nil, nil, :public, build_scheduler, project_directories, nudge_xmlrpc_url))
       httpd.mount("/public/log", LogFileServlet.new(project_directories))
+      httpd.mount("/public/root", WEBrick::HTTPServlet::FileHandler, rootdir, :FancyIndexing => true)
       
       httpd.mount("/public/images", WEBrick::HTTPServlet::FileHandler, "#{webdir}/images")
       httpd.mount("/public/images/currentstatus", CurrentStatusImageServlet.new(build_history_repository, build_scheduler))
@@ -177,6 +178,7 @@ module DamageControl
       httpd.mount("/private/dashboard", DashboardServlet.new(build_history_repository, project_config_repository, build_scheduler, :private))
       httpd.mount("/private/project", ProjectServlet.new(build_history_repository, project_config_repository, trigger, :private, build_scheduler, project_directories, nudge_xmlrpc_url))
       httpd.mount("/private/log", LogFileServlet.new(project_directories))
+      httpd.mount("/private/root", WEBrick::HTTPServlet::FileHandler, rootdir, :FancyIndexing => true)
       
       httpd.mount("/private/images", WEBrick::HTTPServlet::FileHandler, "#{webdir}/images")
       httpd.mount("/private/images/currentstatus", CurrentStatusImageServlet.new(build_history_repository, build_scheduler))

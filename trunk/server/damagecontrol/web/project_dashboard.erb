@@ -2,28 +2,52 @@
 <title><%= project_name %> dashboard</title>
 <body>
 
-<h1><img src="	images/lastcompletedstatus?project_name=<%= project_name %>"/> <%= project_name %></h1>
-<table>
-  <tr class="dashboard">
-    <td class="dashboard_header">Last completed build</td>
-    <td class="dashboard"><%= last_status %></td>
+<table class="main-table">
+<tr><td>
+<h1 class="pane"><img src="	images/lastcompletedstatus?project_name=<%= project_name %>"/> <%= project_name %></h1>
+</td></tr>
+
+<tr><td>
+<table class="pane" width="100%">
+  <tr>
+    <td class="pane-header">Last completed build</td>
   </tr>
+  <tr>
+    <td class="pane"><%= last_status %></td>
+  </tr>
+</table>
+</td></tr>
+
 <% if(last_completed_build != current_build) %>
-  <tr class="dashboard">
-    <td class="dashboard_header">Current build</td>
-    <td class="dashboard"><%= current_status %></td>
+<tr><td>
+<table class="pane" width="100%">
+  <tr>
+    <td class="pane-header">Current build</td>
   </tr>
+  <tr>
+    <td class="pane"><%= current_status %></td>
+  </tr>
+</table>
+</td></tr>
 <% end %>
-  <tr class="dashboard">
-    <td colspan="2">&nbsp;</td>
+
+<tr><td>
+<table class="pane" width="100%">
+  <tr>
+    <td class="pane-header"><a href="root/<%= project_name %>/checkout">Checked out files...</a></td>
   </tr>
-  <tr class="dashboard">
-    <td class="dashboard_header" colspan="2">Build history</td>
+</table>
+</td></tr>
+
+<tr><td>
+<table class="pane" width="100%">
+  <tr class="pane">
+    <td class="pane-header" colspan="3">Build history</td>
   </tr>
-  <tr class="dashboard">
-    <td class="dashboard_header">Timestamp</td>
-    <td class="dashboard_header">Status</td>
-    <td class="dashboard_header">Time</td>
+  <tr class="pane">
+    <td class="pane-column-header">Timestamp</td>
+    <td class="pane-column-header">Status</td>
+    <td class="pane-column-header">Time</td>
   </tr>
 <%
   builds = build_history_repository.build_history(project_name).reverse
@@ -32,12 +56,14 @@
     color = "grey" if !build.completed?
     image = "images/#{color}-16.gif"
 %>
-  <tr class="dashboard">
-    <td class="dashboard"><a href="log?project_name=<%= project_name %>&timestamp=<%= build.timestamp %>"><%= build.timestamp_as_time %></a></td>
-    <td class="dashboard"><img src="<%= image %>" />&nbsp;<%= build.status %></td>
-    <td class="dashboard"><%= build.duration_formatted %></td>
+  <tr class="pane">
+    <td class="pane"><a href="log?project_name=<%= project_name %>&timestamp=<%= build.timestamp %>"><%= build.timestamp_as_time %></a></td>
+    <td class="pane"><img src="<%= image %>" />&nbsp;<%= build.status %></td>
+    <td class="pane"><%= build.duration_formatted %></td>
   </tr>
 <% end %>
 </table>
+</td></tr>
 
+</table>
 </body></html>

@@ -1,52 +1,92 @@
 body {
-color: #000000;
-background-color: #ffffff;
-font-family: Verdana, Helvetica, sans serif;
-font-size: 0.8em;
-text-align: left;}
+  color: #000000;
+  background-color: #ffffff;
+  font-family: Verdana, Helvetica, sans serif;
+  font-size: 10pt;
+  text-align: left;
+}
 
 a:link {
-color: #0000ff;
-background-color: #ffffff;
-text-decoration: underline;}
+  color: #0000ff;
+  background-color: #ffffff;
+  text-decoration: underline;
+}
 
-a:hover {color: #ff0000;
-background-color: #ffffff;
-text-decoration: underline;}
+a:hover {
+  color: #ff0000;
+  background-color: #ffffff;
+  text-decoration: underline;
+}
 
 img {
-vertical-align: middle;}
+  vertical-align: middle;
 }
 
 .config_cell {
-width: 240px;
+  width: 240px;
 }
 
 .top-panel {
-float: top;
-border-bottom: 1px #7f7f7f solid;
-padding-bottom: 3px;
-margin-bottom: 3pt;}
+  float: top;
+  border-bottom: 1px #7f7f7f solid;
+  padding-bottom: 3pt;
+  margin-bottom: 3pt;
+}
 
 .task-panel {
-float: left;
-width: 200px;
-margin-right: -1px;
-padding: 3px;
-border: 1pt #7f7f7f solid;}
+  float: left;
+  width: 200px;
+  margin-right: -1px;
+  padding: 3px;
+  border: 1px #7f7f7f solid;
+  border-bottom: 2px #7f7f7f solid;
+  border-right: 2px #7f7f7f solid;
+}
 
 .main-panel {
-margin-left: 220px;}
+  margin-left: 220px;
+}
 
 .task-header {
-display: block;
-border-bottom: 1px #7f7f7f solid;
-font-weight: bold;
-font-size: 1.1em;}
+  display: block;
+  border-bottom: 1px #7f7f7f solid;
+  font-weight: bold;
+  font-size: 1.1em;
+}
 
 .footer {
-font-size: 0.8em;
-text-align: center}
+  font-size: 0.8em;
+  text-align: center;
+  margin-top: 5em
+}
 
-.dashboard_header {
-font-weight: bold;}
+.main-table {
+}
+
+.pane  {
+  margin-bottom: 0.5em;
+}
+
+table.pane {
+  background-color: #ffffff;
+  border-collapse: collapse;
+  border: 1px #7f7f7f solid;
+  border-bottom: 2px #7f7f7f solid;
+  border-right: 2px #7f7f7f solid;
+}
+
+td.pane {
+  border: 1px #7f7f7f solid;
+  background-color: #ffffff;
+}
+
+td.pane-header {
+  border: 1px #7f7f7f solid;
+  background-color: #bbbbbb;
+  font-weight: bold;
+}
+
+td.pane-column-header {
+  border: 1px #7f7f7f solid;
+  font-weight: bold;
+}

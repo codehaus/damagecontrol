@@ -10,7 +10,7 @@
 		projects = project_config_repository.project_names
 		
 	%>
-	<table class="dashboard">
+	<table>
 		<%
 
 		i = -1
@@ -27,10 +27,10 @@
 		%>
 
 			<% if start_row then %>
-			<tr class="dashboard">
+			<tr>
 			<% end %>
 
-			<td class="dashboard" nowrap="true">
+			<td nowrap="true">
 			<img src="<%= image %>" /> <a href="<%= href %>"><%= project %></a> &nbsp; &nbsp; &nbsp;
 			</td>
 
@@ -42,17 +42,17 @@
 		end
 		%>
 		<% if false then %>
-		<tr class="dashboard">
-			<td class="dashboard">
+		<tr>
+			<td>
 			<img src="images/red-pulse-32.gif" />&nbsp;<a href="project">project1</a>
 			</td>
-			<td class="dashboard">
+			<td>
 			<img src="images/red-32.gif" />&nbsp;<a href="project">project1</a>
 			</td>
-			<td class="dashboard">
+			<td>
 			<img src="images/green-pulse-32.gif" />&nbsp;<a href="project">project1</a>
 			</td>
-			<td class="dashboard">
+			<td>
 			<img src="images/green-32.gif" />&nbsp;<a href="project">project1</a>
 			</td>
 		</tr>
