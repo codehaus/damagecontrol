@@ -296,20 +296,25 @@ module RSCM
       changeset
     end
 
-    def p4describe(chnum)
-      p4("describe -s #{chnum}")
+    def p4changes(from_identifier, to_identifier)
+      puts "p4changes #{from_identifier}, #{to_identifier}"
+      from = p4timespec(from_identifier,PERFORCE_EPOCH)
+      to = p4timespec(to_identifier,Time.infinity)
+      p4("changes //...#{from},#{to}")
     end
 
-    def p4changes(from_identifier, to_identifier)
-      if from_identifier.nil? || from_identifier.is_a?(Time)
-        from_identifier = PERFORCE_EPOCH if from_identifier.nil? || from_identifier < PERFORCE_EPOCH
-        to_identifier = Time.infinity if to_identifier.nil?
-        from = from_identifier.strftime(DATE_FORMAT)
-        to = to_identifier.strftime(DATE_FORMAT)
-        p4("changes //...@#{from},#{to}")
+    def p4timespec(identifier, default)
+      if identifier.nil? 
+          default
+      elsif identifier.is_a?(Time)
+          identifier.strftime(DATE_FORMAT)
       else
-        p4("changes //...@#{from_identifier},#{from_identifier}")
+          "@#{identifier}"
       end
+    end
+
+    def p4describe(chnum)
+      p4("describe -s #{chnum}")
     end
 
     def p4(cmd)
