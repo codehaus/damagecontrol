@@ -1,4 +1,5 @@
 require 'test/unit' 
+require 'thread' 
 require 'pebbles/mockit' 
 require 'xmlrpc/server'
 require 'xmlrpc/parser'
@@ -70,6 +71,19 @@ module XMLRPC
       @bhp.register(@apple1)
       @bhp.register(@pear1)
       @bhp.register(@apple2)
+
+      @mutex = Mutex.new
+      @resource = ConditionVariable.new
+
+      @httpserver = WEBrick::HTTPServer.new(:Port => 4719)
+      Thread.new { @httpserver.start }
+    end
+    
+    def teardown
+      @httpserver.shutdown
+      # lame way to wait for webrick to shut down :-(
+      # can someone grok how to wait for webrick to shut down?
+      sleep(2)
     end
 
     def test_history
@@ -92,10 +106,7 @@ module XMLRPC
       @apple2.changesets.add(Change.new("path/one",   "jon",   "tjo bing",    "1.1", Time.utc(2004,7,5,12,0,2)))
       @apple2.changesets.add(Change.new("path/two",   "jon",   "tjo bing",    "1.2", Time.utc(2004,7,5,12,0,4)))
 
-      httpserver = WEBrick::HTTPServer.new(:Port => 4719)
-      httpserver.mount("/test", xmlrpc_servlet)
-      at_exit { httpserver.shutdown }
-      Thread.new { httpserver.start }
+      @httpserver.mount("/test", xmlrpc_servlet)
       
       # Do a raw post so we can compare the XML that comes back
       header = {  
