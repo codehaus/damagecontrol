@@ -404,10 +404,35 @@ ProxyPassReverse /private http://localhost:4712/private</programlisting>
     <section>
       <title>Configuring DamageControl Projects</title>
 
+      <para>If you have installed DamageControl and set up DamageControl to
+      fit your needs, it is time to configure projects DamageControl will
+      build. This is very easy as you can use the web interface for almost all
+      tasks.</para>
+
       <section>
         <title>Creating Projects</title>
 
-        <para></para>
+        <para>In order to create a new project, open the private dashboard of
+        the DamageControl server. If DamageControl is running on your local
+        machine, the URL is usually <ulink
+        url="http://localhost:4712/private/dashboard">http://localhost:4712/private/dashboard</ulink>,
+        if DamageControl is running behind an Apache proxy, open <ulink
+        url="http://hostname/private/dashboard">http://hostname/private/dashboard</ulink>.</para>
+
+        <figure>
+          <title>An empty private dashboard</title>
+
+          <screenshot>
+            <mediaobject>
+              <imageobject>
+                <imagedata fileref="images/new_project.png" />
+              </imageobject>
+            </mediaobject>
+          </screenshot>
+        </figure>
+
+        <para>A new project is created by following the <guilabel>New
+        project</guilabel> hyperlink.</para>
       </section>
 
       <section>
