@@ -5,7 +5,7 @@ require 'xmlrpc/utils'
 require 'rexml/document'
 require 'cgi'
 require 'rubygems'
-require_gem 'rscm'
+require 'rscm'
 
 module DamageControl
 
@@ -115,7 +115,7 @@ module DamageControl
           rss_item.description << "-----------------------------<p/>" # dang! what's the HTML vertical bar again....
         end
       else
-        rss_item.description << "No changes in this build (since the last build)"
+        rss_item.description = "No changes in this build (since the last build)"
       end
     end
 

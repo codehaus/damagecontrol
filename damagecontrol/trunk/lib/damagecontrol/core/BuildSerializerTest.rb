@@ -4,7 +4,7 @@ require 'damagecontrol/util/FileUtils'
 require 'damagecontrol/core/Build'
 require 'damagecontrol/core/BuildSerializer'
 require 'rubygems'
-require_gem 'rscm'
+require 'rscm'
 
 module DamageControl
 

@@ -17,7 +17,7 @@ require 'damagecontrol/xmlrpc/ConnectionTester'
 require 'damagecontrol/xmlrpc/Trigger'
 require 'damagecontrol/util/Logging'
 require 'rubygems'
-require_gem 'rscm'
+require 'rscm'
 require 'win32/process' if(WIN32)
 
 module DamageControl

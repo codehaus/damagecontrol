@@ -1,6 +1,6 @@
 require 'damagecontrol/scm/AbstractTrackingConfigurator'
 require 'rubygems'
-require_gem 'rscm'
+require 'rscm'
 
 module DamageControl
   class BugzillaWebConfigurator < AbstractTrackingConfigurator

@@ -6,7 +6,7 @@ require 'damagecontrol/publisher/JIRAPublisher'
 require 'ftools'
 require 'cgi'
 require 'rubygems'
-require_gem 'rscm'
+require 'rscm'
 
 module DamageControl
 

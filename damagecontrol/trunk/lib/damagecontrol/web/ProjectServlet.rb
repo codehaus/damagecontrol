@@ -1,7 +1,7 @@
 require 'damagecontrol/web/AbstractAdminServlet'
 require 'damagecontrol/util/FileUtils'
 require 'rubygems'
-require_gem 'rscm'
+require 'rscm'
 
 module DamageControl
   class ProjectServlet < AbstractAdminServlet

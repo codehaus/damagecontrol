@@ -8,19 +8,19 @@ module DamageControl
     include FileUtils
     include Logging
     
-    def initialize(hub, build_history_repository)
+    def initialize(hub, project_directories)
       hub.add_consumer(self)
-      @build_history_repository = build_history_repository
+      @project_directories = project_directories
     end
     
     def put(message)
       if(message.is_a?(BuildCompleteEvent))      
         build = message.build
-        checkout_dir = @build_history_repository.checkout_dir(build.project_name)
+        checkout_dir = @project_directories.checkout_dir(build.project_name)
         
         logs_to_merge = build.config["logs_to_merge"]
         if(logs_to_merge)
-          xml_log_file = @build_history_repository.xml_log_file(build.project_name, build.dc_creation_time)
+          xml_log_file = @project_directories.xml_log_file(build.project_name, build.dc_creation_time)
           mkdir_p(File.dirname(xml_log_file))
           XMLMerger.open("damagecontrol", File.open(xml_log_file, "w+")) do |merger|
             logger.info("merging log files #{logs_to_merge} for #{build.project_name} into #{xml_log_file}")

@@ -1,6 +1,6 @@
 require 'damagecontrol/scm/AbstractWebConfigurator'
 require 'rubygems'
-require_gem 'rscm'
+require 'rscm'
 
 module DamageControl
   class SVNWebConfigurator < AbstractWebConfigurator

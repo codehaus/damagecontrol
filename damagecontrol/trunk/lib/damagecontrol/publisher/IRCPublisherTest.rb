@@ -4,7 +4,7 @@ require 'damagecontrol/publisher/IRCPublisher'
 require 'damagecontrol/core/Build'
 require 'damagecontrol/util/FileUtils'
 require 'rubygems'
-require_gem 'rscm'
+require 'rscm'
 
 module DamageControl
 

@@ -2,7 +2,7 @@ require 'yaml'
 require 'fileutils'
 require 'damagecontrol/core/Build'
 require 'rubygems'
-require_gem 'rscm'
+require 'rscm'
 
 module DamageControl
 

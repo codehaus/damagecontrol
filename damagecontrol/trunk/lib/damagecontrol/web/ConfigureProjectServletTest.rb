@@ -10,7 +10,7 @@ require 'damagecontrol/scm/ScarabWebConfigurator'
 require 'damagecontrol/scm/BugzillaWebConfigurator'
 
 require 'rubygems'
-require_gem 'rscm'
+require 'rscm'
 
 module DamageControl
   class ConfigureProjectServletTest < Test::Unit::TestCase

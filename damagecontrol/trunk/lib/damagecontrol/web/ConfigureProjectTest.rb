@@ -3,7 +3,7 @@ require 'net/http'
 require 'pebbles/mockit'
 require 'damagecontrol/DamageControlServer'
 require 'rubygems'
-require_gem 'rscm'
+require 'rscm'
 
 module DamageControl
 

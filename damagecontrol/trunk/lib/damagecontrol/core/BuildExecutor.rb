@@ -30,11 +30,12 @@ module DamageControl
     
     attr_accessor :last_build_request
 
-    def initialize(name, channel, project_config_repository, build_history_repository)
+    def initialize(name, channel, project_config_repository, build_history_repository, project_directories)
       super
       @channel = channel
       @project_config_repository = project_config_repository
       @build_history_repository = build_history_repository
+      @project_directories = project_directories
       @name = name
     end
     
@@ -217,8 +218,8 @@ module DamageControl
       end
 
       @current_build = message
-      @stdout_file = @build_history_repository.stdout_file(current_build.project_name, current_build.dc_creation_time)
-      @stderr_file = @build_history_repository.stderr_file(current_build.project_name, current_build.dc_creation_time)
+      @stdout_file = @project_directories.stdout_file(current_build.project_name, current_build.dc_creation_time)
+      @stderr_file = @project_directories.stderr_file(current_build.project_name, current_build.dc_creation_time)
 
       begin
         build_start

@@ -6,7 +6,7 @@ require 'damagecontrol/core/Build'
 require 'damagecontrol/publisher/EmailPublisher'
 require 'ftools'
 require 'rubygems'
-require_gem 'rscm'
+require 'rscm'
 
 module DamageControl
 

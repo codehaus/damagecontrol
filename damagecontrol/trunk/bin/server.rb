@@ -13,13 +13,13 @@ server = DamageControlServer.new(
   )
 
 def server.init_build_executors
-  build_scheduler.add_executor(BuildExecutor.new('executor1', hub, project_config_repository, build_history_repository))
+  build_scheduler.add_executor(BuildExecutor.new('executor1', hub, project_config_repository, build_history_repository, project_directories))
   # each BuildExecutor can execute one build in parallel to the others
   # to enable additional parallel builds (for multiple projects) uncomment lines below
   # you can have as many BuildExecutors as your machine can take.
   # Also see: http://docs.codehaus.org/display/DAMAGECONTROL/How+do+I+pin+certain+builds+to+certain+executors
 
-  #build_scheduler.add_executor(BuildExecutor.new('executor2', hub, project_config_repository, build_history_repository))
+  #build_scheduler.add_executor(BuildExecutor.new('executor2', hub, project_config_repository, build_history_repository, project_directories))
 end
 
 def server.init_custom_components

@@ -1,6 +1,6 @@
 require 'test/unit'
 require 'rubygems'
-require_gem 'rscm'
+require 'rscm'
 require 'pebbles/mockit'
 require 'damagecontrol/core/Build'
 require 'damagecontrol/core/ArtifactArchiver'

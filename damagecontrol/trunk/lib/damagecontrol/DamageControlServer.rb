@@ -311,8 +311,8 @@ module DamageControl
     end
     
     def init_build_scheduler
-      component(:log_writer, LogWriter.new(hub, build_history_repository))
-      component(:log_merger, LogMerger.new(hub, build_history_repository))
+      component(:log_writer, LogWriter.new(hub, project_directories))
+      component(:log_merger, LogMerger.new(hub, project_directories))
       component(:artifact_archiver, ArtifactArchiver.new(hub, project_directories))
       component(:dependent_build_trigger, DependentBuildTrigger.new(hub, project_config_repository))
       component(:build_scheduler, BuildScheduler.new(hub))
@@ -321,7 +321,7 @@ module DamageControl
     
     def init_build_executors
       # Only use one build executor (don't allow parallel builds)
-      build_scheduler.add_executor(BuildExecutor.new('executor1', hub, project_config_repository, build_history_repository))
+      build_scheduler.add_executor(BuildExecutor.new('executor1', hub, project_config_repository, build_history_repository, project_directories))
     end
     
     def polling_interval

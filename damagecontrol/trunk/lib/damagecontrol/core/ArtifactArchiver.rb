@@ -17,7 +17,7 @@ module DamageControl
         build = message.build
         checkout_dir = @project_directories.checkout_dir(build.project_name)
 
-        archive_dir = @project_directories.archive_dir()
+        archive_dir = @project_directories.archive_dir(build.project_name, build.dc_creation_time)
         
         artifacts_to_archive = build.config["artifacts_to_archive"]
         if(artifacts_to_archive)

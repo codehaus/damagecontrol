@@ -13,7 +13,7 @@ require 'damagecontrol/core/ProjectDirectories'
 require 'damagecontrol/core/BuildSerializer'
 require 'damagecontrol/xmlrpc/StatusPublisher'
 require 'rubygems'
-require_gem 'rscm'
+require 'rscm'
 
 module DamageControl
 module XMLRPC

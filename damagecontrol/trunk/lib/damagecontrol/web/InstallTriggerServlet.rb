@@ -1,5 +1,5 @@
 require 'rubygems'
-require_gem 'rscm'
+require 'rscm'
 require 'damagecontrol/util/FileUtils'
 require 'damagecontrol/web/AbstractAdminServlet'
 require 'damagecontrol/xmlrpc/Trigger'

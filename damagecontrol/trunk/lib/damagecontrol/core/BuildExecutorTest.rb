@@ -9,7 +9,7 @@ require 'damagecontrol/core/ProjectDirectories'
 require 'damagecontrol/scm/NoSCM'
 require 'damagecontrol/util/FileUtils'
 require 'rubygems'
-require_gem 'rscm'
+require 'rscm'
 
 module DamageControl
 

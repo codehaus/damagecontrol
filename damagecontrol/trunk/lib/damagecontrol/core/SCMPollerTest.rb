@@ -3,7 +3,7 @@ require 'damagecontrol/core/SCMPoller'
 require 'test/unit'
 require 'pebbles/mockit'
 require 'rubygems'
-require_gem 'rscm'
+require 'rscm'
 
 module DamageControl
 

@@ -1,7 +1,7 @@
 require 'timeout'
 require 'fileutils'
 require 'rubygems'
-require_gem 'rscm'
+require 'rscm'
 
 module Pebbles   
 

@@ -1,5 +1,5 @@
 require 'rubygems'
-require_gem 'rscm'
+require 'rscm'
 require 'damagecontrol/web/Report'
 require 'damagecontrol/util/FileUtils'
 

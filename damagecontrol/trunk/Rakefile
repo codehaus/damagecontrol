@@ -81,12 +81,12 @@ task :fix_permissions do
   end
 end
 
-test_file_pattern = ENV["TEST_FILES"] ? ENV["TEST_FILES"] : 'lib/damagecontrol/**/*est.rb'
+test_file_pattern = ENV["TEST_FILES"] ? ENV["TEST_FILES"] : 'lib/**/*est.rb'
 fl = FileList.new(test_file_pattern)
 
 desc "Run Unit Tests"
 Rake::TestTask.new :unit_test do |t|
-  t.libs << "test"
+  t.libs << "lib"
   t.test_files = fl
   t.verbose = true
 end

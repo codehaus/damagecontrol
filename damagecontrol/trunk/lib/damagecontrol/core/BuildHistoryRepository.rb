@@ -1,5 +1,5 @@
 require 'rubygems'
-require_gem 'rscm'
+require 'rscm'
 require 'cgi'
 require 'yaml'
 require 'rss/maker'
@@ -86,7 +86,7 @@ module DamageControl
     
     # returns the commit time for the last build that had a registered commit time.
     def last_commit_time(project_name)
-      build_dirs(project_name).reverse.each do |build_dir|
+      @project_directories.build_dirs(project_name).reverse.each do |build_dir|
         build = @build_serializer.load(build_dir, false)
         return build.scm_commit_time if build.scm_commit_time
       end
