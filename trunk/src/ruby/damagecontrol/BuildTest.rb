@@ -10,21 +10,32 @@ module DamageControl
     include FileUtils
     include HubTestHelper
 
-    def test_successful_build
-
-      testrepo = File.expand_path("#{damagecontrol_home}/target/cvstestrepo")
+    def test_build_failed
 
       build = Build.new( \
         "DamageControlled", \
-        ":local:#{testrepo}:damagecontrolled", \
+        ":local:/foo/bar:zap", \
         "ant compile", \
         ".", \
-        File.expand_path("#{damagecontrol_home}/target/testbuild"))
-      
-      build.execute(create_hub)
+        nil)
 
-      assert_got_message("DamageControl::BuildProgressEvent")
-      assert_got_message("DamageControl::BuildCompleteEvent")
+      def build.override_absolute_build_path(abspath)
+        @abspath = abspath
+      end
+      def build.absolute_build_path
+        @abspath
+      end
+      build.override_absolute_build_path(File.expand_path("#{damagecontrol_home}/testdata/damagecontrolled"))
+      
+      successful = nil
+      build.execute { |progress|
+        puts "BuildTest:" + progress
+        $stdout.flush
+        if(/BUILD SUCCESSFUL/ =~ progress)
+          successful = true
+        end
+      }
+      assert(successful, "Ant build should succeed")
       
     end
   end

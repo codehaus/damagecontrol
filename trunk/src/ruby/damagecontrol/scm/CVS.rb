@@ -1,5 +1,6 @@
 require 'damagecontrol/scm/SCM'
 require 'damagecontrol/FileUtils'
+require 'damagecontrol/SocketTrigger'
 
 module DamageControl
 

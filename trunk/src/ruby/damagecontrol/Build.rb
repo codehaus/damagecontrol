@@ -36,16 +36,22 @@ module DamageControl
       @label                    = Time.now.to_i.to_s
     end
     
-    def execute(hub)
-      @scm.checkout(scm_spec, checkout_dir) { |progress|
-        hub.publish_message(BuildProgressEvent.new(self, progress))
-      }
-      do_build { |progress|
-        hub.publish_message(BuildProgressEvent.new(self, progress))
-      }
-      hub.publish_message(BuildCompleteEvent.new(self))
+    def get_latest_sources
+      @scm.checkout(scm_spec, checkout_dir, &proc)
     end
 
+    def execute(&proc)
+      puts "Changing dir to #{absolute_build_path}"
+      @filesystem.chdir("#{absolute_build_path}")
+      cmdline = translate_command_to_ruby(build_command_line)
+      puts "Executing build command line #{cmdline}"
+      IO.popen(cmdline) do |output|
+        output.each_line do |line|
+          yield line
+        end
+      end
+    end
+ 
     def absolute_build_path
       "#{checkout_dir}/#{@scm.mod(scm_spec)}/#{@build_path}"
     end
@@ -72,18 +78,6 @@ module DamageControl
       "#{@global_checkout_root_dir}/#{project_name}/#{@scm.mod(scm_spec)}/#{@scm.branch(scm_spec)}"
     end
 
-    def do_build
-      puts "Changing dir to #{absolute_build_path}"
-      @filesystem.chdir("#{absolute_build_path}")
-      cmdline = translate_command_to_ruby(build_command_line)
-      puts "Executing build command line #{cmdline}"
-      IO.popen(cmdline) do |output|
-        output.each_line do |line|
-          yield line
-        end
-      end
-    end
-    
     include Ant
 
     def translate_command_to_ruby(build_command_line)
