@@ -34,6 +34,16 @@ module DamageControl
       end
     end
     
+    # http://jira.codehaus.org/browse/DC-312
+    def test_jira_dc_312
+      File.open("#{damagecontrol_home}/testdata/cvs-dataforge.log") do |io|
+        @parser = CVSLogParser.new(io)
+        changesets = @parser.parse_changesets
+        
+        assert_equal(271, changesets.length)
+      end
+    end
+
     def test_parse_changes
       changesets = ChangeSets.new
       @parser.parse_changes(LOG_ENTRY, changesets)
