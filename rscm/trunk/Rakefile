@@ -40,11 +40,14 @@ rd = Rake::RDocTask.new { |rdoc|
 }
 
 task :ant do |t|
-  ant = RUBY_PLATFORM == "i386-mswin32" ? "ant.bat" : system("which ant.sh") ? "ant.sh" : "ant" 
-  puts ant
-  IO.popen("#{ant} -f ext/java/build.xml clean jar") do |io|
-    io.each_line do |line|
-      puts line
+  if(!ENV['RSCM_STARTEAM'])
+    puts "WARNING - NOT BUILDING STARTEAM SUPPORT SINCE 'RSCM_STARTEAM' IS NOT DEFINED."
+  else
+    ant = RUBY_PLATFORM == "i386-mswin32" ? "ant.bat" : system("which ant.sh") ? "ant.sh" : "ant" 
+    IO.popen("#{ant} -f ext/java/build.xml clean jar") do |io|
+      io.each_line do |line|
+        puts line
+      end
     end
   end
 end
