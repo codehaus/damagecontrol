@@ -13,9 +13,11 @@ module DamageControl
     end
     
     def teardown
-      mock_server.kill
-      # wait for max 2 secs. if mock server is still waiting, it's a failure
-      @mock_server.join(2) unless @mock_server.nil?
+      if(@mock_server)
+        @mock_server.kill
+        # wait for max 2 secs. if mock server is still waiting, it's a failure
+        @mock_server.join(2) unless @mock_server.nil?
+       end
     end
     
     def test_parse_local_unix_spec
@@ -108,7 +110,7 @@ module DamageControl
 
       import_damagecontrolled(testcheckout, spec)      
       
-      assert(!mock_server.alive?, "mock server didn't get incoming connection")
+      assert(!@mock_server.alive?, "mock server didn't get incoming connection")
     end
 
   private
