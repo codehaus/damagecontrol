@@ -86,6 +86,7 @@ module RSCM
     # Whether a repository can be created.
     #
     def can_create?
+      false
     end
 
     # Recursively imports files from a directory

@@ -50,7 +50,7 @@ module RSCM
       elsif(@parse_state == :parse_changes)
         change = parse_change(line)
         if change
-          # This unless won't work for new directories
+          # This unless won't work for new directories or if changesets are computed before checkout (which it usually is!)
           fullpath = "#{@checkout_dir}/#{change.path}"
           @changeset << change unless File.directory?(fullpath)
         end
@@ -84,7 +84,7 @@ module RSCM
       if(line =~ /^   [M|A|D|R] ([^\s]+) \(from (.*)\)/)
         path_from_root = $1
         change.status = Change::MOVED
-      elsif(line =~ /^   ([M|A|D]) (.+)$/)
+      elsif(line =~ /^   ([M|A|D|R]) (.+)$/)
         status, path_from_root = line.split
         change.status = STATES[status]
       else

@@ -92,6 +92,14 @@ EOF
       end
     end
 
+    def test_parses_another_tricky_log
+      File.open(File.dirname(__FILE__) + "/svn-growl.log") do |io|
+        parser = SubversionLogParser.new(io, "trunk", nil)
+        changesets = parser.parse_changesets
+        assert_equal(82, changesets.length)
+      end
+    end
+
 SVN_R_LOG_HEAD_DATA = <<-EOF
 ------------------------------------------------------------------------
 r48 | rinkrank | 2004-10-16 20:07:29 -0500 (Sat, 16 Oct 2004) | 1 line

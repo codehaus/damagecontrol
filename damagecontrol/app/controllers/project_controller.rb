@@ -68,7 +68,6 @@ class ProjectController < ApplicationController
 
   def save
     project = instantiate_from_hash(DamageControl::Project, @params[DamageControl::Project.name])
-STDERR.puts "START TIME #{@params['DamageControl::Project'].inspect}"
     project.scm = selected("scms")
     project.tracker = selected("trackers")
     project.publishers = instantiate_array_from_hashes(@params["publishers"])
@@ -146,7 +145,7 @@ protected
 #      }
 #    end
 
-    if(@project.exists? && @project.scm && !@project.scm.exists? && @project.scm.can_create?)
+    if(@project.exists? && @project.scm && @project.scm.can_create? && !@project.scm.exists?)
       @sidebar_links << {
         :controller => "scm", 
         :action     => "create", 
