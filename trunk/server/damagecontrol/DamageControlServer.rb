@@ -173,7 +173,7 @@ module DamageControl
       
       httpd.mount("/public/dashboard", DashboardServlet.new(:public, build_history_repository, project_config_repository, build_scheduler))
       httpd.mount("/public/project", ProjectServlet.new(:public, build_history_repository, project_config_repository, nil, build_scheduler, report_classes))
-      httpd.mount("/private/search", SearchServlet.new(build_history_repository))
+      httpd.mount("/public/search", SearchServlet.new(build_history_repository))
       httpd.mount("/public/log", LogFileServlet.new(project_directories))
       httpd.mount("/public/root", indexing_file_handler)
       
