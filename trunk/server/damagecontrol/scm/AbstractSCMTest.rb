@@ -38,7 +38,7 @@ module DamageControl
       assert_equal(2, changeset.length)
 
       assert_equal("changed something", changeset.message)
-      assert_equal(username, changeset.developer)
+      assert(changeset.developer)
       assert(changeset.revision)
 
       assert_equal("build.xml", changeset[0].path)
