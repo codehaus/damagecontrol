@@ -55,10 +55,7 @@ EOF
       File.open(File.dirname(__FILE__) + "/proxytoys-svn.log") do |io|
         parser = SVNLogParser.new(io, "trunk/proxytoys", nil)
 
-        start_date = Time.utc(2004,02,13,19,02,44,0)
-        end_date = Time.utc(2004,9,06,14,50,25,0)
-
-        changesets = parser.parse_changesets(start_date, end_date) {|line|}
+        changesets = parser.parse_changesets
         
         assert_equal(66, changesets.length)
         # just some random assertions
@@ -92,25 +89,8 @@ EOF
     def test_parses_entire_log_into_changesets
       File.open(File.dirname(__FILE__) + "/cargo-svn.log") do |io|
         parser = SVNLogParser.new(io, "trunk/proxytoys", nil)
-        changesets = parser.parse_changesets(nil, nil)
+        changesets = parser.parse_changesets
         assert_equal(16, changesets.length)
-      end
-    end
-    
-    def test_skips_entries_outside_range
-      File.open(File.dirname(__FILE__) + "/proxytoys-svn.log") do |io|
-        parser = SVNLogParser.new(io, "trunk/proxytoys", nil)
-        # revisions r16, r17 and r18
-        #start_date = Time.utc(2004,04,14,14,17,35,0) # same as r15
-        #end_date = Time.utc(2004,05,10,22,36,25,0) # same as r18
-        first = 16
-        last = 18
-        changesets = parser.parse_changesets(first, last) {|line|}
-        assert_equal(3, changesets.length)
-
-        assert_equal("16", changesets[0].revision)
-        assert_equal("17", changesets[1].revision)
-        assert_equal("18", changesets[2].revision)
       end
     end
 

@@ -85,7 +85,7 @@ module RSCM
       # why is this nil when running as the dcontrol user on codehaus? --jon
       #assert_equal(username, changeset.developer)
       assert(changeset.developer)
-      assert(changeset.revision)
+      assert(changeset.id)
 
       assert_equal("build.xml", changeset[0].path)
       assert(changeset[0].revision)

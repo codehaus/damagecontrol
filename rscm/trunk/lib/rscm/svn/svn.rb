@@ -186,7 +186,7 @@ module RSCM
       with_working_dir(checkout_dir) do
         safer_popen(command) do |stdout|
           parser = SVNLogParser.new(stdout, path, checkout_dir)
-          changesets = parser.parse_changesets(from_identifier, to_identifier)
+          changesets = parser.parse_changesets
         end
       end
       changesets
@@ -274,8 +274,6 @@ module RSCM
       # file_list = files.join('\n')
 # WEIRD cygwin bug garbles this!?!?!?!
       cmd = "log --verbose #{revision_option(from_identifier, to_identifier)} #{url}"
-puts from_identifier
-puts cmd
       cmd
     end
 
@@ -309,7 +307,7 @@ puts cmd
     
     def svndate(time)
       return nil unless time
-      time.utc.strftime("\"{%Y-%m-%d %H:%M:%S +0000\"}")
+      time.utc.strftime("\"{%Y-%m-%d %H:%M:%S\"}")
     end
 
     def commit_command(message)

@@ -14,11 +14,11 @@ which is described in AbstractSCM.
 * RSCM objects are easily serializable to YAML.
 * Uses UTC times according to the SCM server's clock, not the machine running RSCM.
 
-=== Wish:
+=== Future plans
 
 Implement coloured diffs simliar to CVSSpam/SVN::Notify so that all supported SCMs 
-(not only CVS) can benefit from its awesome coloured diff capabilities. This would 
-provide a very nice alternative to SCM web front-ends.
+can benefit from coloured diffs in HTML capabilities. This would provide a very nice 
+alternative to SCM web front-ends, and could also be included in RSS feeds.
 
 Implement import/export functionality to allow migrating from one SCM to another while
 keeping the history. Great for migration from archaic SCMs!
