@@ -35,8 +35,11 @@ module DamageControl
       def url
         "#"
       end
-
     end
+    # For bwc only.
+    class Null < None
+    end
+
 
     class Bugzilla < Base
       register self
