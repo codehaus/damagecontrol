@@ -42,7 +42,7 @@ module DamageControl
     
     def web_url_to_change(change)
       view_cvs_url = config_map["view_cvs_url"]
-      return "root/#{config_map['project_name']}/checkout/#{mod}/#{change.path}" if view_cvs_url.nil?
+      return "root/#{config_map['project_name']}/checkout/#{mod}/#{change.path}" if view_cvs_url.nil? || view_cvs_url == "" 
       
       view_cvs_url_patched = "#{view_cvs_url}/" if(view_cvs_url && view_cvs_url[-1..-1] != "/")
       url = "#{view_cvs_url_patched}#{change.path}"
