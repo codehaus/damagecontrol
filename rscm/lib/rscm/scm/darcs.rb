@@ -81,7 +81,7 @@ module RSCM
       from_identifier = Time.epoch if from_identifier.nil?
       to_identifier = Time.infinity if to_identifier.nil?
       with_working_dir(checkout_dir) do
-        darcs("changes --verbose") do |stdout|
+        darcs("changes --summary --xml-output") do |stdout|
           DarcsLogParser.new.parse_changesets(stdout, from_identifier, to_identifier)
         end
       end
