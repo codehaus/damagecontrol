@@ -136,7 +136,7 @@ module RSCM
       # We expect subclasses to implement this as a protected method (unless this whole method is overridden).
       checkout_silent(checkout_dir, to_identifier)
 
-      after = Dir["#{checkout_dir}/**/*"]
+      files = Dir["#{checkout_dir}/**/*"]
       added = []
       files.each do |file|
         added << file if File.mtime(file) > checkout_time
