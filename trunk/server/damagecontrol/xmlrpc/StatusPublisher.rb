@@ -26,27 +26,45 @@ module XMLRPC
     end
     
     def history(project_name)
-      @build_history_repository.history(project_name)
+      clean_for_marshal(@build_history_repository.history(project_name))
     end
     
     def current_build(project_name)
-      @build_history_repository.current_build(project_name)
+      clean_for_marshal(@build_history_repository.current_build(project_name))
     end
     
     def project_names
-      @build_history_repository.project_names
+      clean_for_marshal(@build_history_repository.project_names)
     end
     
     def last_completed_build(project_name)
-      @build_history_repository.last_completed_build(project_name)
+      clean_for_marshal(@build_history_repository.last_completed_build(project_name))
     end
     
     def last_successful_build(project_name)
-      @build_history_repository.last_successful_build(project_name)
+      clean_for_marshal(@build_history_repository.last_successful_build(project_name))
     end
     
     def global_search(regexp)
-      @build_history_repository.search(Regexp.new(regexp))
+      clean_for_marshal(@build_history_repository.search(Regexp.new(regexp)))
+    end
+    
+    def clean_for_marshal(o)
+      case o
+      when Build
+        o.scm = nil
+        # HACK OF DEATH:
+        # some xmlrpc implementations get very confused by an empty struct
+        # so we'll patch it by adding a pointless property in it
+        # (did that take me like one day to figure out?!)
+        # -- Jon Tirsen
+        o.config["apa"]="banan" if o.config.empty?
+        o
+      when Enumerable
+        o.collect {|s| clean_for_marshal(s)}
+      else
+        o
+      end
     end
     
   end
