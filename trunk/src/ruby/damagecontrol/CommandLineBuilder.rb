@@ -2,15 +2,16 @@ module DamageControl
 	
 	class CommandLineBuilder
 		
-		def initialize(hub, command_line)
+		def initialize(hub)
 			@hub = hub
-			@command_line = command_line
 		end
 		
 		def receive_message(message)
-			result = ""
-			IO.popen(@command_line) {|f| result = f.gets}
-			@hub.publish_message(BuildCompleteEvent.new(result)) if message.is_a? BuildRequestEvent
+			if message.is_a? BuildRequestEvent
+				result = ""
+				IO.popen(message.project.build_command_line) {|f| result = f.gets}
+				@hub.publish_message(BuildCompleteEvent.new(message.project, result))
+			end
 		end
 		
 	end

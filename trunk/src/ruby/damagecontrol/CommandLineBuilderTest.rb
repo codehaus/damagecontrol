@@ -2,6 +2,7 @@ require 'damagecontrol/Hub'
 require 'damagecontrol/CommandLineBuilder'
 require 'damagecontrol/BuildRequestEvent'
 require 'damagecontrol/BuildCompleteEvent'
+require 'damagecontrol/Project'
 
 module DamageControl
 
@@ -9,17 +10,19 @@ module DamageControl
 	
 		def setup
 			@hub = Hub.new
-			@b = CommandLineBuilder.new(@hub, "echo Hello Aslak!")
+			@builder = CommandLineBuilder.new(@hub)
+			@project = Project.new("Aslak")
+			@project.build_command_line = "echo Hello Aslak!"
 		end
 	
 		def test_executes_process_and_sends_build_complete_on_receive_build_request
-			@b.receive_message(BuildRequestEvent.new())
-			assert_equal(BuildCompleteEvent.new("Hello Aslak!\n"), @hub.last_message)
+			@builder.receive_message(BuildRequestEvent.new(@project))
+			assert_equal(BuildCompleteEvent.new(@project, "Hello Aslak!\n"), @hub.last_message)
 			assert_equal("Hello Aslak!\n", @hub.last_message.result)
 		end
 		
 		def test_doesnt_do_anything_on_other_events
-			@b.receive_message(nil)
+			@builder.receive_message(nil)
 			assert_equal(nil, @hub.last_message)
 		end
 		
