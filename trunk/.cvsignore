@@ -1,6 +1,6 @@
 *.log
-*.iml
 *.ipr
+*.iml
 *.iws
 target
 .project
