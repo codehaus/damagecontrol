@@ -18,12 +18,15 @@
 		projects.each do |project|
 
 			i += 1
-			cells_per_row = 4
+			cells_per_row = 5
 			start_row = i % cells_per_row == 0
 			end_row = i == project_count || i % cells_per_row == (cells_per_row - 1)
 			href = "project?project_name=#{project}"
-      
+	
 			image = "images/lastcompletedstatus?project_name=#{project}"
+			last_successful_build = build_history_repository.last_successful_build(project)
+			label = ""
+			label = " (##{last_successful_build.label})" if(last_successful_build)
 		%>
 
 			<% if start_row then %>
@@ -31,7 +34,7 @@
 			<% end %>
 
 			<td nowrap="true">
-			<img src="<%= image %>" /> <a href="<%= href %>"><%= project %></a> &nbsp; &nbsp; &nbsp;
+			<img src="<%= image %>" /> <a href="<%= href %>"><%= project %><%= label %></a> &nbsp; &nbsp; &nbsp;
 			</td>
 
 			<% if end_row then %>
