@@ -2,7 +2,7 @@ module DamageControl
   class ProjectStatus
     attr_reader :name
     
-    def initialize(name, build_history_repository)
+    def initialize(name, build_history_repository, build_scheduler)
       @name = name
       @build_history_repository = build_history_repository
     end

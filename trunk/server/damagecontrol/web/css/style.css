@@ -198,6 +198,7 @@ td.pane {
   border: 1px #bbb solid;
   background-color: #ffffff;
   padding: 3px 4px 3px 4px;
+  vertical-align: middle;
 }
 
 td.pane-header {
@@ -232,49 +233,50 @@ th.pane {
   font-size: 9px;
 }
 
-   #foldertab {
-   padding: 3px 0;
-   margin-left: 0;
-   border-bottom: 1px solid #090;
-   font: bold 12px Verdana, sans-serif;
-   }
+#foldertab {
+  padding: 3px 0;
+  margin-left: 0;
+  border-bottom: 1px solid #090;
+  font: bold 12px Verdana, sans-serif;
+}
 
-   #foldertab li {
-   list-style: none;
-   margin: 0;
-   display: inline;
-   }
+#foldertab li {
+  list-style: none;
+  margin: 0;
+  display: inline;
+}
 
-   #foldertab li a {
-   padding: 3px 0.5em;
-   margin-left: 3px;
-   border: 1px solid #090;
-   border-bottom: none;
-   background: #090;
-   text-decoration: none;
-   }
+#foldertab li a {
+  padding: 3px 0.5em;
+  margin-left: 3px;
+  border: 1px solid #090;
+  border-bottom: none;
+  background: #090;
+  text-decoration: none;
+}
 
-   #foldertab li a:link { color: white; }
-   #foldertab li a:visited { color: white; }
+#foldertab li a:link { color: white; }
+#foldertab li a:visited { color: white; }
 
-   #foldertab li a:hover {
-   color: white;
-   background: #6c0;
-   border-color: #6c0;
-   }
+#foldertab li a:hover {
+  color: white;
+  background: #6c0;
+  border-color: #6c0;
+}
 
-  #foldertab li a#current {
+#foldertab li a#current {
   background: white;
   border-bottom: 1px solid white;
   color: black;
-  }
+}
 
 .highlighted-build {
-  border: 1px solid #ddc;
+  /*border: 1px solid #ddc;*/
   background: #ffe;
   padding: 3px;
   margin-left: -4px;
 }
+
 .changeset-message {
   border: 1px solid #ccb;
   background: #eed;

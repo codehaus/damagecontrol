@@ -52,6 +52,10 @@ module DamageControl
       config_map
     end
     
+    def clean_checkout_dir(project_name)
+      rm_rf(checkout_dir(project_name))
+    end
+    
     def checkout_dir(project_name)
       @project_directories.checkout_dir(project_name)
     end

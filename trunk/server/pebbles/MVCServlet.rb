@@ -109,9 +109,10 @@ module Pebbles
       super(method, *args)
     end
     
-    def action_redirect(action_name, params)
-      params_enc = params.collect {|key, value| "#{key}=#{value}" }.join("&")
-      redirect("#{request.path}?action_name=#{action_name}&#{params_enc}")
+    def action_redirect(action_name, params={})
+      params_enc = ""
+      params_enc = "&" + params.collect {|key, value| "#{key}=#{value}" }.join("&") unless params.empty?
+      redirect("#{request.path}?action_name=#{action_name}#{params_enc}")
     end
         
     def render(erb_template, binding)

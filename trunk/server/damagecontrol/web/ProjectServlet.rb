@@ -15,22 +15,11 @@ module DamageControl
       build_details
     end
     
-    def dashboard
-      last_completed_build = build_history_repository.last_completed_build(project_name)
-      last_status = build_status(last_completed_build)
-
-      current_build = build_history_repository.current_build(project_name)
-      current_status = build_status(current_build)
-
-      render("project_dashboard.erb", binding)
-    end
-    
     def trig_build
       assert_private
       @trigger.trig(project_name, Build.format_timestamp(Time.now))
       sleep 0.5
-      dashboard_redirect
-      render("project_dashboard.erb", binding)
+      build_details_redirect
     end
   
     def build_details
@@ -39,6 +28,12 @@ module DamageControl
       else
         render("never_built.erb", binding)
       end
+    end
+    
+    def clean_out_working_files
+      assert_private
+      project_config_repository.clean_checkout_dir(project_name)
+      build_details_redirect
     end
     
   protected
@@ -65,7 +60,7 @@ module DamageControl
     def extra_css
       selected_report.extra_css
     end
-    
+
     def tasks    
       result = super
       unless project_name.nil?
@@ -75,6 +70,7 @@ module DamageControl
               task(:icon => "icons/box_into.png", :name => "Clone project", :url => "configure?project_name=#{project_name}&action=clone_project"),
               task(:icon => "icons/wrench.png", :name => "Configure", :url => "configure?project_name=#{project_name}&action=configure"),
               task(:icon => "icons/gears_run.png", :name => "Trig build now", :url => "?project_name=#{project_name}&action=trig_build"),
+              task(:icon => "icons/folders.png", :name => "Clean out working files", :url => "?project_name=#{project_name}&action=clean_out_working_files"),
             ]
         end
         result +=
@@ -123,8 +119,8 @@ module DamageControl
   
   private
   
-    def dashboard_redirect
-      action_redirect(:dashboard, { "project_name" => project_name })
+    def build_details_redirect
+      action_redirect(:build_details, { "project_name" => project_name })
     end
     
     def selected_build

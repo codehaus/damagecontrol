@@ -28,21 +28,27 @@
 
 <div>
 <table class="pane">
-  <tr><td class="pane-header" colspan="2">
+  <tr><td class="pane-header" colspan="3">
     Build Executor Status
   </td></tr>
   <tr>
     <th class="pane"></th>
     <th class="pane">Status</th>
+    <th class="pane">&nbsp;</th>
   </tr>
   <%
-    i = 0
+    i = -1
     build_executors.each do |build_executor|
       i += 1
   %>
   <tr>
-    <td class="pane">#<%= i %></td>
-    <td class="pane"><%= build_executor.status_message %></td>
+    <td class="pane">#<%= i+1 %></td>
+    <td class="pane" width="70%"><%= build_executor.status_message %></td>
+    <% if build_executor.build_process_executing? && private? then %>
+      <td class="pane"><a href="?action=kill_executor&executor=<%= i %>"><img width="24" height="24" src="icons/stop.png" /></a></td>
+    <% else %>
+      <td class="pane">&nbsp;</td>
+    <% end %>
   </tr>
   <% end %>
 </table>

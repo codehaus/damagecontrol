@@ -106,6 +106,7 @@ module DamageControl
     
     def kill_build_process
       build_process.kill
+      build_process.wait
       @was_killed = true
     end
  

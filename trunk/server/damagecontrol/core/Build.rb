@@ -54,7 +54,7 @@ module DamageControl
     end
     
     def completed?
-      status == SUCCESSFUL || status == FAILED
+      status == SUCCESSFUL || status == FAILED || status == KILLED
     end
     
     def successful?

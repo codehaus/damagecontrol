@@ -62,7 +62,6 @@ module DamageControl
       wait_for { @build_executor.build_process_executing? }
       assert(@build_executor.build_process_executing?)
       @build_executor.kill_build_process
-      wait_for { !@build_executor.build_process_executing? }
       assert(!@build_executor.build_process_executing?)
       t.join
       assert_message_types_from_hub([BuildStartedEvent, BuildProgressEvent, BuildProgressEvent, BuildCompleteEvent])

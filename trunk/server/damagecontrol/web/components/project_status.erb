@@ -28,7 +28,13 @@ e" title="Configure <%= project.name %>"><img src="icons/wrench.png" width="24" 
 </tr>
 <tr>
     <td>&nbsp;</td>
-    <td>&nbsp;</td>
+    <td>
+      <% if project.current_build then %>
+        <%= project.current_build.status %>
+      <% else %>
+        &nbsp;
+      <% end %>
+    </td>
     <td>
       <% if project.percentage_left != 0 then %>
       <table class="progress-bar">
