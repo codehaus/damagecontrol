@@ -27,15 +27,18 @@ class Project
 		$:<<'lib/rica'
 		$:<<'src/ruby'
 	end
+  
+  def run_test(test)
+		Dir.chdir("#{$damagecontrol_home}/src/ruby")
+		system("ruby #{test}")
+  end
 
 	def unit_test
-		Dir.chdir("#{$damagecontrol_home}/src/ruby")
-		system('ruby AllTests.rb')
+    run_test("AllTests.rb")
 	end
 
 	def integration_test
-		Dir.chdir("#{$damagecontrol_home}/src/ruby")
-		system('ruby End2EndTest.rb')
+    run_test("End2EndTest.rb")
 	end
 	
 	def all
@@ -48,13 +51,13 @@ class Project
 	end
 	
 	def run(args)
-		if args.nil?
+		if args.nil? || args == []
 			default
 		else
-			args.each {|target| project.instance_eval(target) }
+			args.each {|target| instance_eval(target) }
 		end
 	end
 end
 
 project = Project.new
-project.run($ARGV)
+project.run(ARGV)

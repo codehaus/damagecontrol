@@ -15,8 +15,6 @@ module DamageControl
 
     def initialize(channel, builds_dir, scm = DefaultSCMRegistry.new)
       super(channel)
-      @channel = channel
-      @channel.add_subscriber(self)
       @builds_dir = builds_dir
       @scm = scm
       @filesystem = FileSystem.new

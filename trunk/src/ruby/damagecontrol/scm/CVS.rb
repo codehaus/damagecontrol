@@ -1,6 +1,7 @@
 require 'damagecontrol/scm/SCM'
 require 'damagecontrol/FileUtils'
 require 'damagecontrol/SocketTrigger'
+require 'ftools'
 
 module DamageControl
 

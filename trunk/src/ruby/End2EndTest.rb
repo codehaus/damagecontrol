@@ -5,7 +5,6 @@ require 'damagecontrol/SocketTrigger'
 require 'damagecontrol/BuildExecutor'
 require 'damagecontrol/Hub'
 require 'damagecontrol/FileUtils'
-require 'damagecontrol/BuildBootstrapper'
 require 'damagecontrol/scm/SCM'
 
 include DamageControl
@@ -14,38 +13,38 @@ class End2EndTest < Test::Unit::TestCase
 	
 	include FileUtils
         
-        def initialize(someparam)
-            super(someparam)
-            @@damagecontrol_started = false
-
-            # Should be in setup, but we can't run DamageControl twice (it doesn't
-            # shut down cleanly and can't rebind the port). If we change the temp
-            # dir, all our builds will happen in the old one and the second (SVN)
-            # test will fail.
-            @basedir = damagecontrol_home
-            @tempdir = "#{@basedir}/target/temp_e2e_#{Time.new.to_i}"
-            File.mkpath(@tempdir)
-        end
+  def initialize(someparam)
+      super(someparam)
+      @@damagecontrol_started = false
+  
+      # Should be in setup, but we can't run DamageControl twice (it doesn't
+      # shut down cleanly and can't rebind the port). If we change the temp
+      # dir, all our builds will happen in the old one and the second (SVN)
+      # test will fail.
+      @basedir = damagecontrol_home
+      @tempdir = "#{@basedir}/target/temp_e2e_#{Time.new.to_i}"
+      File.mkpath(@tempdir)
+  end
         
 	def setup
-                Dir.chdir(@tempdir)
-
-		@cvsrootdir = "#{@tempdir}/repository"
-		@cvsroot = ":local:#{@cvsrootdir}"
-		@project = "e2eproject"
-                
-                @svn_repo_dir = "#{@tempdir}/repo";
-                @svn_hooks_dir = "#{@svn_repo_dir}/hooks";
-                @svn_url = "file:///#{@svn_repo_dir}";
-                @svn_wc_checkout_dir = "#{@tempdir}/wc";
-                @svn_wc_usage_dir = "#{@svn_wc_checkout_dir}/repo"
+    Dir.chdir(@tempdir)
+    
+    @cvsrootdir = "#{@tempdir}/repository"
+    @cvsroot = ":local:#{@cvsrootdir}"
+    @project = "e2eproject"
+    
+    @svn_repo_dir = "#{@tempdir}/repo";
+    @svn_hooks_dir = "#{@svn_repo_dir}/hooks";
+    @svn_url = "file:///#{@svn_repo_dir}";
+    @svn_wc_checkout_dir = "#{@tempdir}/wc";
+    @svn_wc_usage_dir = "#{@svn_wc_checkout_dir}/repo"
 	end
 	
 	def teardown
 		Dir.chdir(@tempdir)
 		rmdir(@project)
 		rmdir(@cvsrootdir)
-                rmdir(@svn_repo_dir)
+    rmdir(@svn_repo_dir)
 	end
 
 	def create_cvs_repository()
@@ -82,13 +81,12 @@ class End2EndTest < Test::Unit::TestCase
 	end
 	
 	def start_damagecontrol
-            if(@@damagecontrol_started == false) then
-		@hub = Hub.new
-		SocketTrigger.new(@hub).start
-		BuildBootstrapper.new(@hub, buildsdir).start
-		BuildExecutor.new(@hub)
-                @@damagecontrol_started = true
-            end
+    if(@@damagecontrol_started == false) then
+      @hub = Hub.new
+      SocketTrigger.new(@hub).start
+      BuildExecutor.new(@hub, "#{@tempdir}/builds")
+      @@damagecontrol_started = true
+    end
 	end
         
 	
@@ -100,40 +98,10 @@ class End2EndTest < Test::Unit::TestCase
 	end
 	
 	def install_damagecontrol_into_cvs
-		# install the trigger script
-		Dir.chdir(@tempdir)
-		system("cvs -d#{@cvsroot} co CVSROOT")
-		Dir.chdir("CVSROOT")
-		File.copy("#{trigger_script}", script_file("damagecontrol"))
-		system("cvs -d#{@cvsroot} add damagecontrol.bat")
-		
-		# install the nc.exe
-		File.copy( "#{@basedir}/bin/#{nc_file}", "#{@tempdir}/CVSROOT/#{nc_file}" )
-		system("cvs -d#{@cvsroot} add -kb #{nc_file}")
-		
-		# tell cvs to keep a non-,v file in the central repo
-		File.open("checkoutlist", File::WRONLY | File::APPEND) do |file|
-			file.puts
-			file.puts(script_file('damagecontrol'))
-			file.puts(nc_file)
-		end
-		system("cvs com -m 'message'")
-	end
-
-	def activate_damagecontrol_in_cvs
-		Dir.chdir(@tempdir)
-		Dir.chdir("CVSROOT")
-		File.open("loginfo", File::WRONLY | File::APPEND) do |file|
-			file.puts
-			file.puts("DEFAULT #{@cvsrootdir}/CVSROOT/#{script_file("damagecontrol")} #{@project} #{@cvsroot}:#{@project} #{script_file("build")} %{sVv}")
-		end
-		system("cvs com -m 'message'")
-	end
+    cvs = CVS.new
+    cvs.install_trigger("#{@tempdir}/install_trigger_cvs_tmp", @project, "#{@cvsroot}:#{@project}", script_file("build"))
+  end
 	
-	def trigger_script
-		script_file("#{@basedir}/src/script/damagecontrol")
-	end
-
 	def checkout_cvs_project(project)
 		Dir.chdir(@tempdir)
 		rmdir(project)
@@ -167,25 +135,25 @@ class End2EndTest < Test::Unit::TestCase
 		rmdir(project)
 	end
 
-        def wait_for_build_to_complete
-            sleep 5
-        end
+  def wait_for_build_to_complete
+    sleep 5
+  end
 
-        def verify_output_of_build
+  def verify_output_of_build
 		assert_file_content('"Hello world from DamageControl" ', 
 			"#{buildsdir}/e2eproject/buildresult.txt", 
 			"build not executed")
-        end
+  end
 
-        def verify_output_of_svn_build
+  def verify_output_of_svn_build
 		assert_file_content('"Hello world from DamageControl" ', 
 			"#{buildsdir}/repo/buildresult.txt", 
 			"build not executed")
-        end
+  end
 
 	def test_builds_on_cvs_add
 		create_cvs_repository
-                start_damagecontrol
+    start_damagecontrol
 		create_cvsmodule("e2eproject")
 		install_damagecontrol_into_cvs
 		activate_damagecontrol_in_cvs
@@ -200,56 +168,56 @@ class End2EndTest < Test::Unit::TestCase
 		delete_checked_out_project("e2eproject") # will be checked out by bootstrapper
 		
 		wait_for_build_to_complete
-                verify_output_of_build
+    verify_output_of_build
 	end
         
-        def test_builds_on_svn_add
-            create_svn_repository
-            start_damagecontrol
-            install_and_activate_damagecontrol_for_svn
-            checkout_svn_repository
-            Dir.chdir(@svn_wc_usage_dir)
-            File.open("build.bat", "w") do |file|
-                file.puts('echo "Hello world from DamageControl" > buildresult.txt')
-            end
-            add_file_to_svn("build.bat")
-            
-            wait_for_build_to_complete
-            verify_output_of_svn_build
-        end
+  def test_builds_on_svn_add
+      create_svn_repository
+      start_damagecontrol
+      install_and_activate_damagecontrol_for_svn
+      checkout_svn_repository
+      Dir.chdir(@svn_wc_usage_dir)
+      File.open("build.bat", "w") do |file|
+          file.puts('echo "Hello world from DamageControl" > buildresult.txt')
+      end
+      add_file_to_svn("build.bat")
+      
+      wait_for_build_to_complete
+      verify_output_of_svn_build
+  end
         
-        def create_svn_repository
-            dsystem("svnadmin create #{@svn_repo_dir}")
-        end
+  def create_svn_repository
+    dsystem("svnadmin create #{@svn_repo_dir}")
+  end
         
-        def install_and_activate_damagecontrol_for_svn
-            File.open("#{@svn_hooks_dir}/post-commit.bat", "w") do |file|
-                file.puts("@echo off")
-                file.puts("")
-                file.puts("REM Autogenerated script to call DamageControl when a commit succeeds")
-                file.puts("REM %~dp0 is Windows syntax for the directory the current script")
-                file.puts("REM lives in (don't ask...)")
-                file.puts("")
-                file.puts("%~dp0damagecontrol.bat repo #{@svn_url} #{script_file("build")}")
-            end
-            File.copy("#{trigger_script}", script_file("#{@svn_hooks_dir}/damagecontrol"))
-            File.copy( "#{@basedir}/bin/#{nc_file}", "#{@svn_hooks_dir}/#{nc_file}" )
-        end
+  def install_and_activate_damagecontrol_for_svn
+    File.open("#{@svn_hooks_dir}/post-commit.bat", "w") do |file|
+      file.puts("@echo off")
+      file.puts("")
+      file.puts("REM Autogenerated script to call DamageControl when a commit succeeds")
+      file.puts("REM %~dp0 is Windows syntax for the directory the current script")
+      file.puts("REM lives in (don't ask...)")
+      file.puts("")
+      file.puts("%~dp0damagecontrol.bat repo #{@svn_url} #{script_file("build")}")
+    end
+    File.copy("#{trigger_script}", script_file("#{@svn_hooks_dir}/damagecontrol"))
+    File.copy( "#{@basedir}/bin/#{nc_file}", "#{@svn_hooks_dir}/#{nc_file}" )
+  end
         
-        def checkout_svn_repository
-            File.mkpath(@svn_wc_checkout_dir)
-            Dir.chdir(@svn_wc_checkout_dir)
-            dsystem("svn checkout #{@svn_url}")
-        end
+  def checkout_svn_repository
+    File.mkpath(@svn_wc_checkout_dir)
+    Dir.chdir(@svn_wc_checkout_dir)
+    dsystem("svn checkout #{@svn_url}")
+  end
         
-        def add_file_to_svn(filename)
-            dsystem("svn add #{filename}")
-            dsystem("svn commit -m \"Adding test file to svn\" #{filename}")
-        end
+  def add_file_to_svn(filename)
+    dsystem("svn add #{filename}")
+    dsystem("svn commit -m \"Adding test file to svn\" #{filename}")
+  end
         
-        def dsystem(cmd)
-            puts "current dir: " + Dir.pwd()
-            puts "running command: #{cmd}"
-            system cmd
-        end
+  def dsystem(cmd)
+    puts "current dir: " + Dir.pwd()
+    puts "running command: #{cmd}"
+    system cmd
+  end
 end

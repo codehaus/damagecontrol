@@ -20,7 +20,8 @@ module DamageControl
   
     def test_executes_process_and_sends_build_complete_on_build_request
       hub.publish_message(BuildRequestEvent.new(@build))
-      assert_message_types("DamageControl::BuildRequestEvent DamageControl::BuildProgressEvent DamageControl::BuildCompleteEvent")
+      @build_executor.force_tick
+      assert_message_types([BuildRequestEvent, BuildProgressEvent, BuildCompleteEvent])
       assert_equal(BuildProgressEvent.new(@build, "Hello world from DamageControl!\n"), messages_from_hub[1])
       assert_equal("Hello world from DamageControl!\n", messages_from_hub[1].output)
       assert_equal(BuildCompleteEvent.new(@build), messages_from_hub[2])
@@ -46,16 +47,8 @@ module DamageControl
       build = Build.new( \
         "DamageControlled", \
         ":local:/foo/bar:zap", \
-        "#{ant} compile", \
-        ".")
+        "#{ant} compile")
       
-      def build.override_absolute_checkout_path(abspath)
-        @abspath = abspath
-      end
-      def build.absolute_checkout_path
-        @abspath
-      end
-            
       successful = nil
       @hub.add_subscriber(Subscriber.new do |message|
         if (message.is_a?(BuildProgressEvent))
@@ -65,6 +58,7 @@ module DamageControl
       end)
       
       @build_executor.receive_message(BuildRequestEvent.new(build))
+      @build_executor.force_tick
 
       assert(successful, "Ant build should succeed")
       
