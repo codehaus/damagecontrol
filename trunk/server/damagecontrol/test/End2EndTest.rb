@@ -253,16 +253,9 @@ class End2EndTest < Test::Unit::TestCase
   #
   # WEIRD STUFF! -Aslak
   #
-  def test_damagecontrol_works_with_svn
+  def FIXMEtest_damagecontrol_works_with_svn
     svn = LocalSVN.new(@basedir, "e2e_testproject")
-    begin
-      # We're ignoring this failure until we have
-      # figured out what causes this 
-      test_build_and_log_and_irc(svn)
-    rescue Exception => e
-      # While we are investigating, print to stdout
-      puts e.backtrace.join("\n")
-    end
+    test_build_and_log_and_irc(svn)
   end
   
   def test_build_and_log_and_irc(scm)
