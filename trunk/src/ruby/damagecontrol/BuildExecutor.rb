@@ -70,9 +70,11 @@ module DamageControl
             checkout if checkout?
             execute
           rescue Exception => e
-            msg = "Build failed due to: #{e}"
-            report_progress(msg)
+            stacktrace = e.backtrace.join("\n")
+            msg = "Build failed due to: #{stacktrace}"
             puts msg
+# Can't report progress here. Logfile might be closed.
+#            report_progress(msg)
             current_build.successful = false
           end
           @channel.publish_message(BuildCompleteEvent.new(current_build))
