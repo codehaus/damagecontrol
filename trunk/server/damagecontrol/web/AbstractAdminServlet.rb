@@ -72,6 +72,14 @@ module DamageControl
       result
     end
     
+    def search_form
+      global_search_form
+    end
+    
+    def global_search_form
+      erb("components/global_search_form.erb", binding)
+    end
+    
     def navigation
       ""
     end

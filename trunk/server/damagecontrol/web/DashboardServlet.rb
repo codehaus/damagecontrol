@@ -13,14 +13,6 @@ module DamageControl
     
   protected
   
-    def search_form
-      global_search_form
-    end
-    
-    def global_search_form
-      erb("components/global_search_form.erb", binding)
-    end
-    
     def project_status
       erb("components/project_status.erb", binding)
     end
