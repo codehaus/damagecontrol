@@ -54,7 +54,7 @@ module DamageControl
     def execute
       current_build.status = Build::BUILDING
 
-      working_dir = if current_scm.nil? then "." else current_scm.working_dir end
+      working_dir = current_scm.working_dir
       with_working_directory(working_dir) do
         # set up some environment variables the build can use
         ENV["DAMAGECONTROL_CHANGES"] = 

@@ -31,7 +31,6 @@ module DamageControl
     def setup
       create_hub
       @basedir = new_temp_dir("BuildExecutorTest")
-      @build_executor = BuildExecutor.new(hub, BuildHistoryRepository.new(hub), ProjectDirectories.new(@basedir))
       @build = Build.new("damagecontrolled", Time.now, {
         "build_command_line" => "echo Hello world from DamageControl!"
         })
@@ -43,14 +42,29 @@ module DamageControl
     end
   
     def test_when_build_scheduled_executes_sends_start_process_and_complete
+      mock_scm = MockIt::Mock.new
+      mock_scm.__expect(:working_dir) { "." }
+      mock_scm.__expect(:checkout) {}
+      mock_scm.__expect(:working_dir) { "." }
+
+      @build_executor = BuildExecutor.new(hub, BuildHistoryRepository.new(hub), ProjectDirectories.new(@basedir), MockScmFactory.new(mock_scm))
+
       @build_executor.schedule_build(@build)
       @build_executor.process_next_scheduled_build
       assert_message_types_from_hub([BuildStartedEvent, BuildProgressEvent, BuildCompleteEvent])
       assert_equal("Hello world from DamageControl!", messages_from_hub[1].output.chomp.chomp(" "))
       assert_equal(BuildCompleteEvent.new(@build), messages_from_hub[2])
+
+      mock_scm.__verify
     end
     
     def test_failing_build_sends_build_complete_event_with_successful_flag_set_to_false
+      mock_scm = MockIt::Mock.new
+      mock_scm.__expect(:working_dir) { "." }
+      mock_scm.__expect(:checkout) {}
+      mock_scm.__expect(:working_dir) { "." }
+      @build_executor = BuildExecutor.new(hub, BuildHistoryRepository.new(hub), ProjectDirectories.new(@basedir), MockScmFactory.new(mock_scm))
+
       @build = Build.new("damagecontrolled", Time.now, { "build_command_line" => "bad_command"})
       @build_executor.schedule_build(@build)
       @build_executor.process_next_scheduled_build
@@ -63,6 +77,8 @@ module DamageControl
 #      end
       assert(messages_from_hub[-1].is_a?(BuildCompleteEvent))
       assert_equal(Build::FAILED, messages_from_hub[-1].build.status)
+
+      mock_scm.__verify
     end
     
     def test_checks_out_and_determines_changeset_before_building      
