@@ -14,7 +14,7 @@ import EDU.oswego.cs.dl.util.concurrent.Latch;
  * received within a certain period.
  *
  * @author Aslak Helles&oslash;y
- * @version $Revision: 1.3 $
+ * @version $Revision: 1.4 $
  */
 public class QuietPeriodScheduler extends DecoratingScheduler {
     private Clock clock;
@@ -38,7 +38,6 @@ public class QuietPeriodScheduler extends DecoratingScheduler {
     public void start() {
         buildThread = new Thread(new Runnable() {
             public void run() {
-                System.out.println("starting build thread");
                 synchronized (QuietPeriodScheduler.this) {
                     QuietPeriodScheduler.this.notifyAll();
                 }
@@ -71,7 +70,6 @@ public class QuietPeriodScheduler extends DecoratingScheduler {
 
     public synchronized void requestBuild(final String builderName) {
         getBuilder(builderName); // provokes exception as early possible
-        System.out.println("requesting build " + builderName);
         builderToBuild = builderName;
         timeToBuild = clock.currentTimeMillis() + quietPeriodMillis;
         notifyBuildRequested();

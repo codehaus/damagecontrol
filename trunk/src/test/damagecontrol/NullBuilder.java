@@ -6,7 +6,7 @@ import damagecontrol.BuildEvent;
 
 /**
  * @author Aslak Helles&oslash;y
- * @version $Revision: 1.2 $
+ * @version $Revision: 1.3 $
  */
 public class NullBuilder extends AbstractBuilder {
     public static final String SUCCESS_MESSAGE = "Build Successful";
@@ -18,7 +18,8 @@ public class NullBuilder extends AbstractBuilder {
         this.successful = successful.booleanValue();
     }
 
-    public void build() {
-        fireBuildFinished(new BuildEvent(this, successful, successful ? SUCCESS_MESSAGE :  FAILED_MESSAGE));
+    public boolean doBuild(StringBuffer output) {
+        output.append(successful ? SUCCESS_MESSAGE :  FAILED_MESSAGE);
+        return successful;
     }
 }

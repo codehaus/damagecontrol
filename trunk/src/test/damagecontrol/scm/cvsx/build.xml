@@ -91,14 +91,14 @@
          ! by listening on a socket.
         -->
         <pico>
-            <component classname="damagecontrol.triggers.SocketTrigger$WithScheduler"/>
+            <component classname="damagecontrol.SocketTrigger$WithScheduler"/>
             <component classname="damagecontrol.DirectScheduler"/>
-            <component classname="damagecontrol.testtest.NullBuilder">
+            <component classname="damagecontrol.NullBuilder">
                 <constant value="${projecttobuild}"/>
                 <component/>
                 <constant type="java.lang.Boolean" value="true"/>
             </component>
-            <component classname="damagecontrol.testtest.SimpleWriteToFileNotifier">
+            <component classname="damagecontrol.SimpleWriteToFileNotifier">
                 <component/>
                 <constant value="${output.file}"/>
             </component>

@@ -3,8 +3,6 @@ package damagecontrol;
 import damagecontrol.Scheduler;
 import damagecontrol.Builder;
 import damagecontrol.NoSuchBuilderException;
-import damagecontrol.SocketTrigger;
-
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.io.IOException;
@@ -27,7 +25,7 @@ import java.util.StringTokenizer;
  * <P>
  * @author Aslak Helles&oslash;y
  * @author Jon Tirs&eacute;n
- * @version $Revision: 1.6 $
+ * @version $Revision: 1.7 $
  */
 public class SocketTrigger {
     public static final String BUILD = "BUILD";
@@ -56,6 +54,7 @@ public class SocketTrigger {
 
     public void start() throws IOException {
         serverSocket = new ServerSocket(port);
+        System.out.println("LISTENING");
 
         listenerThread = new Thread(new Runnable() {
             public void run() {
@@ -72,7 +71,7 @@ public class SocketTrigger {
                             String commandLine = in.readLine();
                             StringTokenizer commandTokenizer = new StringTokenizer(commandLine);
                             String command = commandTokenizer.nextToken();
-                            if(BUILD.equals(command)) {
+                            if (BUILD.equals(command)) {
                                 String projectName = commandTokenizer.nextToken();
                                 try {
                                     buildScheduler.requestBuild(projectName);
@@ -107,31 +106,24 @@ public class SocketTrigger {
     /**
      * This was just added so that testing could be done from a telnet window.
      */
-    public static void main(String[] args) {
-        try {
-            SocketTrigger socketTrigger = new SocketTrigger.WithScheduler(new Scheduler() {
-                public void requestBuild(String builderName) {
-                }
-
-                public void registerBuilder(String name, Builder builder) {
-                }
-
-                public Builder getBuilder(String builderName) {
-                    return null;
-                }
-
-            });
-            socketTrigger.execute();
-
-            synchronized (socketTrigger) {
-                try {
-                    socketTrigger.wait();
-                } catch (InterruptedException e) {
-                    e.printStackTrace();
-                }
+    public static void main(String[] args) throws IOException, InterruptedException {
+        SocketTrigger socketTrigger = new SocketTrigger.WithScheduler(new Scheduler() {
+            public void requestBuild(String builderName) {
+                System.out.println("REQUESTING BUILD OF " + builderName);
             }
-        } catch (IOException e) {
-            e.printStackTrace();
+
+            public void registerBuilder(String name, Builder builder) {
+            }
+
+            public Builder getBuilder(String builderName) {
+                return null;
+            }
+
+        });
+        socketTrigger.execute();
+
+        synchronized (socketTrigger) {
+            socketTrigger.wait();
         }
     }
 

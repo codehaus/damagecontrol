@@ -11,7 +11,13 @@ public abstract class AbstractBuilder implements Builder {
         scheduler.registerBuilder(name, this);
     }
 
-    public abstract void build();
+    public void build() {
+        StringBuffer output = new StringBuffer();
+        boolean result = doBuild(output);
+        fireBuildFinished(new BuildEvent(this, result, output.toString()));
+    }
+
+    public abstract boolean doBuild(StringBuffer output);
 
     protected void fireBuildFinished(BuildEvent evt) {
         for (Iterator iterator = buildListeners.iterator(); iterator.hasNext();) {

@@ -14,7 +14,7 @@ import java.util.HashMap;
  * SCMs supporting attomic commits (like subversion).
  *
  * @author Aslak Helles&oslash;y
- * @version $Revision: 1.2 $
+ * @version $Revision: 1.3 $
  */
 public class DirectScheduler implements Scheduler {
 
@@ -33,7 +33,6 @@ public class DirectScheduler implements Scheduler {
     }
 
     public void requestBuild(String builderName) {
-        System.out.println("executing build");
         getBuilder(builderName).build();
     }
 

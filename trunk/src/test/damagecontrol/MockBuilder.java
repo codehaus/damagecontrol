@@ -6,7 +6,7 @@ import junit.framework.Assert;
 /**
  *
  * @author Aslak Helles&oslash;y
- * @version $Revision: 1.5 $
+ * @version $Revision: 1.6 $
  */
 public class MockBuilder extends AbstractBuilder {
     private boolean wasBuilt = false;
@@ -28,8 +28,13 @@ public class MockBuilder extends AbstractBuilder {
 
     public synchronized void build() {
         wasBuilt = true;
-        fireBuildFinished(new BuildEvent(this, true, output));
+        super.build();
         buildLatch.release();
+    }
+
+    public boolean doBuild(StringBuffer output) {
+        output.append(this.output);
+        return true;
     }
 
     public void waitForBuildComplete() {

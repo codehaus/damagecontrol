@@ -1,6 +1,5 @@
 package damagecontrol;
 
-import damagecontrol.testtest.NullBuilder;
 import damagecontrol.AbstractBuilderTest;
 import damagecontrol.Builder;
 import damagecontrol.DirectScheduler;
@@ -10,7 +9,7 @@ import damagecontrol.DirectScheduler;
  * in our superclass is correct.
  *
  * @author Aslak Helles&oslash;y
- * @version $Revision: 1.2 $
+ * @version $Revision: 1.3 $
  */
 public class NullBuilderTest extends AbstractBuilderTest {
     protected Builder createSuccessfulBuilder() {

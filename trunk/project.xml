@@ -1,0 +1,109 @@
+<?xml version="1.0"  encoding="ISO-8859-1"?>
+
+<!DOCTYPE project [
+    <!ENTITY eacute "&#233;">
+    <!ENTITY oslash "&#248;">
+]>
+
+<project xmlns:j="jelly:core" xmlns:ant="jelly:ant">
+    <pomVersion>3</pomVersion>
+    <id>damagecontrol</id>
+    <name>Damage Control</name>
+    <currentVersion>1.0-alpha-1-SNAPSHOT</currentVersion>
+
+    <organization>
+        <name>Codehaus</name>
+        <url>http://codehaus.org/</url>
+        <logo>http://images.werken.com/codehaus-plain.gif</logo>
+    </organization>
+    <inceptionYear>2003</inceptionYear>
+    <package>damagecontrol</package>
+    <siteAddress>codehaus.org</siteAddress>
+    <siteDirectory>/www/damagecontrol.codehaus.org</siteDirectory>
+    <distributionDirectory>/www/damagecontrol.codehaus.org/builds/</distributionDirectory>
+    <repository>
+        <connection>scm:cvs:pserver:anonymous@cvs.codehaus.org:/cvsroot/damagecontrol:damagecontrol</connection>
+        <url>http://damagecontrol.cvs.codehaus.org/pico/</url>
+    </repository>
+
+    <versions>
+        <version>
+            <id>1.0-alpha-1</id>
+            <name>1.0-alpha-1</name>
+            <tag>HEAD</tag>
+        </version>
+    </versions>
+
+    <mailingLists>
+    </mailingLists>
+
+    <developers>
+    </developers>
+
+    <contributors>
+    </contributors>
+
+    <build>
+        <sourceDirectory>${basedir}/src/main</sourceDirectory>
+        <unitTestSourceDirectory>${basedir}/src/test</unitTestSourceDirectory>
+        <unitTest>
+            <includes>
+                <include>**/*Test.java</include>
+            </includes>
+            <excludes>
+                <exclude>**/Abstract*</exclude>
+                <exclude>**/IntegrationTest.*</exclude>
+            </excludes>
+        </unitTest>
+    </build>
+
+    <dependencies>
+        <dependency>
+            <id>concurrent</id>
+            <version>1.3.2</version>
+        </dependency>
+        <dependency>
+            <id>junit</id>
+            <version>3.8.1</version>
+        </dependency>
+        <dependency>
+            <id>rsslibj</id>
+            <version>1.0RC2</version>
+        </dependency>
+        <dependency>
+            <id>exml</id>
+            <version>7.0</version>
+        </dependency>
+        <dependency>
+            <id>ant</id>
+            <version>1.5.3-1</version>
+        </dependency>
+        <dependency>
+            <id>picocontainer</id>
+            <version>1.0-beta-2-SNAPSHOT</version>
+        </dependency>
+        <dependency>
+            <id>nanocontainer</id>
+            <version>1.0-alpha-1-SNAPSHOT</version>
+        </dependency>
+    </dependencies>
+
+    <reports>
+        <report>maven-license-plugin</report>
+        <report>maven-faq-plugin</report>
+        <report>maven-checkstyle-plugin</report>
+        <report>maven-pmd-plugin</report>
+        <report>maven-simian-plugin</report>
+        <report>maven-jdepend-plugin</report>
+        <report>maven-changelog-plugin</report>
+        <report>maven-changes-plugin</report>
+        <report>maven-statcvs-plugin</report>
+        <report>maven-file-activity-plugin</report>
+        <report>maven-developer-activity-plugin</report>
+        <report>maven-jxr-plugin</report>
+        <report>maven-javadoc-plugin</report>
+        <report>maven-junit-report-plugin</report>
+        <report>maven-clover-plugin</report>
+    </reports>
+
+</project>
