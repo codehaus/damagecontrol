@@ -79,6 +79,9 @@ module DamageControl
       
     end
 
+    def test_ko
+      fail "Go to JIRA please!"
+    end
   end
   
 end
