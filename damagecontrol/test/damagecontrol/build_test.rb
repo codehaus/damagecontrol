@@ -14,9 +14,9 @@ module DamageControl
       t = Time.utc(1971, 2, 28, 23, 45, 00)
       build = Build.new("mooky", "some_rev", t)
       a_program = File.expand_path(File.dirname(__FILE__) + "/a_program.rb")
-      build.execute("ruby #{a_program} 0")
+      build.execute("ruby #{a_program} 0", {'foo' => 'zap'})
       stderr = "#{home}/mooky/changesets/some_rev/builds/19710228234500/stderr.log"
-      assert_equal("this\nis\nstderr", File.read(stderr))
+      assert_equal("this\nis\nstderr\nzap", File.read(stderr))
       stdout = "#{home}/mooky/changesets/some_rev/builds/19710228234500/stdout.log"
       assert_equal("this\nis\nstdout\n0", File.read(stdout))
       assert_equal(0, build.exit_code)
@@ -29,7 +29,9 @@ module DamageControl
       t = Time.utc(1971, 2, 28, 23, 45, 00)
       build = Build.new("mooky", "some_rev", t)
       a_program = File.expand_path(File.dirname(__FILE__) + "/a_program.rb")
-      build.execute("ruby #{a_program} 44")
+      build.execute("ruby #{a_program} 44", {'foo' => 'bar'})
+      stderr = "#{home}/mooky/changesets/some_rev/builds/19710228234500/stderr.log"
+      assert_equal("this\nis\nstderr\nbar", File.read(stderr))
       stdout = "#{home}/mooky/changesets/some_rev/builds/19710228234500/stdout.log"
       assert_equal("this\nis\nstdout\n44", File.read(stdout))
       assert_equal(44, build.exit_code)
@@ -43,7 +45,7 @@ module DamageControl
       build = Build.new("mooky", "some_rev", t)
       a_program = File.expand_path(File.dirname(__FILE__) + "/a_slow_program.rb")
       t = Thread.new do
-        build.execute("ruby #{a_program} 55")
+        build.execute("ruby #{a_program} 55", {'foo' => 'mooky'})
       end
       # make sure it's running
       sleep(2)

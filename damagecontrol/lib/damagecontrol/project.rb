@@ -1,7 +1,6 @@
 require 'fileutils'
 require 'yaml'
 require 'rscm'
-require 'builder'
 require 'damagecontrol/build'
 require 'damagecontrol/directories'
 require 'damagecontrol/diff_parser'
@@ -123,14 +122,6 @@ module DamageControl
     # Where RSS is written.
     def changesets_rss_file
       Directories.changesets_rss_file(name)
-    end
-
-    def to_xml
-      b = Builder::XmlMarkup.new(:indent => 2)
-      b.project { |b|
-        b.name(@name)
-      }
-      b.target
     end
 
     def checked_out?

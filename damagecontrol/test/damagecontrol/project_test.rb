@@ -139,10 +139,5 @@ module DamageControl
       end
     end
     
-    def test_should_convert_to_xml
-      p = Project.new
-      p.name = "aslak"
-      puts p.to_xml
-    end
   end
 end
