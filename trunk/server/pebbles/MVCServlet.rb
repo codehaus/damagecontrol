@@ -4,9 +4,6 @@ require 'pebbles/RiteMesh'
 
 module Pebbles
   class SimpleServlet
-
-    FORWARDED_HOST_HEADER = "x-forwarded-host"
-
     def get_instance(config, *options)
       self
     end
@@ -15,28 +12,9 @@ module Pebbles
       text.gsub(/</, "&lt;")
     end
 
-    def to_uri(uri)
-      if uri.is_a?(URI) then uri else URI.parse(uri) end
-    end
-
-    def protocol
-      request.meta_vars["SERVER_PROTOCOL"].split(/\//)[0].downcase
-    end
-    
-    def host
-      host = request.host
-      host = request.header[FORWARDED_HOST_HEADER].to_s unless request.header[FORWARDED_HOST_HEADER].nil?
-    end
-
     def redirect(url)
       #dump_headers
-      uri = to_uri(url)
-      if uri.host.nil?
-        puts "adding host #{host}"
-        uri = to_uri("#{protocol}://#{host}#{uri}")
-        puts "result #{uri}"
-      end
-      response["Location"] = uri.to_s
+      response["Location"] = url
       response.status = WEBrick::HTTPStatus::Found.code
     end
 
