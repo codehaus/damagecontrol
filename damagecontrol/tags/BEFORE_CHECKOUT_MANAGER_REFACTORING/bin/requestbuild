@@ -1,7 +1,0 @@
-#!/bin/sh
-DAMAGECONTROL_HOME=`dirname $0`/..
-cd $DAMAGECONTROL_HOME
-DAMAGECONTROL_HOME=`pwd`
-export DAMAGECONTROL_HOME
-# The redirect to file at the end of this line is only for debugging.
-ruby -I"$DAMAGECONTROL_HOME/server" "$DAMAGECONTROL_HOME/server/damagecontrol/tool/admin/requestbuild.rb" $* > $DAMAGECONTROL_HOME/target/trigger_output.$4
