@@ -1,0 +1,141 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+<head>
+</head>
+<body>
+<h1 style="text-align: left;"><img src="images/damagecontrol-logo.gif"
+ title="" alt="" style="width: 99px; height: 106px;"><br>
+</h1>
+<h1>Architecture</h1>
+This document explains the architecture of DamageControl.<br>
+<h2>Classes</h2>
+<h3>Build</h3>
+A Build represents the process of executing a build. It has one method
+called execute() that will do essentially two things:<br>
+<ol>
+  <li>Get the latest sources from the SCM</li>
+  <li>Execute a build command that will result in the generation of
+compulsory build artifacts. The build command may also result in
+generation of secondary build artifacts and perform deployment
+operations.</li>
+</ol>
+If any of these operations fail, the build will be marked as failed.<br>
+<br>
+A lifecycle object goes through the following lifecycle:<br>
+<ol>
+  <li>Prepared (Constructed)<br>
+  </li>
+  <li>Getting sources (may fail or succeed)<br>
+  </li>
+  <li>Executing (may fail or succeed)</li>
+  <li>Analyzing (may fail or succeed)<br>
+  </li>
+  <li>Completed</li>
+</ol>
+TODO: STATE DIAGRAM<br>
+<h5>Prepared<br>
+</h5>
+This is the initial state that the object will be in after its
+creation. At this stage it should contain sufficient internal
+information to carry out steps 2,3 and 4.<br>
+<br>
+At the preparation state it is possible to set information that can
+also be discovered during the Analyzing state. This information is
+typically:<br>
+<ul>
+  <li>files that were changed since last attempted build</li>
+  <li>people who checked in code since last attempted build</li>
+</ul>
+Whether or not to record this information during the prepared state or
+the analyzing state is configurable. Depending on the SCM and build
+system in use, one or the other may be more appropriate.<br>
+<h5>Getting latest sources</h5>
+The build is in this state from the moment an SCM update to the local
+build machine starts until it is finished.<br>
+<h5>Executing</h5>
+While the build command (which will be run as a separate process) is
+still running, the build is in executing state. If the process itself
+fails, the build will be marked as failed, marking it with the error
+message from the operating system.<br>
+<br>
+The standard output/error streams from the build command will be
+intercepted by DamageControl and written to two different log files.<br>
+<br>
+If the process completes, the decision whether the build failed or not
+will be deferred until the Analyzing state.<br>
+<h5>Analyzing</h5>
+If the build process terminated normally, the status of the build will
+now be determined. This can be done in a combination of the following
+ways:<br>
+<ul>
+  <li>Analyse the system out and system error log files produced during
+the Executing state.</li>
+  <li>Analyse additional log files produced by the build system.</li>
+</ul>
+The process log files and build system log files are likely to contain
+redundant (but hopefully not contradictory) information. How they are
+analysed and combined is up to individual build analyser objects. This
+is configured during the setup of the DamageControl launcher script.<br>
+<br>
+The relevant information from the Analyzing state (such as whether the
+build failed, why it failed, how long the execution of the tests took
+etc.) will be set on the build object. This information should not take
+excessive amounts of memory (log files can be several megabytes).<br>
+<br>
+The build object will then be passed on to publishers that will publish
+the result of the build to various communication channels<br>
+<br>
+<h2>Publishers</h2>
+The publisher classes are responsible for delivering content to a
+destination. Currently DamageControl supports IRC and static files
+(HTML). RSS, Email, Jabber and Yahoo! Messenger(TM) is planned.<br>
+The content that a publisher will deliver is provided by templates.<br>
+<br>
+There is also a Java applet that can be used to monitor build progress.
+It is not technically speaking a publisher. It is a poller that polls
+for content (build output redirected to logfiles) on the DamageControl
+server. It is an excellent way to monitor a build at real-time.<br>
+<h2>Templates</h2>
+The templates aer responsible for generating content to be delivered by
+the publihers. Currently only HTML is supported. Planned templates are
+RSS (with link to HTML) and short text (with link to HTML) - intended
+for IRC, Jabber, Y! and email<br>
+<br>
+<h2>SCM<br>
+</h2>
+The SCM classes are responsible for all interaction with the physical
+SCMs. They are not full blown Ruby wrappers for the SCM's native APIs,
+but include functionality that is required for DamageControl:<br>
+<ul>
+  <li>Installing DamageControl triggers (using nc - netcat) in
+repositories</li>
+  <li>Checking out latest code</li>
+  <li>Parsing URL-like strings that identifies a repository</li>
+  <li>Getting/guessing email addresses from users</li>
+</ul>
+<h2>SocketTrigger</h2>
+The SocketTrigger class is the main interaction point with
+DamageControl. It listens for connections on a socket. When it gets a
+connection, it parses a command and starts to build. The socket
+connections typically come from trigger scripts installed in the SCM.<br>
+<br>
+<h1>Glossary</h1>
+<h2>Build artifacts</h2>
+<h3>Compulsory</h3>
+<ul>
+  <li>Compiled code (if appliccable)<br>
+  </li>
+  <li>Test reports</li>
+</ul>
+<h3>Optional</h3>
+<ul>
+  <li>Packaged code</li>
+  <li>Documentation<br>
+  </li>
+</ul>
+<h2>SCM</h2>
+&nbsp;SCM stands for Source Control Management systems. Examples are
+CVS, Subverision (SVN), StarTeam, Perforce, Visual Source Safe (VSS)
+etc. Currently only CVS and SVN are supported.<br>
+</body>
+</html>
