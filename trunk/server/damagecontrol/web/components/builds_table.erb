@@ -71,14 +71,14 @@
       <td class="build-cell-even">
         <form method="get" action="<%= base_url %>">
           <input type="hidden" name="project_name" value="<%= project_name %>" />
-          <select name="timestamp" onchange="submit()">
+          <select name="dc_creation_time" onchange="submit()">
           
           <%
             builds_to_option_box.each do |build|
             prefix = ""
             prefix = "#{build.project_name} " if prefix_with_project_name
           %>
-            <option value="<%= build.timestamp_as_s %>"><%= prefix %><%= build_description(build) %></option>      
+            <option value="<%= build.dc_creation_time.ymdHMS %>"><%= prefix %><%= build_description(build) %></option>      
           <% end %>
           
           </select>

@@ -54,7 +54,7 @@ module DamageControl
       NoSCM.new
     end
 
-    def test_can_create_build_from_project_config
+    def test_creates_build_with_proper_attributes_from_project_config
       @pcr.new_project("newproject")
       @pcr.modify_project_config("newproject", { "scm_type" => NoSCM.name })
       build = @pcr.create_build("newproject")
@@ -64,7 +64,7 @@ module DamageControl
           "scm" => create_default_scm
         },
         build.config)
-      assert_match(/http:\/\/localhost\/public\/project\?project_name=newproject&timestamp=2\d\d\d\d\d\d\d\d\d\d\d\d\d/, build.url)
+      assert_match(/http:\/\/localhost\/public\/project\?project_name=newproject&dc_creation_time=2\d\d\d\d\d\d\d\d\d\d\d\d\d/, build.url)
     end
     
     def test_next_build_number

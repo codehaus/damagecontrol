@@ -1,5 +1,9 @@
+require 'pebbles/TimeUtils'
+
 module DamageControl
   class ProjectStatus
+    include Pebbles::TimeUtils
+
     attr_reader :name
     
     def initialize(name, build_history_repository)
@@ -16,15 +20,15 @@ module DamageControl
     end
     
     def last_successful_build
-      build_history_repository.last_successful_build(name)
+      @build_history_repository.last_successful_build(name)
     end
     
     def last_completed_build
-      build_history_repository.last_completed_build(name)
+      @build_history_repository.last_completed_build(name)
     end
     
     def current_build
-      current_build = build_history_repository.current_build(name)
+      current_build = @build_history_repository.current_build(name)
       current_build = nil if current_build != nil && current_build.completed?
       current_build
     end
@@ -38,11 +42,19 @@ module DamageControl
     end
     
     def time_since_last_success
-      if last_successful_build then last_successful_build.time_since_for_humans else "Never built" end
+      if(last_successful_build  && last_successful_build.dc_end_time)
+        Time.now.utc.difference_as_text(last_successful_build.dc_end_time)
+      else 
+        "Never successfuly built" 
+      end
     end
     
     def last_duration
-      if last_completed_build then last_completed_build.duration_for_humans else "Never built" end
+      if(last_completed_build && last_completed_build.duration)
+        duration_as_text(last_completed_build.duration)
+      else 
+        "Never built" 
+      end
     end
     
     def current_duration
@@ -64,27 +76,23 @@ module DamageControl
       100 - percentage_done
     end
     
-    protected
-    
-      def current_build_duration
-        current_time - current_build.start_time
-      end
-    
-      def longer_than_last_build?
-        current_build_duration > benchmark_build.duration
-      end
-    
-      def benchmark_build
-        last_successful_build || last_completed_build
-      end
-      
-      # can be overloaded during testing
-      def current_time
-        Time.now.utc
-      end
-  
-    private
-    
-      attr_reader :build_history_repository
+  protected
+
+    def current_build_duration
+      current_time - current_build.dc_start_time
+    end
+
+    def longer_than_last_build?
+      current_build_duration > benchmark_build.duration
+    end
+
+    def benchmark_build
+      last_successful_build || last_completed_build
+    end
+
+    # can be overloaded during testing
+    def current_time
+      Time.now.utc
+    end
   end
 end

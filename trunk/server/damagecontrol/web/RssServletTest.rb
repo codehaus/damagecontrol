@@ -31,7 +31,7 @@ module DamageControl
 
     def test_rss
       build = Build.new("myproject")
-      build.timestamp = "20041007160000"
+      build.dc_creation_time = Time.utc(2004,10,7,16,0,0)
       build_history_repository = FakeBuildHistoryRepository.new(build)
       servlet = RssServlet.new(build_history_repository, "http://builds.codehaus.org/rss")
       result = do_request("project_name" => "myproject") do
@@ -43,7 +43,7 @@ module DamageControl
 
     def test_rss_returns_not_modified_when_given_an_etag_with_current_timestamp
       build = Build.new("myproject")
-      build.timestamp = "20041007160000"
+      build.dc_creation_time = Time.utc(2004,10,7,16,0,0)
       build_history_repository = FakeBuildHistoryRepository.new(build)
       servlet = RssServlet.new(build_history_repository, "http://builds.codehaus.org/rss")
       result = do_request("project_name" => "myproject") do
@@ -56,7 +56,7 @@ module DamageControl
 
     def test_rss_returns_content_when_given_an_etag_with_an_old_timestamp
       build = Build.new("myproject")
-      build.timestamp = "20041007160000"
+      build.dc_creation_time = Time.utc(2004,10,7,16,0,0)
       build_history_repository = FakeBuildHistoryRepository.new(build)
       servlet = RssServlet.new(build_history_repository, "http://builds.codehaus.org/rss")
       result = do_request("project_name" => "myproject") do

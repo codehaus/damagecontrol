@@ -37,7 +37,9 @@ module DamageControl
         i+=1
         BuildExecutorStatus.new(i, e, build_history_repository)
       end
-      build_queue = build_scheduler.build_queue.sort {|b1, b2| b1.timestamp_as_time <=> b2.timestamp_as_time }
+      build_queue = build_scheduler.build_queue.sort do |b1, b2| 
+        b1.dc_creation_time - b2.dc_creation_time
+      end
       erb("components/build_scheduler_status.erb", binding)
     end
     

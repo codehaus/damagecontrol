@@ -19,9 +19,6 @@ require 'damagecontrol/core/ProjectConfigRepositoryTest'
 require 'damagecontrol/core/ProjectDirectoriesTest'
 require 'damagecontrol/core/SCMPollerTest'
 
-require 'damagecontrol/cruisecontrol/CruiseControlLogPollerTest'
-require 'damagecontrol/cruisecontrol/CruiseControlLogParserTest'
-
 require 'damagecontrol/dependency/AllTraverserTest'
 require 'damagecontrol/dependency/UpstreamDownstreamTraverserTest'
 

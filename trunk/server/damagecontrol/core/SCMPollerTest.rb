@@ -27,11 +27,11 @@ module DamageControl
       poller = SCMPoller.new(
         hub,
         1,
-        mock_project_config_repository(project_config_with_polling(last_commit), 10), 
+        mock_project_config_repository(project_config_with_polling(last_commit)), 
         build_scheduler
       )
         
-      poller.tick(10)
+      poller.tick(Time.new.utc)
 
     end
     
@@ -43,11 +43,11 @@ module DamageControl
       poller = SCMPoller.new(
         hub,
         1,
-        mock_project_config_repository(project_config_with_polling(Time.new.utc), 10), 
+        mock_project_config_repository(project_config_with_polling(Time.new.utc)), 
         mock_build_scheduler
       )
 
-      poller.tick(10)
+      poller.tick(Time.new.utc)
     end
     
     def test_should_not_poll_projects_where_polling_hasnt_been_specified
@@ -56,11 +56,11 @@ module DamageControl
       poller = SCMPoller.new(
         hub,
         1,
-        mock_project_config_repository(project_config_without_polling(nil), 30), 
+        mock_project_config_repository(project_config_without_polling(nil)), 
         mock_build_scheduler
       )
         
-      poller.tick(30)
+      poller.tick(Time.new.utc)
 
     end
 
@@ -70,11 +70,11 @@ module DamageControl
       poller = SCMPoller.new(
         hub,
         30,
-        mock_project_config_repository(project_config_with_polling(nil, 40), 35), 
+        mock_project_config_repository(project_config_with_polling(nil, 40)), 
         mock_build_scheduler
       )
         
-      poller.tick(35)
+      poller.tick(Time.new.utc)
 
     end
     
@@ -84,11 +84,11 @@ module DamageControl
       poller = SCMPoller.new(
         hub,
         40,
-        mock_project_config_repository(project_config_with_polling(nil, nil), 35), 
+        mock_project_config_repository(project_config_with_polling(nil, nil)), 
         mock_build_scheduler
       )
         
-      poller.tick(35)
+      poller.tick(Time.new.utc + 35)
 
     end
     
@@ -98,11 +98,11 @@ module DamageControl
       poller = SCMPoller.new(
         hub,
         40,
-        mock_project_config_repository(project_config_with_polling(nil, 30), 35),
+        mock_project_config_repository(project_config_with_polling(nil, 30)),
         mock_build_scheduler
       )
         
-      poller.tick(35)
+      poller.tick(Time.new.utc + 35)
 
     end
     
@@ -112,11 +112,11 @@ module DamageControl
       poller = SCMPoller.new(
         hub,
         30,
-        mock_project_config_repository(project_config_with_polling(nil, nil), 35),
+        mock_project_config_repository(project_config_with_polling(nil, nil)),
         mock_build_scheduler
       )
         
-      poller.tick(35)
+      poller.tick(Time.new.utc + 35)
 
     end
     
@@ -126,11 +126,11 @@ module DamageControl
       poller = SCMPoller.new(
         new_mock.__expect(:put) {|m| m.is_a?(DoCheckoutEvent)},
         1,
-        mock_project_config_repository(project_config_with_polling(last_commit), 10),
+        mock_project_config_repository(project_config_with_polling(last_commit)),
         mock_build_scheduler
       )
       
-      poller.tick(10)
+      poller.tick(Time.new.utc + 4)
       
     end
     
@@ -141,11 +141,11 @@ module DamageControl
       poller = SCMPoller.new(
         hub, 
         1,
-        mock_project_config_repository(project_config_with_polling(last_commit), 10),
+        mock_project_config_repository(project_config_with_polling(last_commit)),
         mock_build_scheduler
       )
         
-      poller.tick(10)
+      poller.tick(Time.new.utc + 3)
       
     end
     
@@ -170,7 +170,7 @@ module DamageControl
       build_scheduler
     end
     
-    def mock_project_config_repository(config, build_time)
+    def mock_project_config_repository(config)
       project_config_repository = new_mock
       project_config_repository.__setup(:project_names) { ["project"] }
       project_config_repository.__setup(:project_config) {|project_name|
@@ -183,7 +183,7 @@ module DamageControl
       }
       project_config_repository.__setup(:create_build) {|project_name|
         assert_equal("project", project_name)
-        Build.new("project", build_time)
+        Build.new("project")
       }
       project_config_repository
     end

@@ -13,11 +13,13 @@ module DamageControl
     include MockIt
 
     def test_search_project
+      build = Build.new
+      build.dc_creation_time = Time.new.utc
       build_history_repository = new_mock
       build_history_repository.__expect(:search) {|regexp, project_name|
         assert_equal(/search term/i, regexp)
         assert_equal("myprojectname", project_name)
-        [Build.new]
+        [build]
       }
       servlet = SearchServlet.new(build_history_repository)
       result = do_request("search"=> "search term", "project_name" => "myprojectname") do

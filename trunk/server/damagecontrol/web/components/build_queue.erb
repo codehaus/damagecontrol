@@ -18,7 +18,7 @@
     %>
       <tr>
         <td class="pane"><%= build.project_name %></td>
-        <td class="pane"><%= build.timestamp_for_humans %></td>
+        <td class="pane"><%= build.dc_creation_time.to_human %></td>
       </tr>
     <% end %>
   <% end %>

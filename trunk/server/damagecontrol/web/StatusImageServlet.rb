@@ -35,7 +35,7 @@ module DamageControl
       color = "grey"
       pulse = ""
       build = find_build(project_name)
-      if(!build.nil? && build.completed?)
+      if(build && build.completed?)
         color = if build.successful? then "green" else "red" end
         pulse = "-pulse" if @build_scheduler.project_building?(project_name)
       end
@@ -64,8 +64,8 @@ module DamageControl
     protected
     
     def find_build(project_name)
-      timestamp = request.query["timestamp"]
-      @build_history_repository.lookup(project_name, timestamp)
+      dc_creation_time = request.query["dc_creation_time"]
+      @build_history_repository.lookup(project_name, dc_creation_time)
     end
   end
 end

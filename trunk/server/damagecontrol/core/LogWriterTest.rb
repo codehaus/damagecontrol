@@ -25,7 +25,7 @@ module DamageControl
       @build.error_log_file = "#{@basedir}/project_name/log/19770614002000-error.log"
 
       @build.label = "a_label"
-      @build.timestamp = "19770614002000"
+      @build.dc_start_time = Time.utc(1977,6,14,0,20,0)
     end
     
     def teardown

@@ -8,6 +8,7 @@ require 'webrick'
  
 require 'pebbles/Space'
 require 'damagecontrol/Version'
+require 'damagecontrol/core/Build'
 require 'damagecontrol/core/BuildExecutor'
 require 'damagecontrol/core/BuildScheduler'
 require 'damagecontrol/core/CheckoutManager'
@@ -58,6 +59,11 @@ module WEBrick
 end
 
 module DamageControl
+  # UPGRADE: Migration of old timestamps in build_history.yaml to new ones
+  class Build
+    attr_accessor :timestamp, :start_time, :end_time
+  end
+
   class DamageControlServer
     include FileUtils
     include Logging
@@ -69,6 +75,32 @@ module DamageControl
       @params = params
       @components = []
       @rootdir = rootdir
+    end
+    
+    def upgrade(project_directories, project_config_repository, build_history_repository)
+      # Migrate build history timestamps to new format
+      histories = {}
+      project_directories.project_names.each do |project_name|
+        history = build_history_repository.history(project_name)
+        history.each do |build|
+          # transform old to new
+          build.dc_start_time = build.start_time if build.start_time
+          build.duration = build.end_time - build.start_time if build.end_time && build.start_time
+          build.dc_creation_time = Time.parse_ymdHMS(build.timestamp) if build.timestamp
+          
+          # remove old
+          build.start_time = nil
+          build.end_time = nil
+          build.timestamp = nil
+        end
+        
+        histories[project_name] = history
+      end
+
+      histories.each do |project_name, history|
+        logger.info("Upgrading build history for #{project_name}")
+        build_history_repository.dump(history, project_name)
+      end
     end
     
     def startup_time
@@ -140,6 +172,8 @@ module DamageControl
       component(:project_directories, ProjectDirectories.new(@rootdir))
       component(:project_config_repository, ProjectConfigRepository.new(project_directories, public_web_url))
       component(:build_history_repository, BuildHistoryRepository.new(hub, project_directories))
+
+      upgrade(project_directories, project_config_repository, build_history_repository)
     end
     
     def init_components

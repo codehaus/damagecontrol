@@ -1,4 +1,5 @@
 require 'pebbles/Clock'
+require 'pebbles/TimeUtils'
 require 'damagecontrol/core/BuildEvents'
 require 'damagecontrol/core/Build'
 require 'damagecontrol/util/Logging'
@@ -17,6 +18,7 @@ module DamageControl
   #
   class SCMPoller < Pebbles::Clock
     include Logging
+    include Pebbles::TimeUtils
     
     def initialize(channel, polling_interval, project_config_repository, build_scheduler)
       super(polling_interval)
@@ -28,17 +30,28 @@ module DamageControl
       @poll_times = {}
     end
     
+    def to_s
+      "#{super} polling_interval: #{duration_as_text(@polling_interval)}"
+    end
+    
     def start
       logger.info("starting poller #{self}")
       super
     end
   
     def tick(time)
-      @project_config_repository.project_names.each do |project_name| 
-        now = Time.at(time)
-        if should_poll?(project_name, now)
-          @poll_times[project_name] = now
+      logger.info("tick #{time.to_human}")
+      @project_config_repository.project_names.each do |project_name|        
+        if(@poll_times[project_name].nil?)
+          @poll_times[project_name] = Time.new.utc
+        end
+
+        if should_poll?(project_name, time)
+          @poll_times[project_name] = time
           @channel.put(DoCheckoutEvent.new(project_name, false))
+          logger.info("Requested checkout for #{project_name}")
+        else
+          logger.info("Not requesting checkout for #{project_name}. It isn't time yet.")
         end
       end
     end
@@ -53,10 +66,11 @@ module DamageControl
       polling_interval = project_config["polling"]
       if(polling_interval.is_a?(FalseClass) || polling_interval.is_a?(TrueClass))
         # old format
-        return polling_interval
+        should_poll = polling_interval
+        return should_poll
       else
         interval =  polling_interval || @polling_interval
-        last_poll = @poll_times[project_name] || Time.utc(1970)
+        last_poll = @poll_times[project_name]
         required_time = last_poll + interval
         return required_time < time
       end

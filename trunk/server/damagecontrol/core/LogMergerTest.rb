@@ -17,12 +17,12 @@ module DamageControl
 
       basedir = new_temp_dir
       
-      build_timestamp = "19770615120000"
-      build = Build.new("project", build_timestamp, {
+      build = Build.new("project", {
         "logs_to_merge" => [ "target/test-reports/*.xml", "ant-log.xml", "target/logs/*.log" ]
       })
+      build.dc_start_time = Time.utc(1977,6,15,12,0,0,0)
       
-      build.xml_log_file = "#{basedir}/project/log/#{build_timestamp}.xml"
+      build.xml_log_file = "#{basedir}/project/log/19770615120000.xml"
       
       mkdir_p("#{basedir}/checkout/target/test-reports")
       touch("#{basedir}/checkout/target/test-reports/TEST-com.thoughtworks.Test.xml")

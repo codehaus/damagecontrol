@@ -8,7 +8,7 @@ class RequestBuildTask < XMLRPCClientTask
   def run
     begin
       puts "Trigging build of #{projectname} DamageControl on #{url}"
-      puts xmlrpc_client("build").trig(projectname, Build.format_timestamp(Time.now.utc))
+      puts xmlrpc_client("build").request(projectname)
       puts "OK Trigging build of #{projectname} DamageControl on #{url}"
     rescue Exception => e
       puts e.message

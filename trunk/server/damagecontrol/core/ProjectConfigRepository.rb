@@ -94,14 +94,16 @@ module DamageControl
     end
 
     def create_build(project_name)
-      build = Build.new(project_name, Time.now.utc, project_config(project_name))
-      build.url = "#{ensure_trailing_slash(@public_web_url)}project?project_name=#{build.project_name}&timestamp=#{build.timestamp}"
+      build = Build.new(project_name, project_config(project_name))
+      build.dc_creation_time = Time.new.utc
+      ymdHMS = build.dc_creation_time.ymdHMS
+      build.url = "#{ensure_trailing_slash(@public_web_url)}project?project_name=#{build.project_name}&dc_creation_time=#{ymdHMS}"
       build.scm = create_scm(project_name)
       build.potential_label = peek_next_build_number(project_name).to_s
-      build.log_file = "#{log_dir(project_name)}/#{build.timestamp_as_s}.log"
-      build.error_log_file = "#{log_dir(project_name)}/#{build.timestamp_as_s}-error.log"
-      build.xml_log_file = "#{log_dir(project_name)}/#{build.timestamp_as_s}.xml"
-      build.archive_dir = @project_directories.archive_dir(project_name, build.timestamp_as_s)
+      build.log_file = "#{log_dir(project_name)}/#{ymdHMS}.log"
+      build.error_log_file = "#{log_dir(project_name)}/#{ymdHMS}-error.log"
+      build.xml_log_file = "#{log_dir(project_name)}/#{ymdHMS}.xml"
+      build.archive_dir = @project_directories.archive_dir(project_name, ymdHMS)
       build
     end
     

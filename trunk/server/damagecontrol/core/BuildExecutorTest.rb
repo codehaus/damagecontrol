@@ -31,7 +31,7 @@ module DamageControl
   
     def setup
       @basedir = new_temp_dir("BuildExecutorTest")
-      @build = Build.new("damagecontrolled", Time.now, {
+      @build = Build.new("damagecontrolled", {
         "build_command_line" => "echo Hello world from DamageControl!"
         })
     end
@@ -108,7 +108,7 @@ module DamageControl
         new_mock.__setup(:checkout_dir) {"target"}
       )
 
-      @build = Build.new("damagecontrolled", Time.now, { "build_command_line" => "bad_command"})
+      @build = Build.new("damagecontrolled", { "build_command_line" => "bad_command"})
       @build.scm = new_mock.__expect(:label) {"a_label"}
       build_executor.on_message(@build)
       # what happens for bad_command is different on windows and linux
@@ -141,10 +141,10 @@ module DamageControl
         mock_hub, 
         new_mock.__expect(:checkout_dir).__expect(:checkout_dir)
       )
-      @build = Build.new("damagecontrolled", Time.now,
+      @build = Build.new("damagecontrolled",
         { "build_command_line" => "echo hello world"})
       @build.scm = mock_scm
-      @build.timestamp = current_build_time
+      @build.dc_start_time = current_build_time
 
       build_executor.on_message(@build)
       

@@ -110,7 +110,7 @@ module DamageControl
     def build_description(build)
       label = "##{build.label}"; 
       label = build.status if label == "#"
-      "#{build.timestamp_for_humans} (#{label})"
+      "#{build.dc_creation_time.to_human} (#{label})"
     end
 
     def builds_table(params)
@@ -151,7 +151,7 @@ module DamageControl
   private
     def build_url(build)
       return nil unless build
-      "?project_name=#{build.project_name}&timestamp=#{build.timestamp}"
+      "?project_name=#{build.project_name}&dc_creation_time=#{build.dc_creation_time.ymdHMS}"
     end
     
     def build_status(build)

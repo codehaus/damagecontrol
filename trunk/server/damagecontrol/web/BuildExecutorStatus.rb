@@ -18,11 +18,11 @@ module DamageControl
     end
     
     def last_successful_build
-      build_history_repository.last_successful_build(current_build.project_name)
+      @build_history_repository.last_successful_build(current_build.project_name)
     end
     
     def last_completed_build
-      build_history_repository.last_completed_build(current_build.project_name)
+      @build_history_repository.last_completed_build(current_build.project_name)
     end
     
     def current_build
@@ -51,28 +51,25 @@ module DamageControl
       return 0 unless current_build && benchmark_build
       100 - percentage_done
     end
+
+  protected
     
-    protected
-    
-      def current_build_duration
-        current_time - current_build.start_time
-      end
-    
-      def longer_than_last_build?
-        current_build_duration > benchmark_build.duration
-      end
-    
-      def benchmark_build
-        last_successful_build || last_completed_build
-      end
-      
-      # can be overloaded during testing
-      def current_time
-        Time.now.utc
-      end
-  
-    private
-    
-      attr_reader :build_history_repository
+    def current_build_duration
+      current_time - current_build.dc_start_time
+    end
+
+    def longer_than_last_build?
+      current_build_duration > benchmark_build.duration
+    end
+
+    def benchmark_build
+      last_successful_build || last_completed_build
+    end
+
+    # can be overloaded during testing
+    def current_time
+      Time.now.utc
+    end
+
   end
 end

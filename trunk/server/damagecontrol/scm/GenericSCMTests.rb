@@ -15,16 +15,16 @@ module DamageControl
       work_dir = new_temp_dir
       checkout_dir = "#{work_dir}/WeCanCallItWhatWeWant/checkout"
       repository_dir = "#{work_dir}/repository"
-      scm = create_scm(repository_dir, "damagecontrolled") { |line| logger.debug(line) }
-      scm.create {|line| logger.debug(line)}
+      scm = create_scm(repository_dir, "damagecontrolled") { |line| logger.info(line) }
+      scm.create {|line| logger.info(line)}
       path = "#{damagecontrol_home}/testdata/damagecontrolled"
       import_dir = "#{work_dir}/damagecontrolled"
       copy_dir(path, import_dir)
 
       before_import = Time.new.utc
       sleep(1)
-      scm.import(import_dir) { |line| logger.debug(line) }
-      timestamp = scm.checkout(checkout_dir, before_import, nil) { |line| logger.debug(line) }
+      scm.import(import_dir) { |line| logger.info(line) }
+      timestamp = scm.checkout(checkout_dir, before_import, nil) { |line| logger.info(line) }
       assert(before_import < timestamp)
       
       # modify file and commit it
@@ -33,10 +33,10 @@ module DamageControl
       sleep(1)
       change_file("#{checkout_dir}/build.xml")
       change_file("#{checkout_dir}/src/java/com/thoughtworks/damagecontrolled/Thingy.java")
-      scm.commit(checkout_dir, "changed something") { |line| logger.debug(line) }
+      scm.commit(checkout_dir, "changed something") { |line| logger.info(line) }
       
       # check that we now have one more change
-      changesets = scm.checkout(checkout_dir, before_change, nil) { |line| logger.debug(line) }
+      changesets = scm.checkout(checkout_dir, before_change, nil) { |line| logger.info(line) }
 
       assert_equal(1, changesets.length)
       changeset = changesets[0]
@@ -61,8 +61,8 @@ module DamageControl
       checkout_dir = "#{work_dir}/WeCanCallItWhatWeWant/checkout"
       other_checkout_dir = "#{work_dir}/SomewhereElse/checkout"
       repository_dir = "#{work_dir}/repository"
-      scm = create_scm(repository_dir, "damagecontrolled") { |line| logger.debug(line) }
-      scm.create {|line| logger.debug(line)}
+      scm = create_scm(repository_dir, "damagecontrolled") { |line| logger.info(line) }
+      scm.create {|line| logger.info(line)}
       path = "#{damagecontrol_home}/testdata/damagecontrolled"
 
       before_import = Time.now.utc
@@ -101,7 +101,7 @@ module DamageControl
       checkout_dir = "#{work_dir}/#{path}/checkout"
       repository_dir = "#{work_dir}/repository"
       scm = create_scm(repository_dir, path)
-      scm.create {|line| logger.debug(line)}
+      scm.create {|line| logger.info(line)}
       
       trigger_files_checkout_dir = File.expand_path("#{checkout_dir}/../trigger")
       trigger_command = "bla bla"

@@ -69,17 +69,23 @@ module DamageControl
         # (It would not be associated with a build, but a project)
         logger.info(line)
       end
-      if(scm_from_time.nil? && !changesets_or_last_commit_time.is_a?(Time))
-        last_commit_time = scm.most_recent_timestamp(changesets_or_last_commit_time)
-        logger.info("Did checkout of #{project_name} before knowing last commit time. Found out it was at #{last_commit_time}")
-        update_last_commit_time(project_name, last_commit_time, project_config)
-      elsif(changesets_or_last_commit_time.is_a?(Time))
+
+puts changesets_or_last_commit_time
+puts changesets_or_last_commit_time
+puts changesets_or_last_commit_time
+puts changesets_or_last_commit_time
+
+      if(changesets_or_last_commit_time.is_a?(Time))
         logger.info("First checkout of #{project_name}. Last commit was at #{changesets_or_last_commit_time}")
         update_last_commit_time(project_name, changesets_or_last_commit_time, project_config)
         return changesets_or_last_commit_time
       elsif(changesets_or_last_commit_time.nil? || changesets_or_last_commit_time.empty?)
         logger.info("No changes in #{project_name}")
         return nil
+      elsif(scm_from_time.nil? && !changesets_or_last_commit_time.is_a?(Time))
+        last_commit_time = scm.most_recent_timestamp(changesets_or_last_commit_time)
+        logger.info("Did checkout of #{project_name} before knowing last commit time. Found out it was at #{last_commit_time}")
+        update_last_commit_time(project_name, last_commit_time, project_config)
       else
         last_commit_time = scm.most_recent_timestamp(changesets_or_last_commit_time)
         logger.info("Changes in #{project_name}. Number of changesets: #{changesets_or_last_commit_time.length}.")

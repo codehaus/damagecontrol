@@ -13,12 +13,12 @@ module DamageControl
     def test_copies_away_artifacts_on_build_complete
       basedir = new_temp_dir
       
-      build_timestamp = "19770615120000"
-      build = Build.new("project", build_timestamp, {
+      build = Build.new("project", {
         "artifacts_to_archive" => [ "target/*.jar", "target/jars" ]
       })
+      build.dc_start_time = Time.utc(1977,6,15,12,0,0)
       
-      build.archive_dir = "#{basedir}/project/archive/#{build_timestamp}"
+      build.archive_dir = "#{basedir}/project/archive/19770615120000"
       build.scm = NoSCM.new
       
       mkdir_p("#{basedir}/checkout/target/jars")

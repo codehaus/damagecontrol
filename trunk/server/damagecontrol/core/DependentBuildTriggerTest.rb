@@ -12,8 +12,7 @@ module DamageControl
     include MockIt
 
     def test_triggers_dependent_build_after_build_completes
-      timestamp = "19770615120000"
-      build = Build.new("damagecontrolled", timestamp, {
+      build = Build.new("damagecontrolled", {
         "dependent_projects" => ["dep_project_1", "dep_project_2"]
         })
       build.status = Build::SUCCESSFUL
@@ -38,7 +37,7 @@ module DamageControl
     end
 
     def test_does_not_trigger_on_failed_build
-      build = Build.new("damagecontrolled", Time.new, {
+      build = Build.new("damagecontrolled", {
         "dependent_projects" => ["dep_project_1", "dep_project_2"]
         })
       build.status = Build::FAILED

@@ -33,11 +33,11 @@ module DamageControl
       @build_history_repository.__setup(:last_successful_build) {|project_name|
         assert_equal("project", project_name)
         b = Build.new
-        b.start_time = Time.at(0).utc
-        b.end_time = Time.at(30).utc
+        b.dc_start_time = Time.at(0).utc
+        b.duration = 30
         b
       }
-      @build.start_time = Time.at(40).utc
+      @build.dc_start_time = Time.at(40).utc
       def @status.current_time
         Time.at(50).utc
       end
@@ -54,11 +54,11 @@ module DamageControl
       @build_history_repository.__setup(:last_completed_build) {|project_name|
         assert_equal("project", project_name)
         b = Build.new
-        b.start_time = Time.at(0).utc
-        b.end_time = Time.at(30).utc
+        b.dc_start_time = Time.at(0).utc
+        b.duration = 30
         b
       }
-      @build.start_time = Time.at(40).utc
+      @build.dc_start_time = Time.at(40).utc
       @build_executor.__setup(:scheduled_build) {@build}
       def @status.current_time
         Time.at(50).utc
@@ -71,11 +71,11 @@ module DamageControl
       @build_history_repository.__setup(:last_successful_build) {|project_name|
         assert_equal("project", project_name)
         b = Build.new
-        b.start_time = Time.at(0).utc
-        b.end_time = Time.at(30).utc
+        b.dc_start_time = Time.at(0).utc
+        b.duration = 30
         b
       }
-      @build.start_time = Time.at(40).utc
+      @build.dc_start_time = Time.at(40).utc
       @build_executor.__setup(:scheduled_build) {@build}
       def @status.current_time
         Time.at(80).utc

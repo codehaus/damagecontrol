@@ -106,7 +106,7 @@ module DamageControl
     end
     
     def time_in_queue(build)
-      Time.now - build.timestamp_as_time
+      Time.now.utc - build.dc_creation_time
     end
     
     # try to execute all builds in build queue

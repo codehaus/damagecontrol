@@ -48,16 +48,12 @@ module DamageControl
       "#{project_dir(project_name)}/#{HISTORY_FILE_NAME}"
     end    
     
-    def log_timestamps(project_name)
-      Dir["#{log_dir(project_name)}/*.log"].collect {|f| File.basename(f, ".log") }.sort
+    def log_file(project_name, dc_creation_time)
+      "#{log_dir(project_name)}/#{dc_creation_time}.log"
     end
     
-    def log_file(project_name, timestamp)
-      "#{log_dir(project_name)}/#{timestamp}.log"
-    end
-    
-    def archive_dir(project_name, timestamp)
-      "#{project_dir(project_name)}/archive/#{timestamp}"
+    def archive_dir(project_name, dc_creation_time)
+      "#{project_dir(project_name)}/archive/#{dc_creation_time}"
     end
 
   end

@@ -9,18 +9,41 @@ module DamageControl
 
   class BuildHistoryRepositoryTest < AbstractBuildHistoryTest
     include MockIt
+
+    def test_should_retrieve_build_by_dc_creation_time
+      p1 = Build.new("t")
+      p1.dc_creation_time = Time.utc(2004, 01, 01, 12, 00, 00)
+
+      pt = Build.new("t")
+      t = Time.utc(2004, 01, 04, 12, 00, 00)
+      pt.dc_creation_time = t
+
+      p3 = Build.new("t")
+      p1.dc_creation_time = Time.utc(2004, 01, 05, 12, 00, 00)
+
+      xt = Build.new("x")
+      xt.dc_creation_time = t
+      
+      @bhp.register(p1)
+      @bhp.register(pt)
+      @bhp.register(p3)
+      @bhp.register(xt)
+      
+      assert_equal(pt, @bhp.lookup("t", t))
+    end
+
   
     def test_can_get_current_build
       assert_equal(nil, @bhp.current_build("project_name"))
       
       build1 = Build.new("project_name")
-      build1.timestamp = Time.utc(2004, 04, 02, 12, 00, 00)
+      build1.dc_creation_time = Time.utc(2004, 04, 02, 12, 00, 00)
       build1.status = Build::BUILDING
       @bhp.register(build1)
       assert_equal(build1, @bhp.current_build("project_name"))
       
       build2 = Build.new("project_name")
-      build2.timestamp = Time.utc(2004, 04, 02, 13, 00, 00)
+      build2.dc_creation_time = Time.utc(2004, 04, 02, 13, 00, 00)
       build2.status = Build::BUILDING
       @bhp.register(build2)
       assert_equal(build2, @bhp.current_build("project_name"))
@@ -30,13 +53,13 @@ module DamageControl
       assert_equal(nil, @bhp.current_build("project_name"))
       
       build1 = Build.new("project_name")
-      build1.timestamp = Time.utc(2004, 04, 02, 12, 00, 00)
+      build1.dc_creation_time = Time.utc(2004, 04, 02, 12, 00, 00)
       build1.status = Build::BUILDING
       @bhp.register(build1)
       assert_equal(build1, @bhp.current_build("project_name"))
       
       build2 = Build.new("project_name")
-      build2.timestamp = Time.utc(2004, 04, 02, 13, 00, 00)
+      build2.dc_creation_time = Time.utc(2004, 04, 02, 13, 00, 00)
       build2.status = Build::QUEUED
       @bhp.register(build2)
       assert_equal(build1, @bhp.current_build("project_name"))
@@ -46,19 +69,19 @@ module DamageControl
       assert_equal(nil, @bhp.last_completed_build("project_name"))
       
       build1 = Build.new("project_name")
-      build1.timestamp = Time.utc(2004, 04, 02, 12, 00, 00)
+      build1.dc_creation_time = Time.utc(2004, 04, 02, 12, 00, 00)
       build1.status = Build::BUILDING
       @bhp.register(build1)
       assert_equal(nil, @bhp.last_completed_build("project_name"))
       
       build2 = Build.new("project_name")
-      build2.timestamp = Time.utc(2004, 04, 02, 13, 00, 00)
+      build2.dc_creation_time = Time.utc(2004, 04, 02, 13, 00, 00)
       build2.status = Build::SUCCESSFUL
       @bhp.register(build2)
       assert_equal(build2, @bhp.last_completed_build("project_name"))
       
       build3 = Build.new("project_name")
-      build3.timestamp = Time.utc(2004, 04, 02, 14, 00, 00)
+      build3.dc_creation_time = Time.utc(2004, 04, 02, 14, 00, 00)
       build3.status = Build::FAILED
       @bhp.register(build3)
       assert_equal(build3, @bhp.last_completed_build("project_name"))
@@ -160,48 +183,6 @@ module DamageControl
       File.delete("test.yaml") if File.exist?("test.yaml")
     end
     
-    def test_should_be_able_to_group_builds_per_week_month_and_day
-      week_zero_one = Build.new("test", Time.utc(2004, 01, 01, 12, 00, 00))
-      week_zero_two = Build.new("test", Time.utc(2004, 01, 04, 12, 00, 00))
-
-      week_one_one = Build.new("test", Time.utc(2004, 01, 05, 12, 00, 00))
-      week_one_two = Build.new("test", Time.utc(2004, 01, 11, 12, 00, 00))
-
-      week_two_one = Build.new("test", Time.utc(2004, 01, 12, 12, 00, 00))
-      
-      week_eight_one = Build.new("test", Time.utc(2004, 02, 28, 12, 00, 00))
-      week_eight_two = Build.new("test", Time.utc(2004, 02, 28, 13, 00, 00))
-      
-      @bhp.register(week_zero_one)
-      @bhp.register(week_zero_two)
-      @bhp.register(week_one_one)
-      @bhp.register(week_one_two)
-      @bhp.register(week_two_one)
-      @bhp.register(week_eight_one)
-      @bhp.register(week_eight_two)
-      
-      week_builds = @bhp.group_by_period("test", :week)
-
-      builds_per_week_zero = week_builds[Time.utc(2003, 12, 29)]
-      assert_equal([week_zero_one, week_zero_two], builds_per_week_zero)
-      builds_per_week_one = week_builds[Time.utc(2004, 01, 05)]
-      assert_equal([week_one_one, week_one_two], builds_per_week_one)
-      builds_per_week_two = week_builds[Time.utc(2004, 01, 12)]
-      assert_equal([week_two_one], builds_per_week_two)
-      builds_per_week_two = week_builds[Time.utc(2004, 01, 12)]
-      assert_equal([week_two_one], builds_per_week_two)
-      builds_per_week_eight = week_builds[Time.utc(2004, 02, 23)]
-      assert_equal([week_eight_one, week_eight_two], builds_per_week_eight)
-
-      day_builds = @bhp.group_by_period("test", :day)
-      builds_per_aslaks_birthday = day_builds[Time.utc(2004, 02, 28)]
-      assert_equal([week_eight_one, week_eight_two], builds_per_aslaks_birthday)
-
-      month_builds = @bhp.group_by_period("test", :month)
-      builds_per_january = month_builds[Time.utc(2004, 01, 01)]
-      assert_equal([week_zero_one, week_zero_two, week_one_one, week_one_two, week_two_one], builds_per_january)
-    end
-    
     def test_should_allow_searching_in_anything
       time = Time.new.utc
       a = Build.new("test", time)
@@ -238,25 +219,11 @@ module DamageControl
       assert_equal([c], @bhp.search(/funny/, "onlythisone"))
     end
     
-    def test_should_retrieve_build_by_timestamp_string
-      t = Time.utc(2004, 01, 04, 12, 00, 00)
-      p1 = Build.new("t", Time.utc(2004, 01, 01, 12, 00, 00))
-      pt = Build.new("t", t)
-      p3 = Build.new("t", Time.utc(2004, 01, 05, 12, 00, 00))
-      xt = Build.new("x", t)
-      
-      @bhp.register(p1)
-      @bhp.register(pt)
-      @bhp.register(p3)
-      @bhp.register(xt)
-      
-      assert_equal(pt, @bhp.lookup("t", t))
-      assert_equal(pt, @bhp.lookup("t", "20040104120000"))
-    end
-
     def test_should_find_previous_and_next
-      a = Build.new("test", Time.utc(2004, 01, 01, 12, 00, 00))
-      b = Build.new("test", Time.utc(2004, 01, 04, 12, 00, 00))
+      a = Build.new("test")
+      a.dc_creation_time = Time.new
+      b = Build.new("test")
+      b.dc_creation_time = a.dc_creation_time + 1
       @bhp.register(a)
       @bhp.register(b)
 
@@ -267,19 +234,26 @@ module DamageControl
     end
 
     def test_should_find_previous_successful_build
-      b1 = Build.new("yo", Time.utc(2004, 01, 01, 12, 00, 00))
+      time = Time.new.utc
+      
+      b1 = Build.new("yo")
+      b1.dc_creation_time = time
       b1.status = Build::SUCCESSFUL
 
-      b2 = Build.new("notthis", Time.utc(2004, 01, 01, 12, 00, 01))
+      b2 = Build.new("notthis")
+      b2.dc_creation_time = time + 1
       b2.status = Build::SUCCESSFUL
 
-      b3 = Build.new("yo", Time.utc(2004, 01, 01, 12, 00, 02))
+      b3 = Build.new("yo")
+      b3.dc_creation_time = time + 2
       b3.status = Build::SUCCESSFUL
 
-      b4 = Build.new("yo", Time.utc(2004, 01, 01, 12, 00, 03))
+      b4 = Build.new("yo")
+      b4.dc_creation_time = time + 3
       b4.status = Build::FAILED
 
-      b5 = Build.new("yo", Time.utc(2004, 01, 01, 12, 00, 04))
+      b5 = Build.new("yo")
+      b5.dc_creation_time = time + 4
 
       @bhp.register(b1)
       @bhp.register(b2)
@@ -295,9 +269,12 @@ module DamageControl
     end
 
     def test_to_rss
-      b1 = Build.new("myproject", Time.utc(2004, 9, 3, 15, 0, 0))
+      b1 = Build.new("myproject")
+      b1.dc_creation_time = Time.new.utc
       b1.status = Build::SUCCESSFUL
-      b2 = Build.new("myproject", Time.utc(2004, 9, 4, 15, 0, 0))
+
+      b2 = Build.new("myproject")
+      b2.dc_creation_time = Time.new.utc
       b2.status = Build::FAILED
       @bhp.register(b1)
       @bhp.register(b2)

@@ -66,13 +66,21 @@ module DamageControl
       result = @history[project_name]
       result
     end
-    
+
+    def lookup(project_name, dc_creation_time)
+      dc_creation_time = Time.parse_ymdHMS(dc_creation_time) if dc_creation_time.is_a?(String)
+      history = history(project_name)
+      history.each do |build|start
+        return build if build.dc_creation_time == dc_creation_time
+      end
+      nil
+    end    
+
     def register(build)
       history = history(build.project_name)
       if(history.empty?)
         @history[build.project_name] = history
       end
-
       history << build unless history.index(build)
       if(@project_directories)
         dump(history, build.project_name)
@@ -81,26 +89,6 @@ module DamageControl
     
     def project_names
       @history.keys.sort
-    end
-    
-    # Returns a map of time -> [build]
-    # The time represents a time period of a day, week or month
-    # date_field should be :day, :week or :month
-    def group_by_period(project_name, interval)
-      build_periods = {}
-      build_list = history(project_name)
-      build_list.each do |build|
-        timestamp = build.timestamp_as_time
-        period_number, period_start_date = timestamp.get_period_info(interval)
-        builds_during_that_period = build_periods[period_start_date]
-        if(builds_during_that_period.nil?)
-          builds_during_that_period = []
-          build_periods[period_start_date] = builds_during_that_period
-        end
-
-        builds_during_that_period << build
-      end
-      build_periods
     end
     
     def search(regexp, required_project_name=nil)
@@ -116,15 +104,6 @@ module DamageControl
       result
     end
 
-    def lookup(project_name, timestamp)
-      timestamp = Build.timestamp_to_time(timestamp) if timestamp.is_a?(String)
-      history = history(project_name)
-      history.each do |build|
-        return build if build.timestamp_as_time == timestamp
-      end
-      nil
-    end
-    
     def next(build)
       return nil unless build
       h = history(build.project_name)
@@ -162,6 +141,23 @@ module DamageControl
         end
       end
       rss
+    end
+
+    # should ideally be private, but need access when upgrading formats
+    def dump(history, project_name)
+      # safe writing of history file
+      file = history_file(project_name)
+      writing_file = "#{file}.writing"
+      old_file = "#{file}.old"
+      # writing on temporary file: prepare
+      File.open(writing_file, "w") do |io|
+        YAML::dump(history, io)
+      end
+      # move away old file as backup
+      File.delete(old_file) if File.exist?(old_file)
+      File.move(file, old_file) if File.exist?(file)
+      # rename = semi-atomic operation: commit!
+      File.move(writing_file, file)
     end
 
   private
@@ -213,22 +209,6 @@ module DamageControl
       logger.error("#{filename} can't be parsed. might be of an older format")
       logger.error("Copying it over to #{backup}")
       File.move(filename, backup)
-    end
-
-    def dump(history, project_name)
-      # safe writing of history file
-      file = history_file(project_name)
-      writing_file = "#{file}.writing"
-      old_file = "#{file}.old"
-      # writing on temporary file: prepare
-      File.open(writing_file, "w") do |io|
-        YAML::dump(history, io)
-      end
-      # move away old file as backup
-      File.delete(old_file) if File.exist?(old_file)
-      File.move(file, old_file) if File.exist?(file)
-      # rename = semi-atomic operation: commit!
-      File.move(writing_file, file)
     end
 
     def history_file(project_name)

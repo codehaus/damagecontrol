@@ -90,7 +90,8 @@ module DamageControl
   private
     
     def execute(build)
-      build.start_time = Time.now.utc
+      build.dc_start_time = Time.now.utc
+      
       build.status = Build::BUILDING
       logger.info("Starting build of #{build.project_name}")
       @channel.put(BuildStartedEvent.new(build))
@@ -99,7 +100,7 @@ module DamageControl
       # set up some environment variables the build can use
       environment = { "DAMAGECONTROL_BUILD_LABEL" => label.to_s }
       unless build.changesets.nil?
-        environment["DAMAGECONTROL_CHANGES"] = build.changesets.format(CHANGESET_TEXT_FORMAT, build.start_time)
+        environment["DAMAGECONTROL_CHANGES"] = build.changesets.format(CHANGESET_TEXT_FORMAT, build.dc_start_time)
       end
       report_progress(build.build_command_line)
       begin
@@ -125,7 +126,7 @@ module DamageControl
       ensure
         @build_process = nil
       end
-
+      
       # set the label
       if(build.successful?)
         build.label = label
@@ -148,7 +149,7 @@ module DamageControl
     
     def build_complete(build)
       logger.info("Build complete #{build.project_name}: #{build.status}")
-      build.end_time = Time.now.utc
+      build.duration = Time.now.utc - build.dc_start_time
       @channel.put(BuildCompleteEvent.new(build))
 
       # atomically frees the slot, we are now no longer busy

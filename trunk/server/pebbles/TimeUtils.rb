@@ -1,6 +1,69 @@
+module Pebbles
+  module TimeUtils
+    SECOND =   1
+    MINUTE =  60
+    HOUR   =  60 * MINUTE
+    DAY    =  24 * HOUR
+    WEEK   =   7 * DAY
+    MONTH  =  30 * DAY
+    YEAR   = 365 * DAY
+    YEARS  =   2 * YEAR
+
+    def duration_as_text(duration_secs)
+      case duration_secs
+        when 0                   then "0 seconds"
+        when SECOND              then "#{duration_secs/SECOND} second"
+        when SECOND+1..MINUTE-1  then "#{duration_secs/SECOND} seconds"
+        when MINUTE..2*MINUTE-1  then "#{duration_secs/MINUTE} minute"
+        when 2*MINUTE..HOUR-1    then "#{duration_secs/MINUTE} minutes"
+        when HOUR..2*HOUR-1      then "#{duration_secs/HOUR} hour"
+        when 2*HOUR..DAY-1       then "#{duration_secs/HOUR} hours"
+        when DAY..2*DAY-1        then "#{duration_secs/DAY} day"
+        when 2*DAY..WEEK-1       then "#{duration_secs/DAY} days"
+        when WEEK..2*WEEK-1      then "#{duration_secs/WEEK} week"
+        when 2*WEEK..MONTH-1     then "#{duration_secs/WEEK} weeks"
+        when MONTH..2*MONTH-1    then "#{duration_secs/MONTH} month"
+        when 2*MONTH..YEAR-1     then "#{duration_secs/MONTH} months"
+        when YEAR..2*YEAR-1      then "#{duration_secs/YEAR} year"
+        else                          "#{duration_secs/YEAR} years"
+      end
+    end
+    module_function :duration_as_text
+  end
+end
+
 # Time mixin that adds some additional utility methods
 class Time
+  include Pebbles::TimeUtils
   
+  def Time.parse_ymdHMS(timestamp_as_ymdHMS)
+    Time.utc(
+      timestamp_as_ymdHMS[0..3], # year 
+      timestamp_as_ymdHMS[4..5], # month
+      timestamp_as_ymdHMS[6..7], # day
+      timestamp_as_ymdHMS[8..9], # hour
+      timestamp_as_ymdHMS[10..11], # minute
+      timestamp_as_ymdHMS[12..13] # second
+    )
+  end
+  
+  def to_rss
+    strftime("%a, %d %b %Y %H:%M:%S %Z")
+  end
+  
+  def to_human
+    strftime("%d %b %Y %H:%M:%S")
+  end
+  
+  def ymdHMS
+    strftime("%Y%m%d%H%M%S")
+  end
+  
+  def ==(o)
+    return false unless o.is_a?(Time)
+    ymdHMS == o.ymdHMS
+  end
+
   # In many cases (for example when drawing a graph with 
   # dates along the x-axis) it can be useful to know what
   # month, week or day a certain timestamp is within.
@@ -43,34 +106,10 @@ class Time
     return yday, Time.utc(utc.year, utc.month, utc.day)
   end
 
-  SECOND =   1
-  MINUTE =  60
-  HOUR   =  60 * MINUTE
-  DAY    =  24 * HOUR
-  WEEK   =   7 * DAY
-  MONTH  =  30 * DAY
-  YEAR   = 365 * DAY
-  YEARS  =   2 * YEAR
-
   def difference_as_text(t)
     raise "t must be a time" unless t.is_a?(Time)
     diff = (self - t).to_i
-    case diff
-      when 0                   then "0 seconds"
-      when SECOND              then "#{diff/SECOND} second"
-      when SECOND+1..MINUTE-1  then "#{diff/SECOND} seconds"
-      when MINUTE..2*MINUTE-1  then "#{diff/MINUTE} minute"
-      when 2*MINUTE..HOUR-1    then "#{diff/MINUTE} minutes"
-      when HOUR..2*HOUR-1      then "#{diff/HOUR} hour"
-      when 2*HOUR..DAY-1       then "#{diff/HOUR} hours"
-      when DAY..2*DAY-1        then "#{diff/DAY} day"
-      when 2*DAY..WEEK-1       then "#{diff/DAY} days"
-      when WEEK..2*WEEK-1      then "#{diff/WEEK} week"
-      when 2*WEEK..MONTH-1     then "#{diff/WEEK} weeks"
-      when MONTH..2*MONTH-1    then "#{diff/MONTH} month"
-      when 2*MONTH..YEAR-1     then "#{diff/MONTH} months"
-      when YEAR..2*YEAR-1      then "#{diff/YEAR} year"
-      else                          "#{diff/YEAR} years"
-    end
+    duration_as_text(diff)
   end
+
 end

@@ -21,14 +21,14 @@ module DamageControl
       build_history_repository.__setup(:last_successful_build) {|project_name|
         assert_equal("project", project_name)
         b = Build.new
-        b.start_time = Time.at(0).utc
-        b.end_time = Time.at(30).utc
+        b.dc_start_time = Time.at(0).utc
+        b.duration = 30
         b
       }
       build_history_repository.__setup(:current_build) {|project_name|
         assert_equal("project", project_name)
         b = Build.new
-        b.start_time = Time.at(40).utc
+        b.dc_start_time = Time.at(40).utc
         b
       }
       ps = ProjectStatus.new("project", build_history_repository)
@@ -48,14 +48,14 @@ module DamageControl
       build_history_repository.__setup(:last_completed_build) {|project_name|
         assert_equal("project", project_name)
         b = Build.new
-        b.start_time = Time.at(0).utc
-        b.end_time = Time.at(30).utc
+        b.dc_start_time = Time.at(0).utc
+        b.duration = 30
         b
       }
       build_history_repository.__setup(:current_build) {|project_name|
         assert_equal("project", project_name)
         b = Build.new
-        b.start_time = Time.at(40).utc
+        b.dc_start_time = Time.at(40).utc
         b
       }
       ps = ProjectStatus.new("project", build_history_repository)
@@ -71,14 +71,14 @@ module DamageControl
       build_history_repository.__setup(:last_successful_build) {|project_name|
         assert_equal("project", project_name)
         b = Build.new
-        b.start_time = Time.at(0).utc
-        b.end_time = Time.at(30).utc
+        b.dc_start_time = Time.at(0).utc
+        b.duration = 30
         b
       }
       build_history_repository.__setup(:current_build) {|project_name|
         assert_equal("project", project_name)
         b = Build.new
-        b.start_time = Time.at(40).utc
+        b.dc_start_time = Time.at(40).utc
         b
       }
       ps = ProjectStatus.new("project", build_history_repository)

@@ -158,9 +158,9 @@ module DamageControl
     end
     
     def selected_build
-      timestamp = request.query['timestamp']
-      if timestamp then
-        build_history_repository.lookup(project_name, request.query['timestamp'])
+      dc_creation_time = request.query['dc_creation_time']
+      if dc_creation_time then
+        build_history_repository.lookup(project_name, request.query['dc_creation_time'])
       else
         last_build
       end
