@@ -32,6 +32,12 @@ module RSCM
       "Monotone"
     end
 
+    def add(checkout_dir, relative_filename)
+      with_working_dir(checkout_dir) do
+        monotone("add #{relative_filename}")
+      end
+    end
+
     def create
       FileUtils.mkdir_p(File.dirname(@db_file))
       monotone("db init")
