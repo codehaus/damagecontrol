@@ -4,33 +4,23 @@
 </head>
 <body>
 
-<h1 class="pane"><img src="images/timestampstatus?project_name=<%= project_name %>&timestamp=<%= selected_build.timestamp %>"/> <%= build_description(selected_build) %></h1>
+<h1 class="pane"><img src="images/timestampstatus?project_name=<%= project_name %>&timestamp=<%= selected_build.timestamp %>" width="32" height="32" border="0" /> <%= build_description(selected_build) %></h1>
 
-<table class="tab" nowrap="nowrap" width="100%">
-  <tr>
+<div style="padding-top: 5px">
+<ul id="foldertab">
     <% reports.each do |report| 
       selected = selected_report == report
       %>
-    
       <% if report.available? %>
-        <td valign="center" nowrap="nowrap" <% if selected then %>class="selected_tab"<% else %>class="tab"<% end %>>
-        <% if !selected then %><a href="?project_name=<%= project_name %>&timestamp=<%= selected_build.timestamp %>&report=<%= report.id %>"><% end %>
-        <% if report.icon then %><img valign="center" src="<%= report.icon %>" />&nbsp;<% end %><%= report.title %>
-        <% if !selected then %></a><% end %>
-        </td>
-      <% end %>
-    
+    <li><a href="?project_name=<%= project_name %>&timestamp=<%= selected_build.timestamp %>&report=<%= report.id %>" 
+    <% if selected then %>id="current"<% end %>>
+	<%= report.title %>
+	</a></li>
     <% end %>
-    <td width="100%" class="tab_filler">
-      &nbsp;
-    </td>
-  </tr>
-  <tr>
-    <td colspan="<%= reports.size + 1 %>">
-      <%= selected_report.content %>
-    </td>
-  </tr>
-</table>
+    <% end %>
+</ul>
+</div>
 
+<%= selected_report.content %>
 
 </body></html>

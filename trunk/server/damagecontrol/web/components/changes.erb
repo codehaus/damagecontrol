@@ -1,21 +1,23 @@
-<table class="pane">
 
-  <tr><td class="pane-header" colspan="3">
-    Changes
-  </td></tr>
   <% if(changesets.length == 0)then %>
+<table class="pane">
     <tr>
       <td colspan="3">
         <%= no_changes_in_this_build %>
       </td>
     </tr>
+</table>
   <% else %>
     <%
     changesets.each do |changeset|
     %>
-
+<table class="pane">
       <tr class="pane">
-        <td colspan="3" class="changeset"><%= changeset.developer %> : <%= quote_message(changeset.message) %></td>
+        <td colspan="3" class="changeset">
+	    <div class="changeset-message">
+            <b><%= changeset.developer %>:</b><br>
+	    <%= quote_message(changeset.message) %></div>
+        </td>
       </tr>
       <%
       changeset.each do |change|
@@ -32,8 +34,7 @@
         </td>
       </tr>
       <% end %>
-
+</table>
     <% end %>
   <% end %>
   
-</table>

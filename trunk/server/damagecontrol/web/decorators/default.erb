@@ -1,6 +1,7 @@
 <html>
 <head>
 <link rel="stylesheet" href="css/style.css" type="text/css">
+<link rel="stylesheet" href="css/color.css" type="text/css">
 <% extra_css.each do |css| %>
   <link rel="stylesheet" href="<%= css %>" type="text/css">
 <% end %>
@@ -16,25 +17,32 @@
 
 <body>
 
-<table id="main-table" width="100%" border="0">
+<table id="header" cellpadding="0" cellspacing="0" width="100%" border="0">
 
-<tr><td  id="top-panel" colspan="2">
-<a href="dashboard"><img class="logo" src="images/damagecontrol-logo.png"/></a>
-</td></tr>
-
-<tr id="top-nav">
-	<td id="left-top-nav">
-    <%= breadcrumbs %>
-	</td>
-	<td id="right-top-nav">
-    <% if auto_refresh? %>
-      <a href="<%= auto_refresh_url_prefix %>auto_refresh=false">Turn auto refresh off</a>
-    <% else %>
-      <a href="<%= auto_refresh_url_prefix %>auto_refresh=true">Turn auto refresh on</a>
-    <% end %>
-  </td>
+<tr id="top-panel">
+<td>
+<a href="dashboard"><img class="logo" src="images/damagecontrol-logo.gif"/></a>
+</td>
+<td align="right" valign="bottom" style="vertical-align: bottom;"><%= search_form %></td>
 </tr>
 
+<tr id="top-nav">
+<td id="left-top-nav">
+    <%= breadcrumbs %>
+</td>
+<td id="right-top-nav">
+	<span class="smallfont">
+	REFRESH: 
+	<% if auto_refresh? %>
+      		<span class="greenbold">ON</span> | <a href="<%= auto_refresh_url_prefix %>auto_refresh=false">OFF</a>
+	<% else %>
+		<a href="<%= auto_refresh_url_prefix %>auto_refresh=true">ON</a> | <span class="redbold">OFF</span>
+	<% end %>
+	</span>
+  </td>
+</tr>
+</table>
+<table id="main-table" width="100%" border="0">
 <tr>
 
 <td id="side-panel">
@@ -66,10 +74,10 @@ if(navigation)
 
 </tr>
 
-<tr><td id="footer" colspan="2">
+<tr><td id="footer" colspan="2" background="images/footer_grad.gif">
 This stuff displays best in a Mozilla based browser. Try <a href="http://www.mozilla.org/products/firefox/">Firefox</a>.
 <br>
-<%= html_quote(DamageControl::VERSION_TEXT) %>
+<a href="http://damagecontrol.codehaus.org"><%= html_quote(DamageControl::VERSION_TEXT) %></a>
 </td></tr>
 
 </table>
