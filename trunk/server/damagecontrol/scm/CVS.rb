@@ -236,8 +236,8 @@ module DamageControl
       changesets = nil
 
       execed_command_line = command_line(cvspassword, cmd)
-      cmd_with_io(checkout_dir, execed_command_line, environment) do |io|
-        parser = CVSLogParser.new(io)
+      cmd_with_io(checkout_dir, execed_command_line, environment) do |stdout, stderr|
+        parser = CVSLogParser.new(stdout)
         parser.cvspath = path
         parser.cvsmodule = cvsmodule
         changesets = parser.parse_changesets
