@@ -67,6 +67,8 @@ module DamageControl
             payload << line
           end
         end
+        logger.info("payload:")
+        logger.info(payload)
         begin
           socket.print("DamageControl server on #{get_ip} got message from #{client_ip}\r\n")
           socket.print("http://damagecontrol.codehaus.org/\r\n")
