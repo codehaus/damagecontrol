@@ -31,6 +31,7 @@ module DamageControl
     def setup
       create_hub
       @messages = [1, 2, 3]
+      fail
     end
 
     def test_enqueued_message_processed_on_tick
