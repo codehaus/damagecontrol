@@ -207,7 +207,7 @@ module DamageControl
         changesets = changesets.sort do |a,b|
           a.time <=> b.time
         end
-        current_build.scm_commit_time = changesets[-1] ? changesets[-1].time : nil
+        current_build.scm_commit_time = changesets[-1] ? changesets[-1].time : @build_history_repository.last_commit_time(current_build.project_name)
         logger.info("Done determining changesets for #{current_build.project_name}. Last commit time: #{current_build.scm_commit_time}")
         @channel.put(BuildStateChangedEvent.new(current_build))
       rescue Exception => e

@@ -23,7 +23,7 @@ module DamageControl
       File.new("#{build_dir}/scm_commit_time=#{build.scm_commit_time.ymdHMS}", File::CREAT).close if build.scm_commit_time
       File.new("#{build_dir}/dc_start_time=#{build.dc_start_time.ymdHMS}", File::CREAT).close if build.dc_start_time
       File.open("#{build_dir}/changesets.yaml", File::CREAT | File::WRONLY) do |io|
-       YAML::dump(build.changesets, io)
+        YAML::dump(build.changesets, io)
       end
     end
     

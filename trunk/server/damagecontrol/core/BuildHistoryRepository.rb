@@ -75,6 +75,15 @@ module DamageControl
       nil
     end
     
+    # returns the commit time for the last build that had a registered commit time.
+    def last_commit_time(project_name)
+      build_dirs(project_name).reverse.each do |build_dir|
+        build = @build_serializer.load(build_dir, false)
+        return build.scm_commit_time if build.scm_commit_time
+      end
+      nil
+    end
+    
     def last_successful_build(project_name, with_changesets=false)
       build_dirs(project_name).reverse.each do |build_dir|
         build = @build_serializer.load(build_dir, with_changesets)
