@@ -78,7 +78,7 @@ module DamageControl
       
       project_name = "DamageControlled"
       spec = ":local:#{testrepo}:damagecontrolled"
-      build_command = "ant"
+      build_command = "echo hello"
 
       expected = "#{project_name},#{spec},#{build_command},."
       mock_server = start_mock_server(self, expected)
