@@ -88,7 +88,7 @@ module RSCM
     #
     # This method should be overridden for SCMs that are able to yield checkouts as they happen.
     # For some SCMs this is not possible, or at least very hard. In that case, just override
-    # the checkout_silent method (should be protected).
+    # the checkout_silent method instead of this method (should be protected).
     def checkout(checkout_dir, to_identifier=Time.infinity) # :yield: file
       before = Dir["#{checkout_dir}/**/*"]
 
