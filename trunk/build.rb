@@ -7,9 +7,9 @@ class Project
     $damagecontrol_home = File::expand_path(".")
   end
   
-  def run_test(test)
+  def execute(test, safe_level=0)
     Dir.chdir("#{$damagecontrol_home}/server")
-    system("ruby -I. #{test}") || fail
+    system("ruby -I. -T#{safe_level} #{test}") || fail
     fail if ($? != 0)
   end
 
@@ -19,11 +19,11 @@ class Project
   end
 
   def unit_test
-    run_test("damagecontrol/test/AllTests.rb")
+    execute("damagecontrol/test/AllTests.rb")
   end
 
   def integration_test
-    run_test("damagecontrol/test/End2EndTest.rb")
+    execute("damagecontrol/test/End2EndTest.rb")
   end
   
   def all
@@ -33,6 +33,10 @@ class Project
   
   def default
     all
+  end
+
+  def server
+    execute("damagecontrol/DamageControlServer.rb")
   end
   
   def run(args)

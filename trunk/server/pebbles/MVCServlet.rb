@@ -10,15 +10,31 @@ module Pebbles
       self
     end
     
+    def content_type
+      "text/html"
+    end
+    
+    def actions
+      self.public_methods - self.class.superclass.public_instance_methods
+    end
+    
+    def send(method, *args)
+      raise SecurityError, "Insecure operatiton: #{method}" if method.tainted? || args.tainted?
+      super(method, *args)
+    end
+    
     def service(req, res)
       Thread.current["request"] = req
       Thread.current["response"] = res
       action = req.query['action'] || "default_action"
       
+      response["Content-Type"] = content_type
+      
       begin
-        self.send(action) 
+        raise "no such action: #{action}" unless actions.index(action)
+        self.send(action.untaint)
       rescue Exception => e
-        response.body = "<html><body><pre>" + e.message + "\n" + e.backtrace.join("\n") + "</pre></body></html>" 
+        response.body = "<html><body><pre>" + e.class.name + ": " + e.message + "\n" + e.backtrace.join("\n\t") + "</pre></body></html>" 
       end
     end
     
@@ -42,8 +58,10 @@ module Pebbles
     
     def erb(template, binding)
       response["Content-Type"] = "text/html"
-      puts templatedir
-      template = File.new("#{templatedir}/#{template}").read
+      template = ""
+      File.open("#{templatedir}/#{template}") do |io|
+        template = io.read.untaint
+      end
       response.body = ERB.new(template).result(binding)
     end
   end

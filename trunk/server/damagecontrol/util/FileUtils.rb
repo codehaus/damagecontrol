@@ -43,8 +43,8 @@ module FileUtils
   end
     
   def damagecontrol_home
-    $damagecontrol_home = find_damagecontrol_home if $damagecontrol_home.nil?
-    $damagecontrol_home 
+    $damagecontrol_home = find_damagecontrol_home.untaint if $damagecontrol_home.nil?
+    $damagecontrol_home
   end
     
   def find_damagecontrol_home(path='.')
