@@ -80,9 +80,8 @@ module Pebbles
         else
           ret = yield stdin, stdout, stderr
         end
-        wait
       ensure
-        close_all_streams
+        wait
       end
       raise ProcessFailedException.new(
         "\n\nThe command\n#{command_line}\nrun from directory\n#{working_dir}\nfailed with process return code\n#{exit_code.to_s}\n" +
