@@ -12,14 +12,14 @@ module DamageControl
       attr_accessor :delivery_method
 
       ann :description => "Recipients (comma separated)"
-      attr_accessor :recipients
+      attr_accessor :to
 
       ann :description => "Who sends the email"
       attr_accessor :from
       
       def initialize
         @delivery_method = "sendmail"
-        @recipients = ""
+        @to = ""
         @from = "\"DamageControl\" <dcontrol@codehaus.org>"
       end
       
@@ -36,9 +36,9 @@ module DamageControl
 
     class BuildMailer < ActionMailer::Base
       def email(build, email_publisher, foo=nil, bar=nil)
-        Log.info("Sending email to #{email_publisher.recipients.inspect}")
         @delivery_method = email_publisher.delivery_method
-        @recipients = email_publisher.recipients.split(%r{,\s*})
+        Log.info("Sending email to #{email_publisher.to.inspect} via #{@delivery_method}")
+        @recipients = email_publisher.to.split(%r{,\s*})
 
         @from = email_publisher.from
 

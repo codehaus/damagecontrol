@@ -167,12 +167,14 @@ module DamageControl
       assert_equal(Time.utc(1971,2,28,23,45,33), p.start_time)
     end
     
-    def TODO_test_should_support_template_cloning
-      template = Project.new
-      template.home_page = "http://#" + "{blah}.codehaus.org"
-      clone = template.dupe("blah" => "aslak")
-      
-      assert_equal("http://aslak.codehaus.org", clone.home_page);
+    def test_should_support_template_cloning
+      # Create a template object
+      template_project = Project.new
+      template_project.home_page = "http://\#{unix_name}.codehaus.org"
+
+      # Create a duplicate from the template object
+      dupe = template_project.dupe("unix_name" => "mooky")      
+      assert_equal("http://mooky.codehaus.org", dupe.home_page);
     end
   end
 end

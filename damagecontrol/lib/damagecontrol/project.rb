@@ -12,9 +12,21 @@ require 'damagecontrol/visitor/diff_persister'
 require 'damagecontrol/visitor/rss_writer'
 require 'damagecontrol/publisher/base'
 
+module ObjectTemplate
+  def dupe(variables)
+    template_yaml = YAML::dump(self)
+    b = binding
+    variables.each { |key, value| eval "#{key} = variables[\"#{key}\"]", b }
+    new_yaml = eval(template_yaml.dump.gsub(/\\#/, "#"), b)
+    YAML::load(new_yaml)
+  end
+end
+
 module DamageControl
   # Represents a project with associated SCM, Tracker and SCMWeb
   class Project
+    include ObjectTemplate
+  
     # TODO: move to scms? not sure....
     DEFAULT_QUIET_PERIOD = 10 unless defined? DEFAULT_QUIET_PERIOD
 
@@ -257,13 +269,6 @@ module DamageControl
     
     # Creates a duplicate of ourself, applying simple standard #{blah}
     # transformations of all key,value pairs in +local_assigns+.
-    def dupe(local_assigns)
-      yaml = YAML::dump(self)
-      b = binding
-      local_assigns.each { |key, value| eval "#{key} = local_assigns[\"#{key}\"]", b }
-      new_yaml = eval("\"#{yaml}\"", b)
-      YAML::load(new_yaml)
-    end
 
   private
 
