@@ -14,7 +14,6 @@ import com.starbase.starteam.ViewConfiguration;
 import com.starbase.util.OLEDate;
 import org.apache.tools.ant.BuildEvent;
 import org.apache.tools.ant.BuildListener;
-import org.apache.tools.ant.DefaultLogger;
 import org.apache.tools.ant.Project;
 import org.apache.tools.ant.Target;
 import org.apache.tools.ant.Task;
@@ -159,8 +158,8 @@ public class StarTeam implements RSCM {
                 Folder fromRoot = StarTeamFinder.findFolder(fromRootFolder, folderName);
                 fromRoot.populateNow(server.getTypeNames().FILE, propertiesToCache, -1);
                 recurse(fromFiles, fromRoot);
-            } catch (Exception e) {
-                e.printStackTrace();
+            } catch (com.starbase.starteam.ServerException ignore) {
+                // This typically happens when fromTime is epoch. We can live without recurse the first time.
             }
 
             compareFileLists(fromFiles, toFiles, changeSets, fromDate, toDate);
@@ -176,8 +175,8 @@ public class StarTeam implements RSCM {
     private void antInit(Task task, BuildListener buildListener) {
         Project project = new Project();
         project.init();
-        final DefaultLogger defaultLogger = new DefaultLogger();
-        defaultLogger.setOutputPrintStream(System.out);
+//        final DefaultLogger defaultLogger = new DefaultLogger();
+//        defaultLogger.setOutputPrintStream(System.out);
 //        project.addBuildListener(defaultLogger);
         project.addBuildListener(buildListener);
         task.setProject(project);
@@ -237,11 +236,14 @@ public class StarTeam implements RSCM {
                         java.io.File file = new java.io.File(fileSystemPath);
                         if (file.isFile()) {
                             String starTeamPath = (String) checkedOutStarTeamFileToFileSystemFiles.remove(fileSystemPath);
+System.out.println(starTeamPath);
+System.err.println(starTeamPath);
                             if(starTeamPath != null) {
                                 checkedOutFiles.add(starTeamPath);
                                 // Print to stdout so it can be intercepted
                                 // by Ruby and yielded.
                                 System.out.println(starTeamPath);
+                                System.err.println(starTeamPath);
                             }
                         }
                     }
@@ -255,6 +257,7 @@ public class StarTeam implements RSCM {
 
         checkout.setRootLocalFolder(dir);
         checkout.execute();
+        System.out.println("**********");
         return checkedOutFiles;
     }
 
