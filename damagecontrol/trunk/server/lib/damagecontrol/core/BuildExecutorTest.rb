@@ -51,9 +51,10 @@ module DamageControl
       channel.start
       
       build_history_repository = new_mock
+      project_directories= new_mock
       logdir = new_temp_dir
-      build_history_repository.__expect(:stdout_file) {"#{logdir}/stdout.log"}
-      build_history_repository.__expect(:stderr_file) {"#{logdir}/stderr.log"}
+      project_directories.__expect(:stdout_file) {"#{logdir}/stdout.log"}
+      project_directories.__expect(:stderr_file) {"#{logdir}/stderr.log"}
       build_history_repository.__expect(:last_completed_build) {nil}
 
       project_config_repository = new_mock
@@ -65,7 +66,8 @@ module DamageControl
         'executor1', 
         channel, 
         project_config_repository,
-        build_history_repository
+        build_history_repository,
+        project_directories
       )
       # Make it run in a separate thread
       @build_executor.start
@@ -121,13 +123,14 @@ module DamageControl
       @build.scm = mock_scm
 
       build_history_repository = new_mock
+      project_directories= new_mock
       basedir = new_temp_dir
       logdir = "#{basedir}/logs"
       checkout_dir = "#{basedir}/checkout"
       mkdir_p(logdir)
       mkdir_p(checkout_dir)
-      build_history_repository.__expect(:stdout_file) {"#{logdir}/stdout.log"}
-      build_history_repository.__expect(:stderr_file) {"#{logdir}/stderr.log"}
+      project_directories.__expect(:stdout_file) {"#{logdir}/stdout.log"}
+      project_directories.__expect(:stderr_file) {"#{logdir}/stderr.log"}
 
       build_history_repository.__expect(:last_completed_build) { |project_name|
         assert_equal("damagecontrolled", project_name)
@@ -139,7 +142,8 @@ module DamageControl
         'executor1', 
         channel, 
         new_mock.__setup(:checkout_dir) {checkout_dir}.__expect(:peek_next_build_label) {23}.__expect(:inc_build_label) {23},
-        build_history_repository
+        build_history_repository,
+        project_directories
       )
       @build_executor.on_message(@build)
     end
@@ -151,13 +155,14 @@ module DamageControl
       mock_scm.__expect(:label) {"23"}
 
       build_history_repository = new_mock
+      project_directories= new_mock
       basedir = new_temp_dir
       logdir = "#{basedir}/logs"
       checkout_dir = "#{basedir}/checkout"
       mkdir_p(logdir)
       mkdir_p(checkout_dir)
-      build_history_repository.__expect(:stdout_file) {"#{logdir}/stdout.log"}
-      build_history_repository.__expect(:stderr_file) {"#{logdir}/stderr.log"}
+      project_directories.__expect(:stdout_file) {"#{logdir}/stdout.log"}
+      project_directories.__expect(:stderr_file) {"#{logdir}/stderr.log"}
       build_history_repository.__expect(:last_completed_build) { |project_name|
         assert_equal("damagecontrolled", project_name)
         b = Build.new("damagecontrolled")
@@ -178,7 +183,8 @@ module DamageControl
         'executor1', 
         channel, 
         new_mock.__setup(:checkout_dir) {checkout_dir}.__expect(:peek_next_build_label){-1},
-        build_history_repository
+        build_history_repository,
+        project_directories
       )
 
       @build = Build.new("damagecontrolled", { "build_command_line" => "bad_command"})
@@ -197,9 +203,11 @@ module DamageControl
       current_build_time = Time.utc(2004, 04, 02, 13, 00, 00)
       
       build_history_repository = new_mock
+      project_directories= new_mock
+
       logdir = new_temp_dir
-      build_history_repository.__expect(:stdout_file) {"#{logdir}/stdout.log"}
-      build_history_repository.__expect(:stderr_file) {"#{logdir}/stderr.log"}
+      project_directories.__expect(:stdout_file) {"#{logdir}/stdout.log"}
+      project_directories.__expect(:stderr_file) {"#{logdir}/stderr.log"}
       build_history_repository.__expect(:last_completed_build) { |project_name|
         assert_equal("damagecontrolled", project_name)
         b = Build.new("damagecontrolled")
@@ -256,7 +264,8 @@ module DamageControl
         'executor1', 
         channel, 
         new_mock.__setup(:checkout_dir) { checkout_dir }.__expect(:peek_next_build_label){-1},
-        build_history_repository
+        build_history_repository,
+        project_directories
       )
       @build = Build.new("damagecontrolled",
         { "build_command_line" => windows? ? "cmd /C echo hello world" : "echo hello world"})
@@ -270,7 +279,7 @@ module DamageControl
     end
     
     def test_can_execute_builds_with_matching_executor_selector
-      e = BuildExecutor.new("executor1", new_mock, new_mock, new_mock)
+      e = BuildExecutor.new("executor1", new_mock, new_mock, new_mock, new_mock)
       assert(e.can_execute?(@build))
       @build.config["executor_selector"] = ".*"
       assert(e.can_execute?(@build))

@@ -86,7 +86,7 @@ fl = FileList.new(test_file_pattern)
 
 desc "Run Unit Tests"
 Rake::TestTask.new :unit_test do |t|
-  t.libs << "lib"
+#  t.libs << "."
   t.test_files = fl
   t.verbose = true
 end

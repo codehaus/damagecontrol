@@ -1,9 +1,13 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<rss version="2.0">
+<rss version="2.0"
+  xmlns:trackback="http://madskills.com/public/xml/rss/module/trackback/">
   <channel>
     <title>TestProject builds</title>
     <link>project/TestProject</link>
     <description>TestProject builds</description>
+
     <generator>DamageControl</generator>
+
+
   </channel>
 </rss>

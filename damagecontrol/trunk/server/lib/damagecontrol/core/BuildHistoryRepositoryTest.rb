@@ -1,5 +1,6 @@
 require 'yaml'
 require 'test/unit' 
+require 'rexml/document' 
 require 'pebbles/mockit' 
 require 'damagecontrol/core/BuildHistoryRepository'
 
@@ -28,7 +29,12 @@ module DamageControl
       bhr.register(build)
 
       expected_rss = File.dirname(__FILE__) + "/TestProject/rss.xml"
-      assert_equal(File.open(expected_rss).read, File.open("#{basedir}/rss.xml").read)
+      x = ""
+      REXML::Document.new(File.open(expected_rss).read).write(x, -1)
+
+      a = ""
+      REXML::Document.new(File.open("#{basedir}/rss.xml").read).write(a, -1)
+      assert_equal(x, a)
     end
     
     def test_should_lookup_build_by_dc_creation_time
