@@ -1,3 +1,4 @@
+require 'damagecontrol/scm/Changes'
 require 'damagecontrol/util/FileUtils'
 require 'damagecontrol/util/Logging'
 require 'ftools'
@@ -12,6 +13,7 @@ module DamageControl
   
     include FileUtils
     include Logging
+    include ChangeUtils
     
     attr_reader :cvsroot
     
@@ -50,24 +52,12 @@ module DamageControl
           parser = CVSLogParser.new
           parser.cvspath = path
           parser.cvsmodule = mod
-          parser.parse_log(io)
+          parser.parse_changes_from_log(io)
         end
       end
-      
-      result = []
-      last_change = nil
-      all_changes.each do |change|
-        diff = change.time-from_time
-        if(diff > -1)
-          result << change
-          last_change = change
-        end
-        # find the previous revision
-        if(last_change && (last_change.path == change.path) && (last_change.revision != change.revision) && last_change.previous_revision.nil?)
-          last_change.previous_revision = change.revision
-        end
-      end
-      result
+      changes_within_period = changes_within_period(all_changes, from_time, to_time)
+      changes_within_period
+#      convert_changes_to_changesets(changes_within_period)
     end
     
     def changes_command(from_time, to_time)
@@ -152,7 +142,7 @@ module DamageControl
           file.puts(File.basename(trigger_script_name))
         end
 
-        system("cvs commit -m \"Installed damagecontrol trigger for #{project_name}\"")
+        system("cvs commit -m \"Installed CamageControl nudger for #{project_name}\"")
       end
     end
     
@@ -238,6 +228,7 @@ puts result
         "ruby"
       else
         "/home/services/dcontrol/ruby/bin/ruby"
+#        "ruby"
       end
     end
     
@@ -291,16 +282,16 @@ puts "executing #{cmd}"
       @log = ""
     end
   
-    def parse_log(io)
-      modifications = []
+    def parse_changes_from_log(io)
+      changes = []
       while(log_entry = read_log_entry(io))
         begin
-          modifications += parse_modifications(log_entry)
+          changes += parse_changes(log_entry)
         rescue Exception => e
           logger.error("could not parse log entry: #{log_entry.inspect}\ndue to: #{format_exception(e)}")
         end
       end
-      modifications
+      changes
     end
     
     def read_log_entry(io)
@@ -326,7 +317,7 @@ puts "executing #{cmd}"
       entries
     end
     
-    def parse_modifications(log_entry)
+    def parse_changes(log_entry)
       entries = split_entries(log_entry)
 
       file = nil
@@ -340,15 +331,15 @@ puts "executing #{cmd}"
       end
       logger.error("could not find path: #{entries[0]}") if file.nil?
       
-      modifications = []
+      changes = []
       
       entries[1..entries.length].each do |entry|
-        modification = parse_modification(entry)
-        modification.path = make_relative_to_module(file)
-        modifications<<modification
+        change = parse_change(entry)
+        change.path = make_relative_to_module(file)
+        changes<<change
       end
       
-      modifications
+      changes
     end
     
     attr_accessor :cvspath
@@ -361,18 +352,18 @@ puts "executing #{cmd}"
       file.gsub(/\\/, "/").gsub(/^#{cvspath}\/#{cvsmodule}\//, "")
     end
     
-    def parse_modification(modification_entry)
-      raise "can't parse: #{modification_entry}" if modification_entry=~/-------*/
+    def parse_change(change_entry)
+      raise "can't parse: #{change_entry}" if change_entry=~/-------*/
       
-      modification_entry = modification_entry.split(/\r?\n/)
-      modification = Modification.new
+      change_entry = change_entry.split(/\r?\n/)
+      change = Change.new
       
-      modification.revision = extract_match(modification_entry[0], /revision (.*)/)
-      modification.time = parse_cvs_time(extract_match(modification_entry[1], /date: (.*?);/))
-      modification.developer = extract_match(modification_entry[1], /author: (.*?);/)
-      modification.message = modification_entry[2..-1].join("\n")
+      change.revision = extract_match(change_entry[0], /revision (.*)/)
+      change.time = parse_cvs_time(extract_match(change_entry[1], /date: (.*?);/))
+      change.developer = extract_match(change_entry[1], /author: (.*?);/)
+      change.message = change_entry[2..-1].join("\n")
       
-      modification
+      change
     end
     
     def parse_cvs_time(time)
@@ -384,7 +375,7 @@ puts "executing #{cmd}"
       if entry_line=~regexp
         return($1)
       else
-        logger.error("can't parse modification: #{entry_line}\nexpected to match regexp: #{regexp.to_s}\nline: #{@current_line}\ncvs log:\n#{@log}")
+        logger.error("can't parse change: #{entry_line}\nexpected to match regexp: #{regexp.to_s}\nline: #{@current_line}\ncvs log:\n#{@log}")
       end
     end
     

@@ -20,6 +20,10 @@ module DamageControl
         path, developer, message, revision, time
     end
   
+    def to_s
+      "#{path} #{developer} #{revision} #{time}"
+    end
+  
     attr_accessor :path
     attr_accessor :developer
     attr_accessor :message
@@ -40,12 +44,14 @@ module DamageControl
   end
 
   module ChangeUtils
-    def changes_within_period(changes, from_time, end_time)
+    def changes_within_period(changes, from_time, to_time)
+puts "                                       #{from_time} #{to_time}"
       changes_within_period = []
       last_change = nil
       changes.each do |change|
-        above = end_time - change.time
+        above = to_time - change.time
         below = change.time - from_time
+puts "#{change} #{below} #{above}"
         if(0 <= above && 0 <= below)
           changes_within_period << change
           last_change = change

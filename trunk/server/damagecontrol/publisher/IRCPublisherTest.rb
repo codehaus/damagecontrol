@@ -1,6 +1,7 @@
 require 'test/unit'
 require 'pebbles/mockit'
 require 'damagecontrol/publisher/IRCPublisher'
+require 'damagecontrol/scm/Changes'
 require 'damagecontrol/core/Hub'
 require 'damagecontrol/core/Build'
 require 'damagecontrol/util/FileUtils'
@@ -46,10 +47,10 @@ module DamageControl
     def test_formats_changeset_according_to_changeset
       changeset = 
         [
-          Modification.new("file1.txt", "jtirsen", "change1"),
-          Modification.new("file2.txt", "jtirsen", "change1"),
-          Modification.new("file3.txt", "jtirsen", "change2"),
-          Modification.new("file4.txt", "rinkrank", "change2"),
+          Change.new("file1.txt", "jtirsen", "change1"),
+          Change.new("file2.txt", "jtirsen", "change1"),
+          Change.new("file3.txt", "jtirsen", "change2"),
+          Change.new("file4.txt", "rinkrank", "change2"),
         ]
       expexted_format =
       [
@@ -78,7 +79,7 @@ module DamageControl
       @publisher.send_message_on_build_request = true
       
       build = Build.new("project")
-      build.modification_set = [Modification.new("file.txt", "jtirsen")]
+      build.modification_set = [Change.new("file.txt", "jtirsen")]
       @publisher.enq_message(BuildRequestEvent.new(build))
       @publisher.enq_message(BuildStartedEvent.new(build))
       @publisher.process_messages

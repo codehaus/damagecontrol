@@ -1,5 +1,6 @@
 require 'test/unit'
 require 'mock_with_returns'
+require 'damagecontrol/scm/Changes'
 require 'damagecontrol/core/BuildEvents'
 require 'damagecontrol/core/Build'
 require 'damagecontrol/core/Hub'
@@ -28,7 +29,7 @@ module DamageControl
       build = Build.new("test_project", Time.now, {"jira_project_key" => "DC"})
       build.status = Build::FAILED
       build.label = "99"
-      mod = Modification.new()
+      mod = Change.new()
       mod.developer = "damagecontrol"
       build.modification_set <<  mod
       

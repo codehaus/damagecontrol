@@ -3,31 +3,6 @@ require 'xmlrpc/utils'
 
 module DamageControl
 
-  class Modification
-    def initialize(path="", developer="", message="", revision="", time="")
-      self.path, self.developer, self.message, self.revision, self.time = 
-        path, developer, message, revision, time
-    end
-  
-    attr_accessor :path
-    attr_accessor :developer
-    attr_accessor :message
-    attr_accessor :revision
-    attr_accessor :previous_revision
-    # This is an UTC ruby time
-    attr_accessor :time
-    
-    def message=(message)
-      raise "can't be null" if message.nil?
-      @message = message
-    end
-
-    def developer=(developer)
-      raise "can't be null" if developer.nil?
-      @developer = developer
-    end
-  end
-
   class Build
     include XMLRPC::Marshallable
 
