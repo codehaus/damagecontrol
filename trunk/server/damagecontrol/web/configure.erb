@@ -1,7 +1,7 @@
 <html><body>
 
 <form>
-<input type="hidden" name="command" value="<%= command %>" />
+<input type="hidden" name="action" value="<%= action %>" />
 
 <table>
 <tr>
@@ -9,7 +9,7 @@
   <td><input name="project_name" type="text" value="<%= project_name %>"/></td>
 </tr>
 <tr>
-  <td>Build Command</td>
+  <td>Build action</td>
   <td><input name="build_command_line" type="text" value="<%= project_config["build_command_line"] %>"/></td>
 </tr>
 <tr>

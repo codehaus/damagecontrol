@@ -138,11 +138,6 @@
                     BuildAction = "Compile"
                 />
                 <File
-                    RelPath = "ConnectionMethod.cs"
-                    SubType = "Code"
-                    BuildAction = "Compile"
-                />
-                <File
                     RelPath = "DCTray.sln"
                     BuildAction = "Content"
                 />

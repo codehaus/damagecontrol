@@ -60,6 +60,7 @@ module DamageControl
       config = YAML::load(eof_stripped)
       raise InvalidProjectConfiguration.new(config_content) unless config.is_a? Hash
       config.each do |key, value|
+        break if value.nil?
         value.gsub!(/_pserver:/, ":pserver:")
         value.gsub!(/_local:/, ":local:")
         value.gsub!(/_ext:/, ":ext:")

@@ -13,13 +13,23 @@ module Pebbles
     def service(req, res)
       Thread.current["request"] = req
       Thread.current["response"] = res
-      command = req.query['command'] || "default_command"
+      action = req.query['action'] || "default_action"
       
       begin
-        self.send(command) 
+        self.send(action) 
       rescue Exception => e
         response.body = "<html><body><pre>" + e.message + "\n" + e.backtrace.join("\n") + "</pre></body></html>" 
       end
+    end
+    
+    def action_redirect(action_name, params)
+      params_enc = params.collect {|key, value| "#{key}=#{value}" }.join("&")
+      redirect("#{request.path}?action_name=#{action_name}&#{params_enc}")
+    end
+    
+    def redirect(url)
+      response["Location"] = url
+      response.status = WEBrick::HTTPStatus::Found.code
     end
     
     def request

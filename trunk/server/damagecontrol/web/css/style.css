@@ -1,0 +1,18 @@
+body {
+color: #000000;
+background-color: #ffffff;
+font-family: Verdana, Helvetica, sans serif;
+font-size: 0.8em;
+text-align: left;}
+
+a:link {
+color: #0000ff;
+background-color: #ffffff;
+text-decoration: underline;}
+
+a:hover {color: #ff0000;
+background-color: #ffffff;
+text-decoration: underline;}
+
+img {
+vertical-align: middle;}

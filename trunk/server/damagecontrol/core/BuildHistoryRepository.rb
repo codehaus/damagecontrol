@@ -41,7 +41,7 @@ module DamageControl
     end
     
     def last_completed_build(project_name)
-      patch_build(build_history(project_name).reverse.find {|build| build.is_completed?})
+      patch_build(build_history(project_name).reverse.find {|build| build.completed?})
     end
     
     def last_succesful_build(project_name)
@@ -102,8 +102,13 @@ module DamageControl
       return [] unless @builds.has_key?(project_name)
       @builds[project_name]
     end
+    
+    def project_names
+      get_project_names
+    end
 
-    def get_project_names()
+    # TODO: get_xxx is not idiomatic to ruby
+    def get_project_names
       @builds.keys
     end
 

@@ -18,6 +18,7 @@ require 'damagecontrol/xmlrpc/ConnectionTester'
 require 'damagecontrol/xmlrpc/ServerControl'
 require 'damagecontrol/core/HostVerifier'
 require 'damagecontrol/web/ProjectServlet'
+require 'damagecontrol/web/DashboardServlet'
 
 module DamageControl
   class DamageControlServer
@@ -92,31 +93,40 @@ module DamageControl
       component(:host_verifier, if allow_ips.nil? then OpenHostVerifier.new else HostVerifier.new(allow_ips) end)
       
       component(:socket_trigger, SocketTrigger.new(@hub, socket_trigger_port, host_verifier))
-    
-      public_xmlrpc_servlet = ::XMLRPC::WEBrickServlet.new
-      private_xmlrpc_servlet = ::XMLRPC::WEBrickServlet.new
-      
-      component(:trigger, DamageControl::XMLRPC::Trigger.new(private_xmlrpc_servlet, @hub, project_config_repository))
-      
-      DamageControl::XMLRPC::StatusPublisher.new(public_xmlrpc_servlet, build_history_repository)
-      DamageControl::XMLRPC::ServerControl.new(private_xmlrpc_servlet)
-      DamageControl::XMLRPC::ConnectionTester.new(public_xmlrpc_servlet)
-      
+          
       init_build_scheduler
       
+      init_webserver
+      
+      init_custom_components
+    end
+    
+    def init_webserver
       component(:httpd, WEBrick::HTTPServer.new(
         :Port => http_port, 
         :RequestHandler => HostVerifyingHandler.new(host_verifier)
       ))
       
+      public_xmlrpc_servlet = ::XMLRPC::WEBrickServlet.new
+      DamageControl::XMLRPC::StatusPublisher.new(public_xmlrpc_servlet, build_history_repository)
+      DamageControl::XMLRPC::ConnectionTester.new(public_xmlrpc_servlet)
       # For public unauthenticated XML-RPC connections like getting status
       httpd.mount("/public/xmlrpc", public_xmlrpc_servlet)
+      
+      private_xmlrpc_servlet = ::XMLRPC::WEBrickServlet.new
+      DamageControl::XMLRPC::ServerControl.new(private_xmlrpc_servlet)
+      component(:trigger, DamageControl::XMLRPC::Trigger.new(private_xmlrpc_servlet, @hub, project_config_repository))
       # For private authenticated and encrypted (with eg an Apache proxy) XML-RPC connections like triggering a build
       httpd.mount("/private/xmlrpc", private_xmlrpc_servlet)
 
-      httpd.mount("/private/admin", ProjectServlet.new(build_history_repository, project_config_repository, trigger))
+      httpd.mount("/private/dashboard", DashboardServlet.new(build_history_repository, project_config_repository))
+      httpd.mount("/private/project", ProjectServlet.new(build_history_repository, project_config_repository, trigger))
       
-      init_custom_components
+      webdir = "#{damagecontrol_home}/server/damagecontrol/web"
+      httpd.mount("/public/images", WEBrick::HTTPServlet::FileHandler, "#{webdir}/images")
+      httpd.mount("/private/images", WEBrick::HTTPServlet::FileHandler, "#{webdir}/images")
+      httpd.mount("/public/css", WEBrick::HTTPServlet::FileHandler, "#{webdir}/css")
+      httpd.mount("/private/css", WEBrick::HTTPServlet::FileHandler, "#{webdir}/css")
     end
     
     def checkoutdir

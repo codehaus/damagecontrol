@@ -21,8 +21,6 @@ namespace ThoughtWorks.DamageControl.DCTray
 
 		public Messages Messages = new Messages();
 
-		public ConnectionMethod ConnectionMethod;
-
 		public bool ShowExceptions = true;
 
 		public Settings()
@@ -35,7 +33,6 @@ namespace ThoughtWorks.DamageControl.DCTray
 
 			defaults.ProjectName = "ProjectName";
 
-			defaults.ConnectionMethod = ConnectionMethod.Remoting;
 			defaults.ShowExceptions = true;
 
 			defaults.Sounds = Sounds.CreateDefaultSettings();

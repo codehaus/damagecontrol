@@ -1,16 +1,57 @@
-<html><body>
+<html>
+<head>
+<title>Dashboard</title>
+<link type="text/css" rel="stylesheet" href="css/style.css">
+</head>
+<body>
 
-<table>
-<tr><td>Project Name</td><td><%= project_name %></td></tr>
-<tr><td>CVSROOT</td><td><%= cvsroot %></td></tr>
-<tr><td>Last completed build status</td><td><%= last_status %><br/></td></tr>
-<tr><td>Current build status</td><td><%= current_status %></td></tr>
-</table>
+	<%
+	
+		projects = build_history_repository.project_names
+		
+	%>
+	<table class="dashboard">
+		<tr class="dashboard">
+			<%
+			
+			projects.each do |project|
+			
+				href = "project?project_name=#{project}"
+				color = if build_history_repository.last_completed_build(project).successful? then "green" else "red" end
+				pulse = if build_history_repository.current_build(project).completed? then "" else "-pulse" end
+				image = "images/#{color}#{pulse}-32.gif"
+			%>
+			
+				<td class="dashboard">
+				<img src="<%= image %>" /> <a href="<%= href %>"><%= project %></a>
+				</td>
+			
+			<%
+			end
+			%>
+		</tr>
+		<% if false then %>
+		<tr class="dashboard">
+			<td class="dashboard">
+			<img src="images/red-pulse-32.gif" /> <a href="project">project1</a>
+			</td>
+			<td class="dashboard">
+			<img src="images/red-32.gif" /> <a href="project">project1</a>
+			</td>
+			<td class="dashboard">
+			<img src="images/green-pulse-32.gif" /> <a href="project">project1</a>
+			</td>
+			<td class="dashboard">
+			<img src="images/green-32.gif" /> <a href="project">project1</a>
+			</td>
+		</tr>
+		<% end %>
+	</table>
+	
+	Tasks:
+	<ul>
+	<li><a href="project?action=configure">New Project</a></li>
+	</ul>
 
-Tasks:
-<ul>
-<li><a href="?project_name=<%= project_name %>&command=configure">Configure</a></li>
-<li><a href="?project_name=<%= project_name %>&command=trig_build">Trig build now</a></li>
-</ul>
-
-</body></html>
+</body>
+</html>

@@ -232,20 +232,16 @@ namespace ThoughtWorks.DamageControl.DCTray
 		
 		ProjectStatus GetRemoteProjectStatus(string projectName)
 		{
-			BuildStatus currentBuildStatus = BuildStatus.Unknown;
-			BuildStatus buildStatus = BuildStatus.Unknown;
-
-			Hashtable currentBuildStatusRaw = CallDamageControlServer("status.get_current_build", projectName);
 			Hashtable buildStatusRaw = CallDamageControlServer("status.get_last_completed_build", projectName);
-			DumpHashtable("current", currentBuildStatusRaw);
-			DumpHashtable("last", currentBuildStatusRaw);
-
-			currentBuildStatus = ToBuildStatus((string) currentBuildStatusRaw["status"]);
-			buildStatus = ToBuildStatus((string) buildStatusRaw["status"]);
+			DumpHashtable("last", buildStatusRaw);
+			BuildStatus buildStatus = ToBuildStatus((string) buildStatusRaw["status"]);
 			string label = (string) buildStatusRaw["label"];
 			string url = (string) buildStatusRaw["url"];
-
 			DateTime lastBuildDate = TimestampToDate((string) buildStatusRaw["timestamp"]);
+
+			Hashtable currentBuildStatusRaw = CallDamageControlServer("status.get_current_build", projectName);
+			DumpHashtable("current", currentBuildStatusRaw);
+			BuildStatus currentBuildStatus = ToBuildStatus((string) currentBuildStatusRaw["status"]);
 
 			return new ProjectStatus(projectName, currentBuildStatus, buildStatus, url, lastBuildDate, label);
 		}
@@ -270,6 +266,7 @@ namespace ThoughtWorks.DamageControl.DCTray
 			{
 				System.Diagnostics.Debug.WriteLine(string.Format("{0} = {1}", key, table[key]));
 			}
+			System.Diagnostics.Debug.WriteLine("");
 		}
 
 		Hashtable CallDamageControlServer(string methodName, string projectName)

@@ -27,6 +27,8 @@ module DamageControl
     end
     
     def checkout
+      return if current_build.scm_spec.nil? || current_build.scm_spec == ""
+      
       current_build.status = Build::CHECKING_OUT
       
       @scm.checkout(current_build.scm_spec, project_base_dir) do |progress| 
