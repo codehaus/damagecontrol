@@ -60,7 +60,8 @@ the working directory has been cleaned out, or because there has been no success
     
     def quote_message(message)
       m = html_quote(message)      
-      project_config['tracking'].highlight(m)
+      tracker = project_config['tracking']
+      tracker ? tracker.highlight(m) : m
     end
 
   private

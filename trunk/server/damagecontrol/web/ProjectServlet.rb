@@ -17,10 +17,6 @@ module DamageControl
       build_details
     end
 
-    def create_scm
-      super
-    end
-    
     def trig_build
       assert_private
       @trigger.request(project_name)
@@ -89,7 +85,7 @@ module DamageControl
           if(scm.can_create? && !scm.exists?)
             result +=
               [
-                task(:icon => "largeicons/package_new.png", :name => "Create repository", :url => "#{project_name}?action=create_scm")
+                task(:icon => "largeicons/package_new.png", :name => "Create repository", :url => "#{project_name}?action=create_scm_repository")
               ]
           end
           # Install/uninstall trigger

@@ -60,6 +60,7 @@ module DamageControl
           changesets = scm.changesets(
             checkout_dir, 
             last_completed_build.scm_commit_time, 
+            nil,
             nil
           )
           request_build(project_name, changesets)

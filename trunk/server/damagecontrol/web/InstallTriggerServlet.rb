@@ -19,7 +19,7 @@ module DamageControl
       install = request.query['install'] == "true"
       trigger_installed = false
       damagecontrol_install_dir = damagecontrol_home
-      scm = create_scm
+      scm = @project_config_repository.create_scm(project_name)
       render("trigger_install.erb", binding)
     end
     
@@ -29,7 +29,7 @@ module DamageControl
     
     def do_install_trigger
       damagecontrol_install_dir = request.query['damagecontrol_install_dir']
-      scm = create_scm
+      scm = @project_config_repository.create_scm(project_name)
       error = nil
       trigger_command = DamageControl::XMLRPC::Trigger.trigger_command(damagecontrol_install_dir, project_name, @trig_xmlrpc_url)
       trigger_files_checkout_dir = project_config_repository.trigger_checkout_dir(project_name)

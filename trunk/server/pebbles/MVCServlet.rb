@@ -109,7 +109,7 @@ module Pebbles
     end
     
     def actions
-      self.public_methods #- self.class.superclass.public_instance_methods
+      self.public_methods # - self.class.superclass.public_instance_methods
     end
     
     def send(method, *args)

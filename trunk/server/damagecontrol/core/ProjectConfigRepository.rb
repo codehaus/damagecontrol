@@ -75,7 +75,6 @@ module DamageControl
     end
     
     def modify_project_config(project_name, config_map)
-raise "DOH" unless project_name
       config_map.delete("project_name")
       # remove empty pairs
       config_map.each do |key, value|
@@ -83,8 +82,6 @@ raise "DOH" unless project_name
       end
 
       project_config_file_name = @project_directories.project_config_file(project_name)
-
-puts "Modifying config for #{project_name} -> #{project_config_file_name}"
 
       File.open(project_config_file_name, File::CREAT|File::WRONLY|File::TRUNC) do |io|
         io.puts(config_map.to_yaml)

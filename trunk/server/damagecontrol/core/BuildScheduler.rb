@@ -21,7 +21,6 @@ module DamageControl
       super
       @channel = multicast_space
       @channel.add_consumer(self) unless @channel.nil?
-raise "NaN" unless default_quiet_period.kind_of? Numeric 
       @default_quiet_period = default_quiet_period
       @executors = []
       @build_queue = []

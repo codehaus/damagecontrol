@@ -16,10 +16,14 @@ module DamageControl
       @project_config_repository = project_config_repository
     end
     
-    def create_scm
-      @project_config_repository.create_scm(project_name)
+    def create_scm_repository
+      # Instantiate the SCM object
+      scm = project_config_repository.create_scm(project_name)
+      # Create the repo on disk
+      scm.create
+      action_redirect(:configure, { "project_name" => project_name })
     end
-    
+
   protected
   
     attr_reader :build_history_repository
@@ -66,9 +70,6 @@ module DamageControl
     end
     
     def tasks
-      # result = [
-      #  search_form
-      #]
       result = [] 
       if private?
         configpath = "configure"

@@ -235,7 +235,7 @@ module DamageControl
       httpd.mount("/public/search", SearchServlet.new(build_history_repository))
       httpd.mount("/public/log", LogFileServlet.new(project_directories))
       httpd.mount("/public/root", indexing_file_handler)
-      httpd.mount("/public/rss", RssServlet.new(build_history_repository, public_web_url + "/project"))
+      httpd.mount("/public/rss", RssServlet.new(build_history_repository, public_web_url + "project/"))
       
       httpd.mount("/public/images", WEBrick::HTTPServlet::FileHandler, "#{webdir}/images")
       httpd.mount("/public/project/images", WEBrick::HTTPServlet::FileHandler, "#{webdir}/images")

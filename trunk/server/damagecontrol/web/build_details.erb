@@ -11,7 +11,7 @@
       selected = selected_report == report
       %>
       <% if report.available? %>
-    <li><a href="?project_name=<%= project_name %>&dc_creation_time=<%= selected_build.dc_creation_time.ymdHMS %>&report=<%= report.id %>" 
+    <li><a href="?dc_creation_time=<%= selected_build.dc_creation_time.ymdHMS %>&report=<%= report.id %>" 
     <% if selected then %>id="current"<% end %>>
 	<image src="<%= report.icon %>"/> <%= report.title %>
 	</a></li>

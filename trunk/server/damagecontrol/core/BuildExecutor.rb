@@ -132,7 +132,7 @@ module DamageControl
     def status_message
       status = ""
       if busy? then
-        status = "Building <a href=\"project?project_name=#{scheduled_build.project_name}\">#{scheduled_build.project_name}</a>: #{scheduled_build.status}"
+        status = "Building <a href=\"project/#{scheduled_build.project_name}\">#{scheduled_build.project_name}</a>: #{scheduled_build.status}"
       else
         status = "Idle"
       end

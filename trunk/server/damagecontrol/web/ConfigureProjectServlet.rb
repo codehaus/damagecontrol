@@ -17,7 +17,7 @@ module DamageControl
       result = []
       unless project_name.nil?
         result += [
-          task(:icon => "largeicons/navigate_left.png", :name => "Back to project", :url => "/#{project_name}"),
+          task(:icon => "largeicons/navigate_left.png", :name => "Back to project", :url => "../project/#{project_name}"),
         ]
       end 
       result
@@ -63,12 +63,6 @@ module DamageControl
       action_redirect(:configure, { "project_name" => project_name })
     end
     
-    def create_scm
-      scm = project_config_repository.create_scm(project_name)
-      scm.create
-      action_redirect(:configure, { "project_name" => project_name })
-    end
-
   private
   
     def configure_page(project_name, project_config, next_build_number)

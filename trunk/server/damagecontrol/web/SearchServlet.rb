@@ -10,7 +10,7 @@ module DamageControl
       result = super
       unless project_name.nil?
         result += [
-          task(:icon => "smallicons/navigate_left.png", :name => "Back to project", :url => "/project/#{project_name}")
+          task(:icon => "smallicons/navigate_left.png", :name => "Back to project", :url => "../project/#{project_name}")
         ]
       end 
       result
