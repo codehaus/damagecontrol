@@ -1,6 +1,7 @@
 require 'damagecontrol/util/FileUtils'
 require 'damagecontrol/core/Build'
 require 'damagecontrol/core/ProjectDirectories'
+require 'damagecontrol/util/Logging'
 require 'yaml'
 
 # for default config
@@ -27,6 +28,7 @@ module DamageControl
 
   class ProjectConfigRepository < ProjectDirectories
     include FileUtils
+		include Logging
     
     def initialize(project_directories, public_web_url)
       @project_directories = project_directories
@@ -107,6 +109,7 @@ module DamageControl
     
     def next_build_number(project_name)
       number = peek_next_build_number(project_name)
+			logger.info("increasing the build number for project: #{project_name} to #{number}")
       set_next_build_number(project_name, number + 1)
       number
     end
