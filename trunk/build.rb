@@ -112,7 +112,7 @@ class Project
   
   def build_number
     require 'server/damagecontrol/Version.rb'
-    ENV["DAMAGECONTROL_BUILD_LABEL"] || DamageControl::BUILD
+    ENV["DAMAGECONTROL_BUILD_LABEL"] || params['build'] || params['build_number'] || DamageControl::BUILD
   end
   
   def release_name
@@ -208,6 +208,18 @@ exec ruby -I"$DAMAGECONTROL_HOME/server" "#{target}" $*})
     params['cvs_executable'] = "c:\\bin\\cvs.exe"
     params['user'] = "tirsen"
     params['scp_executable'] = "pscp"
+  end
+  
+  def installer_from_build
+    dist = "damagecontrol-#{version}.tar.gz"
+    unless File.exists?("target/#{dist}")
+      with_working_dir("target") do
+        system("wget http://dist.codehaus.org/damagecontrol/distributions/#{dist}")
+      end
+    end
+    system("tar vzxf target/#{dist}")
+    system("mv damagecontrol-#{version} dist")
+    installer_nodeps
   end
   
   def installer

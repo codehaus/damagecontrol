@@ -19,10 +19,11 @@
   
   ;Name and file
   Name "DamageControl ${VERSION}"
-  OutFile "${ROOTDIR}\target\DamageControl-${VERSION}.exe"
+  !define DISTNAME "DamageControl-${VERSION}"
+  OutFile "${ROOTDIR}\target\${DISTNAME}.exe"
 
   ;Default installation folder
-  InstallDir "$PROGRAMFILES\DamageControl"
+  InstallDir "$PROGRAMFILES\${DISTNAME}"
   
   ;Get installation folder from registry if available
   InstallDirRegKey HKCU "Software\DamageControl" ""
@@ -78,6 +79,26 @@
 ;--------------------------------
 ;Installer Sections
 
+Section "" ; empty string makes it hidden, so would starting with -
+
+  ;Create uninstaller
+  SetOutPath "$INSTDIR" 
+  WriteUninstaller "$INSTDIR\Uninstall.exe"
+
+  ; Register uninstaller in registry
+  WriteRegStr HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\${DISTNAME}" "DisplayName" "DamageControl ${VERSION} (remove only)"
+  WriteRegStr HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\${DISTNAME}" "DisplayVersion" "${VERSION}"
+  WriteRegStr HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\${DISTNAME}" "Publisher" "Codehaus"
+  WriteRegStr HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\${DISTNAME}" "HelpLink" "user@damagecontrol.codehaus.org"
+  WriteRegStr HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\${DISTNAME}" "URLInfoAbout" "http://damagecontrol.codehaus.org"
+  WriteRegStr HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\${DISTNAME}" "URLUpdateInfo" "http://damagecontrol.codehaus.org"
+  WriteRegStr HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\${DISTNAME}" "Readme" "$INSTDIR\release-notes.txt"
+  WriteRegStr HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\${DISTNAME}" "Contact" "irc:irc.codehaus.org#damagecontrol"
+  WriteRegDWORD HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\${DISTNAME}" "NoModify" 1
+  WriteRegDWORD HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\${DISTNAME}" "NoRepair" 1
+
+SectionEnd
+
 Section "DamageControl Server" SecServer
 
   SetOutPath "$INSTDIR" 
@@ -97,10 +118,6 @@ Section "DamageControl Server" SecServer
   ;Store installation folder
   WriteRegStr HKCU "Software\Modern UI Test" "" $INSTDIR
 
-  ;Create uninstaller
-  WriteUninstaller "$INSTDIR\Uninstall.exe"
-
-  
   !insertmacro MUI_STARTMENU_WRITE_BEGIN Application
     
     CreateDirectory "$SMPROGRAMS\$STARTMENU_FOLDER"
@@ -180,7 +197,6 @@ Function PostInstallInstructionsPage
   !insertmacro MUI_INSTALLOPTIONS_DISPLAY "PostInstallInstructions.ini"
 
 FunctionEnd
-
 
 ;--------------------------------
 ;Descriptions
