@@ -21,12 +21,13 @@ module RSCM
     ann :description => "Keys file"
     attr_accessor :keys_file
 
-    def initialize(db_file="MT.db", branch="", key="", passphrase="", keys_file="")
+    def initialize(db_file="MT.db", branch="", key="", passphrase="", keys_file="", server="")
       @db_file = File.expand_path(db_file)
       @branch = branch
       @key = key
       @passphrase = passphrase
       @keys_file = keys_file
+      @server = server
     end
 
     def name
@@ -127,6 +128,9 @@ module RSCM
 
     # Checks out silently. Called by superclass' checkout.
     def checkout_silent(checkout_dir, to_identifier)
+      if @server
+        monotone("pull #{@server} #{@branch}")
+      end
       selector = expand_selector(to_identifier)
       checkout_dir = PathConverter.filepath_to_nativepath(checkout_dir, false)
       if checked_out?(checkout_dir)
