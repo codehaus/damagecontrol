@@ -88,4 +88,29 @@ module DamageControl
 			!@inq.index(message)
 		end
 	end
+
+	class IRCPublisher < AsyncComponent
+	
+		attr_accessor :irc
+	
+		def initialize(hub, server, channel)
+			super(hub)
+			@irc = IRCConnection.new()
+			@server = server
+			@channel = channel
+		end
+	
+		def process_message(message)
+			if message.is_a?(BuildCompleteEvent)
+				if @irc.connected? && @irc.in_channel?
+					@irc.send_message_to_channel("BUILD COMPLETE, project: #{message.build.project_name} label: #{message.build.label}")
+					consume_message(message)
+				else
+					@irc.connect(@server) unless @irc.connected?
+					@irc.join_channel(@channel) if @irc.connected? && !@irc.in_channel?
+				end
+			end
+		end
+
+	end
 end
