@@ -7,8 +7,8 @@ logdir = 'D:\cruise\cruiselogs'
 $damagecontrol_home = '../..'
 $:<<"#{$damagecontrol_home}/src/ruby"
 
-require 'damagecontrol/CruiseControlLogPoller'
-require 'damagecontrol/IRCPublisher'
+require 'damagecontrol/cruisecontrol/CruiseControlLogPoller'
+require 'damagecontrol/publisher/IRCPublisher'
 
 include DamageControl
 
