@@ -6,6 +6,9 @@ module RSCM
     # Simple superclass so we can easily include mixins
     # for all subclasses in one fell swoop.
     class Base #:nodoc:
+      def htmlize(str)
+        str.gsub(/\n/, "<br>")
+      end
     end
 
     class Null < Base
@@ -14,7 +17,7 @@ module RSCM
       end
 
       def highlight(s)
-        s
+        htmlize(s)
       end
     end
 
@@ -32,9 +35,9 @@ module RSCM
       def highlight(s)
         url = PathConverter.ensure_trailing_slash(@url)
         if (url)
-          s.gsub(/#([0-9]+)/, "<a href=\"#{url}show_bug.cgi?id=\\1\">#\\1</a>")
+          htmlize(s.gsub(/#([0-9]+)/, "<a href=\"#{url}show_bug.cgi?id=\\1\">#\\1</a>"))
         else
-          s
+          htmlize(s)
         end
       end
     end
@@ -58,9 +61,9 @@ module RSCM
       def highlight(s)
         url = PathConverter.ensure_trailing_slash(baseurl)
         if(url)
-          s.gsub(/([A-Z]+-[0-9]+)/, "<a href=\"#{url}browse/\\1\">\\1</a>")
+          htmlize(s.gsub(/([A-Z]+-[0-9]+)/, "<a href=\"#{url}browse/\\1\">\\1</a>"))
         else
-          s
+          htmlize(s)
         end
       end
     end
@@ -84,7 +87,7 @@ module RSCM
       end
 
       def highlight(message)
-        message.gsub(PATTERN,"<a href=\"http://sourceforge.net/tracker/index.php?func=detail&aid=\\1&group_id=#{group_id}&atid=#{tracker_id}\">#\\1</a>")
+        htmlize(message.gsub(PATTERN,"<a href=\"http://sourceforge.net/tracker/index.php?func=detail&aid=\\1&group_id=#{group_id}&atid=#{tracker_id}\">#\\1</a>"))
       end
     end
 
@@ -101,7 +104,7 @@ module RSCM
       end
 
       def highlight(message)
-        message.gsub(PATTERN,"<a href=\"http://rubyforge.org/tracker/index.php?func=detail&aid=\\1&group_id=#{group_id}&atid=#{tracker_id}\">#\\1</a>")
+        htmlize(message.gsub(PATTERN,"<a href=\"http://rubyforge.org/tracker/index.php?func=detail&aid=\\1&group_id=#{group_id}&atid=#{tracker_id}\">#\\1</a>"))
       end
     end
 
@@ -124,9 +127,9 @@ module RSCM
       def highlight(s)
         url = PathConverter.ensure_trailing_slash(baseurl)
         if (url)
-          s.gsub(/(#{module_key}[0-9]+)/, "<a href=\"#{url}issues/id/\\1\">\\1</a>")
+          htmlize(s.gsub(/(#{module_key}[0-9]+)/, "<a href=\"#{url}issues/id/\\1\">\\1</a>"))
         else
-          s
+          htmlize(s)
         end
       end
     end
