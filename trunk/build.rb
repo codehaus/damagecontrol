@@ -96,6 +96,7 @@ class Project
   end
   
   def test
+    clean
     unit_test
     integration_test
   end
