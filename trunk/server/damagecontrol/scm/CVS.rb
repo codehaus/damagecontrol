@@ -46,14 +46,29 @@ module DamageControl
     end
     
     def changes(from_time, to_time)
-      with_working_dir(working_dir) do
-        cvs_with_io(changes_command(from_time, to_time)) do |io|
+      all_changes = with_working_dir(working_dir) do
+        cvs_with_io(changes_command(nil, to_time)) do |io|
           parser = CVSLogParser.new
           parser.cvspath = path
           parser.cvsmodule = mod
           parser.parse_log(io)
         end
       end
+      
+      result = []
+      last_change = nil
+      all_changes.each do |change|
+        diff = change.time-from_time
+        if(diff > -1)
+          result << change
+          last_change = change
+        end
+        # find the previous revision
+        if(last_change && (last_change.path == change.path) && (last_change.revision != change.revision) && last_change.previous_revision.nil?)
+          last_change.previous_revision = change.revision
+        end
+      end
+      result
     end
     
     def changes_command(from_time, to_time)
@@ -61,6 +76,7 @@ module DamageControl
     end
     
     def cvsdate(time)
+      return "" unless time
       # CVS wants all dates as UTC.
       time.utc.strftime("%Y-%m-%d %H:%M:%S UTC")
     end
@@ -341,7 +357,8 @@ puts result
       end
       
       if modification_entry[1]=~/date: (.*?);/
-          modification.time = $1
+          # 2003/11/09 15:39:25
+          modification.time = Time.utc($1[0..3], $1[5..6], $1[8..9], $1[11..12], $1[14..15], $1[17..18])
       else
         raise "can't parse: #{modification_entry}"
       end

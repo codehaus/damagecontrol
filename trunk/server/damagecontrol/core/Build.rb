@@ -13,6 +13,8 @@ module DamageControl
     attr_accessor :developer
     attr_accessor :message
     attr_accessor :revision
+    attr_accessor :previous_revision
+    # This is an UTC ruby time
     attr_accessor :time
     
     def message=(message)

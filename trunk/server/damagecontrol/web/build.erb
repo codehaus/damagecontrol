@@ -37,7 +37,11 @@ view_cvs_url = project_config_repository.project_config(project_name)["view_cvs_
 view_cvs_url_patched = "#{view_cvs_url}/" if(view_cvs_url && view_cvs_url[-1] != "/")
 build.modification_set.each do |modification|
 	path = modification.path
-	path = "<a href=\"#{view_cvs_url_patched}#{path}\">#{path}</a>" if(view_cvs_url)
+	if(view_cvs_url)
+		url = "#{view_cvs_url_patched}#{path}"
+		url << "?r1=#{modification.revision}&r2=#{modification.previous_revision}" if(#{modification.previous_revision})
+		path = "<a href=\"#{url}\">#{modification.path}</a>"
+	end
 %>
 	<tr>
 		<td><%= modification.developer %></td>

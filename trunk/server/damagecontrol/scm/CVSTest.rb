@@ -35,11 +35,6 @@ module DamageControl
       # check that we now have one more change
       changes = cvs.changes(time_before, time_after)
 
-puts "CHANGES"
-changes.each do |modif|
-  puts "#{modif.developer} : #{modif.path} : #{modif.time}"
-end
-
       assert_equal(1, changes.length)
       mod = changes[0]
       assert_equal("build.xml", mod.path)
@@ -242,7 +237,7 @@ EOF
     def test_parse_modification
       modification = @parser.parse_modification(MODIFICATION_ENTRY)
       assert_equal("1.20", modification.revision)
-      assert_equal("2003/11/09 17:53:37", modification.time)
+      assert_equal(Time.utc(2003,11,9,17,53,37), modification.time)
       assert_equal("tirsen", modification.developer)
       assert_match(/Quiet period is configurable for each project/, modification.message)
     end
