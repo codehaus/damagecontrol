@@ -1,5 +1,5 @@
 require 'test/unit'
-require 'pebbles/mockit'
+require 'rscm/mockit'
 
 module MockIt
   class MockTest < Test::Unit::TestCase

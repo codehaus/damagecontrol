@@ -1,20 +1,9 @@
+require 'rscm/file_ext.rb'
 require 'rscm/changes_fixture'
 require 'rscm/visitor/rss_writer'
 require 'rss/maker'
 require 'rscm/tracker'
 require 'rscm/scm_web'
-
-class File
-  def read_fix_nl
-    result = ""
-    self.each_line do |line|
-      chomped = line.chomp
-      result << chomped
-      result << "\n" if chomped != line
-    end
-    result
-  end
-end
 
 module RSCM
   module Visitor
