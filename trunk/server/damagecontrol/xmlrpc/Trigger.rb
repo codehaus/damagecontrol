@@ -25,12 +25,11 @@ module XMLRPC
         build.status = Build::QUEUED
         @channel.publish_message(BuildRequestEvent.new(build))
         
-        <<-EOF
-        DamageControl server requests build for #{project_name} on #{timestamp}.
-        http://damagecontrol.codehaus.org/
-        http://builds.codehaus.org/
-        irc://irc.codehaus.org/damagecontrol/
-        EOF
+<<-EOF
+DamageControl server requests build for #{project_name} on #{timestamp}. Monitor build results at:
+http://builds.codehaus.org/public/project?project_name=#{project_name}
+irc://irc.codehaus.org/damagecontrol/
+EOF
       rescue => e
         logger.error(e)
         <<-EOF
