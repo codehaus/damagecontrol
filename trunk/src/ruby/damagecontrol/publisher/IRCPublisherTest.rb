@@ -31,7 +31,7 @@ module DamageControl
       @irc_mock.__expect(:send_message_to_channel) {|message| 
         assert_equal(message, @mock_template.generate(nil))}
       
-      evt = BuildCompleteEvent.new(nil)
+      evt = BuildCompleteEvent.new(Build.new("project_name"))
       @publisher.enq_message(evt)
       @publisher.process_messages
       

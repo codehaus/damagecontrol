@@ -39,4 +39,6 @@ require 'damagecontrol/dependency/UpstreamDownstreamTraverserTest'
 require 'damagecontrol/cruisecontrol/CruiseControlLogPollerTest'
 require 'damagecontrol/cruisecontrol/CruiseControlLogParserTest'
 
+require 'IntegrationTests'
+
 require 'AcceptanceTestRunnerTest'

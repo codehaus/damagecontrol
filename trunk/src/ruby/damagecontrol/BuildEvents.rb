@@ -4,6 +4,7 @@ module DamageControl
 
     def initialize(build)
       @build = build
+      fail "build cannot be null" if build.nil?
     end
 
     def ==(event)

@@ -13,7 +13,7 @@ module DamageControl
     def setup
       @template_mock = MockTemplate.new
       @jabber_mock = Mock.new
-      @build_complete_event = BuildCompleteEvent.new(nil)
+      @build_complete_event = BuildCompleteEvent.new(Build.new("project_name"))
     end
     
     def test_not_sending_message_to_empty_recipients_list_on_build_complete

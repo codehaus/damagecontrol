@@ -1,7 +1,11 @@
+require 'damagecontrol/Timer'
+
 module DamageControl
 
   class Channel
     attr_reader :last_message
+    
+    include Threading
     
     def initialize
       @clock = Clock.new
@@ -9,9 +13,11 @@ module DamageControl
     end   
         
     def publish_message(message)
-      @last_message=message
-      @subscribers.each {|subscriber|
-        subscriber.receive_message(message)
+      protect {
+        @last_message=message
+        @subscribers.each {|subscriber|
+          subscriber.receive_message(message)
+        }
       }
     end
     
