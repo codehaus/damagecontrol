@@ -52,8 +52,14 @@ module DamageControl
     end
   
     def process_message(message)
+      ensure_in_channel
+      if message.is_a?(BuildRequestEvent)
+        content = "Starting build for #{message.build.project_name}"
+        logger.info("sending irc message #{content}")
+        @irc.send_message_to_channel(content)
+      end
+      
       if message.is_a?(BuildCompleteEvent)
-        ensure_in_channel
         content = @template.generate(message.build)
         logger.info("sending irc message #{content}")
         @irc.send_message_to_channel(content)
