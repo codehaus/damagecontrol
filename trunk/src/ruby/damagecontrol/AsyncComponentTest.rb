@@ -29,7 +29,6 @@ module DamageControl
     include HubTestHelper
     
     def setup
-      fail
       create_hub
       @messages = [1, 2, 3]
     end
