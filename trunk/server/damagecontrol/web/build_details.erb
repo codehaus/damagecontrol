@@ -5,24 +5,20 @@
 </head>
 <body>
 
-<%
-build = build_history_repository.lookup(project_name, request.query["timestamp"])
-%>
-
-<h1 class="pane"><img src="images/timestampstatus?project_name=<%= project_name %>&timestamp=<%= request.query['timestamp'] %>"/> <%= build_description(build) %></h1>
+<h1 class="pane"><img src="images/timestampstatus?project_name=<%= project_name %>&timestamp=<%= selected_build.timestamp %>"/> <%= build_description(selected_build) %></h1>
 
 
 <table class="main-table">
 
   <%
-  previous_successful_build = build_history_repository.previous_successful_build(build)
+  previous_successful_build = build_history_repository.previous_successful_build(selected_build)
   previous_successful_build_link = "<a href=\"#{build_url(previous_successful_build)}\">(##{previous_successful_build.label})</a>" if previous_successful_build
   %>
 
   <%
   # =============== next/prev links pane
-  prev_build = build_history_repository.prev(build)
-  next_build = build_history_repository.next(build)
+  prev_build = build_history_repository.prev(selected_build)
+  next_build = build_history_repository.next(selected_build)
   
   prev_link = "&lt;&lt;&nbsp;No previous build"
   prev_link = "&lt;&lt;&nbsp;<a href=\"#{build_url(prev_build)}\">#{build_description(prev_build)}</a>" if prev_build
@@ -58,6 +54,8 @@ build = build_history_repository.lookup(project_name, request.query["timestamp"]
   <%
   # =============== changes pane
   %>
+  
+  <% if selected_build then %>
 
   <table class="pane">
     <tr><td class="pane-header" colspan="4">
@@ -67,7 +65,7 @@ build = build_history_repository.lookup(project_name, request.query["timestamp"]
         Changes
       <% end %>
     </td></tr>
-    <% if(build.changesets.length == 0)then %>
+    <% if(selected_build.changesets.length == 0)then %>
       <tr>
         <td colspan="4">
           <%= no_changes_in_this_build %>
@@ -75,7 +73,7 @@ build = build_history_repository.lookup(project_name, request.query["timestamp"]
       </tr>
     <% else %>
       <%
-      build.changesets.each do |changeset|
+      selected_build.changesets.each do |changeset|
       %>
 
         <tr class="pane">
@@ -99,6 +97,8 @@ build = build_history_repository.lookup(project_name, request.query["timestamp"]
       <% end %>
     <% end %>
   </table>
+  
+  <% end %>
 
 
 

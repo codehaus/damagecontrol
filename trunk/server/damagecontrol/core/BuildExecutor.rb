@@ -115,7 +115,7 @@ module DamageControl
       # this is almost useless information and there's no point in spending lots of time trying to code around it
       unless File.exists?(current_scm.working_dir)
         logger.info("does not determine changeset for #{current_build.project_name} because project not yet checked out")
-        return 
+        return
       end
       
       begin

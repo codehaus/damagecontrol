@@ -1,0 +1,7 @@
+<form action="project">
+  Search <%= project_name %> builds:<br>
+  <input name="search" value="<%= request.query['search'] %>"/>
+  <input name="action" value="search" type="hidden"/>
+  <input name="project_name" value="<%= project_name %>" type="hidden"/>
+  <input type="submit" value="Go"/>
+</form>

@@ -29,19 +29,26 @@
   <tr class="pane">
     <td class="pane">
       <img src="<%= image %>" />&nbsp;
-      <a class="tip" href="<%= build_url(build) %>"><%= prefix %><%= build_description(build) %><span>
-        <% if(build.changesets.length == 0) %>
-          <i><%= no_changes_in_this_build %></i>
-        <% else %>
-          <% build.changesets.each do |changeset| %>
-            (by <%= changeset.developer %> <%= changeset.time_difference %> ago) <br/>
-            <i><%= changeset.message %></i><br/>
-            <% changeset.each do |change| %>
-              <%= change.path %><br/>
+      <a class="tip" href="<%= build_url(build) %>">
+        <% if selected_build == build then %><b><% end %>
+        
+        <%= prefix %><%= build_description(build) %>
+        
+        <% if selected_build == build then %></b><% end %>
+        <span>
+          <% if(build.changesets.length == 0) %>
+            <i><%= no_changes_in_this_build %></i>
+          <% else %>
+            <% build.changesets.each do |changeset| %>
+              (by <%= changeset.developer %> <%= changeset.time_difference %> ago) <br/>
+              <i><%= changeset.message %></i><br/>
+              <% changeset.each do |change| %>
+                <%= change.path %><br/>
+              <% end %>
             <% end %>
           <% end %>
-        <% end %>
-      </span></a>
+        </span>
+      </a>
     </td>
   </tr>
 <% end %>

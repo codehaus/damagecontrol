@@ -13,11 +13,17 @@ module DamageControl
       "Dashboard"
     end
     
-    def tasks
-      return {} unless private?
-      {
-        "New project" => "project?action=configure"
-      }
+    def global_search_form
+      erb("components/global_search_form.erb", binding)
+    end
+    
+    def sidepanes
+      return super unless private?
+      super +
+        [
+          global_search_form,
+          task(:name => "New project", :url => "project?action=configure")
+        ]
     end
   
     def default_action

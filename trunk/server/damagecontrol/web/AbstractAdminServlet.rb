@@ -39,8 +39,8 @@ module DamageControl
       ""
     end
     
-    def tasks
-      {}
+    def sidepanes
+      []
     end
     
     def ritemesh_template
@@ -71,8 +71,15 @@ module DamageControl
       empty_text = params[:empty_text] || "No builds"
       css_class = params[:css_class] || "builds"
       builds = params[:builds] || required_param(:builds)
+      selected_build = params[:selected_build] || nil
       prefix_with_project_name = params[:prefix_with_project_name] == true || false
       erb("components/builds_table.erb", binding)
+    end
+    
+    def task(params)
+      url = params[:url] || required_param(:url)
+      name = params[:name] || required_param(:name)
+      erb("components/task.erb", binding)
     end
     
     def required_param(param)

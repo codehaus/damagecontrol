@@ -10,17 +10,18 @@
 
 <title><%= title %> - <%= html_quote(DamageControl::VERSION_TEXT) %></title>
 </head>
+
 <body>
 
-<div class="top-panel">
+<div id="top-panel">
 <a href="http://damagecontrol.codehaus.org/"><img class="logo" src="images/damagecontrol-logo.png"/></a>
 </div>
 
-<div class="top-nav">
-	<div class="left-top-nav">
+<div id="top-nav">
+	<div id="left-top-nav">
 	<%= breadcrumbs %>
 	</div>
-	<div class="right-top-nav">
+	<div id="right-top-nav">
     <% if auto_refresh? %>
       <a href="<%= auto_refresh_url_prefix %>auto_refresh=false">Turn auto refresh off</a>
     <% else %>
@@ -29,39 +30,36 @@
 	</div>
 </div>
 
-<div>
-<div class="main-panel">
+<div id="main-panel">
 <%= body %>
 </div>
 
-<div class="task-panel">
+<%
+sidepanes = self.sidepanes
+if(sidepanes)
+%>
+  <div id="side-panel">
+  
+    <% sidepanes.each do |sidepane| %>
+      <div class="side-panel-entry"><%= sidepane %></div>
+    <% end %>
+    
+    <div class="side-panel-entry">
+    </div>
+  
+  </div>
+<% end %>
 
-	<div class="task-entry">
-		<form action="project">
-			Search <%if(defined?(project_name))%><%= project_name %><%end%> builds: 
-			<input name="search" value="<%= request.query['search'] %>"/>
-			<input name="action" value="search" type="hidden"/>
-			<% if(defined?(project_name)) %>
-			<input name="project_name" value="<%= project_name %>" type="hidden"/>
-			<% end %>
-			<input type="submit" value="Go"/>
-		</form>
-	</div>
-
-	<% if(tasks) %>
-		<% tasks.each do |name, url| %>
-			<div class='task-entry'><a href="<%= url %>"><%= name %></a></div>
-		<% end %>
-	<% end %>
-
-</div>
-</div>
-
-<div class="footer">
+<% 
+# I just can't get the footer to layout properly :-( --jon 
+if false then
+%>
+<div id="footer">
 This stuff displays best in a Mozilla based browser. Try <a href="http://www.mozilla.org/products/firefox/">Firefox</a>.
 <br>
 <%= html_quote(DamageControl::VERSION_TEXT) %>
 </div>
+<% end %>
 
 </body>
 </html>

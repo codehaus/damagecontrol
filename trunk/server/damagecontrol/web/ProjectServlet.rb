@@ -3,11 +3,11 @@ require 'damagecontrol/scm/SCMFactory'
 
 module DamageControl
   class ProjectServlet < AbstractAdminServlet
-    def initialize(build_history_repository, project_config_repository, trigger, type, build_scheduler, project_directories, nudge_xmlrpc_url)
+    def initialize(build_history_repository, project_config_repository, trigger, type, build_scheduler, project_directories, trig_xmlrpc_url)
       super(type, build_scheduler, build_history_repository, project_config_repository)
       @trigger = trigger
       @project_directories = project_directories
-      @nudge_xmlrpc_url = nudge_xmlrpc_url
+      @trig_xmlrpc_url = trig_xmlrpc_url
 
       @scm_factory = SCMFactory.new
       @template_dir = File.expand_path(File.dirname(__FILE__))
@@ -17,21 +17,42 @@ module DamageControl
       "Project"
     end
     
-    def tasks
-      result = {}
+    def search_form(params)
+      project_name = params[:project_name] || required_param(:project_name)
+      erb("components/search_form.erb", binding)
+    end
+    
+    def sidepanes
+      result = super
       unless project_name.nil?
-        result["Working files"] = "root/#{project_name}/checkout"
+        result +=
+          [
+            search_form(:project_name => project_name)
+          ]
         if(private?)
-          result["Configure"] = "?project_name=#{project_name}&action=configure"
-          result["Nudge build now"] = "?project_name=#{project_name}&action=trig_build"
-          result["Install trigger"] = "?project_name=#{project_name}&action=install_trigger"
+          result +=
+            [
+              task(:name => "Configure", :url => "?project_name=#{project_name}&action=configure"),
+              task(:name => "Trig build now", :url => "?project_name=#{project_name}&action=trig_build"),
+              task(:name => "Install trigger", :url => "?project_name=#{project_name}&action=install_trigger")
+            ]
         end
+        result +=
+          [
+            task(:name => "Working files", :url => "root/#{project_name}/checkout"),
+            builds_table(
+                :header_text => "Build history", 
+                :empty_text => "Never built", 
+                :css_class => "pane",
+                :selected_build => selected_build,
+                :builds => builds)
+          ]
       end
       result
     end
   
     def default_action
-      dashboard
+      build_details
     end
     
     def configure
@@ -67,7 +88,7 @@ module DamageControl
         # Install the trigger if trigger=xmlrpc
         trigger_type = project_config["trigger"]
         if trigger_type == "xmlrpc"
-          scm.install_trigger(project_name, @nudge_xmlrpc_url)
+          scm.install_trigger(project_name, @trig_xmlrpc_url)
         else
           raise "can't install trigger type: #{trigger_type}"
         end
@@ -93,6 +114,23 @@ module DamageControl
       dashboard_redirect
     end
     
+    def selected_build
+      timestamp = request.query['timestamp']
+      if timestamp then
+        build_history_repository.lookup(project_name, request.query['timestamp'])
+      else
+        last_build
+      end
+    end
+    
+    def last_build
+      builds[-1]
+    end
+    
+    def builds
+      build_history_repository.history(project_name)
+    end
+    
     def dashboard
       last_completed_build = build_history_repository.last_completed_build(project_name)
       last_status = build_status(last_completed_build)
@@ -100,7 +138,6 @@ module DamageControl
       current_build = build_history_repository.current_build(project_name)
       current_status = build_status(current_build)
 
-      builds = build_history_repository.history(project_name)
       render("project_dashboard.erb", binding)
     end
     
@@ -123,7 +160,11 @@ module DamageControl
     end
     
     def build_details
-      render("build_details.erb", binding)
+      if selected_build then
+        render("build_details.erb", binding)
+      else
+        render("never_built.erb", binding)
+      end
     end
 
     def build_description(build)

@@ -6,45 +6,26 @@
 <body>
 
 	<%
-	
 		projects = project_config_repository.project_names
-		
 	%>
-	<table>
-		<%
+  
+  <%
 
-		projects.each do |project|
-			href = "project?project_name=#{project}"
-      
-			image = "images/lastcompletedstatus?project_name=#{project}"
-			last_successful_build = build_history_repository.last_successful_build(project)
-			label = ""
-			label = " (##{last_successful_build.label})" if(last_successful_build)
-		%>
+  projects.each do |project|
+    href = "project?project_name=#{project}"
+    
+    image = "images/lastcompletedstatus?project_name=#{project}"
+    last_successful_build = build_history_repository.last_successful_build(project)
+    label = ""
+    label = " (##{last_successful_build.label})" if(last_successful_build)
+  %>
 
-      <div class="dashboard">
-        <img src="<%= image %>" /> <a href="<%= href %>"><%= project %><%= label %></a> &nbsp; &nbsp; &nbsp;
-      </div>
+    <div class="dashboard">
+      <img src="<%= image %>" />&nbsp;<a href="<%= href %>"><%= project %><%= label %></a>&nbsp;&nbsp;&nbsp;
+    </div>
 
-		<%
-		end
-		%>
-		<% if false then %>
-		<tr>
-			<td>
-			<img src="images/red-pulse-32.gif" />&nbsp;<a href="project">project1</a>
-			</td>
-			<td>
-			<img src="images/red-32.gif" />&nbsp;<a href="project">project1</a>
-			</td>
-			<td>
-			<img src="images/green-pulse-32.gif" />&nbsp;<a href="project">project1</a>
-			</td>
-			<td>
-			<img src="images/green-32.gif" />&nbsp;<a href="project">project1</a>
-			</td>
-		</tr>
-		<% end %>
-	</table>
+  <%
+  end
+  %>
 </body>
 </html>
