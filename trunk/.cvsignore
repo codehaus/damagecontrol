@@ -1,7 +1,7 @@
 *.ipr
 *.iml
-*.log
 *.iws
+*.log
 .project
 target
 dist
