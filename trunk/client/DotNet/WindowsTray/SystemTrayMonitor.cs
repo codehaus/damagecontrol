@@ -87,6 +87,9 @@ namespace ThoughtWorks.DamageControl.WindowsTray
 		private void InitialiseSettingsForm()
 		{
 			settingsForm = new SettingsForm(settings, this);
+
+			if (SettingsManager.HasNewSettings)
+				settingsForm.Show();
 		}
 
 		#endregion
@@ -178,7 +181,8 @@ namespace ThoughtWorks.DamageControl.WindowsTray
 			}
 
 			Application.EnableVisualStyles();
-			Application.Run(new SystemTrayMonitor());
+			SystemTrayMonitor monitor = new SystemTrayMonitor();
+			Application.Run(monitor);
 		}
 
 		#endregion

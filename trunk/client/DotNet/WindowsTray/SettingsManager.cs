@@ -35,6 +35,15 @@ namespace ThoughtWorks.DamageControl.WindowsTray
 				_settingsFileName = value;
 			}
 		}
+		
+		private static bool _hasnewsettings = true;
+		static public bool HasNewSettings
+		{
+			get
+			{
+				return _hasnewsettings;
+			}
+		}
 
 		/// <summary>
 		/// Gets the absolute path and filename to the settings file to be used
@@ -84,6 +93,7 @@ namespace ThoughtWorks.DamageControl.WindowsTray
 			{
 				Settings defaults = Settings.CreateDefaultSettings();
 				WriteSettings(defaults);
+				_hasnewsettings = true;
 				return defaults;
 			}
 
@@ -93,12 +103,14 @@ namespace ThoughtWorks.DamageControl.WindowsTray
 			{
 				XmlSerializer serializer = new XmlSerializer(typeof(Settings));
 				reader = new StreamReader(SettingsPathAndFileName);
+				_hasnewsettings = false;
 				return (Settings)serializer.Deserialize(reader);
 			} 
 			catch 
 			{
 				Settings defaults = Settings.CreateDefaultSettings();
 				WriteSettings(defaults);
+				_hasnewsettings = true;
 				return defaults;
 			}
 			finally
