@@ -29,7 +29,12 @@ module DamageControl
         session = nil
         begin
           session = login
-          message = "#{build.project.name}: Build #{build.status_message}"
+          message = nil
+          if(build.successful?)
+            message = "#{build.project.name}: #{build.status_message} build (by #{build.changeset.developer})"
+          else
+            message = "#{build.project.name}: #{build.changeset.developer} broke the build"
+          end
           @friends.split(%r{,\s*}).each do |friend|
             begin
               session.new_message(friend).set_subject(message).set_body(message).send

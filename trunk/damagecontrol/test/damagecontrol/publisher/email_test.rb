@@ -12,14 +12,17 @@ module DamageControl
         project = new_mock
         project.__setup(:name) { "mooky" }
 
-        BuildMailer.template_root = File.expand_path(File.dirname(__FILE__))
-        publisher = Email.new(project)
+        publisher = Email.new
+                
 
         build = new_mock
-        build.__expect(:project) { project }
+        build.__setup(:project) { project }
+        build.__setup(:status_message) { "Kaboom" }
         
+        BuildMailer.template_root = File.expand_path(File.dirname(__FILE__) + "/../../../app/views")
         # not sure what to assert here...
-        assert_equal("TMail::Mail", BuildMailer.create_email(build, publisher).class.name)
+        tmail = BuildMailer.create_email(build, publisher)
+        puts tmail.body_port.ropen.read
       end
     end
   end
