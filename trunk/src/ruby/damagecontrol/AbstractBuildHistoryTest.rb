@@ -1,7 +1,7 @@
 $:<<'../../lib'
 
 require 'damagecontrol/Hub'
-require 'damagecontrol/publisher/BuildHistoryPublisher'
+require 'damagecontrol/BuildHistoryRepository'
 
 module DamageControl
 
@@ -32,7 +32,7 @@ module DamageControl
       @apple2.status = Build::FAILED
       @apple2.timestamp = "20040316225948"
 
-      @bhp = BuildHistoryPublisher.new(Hub.new)
+      @bhp = BuildHistoryRepository.new(Hub.new)
       @bhp.register(@apple1)
       @bhp.register(@pear1)
       @bhp.register(@apple2)

@@ -4,12 +4,12 @@ require 'yaml'
 require 'test/unit' 
 require 'mockit' 
 require 'damagecontrol/Hub'
-require 'damagecontrol/publisher/BuildHistoryPublisher'
-require 'damagecontrol/publisher/AbstractBuildHistoryTest'
+require 'damagecontrol/BuildHistoryRepository'
+require 'damagecontrol/AbstractBuildHistoryTest'
 
 module DamageControl
 
-  class BuildHistoryPublisherTest < AbstractBuildHistoryTest
+  class BuildHistoryRepositoryTest < AbstractBuildHistoryTest
     
     # Not really a unit test, more a YAML experiment
     def test_build_can_be_saved_as_yaml
@@ -51,7 +51,7 @@ module DamageControl
     end
     
     def test_get_build_list_map_with_empty_history_returns_empty_map
-      bhp = BuildHistoryPublisher.new(Hub.new)
+      bhp = BuildHistoryRepository.new(Hub.new)
       should_be_empty = bhp.get_build_list_map()
       should_also_be_empty = bhp.get_build_list_map("foo")
       assert_equal(Hash.new, should_be_empty)
@@ -59,7 +59,7 @@ module DamageControl
     end
     
     def test_register_build_saves_as_yaml
-      bhp = BuildHistoryPublisher.new(Hub.new, "test.yaml")
+      bhp = BuildHistoryRepository.new(Hub.new, "test.yaml")
 
       bhp.register(@apple1)
       bhp.register(@pear1)
@@ -109,7 +109,7 @@ pear:
       testfile = File.open("test.yaml", "w")
       testfile.print(PERSISTED_YAML_DATA)
       testfile.close
-      bhp = BuildHistoryPublisher.new(Hub.new,"test.yaml")
+      bhp = BuildHistoryRepository.new(Hub.new,"test.yaml")
       assert_equal(expected_builds, bhp.get_build_list_map)
     end
     

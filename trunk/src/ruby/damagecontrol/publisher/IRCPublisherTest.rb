@@ -41,9 +41,13 @@ module DamageControl
     def test_sends_message_on_build_requested_and_started
       setup_irc_connected
       @irc_mock.__expect(:send_message_to_channel) {|message| 
-        assert_equal(message, "BUILD REQUESTED project") }
+        assert(message=~/REQUESTED/)
+        assert(message=~/project/)
+      }
       @irc_mock.__expect(:send_message_to_channel) {|message| 
-        assert_equal(message, "BUILD STARTED project") }
+        assert(message=~/STARTED/)
+        assert(message=~/project/)
+      }
       
       @publisher.send_message_on_build_request = true
       

@@ -5,7 +5,7 @@ module DamageControl
     def generate(build)
       # TODO make this work for real (with CruiseControl bridge for example)
       # htmlurl = "#{webpath(build)}/#{build.reports_path}/#{build.label}.html}"
-      "BUILD #{build.status} #{build.project_name} #{build.label}"
+      "[#{build.project_name}] BUILD #{build.status} #{build.label}"
     end
 
     def file_type

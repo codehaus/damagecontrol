@@ -12,6 +12,7 @@ require 'damagecontrol/BuildScheduler'
 require 'damagecontrol/SocketTrigger'
 require 'damagecontrol/HostVerifyingHandler'
 require 'damagecontrol/XMLRPCTrigger'
+require 'damagecontrol/BuildHistoryRepository'
 require 'damagecontrol/publisher/XMLRPCStatusPublisher'
 
 include DamageControl 
@@ -34,7 +35,7 @@ def start_simple_server(params = {})
 
   XMLRPCTrigger.new(query_servlet, @hub)
 
-  bhp = BuildHistoryPublisher.new(@hub, "build_history.yaml")
+  bhp = BuildHistoryRepository.new(@hub, "build_history.yaml")
   bhp.start
   XMLRPCStatusPublisher.new(query_servlet, bhp)
   

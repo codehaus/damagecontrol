@@ -1,9 +1,9 @@
 require 'xmlrpc/server'
 require 'damagecontrol/Build'
 require 'damagecontrol/BuildEvents'
-require 'damagecontrol/publisher/BuildHistoryPublisher'
+require 'damagecontrol/BuildHistoryRepository'
 
-# Exposes a BuildHistoryPublisher to XML-RPC
+# Exposes a BuildHistoryRepository to XML-RPC
 # 
 # Authors: Steven Meyfroidt, Aslak Hellesoy
 module DamageControl

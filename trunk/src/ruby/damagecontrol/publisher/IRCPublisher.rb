@@ -60,11 +60,11 @@ module DamageControl
       ensure_in_channel
       
       if send_message_on_build_request && message.is_a?(BuildRequestEvent)
-        @irc.send_message_to_channel("BUILD REQUESTED #{message.build.project_name}")
+        @irc.send_message_to_channel("[#{message.build.project_name}] BUILD REQUESTED")
       end
       
       if message.is_a?(BuildStartedEvent)
-        @irc.send_message_to_channel("BUILD STARTED #{message.build.project_name}")
+        @irc.send_message_to_channel("[#{message.build.project_name}] BUILD STARTED")
       end
       
       if message.is_a?(BuildCompleteEvent)

@@ -9,7 +9,7 @@ require 'damagecontrol/BuildEvents'
 # Authors: Steven Meyfroidt, Aslak Hellesoy
 module DamageControl
 
-  class BuildHistoryPublisher < AsyncComponent
+  class BuildHistoryRepository < AsyncComponent
   
     def initialize(channel, filename=nil)
       super(channel)

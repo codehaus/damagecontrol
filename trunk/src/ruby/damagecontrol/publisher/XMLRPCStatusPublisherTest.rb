@@ -11,8 +11,8 @@ require 'damagecontrol/BuildScheduler'
 require 'damagecontrol/BuildExecutor'
 require 'damagecontrol/HubTestHelper'
 require 'damagecontrol/publisher/XMLRPCStatusPublisher'
-require 'damagecontrol/publisher/BuildHistoryPublisher'
-require 'damagecontrol/publisher/AbstractBuildHistoryTest'
+require 'damagecontrol/BuildHistoryRepository'
+require 'damagecontrol/AbstractBuildHistoryTest'
 
 module DamageControl
   

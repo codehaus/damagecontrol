@@ -39,7 +39,7 @@ module DamageControl
   <jira:Login username="rinkrank" password="julenissen">
     <jira:CreateIssue 
       summary="Fix broken build"
-      description="BUILD FAILED test_project 99"
+      description="[test_project] BUILD FAILED 99"
       project-key="DC" 
       assignee="damagecontrol"
       issue-type="Task"
