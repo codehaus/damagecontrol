@@ -26,4 +26,5 @@ module DamageControl
       end
     end
   end
+
 end
