@@ -132,9 +132,9 @@ module RSCM
 
     # Checks out silently. Called by superclass' checkout.
     def checkout_silent(checkout_dir, to_identifier)
-      if @server
-        monotone("pull #{@server} #{@branch}")
-      end
+      # pull from the "central" server
+      monotone("pull #{@server} #{@branch}") if @server
+
       selector = expand_selector(to_identifier)
       checkout_dir = PathConverter.filepath_to_nativepath(checkout_dir, false)
       if checked_out?(checkout_dir)
@@ -181,6 +181,9 @@ module RSCM
       rescue
         raise "Didn't have permission to write to #{post_commit_file}."
       end
+      
+      # push to the "central" server
+      monotone("push #{@server} #{@branch}") if @server
     end
 
     def post_commit_file
