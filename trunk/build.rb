@@ -1,4 +1,4 @@
-#!/usr/bin/env ruby
+#!/usr/local/ruby/bin/ruby
 $VERBOSE = nil
 
 #$:<<'lib'
