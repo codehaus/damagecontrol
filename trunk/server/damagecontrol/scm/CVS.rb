@@ -220,12 +220,12 @@ module DamageControl
 
       execed_command_line = "cvs -d#{cvsroot_with_password(cvspassword)} #{cmd}"      
       execute(execed_command_line, checkout_dir, environment) do |stdin, stdout, stderr, pid|
-        logger.debug("Reading chengeset log from stdout")
+        logger.info("Reading chengeset log from stdout")
         parser = CVSLogParser.new(stdout)
         parser.cvspath = path
         parser.cvsmodule = cvsmodule
         changesets = parser.parse_changesets
-        logger.debug("DONE Reading chengeset log from stdout")
+        logger.info("DONE Reading chengeset log from stdout")
       end
       changesets
     end
@@ -241,11 +241,11 @@ module DamageControl
       execed_command_line = "cvs -d#{cvsroot_with_password(cvspassword)} #{cmd}"
 
       execute(execed_command_line, dir, environment) do |stdin, stdout, stderr, pid|
-        logger.debug("Reading from stdout")
+        logger.info("Reading from stdout")
         stdout.each_line do |progress|
           if block_given? then yield progress else logger.info(progress) end
         end
-        logger.debug("DONE Reading from stdout")
+        logger.info("DONE Reading from stdout")
       end
     end
 
