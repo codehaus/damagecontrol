@@ -87,6 +87,10 @@ module DamageControl
         end
       end
     end
+    
+    def install_trigger(*args)
+      raise "can't automatically install trigger for Subversion, you need to install it manually"
+    end
   end
 
   ##################################################################################
@@ -121,11 +125,53 @@ module DamageControl
         end
 
         if(is_new)
-          svn("add #{relative_filename}")
+          svn(working_dir, "add #{relative_filename}")
         end
 
         commit("adding #{relative_filename}")
       end
+    end
+    
+    def hookdir
+      "#{@svnrootdir}/hooks"
+    end
+    
+    def trigger_command(project_name, dc_url)
+      "#{ruby_path} #{trigger_script_name} #{dc_url} #{project_name}"
+    end
+    
+    def hook_file
+      if windows? then "post-commit.bat" else "post-commit" end
+    end
+    
+    def install_trigger(project_name, dc_url)
+      # this stuff doesn't work for some reason, if you execute the file manually it works, but svn never executes the post-commit trigger
+      File.open("#{hookdir}/#{hook_file}", "w") do |file|
+        trigger_command = trigger_command(project_name, dc_url)
+        file.puts("#!/bin/sh") unless windows?
+        file.puts(trigger_command)
+      end
+      system("chmod a+x #{hookdir}/#{hook_file}") unless windows?
+      File.open("#{hookdir}/#{trigger_script_name}", "w") do |io|
+        io.puts(trigger_script)
+      end
+    end
+    
+    # TODO: refactor. This is ugly!
+    def add_or_edit_and_commit_file(relative_filename, content)
+      existed = false
+      with_working_dir(working_dir) do
+        File.mkpath(File.dirname(relative_filename))
+        existed = File.exist?(relative_filename)
+        File.open(relative_filename, "w") do |file|
+          file.puts(content)
+        end
+      end
+      svn(working_dir, "add #{relative_filename}") unless(existed)
+
+      message = existed ? "editing" : "adding"
+
+      commit("#{message} #{relative_filename}")
     end
   end
 end

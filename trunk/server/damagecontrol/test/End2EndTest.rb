@@ -10,7 +10,6 @@ require 'damagecontrol/util/FileUtils'
 require 'damagecontrol/xmlrpc/ConnectionTester'
 require 'damagecontrol/util/Logging'
 require 'damagecontrol/publisher/IRCPublisher'
-require 'damagecontrol/scm/CVSTest'
 
 module DamageControl
 
@@ -157,11 +156,8 @@ class DamageControlServerDriver < Driver
     project_config = project_config_repo.project_config(project)
 
     project_config["build_command_line"] = build_command_line
-    # TODO: we need a general way to ask the scm for this stuff.
-    # Perhaps a method on each SCM called config_map
-    project_config["scm_type"] = "cvs"
-    project_config["cvsroot"] = scm.cvsroot
-    project_config["cvsmodule"] = scm.mod
+    project_config["scm_type"] = scm.class.superclass.name
+    scm.config_map.each {|key, val| project_config[key] = val }
     
     project_config_repo.modify_project_config(project, project_config)
   end
@@ -241,14 +237,16 @@ class End2EndTest < Test::Unit::TestCase
   end
   
   def test_damagecontrol_works_with_cvs
-    mod = "testproject"
-    cvs = LocalCVS.new(@basedir, mod)
-    
+    cvsmodule = "testproject"
+    cvs = LocalCVS.new(@basedir, cvsmodule)
     test_build_and_log_and_irc(cvs)
   end
   
+  # aslak: post-commit trigger script is not executed by svn. don't know why!
+  # see you tomorrow
+  # -- jon
   def TODO_test_damagecontrol_works_with_svn
-    svn = LocalSVN.new(@basedir, mod)
+    svn = LocalSVN.new(@basedir, "testproject")
     test_build_and_log_and_irc(svn)
   end
   

@@ -125,11 +125,7 @@ module DamageControl
     #
     # @block &proc a block that can handle the output (should typically log to file)
     #
-    def install_trigger(
-      project_name, \
-      dc_url="http://localhost:4712/private/xmlrpc", \
-      &proc
-    )
+    def install_trigger(project_name, dc_url="http://localhost:4712/private/xmlrpc", &proc)
       cvsroot_cvs = create_cvsroot_cvs
       cvsroot_cvs.checkout(&proc)
       with_working_dir(cvsroot_cvs.working_dir) do
@@ -153,18 +149,8 @@ module DamageControl
       end
     end
     
-    def trigger_script
-%{require 'xmlrpc/client'
-
-url = ARGV[0]
-project_name = ARGV[1]
-
-puts "Nudging DamageControl on \#{url} to build project \#{project_name}"
-client = XMLRPC::Client.new2(url)
-build = client.proxy("build")
-result = build.trig(project_name, Time.now.utc.strftime("%Y%m%d%H%M%S"))
-puts result
-}
+    def trigger_command(project_name, dc_url)
+      "#{ruby_path} " + to_os_path("#{path}/CVSROOT/#{trigger_script_name}") + " #{dc_url} #{project_name}"
     end
     
     def create_cvsroot_cvs
@@ -226,23 +212,6 @@ puts result
       File.exists?(rootcvs)
     end
         
-    def trigger_script_name
-      "dctrigger.rb"
-    end
-    
-    def trigger_command(project_name, dc_url)
-      "#{ruby_path} " + to_os_path("#{path}/CVSROOT/#{trigger_script_name}") + " #{dc_url} #{project_name}"
-    end
-    
-    def ruby_path
-      if(windows?)
-        "ruby"
-      else
-        "/home/services/dcontrol/ruby/bin/ruby"
-#        "ruby"
-      end
-    end
-    
     def cvs(dir, cmd, &proc)
       cmd = "cvs -q #{cmd} 2>&1"
       cmd_with_io(dir, cmd) do |io|
