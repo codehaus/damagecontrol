@@ -29,7 +29,7 @@ module DamageControl
     end
     
     def find_available_executor
-      executors.find {|executor|  !executor.busy? }
+      executors.find {|executor| !executor.busy? }
     end
     
     def find_build_for_project(project_name)

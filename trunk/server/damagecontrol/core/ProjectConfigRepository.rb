@@ -44,12 +44,6 @@ module DamageControl
       project_directories.project_names
     end
     
-    def parse_project_config(config_content)
-      config = YAML::load(config_content)
-      raise InvalidProjectConfiguration.new(config_content) unless config.is_a? Hash
-      config
-    end
-    
     def project_config(project_name)
       File.open(project_directories.project_config_file(project_name)) do |io|
         parse_project_config(io.gets(nil))
@@ -71,10 +65,19 @@ module DamageControl
         io.puts(config_map.to_yaml)
       end
     end
-    
+
     def create_build(project_name, timestamp)
       Build.new(project_name, timestamp, project_config(project_name))
     end
+
+  private
+
+    def parse_project_config(config_content)
+      config = YAML::load(config_content)
+      raise InvalidProjectConfiguration.new(config_content) unless config.is_a? Hash
+      config
+    end
+    
   end
   
 end
