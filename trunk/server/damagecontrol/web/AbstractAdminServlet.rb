@@ -91,7 +91,8 @@ module DamageControl
     end
     
     def global_search_form
-      erb("components/global_search_form.erb", binding)
+      ""
+      #erb("components/global_search_form.erb", binding)
     end
     
     def navigation

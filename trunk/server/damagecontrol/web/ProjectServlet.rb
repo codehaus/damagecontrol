@@ -162,7 +162,8 @@ module DamageControl
     
     def search_form
       if project_name
-        project_search_form(:project_name => project_name)
+        ""
+        #project_search_form(:project_name => project_name)
       else
         super
       end
