@@ -10,33 +10,33 @@ module Pebbles
       RUBY_PLATFORM == "i386-mswin32" ? "notepad" : "cat"
     end
 
-    def Xtest_should_return_one_for_failing_command
+    def test_should_return_one_for_failing_command
       assert_equal(1, Process2.new("cvs mooky").execute)
     end
 
-    def Xtest_should_return_127_for_unknown_command_with_redirected_stderr
+    def test_should_return_127_for_unknown_command_with_redirected_stderr
       assert_equal(127, Process2.new("mooky", "stderr.log").execute)
     end
 
-    def Xtest_should_return_1_for_unknown_command_without_redirected_stderr
+    def test_should_return_1_for_unknown_command_without_redirected_stderr
       assert_equal(1, Process2.new("mooky").execute)
     end
 
-    def Xtest_should_return_zero_for_successful_command_and_yield_stdout
+    def test_should_return_zero_for_successful_command_and_yield_stdout
       ret = Process2.new("cvs --version").execute do |stdout, process|
         assert_match(/CVSNT version/, stdout.read)
       end
       assert_equal(0, ret)
     end
 
-    def Xtest_should_be_able_to_kill_explicitly
+    def test_should_be_able_to_kill_explicitly
       ret = Process2.new(blocking_command).execute do |stdout, process|
         process.kill
       end
       assert_equal(nil, ret)
     end
     
-    def Xtest_should_kill_on_timeout_and_return_nil_exit_code
+    def test_should_kill_on_timeout_and_return_nil_exit_code
       timeout(3) do
         ret = Process2.new(blocking_command, nil, {}, 2).execute do |stdout, process|
           #puts stdout.read
@@ -80,7 +80,7 @@ module Pebbles
       assert(read_interrupted)
     end
     
-    def Xtest_should_allow_status_query_from_different_thread
+    def test_should_allow_status_query_from_different_thread
       process = nil
       execute_thread = Thread.new do
         ret = Process2.new(blocking_command).execute do |stdout, process|
@@ -95,7 +95,7 @@ module Pebbles
       execute_thread.join
     end
     
-    def Xtest_should_allow_different_environment_in_parallel_processes
+    def test_should_allow_different_environment_in_parallel_processes
       threads = []
       mooky_env = RUBY_PLATFORM == "i386-mswin32" ? "%MOOKY%" : "$MOOKY"
       (1..5).each do |n|
@@ -113,7 +113,7 @@ module Pebbles
       threads.each {|t| t.join}
     end
 
-    def Xtest_should_compute_winprocess_difference
+    def test_should_compute_winprocess_difference
       before = [Win32Process.new(3, "three"), Win32Process.new(1, "one"), Win32Process.new(2, "two")]
       after = [Win32Process.new(3, "three"), Win32Process.new(1, "one"), Win32Process.new(4, "four"), Win32Process.new(2, "two")]
       diff = after - before
