@@ -57,7 +57,7 @@ module DamageControl
         end
       end)
       
-      @build_executor.receive_message(BuildRequestEvent.new(build))
+      @build_executor.process_message(BuildRequestEvent.new(build))
       @build_executor.force_tick
 
       assert(successful, "Ant build should succeed")
