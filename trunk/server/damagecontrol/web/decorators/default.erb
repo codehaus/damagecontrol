@@ -36,24 +36,22 @@
 
 <div class="task-panel">
 
-	<% if !tasks.empty? then %>
-		<div class="task-entry">
-			<form action="project">
-				Search <%if(project_name)%><%= project_name %><%end%> builds: 
-				<input name="search" value="<%= request.query['search'] %>"/>
-				<input name="action" value="search" type="hidden"/>
-				<% if(project_name) %>
-				<input name=project_name value="<%= project_name %>" type="hidden"/>
-				<% end %>
-				<input type="submit" value="Go"/>
-			</form>
-		</div>
+	<div class="task-entry">
+		<form action="project">
+			Search <%if(project_name)%><%= project_name %><%end%> builds: 
+			<input name="search" value="<%= request.query['search'] %>"/>
+			<input name="action" value="search" type="hidden"/>
+			<% if(project_name) %>
+			<input name=project_name value="<%= project_name %>" type="hidden"/>
+			<% end %>
+			<input type="submit" value="Go"/>
+		</form>
+	</div>
 
-		<% tasks.each do |name, url| %>
-			<div class='task-entry'><a href="<%= url %>"><%= name %></a></div>
-		<% end %>
-		<div class='task-entry'><a href="root/<%= project_name %>/checkout\">Checked out files...</a></div>
+	<% tasks.each do |name, url| %>
+		<div class='task-entry'><a href="<%= url %>"><%= name %></a></div>
 	<% end %>
+	<div class='task-entry'><a href="root/<%= project_name %>/checkout\">Checked out files...</a></div>
 
 </div>
 </div>
