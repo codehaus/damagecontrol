@@ -137,14 +137,14 @@ class Project
       cd %DAMAGECONTROL_HOME%
       set RUBY_HOME="%DAMAGECONTROL_HOME%\\ruby"
       set PATH="%RUBY_HOME%\\bin";%PATH%
-      ruby -I"%DAMAGECONTROL_HOME%\\server" "%DAMAGECONTROL_HOME%\\#{win_target}"
+      ruby -I"%DAMAGECONTROL_HOME%\\server" "%DAMAGECONTROL_HOME%\\#{win_target}" %1 %2 %3 %4 %5 %6 %7 %8 %9  
     })
     write_file(script, %{
       \#!/bin/sh
       DAMAGECONTROL_HOME=`dirname $0`/..
       cd $DAMAGECONTROL_HOME
       export DAMAGECONTROL_HOME=`pwd`
-      ruby -I"$DAMAGECONTROL_HOME/server" "$DAMAGECONTROL_HOME/#{target}"
+      ruby -I"$DAMAGECONTROL_HOME/server" "$DAMAGECONTROL_HOME/#{target}" $*
     })
     system("chmod +x #{script}") unless windows?
   end
