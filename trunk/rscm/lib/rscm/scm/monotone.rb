@@ -20,7 +20,7 @@ module RSCM
     ann :description => "Keys file"
     attr_accessor :keys_file
 
-    def initialize(server="", port="5253", db_file="MT.db", branch="", key="", passphrase="", keys_file="")
+    def initialize(port="5253", db_file="MT.db", branch="", key="", passphrase="", keys_file="")
       @db_file = File.expand_path(db_file)
       @branch = branch
       @key = key
