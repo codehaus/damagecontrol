@@ -10,7 +10,7 @@ class String
       # Assume it's a timestamp string - convert to time.
       Time.parse_ymdHMS(self)
     else
-      self
+      self.to_i
     end
   end
 end
