@@ -17,6 +17,15 @@ module DamageControl
     
     def image
       "images/lastcompletedstatus/#{name}"
+			color = "grey"
+      pulse = ""
+      build = last_completed_build
+			
+      if(build && build.completed?)
+        color = if build.successful? then "green" else "red" end
+        pulse = "-pulse" if ongoing_build?
+      end
+      image = "images/#{color}#{pulse}-32.gif"
     end
     
     def last_successful_build
