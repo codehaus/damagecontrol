@@ -205,11 +205,11 @@ module DamageControl
   private
 
     def cvsroot(password=@password)
-      protocol, user, host, path = parse_cvsroot
       if @password && @password != ""
+        protocol, user, host, path = parse_cvsroot
         ":#{protocol}:#{user}:#{password}@#{host}:#{path}"
       else
-        ":#{protocol}:#{user}@#{host}:#{path}"
+        @cvsroot
       end
     end
     

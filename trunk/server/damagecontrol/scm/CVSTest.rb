@@ -15,7 +15,7 @@ module DamageControl
       time_before = Time.utc(2004,01,01,12,00,00) 
       time_after = Time.utc(2004,01,01,13,00,00)
       cvs = CVS.new({"cvsroot" => ":local:repo", "cvsmodule" => "module", "checkout_dir" => "."})
-      assert_equal("log -N -S -d\"2004-01-01 12:00:00 UTC<=2004-01-01 13:00:00 UTC\"",
+      assert_equal("log -N -d\"2004-01-01 12:00:00 UTC<=2004-01-01 13:00:00 UTC\"",
         cvs.changes_command(time_before, time_after))
     end
     

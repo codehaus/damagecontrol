@@ -51,9 +51,10 @@ module DamageControl
 
       @build_executor.schedule_build(@build)
       @build_executor.process_next_scheduled_build
-      assert_message_types_from_hub([BuildStartedEvent, BuildProgressEvent, BuildCompleteEvent])
-      assert_equal("Hello world from DamageControl!", messages_from_hub[1].output.chomp.chomp(" "))
-      assert_equal(BuildCompleteEvent.new(@build), messages_from_hub[2])
+      assert_message_types_from_hub([BuildStartedEvent, BuildProgressEvent, BuildProgressEvent, BuildCompleteEvent])
+      assert_equal("echo Hello world from DamageControl!", messages_from_hub[1].output.chomp.chomp(" "))
+      assert_equal("Hello world from DamageControl!", messages_from_hub[2].output.chomp.chomp(" "))
+      assert_equal(BuildCompleteEvent.new(@build), messages_from_hub[3])
 
       mock_scm.__verify
     end
