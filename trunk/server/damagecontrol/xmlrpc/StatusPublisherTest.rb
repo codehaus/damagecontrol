@@ -58,13 +58,17 @@ module XMLRPC
       resp, data = h.post2('/test', XMLRPC_CALL_DATA, header)
       
       pref = {:ignore_whitespace_nodes=>:all}
-      a = ""
-      REXML::Document.new( data, pref ).write(a)
-      b = ""
-      REXML::Document.new( File.new("#{damagecontrol_home}/testdata/expected_xmlrpc_fetch_all_reply.xml"), pref).write(b)
+      response_as_string = ""
+      response = REXML::Document.new(data, pref)
+      response.write(response_as_string)
+      #File.open("#{damagecontrol_home}/testdata/actual.xml", "w+") do |io|
+      #  response.write(io)
+      #end
+      expected_as_string = ""
+      REXML::Document.new( File.new("#{damagecontrol_home}/testdata/expected_xmlrpc_fetch_all_reply.xml"), pref).write(expected_as_string)
       # Just compare the lengths. Not 100% foolproof, but if they're not equal, compare the actual content
-      if(a.length != b.length)
-        assert_equal(b,a)      
+      if(response_as_string.length != expected_as_string.length)
+        assert_equal(expected_as_string, response_as_string)      
       end
     end
   end
