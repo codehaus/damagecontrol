@@ -29,7 +29,7 @@ module DamageControl
 
       @template.__return(:file_type, "email")
       @template.__next(:generate) { |build2|
-        "some contentAA"
+        "some contentA"
       }
       
       @email_publisher.process_message(BuildCompleteEvent.new(build))
