@@ -24,11 +24,10 @@ function processReqChange() {
         if (req.status == 200) {
             var checkout_list = document.getElementById('checkout_list')
             checkout_list.value = req.responseText
-            checkout_list.scrollBy(3000)
-            setTimeout("loadXMLDoc('<%= @checkout_list_path %>')", 4000)
+            setTimeout("loadXMLDoc('<%= @checkout_list_path %>')", 1000)
         } else {
             alert("There was a problem retrieving the XML data:\n" +
-                req.statusText);
+                req.responseText);
         }
     }
 }

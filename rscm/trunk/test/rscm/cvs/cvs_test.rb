@@ -12,5 +12,10 @@ module RSCM
       CVS.local(repository_root_dir, path)
     end
 
+    def test_should_fail_on_bad_command
+      assert_raise(RuntimeError) do
+        CVS.new("").create
+      end
+    end
   end
 end

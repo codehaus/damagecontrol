@@ -45,6 +45,7 @@ module RSCM
             relative_path = $1.chomp
             relative_path = relative_path.gsub(/\\/, "/") if WINDOWS
             checked_out_files << relative_path
+            yield relative_path if block_given?
           end
         end
       else
@@ -58,11 +59,12 @@ module RSCM
               relative_path = native_absolute_path[native_checkout_dir.length+1..-1].chomp
               relative_path = relative_path.gsub(/\\/, "/") if WINDOWS
               checked_out_files << relative_path
+              yield relative_path if block_given?
             end
           end
         end
       end
-      checked_out_files.sort!
+      checked_out_files
     end
 
     def checkout_commandline

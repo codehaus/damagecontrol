@@ -7,6 +7,13 @@ require 'rscm/directories'
 
 class ApplicationController < ActionController::Base
   include RSCM::Directories
+
+  # Loads the project corresponding to the id
+  # Returns nil if the id param is not specified
+  def load_project
+    project_name = @params["id"]
+    project_name ? RSCM::Project.load(project_name) : nil
+  end
 end
 
 module ActionView

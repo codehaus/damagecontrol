@@ -4,21 +4,18 @@ class ScmController < ApplicationController
 
   layout 'rscm'
 
+  # Checks out a working copy into the project's checkout dir.
   def checkout
-    project_name = @params["id"]
-    if(project_name)
-      project = RSCM::Project.load(project_name)
-      # We'll check out asynch (takes time!)
-      Thread.new do
-#        project.checkout
-      end
+    project = load_project
 
-      # Doing a redirect since this *should* be called via HTTP POST
-      redirect_to :action => "checkout_status", :id => project_name
-    else
-      # TODO: show a better error page.
-      render_text "No project specified"
+    # We'll check out asynch (takes time!)
+    Thread.new do
+# Blocks on win32 - must try with win32utils threads!
+      project.checkout
     end
+
+    # Doing a redirect since this *should* be called via HTTP POST
+    redirect_to :action => "checkout_status", :id => project.name
   end
 
   # Shows the status page with the JS magic that
@@ -27,11 +24,21 @@ class ScmController < ApplicationController
     @checkout_list_path = "/scm/checkout_list/#{@params['id']}"
   end
 
-  # Returns a txt file containing the files currently being checked out.
+  # Sends the file containing the files currently being checked out.to the client
   def checkout_list
-    project_name = @params["id"]
-    file_name = RSCM::Directories.checkout_list_file(project_name)
-    send_file(file_name)
+    project = load_project
+    if(File.exist?(project.checkout_list_file))
+      send_file(project.checkout_list_file)
+    else
+      render_text("No files checked out yet")
+    end
+  end
+
+  # Creates the SCM repo
+  def create
+    project = load_project
+    project.scm.create
+    redirect_to :controller => "project", :action => "view", :id => project.name
   end
 
 end

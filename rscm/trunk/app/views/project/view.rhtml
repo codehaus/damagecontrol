@@ -34,9 +34,9 @@ trackers = [
 </script>
 
 <ul id="foldertab">
-    <li><a href="javascript:showElement('project_tab', tabs)"><img src="/images/16x16/wrench.png"> General</a></li>
-    <li><a href="javascript:showElement('scm_tab', tabs)"><img src="/images/16x16/safe.png"> Source Control</a></li>
-    <li><a href="javascript:showElement('tracker_tab', tabs)"><img src="/images/16x16/scroll_information.png"> Issue Tracker</a></li>
+  <li><a href="javascript:showElement('project_tab', tabs)"><img src="/images/16x16/wrench.png"> General</a></li>
+  <li><a href="javascript:showElement('scm_tab', tabs)"><img src="/images/16x16/safe.png"> Source Control</a></li>
+  <li><a href="javascript:showElement('tracker_tab', tabs)"><img src="/images/16x16/scroll_information.png"> Issue Tracker</a></li>
 </ul>
 
 <form action="/project/save">
@@ -47,27 +47,35 @@ trackers = [
 
 <div id="scm_tab" style="display:none">
 <table width="100%">
-<tr>
-  <td>Source control</td>
-  <td>
-    <% @scms.each do |scm| %>
-      <input 
-        type="radio" 
-        value="<%= scm.class.name %>" 
-        name="scm" 
-        onClick="javascript:showElement('<%= scm.class.name %>', scms)"<%if(scm.selected?)%>checked="true"<%end%>/> 
-      <%= scm.name %>
-    <% end %>
-  </td>
-</tr>
+  <tr>
+    <td>Source control</td>
+    <td>
+      <% @scms.each do |scm| %>
+        <input 
+          type="radio" 
+          value="<%= scm.class.name %>" 
+          name="scm" 
+          onClick="javascript:showElement('<%= scm.class.name %>', scms)"<%if(scm.selected?)%>checked="true"<%end%>/> 
+        <%= scm.name %>
+      <% end %>
+    </td>
+  </tr>
 </table>
 
-  <% @scms.each do |scm| %>
-    <div id="<%= scm.class.name %>" style="<% if(scm.selected?)%>display:block<%else%>display:none<%end%>">
-      <%= render_partial(scm.short, scm) %>
-    </div>
-  <% end %>
-  
+<% @scms.each do |scm| %>
+  <div id="<%= scm.class.name %>" style="<% if(scm.selected?)%>display:block<%else%>display:none<%end%>">
+    <%= render_partial(scm.short, scm) %>
+  </div>
+<% end %>
+
+<% if(!@project.scm.exists? && @project.scm.can_create?) %>
+  <%= link_to("create", :controller => "scm", :action => "create", :id => @project.name) %><br>
+<% end %>
+
+<% if(@project.scm.exists?) %>
+  <%= link_to("checkout", :controller => "scm", :action => "checkout", :id => @project.name) %>
+<% end %>  
+
 </div>
 
 <div id="tracker_tab" style="display:none">

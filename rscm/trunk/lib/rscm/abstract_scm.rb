@@ -14,6 +14,12 @@ class Time
   end
 end
 
+def safer_popen(cmd, mode="r", &proc)
+  IO.popen(cmd, mode="r", &proc)
+  exit_code = $? >> 8
+  raise "#{cmd} failed with code #{exit_code}" if exit_code != 0
+end
+
 module RSCM
   # This class defines the RSCM API. The documentation of the various methods
   # uses CVS' terminology.

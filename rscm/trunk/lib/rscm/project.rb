@@ -41,12 +41,16 @@ module RSCM
       end      
     end
     
+    def checkout_list_file
+      Directories.checkout_list_file(name)
+    end
+    
     # Checks out files to project's checkout directory.
     # Writes the checked out files to +checkout_list_file+.
     def checkout
-      File.open(Directories.checkout_list_file(name), "w") do |f|
+      File.open(checkout_list_file, "w") do |f|
         scm.checkout(Directories.checkout_dir(name)) do |file_name|
-          f << file_name
+          f << file_name << "\n"
         end
       end
     end

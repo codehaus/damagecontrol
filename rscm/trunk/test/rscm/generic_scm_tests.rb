@@ -45,13 +45,17 @@ module RSCM
       end
 
       assert_equal(4, files.length)
+      assert_equal(files, yielded_files)
+      files.sort!
+      yielded_files.sort!
+      assert_equal(files, yielded_files)
+
       assert_equal("build.xml", files[0])
       assert_equal("project.xml", files[1])
       assert_equal("src/java/com/thoughtworks/damagecontrolled/Thingy.java", files[2])
       assert_equal("src/test/com/thoughtworks/damagecontrolled/ThingyTestCase.java", files[3])
-      assert_equal(files, yielded_files)
-      initial_changesets = scm.changesets(checkout_dir, nil, nil, files)
 
+      initial_changesets = scm.changesets(checkout_dir, nil, nil, files)
       assert_equal(1, initial_changesets.length)
       initial_changeset = initial_changesets[0]
       assert_equal(4, initial_changeset.length)
@@ -93,7 +97,7 @@ module RSCM
       assert(scm.uptodate?(checkout_dir, changesets.latest.time+1))
       assert(scm.uptodate?(checkout_dir, changesets.latest.time+1))
 
-      files = scm.checkout(other_checkout_dir) 
+      files = scm.checkout(other_checkout_dir).sort
       assert_equal(2, files.length)
       assert_equal("build.xml", files[0])
       assert_equal("src/java/com/thoughtworks/damagecontrolled/Thingy.java", files[1])
@@ -106,7 +110,7 @@ module RSCM
       assert_equal(1, changesets.length)
       assert_equal(1, changesets[0].length)
       assert("src/java/com/thoughtworks/damagecontrolled/Hello.txt", changesets[0][0].path)
-      assert("src/java/com/thoughtworks/damagecontrolled/Hello.txt", scm.checkout(other_checkout_dir)[0])
+      assert("src/java/com/thoughtworks/damagecontrolled/Hello.txt", scm.checkout(other_checkout_dir).sort[0])
     end
     
     def test_trigger

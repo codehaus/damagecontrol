@@ -77,7 +77,7 @@ module RSCM
           end
         end
       end
-      checked_out_files.sort!
+      checked_out_files
     end
     
     def checkout_commandline(to_identifier=Time.infinity)
@@ -205,7 +205,7 @@ module RSCM
 
       execed_command_line = command_line(password, cmd, simulate)
       with_working_dir(dir) do
-        IO.popen(execed_command_line) do |stdout|
+        safer_popen(execed_command_line) do |stdout|
           stdout.each_line do |progress|
             yield progress if block_given?
           end
@@ -224,7 +224,7 @@ module RSCM
       execed_command_line = command_line(password, cmd)
       changesets = nil
       with_working_dir(checkout_dir) do
-        IO.popen(execed_command_line) do |stdout, process|
+        safer_popen(execed_command_line) do |stdout, process|
           parser = CVSLogParser.new(stdout)
           parser.cvspath = path
           parser.cvsmodule = mod
