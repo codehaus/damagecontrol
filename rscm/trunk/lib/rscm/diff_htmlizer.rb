@@ -21,35 +21,36 @@ module RSCM
       if(line.removed?)
         @io << "<pre class='diff' id='removed'>"
         if(line.removed)
-          @io << line.prefix
+          @io << line.prefix.html_encoded
           @io << "<span id='removedchars'>"
-          @io << line.removed
+          @io << line.removed.html_encoded
           @io << "</span>"
-          @io << line.suffix
+          @io << line.suffix.html_encoded
         else
-          @io << line
+          @io << line.html_encoded
         end
         @io << "</pre>"
       elsif(line.added?)
         @io << "<pre class='diff' id='added'>"
         if(line.added)
-          @io << line.prefix
+          @io << line.prefix.html_encoded
           @io << "<span id='addedchars'>"
-          @io << line.added
+          @io << line.added.html_encoded
           @io << "</span>"
-          @io << line.suffix
+          @io << line.suffix.html_encoded
         else
-          @io << line
+          @io << line.html_encoded
         end
         @io << "</pre>"
       else
         @io << "<pre class='diff' id='context'>"
-        @io << line
+        @io << line.html_encoded
         @io << "</pre>"
       end
     end
   end
 
+  # Not used
   class Plain
     def initialize(io)
       @io = io
@@ -62,7 +63,20 @@ module RSCM
     end
     
     def visitLine(line)
-      @io << line
+      @io << line.html_encoded
+    end
+  end
+end
+
+class String
+  def html_encoded
+    self.gsub(/./) do
+      case $&
+        when "&" then "&amp;"
+        when "<" then "&lt;"
+        when ">" then "&gt;"
+        else $&
+      end
     end
   end
 end
