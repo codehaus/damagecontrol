@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="iso-8859-1"?>
+<Combine xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema" fileversion="1" name="DamageControlClient" description="">
+  <StartMode startupentry="WindowsTray" single="True">
+    <Execute entry="WindowsTray" type="None" />
+    <Execute entry="DamageControlConsoleMonitor" type="None" />
+    <Execute entry="DamageControlClientNet" type="None" />
+    <Execute entry="XmlRpcCs" type="None" />
+  </StartMode>
+  <Entries>
+    <Entry filename="./WindowsTray/WindowsTray.prjx" />
+    <Entry filename="./DamageControlConsoleMonitor/DamageControlConsoleMonitor.prjx" />
+    <Entry filename="./DamageControlClientNet/DamageControlClientNet.prjx" />
+    <Entry filename="./XmlRpcCs/XmlRpcCs.prjx" />
+  </Entries>
+  <Configurations active="Debug">
+    <Configuration name="Release">
+      <Entry name="WindowsTray" configurationname="Debug" build="False" />
+      <Entry name="DamageControlConsoleMonitor" configurationname="Debug" build="False" />
+      <Entry name="DamageControlClientNet" configurationname="Debug" build="False" />
+      <Entry name="XmlRpcCs" configurationname="Debug" build="False" />
+    </Configuration>
+    <Configuration name="Debug">
+      <Entry name="WindowsTray" configurationname="Debug" build="False" />
+      <Entry name="DamageControlConsoleMonitor" configurationname="Debug" build="False" />
+      <Entry name="DamageControlClientNet" configurationname="Debug" build="False" />
+      <Entry name="XmlRpcCs" configurationname="Debug" build="False" />
+    </Configuration>
+  </Configurations>
+</Combine>
