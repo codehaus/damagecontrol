@@ -1,4 +1,4 @@
-require 'Slot'
+require 'damagecontrol/Slot'
 
 module DamageControl
 
