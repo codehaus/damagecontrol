@@ -14,7 +14,7 @@ module DamageControl
           # Workaround for new Ruby symbol semantics in YAML.
           # A String that starts with a colon will be converted
           # to a symbol, which is not what we want.
-          # Therefore, prepend a magic "__" and take it out afterwards.
+          # Therefore, replace the offending ":"s with "_" and take it out afterwards.
           line.gsub!(/:pserver:/, "_pserver:")
           line.gsub!(/:local:/, "_local:")
           line.gsub!(/:ext:/, "_ext:")
