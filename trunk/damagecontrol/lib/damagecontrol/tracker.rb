@@ -21,7 +21,7 @@ module DamageControl
       end
     end
 
-    class Null < Base
+    class None < Base
       register self
     
       def name

@@ -16,7 +16,7 @@ module RSCM
     ann :description => "CVSROOT"
     attr_accessor :root
 
-    ann :description => "module"
+    ann :description => "Module"
     attr_accessor :mod
 
     ann :description => "Branch"

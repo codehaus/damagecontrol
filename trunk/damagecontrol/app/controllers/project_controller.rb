@@ -34,7 +34,6 @@ class ProjectController < ApplicationController
     def first_tracker.selected?
       true
     end
-
     @edit = true
     @new_project = true
     render_action("view")

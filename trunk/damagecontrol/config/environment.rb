@@ -29,7 +29,7 @@ ADDITIONAL_LOAD_PATHS.reverse.each { |dir| $:.unshift(dir) if File.directory?(di
 # Require Rails gems.
 require 'rubygems'
 require_gem 'activesupport'
-require_gem 'activerecord'
+#require_gem 'activerecord'
 require_gem 'actionpack'
 require_gem 'actionmailer'
 require_gem 'actionwebservice'
@@ -37,9 +37,9 @@ require_gem 'rails'
 
 
 # Environment-specific configuration.
-require_dependency "environments/#{RAILS_ENV}"
-ActiveRecord::Base.configurations = YAML::load(File.open("#{RAILS_ROOT}/config/database.yml"))
-ActiveRecord::Base.establish_connection
+#require_dependency "environments/#{RAILS_ENV}"
+#ActiveRecord::Base.configurations = YAML::load(File.open("#{RAILS_ROOT}/config/database.yml"))
+#ActiveRecord::Base.establish_connection
 
 
 # Configure defaults if the included environment did not.
@@ -54,7 +54,8 @@ rescue StandardError
   )
 end
 
-[ActiveRecord, ActionController, ActionMailer].each { |mod| mod::Base.logger ||= RAILS_DEFAULT_LOGGER }
+#[ActiveRecord, ActionController, ActionMailer].each { |mod| mod::Base.logger ||= RAILS_DEFAULT_LOGGER }
+[ActionController, ActionMailer].each { |mod| mod::Base.logger ||= RAILS_DEFAULT_LOGGER }
 [ActionController, ActionMailer].each { |mod| mod::Base.template_root ||= "#{RAILS_ROOT}/app/views/" }
 ActionController::Routing::Routes.reload
 
