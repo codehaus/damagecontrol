@@ -160,9 +160,8 @@ module DamageControl
     def init_config_services
       component(:hub, Hub.new)
       
-      component(:scm_factory, SCMFactory.new)
       component(:project_directories, @project_directories)
-      component(:project_config_repository, ProjectConfigRepository.new(project_directories, scm_factory, public_web_url))
+      component(:project_config_repository, ProjectConfigRepository.new(project_directories, public_web_url))
       component(:build_history_repository, BuildHistoryRepository.new(hub, @project_directories))
     end
     
@@ -287,7 +286,7 @@ module DamageControl
     
     def init_scm_poller
       component(:scm_poller, 
-        SCMPoller.new(hub, polling_interval, scm_factory, project_config_repository, build_history_repository, build_scheduler))
+        SCMPoller.new(hub, polling_interval, project_config_repository, build_history_repository, build_scheduler))
     end
     
     def init_custom_components

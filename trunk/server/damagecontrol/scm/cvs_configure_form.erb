@@ -6,7 +6,7 @@
       # Hackish/Neat trick:
       # the inspect will convert backslashes to double backslashes and do all sorts of nice things
       # it will also add " " around the string so it is not needed in the actual html
-      cvsroot_attrib_value = project_config['cvsroot'].inspect
+      cvsroot_attrib_value = project_config['cvsroot'] ? project_config['cvsroot'].inspect : "\"\""
     %>
     <td><input class="scm_info" name="cvsroot" id="cvsroot" onKeyUp="distributeCvsrootFields()" type="text" value=<%=  cvsroot_attrib_value %>></td>
   </tr>
@@ -27,7 +27,7 @@
   </tr>
   <tr>
     <td>Password</td>
-    <td><input class="scm_info" name="cvspassword" id="cvspassword" onKeyUp="updateCvsRootField()" value="<%= project_config['cvspassword'] %>" type="password"></td>
+    <td><input class="scm_info" name="cvspassword" id="cvspassword" value="<%= project_config['cvspassword'] %>" type="password"></td>
   </tr>
   <tr>
     <td>Server</td>
@@ -43,7 +43,7 @@
   </tr>
   <tr>
     <td>Module</td>
-    <td><input class="scm_info" name="cvsmodule" id="cvsmodule" onKeyUp="updateCvsRootField()" type="text" value="<%= project_config['cvsmodule'] %>"></td>
+    <td><input class="scm_info" name="cvsmodule" id="cvsmodule" type="text" value="<%= project_config['cvsmodule'] %>"></td>
   </tr>
   <tr>
     <td>ViewCVS/Fisheye base URL</td>

@@ -15,8 +15,8 @@ module DamageControl
     
     def initialize(config_map)
       super(config_map)
-      @cvsroot = config_map["cvsroot"] || required_config_param("cvsroot")
-      @mod = config_map["cvsmodule"] || required_config_param("cvsmodule")
+      @cvsroot = config_map["cvsroot"] || required_config_param("cvsroot", config_map)
+      @mod = config_map["cvsmodule"] || required_config_param("cvsmodule", config_map)
       @password = config_map["cvspassword"]
     end
     
@@ -56,7 +56,7 @@ module DamageControl
     end
     
     def can_install_trigger?
-      true
+      exists?
     end
     
     # Installs and activates the trigger script in the repository
@@ -84,10 +84,15 @@ module DamageControl
     def trigger_installed?(project_name)
       cvsroot_cvs = create_cvsroot_cvs
       cvsroot_cvs.checkout
-      loginfo_file = File.new(File.join(cvsroot_cvs.working_dir, "loginfo"))
+      loginfo = File.join(cvsroot_cvs.working_dir, "loginfo")
+      return false if !File.exist?(loginfo)
+      loginfo_file = File.new(loginfo)
       loginfo_content = loginfo_file.read
       loginfo_file.close
-      trigger_in_string?(loginfo_content, project_name)
+      in_local_copy = trigger_in_string?(loginfo_content, project_name)
+      entries = File.join(cvsroot_cvs.working_dir, "CVS", "Entries")
+      committed = File.mtime(entries) > File.mtime(loginfo)
+      in_local_copy && committed
     end
 
     def uninstall_trigger(project_name)
@@ -102,6 +107,25 @@ module DamageControl
       loginfo_file.close
       with_working_dir(cvsroot_cvs.working_dir) do
         system("cvs commit -m \"Disabled DamageControl trigger for #{project_name}\"")
+      end
+    end
+
+    def create
+      raise "Can't create CVS repository for #{@cvsroot}" unless can_create?
+      File.mkpath(path)
+      cvs(path, "-d#{cvsroot} init")
+    end
+    
+    def can_create?
+      local?
+    end
+
+    def exists?
+      if(local?)
+        File.exists?("#{path}/CVSROOT/loginfo")
+      else
+        # don't know. assume yes.
+        true
       end
     end
 
@@ -181,10 +205,6 @@ module DamageControl
       end
     end
     
-    def pserver?
-      protocol == "pserver"
-    end
-    
     def create_cvsroot_cvs
       CVS.new("cvsroot" => @cvsroot, "cvsmodule" => "CVSROOT", "cvspassword" => @password, "checkout_dir" => checkout_dir)
     end
@@ -195,6 +215,10 @@ module DamageControl
 
     def commit_command(message)
       "commit -m \"#{message}\""
+    end
+
+    def local?
+      protocol == "local"
     end
     
     def path
@@ -229,12 +253,6 @@ module DamageControl
   class LocalCVS < CVS
     def initialize(basedir, mod)
       super("cvsroot" => ":local:#{basedir}/cvsroot", "cvsmodule" => mod, "checkout_dir" => "#{basedir}/checkout")
-      @cvsrootdir = "#{basedir}/cvsroot"
-    end
-
-    def create
-      File.mkpath(@cvsrootdir)
-      cvs(@cvsrootdir, "-d#{cvsroot} init")
     end
 
     def import(dir)

@@ -10,8 +10,8 @@ module DamageControl
 
     def initialize(config_map)
       super(config_map)
-      @svnurl = config_map["svnurl"] || required_config_param("svnurl")
-      @svnprefix = config_map["svnprefix"] || required_config_param("svnprefix")
+      @svnurl = config_map["svnurl"] || required_config_param("svnurl", config_map)
+      @svnprefix = config_map["svnprefix"] || required_config_param("svnprefix", config_map)
     end
   
     def web_url_to_change(change)

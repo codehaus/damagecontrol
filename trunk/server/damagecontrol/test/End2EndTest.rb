@@ -6,6 +6,8 @@ require 'damagecontrol/core/Build'
 require 'damagecontrol/core/BuildExecutor'
 require 'damagecontrol/core/BuildScheduler'
 require 'damagecontrol/core/ProjectConfigRepository'
+require 'damagecontrol/scm/CVS'
+require 'damagecontrol/scm/SVN'
 require 'damagecontrol/util/FileUtils'
 require 'damagecontrol/xmlrpc/ConnectionTester'
 require 'damagecontrol/util/Logging'
@@ -152,7 +154,7 @@ class DamageControlServerDriver < Driver
     new_project(project)
     
     pd = ProjectDirectories.new(basedir)
-    project_config_repo = ProjectConfigRepository.new(pd, SCMFactory.new, "")
+    project_config_repo = ProjectConfigRepository.new(pd, "")
     project_config = project_config_repo.project_config(project)
 
     project_config["build_command_line"] = build_command_line
@@ -229,9 +231,9 @@ class End2EndTest < Test::Unit::TestCase
   end
   
   def teardown
-    server.teardown
-    irc.teardown
-    scm.teardown unless scm.nil?
+    @server.teardown
+    @irc.teardown
+    @scm.teardown unless @scm.nil?
     
     #FileUtils.rm_rf(basedir)
   end
@@ -259,9 +261,9 @@ class End2EndTest < Test::Unit::TestCase
     scm.install_trigger(damagecontrol_home, "TestingProject", "http://localhost:14712/private/xmlrpc")
 
     @server = DamageControlServerDriver.new("#{basedir}/serverroot")
-    server.setup    
+    @server.setup    
     @irc = IRCDriver.new
-    irc.setup
+    @irc.setup
 
     server.setup_project_config("TestingProject", scm, execute_script_commandline("build"))
     

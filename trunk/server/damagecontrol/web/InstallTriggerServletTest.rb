@@ -1,7 +1,7 @@
 require 'damagecontrol/core/ProjectConfigRepository'
-require 'damagecontrol/scm/SCMFactory'
-require 'damagecontrol/web/InstallTriggerServlet'
+require 'damagecontrol/scm/NoSCM'
 require 'damagecontrol/util/FileUtils'
+require 'damagecontrol/web/InstallTriggerServlet'
 require 'pebbles/MVCServletTesting'
 require 'test/unit'
 
@@ -11,12 +11,13 @@ module DamageControl
     include Pebbles::MVCServletTesting
     
     def setup
-      @project_config_repository = ProjectConfigRepository.new(ProjectDirectories.new(new_temp_dir), SCMFactory.new, "")
+      @project_config_repository = ProjectConfigRepository.new(ProjectDirectories.new(new_temp_dir), "")
       @servlet = InstallTriggerServlet.new(@project_config_repository, "")
       @project_config_repository.new_project("myprojectname")
     end
 
     def test_install_trigger
+      @project_config_repository.modify_project_config("myprojectname", {"scm_type" => NoSCM.name})
       result = do_request("project_name" => "myprojectname") do
         @servlet.default_action
       end
@@ -24,6 +25,7 @@ module DamageControl
     end
 
     def test_do_install_trigger
+      @project_config_repository.modify_project_config("myprojectname", {"scm_type" => NoSCM.name})
       result = do_request("project_name" => "myprojectname") do
         @servlet.do_install_trigger
       end

@@ -124,12 +124,14 @@ module DamageControl
     end
     
     def next(build)
+      return nil unless build
       h = history(build.project_name)
       i = h.index(build)
       return h[i + 1] unless i == h.length - 1
     end
 
     def prev(build)
+      return nil unless build
       h = history(build.project_name)
       i = h.index(build)
       return h[i - 1] unless i == 0

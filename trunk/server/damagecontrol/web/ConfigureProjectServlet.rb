@@ -8,11 +8,29 @@ module DamageControl
     end
     
     def tasks
+      result = []
       unless project_name.nil?
-        [
-          task(:icon => "icons/navigate_left.png", :name => "Back to project", :url => "project?project_name=#{project_name}")
+        if(private?)
+          scm = project_config_repository.create_scm(project_name)
+          if(scm.can_create? && !scm.exists?)
+            result +=
+              [
+                task(:icon => "icons/package_new.png", :name => "Create repository", :url => "configure?project_name=#{project_name}&action=create_scm")
+              ]
+          end
+          if(scm.can_install_trigger? && !scm.trigger_installed?(project_name))
+            result +=
+              [
+                task(:icon => "icons/gear_connection.png", :name => "Install trigger", :url => "install_trigger?project_name=#{project_name}"),
+              ]
+          end
+        end
+
+        result += [
+          task(:icon => "icons/navigate_left.png", :name => "Back to project", :url => "project?project_name=#{project_name}"),
         ]
       end 
+      result
     end
 
     def default_action
@@ -20,8 +38,11 @@ module DamageControl
     end
     
     def clone_project
-      action = "store_configuration"
       project_config = self.project_config
+      action = "store_configuration"
+      next_build_number = 1
+      dependent_projects = from_array(project_config['dependent_projects'])
+      logs_to_archive = from_array(project_config['logs_to_archive'])
       project_name = ""
       render("configure.erb", binding)
     end
@@ -60,13 +81,17 @@ module DamageControl
       action_redirect(:configure, { "project_name" => project_name })
     end
     
+    def create_scm
+      scm = project_config_repository.create_scm(project_name)
+      scm.create
+      action_redirect(:configure, { "project_name" => project_name })
+    end
+
   private
   
     KEYS = [
       "build_command_line", 
       "project_name", 
-      "unix_groups",
-      "view_cvs_url",
       "trigger", 
       "nag_email", 
       "jira_url", 
@@ -82,10 +107,8 @@ module DamageControl
     end
     
     def scm_configurators(project_config = project_config)
-      scm_configurator_classes.collect {|cls| cls.new(project_config)}
+      @scm_configurator_classes.collect {|cls| cls.new(project_config, project_config_repository)}
     end
-    
-    attr_reader :scm_configurator_classes
     
   end
 end

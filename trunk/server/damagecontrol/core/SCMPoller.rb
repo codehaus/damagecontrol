@@ -9,10 +9,9 @@ module DamageControl
     include TimerMixin
     include Logging
     
-    def initialize(hub, polling_interval, scm_factory, project_config_repository, build_history_repository, build_scheduler)
+    def initialize(hub, polling_interval, project_config_repository, build_history_repository, build_scheduler)
       @hub = hub
       @polling_interval = polling_interval
-      @scm_factory = scm_factory
       @project_config_repository = project_config_repository
       @build_history_repository = build_history_repository
       @build_scheduler = build_scheduler
@@ -41,7 +40,7 @@ module DamageControl
     
     def poll_project(project_name, time)
       return unless should_poll?(project_name, time)
-      scm = @scm_factory.get_scm(project_config(project_name), @project_config_repository.checkout_dir(project_name))
+      scm = @project_config_repository.create_scm(project_name)
       last_completed_build = @build_history_repository.last_completed_build(project_name)
       if last_completed_build.nil?
         # not built yet, just build without checking

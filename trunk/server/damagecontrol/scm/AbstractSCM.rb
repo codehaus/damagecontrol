@@ -20,6 +20,18 @@ module DamageControl
       false
     end
 
+    def trigger_installed?(project_name)
+      false
+    end
+
+    def can_create?
+      false
+    end
+
+    def exists?
+      true
+    end
+
     def trigger_command(damagecontrol_install_dir, project_name, dc_url)
       script = "#{script_prefix}#{damagecontrol_install_dir}/bin/requestbuild#{script_suffix}"
       "#{to_os_path(script)} --url #{dc_url} --projectname #{project_name}"
@@ -37,12 +49,12 @@ module DamageControl
     def initialize(config_map)
       @config_map = config_map
 
-      checkout_dir = config_map["checkout_dir"] || required_config_param("checkout_dir")
+      checkout_dir = config_map["checkout_dir"] || required_config_param("checkout_dir", config_map)
       @checkout_dir = to_os_path(File.expand_path(checkout_dir)) unless checkout_dir.nil?
     end
 
-    def required_config_param(param)
-      raise "required configuration parameter: #{param}"
+    def required_config_param(param, config_map)
+      raise "required configuration parameter: #{param}. config: #{config_map.inspect}"
     end
 
     def script_prefix

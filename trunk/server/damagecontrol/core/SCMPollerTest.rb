@@ -47,8 +47,7 @@ module DamageControl
       
       poller = SCMPoller.new(hub,
         1,
-        mock_scm_factory(should_not_poll_scm), 
-        mock_project_config_repository(project_config_with_polling, 10), 
+        mock_project_config_repository(project_config_with_polling, 10, should_not_poll_scm), 
         mock_build_history_repository(10),
         build_scheduler)
         
@@ -67,8 +66,7 @@ module DamageControl
       
       poller = SCMPoller.new(hub,
         1,
-        mock_scm_factory(should_not_poll_scm), 
-        mock_project_config_repository(project_config_with_polling, 10), 
+        mock_project_config_repository(project_config_with_polling, 10, should_not_poll_scm), 
         build_history_repository,
         mock_build_scheduler)
         
@@ -82,8 +80,7 @@ module DamageControl
       
       poller = SCMPoller.new(hub,
         1,
-        mock_scm_factory(should_not_poll_scm), 
-        mock_project_config_repository(project_config_without_polling, 0), 
+        mock_project_config_repository(project_config_without_polling, 0, should_not_poll_scm), 
         mock_build_history_repository(10),
         mock_build_scheduler)
         
@@ -96,8 +93,7 @@ module DamageControl
       
       poller = SCMPoller.new(hub,
         10,
-        mock_scm_factory(should_not_poll_scm), 
-        mock_project_config_repository(project_config_with_polling, 0), 
+        mock_project_config_repository(project_config_with_polling, 0, should_not_poll_scm), 
         mock_build_history_repository(10),
         mock_build_scheduler)
         
@@ -110,8 +106,7 @@ module DamageControl
       
       poller = SCMPoller.new(hub,
         10,
-        mock_scm_factory(should_poll_scm), 
-        mock_project_config_repository(project_config_with_polling, 0),
+        mock_project_config_repository(project_config_with_polling, 0, should_poll_scm),
         mock_build_history_repository(10),
         mock_build_scheduler)
         
@@ -131,8 +126,7 @@ module DamageControl
             
       poller = SCMPoller.new(hub,
         1,
-        mock_scm_factory(scm), 
-        mock_project_config_repository(project_config_with_polling, now),
+        mock_project_config_repository(project_config_with_polling, now, scm),
         mock_build_history_repository(last_build),
         mock_build_scheduler)
       
@@ -155,8 +149,7 @@ module DamageControl
       
       poller = SCMPoller.new(hub, 
         1,
-        mock_scm_factory(scm), 
-        mock_project_config_repository(project_config_with_polling, now),
+        mock_project_config_repository(project_config_with_polling, now, scm),
         mock_build_history_repository(last_build),
         mock_build_scheduler)
         
@@ -194,23 +187,17 @@ module DamageControl
       }
       build_history_repository
     end
-    
-    def mock_scm_factory(scm)
-      scm_factory = MockIt::Mock.new
-      scm_factory.__setup(:get_scm) {|config, working_dir|
-        assert_equal("checkoutdir", working_dir)
-        scm
-      }
-      to_verify(scm_factory)
-      scm_factory
-    end
-    
-    def mock_project_config_repository(config, now)
+        
+    def mock_project_config_repository(config, now, scm)
       project_config_repository = new_mock
       project_config_repository.__setup(:project_names) { ["project"] }
       project_config_repository.__setup(:project_config) {|project_name|
         assert_equal("project", project_name)
         config
+      }
+      project_config_repository.__setup(:create_scm) {|project_name|
+        assert_equal("project", project_name)
+        scm
       }
       project_config_repository.__setup(:checkout_dir) {|project_name|
         assert_equal("project", project_name)

@@ -1,4 +1,5 @@
 require 'damagecontrol/scm/AbstractWebConfigurator'
+require 'damagecontrol/scm/SVN'
 
 module DamageControl
   class SVNWebConfigurator < AbstractWebConfigurator

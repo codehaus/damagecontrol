@@ -30,7 +30,7 @@ module DamageControl
       error = nil
       begin
         if scm.trigger_installed?(project_name)
-          logger.info("uninstalling triggers for #{project_name}")
+          logger.info("uninstalling trigger for #{project_name}")
           scm.uninstall_trigger(project_name)
         end
         logger.info("installing trigger for #{project_name}")
