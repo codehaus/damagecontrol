@@ -42,8 +42,8 @@ module DamageControl
     end
     
     def test_can_build_a_cvs_rdiff_command_for_retrieving_the_changes_between_two_dates
-      time_before = Time.gm(2004,01,01,12,00,00) 
-      time_after = Time.gm(2004,01,01,13,00,00)
+      time_before = Time.utc(2004,01,01,12,00,00) 
+      time_after = Time.utc(2004,01,01,13,00,00)
       cvs = CVS.new(":local:repo", "module", nil)
       assert_equal("log -d\"2004-01-01 12:00:00 UTC<=2004-01-01 13:00:00 UTC\"",
         cvs.changes_command(time_before, time_after))

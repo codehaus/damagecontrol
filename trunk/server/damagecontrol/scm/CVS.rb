@@ -253,7 +253,6 @@ puts result
     def cvs_with_io(cmd, &proc)
       cmd = "cvs -q #{cmd} 2>&1"
 
-puts("executing #{cmd}")
       logger.debug("executing #{cmd}")
       ret = nil
       io = IO.popen("#{cmd}") do |io|
@@ -285,6 +284,12 @@ puts("executing #{cmd}")
   end
   
   class CVSLogParser
+
+    def initialize
+      @current_line = 0
+      @log = ""
+    end
+  
     def parse_log(io)
       modifications = []
       while(log_entry = read_log_entry(io))
@@ -296,6 +301,8 @@ puts("executing #{cmd}")
     def read_log_entry(io)
       log_entry = ""
       io.each_line do |line|
+        @current_line += 1
+        @log<<line
         return log_entry if line=~/====*/
         log_entry<<line
       end
@@ -351,29 +358,37 @@ puts("executing #{cmd}")
       modification_entry = modification_entry.split(/\r?\n/)
       modification = Modification.new
       
-      if modification_entry[0]=~/revision (.*)/
+      revision_regexp = /revision (.*)/
+      if modification_entry[0]=~revision_regexp
         modification.revision = $1
       else
-        raise "can't parse: #{modification_entry}"
+        raise_unparsable_entry(modification_entry, revision_regexp)
       end
       
-      if modification_entry[1]=~/date: (.*?);/
+      date_regexp = /date: (.*?);/
+      if modification_entry[1]=~date_regexp
           # 2003/11/09 15:39:25
           modification.time = Time.utc($1[0..3], $1[5..6], $1[8..9], $1[11..12], $1[14..15], $1[17..18])
       else
-        raise "can't parse: #{modification_entry}"
+        raise_unparsable_entry(modification_entry, date_regexp)
       end
       
-      if modification_entry[1]=~/author: (.*?);/
+      author_regexp = /author: (.*?);/
+      if modification_entry[1]=~author_regexp
         modification.developer = $1
       else
-        raise "can't parse: #{modification_entry}"
+        raise_unparsable_entry(modification_entry, author_regexp)
       end
       
       modification.message = modification_entry[2..-1].join("\n")
       
       modification
-    end    
+    end
+    
+    def raise_unparsable_entry(modification_entry, regexp)
+      msg = "can't parse modification: #{modification_entry}\nexpected to match regexp: #{regexp.to_s}\nline: #{@current_line}\ncvs log:\n#{@log}"
+      raise msg
+    end
   end
 
 end
