@@ -11,6 +11,10 @@ module DamageControl
       false
     end
     
+    def path_separator
+      windows? ? "\\" : "/"
+    end
+    
     def rmdir(dir)
       if windows?
         system("rmdir /S /Q #{dir}")

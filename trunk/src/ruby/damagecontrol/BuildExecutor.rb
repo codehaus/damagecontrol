@@ -29,14 +29,14 @@ module DamageControl
     def execute
       @filesystem.makedirs(project_base_dir)
       @filesystem.chdir(project_base_dir)
-      
+ 
       # temp hack that only works for Ant/Maven and Ruby tests. We need to get the return code!!!
       did_read_ant_or_maven_build_failed = false
       did_read_ruby_tests_failed = false
       IO.popen(current_build.build_command_line) do |output|
         output.each_line do |line|
           report_progress(line)
-          did_read_ant_or_maven_build_failed = true if /BUILD FAILED/ =~ line
+          did_read_ant_or_maven_build_failed = true if /FAILED/ =~ line
           did_read_ruby_tests_failed = true if /Failure!!!/ =~ line
         end
       end
