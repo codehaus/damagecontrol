@@ -187,8 +187,9 @@ module DamageControl
       end
       
       begin
-        last_successful_build = @build_history_repository.last_successful_build(current_build.project_name)
-        from_time = last_successful_build ? last_successful_build.scm_commit_time : nil
+        # TODO: refactor. same code as in SCMPoller
+        last_completed_build = @build_history_repository.last_completed_build(current_build.project_name)
+        from_time = last_completed_build ? last_completed_build.scm_commit_time : nil
         from_time = from_time ? from_time + 1 : nil
 
         changesets = current_build.changesets

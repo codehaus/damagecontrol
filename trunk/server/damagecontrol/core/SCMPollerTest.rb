@@ -109,7 +109,7 @@ module DamageControl
       scm = new_mock
       scm.__expect(:uptodate?) { |checkout_dir, from, to|
         assert_equal("some_dir", checkout_dir)
-        assert_equal(last_build, from)
+        assert_equal(last_build + 1, from)
         assert_equal(nil, to)
         true
       }
@@ -133,13 +133,13 @@ module DamageControl
       scm = new_mock
       scm.__expect(:uptodate?) { |checkout_dir, from, to|
         assert_equal("some_dir", checkout_dir)
-        assert_equal(last_build, from)
+        assert_equal(last_build + 1, from)
         assert_equal(nil, to)
         false
       }
       scm.__expect(:changesets) { |checkout_dir, from, to|
         assert_equal("some_dir", checkout_dir)
-        assert_equal(Time.at(last_build), from)
+        assert_equal(last_build + 1, from)
         assert_equal(nil, to)
         ChangeSets.new([ChangeSet.new([Change.new])])
       }

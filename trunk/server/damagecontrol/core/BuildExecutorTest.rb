@@ -81,7 +81,7 @@ module DamageControl
       }
 
       mock_build_history = new_mock
-      mock_build_history.__expect(:last_successful_build) {nil}
+      mock_build_history.__expect(:last_completed_build) {nil}
 
       project_config_repository = new_mock
       project_config_repository.__setup(:checkout_dir) { |project_name| assert_equal("damagecontrolled", project_name); "some_dir" }
@@ -149,7 +149,7 @@ module DamageControl
       @build.scm = mock_scm
 
       mock_build_history = new_mock
-      mock_build_history.__expect(:last_successful_build) { |project_name|
+      mock_build_history.__expect(:last_completed_build) { |project_name|
         assert_equal("damagecontrolled", project_name)
         b = Build.new("damagecontrolled")
         b
@@ -171,7 +171,7 @@ module DamageControl
       mock_scm.__expect(:label) {"23"}
 
       mock_build_history = new_mock
-      mock_build_history.__expect(:last_successful_build) { |project_name|
+      mock_build_history.__expect(:last_completed_build) { |project_name|
         assert_equal("damagecontrolled", project_name)
         b = Build.new("damagecontrolled")
         b
@@ -203,7 +203,7 @@ module DamageControl
       last_build_time = Time.utc(2004, 04, 02, 12, 00, 00)
       current_build_time = Time.utc(2004, 04, 02, 13, 00, 00)
       
-      mock_build_history = new_mock.__expect(:last_successful_build) { |project_name|
+      mock_build_history = new_mock.__expect(:last_completed_build) { |project_name|
         assert_equal("damagecontrolled", project_name)
         b = Build.new("damagecontrolled")
         b.scm_commit_time = last_build_time

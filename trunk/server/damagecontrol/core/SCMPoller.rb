@@ -49,9 +49,15 @@ module DamageControl
         logger.info("polling project #{project_name}")
         # check for any changes since last completed build and now
         checkout_dir = @project_directories.checkout_dir(project_name)
+
+        # TODO: refactor. same code as in BuildExecutor
+        last_successful_build = @build_history_repository.last_completed_build(project_name)
+        from_time = last_completed_build ? last_completed_build.scm_commit_time : nil
+        from_time = from_time ? from_time + 1 : nil
+
         if(scm.uptodate?(
           checkout_dir, 
-          last_completed_build.scm_commit_time, 
+          from_time, 
           nil
         ))
           logger.info("no changes in #{project_name}")
@@ -59,7 +65,7 @@ module DamageControl
           logger.info("changes in #{project_name}, requesting build")
           changesets = scm.changesets(
             checkout_dir, 
-            last_completed_build.scm_commit_time, 
+            from_time, 
             nil,
             nil
           )
