@@ -86,7 +86,7 @@ module DamageControl
       if selected_build.log_file && File.exists?(selected_build.log_file)
         tabs +=
           [
-            Tab.new("console", "Console Output", "<pre>#{File.read(selected_build.log_file)}</pre>", "icons/console_network.png")
+            Tab.new("console", "Console Output", "<pre class=\"console\">#{File.read(selected_build.log_file)}</pre>", "icons/console_network.png")
           ]
       end
       tabs

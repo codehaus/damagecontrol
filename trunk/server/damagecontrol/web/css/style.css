@@ -116,6 +116,10 @@ div.dashboard {
   display: inline;
 }
 
+pre.console {
+  overflow: auto;
+}
+
 .scm_info {
   width: 480px;
 }
