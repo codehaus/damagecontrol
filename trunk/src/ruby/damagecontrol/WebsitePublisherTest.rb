@@ -1,4 +1,5 @@
 require 'test/unit'
+require 'damagecontrol/WebsitePublisher'
 
 module DamageControl
 
@@ -10,33 +11,45 @@ module DamageControl
 			@project.website_directory = "out"
 			@result = ""
 			Dir.mkdir("logs") if !File.exists?("logs")
-			3.times {|i|
-				File.open("logs/#{i}.log", "w") {|file| file.puts("Build results #{i}")}
+			foreach_log {|log|
+				File.open("logs/#{log}.log", "w") {|file| file.puts("Build results #{log}")}
 			}
 		end
 		
-		def test_dont_show
-			assert(@publisher.dont_show("."), "shows .")
-			assert(!@publisher.dont_show("1.log"), "doesn't show 1.log")
+		def foreach_log
+			3.times {|i|
+				log = "#{i}"
+				yield(log)
+			}
 		end
-
+		
 		def test_creates_dir_and_index_file
 			@publisher.receive_message( BuildCompleteEvent.new( @project, @result ) )
 			assert(FileTest.exists?("out"), "directory should exist")
 			assert(FileTest.exists?("out/index.html"), "index file should exist")
 		end
 		
-		def test_writes_project_summary_and_lists_files
+		def test_writes_project_summary_and_lists_logs
 			@publisher.receive_message( BuildCompleteEvent.new( @project, @result ) )
-			index_content = content("out/index.html")
+			index_content = content(@project.website_file("index.html"))
 			assert_contain( @project.name, index_content )
-			assert_contain( @project.name, index_content )
-			3.times {|i|
-				assert_contain( "#{i}", index_content )
+			foreach_log {|log|
+				assert_contain( "#{log}", index_content )
+				assert_contain( "#{log}.html", index_content )
 			}
-			assert_not_contain( ".", index_content )
+			assert_not_contain( "..", index_content )
 		end
 		
+		def test_writes_content_of_logs
+			@publisher.receive_message( BuildCompleteEvent.new( @project, @result ) )
+			foreach_log {|log|
+				assert( FileTest::exists?( @project.website_file("#{log}.html") ) )
+				published_content = content(@project.website_file(log + ".html"))
+				log_content = content("logs/#{log}.log")
+				assert_contain( log_content, published_content )
+			}
+		end
+
 		def assert_contain(expected, actual)
 			assert( actual.index(expected) , "<#{actual}> should contain <#{expected}>")
 		end
@@ -53,42 +66,23 @@ module DamageControl
 			return text
 		end
 		
-		def xteardown
-			File.delete("out/index.html")
-			Dir.delete("out")
-			Dir.foreach("logs") {|filename| "logs/" + File.delete(filename) }
-			Dir.delete("logs")
+		def teardown
+			delete_dir("logs")
+			delete_dir("out")
+		end
+		
+		def delete_dir(dir)
+			if FileTest::exist?(dir)
+				Dir.foreach(dir) {|filename| 
+					File.delete(dir + "/" + filename) unless is_special_filename(filename) 
+				}
+				Dir.delete(dir)
+			end
+		end
+		
+		def is_special_filename(filename)
+			filename == '.' || filename == '..'
 		end
 	end
 	
-	class WebsitePublisher
-		def receive_message( event )
-			@project = event.project
-			Dir.mkdir(@project.website_directory) if !File.exists?(@project.website_directory)
-			File.open( @project.website_directory + File::SEPARATOR + "index.html", "w") { |file|
-				file.print(main_page_template())
-			}
-		end
-			
-		def main_page_template
- 			"<html><body>Project name: #{@project.name} <br> <br> #{build_list}</body></html>"
-		end
-		
-		def build_list
-		 	result = "<ul>"
-			Dir.foreach(@project.logs_directory) {|filename| 
-				if !dont_show(filename)
-					filename = filename[0, filename.rindex('.')]
-					result += "<li>#{filename}"
-				end
-			}
-		 	result += "</ul>"
-		 	return result
-		end
-		
-		def dont_show(filename)
-			/^\..*/ =~ filename
-		end
-	end
-
 end

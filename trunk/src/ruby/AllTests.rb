@@ -1,5 +1,6 @@
 require 'test/unit'
 require 'damagecontrol/EqualityTest'
+require 'damagecontrol/ProjectTest'
 require 'damagecontrol/HubTest'
 require 'damagecontrol/WebsitePublisherTest'
 require 'damagecontrol/CommandLineBuilderTest'
