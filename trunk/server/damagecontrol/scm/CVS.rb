@@ -266,7 +266,6 @@ puts result
   
     def cvs_with_io(cmd, &proc)
       cmd = "cvs -q #{cmd} 2>&1"
-puts "executing #{cmd}"
       logger.debug("executing #{cmd}")
       ret = nil
       io = IO.popen("#{cmd}") do |io|
