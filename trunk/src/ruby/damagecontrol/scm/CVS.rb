@@ -88,7 +88,11 @@ module DamageControl
         cvs(checkout_command(scm_spec, directory), &proc)
         # Now just move the directory. Fix for http://jira.codehaus.org/secure/ViewIssue.jspa?key=DC-44
         mod_directory = to_os_path(File.expand_path(mod(scm_spec)))
-        File.move(mod_directory, directory)
+        begin
+          File.move(mod_directory, directory)
+        rescue
+          File.rename(mod_directory, directory)
+        end
       end
     end
 
