@@ -106,10 +106,10 @@ module DamageControl
     
     def kill_build_process
       build_process.kill
+      @was_killed = true
       #doesn't seem to work properly if two different threads are waiting. workaround: sleep a bit to ensure it dies
       #build_process.wait
       sleep 1
-      @was_killed = true
     end
  
     def checkout?

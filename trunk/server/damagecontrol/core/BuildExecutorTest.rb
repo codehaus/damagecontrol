@@ -42,7 +42,7 @@ module DamageControl
     end
     
     def teardown
-      rm_rf(@basedir)
+      #rm_rf(@basedir)
     end
     
     def wait_for(timeout=5, &proc)
