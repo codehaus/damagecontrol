@@ -14,7 +14,7 @@ module DamageControl
     def receive_message(message)
       
       if message.is_a? BuildProgressEvent
-        puts("PROGRESS:" + message.output)
+        puts("[#{message.build.project_name}]:" + message.output)
         begin
           log_file(message.build).puts(message.output)
           log_file(message.build).flush
@@ -24,7 +24,7 @@ module DamageControl
       end
 
       if message.is_a? BuildCompleteEvent
-        puts("BuildCompleteEvent")
+        puts("[#{message.build.project_name}]: BUILD COMPLETE")
         begin
           log_file(message.build).flush
           log_file(message.build).close

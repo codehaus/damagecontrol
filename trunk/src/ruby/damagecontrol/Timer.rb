@@ -13,26 +13,31 @@ module DamageControl
 			@clock = Clock.new if @clock == nil
 			@clock
 		end
+    
+    def protect
+      begin
+        yield
+      rescue
+        $stderr.print $!
+        $stderr.print "\n"
+        $stderr.print $!.backtrace.join("\n")
+        $stderr.print "\n"
+        @error = $!
+      end
+    end
 		
 		def start
 			Thread.new {
-				begin
-					puts "starting #{self}"
-					first_tick(clock.current_time)
-					time = clock.current_time
-					while (!stopped && next_tick > time)
-						sleep( (next_tick - time)/1000 )
-						force_tick
-					end
-				rescue
-					$stderr.print $!
-					$stderr.print "\n"
-					$stderr.print $!.backtrace.join("\n")
-					$stderr.print "\n"
-					@error = $!
-				ensure
-					puts "stopping #{self}"
-				end
+        puts "starting #{self}"
+
+        protect { first_tick(clock.current_time) }
+        time = clock.current_time
+        while (!stopped && next_tick > time)
+          sleep( (next_tick - time)/1000 )
+          protect { force_tick }
+        end
+
+        puts "stopping #{self}"
 			}
 		end
 		
