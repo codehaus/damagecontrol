@@ -14,6 +14,12 @@ module DamageControl
         body = tmail.body_port.ropen.read
         assert(body.index("Successful build (by aslak)"))
         assert(body.index("path/seven"))
+        to = ENV["DC_EMAIL_TEST"]
+        if(to)
+          publisher.to = to
+          puts "Sending mail to #{to} (for real)"
+          BuildMailer.deliver_email(mock_build(true), publisher)
+        end
       end
     end
   end
