@@ -29,6 +29,7 @@ module DamageControl
     attr_accessor :error_message
     attr_accessor :status
     attr_accessor :url
+    attr_accessor :log_file
 
     # the scm to use to talk to this builds source control system
     attr_accessor :scm
