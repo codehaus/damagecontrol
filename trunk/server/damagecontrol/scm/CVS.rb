@@ -76,7 +76,7 @@ module DamageControl
     #
     # @block &proc a block that can handle the output (should typically log to file)
     #
-    def install_trigger(damagecontrol_install_dir, project_name, dc_url="http://localhost:4712/private/xmlrpc", &proc)
+    def install_trigger(damagecontrol_install_dir, project_name, dc_url, &proc)
       cvsroot_cvs = create_cvsroot_cvs
       cvsroot_cvs.checkout(&proc)
       with_working_dir(cvsroot_cvs.working_dir) do

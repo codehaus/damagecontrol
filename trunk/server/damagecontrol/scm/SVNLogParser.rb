@@ -1,87 +1,89 @@
+require 'pebbles/Parser'
 require 'damagecontrol/scm/Changes'
 require 'damagecontrol/scm/AbstractLogParser'
 require 'damagecontrol/util/Logging'
 
 module DamageControl
-  
-  class SVNLogParser < AbstractLogParser
-    include Logging
-  
-    def initialize(io, prefix)
-      super(io)
-      @prefix = prefix
-    end
 
-    def next_log_entry
-      read_until_matching_line(/^-+$/)
+  class SVNLogParser
+    def initialize(io, path)
+      @io = io
+      @changeset_parser = SVNLogEntryParser.new(path)
+      # skip over the first ------
+      @changeset_parser.parse(@io,true)
     end
     
     def parse_changesets
       changesets = ChangeSets.new
-      while(log_entry = next_log_entry)
-        begin
-          changesets.add(parse_changeset(log_entry))
-        rescue Exception => e
-          error("could not parse log entry: #{log_entry}\ndue to: #{format_exception(e)}")
-        end
+      while(!@io.eof?)
+        changeset = @changeset_parser.parse(@io)
+        changesets.add(changeset) unless changeset.nil?
       end
       changesets
     end
-    
-    def parse_changeset(log_entry)
-      log_entry = log_entry.split("\n")
-      
-      changeset = ChangeSet.new
-      revision, developer, time, the_rest = log_entry[0].split("|")
-      changeset.revision = revision.strip unless revision.nil?
-      changeset.developer = developer.strip unless developer.nil?
-      changeset.time = parse_time(time.strip) unless time.nil?
-      
-      # 3rd line to first empty line are changes
-      log_entry[2..first_empty_line(log_entry) - 1].each do |change_line|
-        changeset<<parse_change(changeset.revision, change_line)
+  end
+  
+  class SVNLogEntryParser < Pebbles::Parser
+    def initialize(path)
+      super(/^-+/)
+      @path = path
+    end
+
+  protected
+
+    def parse_line(line)
+      if(@changeset.nil?)
+        parse_header(line)
+      elsif(line.strip == "")
+        @parse_state = :parse_message
+      elsif(line =~ /Changed paths/)
+        @parse_state = :parse_changes
+      elsif(@parse_state == :parse_changes)
+        change = parse_change(line)
+        @changeset << change
+      elsif(@parse_state == :parse_message)
+        @changeset.message << line.chomp << "\n"
       end
-      # everything after first empty line is the message
-      if first_empty_line(log_entry) == log_entry.size then
-        changeset.message = ""
-      else
-        changeset.message = log_entry[first_empty_line(log_entry)+1..-1].join("\n") + "\n"
-      end
-      
-      changeset
+    end
+
+    def next_result
+      result = @changeset
+      @changeset = nil
+      result
+    end
+
+  private
+  
+    STATES = {"M" => Change::MODIFIED, "A" => Change::ADDED, "D" => Change::DELETED}
+
+    def parse_header(line)
+      @changeset = ChangeSet.new
+      @changeset.message = ""
+      revision, developer, time, the_rest = line.split("|")
+      @changeset.revision = revision.strip unless revision.nil?
+      @changeset.developer = developer.strip unless developer.nil?
+      @changeset.time = parse_time(time.strip) unless time.nil?
     end
     
-    def parse_change(revision, change_line)
+    def parse_change(line)
       change = Change.new
-      change.revision = revision
-      change.previous_revision = previous_revision(change.revision)
-      if(change_line =~ /^ *\w (.*) \(from (.*)\)/)
+      if(line =~ /^ *\w (.*) \(from (.*)\)/)
         change.path = $1
         change.status = Change::MOVED
-      elsif(change_line =~ /^ *(\w) (.*)$/)
-        status, path = change_line.split
+      elsif(line =~ /^ *(\w) (.*)$/)
+        status, path = line.split
         change.path = path
         change.status = STATES[status]
       else
-        raise "could not parse change line: #{change_line}"
+        raise "could not parse change line: #{line}"
       end
       change.path = make_relative(change.path)
+      change.revision = @changeset.revision
+      # http://jira.codehaus.org/browse/DC-204
+      change.previous_revision = "PREVIOUS_REVISION_UNKNOWN"
       change
     end
-    
-    def make_relative(path)
-      prefix = convert_all_slashes_to_forward_slashes(@prefix)
-      convert_all_slashes_to_forward_slashes(path).gsub(/^\/#{prefix}\//, "")
-    end
-    
-    def first_empty_line(log_entry)
-      log_entry.each_index {|i| return i if log_entry[i].strip == "" }
-      log_entry.size
-    end
-    
-  private
-    STATES = {"M" => Change::MODIFIED, "A" => Change::ADDED, "D" => Change::DELETED}
-  
+
     def parse_time(svn_time)
       if(svn_time =~ /(.*)-(.*)-(.*) (.*):(.*):(.*) (\+|\-)([0-9]*) (.*)/)
         year  = $1.to_i
@@ -102,12 +104,19 @@ module DamageControl
       else
         raise "unexpected time format"
       end
+
     end
     
     def previous_revision(revision)
       prev = revision[1..-1].to_i - 1
       "r#{prev}"
     end
+
+    def make_relative(change_path)
+      prefix = @path.gsub(/\\/, "/")
+      change_path.gsub(/\\/, "/").gsub(/^\/#{prefix}\//, "")
+    end
+
   end
 
 end

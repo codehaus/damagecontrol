@@ -86,28 +86,6 @@ EOF
       assert(cvs.trigger_in_string?(LOGINFO_WITH_OLD_TRIGGER, "blah"))
     end
     
-    def test_install_uninstall_install_should_add_four_lines_to_loginfo
-      cvs = create_scm
-      cvs.create
-
-      project_name = "OftenModified"
-      
-      assert(!cvs.trigger_installed?(project_name))
-      cvs.install_trigger(
-        project_name,
-        "http://localhost:4713/private/xmlrpc"
-      )
-      assert(cvs.trigger_installed?(project_name))
-      cvs.uninstall_trigger(project_name)
-      assert(!cvs.trigger_installed?(project_name))
-      cvs.install_trigger(
-        project_name,
-        "http://localhost:4713/private/xmlrpc"
-      )
-      assert(cvs.trigger_installed?(project_name))
-
-    end
-    
     def test_invalid_cvs_command_raises_error
       cvs = create_cvs("cvsroot", "cvsmodule")
       assert_raises(Pebbles::ProcessFailedException, "invalid cvs command did not raise error") do

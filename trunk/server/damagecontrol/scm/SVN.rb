@@ -123,29 +123,18 @@ module DamageControl
       end
     end
     
-    def hookdir
-      "#{svnrootdir}/hooks"
+    def post_commit_file
+      if windows? then "#{svnrootdir}/hooks/post-commit.bat" else "#{svnrootdir}/hooks/post-commit" end
     end
     
-    def trigger_command(project_name, dc_url)
-      "#{ruby_path} #{trigger_script_name} #{dc_url} #{project_name}"
-    end
-    
-    def hook_file
-      if windows? then "post-commit.bat" else "post-commit" end
-    end
-    
-    def install_trigger(project_name, dc_url)
+    def install_trigger(damagecontrol_install_dir, project_name, dc_url="http://localhost:4712/private/xmlrpc", &proc)
       # this stuff doesn't work for some reason, if you execute the file manually it works, but svn never executes the post-commit trigger
-      File.open("#{hookdir}/#{hook_file}", "w") do |file|
-        trigger_command = trigger_command(project_name, dc_url)
+      File.open("#{post_commit_file}", "w") do |file|
+        trigger_command = trigger_command(damagecontrol_install_dir, project_name, dc_url)
         file.puts("#!/bin/sh") unless windows?
         file.puts(trigger_command)
       end
-      system("chmod a+x #{hookdir}/#{hook_file}") unless windows?
-      File.open("#{hookdir}/#{trigger_script_name}", "w") do |io|
-        io.puts(trigger_script)
-      end
+      system("chmod g+x #{post_commit_file}") unless windows?
     end
     
     # TODO: refactor. This is ugly!

@@ -8,32 +8,7 @@ module DamageControl
   
     include FileUtils
 
-    def test_read_log_entry_reads_till_line_of_underscores
-      assert_equal("blahblah\n", SVNLogParser.new(StringIO.new("blahblah\n---------------\nubbaubba\n---------------"), "").next_log_entry)
-      assert_equal("ubbaubba\n", SVNLogParser.new(StringIO.new("---------------\nubbaubba\n---------------"), "").next_log_entry)
-      assert_equal(nil, SVNLogParser.new(StringIO.new(""), "").next_log_entry)
-      assert_equal(nil, SVNLogParser.new(StringIO.new("------\n---------------"), "").next_log_entry)
-    end
-    
-    def test_can_parse_changeset
-      parser = SVNLogParser.new(nil, "damagecontrolled")
-      changeset = parser.parse_changeset(SIMPLE_LOG_ENTRY.split("\n")[1..-2].join("\n"))
-      assert_equal("r2", changeset.revision)
-      assert_equal("ahelleso", changeset.developer)
-      assert_equal(Time.utc(2004,7,11,13,29,35), changeset.time)
-      assert_equal("changed something\n", changeset.message)
-      
-      assert_equal(2, changeset.length)
-      assert_equal("build.xml", changeset[0].path)
-      assert_equal("r2", changeset[0].revision)
-      assert_equal("r1", changeset[0].previous_revision)
-      assert_equal(Change::MODIFIED, changeset[0].status)
-      assert_equal("src/java/com/thoughtworks/damagecontrolled/Thingy.java", changeset[1].path)
-      assert_equal(Change::MODIFIED, changeset[1].status)
-    end
-
 SIMPLE_LOG_ENTRY = <<EOF
-------------------------------------------------------------------------
 r2 | ahelleso | 2004-07-11 14:29:35 +0100 (Sun, 11 Jul 2004) | 1 line
 Changed paths:
    M /damagecontrolled/build.xml
@@ -44,29 +19,23 @@ changed something
 EOF
 
 SIMPLE_LOG_ENTRY_WITH_BACKSLASHES = <<EOF
-------------------------------------------------------------------------
 r2 | ahelleso | 2004-07-11 14:29:35 +0100 (Sun, 11 Jul 2004) | 1 line
 Changed paths:
-   M \damagecontrolled\build.xml
-   M \damagecontrolled\src\java\com\thoughtworks\damagecontrolled\Thingy.java
+   M \\damagecontrolled\\build.xml
+   M \\damagecontrolled\\src\\java\\com\\thoughtworks\\damagecontrolled\\Thingy.java
 
 changed something
 ------------------------------------------------------------------------
 EOF
     
-    def test_can_parse_SIMPLE_LOG_ENTRY
-      can_parse_simple_log_entry(SIMPLE_LOG_ENTRY)
+    def test_can_parse_SIMPLE_LOG_ENTRIES
+      parser = SVNLogEntryParser.new("damagecontrolled")
+      can_parse_simple_log_entry(parser, SIMPLE_LOG_ENTRY)
+      can_parse_simple_log_entry(parser, SIMPLE_LOG_ENTRY_WITH_BACKSLASHES)
     end
     
-    def Xtest_can_parse_SIMPLE_LOG_ENTRY_WITH_BACKSLASHES
-      can_parse_simple_log_entry(SIMPLE_LOG_ENTRY_WITH_BACKSLASHES)
-    end
-    
-    def can_parse_simple_log_entry(entry)
-      parser = SVNLogParser.new(StringIO.new(entry), "damagecontrolled")
-      changesets = parser.parse_changesets
-      assert_equal(1, changesets.length)
-      changeset = changesets[0]
+    def can_parse_simple_log_entry(parser, entry)
+      changeset = parser.parse(StringIO.new(entry))
 
       assert_equal("r2", changeset.revision)
       assert_equal("ahelleso", changeset.developer)
@@ -76,7 +45,6 @@ EOF
       assert_equal(2, changeset.length)
       assert_equal("build.xml", changeset[0].path)
       assert_equal("r2", changeset[0].revision)
-      assert_equal("r1", changeset[0].previous_revision)
       assert_equal(Change::MODIFIED, changeset[0].status)
       assert_equal("src/java/com/thoughtworks/damagecontrolled/Thingy.java", changeset[1].path)
       assert_equal(Change::MODIFIED, changeset[1].status)
@@ -102,7 +70,7 @@ EOF
         assert_equal("src/com/thoughtworks/proxy/toys/delegate/DelegatingInvoker.java" , changesets[3][1].path)
         assert_equal(Change::ADDED , changesets[3][1].status)
         assert_equal("r66" , changesets[3][1].revision)
-        assert_equal("r65", changesets[3][1].previous_revision)
+#        assert_equal("r65", changesets[3][1].previous_revision)
 
         assert_equal("src/com/thoughtworks/proxy/toys/delegate/ObjectReference.java" , changesets[3][3].path)
         assert_equal(Change::MOVED, changesets[3][3].status)

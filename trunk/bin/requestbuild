@@ -2,6 +2,6 @@
       #!/bin/sh
       DAMAGECONTROL_HOME=`dirname $0`/..
       cd $DAMAGECONTROL_HOME
-      export DAMAGECONTROL_HOME=`pwd`
-      ruby -I"$DAMAGECONTROL_HOME/server" "$DAMAGECONTROL_HOME/server/damagecontrol/tool/admin/requestbuild.rb" $*
-    
+      DAMAGECONTROL_HOME=`pwd`
+      export DAMAGECONTROL_HOME
+      ruby -I"$DAMAGECONTROL_HOME/server" "$DAMAGECONTROL_HOME/server/damagecontrol/tool/admin/requestbuild.rb" $* > $DAMAGECONTROL_HOME/trigger_output

@@ -238,14 +238,24 @@ class End2EndTest < Test::Unit::TestCase
   end
   
   def test_damagecontrol_works_with_cvs
-    cvsmodule = "testproject"
-    cvs = LocalCVS.new(@basedir, cvsmodule)
+    cvs = LocalCVS.new(@basedir, "testproject")
     test_build_and_log_and_irc(cvs)
   end
   
-  # aslak: post-commit trigger script is not executed by svn. don't know why!
-  # see you tomorrow
-  # -- jon
+  # I have debugged further. The problem isn't that the post-commit
+  # script doesn't get executed. It actually does! The problem is that
+  # for some reason (that is beyond me), the post-commit process running forked from
+  # within svn isn't allowed to connect anywhere ?!?!?!"$%"$!£%!"£%
+  # 
+  # To reproduce, uncomment this test, run:
+  #
+  # ruby build.rb integration_test
+  #
+  # Then have a look at DC_HOME/trigger_output
+  # It is redirected to that file by DC_HOME/request_build (proving that the hook
+  # gets executed)
+  #
+  # WEIRD STUFF!
   def TODO_test_damagecontrol_works_with_svn
     svn = LocalSVN.new(@basedir, "testproject")
     test_build_and_log_and_irc(svn)
@@ -257,7 +267,23 @@ class End2EndTest < Test::Unit::TestCase
     importdir = "#{@basedir}/testproject"
     File.mkpath(importdir)
     scm.import(importdir)
-    scm.install_trigger(damagecontrol_home, "TestingProject", "http://localhost:14712/private/xmlrpc")
+    
+    # With localhost in URL I get this error with test_damagecontrol_works_with_svn:
+    # 
+    # Trigging build of TestingProject DamageControl on http://localhost:14712/private/xmlrpc
+    # getaddrinfo: no address associated with hostname.
+    # /usr/lib/ruby/1.8/net/protocol.rb:83:in `initialize'
+    # /usr/lib/ruby/1.8/net/protocol.rb:83:in `new'
+    # 
+    # With 127.0.0.1 in URL I get this error with test_damagecontrol_works_with_svn:
+    # 
+    # Trigging build of TestingProject DamageControl on http://127.0.0.1:14712/private/xmlrpc
+    # Operation not permitted - socket(2)
+    # /usr/lib/ruby/1.8/net/protocol.rb:83:in `initialize'
+    # /usr/lib/ruby/1.8/net/protocol.rb:83:in `new'
+    # /usr/lib/ruby/1.8/net/protocol.rb:83:in `connect'
+    # 
+    scm.install_trigger(damagecontrol_home, "TestingProject", "http://127.0.0.1:14712/private/xmlrpc")
 
     @server = DamageControlServerDriver.new("#{basedir}/serverroot")
     @server.setup    

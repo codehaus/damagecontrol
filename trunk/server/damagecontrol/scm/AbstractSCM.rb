@@ -33,7 +33,7 @@ module DamageControl
       true
     end
 
-    def trigger_command(damagecontrol_install_dir, project_name, dc_url)
+    def trigger_command(damagecontrol_install_dir, project_name, dc_url="http://localhost:4712/private/xmlrpc")
       script = "#{script_prefix}#{damagecontrol_install_dir}/bin/requestbuild#{script_suffix}"
       "#{to_os_path(script)} --url #{dc_url} --projectname #{project_name}"
     end

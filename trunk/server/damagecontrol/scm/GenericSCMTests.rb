@@ -43,6 +43,37 @@ module DamageControl
       assert_equal("src/java/com/thoughtworks/damagecontrolled/Thingy.java", changeset[1].path)
       assert(changeset[1].revision)
       assert(changeset[1].previous_revision)
+
+      # for debugging only
+#      scm.install_trigger(
+#        damagecontrol_home,
+#        "Whatever",
+#        "http://localhost:4712/private/xmlrpc"
+#      )
+    end
+    
+    def Xtest_install_uninstall_install_should_work_as_many_times_as_we_like
+      scm = create_scm
+      scm.create
+
+      project_name = "OftenModified"
+      
+      assert(!scm.trigger_installed?(project_name))
+      scm.install_trigger(
+        damagecontrol_home,
+        project_name,
+        "http://localhost:4713/private/xmlrpc"
+      )
+      assert(scm.trigger_installed?(project_name))
+      scm.uninstall_trigger(project_name)
+      assert(!scm.trigger_installed?(project_name))
+      scm.install_trigger(
+        damagecontrol_home,
+        project_name,
+        "http://localhost:4713/private/xmlrpc"
+      )
+      assert(scm.trigger_installed?(project_name))
+
     end
     
     def change_file(file)
