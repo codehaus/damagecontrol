@@ -1,14 +1,14 @@
-#!/usr/bin/env ruby
+#!c:/ruby/bin/ruby
 
 require 'webrick'
 require 'optparse'
 
 OPTIONS = {
-  :port        => 4712,
-  :ip          => "127.0.0.1",
+  :port        => 3000,
+  :ip          => "0.0.0.0",
   :environment => "development",
   :server_root => File.expand_path(File.dirname(__FILE__) + "/../public/"),
-  :server_type => WEBrick::SimpleServer,
+  :server_type => WEBrick::SimpleServer
 }
 
 ARGV.options do |opts|
@@ -45,17 +45,7 @@ ENV["RAILS_ENV"] = OPTIONS[:environment]
 require File.dirname(__FILE__) + "/../config/environment"
 require 'webrick_server'
 
-# Get rid of annoying trailing slash in original webrick_server's impl.
-class DispatchServlet
-  def handle_index(req, res)
-    if req.request_uri.path == "/"
-      res.set_redirect WEBrick::HTTPStatus::MovedPermanently, "/project"
-      return true
-    else
-      return false
-    end
-  end
-end
+OPTIONS['working_directory'] = File.expand_path(RAILS_ROOT)
 
 puts "=> Rails application started on http://#{OPTIONS[:ip]}:#{OPTIONS[:port]}"
 DispatchServlet.dispatch(OPTIONS)

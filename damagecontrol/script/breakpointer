@@ -1,5 +1,4 @@
-#!/usr/bin/env ruby
-
+#!c:/ruby/bin/ruby
 require 'rubygems'
 require_gem 'rails'
 require 'breakpoint_client'
