@@ -52,9 +52,12 @@ module Pebbles
       super(req, res)
 
       # http://lab.artlung.com/other/anti-cache/
-      response["CacheControl"] = "no-cache"
-#      response["Pragma"] = "no-cache"
-#      response["Expires"] = "-1"
+      if(res["auto_refresh"] != "true")
+        # we _do_ want the browser to cache when auto_refresh is enabled, to avoid flickering of images
+        response["CacheControl"] = "no-cache"
+        response["Pragma"] = "no-cache"
+        response["Expires"] = "-1"
+      end
       
       action = req.query['action'] || "default_action"
       
