@@ -49,6 +49,10 @@ class Project
 			yield(f)
 		}
 	end
+	
+	def ==(other)
+		@name == other.name && @website_directory == other.website_directory && @logs_directory == other.logs_directory
+	end
 
 end
 

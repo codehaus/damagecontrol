@@ -3,6 +3,7 @@ require 'damagecontrol/Clock'
 module DamageControl
 	
 	class FakeClock < Clock
+		
 		def initialize
 			@time = 0
 			@has_waiters = Latch.new
@@ -15,6 +16,10 @@ module DamageControl
 			@time_changed = Latch.new
 		end
 		
+		def add_time (amount)
+			change_time(@time + amount)
+		end
+
 		def wait_for_waiters (timeout=-1)
 			@has_waiters.wait()
 		end
@@ -29,6 +34,20 @@ module DamageControl
 				@time_changed.wait()
 			end
 		end
+		
+	end
+	
+	# Chris: I think this is a better usage pattern?
+	class FakeTicker < Ticker
+	
+		def current_time
+			@current_time
+		end
+		
+		def set_time(time)
+			@current_time = time
+		end
+		
 	end
 	
 end

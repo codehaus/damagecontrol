@@ -25,6 +25,13 @@ module DamageControl
 			}
 		end
 		
+		def test_build_request_event
+			project = Project.new("name")
+			do_test_equal {
+				BuildProgressEvent.new(project, "output")
+			}
+		end
+				
 		def do_test_same
 			o = yield
 			assert_same(o, o)

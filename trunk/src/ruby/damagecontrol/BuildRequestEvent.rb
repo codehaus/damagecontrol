@@ -5,5 +5,10 @@ module DamageControl
 		def initialize( project )
 			@project = project
 		end
+		
+		def ==(other)
+			@project == other.project
+		end
+		
 	end
 end
