@@ -35,6 +35,7 @@ def start_simple_server(params = {})
   XMLRPCTrigger.new(query_servlet, @hub)
 
   bhp = BuildHistoryPublisher.new(@hub, "build_history.yaml")
+  bhp.start
   XMLRPCStatusPublisher.new(query_servlet, bhp)
   
   scheduler = BuildScheduler.new(@hub)

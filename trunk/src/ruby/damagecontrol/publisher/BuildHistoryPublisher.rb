@@ -12,8 +12,8 @@ module DamageControl
   class BuildHistoryPublisher < AsyncComponent
   
     def initialize(channel, filename=nil)
-      @builds = Hash.new
       super(channel)
+      @builds = Hash.new
       if(filename != nil)
         expanded = File.expand_path(filename)
         if(File.exist?(expanded))

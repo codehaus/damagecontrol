@@ -7,19 +7,18 @@ import marquee.xmlrpc.XmlRpcClient;
 import marquee.xmlrpc.XmlRpcException;
 import marquee.xmlrpc.XmlRpcParser;
 
-import javax.net.SocketFactory;
+import javax.net.ssl.HostnameVerifier;
+import javax.net.ssl.HttpsURLConnection;
 import javax.net.ssl.SSLContext;
+import javax.net.ssl.SSLSession;
+import javax.net.ssl.SSLSocketFactory;
 import javax.net.ssl.TrustManager;
 import javax.net.ssl.X509TrustManager;
-import javax.net.ssl.HttpsURLConnection;
-import javax.net.ssl.SSLSocketFactory;
-import javax.net.ssl.HostnameVerifier;
-import javax.net.ssl.SSLSession;
 import java.net.URL;
 import java.security.KeyManagementException;
 import java.security.NoSuchAlgorithmException;
-import java.security.cert.X509Certificate;
 import java.security.cert.CertificateException;
+import java.security.cert.X509Certificate;
 import java.util.Map;
 
 /**
@@ -27,7 +26,7 @@ import java.util.Map;
  * server using the Marquee XML-RPC library.
  *
  * @author Aslak Helles&oslash;y
- * @version $Revision: 1.3 $
+ * @version $Revision: 1.4 $
  */
 public class MarqueeXmlRpcBuildPoller implements BuildPoller {
     private final XmlRpcClient xmlRpcClient;

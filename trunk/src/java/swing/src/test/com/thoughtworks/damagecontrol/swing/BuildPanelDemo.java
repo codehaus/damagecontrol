@@ -17,7 +17,7 @@ import java.net.MalformedURLException;
 
 /**
  * @author Aslak Helles&oslash;y
- * @version $Revision: 1.3 $
+ * @version $Revision: 1.4 $
  */
 public class BuildPanelDemo {
     private static BuildListener bl;
@@ -25,6 +25,7 @@ public class BuildPanelDemo {
 
     public static void main(String[] args) throws MalformedURLException {
 //        BuildPanelData buildPanel = new BuildPanelData(createDemoPoller());
+//        BuildPanelData buildPanel = new BuildPanelData(new MarqueeXmlRpcBuildPoller(new URL("http://beaver.codehaus.org:4712/xmlrpc")));
         BuildPanelData buildPanel = new BuildPanelData(new MarqueeXmlRpcBuildPoller(new URL("http://localhost:4712/xmlrpc")));
 
         JFrame f = new JFrame("DamageControl");
