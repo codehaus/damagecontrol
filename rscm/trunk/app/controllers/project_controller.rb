@@ -18,6 +18,7 @@ class ProjectController < ApplicationController
   end
 
   def view
+    return render_text("No project specified") unless @params["id"]
     @edit = false
     load
   end
@@ -56,7 +57,27 @@ class ProjectController < ApplicationController
 protected
 
   def set_sidebar_links
-    if(@project && @project.scm && !@project.scm.exists? && @project.scm.can_create?)
+    if(@project.exists?)
+      @sidebar_links << {
+        :controller => "project", 
+        :action     => "edit",
+        :id         => @project.name,
+        :image      => "/images/24x24/wrench.png",
+        :name       => "Edit #{@project.name} settings"
+      }
+    end
+
+    if(@project.exists?)
+      @sidebar_links << {
+        :controller => "project", 
+        :action     => "delete", 
+        :id         => @project.name,
+        :image      => "/images/24x24/box_delete.png",
+        :name       => "Delete #{@project.name} project"
+      }
+    end
+
+    if(@project.exists? && @project.scm && !@project.scm.exists? && @project.scm.can_create?)
       @sidebar_links << {
         :controller => "scm", 
         :action     => "create", 
@@ -65,12 +86,33 @@ protected
       }
     end
 
-    if(@project && @project.scm && @project.scm.exists?)
+    if(@project.exists? && !@project.checked_out?)
       @sidebar_links << {
         :controller => "scm", 
         :action     => "checkout", 
+        :id         => @project.name,
         :image      => "/images/24x24/safe_out.png",
-        :name       => "Check out from #{@project.scm.name} now"
+        :name       => "Check out from #{@project.scm.name}"
+      }
+    end
+
+    if(@project.exists? && @project.checked_out?)
+      @sidebar_links << {
+        :controller => "files", 
+        :action     => "dir",
+        :id         => @project.name,
+        :image      => "/images/24x24/folders.png",
+        :name       => "Browse working copy"
+      }
+    end
+
+    if(@project.exists? && @project.checked_out?)
+      @sidebar_links << {
+        :controller => "scm", 
+        :action     => "delete_working_copy", 
+        :id         => @project.name,
+        :image      => "/images/24x24/garbage.png",
+        :name       => "Delete working copy"
       }
     end
 

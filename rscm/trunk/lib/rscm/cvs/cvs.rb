@@ -198,6 +198,11 @@ module RSCM
       end
     end
 
+    def checked_out?(checkout_dir)
+      rootcvs = File.expand_path("#{checkout_dir}/CVS/Root")
+      File.exists?(rootcvs)
+    end
+        
   private
 
     def cvs(dir, cmd, simulate=false)
@@ -281,11 +286,6 @@ module RSCM
       time.utc.strftime("%Y-%m-%d %H:%M:%S UTC")
     end
     
-    def checked_out?(checkout_dir)
-      rootcvs = File.expand_path("#{checkout_dir}/CVS/Root")
-      File.exists?(rootcvs)
-    end
-        
     def root_with_password(password)
       result = nil
       if local?

@@ -127,6 +127,13 @@ module RSCM
       changesets(checkout_dir, from_identifier).empty?
     end
 
+    # Whether the project is checked out or not.
+    # Subclasses should override this to check for SCM-specific administrative
+    # files if appliccable
+    def checked_out?(checkout_dir)
+      File.exists?(checkout_dir)
+    end
+
     # Whether triggers are supported by this SCM
     def supports_trigger?
       # The default implementation assumes no - override if it can be

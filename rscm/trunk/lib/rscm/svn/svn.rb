@@ -188,6 +188,12 @@ module RSCM
       url[0..last]
     end
 
+    def checked_out?(checkout_dir)
+      rootentries = File.expand_path("#{checkout_dir}/.svn/entries")
+      result = File.exists?(rootentries)
+      result
+    end
+
   private
 
     def install_unix_trigger(trigger_command, damagecontrol_install_dir)
@@ -244,12 +250,6 @@ module RSCM
       end
     end
     
-    def checked_out?(checkout_dir)
-      rootentries = File.expand_path("#{checkout_dir}/.svn/entries")
-      result = File.exists?(rootentries)
-      result
-    end
-
     def checkout_command(checkout_dir)
       checkout_dir = "\"#{checkout_dir}\""
       "checkout #{url} #{checkout_dir}"

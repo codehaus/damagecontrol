@@ -1,0 +1,6 @@
+<H1>WARNING: The links don't work yet.</H1>
+<% @files.each do |f| 
+  filename = File.basename(f)
+%>
+  <%= link_to(filename, :controller => "files", :action => "dir", :id => @project.name, :action_prefix => filename) %><br>
+<% end %>

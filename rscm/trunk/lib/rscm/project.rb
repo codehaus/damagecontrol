@@ -38,7 +38,7 @@ module RSCM
 
     # Saves the state of this project to persistent store (YAML)
     def save
-      f = Directories.project_config_file(name)
+      f = project_config_file
       FileUtils.mkdir_p(File.dirname(f))
       File.open(f, "w") do |io|
         YAML::dump(self, io)
@@ -89,12 +89,27 @@ module RSCM
     def rss_file
       Directories.rss_file(name)
     end
-
-  private
+    
+    def checked_out?
+      @scm.checked_out?(checkout_dir)
+    end
+    
+    def exists?
+      File.exists?(project_config_file)
+    end
 
     def checkout_dir
       Directories.checkout_dir(name)
     end
+    
+    def delete_working_copy
+      File.delete(checkout_dir)
+    end
 
+  private
+
+    def project_config_file
+      Directories.project_config_file(name)
+    end
   end
 end
