@@ -55,7 +55,7 @@ module RSCM
 
       with_working_dir(dir) do
         monotone("add #{relative_paths_to_add.join(' ')}")
-        monotone("commit #{message}", @branch, @key) do |io|
+        monotone("commit '#{message}'", @branch, @key) do |io|
           io.puts(@passphrase)
           io.close_write
           io.read
@@ -93,7 +93,7 @@ module RSCM
 
     def commit(checkout_dir, message)
       with_working_dir(checkout_dir) do
-        monotone("commit #{message}", @branch, @key) do |io|
+        monotone("commit '#{message}'", @branch, @key) do |io|
           io.puts(@passphrase)
           io.close_write
           io.read
