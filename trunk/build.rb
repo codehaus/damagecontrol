@@ -216,6 +216,8 @@ class Project
   end
   
   def self_upgrade
+    mv("~/damagecontrol", "~/damagecontrol.bak")
+    cp_a("target/dist", "~/damagecontrol")
     shutdown_server("DamageControl is shutting down (self upgrade)") rescue info("could not shutdown server")
     # daemontools should automatically start it again
   end
@@ -224,10 +226,11 @@ class Project
     clean
     test
     dist_nodeps
-    archive_nodeps
+    # this doesn't seem to work either!
+    #archive_nodeps
     # doesn't seem to work yet for the dcontrol user :-(
     #upload_nodeps
-    self_upgrade
+    #self_upgrade
   end
   
   def release
