@@ -22,7 +22,7 @@ module DamageControl
         build = message.build
         dir = "#{@target_base_dir}/#{build.project_name}"
         @filesystem.makedirs(dir)
-        @bhrg.generate(@target_base_dir, build.project_name)
+        @bhrg.generate(dir, build.project_name)
       end
     end
   end
