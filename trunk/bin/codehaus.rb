@@ -14,7 +14,7 @@ server = DamageControlServer.new(
   :AccessLog => File.expand_path("~/access.log"),
   :PollingInterval => 5 * 60, # every five minutes (don't want to overload servers)
   :TrigXmlrpcUrl => "http://builds.codehaus.org:4712/private/xmlrpc",
-  :ExternalWebUrl => "http://builds.codehaus.org"
+  :ExternalWebUrl => "http://builds.codehaus.org/damagecontrol"
   )
 
 def server.logging_level
@@ -23,8 +23,8 @@ def server.logging_level
 end
 
 def server.init_build_executors
-  build_scheduler.add_executor(BuildExecutor.new('jon', hub, project_directories))
-  build_scheduler.add_executor(BuildExecutor.new('aslak', hub, project_directories))
+  build_scheduler.add_executor(BuildExecutor.new('Jon', hub, project_directories))
+  build_scheduler.add_executor(BuildExecutor.new('Aslak', hub, project_directories))
 end
 
 def server.init_custom_components
