@@ -53,7 +53,7 @@
       link_text = "#{link_start}#{build.timestamp_for_humans} (#{label})"
   %>
   <tr class="pane">
-    <td class="pane"><img src="<%= image %>" />&nbsp;<a href="log?project_name=<%= project_name %>&timestamp=<%= build.timestamp %>"><%= link_text %></a></td>
+    <td class="pane"><img src="<%= image %>" />&nbsp;<a href="log?project_name=<%= build.project_name %>&timestamp=<%= build.timestamp %>"><%= link_text %></a></td>
   </tr>
 <% end %>
 
