@@ -223,11 +223,16 @@ namespace ThoughtWorks.DamageControl.DCTray
 
 		static BuildStatus ToBuildStatus(string damagecontrolStatus) 
 		{
-			if(damagecontrolStatus == null) 
+			if(damagecontrolStatus == null)
 			{
 				return BuildStatus.Unknown;
 			}
-			return (BuildStatus) _statusMappings[damagecontrolStatus];
+			object resultingStatus = _statusMappings[damagecontrolStatus];
+			if(resultingStatus == null)
+			{
+				return BuildStatus.Unknown;
+			}
+			return (BuildStatus) resultingStatus;
 		}
 		
 		ProjectStatus GetRemoteProjectStatus(string projectName)
