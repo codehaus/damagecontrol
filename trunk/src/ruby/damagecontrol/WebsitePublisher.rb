@@ -1,4 +1,4 @@
-require 'damagecontrol/Project'
+require 'damagecontrol/Build'
 require 'damagecontrol/BuildCompleteEvent'
 
 module DamageControl
@@ -10,12 +10,12 @@ module DamageControl
 	
 		def receive_message (message)
 			if message.is_a? BuildCompleteEvent
-				@project = message.project
-				@project.open_website_file("index.html") { |file|
+				@build = message.build
+				@build.open_website_file("index.html") { |file|
 					file.print(main_page())
 				}
-				@project.foreach_log { |log|
-					@project.open_website_file("#{log.name}.html") { |file|
+				@build.foreach_log { |log|
+					@build.open_website_file("#{log.name}.html") { |file|
 						file.print(log_page(log))
 					}
 				}
@@ -23,7 +23,7 @@ module DamageControl
 		end
 		
 		def title
-			@project.name
+			@build.project_name
 		end
 		
 		def log_page (log)
@@ -70,7 +70,7 @@ module DamageControl
 		
 		def format_build_logs
 			result = "<ul>"
-			@project.foreach_log {|log|
+			@build.foreach_log {|log|
 				result +=
 				%{<li class='log'>
 					<a href='#{log.name}.html' class='loglink'>#{log.name}</a>

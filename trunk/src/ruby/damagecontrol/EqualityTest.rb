@@ -1,34 +1,34 @@
 require 'test/unit'
 require 'damagecontrol/BuildCompleteEvent'
 require 'damagecontrol/BuildProgressEvent'
-require 'damagecontrol/Project'
+require 'damagecontrol/Build'
 
 module DamageControl
 	class EqualityTest < Test::Unit::TestCase
-		def test_project
+		def test_build
 			do_test_same {
-				Project.new("name")
+				Build.new("name")
 			}
 		end
 		
 		def test_build_complete_event
-			project = Project.new("name")
+			build = Build.new("name")
 			do_test_equal {
-				BuildCompleteEvent.new(project)
+				BuildCompleteEvent.new(build)
 			}
 		end
 		
 		def test_build_progress_event
-			project = Project.new("name")
+			build = Build.new("name")
 			do_test_equal {
-				BuildProgressEvent.new(project, "output")
+				BuildProgressEvent.new(build, "output")
 			}
 		end
 		
 		def test_build_request_event
-			project = Project.new("name")
+			build = Build.new("name")
 			do_test_equal {
-				BuildProgressEvent.new(project, "output")
+				BuildProgressEvent.new(build, "output")
 			}
 		end
 				

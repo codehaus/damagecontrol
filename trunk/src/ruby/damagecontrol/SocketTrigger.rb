@@ -1,6 +1,6 @@
 require 'damagecontrol/BuildRequestEvent'
 require 'damagecontrol/Hub'
-require 'damagecontrol/Project'
+require 'damagecontrol/Build'
 
 require 'socket'
 
@@ -10,14 +10,14 @@ module DamageControl
 	
 		attr_accessor :port
 		
-		def initialize(hub, project)
+		def initialize(hub, build)
 			@hub = hub
-			@project = project
+			@build = build
 			@port = 4711
 		end
 		
 		def do_accept()
-			@hub.publish_message(BuildRequestEvent.new(@project))
+			@hub.publish_message(BuildRequestEvent.new(@build))
 		end
 		
 		def start
@@ -43,7 +43,7 @@ module DamageControl
 	def start_server()
 		puts "Starting..."
 		hub = Hub.new()
-		s = SocketTrigger.new(hub, Project.new("Foo"))
+		s = SocketTrigger.new(hub, Build.new("Foo"))
 		s.start_listening()
 	
 		sleep()

@@ -3,17 +3,15 @@ require 'damagecontrol/CruiseControlLogPoller'
 module DamageControl
 
 	class BuildCompleteEvent
-		attr_reader :project
-		attr_accessor :build
+		attr_reader :build
 
-		def initialize (project)
-			@project = project
-			@build = Build.new
+		def initialize (build)
+			@build = build
 		end
 		
 		def ==(event)
 			event.is_a?(BuildCompleteEvent) \
-				&& event.project == project
+				&& event.build == build
 		end
 	end
 

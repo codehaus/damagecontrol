@@ -1,7 +1,7 @@
 require 'mock'
 require 'test/unit'
 require 'damagecontrol/Hub'
-require 'damagecontrol/Project'
+require 'damagecontrol/Build'
 require 'damagecontrol/BuildCompleteEvent'
 require 'damagecontrol/IRCPublisher'
 require 'damagecontrol/HubTestHelper'
@@ -80,7 +80,7 @@ module DamageControl
 			@publisher = IRCPublisher.new(Hub.new, "server", "channel")
 			@irc_mock = Mock.new
 			@publisher.irc = @irc_mock
-			@event = BuildCompleteEvent.new(Project.new("project"))
+			@event = BuildCompleteEvent.new(Build.new("project"))
 		end
 		
 		def test_sends_message_on_build_complete_if_connected_and_in_channel

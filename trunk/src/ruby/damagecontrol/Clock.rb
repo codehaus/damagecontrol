@@ -1,3 +1,5 @@
+require 'damagecontrol/Latch'
+
 module DamageControl
 	class Clock
 	

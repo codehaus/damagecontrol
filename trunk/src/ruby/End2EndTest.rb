@@ -1,5 +1,5 @@
 require 'test/unit'
-require 'damagecontrol/Project'
+require 'damagecontrol/Build'
 require 'damagecontrol/SocketTrigger'
 require 'damagecontrol/BuildExecutor'
 require 'damagecontrol/Hub'
@@ -35,16 +35,16 @@ class End2EndTest < Test::Unit::TestCase
 	end
 	
 	def start_damagecontrol(build_command_line)
-		project = Project.new(@project)
+		build = Build.new(@project)
 		def project.build
 			puts "building #{self}"
 			super()
 			puts "built #{self}"
 		end
-		project.basedir = "#{@tempdir}/#{@project}"
-		project.build_command_line = build_command_line
+		build.basedir = "#{@tempdir}/#{@project}"
+		build.build_command_line = build_command_line
 		hub = Hub.new
-		SocketTrigger.new(hub, project).start
+		SocketTrigger.new(hub, build).start
 		BuildExecutor.new(hub)
 	end
 	

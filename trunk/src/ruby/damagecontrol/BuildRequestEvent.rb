@@ -1,13 +1,13 @@
 module DamageControl
 	class BuildRequestEvent
-		attr_reader :project
+		attr_reader :build
 		
-		def initialize( project )
-			@project = project
+		def initialize( build )
+			@build = build
 		end
 		
 		def ==(other)
-			@project == other.project
+			@build == other.build
 		end
 		
 	end

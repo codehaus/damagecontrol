@@ -11,9 +11,9 @@ module DamageControl
 		def setup
 			@hub = Hub.new
 			@publisher = WebsitePublisher.new(@hub)
-			@project = Project.new("Bob")
-			@project.logs_directory = "logs"
-			@project.website_directory = "out"
+			@build = Build.new("Bob")
+			@build.logs_directory = "logs"
+			@build.website_directory = "out"
 			@result = ""
 			Dir.mkdir("logs") if !File.exists?("logs")
 			foreach_log {|log|
@@ -29,15 +29,15 @@ module DamageControl
 		end
 		
 		def test_creates_dir_and_index_file
-			@hub.publish_message( BuildCompleteEvent.new( @project ) )
+			@hub.publish_message( BuildCompleteEvent.new( @build ) )
 			assert(FileTest.exists?("out"), "directory should exist")
 			assert(FileTest.exists?("out/index.html"), "index file should exist")
 		end
 		
 		def test_writes_project_summary_and_lists_logs
-			@publisher.receive_message( BuildCompleteEvent.new( @project ) )
-			index_content = content(@project.website_file("index.html"))
-			assert_contain( @project.name, index_content )
+			@publisher.receive_message( BuildCompleteEvent.new( @build ) )
+			index_content = content(@build.website_file("index.html"))
+			assert_contain( @build.project_name, index_content )
 			foreach_log {|log|
 				assert_contain( "#{log}", index_content )
 				assert_contain( "#{log}.html", index_content )
@@ -46,10 +46,10 @@ module DamageControl
 		end
 		
 		def test_writes_content_of_logs
-			@publisher.receive_message( BuildCompleteEvent.new( @project ) )
+			@publisher.receive_message( BuildCompleteEvent.new( @build ) )
 			foreach_log {|log|
-				assert( FileTest::exists?( @project.website_file("#{log}.html") ) )
-				published_content = content(@project.website_file(log + ".html"))
+				assert( FileTest::exists?( @build.website_file("#{log}.html") ) )
+				published_content = content(@build.website_file(log + ".html"))
 				log_content = content("logs/#{log}.log")
 				assert_contain( log_content, published_content )
 			}

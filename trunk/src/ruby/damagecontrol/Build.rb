@@ -1,12 +1,12 @@
 
 module DamageControl
 
-	class Project
-		attr_reader :name
+	class Build
+		attr_reader :project_name
 		attr_accessor :website_directory, :logs_directory, :build_command_line, :basedir
 	
-		def initialize (name)
-			@name = name
+		def initialize (project_name)
+			@project_name = project_name
 			@website_directory = "website"
 			@logs_directory = "logs"
 		end
@@ -55,7 +55,9 @@ module DamageControl
 		end
 		
 		def ==(other)
-			@name == other.name && @website_directory == other.website_directory && @logs_directory == other.logs_directory
+			project_name == other.project_name \
+				&& website_directory == other.website_directory \
+				&& logs_directory == other.logs_directory
 		end
 	
 	end

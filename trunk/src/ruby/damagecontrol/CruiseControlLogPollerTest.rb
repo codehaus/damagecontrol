@@ -29,7 +29,7 @@ module DamageControl
 			copy(@log_file, "#{@dir}/log.xml")
 			@ccpoller.force_tick
 			assert_message_types("DamageControl::BuildCompleteEvent")
-			assert_equal('dxbranch', messages_from_hub[0].project.name)
+			assert_equal('dxbranch', messages_from_hub[0].build.project_name)
 			assert_equal('build.698', messages_from_hub[0].build.label)
 		end
 		

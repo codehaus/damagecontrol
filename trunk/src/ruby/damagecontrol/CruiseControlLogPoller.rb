@@ -1,7 +1,7 @@
 require 'damagecontrol/Hub'
 require 'damagecontrol/FilePoller'
 require 'damagecontrol/BuildCompleteEvent'
-require 'damagecontrol/Project'
+require 'damagecontrol/Build'
 
 module DamageControl
 	class Build
@@ -22,6 +22,7 @@ module DamageControl
 		def parse_cc_log(file)
 			projectname = "unknown"
 			label = "unknown"
+			
 			begin
 				log = nil
 				File.open(file) do |io|
@@ -29,14 +30,13 @@ module DamageControl
 				end
 				info = log.elements['cruisecontrol/info']
 				projectname = info.elements["property[@name='projectname']/@value"].to_s
-				project = Project.new(projectname)
 				label = info.elements["property[@name='label']/@value"].to_s
 			rescue
 			end
 			
-			evt = BuildCompleteEvent.new(project)
-			evt.build = Build.new
-			evt.build.label = label
+			build = Build.new(projectname)
+			evt = BuildCompleteEvent.new(build)
+			build.label = label
 
 			evt
 		end

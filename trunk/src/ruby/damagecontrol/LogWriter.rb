@@ -1,5 +1,5 @@
 require 'damagecontrol/Hub'
-require 'damagecontrol/Project'
+require 'damagecontrol/Build'
 require 'damagecontrol/BuildRequestEvent'
 require 'damagecontrol/BuildProgressEvent'
 require 'damagecontrol/BuildCompleteEvent'
@@ -21,7 +21,7 @@ module DamageControl
 			if message.is_a? BuildRequestEvent
 				log = "#{clock.current_time}.log"
 				puts "#{self} opening log #{log}"
-				@current_log = File.open(message.project.log_file(log), "w")
+				@current_log = File.open(message.build.log_file(log), "w")
 			end
 			
 			if message.is_a? BuildProgressEvent

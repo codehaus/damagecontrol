@@ -104,7 +104,7 @@ module DamageControl
 		def process_message(message)
 			if message.is_a?(BuildCompleteEvent)
 				if @irc.connected? && @irc.in_channel?
-					@irc.send_message_to_channel("BUILD COMPLETE, project: #{message.project.name} label: #{message.build.label}")
+					@irc.send_message_to_channel("BUILD COMPLETE, project: #{message.build.project_name} label: #{message.build.label}")
 					consume_message(message)
 				else
 					@irc.connect(@server) unless @irc.connected?

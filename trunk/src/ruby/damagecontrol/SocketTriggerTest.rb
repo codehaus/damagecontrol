@@ -3,7 +3,7 @@ require 'test/unit'
 require 'damagecontrol/BuildRequestEvent'
 require 'damagecontrol/SocketTrigger'
 require 'damagecontrol/Hub'
-require 'damagecontrol/Project'
+require 'damagecontrol/Build'
 
 require 'socket'
 
@@ -13,12 +13,12 @@ module DamageControl
 
 		def test_fires_build_request_on_socket_accept
 
-			project = Project.new("foo")
+			build = Build.new("foo")
 			
-			bre = BuildRequestEvent.new(project)
+			bre = BuildRequestEvent.new(build)
 
 			hub = Hub.new()
-			@s = SocketTrigger.new(hub, project)
+			@s = SocketTrigger.new(hub, build)
 			@s.do_accept()
 			assert_equal( bre, hub.last_message() )
 			
