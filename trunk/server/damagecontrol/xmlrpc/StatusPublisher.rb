@@ -22,7 +22,7 @@ module XMLRPC
     
     def initialize(xmlrpc_servlet, build_history_repository)
       @build_history_repository = build_history_repository
-      xmlrpc_servlet.add_handler(INTERFACE, build_history_repository)
+      xmlrpc_servlet.add_handler(INTERFACE, self)
     end
     
     def history(project_name)
@@ -33,7 +33,7 @@ module XMLRPC
       @build_history_repository.current_build(project_name)
     end
     
-    def project_names()
+    def project_names
       @build_history_repository.project_names
     end
     
