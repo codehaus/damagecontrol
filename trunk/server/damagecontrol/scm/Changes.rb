@@ -113,8 +113,12 @@ EOF
     end
 
     def format(template, format_time=Time.new.utc)
-      time_difference = format_time.difference_as_text(time)
+      time_difference = time_difference(format_time)
       ERB.new(template).result(binding)
+    end
+    
+    def time_difference(format_time=Time.new.utc)
+      time_difference = format_time.difference_as_text(time)
     end
   end
 

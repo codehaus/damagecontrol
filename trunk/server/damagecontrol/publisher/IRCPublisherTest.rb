@@ -75,14 +75,20 @@ module DamageControl
         assert_match(/project/, message)
       }
       @irc_mock.__expect(:send_message_to_channel) {|message| 
-        assert_match(/jtirsen/, message)
-        assert_match(/file\.txt/, message)
+        assert_match(/by jtirsen .* ago/, message)
+      }
+      @irc_mock.__expect(:send_message_to_channel) {|message| 
+        assert_match(/file.txt 3.2/, message)
+      }
+      @irc_mock.__expect(:send_message_to_channel) {|message| 
+        assert_match(/other_file.txt 5.1/, message)
       }
       
       @publisher.send_message_on_build_request = true
       
       build = Build.new("project")
-      build.changesets << Change.new("file.txt", "jtirsen", "bad ass refactoring", "2.2", now)
+      build.changesets << Change.new("file.txt", "jtirsen", "bad ass refactoring", "3.2", now)
+      build.changesets << Change.new("other_file.txt", "jtirsen", "bad ass refactoring", "5.1", now)
       @publisher.enq_message(BuildRequestEvent.new(build))
       @publisher.enq_message(BuildStartedEvent.new(build))
       @publisher.process_messages

@@ -64,14 +64,16 @@ module DamageControl
       ensure_in_channel
       
       if send_message_on_build_request && message.is_a?(BuildRequestEvent)
-        @irc.send_message_to_channel("[#{message.build.project_name}] BUILD REQUESTED")
+        @irc.send_message_to_channel("#{prefix(message)} BUILD REQUESTED")
       end
       
       if message.is_a?(BuildStartedEvent)
-        @irc.send_message_to_channel("[#{message.build.project_name}] BUILD STARTED")
+        @irc.send_message_to_channel("#{prefix(message)} BUILD STARTED")
         message.build.changesets.each do |changeset|
-          formatted_changeset = changeset.format(CHANGESET_TEXT_FORMAT)
-          @irc.send_message_to_channel("[#{message.build.project_name}] #{formatted_changeset}")
+          @irc.send_message_to_channel("#{prefix(message)} (by #{changeset.developer} #{changeset.time_difference} ago) : #{changeset.message}")
+          changeset.each do |change|
+            @irc.send_message_to_channel("#{prefix(message)} #{change.path} #{change.revision}")
+          end
         end
       end
       
@@ -85,6 +87,10 @@ module DamageControl
       if message.is_a?(UserMessage)
         @irc.send_message_to_channel(message.message)
       end
+    end
+    
+    def prefix(message)
+      "[#{message.build.project_name}]"
     end
   end
 
