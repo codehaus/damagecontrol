@@ -64,6 +64,11 @@ module DamageControl
       self.timestamp = timestamp
     end
     
+    def scm=(scm)
+      raise "scm can't be null" unless scm
+      @scm = scm
+    end
+    
     def timestamp=(time)
       @timestamp = Build.format_timestamp(time)
     end
