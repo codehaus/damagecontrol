@@ -120,7 +120,7 @@ nothing
 EOF
 
     def test_should_retrieve_head_revision
-      parser = SVNLogParser.new(StringIO.new(SVN_R_LOG_HEAD_DATA), "blah", true)
+      parser = SVNLogParser.new(StringIO.new(SVN_R_LOG_HEAD_DATA), "blah")
       changesets = parser.parse_changesets
       assert_equal("48", changesets[0].revision)
     end
