@@ -44,7 +44,7 @@ module Pebbles
       response["Content-Type"] = "text/html"
       puts templatedir
       template = File.new("#{templatedir}/#{template}").read
-      response.body=ERB.new(template).result(binding)
+      response.body = ERB.new(template).result(binding)
     end
   end
 end

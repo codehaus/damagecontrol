@@ -199,19 +199,19 @@ module DamageControl
       httpd.shutdown
       
       # this stuff doesn't work for some reason :-(
-      #components.each do |component|
-      #  begin
-      #    if(component.respond_to?(:shutdown))
-      #      # shut down components in a separate thread
-      #      Thread.new do
-      #        logger.info("shutting down #{component}", e)
-      #        component.shutdown 
-      #      end
-      #    end
-      #  rescue Exception => e
-      #    logger.error("could not shut down #{component}: #{format_exception(e)}")
-      #  end
-      #end
+      components.each do |component|
+        begin
+          if(component.respond_to?(:shutdown))
+            # shut down components in a separate thread
+            Thread.new do
+              logger.info("shutting down #{component}")
+              component.shutdown 
+            end
+          end
+        rescue Exception => e
+          logger.error("could not shut down #{component}: #{format_exception(e)}")
+        end
+      end
     end
   end
 end

@@ -1,23 +1,173 @@
-<html><body>
+<html>
+<head>
+<title>Example Design</title>
+<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+<link rel="stylesheet" href="css/style.css" type="text/css">
+</head>
+<body onLoad="distributeCvsrootFields();showScm(scm)">
+<script><!--
+
+oldScmDiv = null
+scm = "<%= project_config['scm_type'] %>"
+function showScm(scm) {
+	if(oldScmDiv) {
+		oldScmDiv.style.display = 'none';
+	}
+	newScmDiv = document.getElementById(scm)
+	newScmDiv.style.display = 'block';
+	oldScmDiv = newScmDiv
+}
+scm_spec = null
+
+////////// CVS functions //////////
+
+function distributeCvsrootFields() {
+    cvsroot = document.getElementById('cvsroot').value
+	if(cvsroot != "") {
+		regexp = new RegExp(":(.*):(.*)@(.*):(.*)")
+		protocolIndex = 1
+		userIndex = 2
+		serverIndex = 3
+		pathIndex = 4
+		if(!regexp.exec(cvsroot)) {
+			regexp = new RegExp(":(local):(.*):(.*)")
+			userIndex = -1
+			serverIndex = -1
+		}
+		tokens = regexp.exec(cvsroot)
+		if(tokens) {
+			document.getElementById('cvsprotocol').selectedIndex = findIndex(tokens[protocolIndex])
+			if(userIndex != -1) {
+				document.getElementById('cvsuser').value = tokens[userIndex]
+				document.getElementById('cvsserver').value = tokens[serverIndex]
+			} else {
+				document.getElementById('cvsuser').value = ""
+				document.getElementById('cvsserver').value = ""
+			}
+			document.getElementById('cvsrepodir').value = tokens[pathIndex]
+		}
+	} else {
+		document.getElementById('cvsprotocol').selectedIndex = 0
+		document.getElementById('cvsuser').value = ""
+		document.getElementById('cvsserver').value = ""
+		document.getElementById('cvsport').value = ""
+		document.getElementById('cvsrepodir').value = ""
+	}
+	enableOrDisableCvsFieldsAndUpdateScmSpec()
+}
+
+function findIndex(protocol) {
+	arr = new Array("ext", "pserver", "local")
+	for (var i=0; i < arr.length; i++) {
+		if(arr[i] == protocol) {
+			return i + 1
+		}
+	}
+	return 0
+}
+
+function updateCvsRootField() {
+	userAtServerAtPort = ""
+	if(document.getElementById('cvsprotocol').value != "local") {
+		// it's proper client/server
+		port = document.getElementById('cvsport').value != "" ? document.getElementById('cvsport').value + ":" : ""
+		userAtServerAtPort =
+			document.getElementById('cvsuser').value + "@" +
+			document.getElementById('cvsserver').value + ":" +
+			port
+	}
+	document.getElementById('cvsroot').value = ":" +
+		document.getElementById('cvsprotocol').value + ":" +
+		userAtServerAtPort +
+		document.getElementById('cvsrepodir').value
+	enableOrDisableCvsFieldsAndUpdateScmSpec()
+}
+
+function enableOrDisableCvsFieldsAndUpdateScmSpec() {
+	if(document.getElementById('cvsprotocol').value != "local") {
+		document.getElementById('cvsuser').disabled = false
+		document.getElementById('cvsserver').disabled = false
+		document.getElementById('cvsport').disabled = false
+	} else {
+		document.getElementById('cvsuser').disabled = true
+		document.getElementById('cvsserver').disabled = true
+		document.getElementById('cvsport').disabled = true
+	}
+
+	// TODO: chenge this when we go away from scm_spec
+	document.getElementById('scm_spec').value = document.getElementById('cvsroot').value + ":" + document.getElementById('cvsmodule').value
+}
+
+////////// Subversion functions //////////
+
+// --></script>
 
 <form>
-<input type="hidden" name="action" value="<%= action %>" />
-
 <table>
 <tr>
-  <td>Project Name</td>
+  <td>Project name</td>
   <td><input name="project_name" type="text" value="<%= project_name %>"/></td>
 </tr>
 <tr>
-  <td>Build action</td>
-  <td><input name="build_command_line" type="text" value="<%= project_config["build_command_line"] %>"/></td>
+  <td>Build command</td>
+  <td><input name="build_command_line" type="text" value="<%= project_config['build_command_line'] %>"/></td>
 </tr>
 <tr>
-  <td>SCM Spec</td>
-  <td><input name="scm_spec" type="text" value="<%= project_config["scm_spec"] %>"/></td>
+  <td>Source control</td>
+  <td>
+    CVS <input id="cvsradio" type="radio" value="cvs" name="scm" onClick="showScm('cvs')"/>
+    Subversion <input id="svnradio" type="radio" value="svn" name="scm" onClick="showScm('svn')"/>
+  </td>
 </tr>
-<table>
-<input name="submit" type="submit" value="Save"/>
+</table>
+
+<div id="cvs" style="display:none">
+	<table>
+		<tr>
+			<td>CVSROOT</td>
+			<td><input id="cvsroot" onKeyUp="distributeCvsrootFields()" type="text" value="<%= project_config['cvsroot'] %>"></td>
+		</tr>
+		<tr>
+			<td>Protocol</td>
+			<td><select id="cvsprotocol" onchange="updateCvsRootField()">
+					<option value=""></option>
+					<option value="ext" selected>Secure shell (:ext:)</option>
+					<option value="pserver">Password server (:pserver:)</option>
+					<option value="local">Locally mounted folder (:local:)</option>
+				</select></td>
+		</tr>
+		<tr>
+			<td>Server</td>
+			<td><input id="cvsserver" onKeyUp="updateCvsRootField()" type="text"></td>
+		</tr>
+		<tr>
+			<td>Port</td>
+			<td><input id="cvsport" onKeyUp="updateCvsRootField()" type="text"></td>
+		</tr>
+		<tr>
+			<td>Repository directory</td>
+			<td><input id="cvsrepodir" onKeyUp="updateCvsRootField()" type="text"></td>
+		</tr>
+		<tr>
+			<td>User name</td>
+			<td><input id="cvsuser" onKeyUp="updateCvsRootField()" type="text"></td>
+		</tr>
+		<tr>
+			<td>Module</td>
+			<td><input id="cvsmodule" onKeyUp="updateCvsRootField()" type="text" value="<%= project_config['cvsmodule'] %>"></td>
+		</tr>
+	</table>
+
+</div>
+
+<div id="svn" style="display:none">
+Subversion settings (doesn't work yet)
+</div>
+
+  <input name="scm_spec" type="hidden" id="scm_spec"/>
+    <input name="action" type="hidden" value="<%= action %>" />
+    <input type="submit" value="Save"/>
 </form>
 
-</body></html>
+</body>
+</html>

@@ -115,6 +115,10 @@ module DamageControl
       end
     end
     
+    def shutdown
+      @server.shutdown
+    end
+    
     def get_ip
       IPSocket.getaddress(Socket.gethostname)
     end

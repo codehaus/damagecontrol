@@ -24,6 +24,26 @@ module DamageControl
       action = "store_configuration"
       project_config = {}
       project_config = @project_config_repository.project_config(project_name) if @project_config_repository.project_exists?(project_name)
+      
+      # HACK!
+      # Ideally, we should get rid of the scm_spec key completely, and instead have:
+      #
+      # scm_type
+      # cvsroot   (if scm_type == "cvs")
+      # cvsmodule (if scm_type == "cvs")
+      # svnurl    (if scm_type == "svn")
+      #
+      # For now, we'll just compute cvsroot and cvsmodule here and chuck it in the same map,
+      # so that the configure.erb web page can use them
+      #
+      scm_spec = project_config["scm_spec"]
+      if(scm_spec)
+        last_colon = scm_spec.rindex(":")
+        project_config["scm_type"] = "cvs"
+        project_config["cvsroot"] = scm_spec[0..last_colon-1]
+        project_config["cvsmodule"] = scm_spec[last_colon+1..-1]
+      end
+      
       erb("configure.erb", binding)
     end
     
@@ -42,11 +62,6 @@ module DamageControl
       action_redirect(:dashboard, { "project_name" => project_name })
     end
     
-    def build_status(build)
-      return "Never built" if build.nil?
-      build.status
-    end
-
     def dashboard
       last_status = build_status(@build_history_repository.last_completed_build(project_name))
       current_status = build_status(@build_history_repository.current_build(project_name))
@@ -74,5 +89,10 @@ module DamageControl
       request.query['project_name']
     end
     
+    def build_status(build)
+      return "Never built" if build.nil?
+      build.status
+    end
+
   end
 end
