@@ -19,6 +19,11 @@ module DamageControl
       def highlight(s)
         htmlize(s)
       end
+
+      def url
+        "#"
+      end
+
     end
 
     class Bugzilla < Base
@@ -31,7 +36,7 @@ module DamageControl
       def name
         "Bugzilla"
       end
-
+      
       def highlight(s)
         url = RSCM::PathConverter.ensure_trailing_slash(@url)
         if (url)
