@@ -11,7 +11,7 @@ module DamageControl
       super()
       @inq = []
       @channel = channel
-      channel.add_subscriber(self)
+      channel.add_subscriber(self) unless channel.nil?
     end
 
     def tick(time)
