@@ -39,15 +39,15 @@
   <tr class="build-row">
     <td nowrap="nowrap">
       <img width="16" height="16" src="<%= image %>" />&nbsp;
-    <% if selected_build == build then%><span class="highlighted-build"><% end %>
+    <% if selected_build.dc_creation_time == build.dc_creation_time then%><span class="highlighted-build"><% end %>
       <a class="tip" href="<%= base_url %><%= build_url(build) %>">
-        <% if selected_build == build then %><b><% end %>
+        <% if selected_build.dc_creation_time == build.dc_creation_time then %><b><% end %>
         
         <%= prefix %><%= build_description(build) %>
         
-        <% if selected_build == build then %></b><% end %>
+        <% if selected_build.dc_creation_time == build.dc_creation_time then %></b><% end %>
       </a>
-    <% if selected_build == build then%></span><% end %>
+    <% if selected_build.dc_creation_time == build.dc_creation_time then%></span><% end %>
     </td>
   </tr>
   
