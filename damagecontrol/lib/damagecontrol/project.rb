@@ -69,7 +69,7 @@ module DamageControl
     
     # Tells all publishers to publish a build
     def publish(build)
-      @publishers.each do |publisher| publisher.publish(build) end
+      @publishers.each { |publisher| publisher.publish(build) } unless @publishers.nil?
     end
     
     # Saves the state of this project to persistent store (YAML)
