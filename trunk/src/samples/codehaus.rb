@@ -15,7 +15,7 @@ require 'damagecontrol/publisher/FilePublisher'
 require 'damagecontrol/publisher/EmailPublisher' 
  
 include DamageControl 
- 
+
 buildRoot = File.expand_path("/var/build") 
  
 hub = Hub.new 
