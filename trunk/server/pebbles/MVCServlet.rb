@@ -52,7 +52,7 @@ module Pebbles
       super(req, res)
 
       # http://lab.artlung.com/other/anti-cache/
-      if(res["auto_refresh"] != "true")
+      if(req["auto_refresh"] != "true")
         # we _do_ want the browser to cache when auto_refresh is enabled, to avoid flickering of images
         response["CacheControl"] = "no-cache"
         response["Pragma"] = "no-cache"
