@@ -96,7 +96,12 @@ module DamageControl
     def most_recent_timestamp(changesets)
       most_recent = nil
       changesets.each do |changeset|
-        most_recent = changeset.time if most_recent.nil? || most_recent < changeset.time
+        if(changeset.time)
+          most_recent = changeset.time if most_recent.nil? || most_recent < changeset.time
+        else
+          logger.warn("No time for changeset:")
+          logger.warn(changeset)
+        end
       end
       most_recent
     end
