@@ -38,7 +38,7 @@
 <!ENTITY scope 'count(ancestor::node()|$scope) = count(ancestor::node())'>
 ]>
 <xsl:stylesheet version="1.0" xmlns:xsl="http://www.w3.org/1999/XSL/Transform">
-	<xsl:import href="/usr/share/sgml/docbook/xsl-stylesheets-1.65.1/html/chunk.xsl"/>
+	<xsl:import href="http://docbook.sourceforge.net/release/xsl/current/html/chunk.xsl"/>
 	
 	<xsl:param name="damagecontrol.version">0.4-alpha-dev</xsl:param>
 	
