@@ -120,6 +120,10 @@ p ruby dctrigger.rb http://localhost:4713/private/xmlrpc pizza
 #b ruby dctrigger.rb http://localhost:4713/private/xmlrpc bongo
 EOF
 
+LOGINFO_WITH_OLD_TRIGGER = <<-EOF
+old cat $CVSROOT/CVSROOT/damagecontrol-old.conf | nc builds.codehaus.org 4711
+EOF
+
 LOGINFO_WITH_ONE_TRIGGER = <<-EOF
 # or
 #DEFAULT (echo ""; id; echo %{sVv}; date; cat) >> $CVSROOT/CVSROOT/commitlog
@@ -140,6 +144,11 @@ EOF
       cvs = CVS.new(nil, nil, nil)
       uninstalled = cvs.disable_trigger_from_string(LOGINFO_WITH_TWO_TRIGGERS, "pizza", Time.utc(2004, 6, 27, 0, 0, 0, 0))
       assert_equal(LOGINFO_WITH_ONE_TRIGGER, uninstalled)
+    end
+    
+    def test_old_style_triggers_should_be_recognised
+      cvs = CVS.new(nil, nil, nil)
+      assert(cvs.trigger_in_string?(LOGINFO_WITH_OLD_TRIGGER, "blah"))
     end
     
     def test_install_uninstall_install_should_add_four_lines_to_loginfo

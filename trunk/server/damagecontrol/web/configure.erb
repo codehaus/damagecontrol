@@ -10,8 +10,6 @@
 /*
 TODO:
 
-o Do NOT disable  unix_groups. SCM and DC box may not be the same. May need unix groups if DC=unix and SCM=win
-  display only if DC is running on a unix box (find out in startup script).
 o Include SCM images in distro for firewalled installations.
 o TW logo and link to homepage.
 o Optionally only allow trigging/polling for projects with SCM in a certain place (codehaus)
@@ -22,17 +20,6 @@ o display windows/unix icon according to path
 o make sure SCM radio is checked
 o make sure SCM is expanded if check checked
 o make all javascript perfectly runnable without server
-o migrate over all existing projects at the haus:
-  - BEFORE COMMIT OF NEW STUFF
-  - create conf files in old deployed web admin if possible (alt: manually)
-  - make sure build can be trigged from old deployed web admin
-  - make sure unistall_trigger also comments out old socket triggers with #disabled by DC on (date)
-  - AFTER COMMIT OF NEW STUFF (support for socket trigger is now gone!)
-  - reconfigure all projects in web admin. this should:
-    - update conf files
-    - comment out old triggers
-    - enable new triggers (installing the ruby script)
-  - update doco and announce on hausmates
 
 o Trigger settings:
   - xmlrpc: nothing more to specify, since the server should know.

@@ -182,8 +182,10 @@ puts result
     def disable_trigger_from_string(loginfo_content, project_name, date)
       modified = ""
       loginfo_content.each_line do |line|
-        # TODO: couldn't find out how to express this with a single regexp
+        # TODO: couldn't find out how to express this with a single regexp.
         matches = (Regexp.new(".* ruby.*dctrigger.rb http.* #{project_name}$") =~ line) && line[0..0] != "#"
+        # The old format - we want to match them to so they get deleted.
+        matches = (Regexp.new("^cat .* | nc.*4711$") =~ line) && line[0..0] != "#" unless matches
         if(matches)
           formatted_date = date.strftime("%B %d, %Y")
           modified << "# Disabled by DamageControl on #{formatted_date}\n"

@@ -38,7 +38,7 @@ module DamageControl
       build = @build_history_repository.send(last_or_current, project_name)
       if(!build.nil?)
         color = if build.successful? then "green" else "red" end
-        pulse = "-pulse" if @build_scheduler.project_building?(project_name)
+        pulse = "-pulse" if @build_scheduler.project_building?(project_name) && last_or_current == :current_build
       end
       image = "images/#{color}#{pulse}-32.gif"
     end
