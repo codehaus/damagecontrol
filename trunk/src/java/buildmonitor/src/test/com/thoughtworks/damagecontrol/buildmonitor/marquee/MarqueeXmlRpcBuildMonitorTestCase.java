@@ -5,27 +5,18 @@ import com.thoughtworks.damagecontrol.buildmonitor.BuildListener;
 import com.thoughtworks.damagecontrol.buildmonitor.BuildPoller;
 import org.jmock.Mock;
 import org.jmock.MockObjectTestCase;
-import org.jmock.core.Constraint;
 
-import java.io.File;
-import java.io.FileReader;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
+import java.io.*;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.net.SocketTimeoutException;
 import java.net.URL;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 //TODO refactor to an abstract test so we can subclass an integration test
 //that goes against the ruby server
 /**
  * @author Aslak Helles&oslash;y
- * @version $Revision: 1.7 $
+ * @version $Revision: 1.8 $
  */
 public class MarqueeXmlRpcBuildMonitorTestCase extends MockObjectTestCase {
     private IOException serverEx;
@@ -39,16 +30,16 @@ public class MarqueeXmlRpcBuildMonitorTestCase extends MockObjectTestCase {
         while((b = in.read()) != -1) {
             sb.append((char) b);
         }
-        String xmlrpc = sb.toString();
+        String expected_xmlrpc_fetch_all_reply = sb.toString();
 
         final String header = "" +
                 "HTTP/1.1 200 OK\r\n" +
                 "Connection: close\r\n" +
                 "Content-Type: text/xml\r\n" +
-                "Content-length: " + xmlrpc.length() + "\r\n" +
+                "Content-length: " + expected_xmlrpc_fetch_all_reply.length() + "\r\n" +
                 "\r\n";
 
-        final String payload = header + xmlrpc;
+        final String payload = header + expected_xmlrpc_fetch_all_reply;
 
         // TODO: Use Jetty here. Will hopefully handle HTTPS
         Thread serverThread = new Thread(new Runnable() {
@@ -127,12 +118,7 @@ public class MarqueeXmlRpcBuildMonitorTestCase extends MockObjectTestCase {
         expectedBuildListMap.put("apple", expectedBuildList);
 
         Mock mockBuildListener = new Mock(BuildListener.class);
-        mockBuildListener.expects(once()).method("update"), new Constraint() {
-            public boolean eval(Object o) {
-                assertEquals(expectedBuildListMap, o);
-                return true;
-            }
-        });
+        mockBuildListener.expects(once()).method("update").with(eq(expectedBuildList));
 
         BuildPoller buildMonitor = new MarqueeXmlRpcBuildPoller(new URL("http://localhost:14315/"));
         buildMonitor.addBuildListener((BuildListener) mockBuildListener.proxy());

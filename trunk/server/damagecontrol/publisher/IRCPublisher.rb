@@ -1,3 +1,4 @@
+require 'erb'
 require 'rica/rica'
 require 'damagecontrol/util/Timer'
 require 'damagecontrol/core/AsyncComponent'
@@ -10,20 +11,24 @@ module DamageControl
 
     include Logging
   
-    attr_accessor :irc
-    attr_accessor :handle
     attr_reader :channel
     attr_reader :server
+    attr_accessor :irc
+    attr_accessor :handle
     attr_accessor :send_message_on_build_request
   
-    def initialize(channel, server, irc_channel, template)
+    def initialize(channel, dc_server, irc_server, irc_channel, template)
       super(channel)
+      @dc_server = dc_server
       @irc = IRCConnection.new
-      @server = server
+      @irc_server = irc_server
       @irc_channel = irc_channel
       @template = template
       @handle = 'dcontrol'
       @send_message_on_build_request = true
+
+      template_dir = "#{File.expand_path(File.dirname(__FILE__))}/../template"
+      @template = File.new("#{template_dir}/#{template}").read
     end
     
     def start
@@ -42,13 +47,13 @@ module DamageControl
     
     def ensure_in_channel
       if !@irc.connected?
-        logger.info("connecting to #{server}")
-        @irc.connect(server, handle)
+        logger.info("connecting to #{irc_server}")
+        @irc.connect(irc_server, handle)
         wait_until(10) { @irc.connected? }
       end
       
       if @irc.connected? && !@irc.in_channel?
-        logger.info("joining channel #{@server_channel}")
+        logger.info("joining channel #{@irc_channel}")
         @irc.join_channel(@irc_channel)
         wait_until(10) { @irc.in_channel? }
       end
@@ -80,7 +85,10 @@ module DamageControl
       end
       
       if message.is_a?(BuildCompleteEvent)
-        @irc.send_message_to_channel(@template.generate(message.build))
+        build = message.build
+        dc_url = @dc_server.dc_url
+        msg = ERB.new(@template).result(binding)
+        @irc.send_message_to_channel(msg)
       end
 
       if message.is_a?(UserMessage)

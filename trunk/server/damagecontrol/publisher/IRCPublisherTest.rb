@@ -8,10 +8,16 @@ require 'damagecontrol/template/ShortTextTemplate'
 
 module DamageControl
 
+  class DcServerStub
+    def dc_url
+      "http://moradi.com/"
+    end
+  end
+
   class IRCPublisherTest < Test::Unit::TestCase
   
     def setup
-      @publisher = IRCPublisher.new(Hub.new, "server", "channel", ShortTextTemplate.new)
+      @publisher = IRCPublisher.new(Hub.new, DcServerStub.new, "server", "channel", "short_html_build_result.erb")
       @irc_mock = MockIt::Mock.new
       @publisher.irc = @irc_mock
     end
@@ -28,9 +34,9 @@ module DamageControl
     def test_sends_message_on_build_complete
       setup_irc_connected
       @irc_mock.__expect(:send_message_to_channel) {|message| 
-        assert_equal(message, "[project_name] BUILD SUCCESSFUL ")}
+        assert_equal(message, "<a href=\"http://moradi.com/public/project?project_name=cheese\">[cheese] BUILD SUCCESSFUL</a>")}
       
-      b = Build.new("project_name")
+      b = Build.new("cheese")
       b.status = Build::SUCCESSFUL
       evt = BuildCompleteEvent.new(b)
       @publisher.enq_message(evt)

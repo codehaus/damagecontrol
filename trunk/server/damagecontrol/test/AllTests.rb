@@ -28,8 +28,6 @@ require 'damagecontrol/publisher/JabberPublisherTest'
 require 'damagecontrol/publisher/JIRAPublisherTest'
 require 'damagecontrol/web/ConfigureProjectTest'
 
-require 'damagecontrol/template/HTMLTemplateTest'
-
 require 'damagecontrol/dependency/AllTraverserTest'
 require 'damagecontrol/dependency/UpstreamDownstreamTraverserTest'
 

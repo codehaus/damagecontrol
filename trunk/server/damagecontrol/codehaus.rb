@@ -14,7 +14,9 @@ server = DamageControlServer.new(
   :RootDir => buildRoot,
   :HttpPort => 4712,
   :HttpsPort => 4713,
-  :AllowIPs => [ "127.0.0.1", "64.7.141.17" ]
+  :AllowIPs => [ "127.0.0.1", "64.7.141.17" ],
+  :NudgeXmlrpcUrl => "http://builds.codehaus.org/private/xmlrpc/",
+  :DamageControlUrl => "http://builds.codehaus.org/"
   )
 
 def server.logging_level
@@ -30,15 +32,13 @@ end
 def server.init_custom_components
   
   require 'damagecontrol/publisher/IRCPublisher'
-  require 'damagecontrol/template/ShortTextTemplate'
-  component(:irc_publisher, IRCPublisher.new(hub, "irc.codehaus.org", '#damagecontrol', ShortTextTemplate.new))
+  component(:irc_publisher, IRCPublisher.new(hub, server, "irc.codehaus.org", '#damagecontrol', "short_html_build_result.erb"))
   
  # require 'damagecontrol/publisher/GraphPublisher'
  # component(:graph_publisher, GraphPublisher.new(hub, project_directories, build_history_repository))
   
   require 'damagecontrol/publisher/EmailPublisher'
-  require 'damagecontrol/template/HTMLTemplate'
-  component(:email_publisher, EmailPublisher.new(hub, ShortTextTemplate.new, HTMLTemplate.new, "dcontrol@builds.codehaus.org"))
+  component(:email_publisher, EmailPublisher.new(hub, server, "short_text_build_result.erb", "short_html_build_result.erb", "dcontrol@builds.codehaus.org"))
   
   require 'damagecontrol/core/SelfUpgrader'
   component(:self_upgrader, SelfUpgrader.new(hub))

@@ -126,7 +126,11 @@ module DamageControl
     end
     
     def nudge_xmlrpc_url
-      params[:NudgeXmlrpcUrl] || "http://#{get_ip}:#{http_port}/private/xmlrpc"
+      params[:NudgeXmlrpcUrl] || "http://#{get_ip}:#{http_port}/private/xmlrpc/"
+    end
+    
+    def dc_url
+      params[:DamageControlUrl] || "http://#{get_ip}:#{http_port}/"
     end
     
     def get_ip

@@ -7,17 +7,14 @@ import marquee.xmlrpc.XmlRpcClient;
 import marquee.xmlrpc.XmlRpcException;
 import marquee.xmlrpc.XmlRpcParser;
 
-import javax.net.ssl.HostnameVerifier;
-import javax.net.ssl.HttpsURLConnection;
-import javax.net.ssl.SSLContext;
-import javax.net.ssl.SSLSession;
-import javax.net.ssl.SSLSocketFactory;
-import javax.net.ssl.TrustManager;
-import javax.net.ssl.X509TrustManager;
+import javax.net.ssl.*;
 import java.net.URL;
 import java.security.KeyManagementException;
 import java.security.NoSuchAlgorithmException;
 import java.security.cert.X509Certificate;
+import java.util.List;
+import java.util.Iterator;
+import java.util.HashMap;
 import java.util.Map;
 
 /**
@@ -25,7 +22,7 @@ import java.util.Map;
  * server using the Marquee XML-RPC library.
  *
  * @author Aslak Helles&oslash;y
- * @version $Revision: 1.5 $
+ * @version $Revision: 1.6 $
  */
 public class MarqueeXmlRpcBuildPoller implements BuildPoller {
     private final XmlRpcClient xmlRpcClient;
@@ -37,7 +34,7 @@ public class MarqueeXmlRpcBuildPoller implements BuildPoller {
         System.setProperty("org.xml.sax.driver", "org.apache.crimson.parser.XMLReaderImpl");
         xmlRpcClient = new XmlRpcClient(url);
         if(url.toExternalForm().startsWith("https://")) {
-            setUpTrustedSocketFactory();            
+            setUpTrustedSocketFactory();
         }
     }
 
@@ -78,13 +75,21 @@ public class MarqueeXmlRpcBuildPoller implements BuildPoller {
 
     public void poll() throws PollException {
         try {
-            Object result = xmlRpcClient.invoke("status.get_build_list_map", new Object[]{});
-            Map map = (Map) result;
+            List project_names = (List) xmlRpcClient.invoke("status.project_names", new Object[]{});
 
             // check the result for exceptions before passing it on
-            String faultString = (String) map.get("faultString");
-            if(faultString != null) {
-                throw new PollException("Server error: " + faultString + " faultCode=" + (Integer) map.get("faultCode"));
+//            String faultString = (String) map.get("faultString");
+//            if(faultString != null) {
+//                throw new PollException("Server error: " + faultString + " faultCode=" + (Integer) map.get("faultCode"));
+//            }
+
+            Map map = new HashMap();
+            for (Iterator iterator = project_names.iterator(); iterator.hasNext();) {
+                Object o = iterator.next();
+                System.out.println("o = " + o);
+                String projectName = (String) o;
+                List builds = (List) xmlRpcClient.invoke("status.history", new Object[]{projectName});
+                map.put(projectName, builds);
             }
 
             buildListener.update(map);

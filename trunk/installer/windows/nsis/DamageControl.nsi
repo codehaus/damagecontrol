@@ -11,6 +11,7 @@
 ;General
 
   !define ROOTDIR "..\..\.."
+  !define RUBY_HOME "C:\ruby"
   
   ; VERSION needs to be defined on the command line with /DVERSION=1.2.3 option
   
@@ -80,8 +81,8 @@ Section "DamageControl Server" SecServer
   SetOutPath "$INSTDIR"
   
   File /r "${ROOTDIR}\server"
-  File /r "${ROOTDIR}\ruby"
   File /r "${ROOTDIR}\bin"
+  File /r "${RUBY_HOME}\bin"
   
   ;Store installation folder
   WriteRegStr HKCU "Software\Modern UI Test" "" $INSTDIR
