@@ -3,7 +3,7 @@ if [ -z "$DAMAGECONTROL_WORK" ] ; then
 	DAMAGECONTROL_WORK=~/.damagecontrol
 fi
 
-if [ -z "$DAMAGECONTROL_HOME"] ; then
+if [ -z "$DAMAGECONTROL_HOME" ] ; then
 	echo "Please define DAMAGECONTROL_HOME before starting DamageControl"
 	exit 1;
 fi
