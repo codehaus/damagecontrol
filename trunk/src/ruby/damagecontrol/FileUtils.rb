@@ -2,6 +2,16 @@ module DamageControl
 
   module FileUtils
   
+    def with_working_dir(dir)
+      prev = Dir.pwd
+      begin
+        Dir.chdir(dir)
+        yield
+      ensure
+        Dir.chdir(prev)
+      end
+    end
+
     def windows?
       $:.each{ |line|
         if(line =~ /.*msvcrt.*/)
@@ -44,5 +54,6 @@ module DamageControl
     def target_file(filename)
       damagecontrol_file("target/#{filename}")
     end
+    
   end
 end
