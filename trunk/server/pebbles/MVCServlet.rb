@@ -28,8 +28,18 @@ module Pebbles
     end
     
     def erb(template, binding)
-      ERB.new(file_content(template)).result(binding)
+			begin
+      	ERB.new(file_content(template)).result(binding)
+			rescue Exception
+				puts $!
+				ERB.new(file_content(error_page(template))).result(binding)
+			end
     end
+		
+		# default template for error pages
+		def error_page(template)
+			'error.erb'
+		end
     
     def template_dir
       raise "you must overload template dir"

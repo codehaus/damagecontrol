@@ -1,0 +1,78 @@
+<html>
+	<head>
+		<title>Error</title>
+		<link type="text/css" rel="stylesheet" href="css/style.css">
+	</head>
+	<body>
+		<h1 class="pane">An error occurred</h1>
+		<div style="padding-top: 5px">
+			<ul id="foldertab">
+				<li>
+					<a href="#" id="current" onclick="hideDetails();">
+						<img src="smallicons/document_exchange.png"/>Error Message</a>
+				</li>
+				<li>
+					<a href="#"  onclick="showDetails();">
+						<img src="smallicons/console.png"/>Error Details</a>
+				</li>
+			</ul>
+		</div>
+				<script type="text/javascript">
+		function showDetails() {
+			document.getElementById('details').style.display = 'block';
+			document.getElementById('message').style.display = 'none';
+		}
+		
+		function hideDetails() {
+			document.getElementById('details').style.display = 'none';
+			document.getElementById('message').style.display = 'block';
+		}
+		</script>
+		<table class="pane" id="message">
+			<tr>
+				<td>
+					An error occurred when rendering this page. The exact error message
+					was:
+					<blockquote>
+						<%=$! %>
+					</blockquote>
+					You might want to <a href="http://jira.codehaus.org/secure/Dashboard.jspa?os_destination=secure/CreateIssue!default.jspa">log in</a>
+					to DamageControl's issue tracking system and
+					<a href="http://jira.codehaus.org/secure/CreateIssue!default.jspa">report a bug</a>.
+				</td>
+			</tr>
+			<tr>
+				<td>
+					Please include details about your project configuration and what steps
+					you took before you entered this page.</td>
+			</tr>
+		</table>
+		
+		<table class="pane" id="details" style="display:none;">
+			<!--
+			<tr>
+				<th>File</th>
+				<th>Line</th>
+				<th>Method</th>
+			</tr>
+			-->
+			<% 
+				$!.backtrace.each { |line| 
+			%>
+			<tr>
+				<td>
+					<%=line.sub(/:[\d]+.*/,"").sub(/(.*damagecontrol)\/(bin|server)\/(.+)/,"<a href='http://cvs.damagecontrol.codehaus.org/viewrep/damagecontrol/damagecontrol/\\2/\\3?r=HEAD#l#{line[/:([\d]+):/,1]}'><tt>$DAMAGECONTROL_SRC</tt>/\\2/\\3</a>") %>
+				</td>
+				<td>
+					<%=line[/:([\d]+):/,1] %>
+				</td>
+				<td>
+					<%=line[/:in `(.*)\'/,1] %>
+				</td>
+			</tr>
+			<% } %>
+		</table>
+		
+	</body>
+</html>
+<!-- :mode=erb: -->
