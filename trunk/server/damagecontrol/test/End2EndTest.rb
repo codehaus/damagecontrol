@@ -283,7 +283,7 @@ class DamageControlServerDriver < Driver
       @server_startup_result = nil
       @server_startup_result = system("ruby -I#{damagecontrol_home}/server #{startup_script} #{basedir} #{timeout}")
     }
-    wait_for(3) { server_running? }
+    wait_for(10) { server_running? }
     assert_server_running
   end
   
@@ -338,7 +338,7 @@ class DamageControlServerDriver < Driver
     puts @server_startup_result
     assert(!server_shutdown?, "server did not start up properly")
     shutdown_server
-    wait_for(3) { server_shutdown? }
+    wait_for(20) { server_shutdown? }
     assert(server_shutdown?, "server did not shut down properly")
   end
 end
@@ -366,9 +366,9 @@ class End2EndTest < Test::Unit::TestCase
   end
   
   def teardown
+    server.teardown
     irc.teardown
     scm.teardown unless scm.nil?
-    server.teardown
     
     #FileUtils.rm_rf(basedir)
   end

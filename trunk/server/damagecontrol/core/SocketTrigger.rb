@@ -99,8 +99,8 @@ module DamageControl
       Thread.new {
         begin
           @server = TCPServer.new(port)
+          at_exit { @server.shutdown }
           logger.info "#{self} listening on port #{port}"
-          $stdout.flush
           
           while (socket = @server.accept)
             do_accept(socket)

@@ -197,7 +197,7 @@ module DamageControl
       if(windows?)
         to_os_path("#{path(scm_spec)}/CVSROOT/#{trigger_script_name}") + " #{dc_url} #{project_name}"
       else
-        "ruby #{trigger_script_name} #{dc_url} #{project_name}"
+        "ruby $CVSROOT/CVSROOT/#{trigger_script_name} #{dc_url} #{project_name}"
       end
     end
 

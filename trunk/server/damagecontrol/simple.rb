@@ -80,7 +80,7 @@ def start_simple_server(params = {})
   httpd.mount("/private/xmlrpc", private_xmlrpc_servlet)
   
   at_exit { httpd.shutdown }
-  Thread.new { httpd.start }
+  @httpd_thread = Thread.new { httpd.start }
 
 end
 
