@@ -37,14 +37,18 @@ class Time
   include Pebbles::TimeUtils
   
   def Time.parse_ymdHMS(timestamp_as_ymdHMS)
-    Time.utc(
-      timestamp_as_ymdHMS[0..3], # year 
-      timestamp_as_ymdHMS[4..5], # month
-      timestamp_as_ymdHMS[6..7], # day
-      timestamp_as_ymdHMS[8..9], # hour
-      timestamp_as_ymdHMS[10..11], # minute
-      timestamp_as_ymdHMS[12..13] # second
-    )
+		begin
+			Time.utc(
+				timestamp_as_ymdHMS[0..3], # year 
+				timestamp_as_ymdHMS[4..5], # month
+				timestamp_as_ymdHMS[6..7], # day
+				timestamp_as_ymdHMS[8..9], # hour
+				timestamp_as_ymdHMS[10..11], # minute
+				timestamp_as_ymdHMS[12..13] # second
+			)
+		rescue Exception => e
+			nil
+		end
   end
   
   def to_rfc2822
