@@ -29,13 +29,12 @@ module DamageControl
     def test_sends_message_on_build_complete
       setup_irc_connected
       @irc_mock.__expect(:send_message_to_channel) {|message|
-        expected = "<a href=\"http://moradi.com/public/project/cheese?action=build_details&timestamp=19710228234500\">[cheese] BUILD SUCCESSFUL</a>"
+        expected = "<a href=\"http://moradi.com/public/project/cheese?dc_creation_time=19710228234500\">[cheese] BUILD SUCCESSFUL</a>"
         assert_equal(expected, message)
       }
       
-      b = Build.new("cheese")
+      b = Build.new("cheese", {}, "http://moradi.com/public/")
       b.status = Build::SUCCESSFUL
-      b.url = "http://moradi.com/public/project/cheese?action=build_details&timestamp=19710228234500"
       b.dc_creation_time = Time.utc(1971,2,28,23,45,0,0)
       evt = BuildCompleteEvent.new(b)
       @publisher.on_message(evt)
@@ -65,6 +64,7 @@ module DamageControl
       @publisher.send_message_on_build_request = true
       
       build = Build.new("project")
+      build.dc_creation_time = Time.utc(2004, 9, 3, 15, 0, 0)
       build.changesets.add(Change.new("file.txt", "jtirsen", "bad ass refactoring", "3.2", now))
       build.changesets.add(Change.new("other_file.txt", "jtirsen", "bad ass refactoring", "5.1", now))
       @publisher.on_message(BuildRequestEvent.new(build))

@@ -46,9 +46,9 @@ module DamageControl
     end
   
     def test_email_is_sent_upon_build_complete_event    
-      build = Build.new("cheese", {"nag_email" => "somelist@someproject.bar"})
+      build = Build.new("cheese", {"nag_email" => "somelist@someproject.bar"}, "http://moradi.com/public/")
       build.status = Build::FAILED
-      build.url =  "http://moradi.com/public/project/cheese?action=build_details&dc_creation_time=19710228234500"
+      build.dc_creation_time = Time.utc(1971,2,28,22,45,0,0)
       build.dc_start_time = Time.utc(1971,2,28,23,45,0,0)
       change1 = Change.new("a/file", "aslak", nil, nil, Time.new.utc)
       build.changesets.add(change1)
@@ -64,7 +64,7 @@ module DamageControl
         "MIME-Version: 1.0\r\nContent-Type: text/html\r\n" +
         "\r\n" + 
         "aslak broke the build <br>" +
-        "<a href=\"http://moradi.com/public/project/cheese?action=build_details&dc_creation_time=19710228234500\">[cheese] BUILD FAILED</a>", 
+        "<a href=\"http://moradi.com/public/project/cheese?dc_creation_time=19710228224500\">[cheese] BUILD FAILED</a>", 
         @sender.mail)
     end
     

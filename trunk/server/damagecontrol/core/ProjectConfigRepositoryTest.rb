@@ -70,7 +70,6 @@ module DamageControl
           "scm" => create_default_scm
         },
         build.config)
-      assert_match(/http:\/\/localhost\/public\/project\/newproject\?dc_creation_time=2\d\d\d\d\d\d\d\d\d\d\d\d\d/, build.url)
     end
     
     def test_inc_build_label

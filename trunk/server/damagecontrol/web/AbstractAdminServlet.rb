@@ -164,11 +164,6 @@ module DamageControl
     end
     
   private
-
-    def build_url(build)
-      return nil unless build
-      "#{build.project_name}?dc_creation_time=#{build.dc_creation_time.ymdHMS}"
-    end
     
     def build_status(build)
       return "Never built" if build.nil?

@@ -5,6 +5,7 @@ require 'pebbles/TimeUtils'
 require 'xmlrpc/utils'
 require 'rexml/document'
 require 'cl/xmlserial'
+require 'cgi'
 
 module DamageControl
 
@@ -31,7 +32,6 @@ module DamageControl
     attr_accessor :status
 
 #START FIXME - not portable data
-    attr_accessor :url
     attr_accessor :archive_dir
 #END FIXME
 
@@ -77,12 +77,17 @@ module DamageControl
     def failed?
       status == FAILED
     end
+
+    def url
+      @html_url.nil? ? nil : "#{@html_url}project/#{CGI.escape(project_name)}?dc_creation_time=#{dc_creation_time.ymdHMS}"
+    end
     
-    def initialize(project_name = nil, config={})
+    def initialize(project_name = nil, config={}, html_url=nil)
       @project_name = project_name
       @config = config
       @status = IDLE
       @changesets = ChangeSets.new
+      @html_url = html_url
     end
     
     def build_command_line
@@ -112,6 +117,10 @@ module DamageControl
       config == o.config &&
       dc_creation_time == o.dc_creation_time &&
       changesets == o.changesets
+    end
+
+    def __get_instance_variables
+      (instance_variables.reject {|var| var == "@html_url"}).collect {|var| [var[1..-1], eval(var)] }
     end
 
   end

@@ -28,7 +28,7 @@ module DamageControl
       channel.add_consumer(self)
       @basedir = basedir
       @html_url = html_url
-      @build_serializer = BuildSerializer.new
+      @build_serializer = BuildSerializer.new(html_url)
     end
     
     def on_message(message)
@@ -146,7 +146,7 @@ module DamageControl
       channel = rss.root.add_element("channel")
       channel.add_element("title").add_text("DamageControl: #{project_name}")
       channel.add_element("description").add_text("Build results for #{project_name}")
-      channel.add_element("link").add_text("#{@html_url}#{CGI.escape(project_name)}")
+      channel.add_element("link").add_text("#{@html_url}project/#{CGI.escape(project_name)}")
       history(project_name).reverse.each do |build|
         channel.add(build.to_rss_item)
       end

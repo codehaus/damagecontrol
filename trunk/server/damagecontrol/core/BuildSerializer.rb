@@ -13,6 +13,10 @@ module DamageControl
   class BuildSerializer
     include FileUtils
 
+    def initialize(html_url=nil)
+      @html_url = html_url
+    end
+
     def dump(build, build_dir)
       mkdir_p(build_dir)
       property_files = Dir["#{build_dir}/*=*"]
@@ -29,7 +33,7 @@ module DamageControl
     
     def load(build_dir, with_changesets=false)
       project_name = File.basename(File.expand_path("#{build_dir}/../.."))
-      build = Build.new(project_name)
+      build = Build.new(project_name, {}, @html_url)
 
       build.dc_creation_time = dc_creation_time(build_dir)
       build.duration         = duration(build_dir)

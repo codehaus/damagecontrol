@@ -40,7 +40,7 @@
     <td nowrap="nowrap">
       <img width="16" height="16" src="<%= image %>" />&nbsp;
     <% if selected_build.dc_creation_time == build.dc_creation_time then%><span class="highlighted-build"><% end %>
-      <a class="tip" href="<%= base_url %><%= build_url(build) %>">
+      <a class="tip" href="<%= base_url %><%= build.url %>">
         <% if selected_build.dc_creation_time == build.dc_creation_time then %><b><% end %>
         
         <%= prefix %><%= build_description(build) %>

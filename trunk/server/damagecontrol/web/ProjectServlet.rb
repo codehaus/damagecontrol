@@ -147,14 +147,14 @@ module DamageControl
         if(prev_build)
           result +=
             [
-              task(:icon => "largeicons/navigate_left.png", :name => "Previous build", :url => build_url(prev_build))
+              task(:icon => "largeicons/navigate_left.png", :name => "Previous build", :url => prev_build.url)
             ]
         end
         next_build = build_history_repository.next(selected_build)
         if(next_build)
           result +=
             [
-              task(:icon => "largeicons/navigate_right.png", :name => "Next build", :url => build_url(next_build))
+              task(:icon => "largeicons/navigate_right.png", :name => "Next build", :url => next_build.url)
             ]
         end
       end
