@@ -1,5 +1,5 @@
 class Class
-  @@anns ||= {}
+  @@anns = {}
 
   # Defines annotation(s) for the next defined +attr_reader+ or
   # +attr_accessor+. The +anns+ argument should be a Hash defining annotations
@@ -33,7 +33,7 @@ class Class
   alias old_attr_reader attr_reader #:nodoc:
   def attr_reader(*syms) #:nodoc:
     syms.each do |sym|
-      @@anns[sym] = $attr_anns
+      @@anns[sym] = $attr_anns.dup if $attr_anns
     end
     $attr_anns = nil
     old_attr_reader(*syms)

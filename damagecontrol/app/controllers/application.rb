@@ -190,7 +190,6 @@ module ActionView
     def render_object(o, collection_name, edit)
       underscored_name = underscore(demodulize(o.class.name))
       template = File.expand_path(File.dirname(__FILE__) + "/../views/project/_#{underscored_name}.rhtml")
-$stderr.puts template
       if(File.exist?(template))
         render_partial(underscored_name, o)
       else

@@ -4,8 +4,6 @@ require 'rscm'
 
 module RSCM
   class SubversionLogParserTest < Test::Unit::TestCase
-  
-#    include FileUtils
 
 SIMPLE_LOG_ENTRY = <<EOF
 r2 | ahelleso | 2004-07-11 14:29:35 +0100 (Sun, 11 Jul 2004) | 1 line

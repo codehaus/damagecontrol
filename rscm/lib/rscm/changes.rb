@@ -217,7 +217,7 @@ module RSCM
     # This is a UTC ruby time
     attr_accessor :time
     
-    def initialize(path=nil, developer=nil, message=nil, revision=nil, time=nil, status=DELETED)
+    def initialize(path=nil, status=nil, developer=nil, message=nil, revision=nil, time=nil)
       @path, @developer, @message, @revision, @time, @status = path, developer, message, revision, time, status
     end
   

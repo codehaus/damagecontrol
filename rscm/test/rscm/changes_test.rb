@@ -97,9 +97,9 @@ module RSCM
     
     def test_reports_timestamp_of_latest_change
       changeset = ChangeSet.new
-      changeset << Change.new(nil, nil, nil, nil, Time.utc(2004))
-      changeset << Change.new(nil, nil, nil, nil, Time.utc(2005))
-      changeset << Change.new(nil, nil, nil, nil, Time.utc(2003))
+      changeset << Change.new(nil, nil, nil, nil, nil, Time.utc(2004))
+      changeset << Change.new(nil, nil, nil, nil, nil, Time.utc(2005))
+      changeset << Change.new(nil, nil, nil, nil, nil, Time.utc(2003))
       assert_equal(Time.utc(2005), changeset.time)
     end
 

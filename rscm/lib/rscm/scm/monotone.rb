@@ -1,5 +1,5 @@
-require 'rscm/abstract_scm'
 require 'fileutils'
+require 'rscm'
 
 module RSCM
   class Monotone < AbstractSCM
@@ -82,27 +82,13 @@ module RSCM
     end
 
     def changesets(checkout_dir, from_identifier, to_identifier=Time.infinity)
-      result = ChangeSets.new
+      from_identifier = Time.epoch if from_identifier.nil?
+      to_identifier = Time.infinity if to_identifier.nil?
       with_working_dir(checkout_dir) do
         monotone("log", @branch, @key) do |stdout|
-          stdout.each_line do |line|
-            puts line
-          end
+          MonotoneLogParser.new.parse_changesets(stdout, from_identifier, to_identifier)
         end
-        
-        # TODO: this is temporarily hardcoded just to help with testing.
-        changeset = ChangeSet.new
-        changeset.developer = "tester@test.net"
-        changeset.time = Time.new
-        changeset << Change.new("build.xml", nil, nil, nil, nil, Change::ADDED)
-        changeset << Change.new("project.xml", nil, nil, nil, nil, Change::ADDED)
-        changeset << Change.new("src/java/com/thoughtworks/damagecontrolled/Thingy.java", nil, nil, nil, nil, Change::ADDED)
-        changeset << Change.new("src/test/com/thoughtworks/damagecontrolled/ThingyTestCase.java", nil, nil, nil, nil, Change::ADDED)
-        changeset.message = "imported\nsources"
-
-        result.add(changeset)
       end
-      result
     end
 
     def commit(checkout_dir, message)

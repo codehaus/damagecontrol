@@ -77,7 +77,7 @@ module RSCM
       # check that we now have one more change
       changesets = scm.changesets(checkout_dir, initial_changesets.time + 1)
 
-      assert_equal(1, changesets.length)
+      assert_equal(1, changesets.length, changesets.collect{|cs| cs.to_s})
       changeset = changesets[0]
       assert_equal(2, changeset.length)
 
