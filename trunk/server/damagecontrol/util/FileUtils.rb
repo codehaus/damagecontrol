@@ -59,6 +59,14 @@ module FileUtils
     end
   end
   
+  def ensure_trailing_slash(url)
+    if(url && url[-1..-1] != "/")
+      "#{url}/"
+    else
+      url
+    end
+  end
+  
   def cmd_with_io(dir, cmd, &proc)
     with_working_dir(dir) do
       logger.debug("in directory #{dir}")

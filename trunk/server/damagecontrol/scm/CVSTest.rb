@@ -1,7 +1,6 @@
 require 'test/unit'
 require 'damagecontrol/scm/GenericSCMTests'
 require 'damagecontrol/scm/CVS'
-require 'webrick'
 
 module DamageControl
   class CVSTest < Test::Unit::TestCase
@@ -22,50 +21,6 @@ module DamageControl
     
     def create_cvs(cvsroot, cvsmodule, checkout_dir=new_temp_dir)
       CVS.new("cvsroot" => cvsroot, "cvsmodule" => cvsmodule, "checkout_dir" => checkout_dir)
-    end
-    
-    def test_parse_local_unix_cvsroot
-      protocol = "local"
-      path     = "/cvsroot/damagecontrol"
-      mod      = "damagecontrol"
-
-      cvs      = create_cvs(":#{protocol}:#{path}", "#{mod}")
-
-      assert_equal(protocol, cvs.protocol)
-      assert_equal(nil,         cvs.user)
-      assert_equal(nil,         cvs.host)
-      assert_equal(path,      cvs.path)
-      assert_equal(mod,       cvs.mod)
-    end
-
-    def test_parse_local_windows_cvsroot
-      protocol = "local"
-      path     = "C:\\pling\\plong"
-      mod      = "damagecontrol"
-
-      cvs      = create_cvs(":#{protocol}:#{path}", "#{mod}")
-
-      assert_equal(protocol, cvs.protocol)
-      assert_equal(nil,      cvs.user)
-      assert_equal(nil,      cvs.host)
-      assert_equal(path,     cvs.path)
-      assert_equal(mod,      cvs.mod)
-    end
-    
-    def test_parse_pserver_unix_cvsroot
-      protocol = "pserver"
-      user     = "anonymous"
-      host     = "beaver.codehaus.org"
-      path     = "/cvsroot/damagecontrol"
-      mod      = "damagecontrol"
-
-      cvs      = create_cvs(":#{protocol}:#{user}@#{host}:#{path}", "#{mod}")
-
-      assert_equal(protocol, cvs.protocol)
-      assert_equal(user,     cvs.user)
-      assert_equal(host,     cvs.host)
-      assert_equal(path,     cvs.path)
-      assert_equal(mod,      cvs.mod)
     end
     
     def jons_birthday

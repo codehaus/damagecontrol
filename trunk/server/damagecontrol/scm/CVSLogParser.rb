@@ -11,6 +11,9 @@ module DamageControl
 
     include Logging
     
+    attr_accessor :cvspath
+    attr_accessor :cvsmodule
+    
     def initialize(io)
       super(io)
       @log = ""
@@ -72,9 +75,6 @@ module DamageControl
       return convert_all_slashes_to_forward_slashes(working_file) unless working_file.nil? || working_file == ""
       make_relative_to_module(extract_required_match(first_entry, /^RCS file: (.*?)(,v|$)/m))
     end
-    
-    attr_accessor :cvspath
-    attr_accessor :cvsmodule
     
     def make_relative_to_module(file)
       return file if cvspath.nil? || cvsmodule.nil? || file.nil?

@@ -1,8 +1,8 @@
-require 'ftools'
 require 'stringio'
 require 'damagecontrol/scm/AbstractSCM'
 require 'damagecontrol/scm/CVSLogParser'
 require 'damagecontrol/scm/Changes'
+require 'damagecontrol/util/FileUtils'
 
 module DamageControl
 
@@ -12,8 +12,10 @@ module DamageControl
   # If pserver is used, the user is assumed to already be authenticated with cvs login
   # prior to starting damagecontrol. (TODO: fix that!) 
   class CVS < AbstractSCM
-  
-    attr_reader :cvsroot
+    include FileUtils
+
+  public
+    attr_reader :cvsroot, :mod
     
     def initialize(config_map)
       super(config_map)
@@ -21,28 +23,15 @@ module DamageControl
       @mod = config_map["cvsmodule"] || required_config_param("cvsmodule")
     end
     
+    # Works with ViewCVS (which works with CVS and SVN) and Fisheye (works with CVS and soon SVN)
     def web_url_to_change(change)
-      view_cvs_url_to_change(change)
-    end
+      view_cvs_url = config_map["view_cvs_url"]
+      return "root/#{config_map['project_name']}/checkout/#{mod}/#{change.path}" if view_cvs_url.nil? || view_cvs_url == "" 
 
-    def protocol
-      parse_cvsroot[0]
-    end
-
-    def user
-      parse_cvsroot[1]
-    end
-
-    def host
-      parse_cvsroot[2]
-    end
-
-    def path
-      parse_cvsroot[3]
-    end
-
-    def mod
-      @mod
+      view_cvs_url_patched = ensure_trailing_slash(view_cvs_url)
+      url = "#{view_cvs_url_patched}#{change.path}"
+      url << "?r1=#{change.previous_revision}&r2=#{change.revision}" if(change.previous_revision)
+      url
     end
     
     def changesets(from_time, to_time)
@@ -65,39 +54,6 @@ module DamageControl
       parser.parse_changesets
     end
     
-    def changes_command(from_time, to_time)
-      # https://www.cvshome.org/docs/manual/cvs-1.11.17/cvs_16.html#SEC144
-      # -N => Suppress the header if no revisions are selected.
-      # -S => Do not print the list of tags for this file.
-      "log -N -S -d\"#{cvsdate(from_time)}<=#{cvsdate(to_time)}\""
-    end
-    
-    def cvsdate(time)
-      return "" unless time
-      # CVS wants all dates as UTC.
-      time.utc.strftime("%Y-%m-%d %H:%M:%S UTC")
-    end
-    
-    def commit(message, &proc)
-      cvs(working_dir, commit_command(message), &proc)
-    end
-
-    def commit_command(message)
-      "commit -m \"#{message}\""
-    end
-    
-    def time_option(time)
-      if time.nil? then "" else "-D \"#{cvsdate(time)}\"" end
-    end
-
-    def checkout_command(time)
-      "-d#{@cvsroot} checkout #{time_option(time)} #{mod}"
-    end
-
-    def update_command(time)
-      "-d#{@cvsroot} update #{time_option(time)} -d -P"
-    end
-    
     def checkout(time = nil, &proc)
       if(checked_out?)
         cvs(working_dir, update_command(time), &proc)
@@ -106,6 +62,10 @@ module DamageControl
       end
     end
     
+    def commit(message, &proc)
+      cvs(working_dir, commit_command(message), &proc)
+    end
+
     def working_dir
       "#{checkout_dir}/#{mod}"
     end
@@ -136,10 +96,6 @@ module DamageControl
       end
     end
     
-    def create_cvsroot_cvs
-      CVS.new("cvsroot" => @cvsroot, "cvsmodule" => "CVSROOT", "checkout_dir" => checkout_dir)
-    end
-
     def trigger_installed?(project_name)
       cvsroot_cvs = create_cvsroot_cvs
       cvsroot_cvs.checkout
@@ -164,6 +120,9 @@ module DamageControl
       end
     end
 
+  # NOT PART OF PUBLIC API. EXPOSED JUST TO MAKE TESTING EASIER
+  # SHOULD IDEALLY BE MOVED TO protected OR private.
+
     def trigger_in_string?(loginfo_content, project_name)
       disable_trigger_from_string(loginfo_content, project_name, Time.new.utc) != loginfo_content
     end
@@ -187,15 +146,21 @@ module DamageControl
       modified
     end
     
-    def conf_script(conf_file_name)
-      to_os_path("#{path}/CVSROOT/#{conf_file_name}")
+    def changes_command(from_time, to_time)
+      # https://www.cvshome.org/docs/manual/cvs-1.11.17/cvs_16.html#SEC144
+      # -N => Suppress the header if no revisions are selected.
+      # -S => Do not print the list of tags for this file.
+      "log -N -S -d\"#{cvsdate(from_time)}<=#{cvsdate(to_time)}\""
     end
     
-    def checked_out?
-      rootcvs = File.expand_path("#{working_dir}/CVS/Root")
-      File.exists?(rootcvs)
+    def update_command(time)
+      "-d#{@cvsroot} update #{time_option(time)} -d -P"
     end
-        
+    
+    def checkout_command(time)
+      "-d#{@cvsroot} checkout #{time_option(time)} #{mod}"
+    end
+
     def cvs(dir, cmd, &proc)
       cmd = "cvs -q #{cmd} 2>&1"
       cmd_with_io(dir, cmd) do |io|
@@ -205,8 +170,37 @@ module DamageControl
       end
     end
 
+  protected
+      
+    def cvsdate(time)
+      return "" unless time
+      # CVS wants all dates as UTC.
+      time.utc.strftime("%Y-%m-%d %H:%M:%S UTC")
+    end
+    
+    def checked_out?
+      rootcvs = File.expand_path("#{working_dir}/CVS/Root")
+      File.exists?(rootcvs)
+    end
+        
   private
 
+    def create_cvsroot_cvs
+      CVS.new("cvsroot" => @cvsroot, "cvsmodule" => "CVSROOT", "checkout_dir" => checkout_dir)
+    end
+
+    def time_option(time)
+      if time.nil? then "" else "-D \"#{cvsdate(time)}\"" end
+    end
+
+    def commit_command(message)
+      "commit -m \"#{message}\""
+    end
+    
+    def path
+      parse_cvsroot[3]
+    end
+    
     # parses the cvsroot into tokens
     # [protocol, user, host, path]
     #
@@ -222,7 +216,6 @@ module DamageControl
         when @cvsroot =~ /^:pserver:/ then md[1..4]
       end
     end
-
   end
 
   ##################################################################################

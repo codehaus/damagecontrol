@@ -1,6 +1,7 @@
 module DamageControl
   
   # Some utilities for log-parsers
+  # TODO: make this a module and remove the attr_reader
   class AbstractLogParser
   
     attr_reader :io

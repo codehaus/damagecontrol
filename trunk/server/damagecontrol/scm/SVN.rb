@@ -1,11 +1,12 @@
-require 'ftools'
 require 'stringio'
 require 'damagecontrol/scm/AbstractSCM'
 require 'damagecontrol/scm/SVNLogParser'
+require 'damagecontrol/util/FileUtils'
 
 module DamageControl
 
   class SVN < AbstractSCM
+    include FileUtils
 
     def initialize(config_map)
       super(config_map)
@@ -14,7 +15,13 @@ module DamageControl
     end
   
     def web_url_to_change(change)
-      view_cvs_url_to_change(change)
+      view_cvs_url = config_map["view_cvs_url"]
+      return super if view_cvs_url.nil? || view_cvs_url == "" 
+
+      view_cvs_url_patched = ensure_trailing_slash(view_cvs_url)
+      url = "#{view_cvs_url_patched}#{change.path}"
+      url << "?r1=#{change.previous_revision}&r2=#{change.revision}" if(change.previous_revision)
+      url
     end
 
     def checkout(time = nil, &proc)
@@ -45,7 +52,6 @@ module DamageControl
     end
 
     def working_dir
-      # yeah, @svnurl is not a file path, but this works
       "#{checkout_dir}/#{@svnprefix}"
     end
 
