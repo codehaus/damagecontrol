@@ -219,7 +219,7 @@ end
 # (This is not needed in the superclass, since it is not used by DC)
 class LocalCVS < CVS
   def initialize(cvsrootdir, mod, working_dir_root)
-    super(":local:#{cvsrootdir}", mod, working_dir_root)
+    super("cvsroot" => ":local:#{cvsrootdir}", "cvsmodule" => mod, "working_dir_root" => working_dir_root)
     @cvsrootdir = cvsrootdir
   end
   

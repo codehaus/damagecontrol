@@ -41,6 +41,14 @@ module DamageControl
       raise "can't be null" if developer.nil?
       @developer = developer
     end
+    
+    def ==(change)
+      self.path == change.path &&
+        self.developer == change.developer &&
+        self.message == change.message &&
+        self.revision == change.revision &&
+        self.time == change.time
+    end
   end
 
   module ChangeUtils

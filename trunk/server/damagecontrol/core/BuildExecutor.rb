@@ -171,6 +171,7 @@ module DamageControl
           current_build.potential_label = 1
         end
         
+        determine_changeset
         @channel.publish_message(BuildStartedEvent.new(current_build))
     end
     
@@ -178,8 +179,6 @@ module DamageControl
       next_scheduled_build
       begin
         build_start
-        
-        determine_changeset
         checkout
         execute
       rescue Exception => e
