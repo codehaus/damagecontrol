@@ -4,8 +4,6 @@ require 'ftools'
 
 module DamageControl
 
-	include FileUtils
-
 	# format of path is cvsroot:module
 	# examples
 	# :local:/cvsroot/damagecontrol:damagecontrol
