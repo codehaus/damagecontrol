@@ -19,7 +19,7 @@ module DamageControl
     end
     
     def content
-      "<iframe border=\"0\" width=\"100%\" height=\"100%\" src=\"../../public/root/#{project_name}/build/#{selected_build.dc_creation_time.ymdHMS}/stdout.log\" />"
+      "<iframe border=\"0\" width=\"100%\" height=\"100%\" src=\"../root/#{project_name}/build/#{selected_build.dc_creation_time.ymdHMS}/stdout.log\" />"
     end
   end
 end
