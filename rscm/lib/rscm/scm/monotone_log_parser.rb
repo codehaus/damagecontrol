@@ -12,23 +12,34 @@ module RSCM
       
       changesets = ChangeSets.new
       changeset_string = ""
+      
+      # hash of path => [array of revisions]
+      path_revisions = {}
       io.each_line do |line|
         if(line =~ /-----------------------------------------------------------------/)
-          changeset = parse_changeset(StringIO.new(changeset_string))
+          changeset = parse_changeset(StringIO.new(changeset_string), path_revisions)
           changesets.add(changeset)
           changeset_string = ""
         else
           changeset_string << line
         end
       end
-      changeset = parse_changeset(StringIO.new(changeset_string))
+      changeset = parse_changeset(StringIO.new(changeset_string), path_revisions)
       if((from_identifier <= changeset.time) && (changeset.time <= to_identifier))
         changesets.add(changeset)
+      end
+
+      # set the previous revisions. most recent is at index 0.
+      changesets.each do |changeset|
+        changeset.each do |change|
+          current_index = path_revisions[change.path].index(change.revision)
+          change.previous_revision = path_revisions[change.path][current_index + 1]
+        end
       end
       changesets
     end
 
-    def parse_changeset(changeset_io)
+    def parse_changeset(changeset_io, path_revisions)
       changeset = ChangeSet.new
       state = nil
       changeset_io.each_line do |line|
@@ -54,25 +65,30 @@ module RSCM
         elsif(line =~ /^Added files:$/)
           state = :added
         elsif(state == :added)
-          add_changes(changeset, line, Change::ADDED)
+          add_changes(changeset, line, Change::ADDED, path_revisions)
         elsif(line =~ /^Modified files:$/)
           state = :modified
         elsif(state == :modified)
-          add_changes(changeset, line, Change::MODIFIED)
+          add_changes(changeset, line, Change::MODIFIED, path_revisions)
         end
       end
       changeset.message.chomp!
-      raise "No time:\n{changeset}" unless changeset.time
       changeset
     end
     
   private
 
-    def add_changes(changeset, line, state)
+    def add_changes(changeset, line, state, path_revisions)
       paths = line.split(" ")
       paths.each do |path|
-        changeset << Change.new(path, state)
+        changeset << Change.new(path, state, changeset.developer, nil, changeset.revision, changeset.time)
+
+        # now record path revisions so we can keep track of previous rev for each path
+        # doesn't work for moved files, and have no idea how to make it work either.
+        path_revisions[path] ||= [] 
+        path_revisions[path] << changeset.revision
       end
+      
     end
   end
 
