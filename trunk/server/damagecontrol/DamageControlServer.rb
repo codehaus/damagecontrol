@@ -39,6 +39,7 @@ require 'damagecontrol/scm/NoSCMWebConfigurator'
 require 'damagecontrol/web/ConsoleOutputReport'
 require 'damagecontrol/web/BuildArtifactsReport'
 require 'damagecontrol/web/ChangesReport'
+require 'damagecontrol/web/ErrorsReport'
  require 'damagecontrol/web/cruisecontrol/TestsReport'
 
 # patch webrick so that it displays files it doesn't recognize as text
@@ -228,6 +229,7 @@ module DamageControl
       [
         DamageControl::ChangesReport,
         DamageControl::ConsoleOutputReport,
+        DamageControl::ErrorsReport,
         DamageControl::TestsReport,
         DamageControl::BuildArtifactsReport
       ]
