@@ -3,6 +3,9 @@
 RSCM is a Ruby library for various Source Control Management (SCM) systems. RSCM provides an intuitive API
 which is described in AbstractSCM.
 
+bla
+bla
+
 = Feature overview
 
 * API support for several high level operations such as checkout, get changesets, check for uptodate etc.
