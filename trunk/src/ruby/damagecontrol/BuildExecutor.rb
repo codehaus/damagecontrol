@@ -70,7 +70,9 @@ module DamageControl
             checkout if checkout?
             execute
           rescue Exception => e
-            report_progress("Build failed due to: #{e}")
+            msg = "Build failed due to: #{e}"
+            report_progress(msg)
+            puts msg
             current_build.successful = false
           end
           @channel.publish_message(BuildCompleteEvent.new(current_build))
