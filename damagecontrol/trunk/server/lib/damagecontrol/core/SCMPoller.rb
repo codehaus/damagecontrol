@@ -47,26 +47,14 @@ module DamageControl
       last_commit_time = @build_history_repository.last_commit_time(project_name)
       from_time = last_commit_time ? last_commit_time + 1 : Time.epoch
 
-      changesets = nil
       # check for any changes since last completed build and now
       if(scm.uptodate?(checkout_dir, from_time))
-        logger.info("#{project_name} seems to be uptodate")
-        return
+        logger.info("Working copy for #{project_name} seems to be uptodate")
       else
-        logger.info("Local working copy for #{project_name} is not uptodate, getting changesets and requesting build")
-        changesets = scm.changesets(checkout_dir, from_time)
-        if(changesets.empty? && last_commit_time)
-          logger.info("WARNING!!!! we decided #{project_name} was not uptodate, yet there were no changes. This is contradictory!!")
-          return
-        end
+        logger.info("Working copy for #{project_name} seems to be out of date - requesting build")
+        build = @project_config_repository.create_build(project_name)
+        @hub.put(BuildRequestEvent.new(build))
       end
-      request_build(project_name, changesets)
-    end
-    
-    def request_build(project_name, changesets=nil)
-      build = @project_config_repository.create_build(project_name)
-      build.changesets = changesets if changesets # set this to avoid BuildExecutor from having to parse the log again
-      @hub.put(BuildRequestEvent.new(build))
-    end
+    end    
   end
 end

@@ -106,9 +106,9 @@ module DamageControl
     end
         
     def schedule_build(build)
+      logger.info("Scheduling build for #{build.project_name}")
       build_queue.delete_if{|b| b.project_name == build.project_name}
       build_queue << build
-      
       c = Pebbles::Countdown.new(quiet_period(build)) do |time|
         begin
           try_to_execute_build(build)

@@ -75,7 +75,7 @@ module DamageControl
 
     def url
       # FIXME: this member is ugly - rather pass something into the populate method
-      @html_url.nil? ? nil : "#{@html_url}project/#{CGI.escape(project_name)}?dc_creation_time=#{dc_creation_time.ymdHMS}"
+      @html_url.nil? ? nil : "#{@html_url}public/project/#{CGI.escape(project_name)}?dc_creation_time=#{dc_creation_time.ymdHMS}"
     end
     
     def initialize(project_name = nil, config={}, html_url=nil)
@@ -105,14 +105,16 @@ module DamageControl
       rss_item.author = changesets.developers.join(", ")
       rss_item.title = title
       rss_item.link = url # YUK - pass in to this method instead
-      
+      rss_item.description = ""
+
       if(!changesets.empty?)
         changesets.each do |changeset|
-          rss_item.description = message_linker.highlight(changeset.message).gsub(/\n/, "<br/>\n") << "<p/>\n"
+          rss_item.description << "<b>#{changeset.developer}</b><br/>\n"
+          rss_item.description << message_linker.highlight(changeset.message).gsub(/\n/, "<br/>\n") << "<p/>\n"
           changeset.each do |change|
             rss_item.description << change_linker.change_url(change, true) << "<br/>\n"
           end
-          rss_item.description << "-----------------------------<p/>" # dang! what's the HTML vertical bar again....
+          rss_item.description << "<hr/>\n"
         end
       else
         rss_item.description = "No changes in this build (since the last build)"

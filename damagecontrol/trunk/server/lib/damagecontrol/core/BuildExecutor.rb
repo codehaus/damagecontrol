@@ -39,8 +39,84 @@ module DamageControl
       @name = name
     end
     
-    def checkout?
-      !current_scm.nil?
+    def on_message(message)
+      # Must kill in the same thread
+      if(message.is_a?(Kill))
+        message.kill
+        return
+      end
+
+      @current_build = message
+      @stdout_file = @project_directories.stdout_file(current_build.project_name, current_build.dc_creation_time)
+      @stderr_file = @project_directories.stderr_file(current_build.project_name, current_build.dc_creation_time)
+
+      begin
+puts "STARTING BUILD"
+        build_start
+puts "CHECKING OUT"
+        checkout
+puts "EXECUTING"
+        execute
+puts "DONE"
+      rescue Exception => e
+        message = format_exception(e)
+        logger.error("build failed: #{message}")
+        current_build.error_message = message
+        current_build.status = Build::FAILED
+        @channel.put(BuildStateChangedEvent.new(current_build))
+        stderr("Build failed due to: #{message}")
+      ensure
+        logger.info("Build complete #{current_build.project_name}")
+        current_build.duration = (Time.now.utc - current_build.dc_start_time).to_i
+        @channel.put(BuildCompleteEvent.new(current_build))
+
+        # atomically frees the slot, we are now no longer busy
+        @current_build = nil
+      end
+    end
+    
+    def build_start
+      logger.info("build starting #{current_build.project_name}")
+      current_build.dc_start_time = Time.now.utc
+      determine_changeset
+      @channel.put(BuildStartedEvent.new(current_build))
+    end
+    
+    def determine_changeset
+      current_build.status = Build::DETERMINING_CHANGESETS
+      @channel.put(BuildStateChangedEvent.new(current_build))
+      if !checkout?
+        logger.info("Not determining changeset for #{current_build.project_name} because scm not configured")
+        return 
+      end
+      unless File.exists?(checkout_dir)
+        # this won't work the first build, so I just skip it
+        # the first time a project is built it will have a changeset of every file in the repository
+        # this is almost useless information and there's no point in spending lots of time trying to code around it (not to mention executing it)
+        logger.info("Not determining changeset for #{current_build.project_name} because project not yet checked out - #{checkout_dir} does not exist")
+# HMMMM - should we check out? Currently we need to trigger twice before we get the
+# SCM comnmit time!!!
+        return
+      end
+      
+      begin
+        last_commit_time = @build_history_repository.last_commit_time(current_build.project_name)
+        from_time = last_commit_time ? last_commit_time + 1 : Time.epoch
+
+        logger.info("Determining changesets for #{current_build.project_name} from #{from_time} (inclusive)")
+        changesets = current_scm.changesets(checkout_dir, from_time) {|line| stdout(line)}
+
+        # Only store changesets if the previous commit time was known
+        current_build.changesets = changesets if changesets && last_commit_time
+        
+        latest = changesets.latest
+        current_build.scm_commit_time = latest ? latest.time : @build_history_repository.last_commit_time(current_build.project_name)
+        logger.info("Done determining changesets for #{current_build.project_name}. Last commit time: #{current_build.scm_commit_time}")
+        
+        @channel.put(BuildStateChangedEvent.new(current_build))
+      rescue Exception => e
+        logger.error "Could not determine changeset: #{format_exception(e)}"
+      end
     end
     
     def checkout
@@ -76,10 +152,6 @@ module DamageControl
       end
     end
     
-    def checkout_dir
-      @project_config_repository.checkout_dir(current_build.project_name)
-    end
-    
     def execute
       current_build.status = Build::BUILDING
       @channel.put(BuildStateChangedEvent.new(current_build))
@@ -105,6 +177,14 @@ module DamageControl
       end
     end
 
+    def checkout?
+      !current_scm.nil?
+    end
+    
+    def checkout_dir
+      @project_config_repository.checkout_dir(current_build.project_name)
+    end
+    
     def build_process_executing?
       @process && @process.running?
     end
@@ -148,45 +228,6 @@ module DamageControl
       busy? && current_build.project_name == project_name
     end
     
-    def determine_changeset
-      current_build.status = Build::DETERMINING_CHANGESETS
-      @channel.put(BuildStateChangedEvent.new(current_build))
-      if !checkout?
-        logger.info("Not determining changeset for #{current_build.project_name} because scm not configured")
-        return 
-      end
-      unless File.exists?(checkout_dir)
-        # this won't work the first build, so I just skip it
-        # the first time a project is built it will have a changeset of every file in the repository
-        # this is almost useless information and there's no point in spending lots of time trying to code around it (not to mention executing it)
-        logger.info("Not determining changeset for #{current_build.project_name} because project not yet checked out - #{checkout_dir} does not exist")
-        return
-      end
-      
-      begin
-        last_commit_time = @build_history_repository.last_commit_time(current_build.project_name)
-        from_time = last_commit_time ? last_commit_time + 1 : Time.epoch
-
-        changesets = current_build.changesets
-        if !current_build.changesets.empty?
-          logger.info("Not determining changeset for #{current_build.project_name} because other component (such as SCMPoller) has already determined it")
-        else
-          logger.info("Determining changesets for #{current_build.project_name} from #{from_time} (inclusive)")
-          changesets = current_scm.changesets(checkout_dir, from_time) {|line| stdout(line)}
-        end
-
-        # Only store changesets if the previous commit time was known
-        current_build.changesets = changesets if changesets && last_commit_time
-        
-        latest = changesets.latest
-        current_build.scm_commit_time = latest ? latest.time : @build_history_repository.last_commit_time(current_build.project_name)
-        logger.info("Done determining changesets for #{current_build.project_name}. Last commit time: #{current_build.scm_commit_time}")
-        @channel.put(BuildStateChangedEvent.new(current_build))
-      rescue Exception => e
-        logger.error "Could not determine changeset: #{format_exception(e)}"
-      end
-    end
-    
     def build_complete
     end
     
@@ -196,45 +237,6 @@ module DamageControl
     
     def current_scm
       current_build.scm
-    end
-    
-    def build_start
-      logger.info("build starting #{current_build.project_name}")
-      current_build.dc_start_time = Time.now.utc
-      determine_changeset
-      @channel.put(BuildStartedEvent.new(current_build))
-    end
-    
-    def on_message(message)
-      # Must kill in the same thread
-      if(message.is_a?(Kill))
-        message.kill
-        return
-      end
-
-      @current_build = message
-      @stdout_file = @project_directories.stdout_file(current_build.project_name, current_build.dc_creation_time)
-      @stderr_file = @project_directories.stderr_file(current_build.project_name, current_build.dc_creation_time)
-
-      begin
-        build_start
-        checkout
-        execute
-      rescue Exception => e
-        message = format_exception(e)
-        logger.error("build failed: #{message}")
-        current_build.error_message = message
-        current_build.status = Build::FAILED
-        @channel.put(BuildStateChangedEvent.new(current_build))
-        stderr("Build failed due to: #{message}")
-      ensure
-        logger.info("Build complete #{current_build.project_name}")
-        current_build.duration = (Time.now.utc - current_build.dc_start_time).to_i
-        @channel.put(BuildCompleteEvent.new(current_build))
-
-        # atomically frees the slot, we are now no longer busy
-        @current_build = nil
-      end
     end
     
     def stdout(s)

@@ -90,11 +90,13 @@ module DamageControl
       result = nil
       @project_directories.build_dirs(project_name).reverse.each do |build_dir|
         build = @build_serializer.load(build_dir, false)
-        result = build.scm_commit_time if build.scm_commit_time
+        if build.scm_commit_time
+          logger.info("Last recorded commit time for #{project_name} was #{build.scm_commit_time} (build id: #{build.dc_creation_time.ymdHMS})")
+          return build.scm_commit_time
+        end
       end
-      msg = result ? result : "(we don't know)"
-      logger.info("Last commit time for #{project_name} was #{msg}")
-      result
+      logger.info("No recorded commit time for #{project_name}")
+      nil
     end
     
     def last_successful_build(project_name, with_changesets=false)
@@ -140,24 +142,23 @@ module DamageControl
   
     # Writes rss to disk
     def write_rss(project_name)
-      rss = RSS::Maker.make("2.0") do |rss|
+      RSS::Maker.make("2.0") do |rss|
         rss.channel.title = "#{project_name} builds"
         rss.channel.description = rss.channel.title
-        rss.channel.link = "#{@html_url}project/#{CGI.escape(project_name)}"
+        rss.channel.link = "#{@html_url}public/project/#{CGI.escape(project_name)}"
         rss.channel.generator = "DamageControl"
 
         project_config = project_config(project_name)
-        message_linker = project_config["tracking"]
-        change_linker = project_config["scm_web"]
-        history(project_name).reverse.each do |build|
+        message_linker = project_config["tracking"] || RSCM::Tracker::Null.new
+        change_linker = project_config["scm_web"] || RSCM::SCMWeb::Null.new
+        history(project_name, true).reverse.each do |build|
           item = rss.items.new_item
           build.populate(item, message_linker, change_linker)
         end
-        rss.to_rss
-      end
 
-      File.open(@project_directories.rss_file(project_name), "w") do |io|
-        io.puts(rss.to_s)
+        File.open(@project_directories.rss_file(project_name), "w") do |io|
+          io.puts(rss.to_rss)
+        end
       end
     end
 
