@@ -232,7 +232,7 @@ module DamageControl
       modifications = @parser.parse_modifications(LOG_ENTRY)
       assert_equal(4, modifications.length)
       assert_equal("/cvsroot/damagecontrol/damagecontrol/src/ruby/damagecontrol/BuildExecutorTest.rb", modifications[0].path)
-      assert_equal("    linux/windows galore\n", modifications[2].message)
+      assert_equal("linux/windows galore\n", modifications[2].message)
     end
     
 
@@ -241,7 +241,7 @@ module DamageControl
       assert_equal("1.20", modification.revision)
       assert_equal("2003/11/09 17:53:37", modification.time)
       assert_equal("tirsen", modification.developer)
-      assert_equal("    Quiet period is configurable for each project\n", modification.message)
+      assert_equal("Quiet period is configurable for each project\n", modification.message)
     end
     
     def test_split_entries
@@ -251,42 +251,42 @@ module DamageControl
     end
 
     MODIFICATION_ENTRY = <<-EOF
-    revision 1.20
-    date: 2003/11/09 17:53:37;  author: tirsen;  state: Exp;  lines: +3 -4
-    Quiet period is configurable for each project
-    EOF
-    
-    LOG_ENTRY = <<-EOF
-    =============================================================================
-    
-    RCS file: /cvsroot/damagecontrol/damagecontrol/src/ruby/damagecontrol/BuildExecutorTest.rb,v
-    Working file: src/ruby/damagecontrol/BuildExecutorTest.rb
-    head: 1.20
-    branch:
-    locks: strict
-    access list:
-    symbolic names:
-    keyword substitution: kv
-    total revisions: 20;    selected revisions: 4
-    description:
-    ----------------------------
-    revision 1.20
-    date: 2003/11/09 17:53:37;  author: tirsen;  state: Exp;  lines: +3 -4
-    Quiet period is configurable for each project
-    ----------------------------
-    revision 1.19
-    date: 2003/11/09 17:04:18;  author: tirsen;  state: Exp;  lines: +32 -2
-    Quiet period implemented for BuildExecutor, but does not yet handle multiple projects (builds are not queued as before)
-    ----------------------------
-    revision 1.18
-    date: 2003/11/09 15:51:50;  author: rinkrank;  state: Exp;  lines: +1 -2
-    linux/windows galore
-    ----------------------------
-    revision 1.17
-    date: 2003/11/09 15:00:06;  author: rinkrank;  state: Exp;  lines: +6 -8
-    o YAML config (BuildBootstrapper)
-    o EmailPublisher
-    =============================================================================
+revision 1.20
+date: 2003/11/09 17:53:37;  author: tirsen;  state: Exp;  lines: +3 -4
+Quiet period is configurable for each project
+EOF
+
+LOG_ENTRY = <<-EOF
+=============================================================================
+
+RCS file: /cvsroot/damagecontrol/damagecontrol/src/ruby/damagecontrol/BuildExecutorTest.rb,v
+Working file: src/ruby/damagecontrol/BuildExecutorTest.rb
+head: 1.20
+branch:
+locks: strict
+access list:
+symbolic names:
+keyword substitution: kv
+total revisions: 20;    selected revisions: 4
+description:
+----------------------------
+revision 1.20
+date: 2003/11/09 17:53:37;  author: tirsen;  state: Exp;  lines: +3 -4
+Quiet period is configurable for each project
+----------------------------
+revision 1.19
+date: 2003/11/09 17:04:18;  author: tirsen;  state: Exp;  lines: +32 -2
+Quiet period implemented for BuildExecutor, but does not yet handle multiple projects (builds are not queued as before)
+----------------------------
+revision 1.18
+date: 2003/11/09 15:51:50;  author: rinkrank;  state: Exp;  lines: +1 -2
+linux/windows galore
+----------------------------
+revision 1.17
+date: 2003/11/09 15:00:06;  author: rinkrank;  state: Exp;  lines: +6 -8
+o YAML config (BuildBootstrapper)
+o EmailPublisher
+=============================================================================
     EOF
 
   end
