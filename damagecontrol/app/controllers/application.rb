@@ -1,16 +1,15 @@
 # The filters added to this controller will be run for all controllers in the application.
 # Likewise will all the methods added be available for all controllers.
 
-require 'rubygems'
-require_gem 'rscm'
 require 'damagecontrol/project'
 require 'damagecontrol/build'
 require 'damagecontrol/tracker'
 require 'damagecontrol/scm_web'
 
+# TODO - do this only when needed. It's slow!
 # Start Drb - this is how we communicate with the daemon.
-DRb.start_service()
-Rscm = DRbObject.new(nil, 'druby://localhost:9000')
+#DRb.start_service()
+#Rscm = DRbObject.new(nil, 'druby://localhost:9000')
 
 class ApplicationController < ActionController::Base
 
@@ -38,8 +37,34 @@ class ApplicationController < ActionController::Base
     subpaths = @request.path.split(/\//)
 #    subpaths.collect { |p| link_to_unless_current(p) }.links.join(" ")
   end
-  
+
 protected
+
+  # Override so we can get rid of the Content-Disposition
+  # headers by specifying :no_disposition => true in options
+  # This is needed when we want to send big files that are
+  # *not* intended to pop up a save-as dialog in the browser.
+  def send_file_headers!(options)
+    options.update(DEFAULT_SEND_FILE_OPTIONS.merge(options))
+    [:length, :type, :disposition].each do |arg|
+      raise ArgumentError, ":#{arg} option required" if options[arg].nil?
+    end
+
+    headers = {
+      'Content-Length'            => options[:length],
+      'Content-Type'              => options[:type]
+    }
+    unless(options[:no_disposition])
+      disposition = options[:disposition].dup || 'attachment'
+      disposition <<= %(; filename="#{options[:filename]}") if options[:filename]
+      headers.merge!(
+        'Content-Disposition'       => disposition,
+        'Content-Transfer-Encoding' => 'binary'
+      )
+    end
+        
+    @headers.update(headers);
+  end
 
   # Sets the links to display in the sidebar. Override this method in other controllers
   # To change what to display.

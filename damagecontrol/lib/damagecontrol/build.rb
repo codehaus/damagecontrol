@@ -2,7 +2,9 @@ require 'rscm/path_converter'
 require 'damagecontrol/directories'
 
 module DamageControl
-  # File structure
+  # Represents build-related data organised in the following file structure:
+  #
+  # File structure:
   #
   #   .damagecontrol/
   #     SomeProject/
@@ -26,9 +28,9 @@ module DamageControl
       @project_name, @changeset_identifier, @time = project_name, changeset_identifier, time
     end
 
-    # The changeset we belong to
-    def changeset
-      Directories.changeset
+    # Our unique id within the changeset
+    def identifier
+      time.ymdHMS
     end
     
     # Executes +command+ with the environment variables +env+ and persists the command for future reference.
@@ -40,8 +42,6 @@ module DamageControl
       File.open(command_file, "w") do |io|
         io.write(command)
       end
-      stderr = Directories.stderr(@project_name, @changeset_identifier, @time)
-      stdout = Directories.stdout(@project_name, @changeset_identifier, @time)
       command_line = "#{command} > #{stdout} 2> #{stderr}"
 
       begin
@@ -82,7 +82,15 @@ module DamageControl
     def kill
       Process.kill("SIGHUP", pid)
     end
-    
+
+    def stdout
+      Directories.stdout(@project_name, @changeset_identifier, @time)
+    end
+
+    def stderr
+      Directories.stderr(@project_name, @changeset_identifier, @time)
+    end
+
   private
   
     def checkout_dir

@@ -1,0 +1,35 @@
+<ul id="foldertab">
+  <li><a href="javascript:setTab('changesets')"><img src="/images/16x16/document_exchange.png"> Changesets</a></li>
+  <% @project.builds(@changeset.identifier).each do |build| %>
+  <li><%= link_to(build.identifier, 
+          :controller => "build", :action => "status", :id => @project.name, :params => 
+          {"changeset" => @changeset.identifier, "build" => build.identifier}) %></li>
+  <% end %>
+</ul>
+
+<table class="pane">
+  <tr class="pane">
+    <td colspan="3" class="changeset">
+      <div class="changeset-message">
+        <b><%= @changeset.developer %></b>
+        (<%= @changeset.time.to_human %> UTC)<br>
+        <%= @project.tracker.highlight(@changeset.message) %>
+      </div>
+    </td>
+  </tr>
+  <%
+  @changeset.each do |change|
+  %>
+    <tr>
+      <td width="5%"><%= tag("img", :src => change.icon) %></td>
+      <td width="5%"><%= change.revision %></td>
+      <td width="90%">
+        <a class="diff-toggle" href="#" onclick="toggleCode('<%= change.path %>');return false"><%= change.path %></a>
+        <br>
+        <div class="diff" id="<%= change.path %>">
+        <%= change.html_diff %>
+        </div>
+      </td>
+    </tr>
+  <% end %>
+</table>  

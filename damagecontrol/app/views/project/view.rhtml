@@ -1,28 +1,11 @@
 <script><!--
 
-function setTab(tab) {
-  stickyTab = tab
-  showElement(stickyTab, tabs)
-}
-
 function executeOnLoad() {
 <% @scms.each do |scm| %>
   <%= scm.short %>_init();
 <% end %>
   tab = "<%= @params['tab'] || 'tabs[0]' %>"
   setTab(tab)
-}
-
-function showElement(selected, elements) {
-  // hide all divs in the group unless selected
-  for(element in elements) {
-    id = elements[element]
-    style = "none"
-    if(id == selected) {
-      style = "block"
-    }
-    document.getElementById(id).style.display = style
-  }
 }
 
 tabs = ["projects", "scms", "trackers", "changesets"]

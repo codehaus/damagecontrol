@@ -102,11 +102,11 @@ class ProjectController < ApplicationController
     redirect_to(:action => "view", :id => project.name)
   end
   
-  def changesets
+  def changeset
     load
-    last_changeset_identifier = @params["changeset"]
-    @changesets = @project.changesets(last_changeset_identifier.to_identifier, 1)    
-    @changesets.accept(HtmlDiffVisitor.new(@project))
+    changeset_identifier = @params["changeset"]
+    @changeset = @project.changeset(changeset_identifier.to_identifier)    
+    @changeset.accept(HtmlDiffVisitor.new(@project))
   end
   
 protected
@@ -117,9 +117,6 @@ protected
       @project = project
     end
     
-    def visit_changesets(changesets)
-    end
-
     def visit_changeset(changeset)
       @changeset = changeset
     end

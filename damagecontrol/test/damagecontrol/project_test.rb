@@ -104,7 +104,7 @@ module DamageControl
       end
 
       before = Time.new
-      p.build("boo") do |build|
+      p.execute_build("boo") do |build|
         now = Time.new
         assert(before <= build.time)
         assert(build.time <= now)

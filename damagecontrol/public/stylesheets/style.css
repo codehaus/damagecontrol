@@ -305,3 +305,10 @@ th.pane {
   background: #eed;
   padding: 4px;
 }
+
+.simplebox { 
+  background:#eee; 
+  border:1px solid #ccc; 
+  padding:5px; 
+  margin-bottom: 15px; 
+}
