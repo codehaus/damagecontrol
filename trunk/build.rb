@@ -110,20 +110,28 @@ class Project
     File.open(file, "w") {|io| io.puts(content) }
   end
   
+  def build_number
+    require 'server/damagecontrol/Version.rb'
+    ENV["DAMAGECONTROL_BUILD_LABEL"] || DamageControl::BUILD_NUMBER
+  end
+  
+  def release_name
+    require 'server/damagecontrol/Version.rb'
+    DamageControl::RELEASE
+  end
+  
   def version
-    load 'server/damagecontrol/Version.rb'
-    build_number = ENV["DAMAGECONTROL_BUILD_LABEL"]
-    if(build_number)
-      "#{DamageControl::VERSION}-build#{build_number}"
-    else
-      DamageControl::VERSION
-    end
+    "#{release_name}-#{build_number}"
   end
   
   def target_dir
     params["target_dir"] || "target"
   end
   
+  def dist_name
+    "damagecontrol-#{version}"
+  end
+
   def dist_dir
     params["dist_dir"] || "#{target_dir}/dist"
   end
@@ -138,9 +146,25 @@ class Project
     cp("release-notes.txt", dist_dir)
     copy_dir("bin", "#{dist_dir}/bin")
     copy_dir("server", "#{dist_dir}/server")
+    generate_version_info("#{dist_dir}/server/damagecontrol/Version.rb")
     generate_startup_scripts
   end
+
+  def generate_version_info(file)
+    info("generating #{file}")
+    require 'server/damagecontrol/Version.rb'
+    write_file(file,
+%{module DamageControl
+  PRODUCT_NAME = "#{DamageControl::PRODUCT_NAME}"
+  BUILD_NUMBER = "#{build_number}"
+  RELEASE = "#{release_name}"
+  VERSION = "\#{RELEASE}-\#{BUILD_NUMBER}"
   
+  VERSION_TEXT = "\#{PRODUCT_NAME} version \#{VERSION}"
+end
+})
+  end
+
   def generate_startup_scripts
     {
       "dctrigger" => "bin/dctrigger.rb",
@@ -155,29 +179,35 @@ class Project
   
   def generate_startup_script(script, target)
     win_target = target.gsub(/\//, "\\")
-    write_file("#{script}.cmd", %{
-      @echo off
-      set DAMAGECONTROL_HOME=%~dp0..
-      cd %DAMAGECONTROL_HOME%
-      set RUBY_HOME="%DAMAGECONTROL_HOME%\\ruby"
-      set PATH="%RUBY_HOME%\\bin";%PATH%
-      echo %RUBY_HOME%\\bin\\ruby -I "%DAMAGECONTROL_HOME%\\server" "#{target}" %1 %2 %3 %4 %5 %6 %7 %8 %9
-      %RUBY_HOME%\\bin\\ruby -I "%DAMAGECONTROL_HOME%\\server" "#{target}" %1 %2 %3 %4 %5 %6 %7 %8 %9
-      pause
-    }.gsub(/\n/, "\r\n"))
-    write_file(script, %{
-      \#!/bin/sh
-      DAMAGECONTROL_HOME=`dirname $0`/..
-      cd $DAMAGECONTROL_HOME
-      export DAMAGECONTROL_HOME=`pwd`
-      exec ruby -I"$DAMAGECONTROL_HOME/server" "#{target}" $*
-    })
+    write_file("#{script}.cmd",
+%{@echo off
+set DAMAGECONTROL_HOME=%~dp0..
+cd %DAMAGECONTROL_HOME%
+set RUBY_HOME=%DAMAGECONTROL_HOME%\\ruby
+set PATH=%~dp0;%RUBY_HOME%\\bin;%PATH%
+set CMD=ruby -I "%DAMAGECONTROL_HOME%\\server" "#{target}" %1 %2 %3 %4 %5 %6 %7 %8 %9
+echo %CMD%
+%CMD%
+pause}.gsub(/\n/, "\r\n"))
+    write_file(script,
+%{\#!/bin/sh
+DAMAGECONTROL_HOME=`dirname $0`/..
+cd $DAMAGECONTROL_HOME
+export DAMAGECONTROL_HOME=`pwd`
+exec ruby -I"$DAMAGECONTROL_HOME/server" "#{target}" $*})
     system("chmod +x #{script}") unless windows?
   end
   
   def windows?
     require 'rbconfig.rb'
     !Config::CONFIG["host"].index("mswin32").nil?
+  end
+  
+  def jon_settings
+    params['ruby_home'] = "c:\\projects\\damagecontrol\\ruby"
+    params['cvs_executable'] = "c:\\bin\\cvs.exe"
+    params['user'] = "tirsen"
+    params['scp_executable'] = "pscp"
   end
   
   def installer
@@ -201,7 +231,8 @@ class Project
     existing_file(params["makensis_executable"]) ||
       existing_file("/cygdrive/c/Program Files/NSIS/makensis.exe") || 
       existing_file("C:\\Program Files\\NSIS\\makensis.exe") ||
-      params["makensis_executable"] || missing_installer_variable("makensis_executable", "NSIS executable (NSIS can be downloaded from http://nsis.sf.net)", "c:\\Program Files\\NSIS\\makensis.exe")
+      params["makensis_executable"] || 
+      missing_installer_variable("makensis_executable", "NSIS executable (NSIS can be downloaded from http://nsis.sf.net)", "c:\\Program Files\\NSIS\\makensis.exe")
   end
   
   def installer_nodeps
@@ -220,9 +251,12 @@ class Project
   end
   
   def archive_nodeps
-    info("creating archive target/damagecontrol-#{version}.tar.gz")
+    info("creating archive target/#{dist_name}.tar.gz")
     begin
-      system("tar cf target/damagecontrol-#{version}.tar -C target/dist .")
+      mkdir_p("target/archive")
+      system("cp -a #{dist_dir} target/archive")
+      system("mv target/archive/dist target/archive/#{dist_name}")
+      system("tar cf target/damagecontrol-#{version}.tar -C target/archive .")
       system("gzip target/damagecontrol-#{version}.tar")
     rescue
       fail("could not execute tar or gzip, if you're on windows install this: http://unxutils.sourceforge.net/")
@@ -243,7 +277,7 @@ class Project
   end
   
   def scp_executable
-    if windows? then "pscp" else "scp" end
+    params["scp_executable"] || if windows? then "pscp" else "scp" end
   end
   
   def upload
@@ -273,7 +307,7 @@ class Project
     unless windows?
       home = "/home/services/dcontrol"
       mkdir_p("#{home}/damagecontrol.new")
-      system("cp -a target/dist/* #{home}/damagecontrol.new")
+      system("cp -a #{dist_dir}/* #{home}/damagecontrol.new")
       system("rm -rf #{home}/damagecontrol.old")
       system("mv #{home}/damagecontrol #{home}/damagecontrol.old")
       system("mv #{home}/damagecontrol.new #{home}/damagecontrol")
