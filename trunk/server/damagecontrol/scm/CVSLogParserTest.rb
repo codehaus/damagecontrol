@@ -83,7 +83,7 @@ branch:
 locks: strict
 access list:
 keyword substitution: kv
-total revisions: 23;	selected revisions: 1
+total revisions: 23;  selected revisions: 1
 description:
 ----------------------------
 revision 1.23
@@ -379,7 +379,7 @@ EOF
       assert_equal(Change::MODIFIED, changeset_fix_url[0].status)
     end
 
-LOG_WITH_MISSING_ENTRIES= <<EOF
+LOG_WITH_MISSING_ENTRIES = <<EOF
 RCS file: /cvsroot/damagecontrol/damagecontrol/Attic/build.xml,v
 Working file: build.xml
 head: 1.2
@@ -412,6 +412,61 @@ EOF
       changesets = @parser.parse_changesets
       assert_equal(0, changesets.length)
     end
-  end
+  
+LOG_WITH_NEW_AND_OLD_FILE = <<EOF
+RCS file: /home/projects/damagecontrol/scm/damagecontrol/dummy.txt,v
+Working file: dummy.txt
+head: 1.1
+branch:
+locks: strict
+access list:
+keyword substitution: kv
+total revisions: 1;     selected revisions: 1
+description:
+----------------------------
+revision 1.1
+date: 2004/07/13 21:50:59;  author: rinkrank;  state: Exp;
+Debug. Need to see what the log looks like for a new file.
+=============================================================================
 
+RCS file: /home/projects/damagecontrol/scm/damagecontrol/license.txt,v
+Working file: license.txt
+head: 1.4
+branch:
+locks: strict
+access list:
+keyword substitution: kv
+total revisions: 4;     selected revisions: 4
+description:
+----------------------------
+revision 1.4
+date: 2004/07/10 17:41:14;  author: rinkrank;  state: Exp;  lines: +2 -2
+typo
+----------------------------
+revision 1.3
+date: 2004/07/10 17:38:22;  author: rinkrank;  state: Exp;  lines: +2 -2
+fixed http://jira.codehaus.org/browse/DC-123
+----------------------------
+revision 1.2
+date: 2004/07/04 02:39:48;  author: rinkrank;  state: Exp;  lines: +1 -1
+doherss
+----------------------------
+revision 1.1
+date: 2004/07/02 08:42:51;  author: tirsen;  state: Exp;
+installer!!!!!! it's getting close to release!!!
+=============================================================================
+EOF
+
+    def test_can_distinguish_new_file_from_old_file
+      @parser = CVSLogParser.new(StringIO.new(LOG_WITH_NEW_AND_OLD_FILE))
+      changesets = @parser.parse_changesets
+
+      new_file = changesets[0][0] 
+      assert_equal(Change::ADDED, new_file.status)
+
+      old_file = changesets[1][0] 
+      assert_equal(Change::MODIFIED, old_file.status)
+    end
+
+  end
 end

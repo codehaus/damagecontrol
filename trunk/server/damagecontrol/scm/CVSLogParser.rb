@@ -52,12 +52,19 @@ module DamageControl
       entries[1..entries.length].each do |entry|
         change = parse_change(entry)
         change.path = parse_path(entries[0])
+
+        change.status = Change::ADDED if change.revision =~ /1.1$/
+
         changeset = changesets.add(change)
         # CVS doesn't have revision for changesets, use
         # Fisheye-style revision
         changeset.revision = "MAIN:#{change.developer}:#{change.time.utc.strftime('%Y%m%d%H%M%S')}" if changeset
       end
       nil
+    end
+    
+    def parse_head_revision(first_entry)
+      head_revision = extract_match(first_entry, /^head: (.*?)$/m)
     end
     
     def parse_path(first_entry)
