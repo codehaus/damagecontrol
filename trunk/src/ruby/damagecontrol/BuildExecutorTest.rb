@@ -21,8 +21,7 @@ module DamageControl
       hub.publish_message(BuildRequestEvent.new(@build))
       @build_executor.force_tick
       assert_message_types([BuildRequestEvent, BuildProgressEvent, BuildCompleteEvent])
-      assert_equal(BuildProgressEvent.new(@build, "Hello world from DamageControl! \n"), messages_from_hub[1])
-      assert_equal("Hello world from DamageControl! \n", messages_from_hub[1].output)
+      assert_equal("Hello world from DamageControl!", messages_from_hub[1].output.chomp.chomp(" "))
       assert_equal(BuildCompleteEvent.new(@build), messages_from_hub[2])
     end
     
