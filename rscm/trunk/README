@@ -5,17 +5,26 @@ which is described in AbstractSCM.
 
 = Feature overview
 
+* API support for several high level operations such as checkout, get changesets, check for uptodate etc.
+* Built-in admin server based on Rails (http://www.rubyonrails.org/)
 * Generation of RSS feeds.
 * Generation of URL links to diffs for several popular SCM web front-ends.
 * Generation of URL links to bugs/issues for several popular bug/issue trackers.
 * Changeset emulation for SCMs that don't support it natively (like CVS and StarTeam)
-* API support for several high level operations such as checkout, get changesets, check for uptodate etc.
 * RSCM objects are easily serializable to YAML.
 
 === Wish:
 
 Integrate with CVSSpam so that all supported SCMs (not only CVS) can benefit from its awesome coloured diff capabilities.
 This would provide a very nice alternative to SCM web front-ends.
+
+== Admin Server
+
+RSCM ships with a web interface based on Rails (which you have to install separately). To launch, just run the script/server script:
+
+  ruby script/server
+  
+Please refer to the Rails doco for further details. (TODO: improve this part of the doco).
 
 == RSS Server
 
@@ -32,9 +41,9 @@ It will be customisable with a simple YAML file. It will also come with its ownb
 == Supported SCMs
 
 * CVS
-* P4 (in progress)
-* StarTeam (in progress)
+* StarTeam
 * Subversion
+* P4 (in progress)
 
 == Supported Issue trackers
 
@@ -88,6 +97,9 @@ Here is an example of how to use RSCM to get a list of changes with Subversion:
 = Implementing support for a new SCM
 
 Let's write an RSCM implementation for the imaginary SCM called Mooky.
+
+== Writing the API
+
 Start by writing a test:
 
 <<< test/rscm/mooky/mooky_test.rb
@@ -133,9 +145,13 @@ NOTE: If the SCM doesn't have a command line utility or a 3rd party Ruby API, bu
 provides libraries (perhaps in C), then you should consider writing a Ruby C extension
 instead.
 
+== Writing the web interface
+
+TODO...
+(Pretty straightforward. Just follow the examples. Ask on the mailing list if you are confused.)
+
 = Implementation notes
 
 * SCM classes should have a no-arg constructor and be serialisable with YAML
 * SCM classes should be inexpensive to instantiate (should not access SCM in constructor)
 
-= Web interface

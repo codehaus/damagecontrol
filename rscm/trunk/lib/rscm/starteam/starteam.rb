@@ -29,6 +29,10 @@ module RSCM
       "StarTeam"
     end
     
+    def form_file
+      File.dirname(__FILE__) + "/form.html"
+    end
+
     def changesets(checkout_dir, from_identifier=Time.epoch, to_identifier=Time.infinity, files=nil)
       # just assuming it is a Time for now, may support labels later.
       # the java class really wants rfc822 and not rfc2822, but this works ok anyway.

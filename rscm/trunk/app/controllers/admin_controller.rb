@@ -4,6 +4,7 @@ require 'yaml'
 
 # Add some generic web capabilities to the SCM classes
 class RSCM::AbstractSCM
+
   def javascript_on_load
     ""
   end
@@ -18,9 +19,11 @@ class RSCM::AbstractSCM
   
   def config_form
     if(respond_to?(:form_file) && File.exist?(form_file))
-      File.expand_path(form_file)
+      template = File.read(File.expand_path(form_file))
+      erb = ERB.new(template, nil, '-')
+      erb.result(binding)
     else
-      nil
+      ""
     end
   end
 end
@@ -37,6 +40,8 @@ class AdminController < ApplicationController
   end
   
   def show
+    # TODO: YAML load from file based on project id
+
     init
 
     # TODO: loop through query params and override the selected?
@@ -46,7 +51,9 @@ class AdminController < ApplicationController
   end
   
   def save
-    # TODO do all the saving stuff....
+    scm = instantiate_from_params("scm")
+    # TODO instantiate more objects and YAML everything to file...
+    
     redirect_to(:action => "show")
   end
 
@@ -55,8 +62,19 @@ class AdminController < ApplicationController
   
 private
 
+  # Instantiates an object from parameters
+  def instantiate_from_params(param)
+    class_name = @params[param]
+    clazz = eval(class_name)
+    ob = clazz.new
+    attribs = @params[class_name]
+    attribs.each do |k,v|
+      ob.send("#{k}=", v)
+    end
+    ob
+  end
+
   def init
-    @config_forms = Hash.new("NO FORM")
     @scm_map = {}
     @scms = []
     SCMS.each do |c|

@@ -26,7 +26,7 @@ module RSCM
     end
 
     def test_checkout
-      files = create_scm(nil, nil).checkout("target/starteam/checkout", Time.new)
+      files = create_scm(nil, nil).checkout("target/starteam/checkout")
       assert_equal(3, files.length)
       assert_equal("eenie/meenie/minee/mo", files[0])
       assert_equal("catch/a/redneck/by", files[1])

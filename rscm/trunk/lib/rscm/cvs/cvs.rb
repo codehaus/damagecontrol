@@ -27,6 +27,10 @@ module RSCM
       "CVS"
     end
     
+    def form_file
+      File.dirname(__FILE__) + "/form.html"
+    end
+    
     def import(dir, message)
       modname = File.basename(dir)
       cvs(dir, "import -m \"#{message}\" #{modname} VENDOR START")
@@ -113,7 +117,7 @@ module RSCM
           file.puts(trigger_line)
         end
         begin
-          commit(trigger_files_checkout_dir, "Installed trigger for CVS mod '#{mod}'")
+          commit(trigger_files_checkout_dir, "Installed trigger for CVS module '#{mod}'")
         rescue
           raise "Couldn't commit the trigger back to CVS. Try to manually check out CVSROOT/loginfo, " +
           "add the following line and commit it back:\n\n#{trigger_line}"
@@ -215,7 +219,7 @@ module RSCM
         IO.popen(execed_command_line) do |stdout, process|
           parser = CVSLogParser.new(stdout)
           parser.cvspath = path
-          parser.mod = mod
+          parser.cvsmodule = mod
           changesets = parser.parse_changesets
         end
       end
@@ -279,7 +283,7 @@ module RSCM
       if local?
         result = root
       elsif password && password != ""
-        protocol, user, host, path = root_with_password(root)
+        protocol, user, host, path = parse_cvs_root
         result = ":#{protocol}:#{user}:#{password}@#{host}:#{path}"
       else
         result = root
@@ -315,17 +319,17 @@ module RSCM
     end
     
     def path
-      root_with_password(root)[3]
+      parse_cvs_root[3]
     end
     
     def protocol
-      root_with_password(root)[0]
+      parse_cvs_root[0]
     end
     
     # parses the root into tokens
     # [protocol, user, host, path]
     #
-    def root_with_password(root)
+    def parse_cvs_root
       md = case
         when root =~ /^:local:/   then /^:(local):(.*)/.match(root)
         when root =~ /^:ext:/     then /^:(ext):(.*)@(.*):(.*)/.match(root)

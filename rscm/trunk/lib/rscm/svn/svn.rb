@@ -25,6 +25,10 @@ module RSCM
       "Subversion"
     end
 
+    def form_file
+      File.dirname(__FILE__) + "/form.html"
+    end
+
     def add(checkout_dir, relative_filename)
       svn(checkout_dir, "add #{relative_filename}")
     end

@@ -2,7 +2,7 @@
 <table width="100%">
   <tr>
     <td class="setting-name">CVSROOT</td>
-    <td width="75%"><input class="setting-input" name="RSCM::CVS[root]" id="cvsroot" onKeyUp="distributeCvsrootFields()" type="text" value="<%= 'root' %>"></td>
+    <td width="75%"><input class="setting-input" name="RSCM::CVS[root]" id="cvsroot" onKeyUp="distributeCvsrootFields()" type="text" value="<%= self.root %>"></td>
   </tr>
   <tr>
     <td>Protocol</td>
@@ -27,7 +27,7 @@
   </tr>
   <tr>
     <td>Password</td>
-    <td><input class="setting-input" name="RSCM::CVS[password]" id="cvspassword" value="<%= 'password' %>" type="password"></td>
+    <td><input class="setting-input" name="RSCM::CVS[password]" id="cvspassword" value="<%= self.password %>" type="password"></td>
   </tr>
   <tr>
     <td>&nbsp;</td>
@@ -52,11 +52,11 @@
   </tr>
   <tr>
     <td>Module</td>
-    <td><input class="setting-input" name="RSCM::CVS[module]" id="cvsmodule" type="text" value="<%= 'module' %>"></td>
+    <td><input class="setting-input" name="RSCM::CVS[mod]" id="cvsmodule" type="text" value="<%= self.mod %>"></td>
   </tr>
   <tr>
     <td>Branch</td>
-    <td><input class="setting-input" name="RSCM::CVS[branch]" id="cvsbranch" type="text" value="<%= 'branch' %>"></td>
+    <td><input class="setting-input" name="RSCM::CVS[branch]" id="cvsbranch" type="text" value="<%= self.branch %>"></td>
   </tr>
   <tr>
     <td>&nbsp;</td>

@@ -17,11 +17,11 @@ module RSCM
       svn = SVN.new("svn+ssh://mooky/bazooka/baluba", "bazooka/baluba")
       assert_equal("svn+ssh://mooky", svn.repourl)
 
-      svn.svnpath = nil
-      assert_equal(svn.svnurl, svn.repourl)
+      svn.path = nil
+      assert_equal(svn.url, svn.repourl)
 
-      svn.svnpath = ""
-      assert_equal(svn.svnurl, svn.repourl)
+      svn.path = ""
+      assert_equal(svn.url, svn.repourl)
     end
     
   end

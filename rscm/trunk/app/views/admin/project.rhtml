@@ -122,7 +122,7 @@ function showTracker(tracker) {
       <input 
         id="<%= scm.class.name %>radio" 
         type="radio" value="<%= scm.class.name %>" 
-        name="class" onClick="javascript:showScm('<%= scm.class.name %>')"<%if(scm.selected?)%>checked="true"<%end%>/> 
+        name="scm" onClick="javascript:showScm('<%= scm.class.name %>')"<%if(scm.selected?)%>checked="true"<%end%>/> 
         <%= scm.name %>
           <% end %>
         </td>
@@ -131,7 +131,7 @@ function showTracker(tracker) {
 
   <% @scms.each do |scm| %>
     <div id="<%= scm.class.name %>" style="<% if(scm.selected?)%>display:block<%else%>display:none<%end%>">
-      <%= @config_forms[scm] %>
+      <%= scm.config_form %>
     </div>
   <% end %>
   

@@ -15,10 +15,12 @@ desc "Default Task"
 task :default => [ :all ]
 
 # Run the unit tests
-# To run a specific test: rake test TEST_FILES=<some glob>
-test_file_pattern = ENV["TEST_FILES"] ? ENV["TEST_FILES"] : 'test/**/*_test.rb'
-fl = FileList.new(test_file_pattern)
-fl.exclude('test/**/mooky*.rb') unless ENV["TEST_FILES"]
+# To run a specific test: rake test TEST=path/to/test
+fl = FileList.new('test/**/*_test.rb')
+fl.exclude('test/**/mooky*.rb')
+fl.exclude('test/**/darcs*.rb')    # Incomplete/unsupported for now - reactivate when more complete!
+fl.exclude('test/**/perforce*.rb') # Incomplete/unsupported for now - reactivate when more complete!
+fl.exclude('test/**/starteam*.rb') # Too bloody hard to test without a StarTeam server license! Tested ad-hoc.
 Rake::TestTask.new { |t|
   t.libs << "test"
   t.test_files = fl
