@@ -1,3 +1,4 @@
+require 'erb'
 require 'damagecontrol/core/Build'
 require 'damagecontrol/core/BuildEvents'
 require 'damagecontrol/core/AsyncComponent'
@@ -11,11 +12,12 @@ module DamageControl
   
     def initialize(channel, template, jira_host, jira_user=ENV['JIRA_USER'], jira_password=ENV['JIRA_PASSWORD'])
       super(channel)
-      @template = template
       @jira_host = jira_host
-
       @jira_user = jira_user
       @jira_password = jira_password
+
+      template_dir = "#{File.expand_path(File.dirname(__FILE__))}/../template"
+      @template = File.new("#{template_dir}/#{template}").read
     end
   
     def process_message(message)
@@ -26,7 +28,9 @@ module DamageControl
           if(@jira_user && @jira_password && jira_project_key)
 #          assignee = message.build.modification_set[0].developer
             assignee = "damagecontrol"
-            jelly_script = create_jelly_script("Fix broken build", @template.generate(message.build), jira_project_key, assignee)
+            build = message.build
+            msg = ERB.new(@template).result(binding)
+            jelly_script = create_jelly_script("Fix broken build", msg, jira_project_key, assignee)
             puts "Posting JIRA issue"
             post_script(jelly_script)
           end
