@@ -27,6 +27,10 @@ module RSCM
       "CVS"
     end
     
+    def form_file
+      File.dirname(__FILE__) + "/cvs_configure_form.rhtml"
+    end
+
     def import(dir, message)
       modulename = File.basename(dir)
       cvs(dir, "import -m \"#{message}\" #{modulename} VENDOR START")
@@ -91,7 +95,6 @@ module RSCM
     end
 
     def changesets(checkout_dir, from_identifier, to_identifier=Time.infinity, files=nil)
-puts "CHANGESETS #{from_identifier} - #{to_identifier}"
       begin
         parse_log(checkout_dir, new_changes_command(from_identifier, to_identifier, files))
       rescue => e

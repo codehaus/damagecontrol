@@ -35,7 +35,7 @@ public class TestScm implements RSCM {
         ChangeSets changeSets = new ChangeSets();
 
         changeSets.add(new Change("rinkrank",
-                "En to\ntre buksa \nned\n",
+                "En to\ntre buksa \n\"ned\n",
                 "server/rubyforge/web/AbstractAdminServlet.rb",
                 "1.42",
                 "1.43",
@@ -43,7 +43,7 @@ public class TestScm implements RSCM {
                 utc(2004, Calendar.NOVEMBER, 30, 04, 52, 24)));
 
         changeSets.add(new Change("rinkrank",
-                "En to\ntre buksa \nned\n",
+                "En to\ntre buksa \n\"ned\n",
                 "server/rubyforge/web/ProjectServlet.rb",
                 "1.71",
                 "1.72",

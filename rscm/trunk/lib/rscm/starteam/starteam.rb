@@ -25,6 +25,14 @@ module RSCM
       @st_user_name, @st_password, @st_server_name, @st_server_port, @st_project_name, @st_view_name, @st_folder_name = st_user_name, st_password, st_server_name, st_server_port, st_project_name, st_view_name, st_folder_name
     end
 
+    def name
+      "StarTeam"
+    end
+    
+    def form_file
+      File.dirname(__FILE__) + "/starteam_configure_form.rhtml"
+    end
+
     def changesets(checkout_dir, from_identifier=Time.epoch, to_identifier=Time.infinity, files=nil)
       # just assuming it is a Time for now, may support labels later.
       # the java class really wants rfc822 and not rfc2822, but this works ok anyway.
@@ -84,6 +92,7 @@ module RSCM
       IO.popen(cmdline) do |io|
 #        io = io.read
 #        puts io
+#        File.open("aslak.yml", "w") {|f| f.puts io}
 #puts "------------"
         YAML::load(io)
       end

@@ -1,0 +1,171 @@
+<html>
+<head>
+<title>Add Project</title>
+<link type="text/css" rel="stylesheet" href="css/style.css">
+</head>
+<body onLoad="executeOnLoad()">
+<script><!--
+
+tabs = ["scm_tab", "general_tab", "tracker_tab"]
+
+function showTab(id) {
+	for(tab in tabs) {
+		tab = tabs[tab]
+		style = "none"
+		if(id == tab) {
+			style = "block"
+		}
+		document.getElementById(tab).style.display = style
+	}
+}
+
+function executeOnLoad() {  
+  <% @scms.each do |scm| %>
+    <%= scm.javascript_on_load %>
+  <% end %>
+}
+
+scmconfigurators = [
+<% @scms.each do |scm| %>
+	"<%=scm.class.name %>",
+<% end %> "" ];
+
+function showScm(scm) {
+	for (i=0;i<scmconfigurators.length-1;i++) {
+		oldTrackerDiv = document.getElementById(scmconfigurators[i]);
+		oldTrackerDiv.style.display = 'none'
+	}
+  newTrackerDiv = document.getElementById(scm);
+  newTrackerDiv.style.display = 'block';
+}
+
+trackingconfigurators = [
+<% @tracking_configurators.each do |tracking_configurator| %>
+	"<%=tracking_configurator.tracking_id %>",
+<% end %> "" ];
+
+function showTracker(tracker) {
+	for (i=0;i<trackingconfigurators.length-1;i++) {
+		oldTrackerDiv = document.getElementById(trackingconfigurators[i]);
+		oldTrackerDiv.style.display = 'none'
+	}
+  newTrackerDiv = document.getElementById(tracker);
+  newTrackerDiv.style.display = 'block';
+}
+
+<% @scms.each do |scm| %>
+  <%= scm.javascript %>
+<% end %>
+
+// -->
+</script>
+
+<ul id="foldertab">
+    <li><a href="javascript:showTab('general_tab')"><img src="../images/16x16//wrench.png"> General</a></li>
+    <li><a href="javascript:showTab('scm_tab')"><img src="../images/16x16//safe.png"> Source Control</a></li>
+    <li><a href="javascript:showTab('tracker_tab')"><img src="../images/16x16//scroll_information.png"> Issue Tracker</a></li>
+</ul>
+
+<form action="save" id="configform">
+
+<div id="general_tab" style="display:block">
+<table width="100%">
+<tr>
+  <td class="setting-name">Project name</td>
+  <td width="75%">
+    <% if nil %>
+      <%= @project_name %>
+      <input name="@project_name" type="hidden" value="<%= @project_name %>"/>
+    <% else %>
+      <input class="setting-input" name="@project_name" type="text" value="<%= @project_name %>"/>
+    <% end %>
+  </td>
+</tr>
+<tr>
+  <td>&nbsp;</td>
+  <td class="setting-description">
+    The project name should not use space characters, as it will be used to create a folder on the DC server.
+  </td>
+</tr>
+<tr>
+  <td>Project home page</td>
+  <td><input class="setting-input" name="home_page" id="home_page" type="text" value="<%= @project_config['home_page'] %>"></td>
+</tr>
+<tr>
+  <td>ViewCVS/Fisheye URL</td>
+  <td><input class="setting-input" name="scm_web_url" id="scm_web_url" type="text" value="<%= @project_config['scm_web_url'] %>"></td>
+</tr>
+<tr>
+  <td>&nbsp;</td>
+  <td class="setting-description">
+    The url to the root of the project in ViewCVS or Fisheye. For example: <tt>http://svn.cargo.codehaus.org/cargo/trunk/</tt>.
+  </td>
+</tr>
+<tr>
+  <td class="setting-name">Polling</td>
+  <td><input name="polling" id="polling" type="checkbox" <%= if @project_config['polling'] then "checked=true" else "" end %> /></td>
+</tr>
+<tr>
+  <td>&nbsp;</td>
+  <td class="setting-description">
+    Polling will at a specified interval check the SCM for changes. If there are any changes a build will be trigged.
+    The polling interval is currently specified at the server level and can't be changed on a project level,
+    this <a href="http://jira.codehaus.org/browse/DC-260">will be fixed in the future</a>.
+  </td>
+</tr>
+<div id="scm_tab" style="display:none">
+<table width="100%">
+<tr>
+  <td>Source control</td>
+  <td>
+    <% @scms.each do |scm| %>
+      <input 
+        id="<%= scm.class.name %>radio" 
+        type="radio" value="<%= scm.class.name %>" 
+        name="class" onClick="javascript:showScm('<%= scm.class.name %>')"<%if(scm.selected?)%>checked="true"<%end%>/> 
+        <%= scm.name %>
+          <% end %>
+        </td>
+</tr>
+</table>
+
+  <% @scms.each do |scm| %>
+    <div id="<%= scm.class.name %>" style="<% if(scm.selected?)%>display:block<%else%>display:none<%end%>">
+      <%= scm.config_form %>
+    </div>
+  <% end %>
+	
+</div>
+
+<div id="tracker_tab" style="display:none">
+Issue tracking. By specifying an issue tracker, DamageControl will detect issue numbers/ids in developers' SCM commit messages
+and create links to the issues on the changeset pages. This way people browsing the changesets for a build can easily navigate
+to any issues related to the commits that went into the build.
+<table width="100%">
+<tr>
+  <td>
+    <% @tracking_configurators.each do |tracking_configurator| %>
+      <input 
+  id="<%= tracking_configurator.tracking_id %>radio" 
+  type="radio" value="<%= tracking_configurator.tracking_id %>" 
+  name="tracking_id" 
+  onClick="javascript:showTracker('<%= tracking_configurator.tracking_id %>')"<% if(tracking_configurator.selected?) %>checked="true"<%end%>/>
+			<%= tracking_configurator.tracking_display_name %>
+    <% end %>
+  </td>
+</tr>
+</table>
+
+  <% @tracking_configurators.each do |tracking_configurator| %>
+    <div id="<%= tracking_configurator.tracking_id %>" style="<% if(tracking_configurator.selected?)%>display:block<%else%>display:none<%end%>">
+      <%= tracking_configurator.config_form %>
+    </div>
+  <% end %>
+</div>
+
+  <input type="submit" value="Save"/>
+  
+</form>
+  
+</body>
+</html>

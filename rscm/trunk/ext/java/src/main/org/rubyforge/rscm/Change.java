@@ -31,12 +31,16 @@ public class Change implements Comparable {
 
     public Change(String developer, String message, String path, String previous_revision, String revision, String status, Date time) {
         this.developer = developer;
-        this.message = message;
+        this.message = escape(message);
         this.path = path;
         this.previous_revision = previous_revision;
         this.revision = revision;
         this.status = status;
         this.time = time;
+    }
+
+    private String escape(String message) {
+        return message.replaceAll("\"", "\\\\\"");
     }
 
     public void write(Writer out) throws IOException {

@@ -1,0 +1,28 @@
+<img src="images/svnlogo64.png"/>
+<table width="100%">
+  <tr>
+    <td class="config_cell">Url</td>
+    <td width="75%"><input class="setting-input" name="svnurl" id="svnurl" type="text" value="<%= svnurl %>"></td>
+  </tr>
+  <tr>
+    <td>&nbsp;</td>
+    <td class="setting-description">
+      If you specify a local URL (starting with file://) DamageControl can create the repository for you after you save (unless the repository already exists).<br>
+      Using a file:// URL will also give you the option to have DamageControl install a trigger in Subversion,
+      so that you don't have to use polling to detect changes.<br>
+      On Windows, file URLs must look like file:///C:/jupiter/mars
+    </td>
+  </tr>
+  <tr>
+    <td class="config_cell">Directory</td>
+    <td><input class="setting-input" name="svnpath" id="svnpath" type="text" value="<%= svnpath %>"></td>
+  </tr>
+  <tr>
+    <td>&nbsp;</td>
+    <td class="setting-description">
+      This is the relative path from the start of the repository to the end of the URL. Example:
+      if your URL is svn://your.server/path/to/repository/path/within/repository then this value
+      should be path/within/repository
+    </td>
+  </tr>
+</table>
