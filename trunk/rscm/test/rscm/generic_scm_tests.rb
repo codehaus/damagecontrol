@@ -75,7 +75,7 @@ module RSCM
       scm.commit(checkout_dir, "changed\nsomething") 
 
       # check that we now have one more change
-      changesets = scm.changesets(checkout_dir, initial_changesets.time + 1) 
+      changesets = scm.changesets(checkout_dir, initial_changesets.time + 1)
 
       assert_equal(1, changesets.length)
       changeset = changesets[0]
@@ -185,6 +185,7 @@ module RSCM
       scm.import(import_dir, "Imported a file to diff against")
       scm.checkout(checkout_dir)
 
+      scm.edit("#{checkout_dir}/afile.txt")
       File.open("#{checkout_dir}/afile.txt", "w") do |io|
         io.puts("one two three four")
         io.puts("five six")
@@ -195,6 +196,7 @@ module RSCM
       end
       scm.commit(checkout_dir, "Modified file to diff")
 
+      scm.edit("#{checkout_dir}/afile.txt")
       File.open("#{checkout_dir}/afile.txt", "w") do |io|
         io.puts("one to threee")
         io.puts("hello")

@@ -38,7 +38,7 @@ class Time
 
   class << self
     def epoch
-      Time.at(0).utc
+      Time.utc(1970)
     end
 
     def infinity
