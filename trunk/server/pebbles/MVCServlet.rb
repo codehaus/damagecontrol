@@ -56,7 +56,7 @@ module Pebbles
       Thread.current["request"] = req
       Thread.current["response"] = res
 
-      response["Content-Type"] = content_type
+      response["Content-Type"] = content_type if content_type
     end
     
   protected
