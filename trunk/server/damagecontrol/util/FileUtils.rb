@@ -88,7 +88,8 @@ module FileUtils
       p.command_line = cmd
       p.environment = environment
       p.working_dir = dir
-      p.join_stdout_and_stderr = true
+			p.join_stdout_and_stderr = false unless proc.arity == 1
+      p.join_stdout_and_stderr = true if proc.arity == 1
       ret = p.execute do |stdout, stdin|
         if proc.arity == 1 then proc.call(p.stdout) else proc.call(p.stdout, p.stdin) end
       end

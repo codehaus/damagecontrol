@@ -60,7 +60,7 @@ module DamageControl
       checked_out_files = []
       if(checked_out?(checkout_dir))
         path_regex = /^[U|P] (.*)/
-        cvs(checkout_dir, update_command(scm_time)) do |line|
+        cvs(checkout_dir, update_command(scm_time)) do |line, err|
           if(line =~ path_regex)
             checked_out_files << $1
           end
@@ -73,7 +73,7 @@ module DamageControl
         target_dir = File.basename(checkout_dir)
         run_checkout_command_dir = File.dirname(checkout_dir)
         # -D is sticky, but subsequent updates will reset stickiness with -A
-        cvs(run_checkout_command_dir, checkout_command(scm_time, target_dir)) do |line|
+        cvs(run_checkout_command_dir, checkout_command(scm_time, target_dir)) do |line, err|
           if(line =~ path_regex)
             checked_out_files << $1
           end
