@@ -1,13 +1,13 @@
 require 'erb'
 require 'uri'
+require 'webrick/htmlutils'
 require 'pebbles/RiteMesh'
 
 module Pebbles
   module HTMLQuoting
-    # TODO: use the standard CGI class for this (might be something is WebRick too)
     def html_quote(text)
       return "" unless text
-      text.gsub(/</, "&lt;").gsub(/>/, "&gt;").gsub(/\r?\n/, "<br/>")
+      WEBrick::HTMLUtils.escape(text).gsub(/</, "&lt;").gsub(/>/, "&gt;").gsub(/\r?\n/, "<br/>")
     end
   end
 
