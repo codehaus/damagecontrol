@@ -34,6 +34,8 @@
         <surname>Trieloff</surname>
       </author>
     </authorgroup>
+
+    <subtitle>control the damage before the damage controls you</subtitle>
   </bookinfo>
 
   <preface>
@@ -217,7 +219,8 @@
             <step>
               <para>Download the ebuilds.</para>
 
-              <screen><prompt># </prompt><userinput>wget http://www.goshaky.com/goshaky-distfiles/gentoo/damagecontrol-ebuild.tar.bz2</userinput></screen>
+              <screen><prompt># </prompt><userinput>wget \
+  http://goshaky.com/goshaky-distfiles/gentoo/damagecontrol-ebuild.tar.bz2</userinput></screen>
             </step>
 
             <step>
@@ -425,7 +428,8 @@ ProxyPassReverse /private http://localhost:4712/private</programlisting>
           <screenshot>
             <mediaobject>
               <imageobject>
-                <imagedata fileref="images/new_project.png" />
+                <imagedata contentwidth="16cm"
+                           fileref="images/new_project.png" />
               </imageobject>
             </mediaobject>
           </screenshot>
@@ -442,7 +446,8 @@ ProxyPassReverse /private http://localhost:4712/private</programlisting>
           <screenshot>
             <mediaobject>
               <imageobject>
-                <imagedata fileref="images/project_name.png" />
+                <imagedata contentwidth="16cm"
+                           fileref="images/project_name.png" />
               </imageobject>
             </mediaobject>
           </screenshot>
@@ -866,7 +871,7 @@ component(:irc_publisher,
           <screenshot>
             <mediaobject>
               <imageobject>
-                <imagedata fileref="images/xml_icon.png" />
+                <imagedata contentwidth="4cm" fileref="images/xml_icon.png" />
               </imageobject>
             </mediaobject>
           </screenshot>
@@ -891,7 +896,7 @@ component(:irc_publisher,
           <screenshot>
             <mediaobject>
               <imageobject>
-                <imagedata fileref="images/dctray_net.png" />
+                <imagedata contentwidth="4cm" fileref="images/dctray_net.png" />
               </imageobject>
             </mediaobject>
           </screenshot>
@@ -918,7 +923,7 @@ component(:irc_publisher,
           <screenshot>
             <mediaobject>
               <imageobject>
-                <imagedata fileref="images/dctray_mono.png" />
+                <imagedata contentwidth="4cm" fileref="images/dctray_mono.png" />
               </imageobject>
             </mediaobject>
           </screenshot>
