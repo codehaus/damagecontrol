@@ -5,6 +5,7 @@ require 'rscm/time_ext'
 
 module RSCM
 
+  # A collection of changesets.
   class ChangeSets
     include Enumerable
     include XMLRPC::Marshallable
@@ -40,6 +41,7 @@ module RSCM
       @changesets.empty?
     end
     
+    # The set of developers that contributed to all of the contained ChangeSet s.
     def developers
       result = []
       each do |changeset|
@@ -95,6 +97,7 @@ module RSCM
     end
 
     # Writes RSS for the changesets to file.
+    # TODO: take this out and add support for visitors instead.
     def write_rss(title, rss_file, link, description, message_linker, change_linker)
       FileUtils.mkdir_p(File.dirname(rss_file))
       File.open(rss_file, "w") do |io|
