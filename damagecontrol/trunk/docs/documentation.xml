@@ -28,7 +28,7 @@
   </bookinfo>
   <preface>
     <title>What is DamageControl</title>
-    <para>DamageControl is a continous integration system that helps you to
+    <para><indexterm><primary>DamageControl</primary></indexterm>DamageControl is a continous integration system that helps you to
     keep feedback about build failures. If you are working on a project that
     is supervised by DamageControl and one of your team members commits
     changes to the Software Configuration Management System, DamageControl
@@ -46,7 +46,7 @@
     the project is in an consistant state again. The damager will repair the
     damage and everyone else will continue to work.</para>
     <para>What distinguishes DamageControl from other continuous integration
-    systems like CruiseControl or CruiseControl.NET?</para>
+    systems like <indexterm><primary>CruiseControl</primary></indexterm>CruiseControl or <indexterm><primary>CruiseControl</primary><secondary>.NET</secondary></indexterm>CruiseControl.NET?</para>
     <itemizedlist>
       <listitem>
         <para>DamageControl is under heavy development. If you want to use
@@ -54,7 +54,7 @@
         reading here.</para>
       </listitem>
       <listitem>
-        <para>DamageControl is platform agnostic. You can build your project
+        <para>DamageControl is <indexterm><primary>platform support</primary></indexterm>platform agnostic. You can build your project
         with Java, Ant, Ruby, .NET, Nant, Make or whatever tools you
         like.</para>
       </listitem>
@@ -73,7 +73,7 @@
       </listitem>
       <listitem>
         <para>DamageControl supports as many projects as you need and your
-        build server can handle. It is even possible to run multiple builds at
+        build server can handle. It is even possible to run <indexterm><primary>builds</primary><secondary>multiple</secondary></indexterm>multiple builds at
         once.</para>
       </listitem>
       <listitem>
@@ -82,7 +82,7 @@
         it is impossible to use triggers.</para>
       </listitem>
       <listitem>
-        <para>DamageControl integrates with tools like ViewCVS or Fisheye as
+        <para><indexterm><primary>tool</primary><secondary>integration</secondary></indexterm>DamageControl integrates with tools like ViewCVS or Fisheye as
         well as Jira, Bugzilla and Scarab.</para>
       </listitem>
     </itemizedlist>
@@ -94,7 +94,7 @@
     because it does not help you to create more shiny new code in shorter
     time, consider the advantages of detecting problems early: The sooner a
     problem is detected, the cheaper it is to fix it.</para>
-    <para>If you identify problems during requirements engineering, you can
+    <para><indexterm><primary>costs of damage</primary></indexterm>If you identify problems during requirements engineering, you can
     talk with the customer and the problem is gone. If you identify problems
     during the design phase, you have all opportunities to find a design that
     will avoid those problems. If you occur problems during the
@@ -109,8 +109,10 @@
     <title>User Manual</title>
     <section>
       <title>Installing DamageControl</title>
+			<indexterm><primary>installation</primary></indexterm>
       <section os="unix">
         <title>Linux, UNIX, Mac OS X</title>
+				<indexterm><primary>installation</primary><secondary>UNIX</secondary></indexterm>
         <para>To install DamageControl on a server with an UNIX-like operating
         system, follow these steps.</para>
         <procedure>
@@ -153,6 +155,7 @@
         still send mails to individual developers.</para>
         <section>
           <title>Gentoo Linux</title>
+					<indexterm><primary>installation</primary><secondary>Gentoo Linux</secondary></indexterm>
           <para>Users of Gentoo Linux can take advantage of a ebuild that wil
           automatically install DamageControl. Follow these instructions to
           install the ebuild.</para>
@@ -181,14 +184,14 @@
         </section>
       </section>
       <section os="windows">
-        <title>Windows</title>
+        <title>Windows</title><indexterm><primary>installation</primary><secondary>windows</secondary></indexterm>
         <para>Users of the Microsoft Windows Operating System can install
         DamageControl using the installer. You do not need to download a
         separate Ruby runtime, as it is included in the installer.</para>
       </section>
     </section>
     <section>
-      <title>Configuring the DamageControl Server</title>
+      <title>Configuring the DamageControl Server</title><indexterm><primary>configuration</primary></indexterm>
       <para>Users of DamageControl under Microsoft Windows can start
       DamageControl using the created entries in the Start menu. On other
       platforms, starting
@@ -196,13 +199,13 @@
       is the preferred solution. This script expects a configuration file as
       command line argument.</para>
       <caution>
-        <para>It is very dangerous to run DamageControl as
+        <para><indexterm><primary>security</primary></indexterm>It is very dangerous to run DamageControl as
         <literal>root</literal>-user. It is better to create a new user, which
         has read and write access to <envar>DAMAGECONTROL_HOME</envar> and
         <envar>DAMAGECONTROL_WORK</envar>, but cannot access other user&apos;s
         files.</para>
       </caution>
-      <para>A default configuration is provided in the file
+      <para><indexterm><primary>configuration</primary><secondary>default</secondary></indexterm>A default configuration is provided in the file
       <filename><envar>DAMAGECONTROL_HOME</envar>/bin/server.rb</filename>. If
       you would like to make changes to the configuration, you should create a
       copy of <filename>server.rb</filename> and edit and use this
@@ -211,7 +214,7 @@
       of purposes. All these configurations are optional and not needed if you
       just want to test DamageControl.</para>
       <section>
-        <title>Access Control</title>
+        <title>Access Control</title><indexterm><primary>access control</primary></indexterm>
         <para>By default everyone can access the DamageControl server and add
         projects or change configurations. This is not useful if you want to
         have an public build server, because you do not want to allow
@@ -256,7 +259,7 @@
         <para>In order to serve the DamageControl pages from an ordinary web
         server, install a web server and configure it to work as a proxy for
         DamageControl. An example configuration for the Apache webserver is
-        like this.</para>
+        like this.<indexterm><primary>apache configuration</primary></indexterm></para>
         <programlisting role="apacheconf">ProxyRequests off
 RewriteEngine On
 ProxyPass /public http://localhost:4712/public
@@ -280,7 +283,7 @@ ProxyPassReverse /private http://localhost:4712/private</programlisting>
         <filename>/etc/apache2/dc.passwd</filename>.</para>
       </section>
       <section id="section.multiplebuildexecutors">
-        <title>Multiple Build Executors</title>
+        <title>Multiple Build Executors</title><indexterm><primary>build executors</primary></indexterm>
         <para>DamageControl has the ability to run multiple build parallel.
         Each build will be executed by one build executor. The default
         configuration includes only one build executor, so if this executor is
@@ -325,7 +328,7 @@ ProxyPassReverse /private http://localhost:4712/private</programlisting>
         </highlights>
         <variablelist>
           <varlistentry>
-            <term>
+            <term><indexterm><primary>root directory</primary></indexterm>
               <parameter>RootDir</parameter>
             </term>
             <listitem>
@@ -334,7 +337,7 @@ ProxyPassReverse /private http://localhost:4712/private</programlisting>
             </listitem>
           </varlistentry>
           <varlistentry>
-            <term>
+            <term><indexterm><primary>ip addresses</primary></indexterm>
               <parameter>AllowIPs</parameter>
             </term>
             <listitem>
@@ -344,7 +347,7 @@ ProxyPassReverse /private http://localhost:4712/private</programlisting>
             </listitem>
           </varlistentry>
           <varlistentry>
-            <term>
+            <term><indexterm><primary>HTTP port</primary></indexterm>
               <parameter>HttpPort</parameter>
             </term>
             <listitem>
@@ -353,8 +356,8 @@ ProxyPassReverse /private http://localhost:4712/private</programlisting>
             </listitem>
           </varlistentry>
           <varlistentry>
-            <term>
-              <parameter>HttpPort</parameter>
+            <term><indexterm><primary>secure HTTP port</primary></indexterm>
+              <parameter>HttpsPort</parameter>
             </term>
             <listitem>
               <para>Port where the DamageControl <abbrev>HTTPS</abbrev> server
@@ -362,7 +365,7 @@ ProxyPassReverse /private http://localhost:4712/private</programlisting>
             </listitem>
           </varlistentry>
           <varlistentry>
-            <term>
+            <term><indexterm><primary>XML-RPC</primary><secondary>URL</secondary></indexterm>
               <parameter>TrigXmlrpcUrl</parameter>
             </term>
             <listitem>
@@ -371,7 +374,7 @@ ProxyPassReverse /private http://localhost:4712/private</programlisting>
             </listitem>
           </varlistentry>
           <varlistentry>
-            <term>
+            <term><indexterm><primary>URL</primary><secondary>external</secondary></indexterm>
               <parameter>ExternalWebUrl</parameter>
             </term>
             <listitem>
@@ -380,7 +383,7 @@ ProxyPassReverse /private http://localhost:4712/private</programlisting>
             </listitem>
           </varlistentry>
           <varlistentry>
-            <term>
+            <term><indexterm><primary>URL</primary><secondary>public</secondary></indexterm>
               <parameter>PublicWebUrl</parameter>
             </term>
             <listitem>
@@ -389,7 +392,7 @@ ProxyPassReverse /private http://localhost:4712/private</programlisting>
             </listitem>
           </varlistentry>
           <varlistentry>
-            <term>
+            <term><indexterm><primary>polling</primary></indexterm>
               <parameter>PollingInterval</parameter>
             </term>
             <listitem>
@@ -401,13 +404,13 @@ ProxyPassReverse /private http://localhost:4712/private</programlisting>
       </section>
     </section>
     <section>
-      <title>Configuring DamageControl Projects</title>
+      <title>Configuring DamageControl Projects</title><indexterm><primary>project configuration</primary></indexterm>
       <para>If you have installed DamageControl and set up DamageControl to
       fit your needs, it is time to configure projects DamageControl will
       build. This is very easy as you can use the web interface for almost all
       tasks.</para>
       <section>
-        <title>Creating Projects</title>
+        <title>Creating Projects</title><indexterm><primary>project creation</primary></indexterm>
         <para>In order to create a new project, open the private dashboard of
         the DamageControl server. If DamageControl is running on your local
         machine, the URL is usually <ulink url="http://localhost:4712/private/dashboard">http://localhost:4712/private/dashboard</ulink>,
@@ -455,7 +458,7 @@ ProxyPassReverse /private http://localhost:4712/private</programlisting>
         builds.</para>
       </section>
       <section>
-        <title>DamageControl and Build Tools</title>
+        <title>DamageControl and Build Tools</title><indexterm><primary>build tools</primary></indexterm>
         <para>DamageControl will support any build tool you need in your
         project. All you need to do is to enter the relevant build command in
         the field labeled <guilabel>Build command</guilabel>. If the command
@@ -463,7 +466,7 @@ ProxyPassReverse /private http://localhost:4712/private</programlisting>
         if the build end with another status code, it was a failed
         build.</para>
         <sidebar>
-          <title>What if the build returns the wrong error code?</title>
+          <title>What if the build returns the wrong error code?</title><indexterm><primary>return code</primary></indexterm><indexterm><primary>error code</primary></indexterm>
           <para>Some configurations of Ant under Microsoft Windows operating
           systems return the wrong error code. To fix this behaviour, you will
           have to modify the <filename>ant.bat</filename> that is executed
@@ -485,7 +488,7 @@ maven jar</screen>
         before. An appropiate build command would be as following.</para>
         <screen>cd subdir &amp;&amp; make all</screen>
         <para>If you need to build more complicated build scripts, you can use
-        following environment variables that are passed to an external build
+        following <indexterm><primary>environment variables</primary></indexterm>environment variables that are passed to an external build
         process. You can use these variables to create build artifacts which
         are specific to a certain build.</para>
         <variablelist>
@@ -510,7 +513,7 @@ maven jar</screen>
         </variablelist>
       </section>
       <section>
-        <title>DamageControl and SCM Systems</title>
+        <title>DamageControl and SCM Systems</title><indexterm><primary>SCM</primary></indexterm>
         <para>DamageControl has an event-view to your project. This means,
         rebuilds are triggered when a change to the codebase of your project
         (an event) occurs. To make this triggering possible, your software
@@ -527,13 +530,13 @@ maven jar</screen>
         fortunate, you will have to install the triggers yourself, which is
         described in the following sections.</para>
         <section>
-          <title>Installing Triggers for <abbrev>CVS</abbrev></title>
+          <title>Installing Triggers for <abbrev>CVS</abbrev></title><indexterm><primary>SCM</primary><secondary>triggers</secondary></indexterm>
           <para>To install the triggers for <abbrev>CVS</abbrev> you need to
           have DamageControl installed at the <abbrev>CVS</abbrev> server.
           DamageControl does not need to be running, as it will be used as
           client to trigger new builds via the remote
           <acronym>API</acronym>.</para>
-          <para>To install the trigger follow these steps from a computer that
+          <para><indexterm><primary>CVS triggers</primary></indexterm>To install the trigger follow these steps from a computer that
           has access to the <abbrev>CVS</abbrev> repository.</para>
           <procedure>
             <step>
@@ -589,7 +592,7 @@ maven jar</screen>
           </procedure>
         </section>
         <section>
-          <title>Installing hooks for Subversion</title>
+          <title>Installing hooks for Subversion</title><indexterm><primary>Subversion</primary><secondary>hooks</secondary></indexterm>
           <para>In order to install the hooks for Subversion you need to have
           DamageControl installed at the Subversion server. DamageControl does
           not need to be running, as it will be used as client to trigger new
@@ -650,13 +653,13 @@ maven jar</screen>
         </section>
       </section>
       <section>
-        <title>DamageControl and Issue Trackers</title>
+        <title>DamageControl and Issue Trackers</title><indexterm><primary>issue tracking</primary></indexterm>
         <para>DamageControl has support for various issue trackers. In most
         cases this support means that whenever a commit message refers to a
-        issue number in Jira, Bugzilla, Scarab or sourceforge.net issue
+        issue number in Jira, <indexterm><primary>Bugzilla</primary></indexterm>Bugzilla, <indexterm><primary>Scarab</primary></indexterm>Scarab or sourceforge.net issue
         trackers, this issue number will be turned into a hyperlink to the
         issue tracking system.</para>
-        <para>For the issue tracker Jira, there is an additional feature. A
+        <para>For the issue tracker Jira<indexterm><primary>Jira</primary></indexterm>, there is an additional feature. A
         Jira publisher allows to create Jira issues for each failed build. To
         use this publisher, you will have to edit the server configuration
         file.</para>
@@ -694,7 +697,7 @@ component(:jira_publisher,
     <section>
       <title>DamageControl Notifications</title>
       <section>
-        <title>Send EMails on build</title>
+        <title>Send EMails on build</title><indexterm><primary>EMail</primary></indexterm>
         <para>By default DamageControl will send no notification messages on
         each build. In oder to send EMails on successful or failed build, you
         have to configure an EMail publisher. To do this, follow these
@@ -760,7 +763,7 @@ component(:email_publisher, EmailPublisher.new(hub, build_history_repository,
         </procedure>
       </section>
       <section>
-        <title>Publish to <abbrev>IRC</abbrev> server</title>
+        <title>Publish to <abbrev>IRC</abbrev> server</title><indexterm><primary>IRC</primary></indexterm>
         <para>Publishing build results to an <abbrev>IRC</abbrev> server
         requires similar configuration of an <abbrev>IRC</abbrev> publisher.
         This is done by following these steps.</para>
@@ -791,7 +794,7 @@ component(:irc_publisher,
       <section>
         <title>
           <abbrev>RSS</abbrev>
-        </title>
+        </title><indexterm><primary>RSS</primary></indexterm>
         <para>DamageControl offers a convenient way to view the results of the
         last builds of a project. If you use a <abbrev>RSS</abbrev> reader
         like <phrase os="macosx">NetNewsWire,</phrase> <phrase os="windows">RSSBandit,</phrase> <phrase os="linux">Straw</phrase> or
@@ -812,7 +815,7 @@ component(:irc_publisher,
         through your <abbrev>RSS</abbrev> reader.</para>
       </section>
       <section>
-        <title>Windows System Tray</title>
+        <title>Windows System Tray</title><indexterm><primary>system tray</primary><secondary>windows</secondary></indexterm>
         <para>Another nice way to be notified is the Windows System Tray icon,
         which can be installed for DamageControl. You can configure a number
         of projects on different DamageControl servers and the tray icon will
@@ -834,7 +837,7 @@ component(:irc_publisher,
         configure the projects to monitor.</para>
       </section>
       <section>
-        <title>GNOME System Tray</title>
+        <title>GNOME System Tray</title><indexterm><primary>system tray</primary><secondary>GNOME</secondary></indexterm>
         <para>There is also a System Tray Icon for the
         <acronym>GNOME</acronym> desktop, which will show a red or green
         status light if depending on the build status of your monitored
@@ -886,9 +889,9 @@ component(:irc_publisher,
       </section>
     </section>
     <section>
-      <title>Getting Support</title>
+      <title>Getting Support</title><indexterm><primary>support</primary></indexterm>
       <para>The best way to contact the developers of DamageControl is though
-      the DamageControl-Users-Mailinglist. You can subscribe to this mailing
+      the <indexterm><primary>mailinglist</primary></indexterm>DamageControl-Users-Mailinglist. You can subscribe to this mailing
       list by sending an empty EMail to
       <email>user-subscribe@damagecontrol.codehaus.org</email>.</para>
       <para>Sometimes you might find other users or developers in the
@@ -897,12 +900,12 @@ component(:irc_publisher,
       <literal>irc.codehaus.org</literal>.</para>
     </section>
     <section>
-      <title>Frequently Asked Questions</title>
+      <title>Frequently Asked Questions</title><indexterm><primary>FAQ</primary></indexterm>
       <qandaset>
         <qandadiv>
           <qandaentry>
             <question>
-              <para>Why do I get random crashes?</para>
+              <para>Why do I get random crashes?</para><indexterm><primary>crashes</primary></indexterm>
             </question>
             <answer>
               <para>There is a bug in the <acronym>YAML</acronym>
@@ -1062,7 +1065,7 @@ end</programlisting>
           <qandaentry>
             <question>
               <para>How to make a subversion
-request against a repository that is protected with a username/password?</para>
+request against a repository that is protected with a username/password?</para><indexterm><primary>Subversion</primary><secondary>authentication</secondary></indexterm>
             </question>
             <answer>
               <para>Use following procedure to access a password-proteced subversion
@@ -1096,7 +1099,7 @@ repository:
     </section>
   </chapter>
   <chapter>
-    <title>Developer Handbook</title>
+    <title>Developer Handbook</title><indexterm><primary>developers</primary></indexterm>
     <para>This chapter contains information for developers of DamageControl or
     users of DamageControl who would like to extend the features offered by
     DamageControl.</para>
