@@ -9,12 +9,13 @@ module DamageControl
     include XMLRPC::Marshallable
     include Pebbles::Matchable
 
-    IDLE           = "IDLE"
-    SUCCESSFUL     = "SUCCESSFUL"
-    FAILED         = "FAILED"
-    QUEUED         = "QUEUED"
-    BUILDING       = "BUILDING"
-    CHECKING_OUT   = "CHECKING OUT"
+    IDLE = "IDLE"
+    SUCCESSFUL = "SUCCESSFUL"
+    FAILED = "FAILED"
+    QUEUED = "QUEUED"
+    BUILDING = "BUILDING"
+    CHECKING_OUT = "CHECKING OUT"
+    KILLED = "KILLED"
 
     attr_accessor :project_name
 

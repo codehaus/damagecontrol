@@ -66,14 +66,23 @@ module DamageControl
         current_build.changesets.format(CHANGESET_TEXT_FORMAT, Time.new.utc) unless current_build.changesets.nil?
       report_progress(current_build.build_command_line)
       begin
-        cmd_with_io(working_dir, current_build.build_command_line, environment) do |io|
-          io.each_line {|line| report_progress(line) }
-          current_build.status = Build::SUCCESSFUL
+        @build_process = Pebbles::Process.new
+        @build_process.working_dir = working_dir
+        @build_process.command_line = current_build.build_command_line
+        @build_process.environment = environment
+        @build_process.join_stdout_and_stderr = true
+        @build_process.execute do |stdin, stdout|
+          stdout.each_line {|line| report_progress(line) }
         end
+        current_build.status = Build::SUCCESSFUL
       rescue Exception => e
         logger.error("build failed: #{format_exception(e)}")
         report_progress(format_exception(e))
-        current_build.status = Build::FAILED
+        if was_killed?
+          current_build.status = Build::KILLED
+        else
+          current_build.status = Build::FAILED
+        end
       end
 
       # set the label
@@ -81,6 +90,23 @@ module DamageControl
         current_build.label = current_build.potential_label
       end
 
+    end
+    
+    def build_process
+      @build_process
+    end
+    
+    def build_process_executing?
+      build_process && build_process.executing?
+    end
+    
+    def was_killed?
+      @was_killed
+    end
+    
+    def kill_build_process
+      build_process.kill
+      @was_killed = true
     end
  
     def checkout?

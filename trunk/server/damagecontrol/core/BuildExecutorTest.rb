@@ -11,6 +11,7 @@ require 'damagecontrol/util/FileUtils'
 require 'damagecontrol/core/BuildHistoryRepository'
 require 'damagecontrol/core/ProjectConfigRepository'
 require 'damagecontrol/core/ProjectDirectories'
+require 'damagecontrol/scm/NoSCM'
 
 module DamageControl
 
@@ -32,14 +33,40 @@ module DamageControl
     def setup
       create_hub
       @basedir = new_temp_dir("BuildExecutorTest")
+      mkdir_p(@basedir)
       @build = Build.new("damagecontrolled", Time.now, {
         "build_command_line" => "echo Hello world from DamageControl!"
         })
+      @build.scm = NoSCM.new("checkout_dir" => @basedir)
       @quiet_period = 10
     end
     
     def teardown
       rm_rf(@basedir)
+    end
+    
+    def wait_for(timeout=5, &proc)
+      0.upto(timeout) do
+        return if proc.call
+        sleep 1
+      end
+    end
+    
+    def test_can_kill_a_running_build
+      @build.config["build_command_line"] = "cat"
+      @build_executor = BuildExecutor.new(hub, BuildHistoryRepository.new(hub))
+      @build_executor.schedule_build(@build)
+      t = Thread.new {
+        @build_executor.process_next_scheduled_build
+      }
+      wait_for { @build_executor.build_process_executing? }
+      assert(@build_executor.build_process_executing?)
+      @build_executor.kill_build_process
+      wait_for { !@build_executor.build_process_executing? }
+      assert(!@build_executor.build_process_executing?)
+      t.join
+      assert_message_types_from_hub([BuildStartedEvent, BuildProgressEvent, BuildProgressEvent, BuildCompleteEvent])
+      assert_equal(Build::KILLED, messages_from_hub[-1].build.status)
     end
   
     def test_when_build_scheduled_executes_sends_start_process_and_complete

@@ -3,6 +3,9 @@ require 'ftools'
 require 'damagecontrol/util/Logging'
 
 module Pebbles
+  class ProcessFailedException < StandardError
+  end
+  
   class Process
   
       attr_accessor :command_line
@@ -54,6 +57,7 @@ module Pebbles
           end
           exec(command_line)
         end
+        @executing = true
         # both processes now have these open
         # it will not close entirely until both have closed them, which will make the child process hang
         # so we'll close these now in this process since we are not going to use them
@@ -64,25 +68,34 @@ module Pebbles
       end
       
       def execute
+        ret = nil
         begin
+          start
           if join_stdout_and_stderr?
-            yield stdin, stdout
+            ret = yield stdin, stdout
           else
-            yield stdin, stdout, stderr
+            ret = yield stdin, stdout, stderr
           end
+          wait
         ensure
           close_all_streams
         end
+        raise ProcessFailedException.new("'#{command_line}' in directory '#{working_dir}' failed with code #{exit_code.to_s}") if exit_code != 0
+        ret
+      end
+      
+      def executing?
+        @executing
+      end
+      
+      def kill
+        ::Process.kill("KILL", pid)
       end
       
       def wait
-        ::Process::waitpid(pid)
-        @exit_code = $?
+        @pid, @exit_code = ::Process::waitpid2(pid)
         close_all_streams
-      end
-      
-      def join_stdout_and_stderr?
-        @join_stdout_and_stderr
+        @executing = false
       end
       
       def close_all_streams
@@ -93,6 +106,10 @@ module Pebbles
   
       private
       
+        def join_stdout_and_stderr?
+          @join_stdout_and_stderr
+        end
+        
         def parent_stdout_read
           @stdout_pipe[0]
         end
@@ -124,9 +141,6 @@ module FileUtils
 
   include DamageControl::Logging
 
-  class ProcessFailedException < StandardError
-  end
-  
   def new_temp_dir(identifier = self)
     identifier = identifier.to_s
     identifier.gsub!(/\(|:|\)/, '_')
@@ -196,10 +210,9 @@ module FileUtils
       p.environment = environment
       p.working_dir = dir
       p.join_stdout_and_stderr = true
-      p.start
-      ret = if proc.arity == 1 then proc.call(p.stdout) else proc.call(p.stdout, p.stdin) end
-      p.wait
-      raise ProcessFailedException.new("'#{cmd}' in directory '#{Dir.pwd}' failed with code #{p.exit_code.to_s}") if $? != 0
+      ret = p.execute do |stdout, stdin|
+        if proc.arity == 1 then proc.call(p.stdout) else proc.call(p.stdout, p.stdin) end
+      end
       logger.debug("successfully executed #{cmd}")
       ret
     rescue NotImplementedError
