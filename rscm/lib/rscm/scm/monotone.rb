@@ -21,6 +21,9 @@ module RSCM
     ann :description => "Keys file"
     attr_accessor :keys_file
 
+    ann :description => "Server"
+    attr_accessor :server
+
     def initialize(db_file="MT.db", branch="", key="", passphrase="", keys_file="", server=nil)
       @db_file = File.expand_path(db_file)
       @branch = branch
@@ -90,7 +93,7 @@ module RSCM
       end
     end
 
-    def changesets(checkout_dir, from_identifier, to_identifier=Time.infinity)
+    def changesets(checkout_dir, from_identifier=Time.epoch, to_identifier=Time.infinity)
       checkout(checkout_dir, to_identifier)
       to_identifier = Time.infinity if to_identifier.nil?
       with_working_dir(checkout_dir) do
