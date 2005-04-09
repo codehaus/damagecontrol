@@ -9,5 +9,12 @@ module RSCM
       assert(scm.distributed?)
     end
 
+    def test_should_create_local_repository
+
+    end
+    
+    def test_should_pull_before_checkout
+
+    end
   end
 end
