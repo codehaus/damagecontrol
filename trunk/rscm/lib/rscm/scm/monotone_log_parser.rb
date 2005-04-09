@@ -79,7 +79,7 @@ module RSCM
           add_changes(changeset, line, Change::MODIFIED, path_revisions)
         end
       end
-      changeset.message.chomp!
+      changeset.message.chomp! rescue changeset.message = ''
       changeset
     end
     
