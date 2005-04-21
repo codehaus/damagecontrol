@@ -36,7 +36,7 @@ module DamageControl
         end 
 
         b.queue do
-          DamageControl::BuildQueue.new(b.builder)
+          DamageControl::BuildQueue.new
         end 
 
         b.poller do 
