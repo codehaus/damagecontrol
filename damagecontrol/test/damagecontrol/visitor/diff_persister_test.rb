@@ -15,7 +15,7 @@ module DamageControl
           @n = 0
         end
         
-        def diff(checkout_dir, change, &proc)
+        def diff(change, &proc)
           proc.call(@diffs[@n])
           @n = @n + 1
         end

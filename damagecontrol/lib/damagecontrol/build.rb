@@ -67,7 +67,7 @@ module DamageControl
 
     # Executes +command+ with the environment variables +env+ and persists the command for future reference.
     # (This will prevent the same build from being executed in the future.)
-    def execute(command, env={})
+    def execute(command, execute_dir, env)
       raise "ChangeSet can't be nil" if @changeset.nil?
       raise "ChangeSet's project can't be nil" if changeset.project.nil?
       raise "ChangeSet's dir can't be nil" if changeset.dir.nil?
@@ -103,10 +103,6 @@ module DamageControl
           io.write(exit_code)
         end
       end
-    end
-
-    def execute_dir
-      @changeset.project.checkout_dir
     end
 
     # Returns the exit code of the build process, or nil if the process was killed

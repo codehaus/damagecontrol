@@ -33,22 +33,22 @@ module RSCM
       "CVS"
     end
     
-    def import(dir, message)
+    def import_central(dir, message)
       modname = File.basename(dir)
       cvs(dir, "import -m \"#{message}\" #{modname} VENDOR START")
     end
     
-    def add(checkout_dir, relative_filename)
-      cvs(checkout_dir, "add #{relative_filename}")
+    def add(relative_filename)
+      cvs(@checkout_dir, "add #{relative_filename}")
     end
 
     # The extra simulate parameter is not in accordance with the AbstractSCM API,
     # but it's optional and is only being used from within this class (uptodate? method).
-    def checkout(checkout_dir, to_identifier=nil, simulate=false)
+    def checkout(to_identifier=nil, simulate=false)
       checked_out_files = []
-      if(checked_out?(checkout_dir))
+      if(checked_out?)
         path_regex = /^[U|P] (.*)/
-        cvs(checkout_dir, update_command(to_identifier), simulate) do |line|
+        cvs(@checkout_dir, update_command(to_identifier), simulate) do |line|
           if(line =~ path_regex)
             path = $1.chomp
             yield path if block_given?
@@ -56,12 +56,12 @@ module RSCM
           end
         end
       else
-        prefix = File.basename(checkout_dir)
+        prefix = File.basename(@checkout_dir)
         path_regex = /^[U|P] #{prefix}\/(.*)/
         # This is a workaround for the fact that -d . doesn't work - must be an existing sub folder.
-        mkdir_p(checkout_dir) unless File.exist?(checkout_dir)
-        target_dir = File.basename(checkout_dir)
-        run_checkout_command_dir = File.dirname(checkout_dir)
+        mkdir_p(@checkout_dir) unless File.exist?(@checkout_dir)
+        target_dir = File.basename(@checkout_dir)
+        run_checkout_command_dir = File.dirname(@checkout_dir)
         # -D is sticky, but subsequent updates will reset stickiness with -A
         cvs(run_checkout_command_dir, checkout_command(target_dir, to_identifier), simulate) do |line|
           if(line =~ path_regex)
@@ -74,35 +74,27 @@ module RSCM
       checked_out_files
     end
     
-    def checkout_commandline(to_identifier=Time.infinity)
-      "cvs checkout #{branch_option} #{revision_option(to_identifier)} #{mod}"
+    def commit(message, &proc)
+      cvs(@checkout_dir, commit_command(message), &proc)
     end
 
-    def update_commandline
-      "cvs update #{branch_option} -d -P -A"
-    end
-
-    def commit(checkout_dir, message, &proc)
-      cvs(checkout_dir, commit_command(message), &proc)
-    end
-
-    def uptodate?(checkout_dir, since)
-      if(!checked_out?(checkout_dir))
+    def uptodate?(identifier)
+      if(!checked_out?)
         return false
       end
 
       # simulate a checkout
-      files = checkout(checkout_dir, nil, true)
+      files = checkout(identifier, true)
       files.empty?
     end
 
-    def changesets(checkout_dir, from_identifier, to_identifier=Time.infinity)
-      checkout(checkout_dir, to_identifier) unless uptodate?(checkout_dir, to_identifier) # must checkout to get changesets
-      parse_log(checkout_dir, changes_command(from_identifier, to_identifier))
+    def changesets(from_identifier, to_identifier=Time.infinity)
+      checkout(to_identifier) unless uptodate?(to_identifier) # must checkout to get changesets
+      parse_log(changes_command(from_identifier, to_identifier))
     end
     
-    def diff(checkout_dir, change)
-      with_working_dir(checkout_dir) do
+    def diff(change)
+      with_working_dir(@checkout_dir) do
         opts = case change.status
           when /#{Change::MODIFIED}/; "#{revision_option(change.previous_revision)} #{revision_option(change.revision)}"
           when /#{Change::DELETED}/; "#{revision_option(change.previous_revision)}"
@@ -117,22 +109,22 @@ module RSCM
       end
     end
     
-    def apply_label(checkout_dir, label)
-      cvs(checkout_dir, "tag -c #{label}")
+    def apply_label(label)
+      cvs(@checkout_dir, "tag -c #{label}")
     end
     
     def install_trigger(trigger_command, trigger_files_checkout_dir)
       raise "mod can't be null or empty" if (mod.nil? || mod == "")
 
-      root_cvs = create_root_cvs
-      root_cvs.checkout(trigger_files_checkout_dir)
+      root_cvs = create_root_cvs(trigger_files_checkout_dir)
+      root_cvs.checkout
       with_working_dir(trigger_files_checkout_dir) do
         trigger_line = "#{mod} #{trigger_command}\n"
         File.open("loginfo", File::WRONLY | File::APPEND) do |file|
           file.puts(trigger_line)
         end
         begin
-          commit(trigger_files_checkout_dir, "Installed trigger for CVS module '#{mod}'")
+          root_cvs.commit("Installed trigger for CVS module '#{mod}'")
         rescue
           raise "Couldn't commit the trigger back to CVS. Try to manually check out CVSROOT/loginfo, " +
           "add the following line and commit it back:\n\n#{trigger_line}"
@@ -144,9 +136,9 @@ module RSCM
       loginfo_line = "#{mod} #{trigger_command}"
       regex = Regexp.new(Regexp.escape(loginfo_line))
 
-      root_cvs = create_root_cvs
+      root_cvs = create_root_cvs(trigger_files_checkout_dir)
       begin
-        root_cvs.checkout(trigger_files_checkout_dir)
+        root_cvs.checkout
         loginfo = File.join(trigger_files_checkout_dir, "loginfo")
         return false if !File.exist?(loginfo)
 
@@ -168,23 +160,23 @@ module RSCM
       loginfo_line = "#{mod} #{trigger_command}"
       regex = Regexp.new(Regexp.escape(loginfo_line))
 
-      root_cvs = create_root_cvs
-      root_cvs.checkout(trigger_files_checkout_dir)
+      root_cvs = create_root_cvs(trigger_files_checkout_dir)
+      root_cvs.checkout
       loginfo_path = File.join(trigger_files_checkout_dir, "loginfo")
       File.comment_out(loginfo_path, regex, "# ")
       with_working_dir(trigger_files_checkout_dir) do
-        commit(trigger_files_checkout_dir, "Uninstalled trigger for CVS mod '#{mod}'")
+        root_cvs.commit("Uninstalled trigger for CVS mod '#{mod}'")
       end
       raise "Couldn't uninstall/commit trigger to loginfo" if trigger_installed?(trigger_command, trigger_files_checkout_dir)
     end
 
-    def create
-      raise "Can't create CVS repository for #{root}" unless can_create?
+    def create_central
+      raise "Can't create central CVS repository for #{root}" unless can_create_central?
       File.mkpath(path)
       cvs(path, "init")
     end
     
-    def can_create?
+    def can_create_central?
       begin
         local?
       rescue
@@ -205,7 +197,7 @@ module RSCM
       end
     end
 
-    def checked_out?(checkout_dir)
+    def checked_out?
       rootcvs = File.expand_path("#{checkout_dir}/CVS/Root")
       File.exists?(rootcvs)
     end
@@ -225,13 +217,13 @@ module RSCM
       end
     end
 
-    def parse_log(checkout_dir, cmd, &proc)
+    def parse_log(cmd, &proc)
       logged_command_line = command_line(cmd, hidden_password)
       yield logged_command_line if block_given?
 
       execed_command_line = command_line(cmd, password)
       changesets = nil
-      with_working_dir(checkout_dir) do
+      with_working_dir(@checkout_dir) do
         safer_popen(execed_command_line) do |stdout|
           parser = CvsLogParser.new(stdout)
           parser.cvspath = path
@@ -261,7 +253,7 @@ module RSCM
     end
 
     def checkout_command(target_dir, to_identifier)
-      "checkout #{branch_option} -d #{target_dir} #{mod} #{revision_option(to_identifier)}"
+      "checkout #{branch_option} -d #{target_dir} #{revision_option(to_identifier)} #{mod}"
     end
     
     def hidden_password
@@ -303,8 +295,10 @@ module RSCM
       "cvs -f \"-d#{root_with_password(password)}\" #{cvs_options} -q #{cmd}"
     end
 
-    def create_root_cvs
-      Cvs.new(self.root, "CVSROOT", nil, self.password)
+    def create_root_cvs(checkout_dir)
+      cvs = Cvs.new(self.root, "CVSROOT", nil, self.password)
+      cvs.checkout_dir = checkout_dir
+      cvs
     end
 
     def revision_option(identifier)

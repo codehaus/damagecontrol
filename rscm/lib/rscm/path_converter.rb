@@ -8,17 +8,9 @@ WINDOWS = WIN32 || CYGWIN
 # TODO: change to override IO.popen, using that neat trick we
 # used in threadfile.rb (which is now gone)
 def safer_popen(cmd, mode="r", expected_exit=0, &proc)
+puts "\n#{cmd}"
   Log.info "Executing command: '#{cmd}'"
   ret = IO.popen(cmd, mode) do |io|
-# TODO: we're referring to ourself, not the child. Fork? how to do this so it works on windows too?
-#    Log.info("Running child process #{cmd} with pid #{Process.pid}")
-#    at_exit do
-#      Log.info("Killing child process #{cmd} with pid #{Process.pid}")
-#      begin
-#        Process.kill("SIGHUP", Process.pid)
-#      rescue
-#      end
-#    end
     proc.call(io)
   end
   exit_code = $? >> 8
@@ -33,11 +25,13 @@ def with_working_dir(dir)
   prev = Dir.pwd
   begin
     dir = File.expand_path(dir)
-    Log.info "Making directory: '#{dir}'"
     FileUtils.mkdir_p(dir)
     Dir.chdir(dir)
-    Log.info "In directory: '#{dir}'"
     yield
+  rescue => e
+    Log.error("dir:#{dir}")
+    Log.error(e.backtrace.join("\n"))
+    raise e
   ensure
     Dir.chdir(prev)
   end

@@ -30,8 +30,9 @@ module RSCM
         'DAMAGECONTROL_BUILD_LABEL' => identifier.to_s, # For others
         'DAMAGECONTROL_CHANGED_FILES' => changes.collect{|change| change.path}.join(",")
       }
-      # TODO: persist here, nott in app.rb
-      build.execute(project.build_command, env)
+      
+      # TODO: persist here, not in app.rb
+      build.execute(project.build_command, project.execute_dir, env)
       yield build
     end
 
@@ -54,6 +55,11 @@ module RSCM
     # Returns the latest Build.
     def latest_build
       builds[-1]
+    end
+    
+    alias old_eq ==
+    def ==(other)
+      old_eq(other) && self.project == other.project
     end
 
   end

@@ -5,12 +5,12 @@ class BuildController < ApplicationController
 
   def stdout
     load_build
-    send_log(@build.stdout)
+    send_log(@build.stdout_file)
   end
 
   def stderr
     load_build
-    send_log(@build.stderr)
+    send_log(@build.stderr_file)
   end
 
   def tests

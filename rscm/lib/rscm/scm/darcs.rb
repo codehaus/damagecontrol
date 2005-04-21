@@ -17,13 +17,17 @@ module RSCM
       "Darcs"
     end
 
-    def create
+    def can_create_central?
+      true
+    end
+
+    def create_central
       with_working_dir(@dir) do
         darcs("initialize")
       end
     end
     
-    def import(dir, message)
+    def import_central(dir, message)
       ENV["EMAIL"] = "dcontrol@codehaus.org"
       FileUtils.cp_r(Dir.glob("#{dir}/*"), @dir)
       with_working_dir(@dir) do
@@ -38,32 +42,32 @@ module RSCM
       end
     end
 
-    def commit(checkout_dir, message)
+    def commit(message)
       logfile = Tempfile.new("darcs_logfile")
       logfile.print("something nice\n")
       logfile.print(message + "\n")
       logfile.close
 
-      with_working_dir(checkout_dir) do
+      with_working_dir(@checkout_dir) do
         darcs("record --all --logfile #{PathConverter.filepath_to_nativepath(logfile.path, false)}")
       end
     end
 
-    def add(checkout_dir, relative_filename)
-      with_working_dir(checkout_dir) do
+    def add(relative_filename)
+      with_working_dir(@checkout_dir) do
         darcs("add #{relative_filename}")
       end
     end
 
-    def checked_out?(checkout_dir)
-      File.exists?("#{checkout_dir}/_darcs")
+    def checked_out?
+      File.exists?("#{@checkout_dir}/_darcs")
     end
 
-    def uptodate?(checkout_dir, from_identifier)
-      if (!checked_out?(checkout_dir))
+    def uptodate?(from_identifier)
+      if (!checked_out?(@checkout_dir))
         false
       else
-        with_working_dir(checkout_dir) do
+        with_working_dir(@checkout_dir) do
           darcs("pull --dry-run #{@dir}") do |io|
             io.each_line do |line|
               if (line =~ /No remote changes to pull in!/)
@@ -77,10 +81,10 @@ module RSCM
       end
     end
 
-    def changesets(checkout_dir, from_identifier, to_identifier=Time.infinity)
+    def changesets(from_identifier, to_identifier=Time.infinity)
       from_identifier = Time.epoch if from_identifier.nil?
       to_identifier = Time.infinity if to_identifier.nil?
-      with_working_dir(checkout_dir) do
+      with_working_dir(@checkout_dir) do
         darcs("changes --summary --xml-output") do |stdout|
           DarcsLogParser.new.parse_changesets(stdout, from_identifier, to_identifier)
         end
@@ -89,7 +93,7 @@ module RSCM
   
   protected
 
-    def checkout_silent(checkout_dir, to_identifier) # :yield: file
+    def checkout_silent(to_identifier) # :yield: file
       with_working_dir(File.dirname(checkout_dir)) do
         darcs("get --repo-name #{File.basename(checkout_dir)} #{@dir}")
       end

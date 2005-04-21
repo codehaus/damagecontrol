@@ -21,6 +21,7 @@ module ObjectTemplate
 end
 
 module DamageControl
+
   # Represents a project with associated SCM, Tracker and SCMWeb
   class Project
     include ObjectTemplate
@@ -31,6 +32,8 @@ module DamageControl
     attr_accessor :name
     attr_accessor :home_page
     attr_accessor :start_time
+    # Relative path from scm's checkout dir where build is executed from.
+    attr_accessor :relative_execute_path
 
     attr_accessor :scm
     attr_accessor :tracker
@@ -38,7 +41,7 @@ module DamageControl
 
     # How long to sleep between each changesets invocation for non-transactional SCMs  
     attr_accessor :quiet_period
-
+    
     attr_accessor :build_command
     attr_accessor :publishers
     
@@ -47,8 +50,9 @@ module DamageControl
       Log.info "Loading project from #{config_file}"
       project = File.open(config_file) do |io|
         YAML::load(io)
-      end      
+      end
       project.dir = File.dirname(config_file)
+      project.scm.checkout_dir = "#{project.dir}/working_copy" if project.scm
 
       # Add new publishers that may have be defined after the project was YAMLed.
       project.publishers = [] if project.publishers.nil?
@@ -68,6 +72,12 @@ module DamageControl
       end
     end
     
+    def to_yaml_properties
+      props = instance_variables
+      props.delete("@dir")
+      props.sort!
+    end
+    
     def initialize(name="")
       @name = name
       @publishers = Publisher::Base.classes.collect{|cls| cls.new}
@@ -77,8 +87,56 @@ module DamageControl
       # Default start time is 2 weeks ago
       @start_time = Time.now.utc - (3600*24*14)
       @quiet_period = DEFAULT_QUIET_PERIOD
+      @relative_execute_dir = "."
+      @dependencies = []
     end
     
+    # Lists all immediate dependencies of this project.
+    def dependencies
+      @dependencies ||= []
+      result = @dependencies.collect do |project_name|
+        if(@dir)
+          config = "#{File.dirname(dir)}/#{project_name}/project.yaml"
+          Project.load(config)
+        else
+          # Used in testing, when it's often too cumbersome to set up a dir
+          Project.new(project_name)
+        end
+      end
+      result.freeze
+      result
+    end
+    
+    # Adds a dependency for this project
+    def add_dependency(project)
+      @dependencies ||= []
+      raise "Circular dependency!" if(project.depends_on?(self))
+      @dependencies << project.name
+    end
+
+    def clear_dependencies
+      @dependencies ||= []
+      @dependencies.clear
+    end
+    
+    # Returns true if this project depends on +project+ (directly or indirectly)
+    def depends_on?(project)
+      depends_directly_on?(project) || depends_indirectly_on?(project)
+    end
+    
+    # Returns true if and only if this project *indirectly* depends on +project+.
+    def depends_directly_on?(project)
+      dependencies.index(project) != nil
+    end
+    
+    # Returns true if and only if this project *indirectly* depends on +project+.
+    def depends_indirectly_on?(project)
+      dependencies.find{|d| d.depends_on?(project)} != nil
+    end
+    
+    # Sets the time of the first changeset to be retrieved for this project.
+    # Will only be used for new projects, and only once.
+    # TODO: rename to first_recorded_changeset_time
     def start_time=(t)
       t = Time.parse_ymdHMS(t) if t.is_a? String
       @start_time = t
@@ -87,19 +145,19 @@ module DamageControl
     def dir=(d)
       @dir = d
     end
-
+    
     # The directory the project lives in. This is not serialised to yaml.
     def dir
       raise "dir not set" unless @dir
       @dir
     end
     
-    def to_yaml_properties
-      props = instance_variables
-      props.delete("@dir")
-      props.sort!
+    # The directory where builds are executed from. Should be a relative path
+    # from the root of the SCM's working copy directory.
+    def execute_dir
+      File.expand_path(@scm.checkout_dir + "/" + @relative_execute_dir)
     end
-    
+
     # Tells all publishers to publish a build
     def publish(build)
       @publishers.each do |publisher| 
@@ -127,21 +185,25 @@ module DamageControl
       end
     end
     
+    # TODO: remove
     # Checks out files to project's checkout directory.
     # Writes the checked out files to +checkout_list_file+.
     # The +changeset_identifier+ parameter is a String or a Time
     # representing a changeset.
     def checkout(changeset_identifier)
-      scm.checkout(checkout_dir, changeset_identifier)
+      scm.checkout(changeset_identifier)
     end
 
+    # TODO: pass quiet_period as arg here?
     # Polls SCM for new changesets and yields them to the given block.
     def poll
       start = Time.now
-      from = next_changeset_identifier(changesets_dir) || @start_time
+
+      latest_identifier = DamageControl::Visitor::YamlPersister.new(changesets_dir).latest_identifier
+      from = latest_identifier || @start_time
       
       Log.info "Polling changesets for #{name}'s #{@scm.name} from #{from}"
-      changesets = @scm.changesets(checkout_dir, from)
+      changesets = @scm.changesets(from)
       if(!changesets.empty? && !@scm.transactional?)
         # We're dealing with a non-transactional SCM (like CVS/StarTeam/ClearCase,
         # unlike Subversion/Monotone). Sleep a little, get the changesets again.
@@ -153,27 +215,17 @@ module DamageControl
         commit_in_progress = true
         while(commit_in_progress)
           @quiet_period ||= DEFAULT_QUIET_PERIOD
-          Log.info "Sleeping for #{@quiet_period} seconds since #{name}'s SCM (#{@scm.name}) is not transactional."
+          Log.info "Detected changesets. Sleeping for #{@quiet_period} seconds since #{name}'s SCM (#{@scm.name}) is not transactional."
           sleep @quiet_period
-          next_changesets = @scm.changesets(checkout_dir, from)
+          next_changesets = @scm.changesets(from)
           commit_in_progress = changesets != next_changesets
           changesets = next_changesets
         end
-        Log.info "Quiet period elapsed for #{name}"
+        Log.info "Quiet period elapsed for #{name}. Commit in progress: #{commit_in_progress}"
       end
       changesets.each{|changeset| changeset.project = self}
-      Log.info "Got changesets for #{@name} in #{Time.now.difference_as_text(start)}"
+      Log.info "Polled changesets for #{@name} in #{Time.now.difference_as_text(start)}"
       yield changesets
-    end
-
-    # Returns the identifier (int label or time) that should be used to get the next (unrecorded)
-    # changeset. This is the identifier *following* the latest recorded changeset. 
-    # This identifier is determined by looking at the directory names under 
-    # +changesets_dir+. If there are none, this method returns nil.
-    def next_changeset_identifier(d)
-      # See String extension at top of this file.
-      latest_identifier = DamageControl::Visitor::YamlPersister.new(d).latest_identifier
-      latest_identifier ? latest_identifier + 1 : nil
     end
     
     # Where RSS is written.
@@ -181,24 +233,22 @@ module DamageControl
       "#{dir}/changesets.xml"
     end
 
+    # TODO: remove
     def checked_out?
-      @scm.checked_out?(checkout_dir)
+      @scm.checked_out?
     end
     
     def exists?
       File.exists?(project_config_file)
     end
 
+    # TODO: remove
     def scm_exists?
       scm.exists?
     end
 
-    def checkout_dir
-      "#{dir}/checkout"
-    end
-    
     def delete_working_copy
-      File.delete(checkout_dir)
+      File.delete(scm.checkout_dir)
     end
 
     def changesets_rss_exists?
@@ -243,7 +293,9 @@ module DamageControl
     end
     
     def == (o)
+      raise "name not defined!" if name.nil?
       return false unless o.is_a?(Project)
+      raise "name not defined!" if o.name.nil?
       name == o.name
     end
 

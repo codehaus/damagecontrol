@@ -24,88 +24,111 @@ module RSCM
     ann :description => "Server"
     attr_accessor :server
 
-    def initialize(db_file="MT.db", branch="", key="", passphrase="", keys_file="", server=nil)
-      @db_file = File.expand_path(db_file)
+    def initialize(branch=nil, key=nil, passphrase=nil, keys_file=nil, server=nil, central_checkout_dir=nil)
       @branch = branch
       @key = key
       @passphrase = passphrase
       @keys_file = keys_file
       @server = server
+      @central_checkout_dir = File.expand_path(central_checkout_dir) unless central_checkout_dir.nil?
     end
 
     def name
       "Monotone"
     end
 
-    def distributed?
-      true
-    end
-
-    def add(checkout_dir, relative_filename)
-      with_working_dir(checkout_dir) do
-        monotone("add #{relative_filename}")
+    def add(relative_filename)
+      db = db(@checkout_dir)
+      with_working_dir(@checkout_dir) do
+        monotone("add #{relative_filename}", db)
       end
     end
 
-    def create
-      FileUtils.mkdir_p(File.dirname(@db_file))
-      monotone("db init")
-      monotone("read") do |io|
-        io.write(File.open(@keys_file).read)
-        io.close_write
-      end
+    def can_create_central?
+      @server == "localhost" && !@central_checkout_dir.nil?
+    end
+    
+    def central_exists?
+      @central_checkout_dir && @serve_pid
     end
 
-    def transactional?
-      true
+    def create_central
+      init(@central_checkout_dir)
+      # create empty working copy
+      dir = PathConverter.filepath_to_nativepath(@central_checkout_dir, false)
+      # set up a working copy
+      monotone("setup #{dir}")
+      start_serve
     end
-
-    def import(dir, message)
-      dir = File.expand_path(dir)
-
-      # post 0.17, this can be "cd dir && cmd add ."
-
-      files = Dir["#{dir}/*"]
-      relative_paths_to_add = to_relative(dir, files)
-
-      with_working_dir(dir) do
-        monotone("setup .", @branch, @key)
-        monotone("add #{relative_paths_to_add.join(' ')}")
-        monotone("commit --message='#{message}'", @branch, @key) do |io|
+    
+    def start_serve
+      @serve_pid = fork do
+        #Signal.trap("HUP") { puts "Monotone server shutting down..."; exit }
+        monotone("serve #{@server} #{@branch}", db(@central_checkout_dir)) do |io|
+puts "PASSPHRASE: #{@passphrase}"
           io.puts(@passphrase)
           io.close_write
           io.read
         end
       end
+      Process.detach(@serve_pid)
+    end
+    
+    def stop_serve
+      Process.kill("HUP", @serve_pid) if @serve_pid
+      Process.waitpid2(@serve_pid) if @serve_pid
+      @serve_pid = nil
+    end
+    
+    def destroy_central
+      stop_serve
+      FileUtils.rm_rf(@central_checkout_dir) if File.exist?(@central_checkout_dir)
+      FileUtils.rm(db(@central_checkout_dir)) if File.exist?(db(@central_checkout_dir))
+      puts "Destroyed Monotone server"
+    end
+    
+    def transactional?
+      true
     end
 
-    def checked_out?(checkout_dir)
-      File.exists?("#{checkout_dir}/MT")
-    end
-
-    def uptodate?(checkout_dir, from_identifier)
-      if (!checked_out?(checkout_dir))
-        false
-      else
-        lr = local_revision(checkout_dir)
-        hr = head_revision(checkout_dir)
-        lr == hr
+    def import_central(dir, message)
+      cp_r(Dir["#{dir}/*"], @central_checkout_dir)
+      with_working_dir(@central_checkout_dir) do
+        monotone("add .")
+        commit_in_dir(message, @central_checkout_dir)
       end
     end
 
-    def changesets(checkout_dir, from_identifier=Time.epoch, to_identifier=Time.infinity)
-      checkout(checkout_dir, to_identifier)
+    def checked_out?
+      mt = File.expand_path("#{@checkout_dir}/MT")
+      File.exists?(mt)
+    end
+
+    def uptodate?(identifier=nil)
+      if (!checked_out?)
+        false
+      else
+        pull
+
+        rev = identifier ? identifier : head_revision
+        local_revision == rev
+      end
+    end
+
+    def changesets(from_identifier, to_identifier=Time.infinity)
+      checkout(to_identifier)
       to_identifier = Time.infinity if to_identifier.nil?
       with_working_dir(checkout_dir) do
-        monotone("log", @branch, @key) do |stdout|
+        monotone("log") do |stdout|
           MonotoneLogParser.new.parse_changesets(stdout, from_identifier, to_identifier)
         end
       end
     end
 
-    def commit(checkout_dir, message)
-      with_working_dir(checkout_dir) do
-        monotone("commit --message='#{message}'", @branch, @key) do |io|
+    def commit(message)
+      commit_in_dir(message, @checkout_dir)
+      with_working_dir(@checkout_dir) do
+        monotone("push #{@server} #{@branch}") do |io|
           io.puts(@passphrase)
           io.close_write
           io.read
@@ -115,53 +138,52 @@ module RSCM
 
     # http://www.venge.net/monotone/monotone.html#Hook-Reference
     def install_trigger(trigger_command, install_dir)
+      stop_serve
       if (WINDOWS)
         install_win_trigger(trigger_comand, install_dir)
       else
         install_unix_trigger(trigger_command, install_dir)
       end
+      start_serve
     end
     
     def trigger_installed?(trigger_command, install_dir)
-      File.exist?(@rcfile) if @rcfile
+      File.exist?(rcfile)
     end
 
     def uninstall_trigger(trigger_command, install_dir)
-      File.delete(@rcfile) if @rcfile
-      @rcfile = nil
+      stop_serve
+      File.delete(rcfile)
+      start_serve
     end
 
-    def diff(checkout_dir, change, &block)
-      checkout(checkout_dir, change.revision)
-      with_working_dir(checkout_dir) do
-        monotone("diff --revision=#{change.previous_revision} #{change.path}", @branch, @key) do |stdout|
+    def diff(change, &block)
+      checkout(change.revision)
+      with_working_dir(@checkout_dir) do
+        monotone("diff --revision=#{change.previous_revision} #{change.path}") do |stdout|
           yield stdout
         end
       end
     end
-
+    
   protected
 
     # Checks out silently. Called by superclass' checkout.
-    def checkout_silent(checkout_dir, to_identifier)
-      # pull from the "central" server
-      monotone("pull #{@server} #{@branch}") if @server
+    def checkout_silent(to_identifier)
+      # raise "Monotone doesn't support checkout to time. Please use identifiers instead." if to_identifier.is_a?(Time)
+      db_file = db(@checkout_dir)
+      if(!File.exist?(db_file))
+        init(@checkout_dir)
+      end
 
-      selector = expand_selector(to_identifier)
-      checkout_dir = PathConverter.filepath_to_nativepath(checkout_dir, false)
-      if checked_out?(checkout_dir)
-        with_working_dir(checkout_dir) do
-          monotone("update #{selector}")
-        end
-      else
-        monotone("checkout #{checkout_dir}", @branch, @key) do |stdout|
-          stdout.each_line do |line|
-            # TODO: checkout prints nothing to stdout - may be fixed in a future monotone.
-            # When/if it happens we may want to do a kosher implementation of checkout
-            # to get yields as checkouts happen.
-            yield line if block_given?
-          end
-        end
+      pull
+      checked_out = checked_out?
+
+      with_working_dir(@checkout_dir) do
+        monotone("checkout .", db_file, @branch) unless checked_out
+
+        selector = expand_selector(to_identifier)
+        monotone("update #{selector}", db_file)
       end
     end
 
@@ -172,48 +194,89 @@ module RSCM
 
   private
 
-    def install_unix_trigger(trigger_command, install_dir)
-      if File.exist?(post_commit_file)
-        mode = File::APPEND|File::WRONLY
-      else
-        FileUtils.mkdir_p(install_dir + "/MT/")
-        mode = File::CREAT|File::WRONLY
+    def commit_in_dir(message, dir)
+      db_file = db(dir)
+      with_working_dir(dir) do
+        monotone("commit --message='#{message}'", db_file, @branch, @key) do |io|
+          io.puts(@passphrase)
+          io.close_write
+          io.read
+        end
       end
+    end
+
+    def pull
+      db_file = db(@checkout_dir)
+      with_working_dir(@checkout_dir) do
+        # pull from the "central" server
+        if(@server)
+          monotone("pull #{@server} #{@branch}", db_file) do |io|
+            io.puts(@passphrase)
+            io.close_write
+            io.read
+          end
+        end
+      end
+    end
+
+    def db(checkout_dir)
+      PathConverter.filepath_to_nativepath(checkout_dir + ".db", false)
+    end
+
+    # Initialises a monotone database
+    #
+    def init(dir)
+      dir = File.expand_path(dir)
+      db_file = db(dir)
+      raise "Database #{db_file} already exists" if File.exist?(db_file)
+      FileUtils.mkdir_p(File.dirname(db_file))
+      # create database
+      monotone("db init", db_file)
+      # TODO: do a genkey
+      monotone("read", db_file) do |io|
+        io.write(File.open(@keys_file).read)
+        io.close_write
+      end
+    end
+
+    def install_unix_trigger(trigger_command, install_dir)
+      mode = File::CREAT|File::WRONLY
+      if File.exist?(rcfile)
+        mode = File::APPEND|File::WRONLY
+      end
+
       begin
-        File.open(post_commit_file, mode) do |file|
+        File.open(rcfile, mode) do |file|
           file.puts("function note_commit(new_id, certs)")
-          execstr = ""
-          trigger_command.split.each { |s|
-            execstr += "\"#{s}\","
-          } 
-          execstr.chomp!(",")
+          execstr = "\"" + trigger_command.split.join("\",\"") + "\""
           file.puts("  execute(#{execstr})")
           file.puts("end")
         end
-      rescue
-        raise "Didn't have permission to write to #{post_commit_file}."
+      rescue => e
+        puts e.message
+        puts e.backtrace.join("\n")
+        raise "Didn't have permission to write to #{rcfile}."
       end
       
       # push to the "central" server
-      monotone("push #{@server} #{@branch}") if @server
+#      monotone("push #{@server} #{@branch}", db(@central_checkout_dir))
     end
 
-    def post_commit_file
-      @rcfile = "/tmp/monotone-trigger.lua"
-      @rcfile
+    def rcfile
+      "#{@central_checkout_dir}/MT/monotonerc"
     end
 
-    def local_revision(checkout_dir)
+    def local_revision
       local_revision = nil
       rev_file = File.expand_path("#{checkout_dir}/MT/revision")
       local_revision = File.open(rev_file).read.strip
       local_revision
     end
     
-    def head_revision(checkout_dir)
+    def head_revision
       # FIXME: this will grab last head if heads are not merged.
       head_revision = nil
-      monotone("heads", @branch) do |stdout|
+      monotone("heads", db(@checkout_dir), @branch) do |stdout|
         stdout.each_line do |line|
           next if (line =~ /^monotone:/)
           head_revision = line.split(" ")[0]
@@ -225,21 +288,23 @@ module RSCM
     # See http://www.venge.net/monotone/monotone.html#Selectors
     # Also see docs for expand_selector in the same document
     # Dates are formatted with strftime-style %F, which is of style 2005-28-02,
-    # which is too coarse grained. Dates are therefore not supported.
+    # which is very coarse grained. Date identifiers are therefore discouraged.
     def expand_selector(identifier)
       if(identifier.is_a?(Time))
-        Log.warn("Time selectors are not supported for Monotone")
+        # Won't work:
+        # "d:#{identifier.strftime('%Y-%m-%d')}"
         ""
       else
         "i:#{identifier}"
       end
     end
   
-    def monotone(monotone_cmd, branch=nil, key=nil)
+    def monotone(monotone_cmd, db_file=nil, branch=nil, key=nil)
+      db_opt = db_file ? "--db=\"#{db_file}\"" : ""
       branch_opt = branch ? "--branch=\"#{branch}\"" : ""
       key_opt = key ? "--key=\"#{key}\"" : ""
       rcfile_opt = @rcfile ? "--rcfile=\"#{@rcfile}\"" : ""
-      cmd = "monotone --db=\"#{@db_file}\" #{branch_opt} #{key_opt} #{rcfile_opt} #{monotone_cmd}"
+      cmd = "monotone #{db_opt} #{branch_opt} #{key_opt} #{rcfile_opt} #{monotone_cmd}"
       safer_popen(cmd, "r+") do |io|
         if(block_given?)
           return(yield(io))
