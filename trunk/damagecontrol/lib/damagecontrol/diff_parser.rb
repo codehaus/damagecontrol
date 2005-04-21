@@ -144,10 +144,10 @@ end
 # Add visiting capabilities to Array
 class Array
   def accept(visitor)
-    each do |d| 
-      visitor.visitDiff(d)
-      d.accept(visitor)
-      visitor.visitDiffEnd(d)
+    each do |diff| 
+      visitor.visitDiff(diff)
+      diff.accept(visitor)
+      visitor.visitDiffEnd(diff)
     end
   end
 end

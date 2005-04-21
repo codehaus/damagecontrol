@@ -40,14 +40,13 @@ module RSCM
         changeset.message = element.elements["comment"].text
         changeset.message.lstrip!
         changeset.message.rstrip!
-      
 
-        element.elements["summary"].elements.each("add_file") { |file|
+        element.elements["summary"].elements.each("add_file") do |file|
           add_changes(changeset, file.text.strip, Change::ADDED, path_revisions)
-        }
-        element.elements["summary"].elements.each("modify_file") { |file|
+        end
+        element.elements["summary"].elements.each("modify_file") do |file|
           add_changes(changeset, file.text.strip, Change::MODIFIED, path_revisions)
-        }
+        end
       end
 
       changeset

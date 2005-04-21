@@ -9,7 +9,7 @@ module DamageControl
     
     def test_should_persist_exit_code_stderr_and_stdout
       temp = RSCM.new_temp_dir("test_should_persist_failure")
-      $execute_dir = "#{temp}/execute"
+      execute_dir = "#{temp}/execute"
       changeset_dir = "#{temp}/changeset"
 
       p = new_mock
@@ -20,12 +20,9 @@ module DamageControl
 
       t = Time.utc(1971,2,28,23,45,00)
       build = Build.new(changeset, t, "Testing")
-      def build.execute_dir
-        $execute_dir
-      end
       
       a_program = File.expand_path(File.dirname(__FILE__) + "/a_program.rb")
-      build.execute("ruby #{a_program} 44", {'foo' => 'bar'})
+      build.execute("ruby #{a_program} 44", execute_dir, {'foo' => 'bar'})
       stderr = File.expand_path("#{changeset_dir}/builds/19710228234500/stderr.log")
       assert_equal("this\nis\nstderr\nbar", File.read(stderr))
       stdout = File.expand_path("#{changeset_dir}/builds/19710228234500/stdout.log")

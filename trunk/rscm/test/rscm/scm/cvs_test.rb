@@ -24,7 +24,7 @@ module RSCM
 
     def test_should_fail_on_bad_command
       assert_raise(RuntimeError) do
-        Cvs.new("").create
+        Cvs.new("").create_central
       end
     end
     

@@ -33,21 +33,21 @@ module RSCM
       "Subversion"
     end
 
-    def add(checkout_dir, relative_filename)
-      svn(checkout_dir, "add #{relative_filename}")
+    def add(relative_filename)
+      svn(@checkout_dir, "add #{relative_filename}")
     end
 
     def transactional?
       true
     end
 
-    def checkout(checkout_dir, to_identifier=nil)
-      checkout_dir = PathConverter.filepath_to_nativepath(checkout_dir, false)
-      mkdir_p(checkout_dir)
+    def checkout(to_identifier=nil)
+      checkout_dir = PathConverter.filepath_to_nativepath(@checkout_dir, false)
+      mkdir_p(@checkout_dir)
       checked_out_files = []
       path_regex = /^[A|D|U]\s+(.*)/
-      if(checked_out?(checkout_dir))
-        svn(checkout_dir, update_command(to_identifier)) do |line|
+      if(checked_out?)
+        svn(@checkout_dir, update_command(to_identifier)) do |line|
           if(line =~ path_regex)
             absolute_path = "#{checkout_dir}/#{$1}"
             relative_path = $1.chomp
@@ -57,14 +57,15 @@ module RSCM
           end
         end
       else
-        svn(checkout_dir, checkout_command(checkout_dir, to_identifier)) do |line|
+        svn(@checkout_dir, checkout_command(to_identifier)) do |line|
           if(line =~ path_regex)
             native_absolute_path = $1
-            native_checkout_dir = $1
-            absolute_path = PathConverter.nativepath_to_filepath($1)
-            native_checkout_dir = PathConverter.filepath_to_nativepath(checkout_dir, false)
+            absolute_path = PathConverter.nativepath_to_filepath(native_absolute_path)
             if(File.exist?(absolute_path) && !File.directory?(absolute_path))
-              relative_path = native_absolute_path[native_checkout_dir.length+1..-1].chomp
+              native_checkout_dir = PathConverter.filepath_to_nativepath(@checkout_dir, false)
+#              relative_path = native_absolute_path[native_checkout_dir.length+1..-1].chomp
+# not sure about this old code - this seems to work. keep it here till it's verified on win32
+              relative_path = absolute_path
               relative_path = relative_path.gsub(/\\/, "/") if WINDOWS
               checked_out_files << relative_path
               yield relative_path if block_given?
@@ -83,48 +84,27 @@ module RSCM
       "svn update #{url} #{checkout_dir}"
     end
 
-    def uptodate?(checkout_dir, from_identifier)
-      if(!checked_out?(checkout_dir))
+    def uptodate?(identifier)
+      if(!checked_out?)
         false
       else
-        lr = local_revision(checkout_dir)
-        hr = head_revision(checkout_dir)
-        lr == hr
+        rev = identifier ? identifier : head_revision
+        local_revision == rev
       end
     end
 
-    def local_revision(checkout_dir)
-      local_revision = nil
-      svn(checkout_dir, "info") do |line|
-        if(line =~ /Revision: ([0-9]*)/)
-          return $1.to_i
-        end
-      end
-    end
-
-    def head_revision(checkout_dir)
-      cmd = "svn log #{repourl} -r HEAD"
-      with_working_dir(checkout_dir) do
-        safer_popen(cmd) do |stdout|
-          parser = SubversionLogParser.new(stdout, path, checkout_dir)
-          changesets = parser.parse_changesets
-          changesets[0].revision.to_i
-        end
-      end
-    end
-
-    def commit(checkout_dir, message)
-      svn(checkout_dir, commit_command(message))
+    def commit(message)
+      svn(@checkout_dir, commit_command(message))
       # We have to do an update to get the local revision right
-      svn(checkout_dir, "update")
+      svn(@checkout_dir, "update")
     end
 
-    def label(checkout_dir)
-      local_revision(checkout_dir).to_s
+    def label
+      local_revision.to_s
     end
 
-    def diff(checkout_dir, change, &block)
-      with_working_dir(checkout_dir) do
+    def diff(change, &block)
+      with_working_dir(@checkout_dir) do
         cmd = "svn diff -r #{change.previous_revision}:#{change.revision} \"#{url}/#{change.path}\""
         safer_popen(cmd) do |io|
           return(yield(io))
@@ -132,7 +112,7 @@ module RSCM
       end
     end
 
-    def can_create?
+    def can_create_central?
       local?
     end
 
@@ -158,7 +138,7 @@ module RSCM
       local?
     end
 
-    def create      
+    def create_central
       native_path = PathConverter.filepath_to_nativepath(svnrootdir, true)
       mkdir_p(PathConverter.nativepath_to_filepath(native_path))
       svnadmin(svnrootdir, "create #{native_path}")
@@ -182,21 +162,21 @@ module RSCM
       not_already_commented
     end
     
-    def import(dir, message)
+    def import_central(dir, message)
       import_cmd = "import #{url} -m \"#{message}\""
       svn(dir, import_cmd)
     end
 
-    def changesets(checkout_dir, from_identifier, to_identifier=Time.infinity)
+    def changesets(from_identifier, to_identifier=Time.infinity)
       # Return empty changeset if the requested revision doesn't exist yet.
-      return ChangeSets.new if(from_identifier.is_a?(Integer) && head_revision(checkout_dir) < from_identifier)
+      return ChangeSets.new if(from_identifier.is_a?(Integer) && head_revision < from_identifier)
 
-      checkout_dir = PathConverter.filepath_to_nativepath(checkout_dir, false)
+      checkout_dir = PathConverter.filepath_to_nativepath(@checkout_dir, false)
       changesets = nil
       command = "svn #{changes_command(from_identifier, to_identifier)}"
       yield command if block_given?
 
-      with_working_dir(checkout_dir) do
+      with_working_dir(@checkout_dir) do
         safer_popen(command) do |stdout|
           parser = SubversionLogParser.new(stdout, path, checkout_dir)
           changesets = parser.parse_changesets
@@ -211,13 +191,33 @@ module RSCM
       url[0..last]
     end
 
-    def checked_out?(checkout_dir)
+    def checked_out?
       rootentries = File.expand_path("#{checkout_dir}/.svn/entries")
       result = File.exists?(rootentries)
       result
     end
 
   private
+
+    def local_revision
+      local_revision = nil
+      svn(@checkout_dir, "info") do |line|
+        if(line =~ /Revision: ([0-9]*)/)
+          return $1.to_i
+        end
+      end
+    end
+
+    def head_revision
+      cmd = "svn log #{repourl} -r HEAD"
+      with_working_dir(@checkout_dir) do
+        safer_popen(cmd) do |stdout|
+          parser = SubversionLogParser.new(stdout, path, checkout_dir)
+          changesets = parser.parse_changesets
+          changesets[0].revision.to_i
+        end
+      end
+    end
 
     def install_unix_trigger(trigger_command, damagecontrol_install_dir)
       post_commit_exists = File.exists?(post_commit_file)
@@ -273,7 +273,7 @@ module RSCM
       end
     end
     
-    def checkout_command(checkout_dir, to_identifier)
+    def checkout_command(to_identifier)
       checkout_dir = "\"#{checkout_dir}\""
       "checkout #{url} #{checkout_dir} #{revision_option(nil,to_identifier)}"
     end

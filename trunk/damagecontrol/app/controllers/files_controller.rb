@@ -2,7 +2,7 @@ class FilesController < ApplicationController
   
   before_filter :load_project
 
-  def list  
+  def browse  
     root = @project.checkout_dir
     relative_path = @params['path']
     absolute_path = relative_path ? "#{root}/#{relative_path}" : root

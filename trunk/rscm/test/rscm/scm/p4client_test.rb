@@ -21,7 +21,7 @@ module RSCM
   class P4ClientTests < Test::Unit::TestCase
       def test_correctly_decodes_changes_specifiers
           client = P4Client.new "foo"
-          client.expect "changes //...@1200,2038/01/01:00:00:00", ""
+          client.expect "changes //...@1200,2036/01/01:00:00:00", ""
           client.changesets("1200", Time.infinity) 
       end
       def test_should_accept_changespecs_for_from_and_to

@@ -14,7 +14,7 @@ class ProjectController < ApplicationController
   end
 
   def index
-    @projects = ::DamageControl::Project.find_all("#{BASEDIR}/projects")
+    @projects = DamageControl::Project.find_all("#{BASEDIR}/projects")
     @navigation_name = "null"
   end
 
@@ -40,12 +40,16 @@ class ProjectController < ApplicationController
   def view
     return render_text("No project specified") unless @params["id"]
     @edit = false
+    @navigation_name = "changesets_list"
+    @projects = DamageControl::Project.find_all("#{BASEDIR}/projects")
     load
   end
 
   def edit
     @edit = true
     load
+    @navigation_name = "changesets_list"
+    @projects = DamageControl::Project.find_all("#{BASEDIR}/projects")
     render_action("view")
   end
   
@@ -54,23 +58,26 @@ class ProjectController < ApplicationController
     send_file(@project.changesets_rss_file)
   end
 
-  def delete
-    load_project
-    begin
-      Rscm.delete_project(project)
-    rescue => e
-      return render_text("Couldn't connect to RSCM server. Please make sure it's running.<br/>" + e.message)
-    end
-    index
-  end
-
   def save
     project = instantiate_from_hash(DamageControl::Project, @params[DamageControl::Project.name])
     project.scm = find_selected("scms")
     project.tracker = find_selected("trackers")
     project.publishers = instantiate_array_from_hashes(@params["publishers"])
     project.dir = "#{BASEDIR}/projects/#{project.name}"
-
+    
+    # TODO: this is quite clunky (loads all projects to add). Find a better way.
+    project.clear_dependencies
+    posted_dependencies = @params["dependencies"] || []
+    posted_dependencies.each do |project_name|
+      begin
+        project.add_dependency(DamageControl::Project.load("#{BASEDIR}/projects/#{project_name}/project.yaml"))
+      rescue => e
+        # project might have been deleted or removed
+        $stderr.puts("Failed to add dependency #{project.name} -> #{project_name}")
+        raise e
+      end
+    end
+    
     project.save
 
     redirect_to(:action => "view", :id => project.name)
@@ -78,10 +85,17 @@ class ProjectController < ApplicationController
   
   def changeset
     load
+    @navigation_name = "changesets_list"
     changeset_identifier = @params["changeset"]
     @changeset = @project.changeset(changeset_identifier.to_identifier)
     @changeset.accept(HtmlDiffVisitor.new(@project))
   end
+
+  def latest_changeset_json
+    load
+    render_text @project.latest_changeset.to_json
+  end
+
   
 protected
 
@@ -130,7 +144,7 @@ protected
         :action     => "edit",
         :id         => @project.name,
         :image      => "/images/24x24/wrench.png",
-        :name       => "Edit #{@project.name} settings"
+        :name       => "Edit #{@project.name} settings",
       }
     end
 
@@ -144,7 +158,7 @@ protected
 #      }
 #    end
 
-    if(@project.exists? && @project.scm && @project.scm.can_create? && !@project.scm.exists?)
+    if(@project.exists? && @project.scm && @project.scm.can_create_central? && !@project.scm.exists?)
       @sidebar_links << {
         :controller => "scm", 
         :action     => "create", 
@@ -167,7 +181,8 @@ protected
     if(@project.exists? && @project.checked_out?)
       @sidebar_links << {
         :controller => "files", 
-        :action     => "list",
+        :action     => "browse",
+        :path       => "",
         :id         => @project.name,
         :image      => "/images/24x24/folders.png",
         :name       => "Browse working copy"
@@ -222,7 +237,7 @@ private
       true
     end
     # Make a dupe of the scm/tracker lists and substitute with project's value
-    @scms = RSCM::AbstractSCM.classes.collect {|cls| $stderr.puts "CLASS: #{cls.name}" ;cls.new}
+    @scms = RSCM::AbstractSCM.classes.collect {|cls| ;cls.new}
     @scms.each_index {|i| @scms[i] = @project.scm if @scms[i].class == @project.scm.class}
 
     tracker = @project.tracker

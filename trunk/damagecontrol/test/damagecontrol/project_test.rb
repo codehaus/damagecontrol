@@ -1,8 +1,11 @@
 require 'test/unit'
+require 'yaml'
+require 'rscm'
 require 'rscm/tempdir'
 require 'rscm/mockit'
 require 'rscm/changes'
 require 'damagecontrol/project'
+require 'damagecontrol/json_ext'
 
 module DamageControl
   class ProjectTest < Test::Unit::TestCase
@@ -23,7 +26,7 @@ module DamageControl
       changesets = new_mock
       changesets.__expect(:empty?) {true}
       changesets.__expect(:each) {Proc.new{|changeset|}}
-      @p.scm.__expect(:changesets) do |checkout_dir, from|
+      @p.scm.__expect(:changesets) do |from|
         assert_equal(@p.start_time, from)
         changesets
       end
@@ -38,18 +41,18 @@ module DamageControl
       @p.quiet_period = 0
       @p.scm = new_mock
       @p.scm.__setup(:name) {"mooky"}
-      @p.scm.__expect(:changesets) do |checkout_dir, from|
+      @p.scm.__expect(:changesets) do |from|
         assert_equal(@p.start_time, from)
         cs = RSCM::ChangeSets.new
         cs.add(RSCM::ChangeSet.new)
         cs
       end
       @p.scm.__expect(:transactional?) {false}
-      @p.scm.__expect(:changesets) do |checkout_dir, from|
+      @p.scm.__expect(:changesets) do |from|
         assert_equal(@p.start_time, from)
         RSCM::ChangeSets.new
       end
-      @p.scm.__expect(:changesets) do |checkout_dir, from|
+      @p.scm.__expect(:changesets) do |from|
         assert_equal(@p.start_time, from)
         RSCM::ChangeSets.new
       end
@@ -74,7 +77,7 @@ module DamageControl
       changesets = new_mock
       changesets.__expect(:empty?) {false}
       changesets.__expect(:each) {Proc.new{|changeset|}}
-      @p.scm.__expect(:changesets) do |checkout_dir, from|
+      @p.scm.__expect(:changesets) do |from|
         assert_equal(a+1, from)
         changesets
       end
@@ -138,5 +141,56 @@ module DamageControl
       dupe = template_project.dupe("unix_name" => "mooky")      
       assert_equal("http://mooky.codehaus.org", dupe.home_page);
     end
+
+    def test_should_store_dependencies
+      dir = RSCM.new_temp_dir("deps")
+
+      a = Project.new("a")
+      a.dir = "#{dir}/a"
+      b = Project.new("b")
+      b.dir = "#{dir}/b"
+
+      a.add_dependency(b)
+      b.save
+      a.save
+      
+      a2 = Project.load("#{a.dir}/project.yaml")
+      assert_equal([b], a2.dependencies)
+    end
+
+    def test_should_detect_transitive_dependencies
+      $a = Project.new("a")
+      $b = Project.new("b")
+      $c = Project.new("c")
+      
+      def $a.dependencies
+        [$b]
+      end
+
+      def $b.dependencies
+        [$c]
+      end
+      
+      assert($a.depends_on?($c))
+    end
+
+    def test_should_not_allow_cyclical_dependencies
+      $a = Project.new("a")
+      $b = Project.new("b")
+      $c = Project.new("c")
+      
+      def $a.dependencies
+        [$b]
+      end
+
+      def $b.dependencies
+        [$c]
+      end
+
+      assert_raise(RuntimeError) do
+        $c.add_dependency($a)
+      end
+    end
+    
   end
 end

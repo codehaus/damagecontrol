@@ -3,6 +3,8 @@ require 'needle'
 require 'rscm'
 require 'damagecontrol/changeset_ext'
 require 'damagecontrol/poller'
+require 'damagecontrol/builder'
+require 'damagecontrol/build_queue'
 require 'damagecontrol/standard_persister'
 require 'damagecontrol/publisher/base'
 
@@ -27,23 +29,36 @@ module DamageControl
           DamageControl::StandardPersister.new
         end 
       
+        b.builder do
+          # TODO: use some sort of composite builder here.
+          # It must be multithreaded and preferrably configurable via web
+          DamageControl::Builder.new
+        end 
+
+        b.queue do
+          DamageControl::BuildQueue.new(b.builder)
+        end 
+
         b.poller do 
           DamageControl::Poller.new("#{basedir}/projects") do |project, changesets|
             b.persister.save_changesets(project, changesets)
             b.persister.save_rss(project)
             changeset = changesets.latest
       
-            changeset.build!(project, "Detected changes by polling #{project.scm.name}") do |build|
-              project.publish(build)
-            end
-            # TODO: do this in a publisher that can be turned off if an other SCMWeb is used.
-            # Disable by default if other SCMWeb is specified.
-            # This may take a while, so we do it after the build.
-            b.persister.save_diffs(changesets)
+            b.queue.enqueue(changeset, "Detected changesets by polling #{project.scm.name}")
+
+            # TODO: do this on-demand with AJAX
+#            b.persister.save_diffs(changesets)
           end
         end
       end
-      registry.poller.start.join
+      
+      threads = []
+
+      threads << registry.poller.start
+      
+      # wait for each thread to die
+      threads.each{ |t| t.join }
     end
   end
   

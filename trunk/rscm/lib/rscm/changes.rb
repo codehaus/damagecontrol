@@ -98,15 +98,6 @@ module RSCM
       self
     end
 
-    # The most recent time of all the ChangeSet s.
-    def time
-      time = nil
-      changesets.each do |changeset|
-        time = changeset.time if @time.nil? || @time < changeset.time
-      end
-      time
-    end
-
     # Sorts the changesets according to time
     def sort!
       @changesets.sort!

@@ -23,6 +23,8 @@ module RSCM
       p = DamageControl::Project.new
       p.dir = project_dir
       p.scm = new_mock.__expect(:checkout)
+      execute_dir = p.dir + "/foo"
+      p.scm.__expect(:checkout_dir) {execute_dir}
       p.build_command = "some command"
 
       c = ChangeSet.new
@@ -63,11 +65,11 @@ module RSCM
       assert_equal(build_1_time, builds[0].time)
       assert_equal(build_2_time, builds[1].time)
       assert_raises(DamageControl::BuildException, "shouldn't be able to execute persisted build") do
-        builds[0].execute("this should fail because command file exists")
+        builds[0].execute("this should fail because command file exists", nil, nil)
       end
-      builds[1].execute("echo \"this should pass since command file doesn't exist\"")
+      builds[1].execute("echo \"this should pass since command file doesn't exist\"", p.dir, {})
       assert_raises(DamageControl::BuildException, "shouldn't be able to execute persisted build") do
-        builds[1].execute("this should fail because command file exists")
+        builds[1].execute("this should fail because command file exists", p.dir, nil)
       end
     end
     

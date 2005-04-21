@@ -42,7 +42,7 @@ class Time
     end
 
     def infinity
-      Time.utc(2038)
+      Time.utc(2036)
     end
   end
   

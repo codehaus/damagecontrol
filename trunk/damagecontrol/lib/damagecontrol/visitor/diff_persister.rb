@@ -18,8 +18,7 @@ module DamageControl
       def visit_change(change)
         change.changeset = @changeset
         diff_file = change.diff_file
-        checkout_dir = change.changeset.project.checkout_dir
-        change.changeset.project.scm.diff(checkout_dir, change) do |diff_io|
+        change.changeset.project.scm.diff(change) do |diff_io|
           FileUtils.mkdir_p(File.dirname(diff_file))
           File.open(diff_file, "w") do |io|
             diff_io.each_line do |line|

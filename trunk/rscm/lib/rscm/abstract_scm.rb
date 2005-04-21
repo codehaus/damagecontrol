@@ -23,7 +23,41 @@ end
 
 module RSCM
   # This class defines the RSCM API. The documentation of the various methods
-  # uses CVS' terminology.
+  # uses CVS and Subversion's terminology. (For example, checkout means 'get working copy',
+  # not 'lock for private edit' as in ClearCase or VSS terminology).
+  #
+  # Concrete subclasses of this class provide an API to manage a local working copy
+  # as well as an associated 'central' repository. The main responsibility is working
+  # copy operations:
+  #
+  # * checkout
+  # * changesets
+  # * uptodate?
+  # * checked_out?
+  # * diff
+  # * edit
+  #
+  # In addition to operations related to working copies, the same instance should provide
+  # methods to administer the working copy's associated 'central' repository. These are:
+  #
+  # * central_exists?
+  # * create_central
+  # * can_create_central?
+  # * import_central
+  # * supports_trigger? # TODO: rename to can_install_trigger?
+  # * trigger_installed?
+  # * install_trigger
+  # * uninstall_trigger
+  #
+  # Some methods are a bit fuzzy with respect to their relevance to the working copy or
+  # the associated central repository, as it depends on the nature of the individual underlying 
+  # SCMs. These methods are:
+  #
+  # * label
+  # * name
+  # * transactional?
+  # * checkout_command_line
+  # * update_command_line
   #
   # Some of the methods in this API use +from_identifier+ and +to_identifier+.
   # These identifiers can be either a UTC Time (according to the SCM's clock)
@@ -33,10 +67,7 @@ module RSCM
   # If +from_identifier+ or +to_identifier+ are +nil+ they should respectively default to
   # epoch or the infinite future.
   #
-  # Most of the methods take a mandatory +checkout_dir+ - even if this may seem
-  # unnecessary. The reason is that some SCMs require a working copy to be checked
-  # out in order to perform certain operations. In order to develop portable code,
-  # you should always pass in a non +nil+ value for +checkout_dir+.
+  # TODO: rename this superclass to 'Base'
   #
   class AbstractSCM
     include FileUtils
@@ -63,9 +94,17 @@ module RSCM
 
   public
   
+    attr_accessor :checkout_dir
+  
+    def to_yaml_properties
+      props = instance_variables
+      props.delete("@checkout_dir")
+      props.sort!
+    end
+
     # Whether the physical SCM represented by this instance exists.
     #
-    def exists?
+    def central_exists?
       # The default implementation assumes yes - override if it can be
       # determined programmatically.
       true
@@ -85,18 +124,29 @@ module RSCM
     # This method should throw an exception if the repository cannot be created (for
     # example if the repository is 'remote' or if it already exists).
     #
-    def create
+    def create_central
+      raise "Not implemented"
+    end
+    
+    # Destroysthe central repository. Shuts down any server processes and deletes the repository.
+    # WARNING: calling this may result in loss of data. Only call this if you really want to wipe it out for good!
+    def destroy_central
     end
 
     # Whether a repository can be created.
     #
-    def can_create?
+    def can_create_central?
       false
     end
 
-    # Recursively imports files from a directory
+    # Adds +relative_filename+ to the working copy.
+    def add(relative_filename)
+    end
+
+    # Recursively imports files from a directory into the central scm
     #
-    def import(dir, message)
+    def import_central(dir, message)
+      raise "Not implemented"
     end
 
     # The display name of this SCM
@@ -108,7 +158,7 @@ module RSCM
 
     # Gets the label for the working copy currently checked out in +checkout_dir+.
     #
-    def label(checkout_dir)
+    def label
       # TODO: what do we need this for? If we need it, rename to revision?
     end
 
@@ -132,13 +182,14 @@ module RSCM
     # This method should be overridden for SCMs that are able to yield checkouts as they happen.
     # For some SCMs this is not possible, or at least very hard. In that case, just override
     # the checkout_silent method instead of this method (should be protected).
-    def checkout(checkout_dir, to_identifier=Time.infinity) # :yield: file
+    #
+    def checkout(to_identifier=Time.infinity) # :yield: file
       # the OS doesn't store file timestamps with fractions.
       before_checkout_time = Time.now.utc - 1
 
       # We expect subclasses to implement this as a protected method (unless this whole method is overridden).
-      checkout_silent(checkout_dir, to_identifier)
-      files = Dir["#{checkout_dir}/**/*"]
+      checkout_silent(to_identifier)
+      files = Dir["#{@checkout_dir}/**/*"]
       added = []
       files.each do |file|
         added << file if File.mtime(file).utc > before_checkout_time
@@ -159,7 +210,7 @@ module RSCM
     # Returns a ChangeSets object for the period specified by +from_identifier+ (exclusive, i.e. after)
     # and +to_identifier+ (inclusive).
     #
-    def changesets(checkout_dir, from_identifier, to_identifier=Time.infinity)
+    def changesets(from_identifier, to_identifier=Time.infinity)
       # Should be overridden by subclasses
       changesets = ChangeSets.new
       changesets.add(
@@ -178,21 +229,23 @@ module RSCM
       changesets
     end
 
-    # Whether the working copy in +checkout_dir+ is in synch with the central
-    # repository since +from_identifier+.
+    # Whether the working copy is in synch with the central
+    # repository's revision/time identified by +identifier+. 
+    # If +identifier+ is nil, 'HEAD' of repository should be assumed.
     #
-    def uptodate?(checkout_dir, from_identifier)
+    # TODO: rename to in_synch?
+    def uptodate?(identifier)
       # Suboptimal algorithm that works for all SCMs.
       # Subclasses can override this to improve efficiency.
       
-      changesets(checkout_dir, from_identifier).empty?
+      changesets(identifier).empty?
     end
 
     # Whether the project is checked out from the central repository or not.
     # Subclasses should override this to check for SCM-specific administrative
     # files if appliccable
-    def checked_out?(checkout_dir)
-      File.exists?(checkout_dir)
+    def checked_out?
+      File.exists?
     end
 
     # Whether triggers are supported by this SCM. A trigger is a command that can be executed
@@ -210,31 +263,36 @@ module RSCM
     # Most implementations will ignore this parameter.
     #
     def install_trigger(trigger_command, install_dir)
+      raise "Not implemented"
     end
 
     # Uninstalls +trigger_command+ from the SCM.
     #
     def uninstall_trigger(trigger_command, install_dir)
+      raise "Not implemented"
     end
 
     # Whether the command denoted by +trigger_command+ is installed in the SCM.
     #
     def trigger_installed?(trigger_command, install_dir)
+      raise "Not implemented"
     end
 
     # The command line to run in order to check out a fresh working copy.
     #
     def checkout_commandline(to_identifier=Time.infinity)
+      raise "Not implemented"
     end
 
     # The command line to run in order to update a working copy.
     #
     def update_commandline(to_identifier=Time.infinity)
+      raise "Not implemented"
     end
 
     # Returns/yields an IO containing the unified diff of the change.
-    def diff(checkout_dir, change, &block)
-      return(yield("Diff not implemented"))
+    def diff(change, &block)
+      return(yield("Not implemented"))
     end
 
     def ==(other_scm)
@@ -247,7 +305,7 @@ module RSCM
 
   protected
 
-    # Takes an array of +absolute_paths+ and turn them into an array
+    # Takes an array of +absolute_paths+ and turns it into an array
     # of paths relative to +dir+
     # 
     def to_relative(dir, absolute_paths)

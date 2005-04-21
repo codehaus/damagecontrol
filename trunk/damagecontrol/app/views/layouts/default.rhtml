@@ -9,6 +9,8 @@
     <script type="text/javascript" src="/javascripts/toggle_diff.js"></script>
     <script type="text/javascript" src="/javascripts/toggle_div.js"></script>
     <script type="text/javascript" src="/javascripts/dateFormat.js"></script>
+    <script type="text/javascript" src="/javascripts/template.js"></script>
+    <script type="text/javascript" src="/javascripts/macdock.js"></script>
     
     <script type="text/javascript" src="/javascripts/jscalendar/calendar.js"></script>    
     <script type="text/javascript" src="/javascripts/jscalendar/lang/calendar-en.js"></script>    
@@ -54,17 +56,18 @@
       if(href)
     %>
       <div class="task">
-        <%= content_tag("a", tag("img", :src => image, :alt=>""), {:href => href}) %> <%= content_tag("a", name, {:href => href}) %>
+        <%= content_tag("a", tag("img", :src => image, :alt=>"", :width => "24", :height => "24"), {:href => href}) %> <%= content_tag("a", name, {:href => href}) %>
       </div>
     <% else %>  
       <div class="task">
-        <%= link_to_image(image, link) %> <%= link_to(name, link) %>
+        <%= link_to_image(image, link, {:size => "24x24"}) %> <%= link_to(name, link) %>
       </div>
     <% end %>  
   <% end %>  
   </div>
 
-  <div id="navigation">  
+  <div id="navigation">
+<% $stderr.puts "NAVIGATION = #{@navigation_name}" %>
     <%= render_partial(@navigation_name, nil) if @navigation_name %>
   </div>
 </td>

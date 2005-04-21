@@ -36,7 +36,11 @@ module RSCM
       @client_name, @port, @user, @pwd = client_name, port, user, pwd
     end
 
-    def create
+    def can_create_central?
+      true
+    end
+    
+    def create_central
     end
 
     def name
@@ -47,30 +51,30 @@ module RSCM
       true
     end
 
-    def import(dir, comment)
+    def import_central(dir, comment)
       with_create_client(dir) do |client|
         client.add_all(list_files)
         client.submit(comment)
       end
     end
 
-    def checkout(checkout_dir, to_identifier = nil, &proc)
+    def checkout(to_identifier = nil, &proc)
       client.checkout(to_identifier, &proc)
     end
 
-    def add(checkout_dir, relative_filename)
+    def add(relative_filename)
       client.add(relative_filename)
     end
 
-    def commit(checkout_dir, message, &proc)
+    def commit(message, &proc)
       client.submit(message, &proc)
     end
 
-    def changesets(checkout_dir, from_identifier, to_identifier=Time.infinity)
+    def changesets(from_identifier, to_identifier=Time.infinity)
       client.changesets(from_identifier, to_identifier)
     end
 
-    def uptodate?(checkout_dir, from_identifier)
+    def uptodate?(from_identifier)
       client.uptodate?
     end
 
@@ -90,7 +94,8 @@ module RSCM
       p4admin.uninstall_trigger(trigger_command)
     end
 
-    private
+  private
+
     def p4admin
       @p4admin ||= P4Admin.new
     end
@@ -257,7 +262,8 @@ module RSCM
       checked_out_files
     end
 
-    private
+  private
+
     def rootdir
       unless @rootdir
         p4("info") =~ /Client root: (.+)/
