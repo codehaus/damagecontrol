@@ -169,7 +169,7 @@ module RSCM
 
     def changesets(from_identifier, to_identifier=Time.infinity)
       # Return empty changeset if the requested revision doesn't exist yet.
-      return ChangeSets.new if(from_identifier.is_a?(Integer) && head_revision < from_identifier)
+      return ChangeSets.new if(from_identifier.is_a?(Integer) && head_revision <= from_identifier)
 
       checkout_dir = PathConverter.filepath_to_nativepath(@checkout_dir, false)
       changesets = nil
@@ -291,6 +291,7 @@ module RSCM
     end
 
     def revision_option(from_identifier, to_identifier)
+      # The inclusive start
       from = nil
       if(from_identifier.is_a?(Time))
         from = svndate(from_identifier + 1)

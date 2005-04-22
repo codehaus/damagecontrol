@@ -3,7 +3,7 @@ class FilesController < ApplicationController
   before_filter :load_project
 
   def browse  
-    root = @project.checkout_dir
+    root = @project.scm.checkout_dir
     relative_path = @params['path']
     absolute_path = relative_path ? "#{root}/#{relative_path}" : root
     if(File.file?(absolute_path))
