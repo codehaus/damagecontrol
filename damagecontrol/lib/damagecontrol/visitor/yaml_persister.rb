@@ -38,23 +38,23 @@ module DamageControl
       #
       def load_upto(last_changeset_identifier, prior)
         Log.info "Loading #{prior} changesets from #{@changesets_dir} (from #{last_changeset_identifier} and down)"
-        last = identifiers.index(last_changeset_identifier)
+        ids = identifiers
+        last = ids.index(last_changeset_identifier)
+        raise "Changeset with identifier #{last_changeset_identifier} (#{last_changeset_identifier.class.name}) not found among #{ids.join(',')}, which are of type #{ids[0].class.name}" unless last
 
         changesets = RSCM::ChangeSets.new
-        if(last)
-          first = last - prior + 1
-          first = 0 if first < 0
+        first = last - prior + 1
+        first = 0 if first < 0
 
-          identifiers[first..last].each do |identifier|
-            changeset_yaml = "#{@changesets_dir}/#{identifier.to_s}/changeset.yaml"
-            Log.info "Loading changesets from #{changeset_yaml}"
-            begin
-              changesets.add(YAML::load_file(changeset_yaml))
-            rescue Exception => e
-              # Sometimes the yaml files get corrupted
-              Log.error "Error loading changesets file: #{File.expand_path(changeset_yaml)}"
-              # Todo: delete it and schedule it for re-retrieval somehow.
-            end
+        ids[first..last].each do |identifier|
+          changeset_yaml = "#{@changesets_dir}/#{identifier.to_s}/changeset.yaml"
+          Log.info "Loading changesets from #{changeset_yaml}"
+          begin
+            changesets.add(YAML::load_file(changeset_yaml))
+          rescue Exception => e
+            # Sometimes the yaml files get corrupted
+            Log.error "Error loading changesets file: #{File.expand_path(changeset_yaml)}"
+            # Todo: delete it and schedule it for re-retrieval somehow.
           end
         end
         changesets

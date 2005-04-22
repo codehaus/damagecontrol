@@ -68,7 +68,7 @@ module RSCM
     attr_accessor :changeset
 
     def to_yaml_properties
-      props = instance_variables
+      props = instance_variables.dup
       props.delete("@changeset")
       props.sort!
     end

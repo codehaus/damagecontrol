@@ -78,7 +78,7 @@ module DamageControl
       changesets.__expect(:empty?) {false}
       changesets.__expect(:each) {Proc.new{|changeset|}}
       @p.scm.__expect(:changesets) do |from|
-        assert_equal(a+1, from)
+        assert_equal(a, from)
         changesets
       end
       @p.scm.__expect(:transactional?) {true}
@@ -87,23 +87,6 @@ module DamageControl
       end
     end
     
-    def test_should_look_at_folders_to_determine_next_changeset_time
-      dir = RSCM.new_temp_dir("ProjectTest4")
-      @p.dir = dir
-
-      a = Time.new.utc
-      b = a + 1
-      c = b + 1
-      FileUtils.mkdir_p("#{@p.changesets_dir}/#{a.ymdHMS}")
-      FileUtils.touch("#{@p.changesets_dir}/#{a.ymdHMS}/changeset.yaml")
-      FileUtils.mkdir_p("#{@p.changesets_dir}/#{c.ymdHMS}")
-      FileUtils.touch("#{@p.changesets_dir}/#{c.ymdHMS}/changeset.yaml")
-      FileUtils.mkdir_p("#{@p.changesets_dir}/#{b.ymdHMS}")
-      FileUtils.touch("#{@p.changesets_dir}/#{b.ymdHMS}/changeset.yaml")
-      
-      assert_equal(c+1, @p.next_changeset_identifier(@p.changesets_dir))
-    end
-
     def test_should_tell_each_publisher_to_publish_build
       p = Project.new("mooky")
       p.publishers = []
