@@ -16,10 +16,10 @@ module DamageControl
       end
 
       def visit_change(change)
-        change.changeset = @changeset
+        change.changeset = @changeset unless change.changeset
         diff_file = change.diff_file
+        FileUtils.mkdir_p(File.dirname(diff_file))
         change.changeset.project.scm.diff(change) do |diff_io|
-          FileUtils.mkdir_p(File.dirname(diff_file))
           File.open(diff_file, "w") do |io|
             diff_io.each_line do |line|
               io.write(line)

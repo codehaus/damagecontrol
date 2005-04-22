@@ -278,7 +278,7 @@ module DamageControl
 
     def changeset(changeset_identifier)
       changesets(changeset_identifier, 1)[0]
-     end
+    end
 
     def changeset_identifiers
       changesets_persister.identifiers

@@ -6,7 +6,7 @@
           {"changeset" => @changeset.identifier, "build" => build.identifier}) %></li>
   <% end %>
 </ul>
-
+<%= define_javascript_functions %>
 <table class="pane">
   <tr class="pane">
     <td colspan="3" class="changeset">
@@ -18,18 +18,20 @@
     </td>
   </tr>
   <%
-  @changeset.each do |change|
+  @changeset.each_with_index do |change, i|
   %>
     <tr>
       <td width="5%"><%= tag("img", :src => change.icon) %></td>
       <td width="5%"><%= change.revision %></td>
       <td width="90%">
-        <a class="diff-toggle" href="#" onclick="toggleCode('<%= change.path %>');return false"><%= change.path %></a>
-        <br/>
-        <div class="diff" id="<%= change.path %>">
-        <%= change.html_diff %>
-        </div>
+        <%= link_to_remote change.path, :update => "diff_#{i}", :url => { 
+              :controller => "scm", 
+              :action => "change", 
+              :id => @project.name, 
+              :params => {"changeset_identifier" => @changeset.identifier, "change_index" => i}
+            } %>
+        <div id="diff_<%=i%>"></div>
       </td>
     </tr>
   <% end %>
-</table>  
+</table>

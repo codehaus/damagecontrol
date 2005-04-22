@@ -88,54 +88,14 @@ class ProjectController < ApplicationController
     @navigation_name = "changesets_list"
     changeset_identifier = @params["changeset"]
     @changeset = @project.changeset(changeset_identifier.to_identifier)
-    @changeset.accept(HtmlDiffVisitor.new(@project))
   end
 
   def latest_changeset_json
     load
     render_text @project.latest_changeset.to_json
   end
-
   
 protected
-
-  # Visitor that adds a method called +html_diff+ to each change
-  class HtmlDiffVisitor
-    def initialize(project)
-      @project = project
-    end
-    
-    def visit_changeset(changeset)
-      @changeset = changeset
-    end
-
-    def visit_change(change)
-      def change.html_diff=(html)
-        @html = html
-      end
-
-      def change.html_diff
-        @html
-      end
-
-      html = ""
-      dp = DamageControl::DiffParser.new
-      diff_file = change.diff_file
-      if(File.exist?(diff_file))
-        File.open(diff_file) do |diffs_io|
-          diffs = dp.parse_diffs(diffs_io)
-          dh = DamageControl::DiffHtmlizer.new(html)
-          diffs.accept(dh)
-          if(html == "")
-            html = "Diff was calculated, but was empty. (This may be a bug - new, moved and binary files and are not supported yet)."
-          end
-        end
-      else
-        html = "Diff not calculated yet."
-      end
-      change.html_diff = html
-    end
-  end
 
   def set_sidebar_links
     if(@project.exists?)
