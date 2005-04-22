@@ -1,6 +1,7 @@
 require 'fileutils'
 require 'yaml'
 require 'rscm'
+require 'damagecontrol/changeset_ext'
 require 'damagecontrol/diff_parser'
 require 'damagecontrol/diff_htmlizer'
 require 'damagecontrol/scm_web'
@@ -97,12 +98,17 @@ module DamageControl
       result = @dependencies.collect do |project_name|
         if(@dir)
           config = "#{File.dirname(dir)}/#{project_name}/project.yaml"
-          Project.load(config)
+          if(File.exist?(config))
+            Project.load(config)
+          else
+            nil
+          end
         else
           # Used in testing, when it's often too cumbersome to set up a dir
           Project.new(project_name)
         end
       end
+      result.delete_if {|x| x.nil? } 
       result.freeze
       result
     end
@@ -197,13 +203,16 @@ module DamageControl
     # TODO: pass quiet_period as arg here?
     # Polls SCM for new changesets and yields them to the given block.
     def poll
-      start = Time.now
-
       latest_identifier = DamageControl::Visitor::YamlPersister.new(changesets_dir).latest_identifier
       from = latest_identifier || @start_time
       
       Log.info "Polling changesets for #{name}'s #{@scm.name} from #{from}"
       changesets = @scm.changesets(from)
+      if(changesets.empty?)
+        Log.info "No changesets for #{name}'s #{@scm.name} from #{from}"
+      else
+        Log.info "There were changesets for #{name}'s #{@scm.name} from #{from}"
+      end
       if(!changesets.empty? && !@scm.transactional?)
         # We're dealing with a non-transactional SCM (like CVS/StarTeam/ClearCase,
         # unlike Subversion/Monotone). Sleep a little, get the changesets again.
@@ -215,16 +224,15 @@ module DamageControl
         commit_in_progress = true
         while(commit_in_progress)
           @quiet_period ||= DEFAULT_QUIET_PERIOD
-          Log.info "Detected changesets. Sleeping for #{@quiet_period} seconds since #{name}'s SCM (#{@scm.name}) is not transactional."
+          Log.info "Sleeping for #{@quiet_period} seconds since #{name}'s SCM (#{@scm.name}) is not transactional."
           sleep @quiet_period
           next_changesets = @scm.changesets(from)
           commit_in_progress = changesets != next_changesets
           changesets = next_changesets
         end
-        Log.info "Quiet period elapsed for #{name}. Commit in progress: #{commit_in_progress}"
+        Log.info "Quiet period elapsed for #{name}. Commit still in progress: #{commit_in_progress}"
       end
       changesets.each{|changeset| changeset.project = self}
-      Log.info "Polled changesets for #{@name} in #{Time.now.difference_as_text(start)}"
       yield changesets
     end
     

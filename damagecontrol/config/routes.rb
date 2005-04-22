@@ -23,7 +23,7 @@ ActionController::Routing::Routes.draw do |map|
   map.connect 'projects/:id/changesets/:changeset/builds/:build/stdout', :controller => 'build', :action => "stdout"
 
   map.connect 'projects/:id/browse/:path', :controller => 'files', :action => "browse"
-  map.connect 'projects/:id/browse', :controller => 'files', :action => "browse", :path => "."
+  map.connect 'projects/:id/browse', :controller => 'files', :action => "browse", :path => ""
   
   # Install the default route as the lowest priority.
   map.connect ':controller/:action/:id' #'
