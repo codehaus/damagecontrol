@@ -202,16 +202,16 @@ module DamageControl
 
     # TODO: pass quiet_period as arg here?
     # Polls SCM for new changesets and yields them to the given block.
-    def poll
+    def poll(quiet_period=DEFAULT_QUIET_PERIOD)
       latest_identifier = DamageControl::Visitor::YamlPersister.new(changesets_dir).latest_identifier
       from = latest_identifier || @start_time
       
-      Log.info "Polling changesets for #{name}'s #{@scm.name} from #{from}"
+      Log.info "Polling changesets for #{name}'s #{@scm.name} after #{from}"
       changesets = @scm.changesets(from)
       if(changesets.empty?)
-        Log.info "No changesets for #{name}'s #{@scm.name} from #{from}"
+        Log.info "No changesets for #{name}'s #{@scm.name} after #{from}"
       else
-        Log.info "There were changesets for #{name}'s #{@scm.name} from #{from}"
+        Log.info "There were changesets for #{name}'s #{@scm.name} after #{from}"
       end
       if(!changesets.empty? && !@scm.transactional?)
         # We're dealing with a non-transactional SCM (like CVS/StarTeam/ClearCase,
@@ -223,9 +223,8 @@ module DamageControl
         # changeset (on next poll).
         commit_in_progress = true
         while(commit_in_progress)
-          @quiet_period ||= DEFAULT_QUIET_PERIOD
-          Log.info "Sleeping for #{@quiet_period} seconds since #{name}'s SCM (#{@scm.name}) is not transactional."
-          sleep @quiet_period
+          Log.info "Sleeping for #{quiet_period} seconds because #{name}'s SCM (#{@scm.name}) is not transactional."
+          sleep quiet_period
           next_changesets = @scm.changesets(from)
           commit_in_progress = changesets != next_changesets
           changesets = next_changesets

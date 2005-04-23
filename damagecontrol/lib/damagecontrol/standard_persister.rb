@@ -14,12 +14,6 @@ module DamageControl
       changesets.accept(project.changesets_persister)
     end
     
-    # Get the diffs for each change and save them.
-    def save_diffs(changesets)
-      dp = DamageControl::Visitor::DiffPersister.new
-      changesets.accept(dp)
-    end
-    
     # Save RSS to disk. The RSS spec says max 15 items in a channel,
     # (http://www.chadfowler.com/ruby/rss/)
     # We'll get upto the latest 15 changesets and turn them into RSS.

@@ -1,4 +1,5 @@
 require 'rubygems'
+require 'yaml'
 require 'needle'
 require 'rscm'
 require 'damagecontrol/changeset_ext'
@@ -36,7 +37,7 @@ module DamageControl
         end 
 
         b.queue do
-          DamageControl::BuildQueue.new
+          DamageControl::BuildQueue.new("#{basedir}/build_queue.yaml")
         end 
 
         b.poller do 
@@ -46,9 +47,6 @@ module DamageControl
             changeset = changesets.latest
       
             b.queue.enqueue(changeset, "Detected changesets by polling #{project.scm.name}")
-
-            # TODO: do this on-demand with AJAX
-#            b.persister.save_diffs(changesets)
           end
         end
       end

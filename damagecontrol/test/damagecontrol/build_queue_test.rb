@@ -81,6 +81,21 @@ module DamageControl
       assert_equal(["BARNEY", "WILMA", "DINO", "FRED"], projects)
     end
     
+    def test_should_create_hash_structure_for_persistence
+      @fred.add_dependency(@dino)
+
+      bs = BuildQueue.new
+      bs.enqueue(@fred_cs_1, "fred is cool")
+      bs.enqueue(@dino_cs_1, "dino is cool")
+      
+      hash = [
+        {:project_name => "DINO", :reasons => ["dino is cool"]},
+        {:project_name => "FRED", :reasons => ["fred is cool"]}
+      ]
+      
+      assert_equal(hash, bs.as_list)
+    end
+    
     def test_should_block_on_pop_until_there_is_something_in_the_queue
       bs = BuildQueue.new
       

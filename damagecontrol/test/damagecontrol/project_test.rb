@@ -24,7 +24,7 @@ module DamageControl
       @p.scm = new_mock
       @p.scm.__setup(:name) {"MockSCM"}
       changesets = new_mock
-      changesets.__expect(:empty?) {true}
+      changesets.__setup(:empty?) {true}
       changesets.__expect(:each) {Proc.new{|changeset|}}
       @p.scm.__expect(:changesets) do |from|
         assert_equal(@p.start_time, from)
@@ -75,7 +75,7 @@ module DamageControl
       @p.scm = new_mock
       @p.scm.__setup(:name) {"MockSCM"}
       changesets = new_mock
-      changesets.__expect(:empty?) {false}
+      changesets.__setup(:empty?) {false}
       changesets.__expect(:each) {Proc.new{|changeset|}}
       @p.scm.__expect(:changesets) do |from|
         assert_equal(a, from)
