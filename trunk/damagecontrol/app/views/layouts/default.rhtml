@@ -5,21 +5,22 @@
     <title>DamageControl</title>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     <meta http-equiv="Content-Language" content="en-us" />
-
-    <script type="text/javascript" src="/javascripts/toggle_diff.js"></script>
-    <script type="text/javascript" src="/javascripts/toggle_div.js"></script>
-    <script type="text/javascript" src="/javascripts/dateFormat.js"></script>
-    <script type="text/javascript" src="/javascripts/template.js"></script>
-    <script type="text/javascript" src="/javascripts/macdock.js"></script>
-    
-    <script type="text/javascript" src="/javascripts/jscalendar/calendar.js"></script>    
-    <script type="text/javascript" src="/javascripts/jscalendar/lang/calendar-en.js"></script>    
-    <script type="text/javascript" src="/javascripts/jscalendar/calendar-setup.js"></script>
-    <link type="text/css" rel="stylesheet" href="/javascripts/jscalendar/calendar-win2k-2.css" />
-
-    <link type="text/css" rel="stylesheet" href="/stylesheets/style.css" />
-    <link type="text/css" rel="stylesheet" href="/stylesheets/diff.css" />
-    <script type="text/javascript">
+	<%= stylesheet_link_tag(
+			"/javascripts/jscalendar/calendar-win2k-2",
+			"style.css",
+			"diff.css"
+    		)
+	%>
+    <%= javascript_include_tag(
+			"prototype",
+			"toggle_div",
+			"dateFormat",
+			"jscalendar/calendar",
+			"jscalendar/calendar-setup.js",		
+			"jscalendar/lang/calendar-en.js"
+		)
+	%>
+	<script type="text/javascript">
       <!-- 
       // http://developer.irt.org/script/1428.htm - add timezone
       function intercept(a) {
@@ -45,44 +46,51 @@
 </table>
 
 <table id="main-table" width="100%" border="0" style="height:70%;">
-<tr>
+	<tr>
+		<td id="side-panel" width="20%">
+			<div id="tasks">  
+				<% @sidebar_links.each do |link| 
+					image = link.delete(:image)
+					name  = link.delete(:name)
+					href = link.delete(:href)
+					if(href) %>
+		      			<div class="task">
+							<%= content_tag("a", 
+ 								tag("img", 
+      								:src => image, :alt=>"", 
+      								:width => "24", 
+      								:height => "24"
+      							), 
+		      					{:href => href}) 
+							%> <%= content_tag("a", name, {:href => href}) %>
+						</div>
+					<% else %>  
+						<div class="task">
+							<%= link_to_image(image, link, {:size => "24x24"}) %> <%= link_to(name, link) %>
+						</div>
+    					<% end %>
+				<% end %>
+			</div>
+			<div id="navigation">
+				<% $stderr.puts "NAVIGATION = #{@navigation_name}" %>
+				<%= render_partial(@navigation_name, nil) if @navigation_name %>
+ 			</div>
+		</td>
+		<td id="main-panel" width="70%" height="100%">
+			<%= @content_for_layout %>
+		</td>
+		<td width="10%">
+			<%= periodically_call_remote(:update => "build_queue", :frequency => 4, :url => {:controller => "build_queue", :action => "view"}) %>
+			<div id="build_queue">Build queue loading...</div>
+		</td>
+	</tr>
 
-<td id="side-panel" width="20%">
-  <div id="tasks">  
-    <% @sidebar_links.each do |link| 
-      image = link.delete(:image)
-      name  = link.delete(:name)
-      href  = link.delete(:href)
-      if(href)
-    %>
-      <div class="task">
-        <%= content_tag("a", tag("img", :src => image, :alt=>"", :width => "24", :height => "24"), {:href => href}) %> <%= content_tag("a", name, {:href => href}) %>
-      </div>
-    <% else %>  
-      <div class="task">
-        <%= link_to_image(image, link, {:size => "24x24"}) %> <%= link_to(name, link) %>
-      </div>
-    <% end %>  
-  <% end %>  
-  </div>
-
-  <div id="navigation">
-<% $stderr.puts "NAVIGATION = #{@navigation_name}" %>
-    <%= render_partial(@navigation_name, nil) if @navigation_name %>
-  </div>
-</td>
-
-<td id="main-panel" width="80%" height="100%">
-<%= @content_for_layout %>
-</td>
-
-</tr>
-
-<tr><td id="footer" colspan="2" style="background: white url(/images/footer.gif) repeat-x ">
-This stuff displays best in a Mozilla based browser. Try <a href="http://www.mozilla.org/products/firefox/">Firefox</a>.
-<br/>
-</td></tr>
-
+	<tr>
+		<td id="footer" colspan="3" style="background: white url(/images/footer.gif) repeat-x ">
+			This stuff displays best in a Gecko based browser. Try <a href="http://www.mozilla.org/products/firefox/">Firefox</a>.
+			<br/>
+		</td>
+	</tr>
 </table>
 
 <!-- These scripts must be inside or after the body tag since they check for the presence of document.body -->

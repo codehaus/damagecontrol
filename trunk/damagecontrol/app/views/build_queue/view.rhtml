@@ -1,0 +1,17 @@
+<table>
+	<tr>
+		<th>Build Queue</th>
+	</tr>
+	<% if(@queue.size == 0) %>
+		<tr>
+			<td>No builds in queue</td>
+		</tr>
+	<% else %>	
+		<% @queue.each do |req| %>
+			<tr>
+				<td><%= req[:project_name] %></td>
+				<!-- td><%= req[:reasons].join(",") %></td-->
+			</tr>
+		<% end %>
+	<% end %>	
+</table>
