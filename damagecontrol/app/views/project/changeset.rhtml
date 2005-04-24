@@ -1,3 +1,9 @@
+<%= link_to(
+	"Trigger build for this changeset",
+	{:controller => "build", :action => "request_build", :id => @changeset.project.name, :params => {"changeset" => @changeset.identifier, "reason" => "Manually triggered via web interface"}}
+) %>
+<div id="request_build"></div>
+
 <ul class="foldertab">
   <li><a href="javascript:setTab('changesets')"><img src="/images/16x16/document_exchange.png"> Changesets</a></li>
   <% @changeset.builds.each do |build| %>

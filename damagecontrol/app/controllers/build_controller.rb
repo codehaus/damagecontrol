@@ -1,6 +1,24 @@
+require 'yaml'
+require 'fileutils'
+
 class BuildController < ApplicationController
 
-  def status
+  layout nil
+
+  # Requests a build for a ChangeSet
+  def request_build
+    load_project
+    @changeset_identifier = @params["changeset"].to_identifier
+    reason = @params["reason"].to_identifier
+    # Persist the request so it can be picked up by the daemon
+    FileUtils.mkdir_p("#{BASEDIR}/build_requests")
+    File.open("#{BASEDIR}/build_requests/#{@project.name}_#{@changeset_identifier}.yaml", 'w') do |io|
+      YAML::dump({
+        :project_name => @project.name, 
+        :changeset_identifier => @changeset_identifier, 
+        :reason => reason
+      }, io)
+    end
   end
 
   def stdout
@@ -11,9 +29,6 @@ class BuildController < ApplicationController
   def stderr
     load_build
     send_log(@build.stderr_file)
-  end
-
-  def tests
   end
 
 private

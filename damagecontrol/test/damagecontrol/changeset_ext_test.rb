@@ -32,7 +32,7 @@ module RSCM
       c.project = p
       
       before = Time.new
-      c.build!(p, "Testing") do |build|
+      c.build!("Testing") do |build|
         now = Time.new
         assert(before <= build.time)
         assert(build.time <= now)

@@ -16,8 +16,7 @@ module RSCM
     end
 
     # Creates, persists and executes a Build for this changeset. 
-    # Should be called with a block of arity 1 that will receive the build *after*
-    # the build has terminated execution. (Typically given to build publishers).
+    # Usually, this method should only be called by a Builder.
     def build!(build_reason)
 
       @project.scm.checkout(identifier)

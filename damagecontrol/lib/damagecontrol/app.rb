@@ -6,6 +6,7 @@ require 'damagecontrol/changeset_ext'
 require 'damagecontrol/poller'
 require 'damagecontrol/builder'
 require 'damagecontrol/build_queue'
+require 'damagecontrol/build_request_poller'
 require 'damagecontrol/standard_persister'
 require 'damagecontrol/publisher/base'
 
@@ -21,6 +22,7 @@ end
   
 module DamageControl
 
+  # The main entry point for the DC daemon
   class App
     def run
       # Wire up the whole DamageControl app with Needle's nice block based DI framework.
@@ -29,38 +31,49 @@ module DamageControl
         b.persister do
           DamageControl::StandardPersister.new
         end 
-      
-        b.queue do
+
+        b.build_queue do
           DamageControl::BuildQueue.new("#{basedir}/build_queue.yaml")
         end 
 
-        b.poller do 
+        b.build_request_poller do
+          DamageControl::BuildRequestPoller.new(basedir, b.build_queue)
+        end 
+
+        b.scm_poller do 
           DamageControl::Poller.new("#{basedir}/projects") do |project, changesets|
             b.persister.save_changesets(project, changesets)
             b.persister.save_rss(project)
-            changeset = changesets.latest
-      
-            b.queue.enqueue(changeset, "Detected changesets by polling #{project.scm.name}")
+            changesets.each do |changeset|
+              b.build_queue.enqueue(changeset, "Detected changesets by polling #{project.scm.name}")
+            end
           end
         end
 
         # We can't use builder - it conflicts with needle
         b.builder_ do
-          DamageControl::Builder.new(b.queue)
+          DamageControl::Builder.new(b.build_queue)
         end 
 
       end
       
       threads = []
-
       threads << Thread.new do
         while(true)
           registry.builder_.build_next
-          sleep 20
         end
       end
-      threads << registry.poller.start
-      
+
+      # a poller that picks up request on file every 5 secs
+      threads << Thread.new do
+        while(true)
+          registry.build_request_poller.poll
+          sleep 5
+        end
+      end
+
+      threads << registry.scm_poller.start
+
       # wait for each thread to die
       threads.each{ |t| t.join }
     end
