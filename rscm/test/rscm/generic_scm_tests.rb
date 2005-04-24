@@ -174,12 +174,9 @@ module RSCM
       trigger_command = "touch " + PathConverter.filepath_to_nativepath(trigger_proof, false)
       trigger_files_checkout_dir = File.expand_path("#{checkout_dir}/../trigger")
       (1..3).each do |i|
-        puts "TRIGGER INSTALL/UNINSTALL CYCLE #{i}"
         assert(!scm.trigger_installed?(trigger_command, trigger_files_checkout_dir))
-        puts "INSTALL"
         scm.install_trigger(trigger_command, trigger_files_checkout_dir)
         assert(scm.trigger_installed?(trigger_command, trigger_files_checkout_dir))
-        puts "UNINSTALL"
         scm.uninstall_trigger(trigger_command, trigger_files_checkout_dir)
       end
 

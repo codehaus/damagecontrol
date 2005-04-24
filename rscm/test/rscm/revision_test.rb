@@ -97,9 +97,9 @@ module RSCM
     
     def test_reports_timestamp_of_latest_change
       revision = Revision.new
-      revision << Change.new(nil, nil, nil, nil, nil, Time.utc(2004))
-      revision << Change.new(nil, nil, nil, nil, nil, Time.utc(2005))
-      revision << Change.new(nil, nil, nil, nil, nil, Time.utc(2003))
+      revision << RevisionFile.new(nil, nil, nil, nil, nil, Time.utc(2004))
+      revision << RevisionFile.new(nil, nil, nil, nil, nil, Time.utc(2005))
+      revision << RevisionFile.new(nil, nil, nil, nil, nil, Time.utc(2003))
       assert_equal(Time.utc(2005), revision.time)
     end
 

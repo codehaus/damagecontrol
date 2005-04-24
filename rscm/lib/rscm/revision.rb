@@ -1,5 +1,6 @@
 require 'xmlrpc/utils'
 require 'rscm/time_ext'
+require 'rscm/revision_file'
 
 module RSCM
 
@@ -20,15 +21,15 @@ module RSCM
     #
     # * visit_revisions(revisions)
     # * visit_revision(revision)
-    # * visit_file(change)
+    # * visit_file(file)
     #
     def accept(visitor)
       visitor.visit_revisions(self)
       self.each{|revision| revision.accept(visitor)}
     end
 
-    def [](change)
-      @revisions[change]
+    def [](file)
+      @revisions[file]
     end
 
     def each(&block)
@@ -76,25 +77,25 @@ module RSCM
     # a new Revision is created, added, and the File is added to that Revision -
     # and then finally the newly created Revision is returned.
     # Otherwise nil is returned.
-    def add(change_or_revision)
-      if(change_or_revision.is_a?(Revision))
-        @revisions << change_or_revision
-        return change_or_revision
+    def add(file_or_revision)
+      if(file_or_revision.is_a?(Revision))
+        @revisions << file_or_revision
+        return file_or_revision
       else
-        revision = @revisions.find { |a_revision| a_revision.can_contain?(change_or_revision) }
+        revision = @revisions.find { |a_revision| a_revision.can_contain?(file_or_revision) }
         if(revision.nil?)
           revision = Revision.new
           @revisions << revision
-          revision << change_or_revision
+          revision << file_or_revision
           return revision
         end
-        revision << change_or_revision
+        revision << file_or_revision
         return nil
       end
     end
     
-    def push(*change_or_revisions)
-      change_or_revisions.each { |change_or_revision| self << (change_or_revision) }
+    def push(*file_or_revisions)
+      file_or_revisions.each { |file_or_revision| self << (file_or_revision) }
       self
     end
 
@@ -114,38 +115,38 @@ module RSCM
     include Enumerable
     include XMLRPC::Marshallable
 
-    attr_reader :changes
+    attr_reader :files
     attr_accessor :revision
     attr_accessor :developer
     attr_accessor :message
     attr_accessor :time
 
-    def initialize(changes=[])
-      @changes = changes
+    def initialize(files=[])
+      @files = files
     end
     
     def accept(visitor)
       visitor.visit_revision(self)
-      @changes.each{|change| change.accept(visitor)}
+      @files.each{|file| file.accept(visitor)}
     end
 
-    def << (change)
-      @changes << change
-      self.time = change.time if self.time.nil? || self.time < change.time unless change.time.nil?
-      self.developer = change.developer if change.developer
-      self.message = change.message if change.message
+    def << (file)
+      @files << file
+      self.time = file.time if self.time.nil? || self.time < file.time unless file.time.nil?
+      self.developer = file.developer if file.developer
+      self.message = file.message if file.message
     end
 
-    def [] (change)
-      @changes[change]
+    def [] (file)
+      @files[file]
     end
 
     def each(&block)
-      @changes.each(&block)
+      @files.each(&block)
     end
     
     def length
-      @changes.length
+      @files.length
     end
 
     def time=(t)
@@ -156,7 +157,7 @@ module RSCM
     
     def ==(other)
       return false if !other.is_a?(self.class)
-      @changes == other.changes
+      @files == other.files
     end
 
     def <=>(other)
@@ -165,17 +166,17 @@ module RSCM
 
     # Whether this instance can contain a File. Used
     # by non-transactional SCMs.
-    def can_contain?(change)
-      self.developer == change.developer &&
-      self.message == change.message &&
-      (self.time - change.time).abs < 60
+    def can_contain?(file)
+      self.developer == file.developer &&
+      self.message == file.message &&
+      (self.time - file.time).abs < 60
     end
 
     # String representation that can be used for debugging.
     def to_s
       result = "#{revision} | #{developer} | #{time} | #{message}\n"
-      self.each do |change|
-        result << " " << change.to_s << "\n"
+      self.each do |file|
+        result << " " << file.to_s << "\n"
       end
       result
     end
@@ -184,75 +185,6 @@ module RSCM
     # (if defined) or an UTC time if it is not natively supported by the scm.
     def identifier
       @revision || @time
-    end
-    
-  end
-
-  # Represents a file within a Revision, and also information about how this file
-  # was modified compared with the previous revision.
-  class RevisionFile
-    include XMLRPC::Marshallable
-
-    MODIFIED = "MODIFIED"
-    DELETED = "DELETED"
-    ADDED = "ADDED"
-    MOVED = "MOVED"
-    
-    attr_accessor :status
-    attr_accessor :path
-    attr_accessor :previous_revision
-    attr_accessor :revision
-
-    # TODO: Remove redundant attributes that are in Revision
-    attr_accessor :developer
-    attr_accessor :message
-    # This is a UTC ruby time
-    attr_accessor :time
-    
-    def initialize(path=nil, status=nil, developer=nil, message=nil, revision=nil, time=nil)
-      @path, @developer, @message, @revision, @time, @status = path, developer, message, revision, time, status
-    end
-  
-    def accept(visitor)
-      visitor.visit_file(self)
-    end
-
-    def to_s
-      "#{path} | #{revision}"
-    end
-
-    def developer=(developer)
-      raise "can't be null" if developer.nil?
-      @developer = developer
-    end
-    
-    def message=(message)
-      raise "can't be null" if message.nil?
-      @message = message
-    end
-
-    def path=(path)
-      raise "can't be null" if path.nil?
-      @path = path
-    end
-
-    def revision=(revision)
-      raise "can't be null" if revision.nil?
-      @revision = revision
-    end
-
-    def time=(time)
-      raise "time must be a Time object" unless time.is_a?(Time)
-      @time = time
-    end
-
-    def ==(other)
-      return false if !other.is_a?(self.class)
-      self.path == other.path &&
-      self.developer == other.developer &&
-      self.message == other.message &&
-      self.revision == other.revision &&
-      self.time == other.time
     end
     
   end
