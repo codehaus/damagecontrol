@@ -38,14 +38,14 @@ module DamageControl
       raise "ChangeSet's project can't be nil" if changeset.project.nil?
       raise "ChangeSet's dir can't be nil" if changeset.dir.nil?
 
-      reason_file = "#{changeset.dir}/builds/#{time.ymdHMS}/reason"
-      reason = File.exist?(reason_file) ? File.open(reason_file).read : "unknown build reason"
-      Build.new(changeset, time, reason)
+      reasons_file = "#{changeset.dir}/builds/#{time.ymdHMS}/reasons"
+      reasons = File.exist?(reasons_file) ? File.open(reason_file).read : "unknown build reason"
+      Build.new(changeset, time, reasons)
     end
   
     # Creates a new Build for a +changeset+, created at +time+ and executed because of +reason+.
-    def initialize(changeset, time, reason)
-      @changeset, @time, @reason = changeset, time, reason
+    def initialize(changeset, time, reasons)
+      @changeset, @time, @reasons = changeset, time, reasons
 
       raise "ChangeSet can't be nil" if @changeset.nil?
       raise "ChangeSet's project can't be nil" if @changeset.project.nil?
@@ -88,7 +88,7 @@ module DamageControl
           ENV.each {|k,v| Log.info("#{k}=#{v}")}
           IO.popen(command_line) do |io|
             File.open(@pid_file, "w") do |pid_io|
-              pid_io.write(pid)
+              pid_io.write("TODO: get the pid")
             end
             
             # there is nothing to read, since we're redirecting to file,

@@ -89,17 +89,31 @@ module DamageControl
       bs.enqueue(@dino_cs_1, "dino is cool")
       
       hash = [
-        {:project_name => "DINO", :reasons => ["dino is cool"]},
-        {:project_name => "FRED", :reasons => ["fred is cool"]}
+        {:project_name => "DINO", :reasons => ["dino is cool"], :building => false},
+        {:project_name => "FRED", :reasons => ["fred is cool"], :building => false}
       ]
       
       assert_equal(hash, bs.as_list)
     end
     
-    def test_should_block_on_pop_until_there_is_something_in_the_queue
+    def test_should_move_pending_to_building
       bs = BuildQueue.new
+      bs.enqueue(@fred_cs_1, "fred is cool")
+      bs.enqueue(@dino_cs_1, "dino is cool")
       
-      bs.enqueue(@wilma_cs_1, nil)      
+      hash = [
+        {:project_name => "DINO", :reasons => ["dino is cool"], :building => true},
+        {:project_name => "FRED", :reasons => ["fred is cool"], :building => false}
+      ]
+      
+      req = bs.pop(nil)
+      assert_equal(hash, bs.as_list)
+
+      bs.remove(req)
+      hash = [
+        {:project_name => "FRED", :reasons => ["fred is cool"], :building => false}
+      ]
+      assert_equal(hash, bs.as_list)
     end
   end
 end

@@ -18,22 +18,20 @@ module RSCM
     # Creates, persists and executes a Build for this changeset. 
     # Should be called with a block of arity 1 that will receive the build *after*
     # the build has terminated execution. (Typically given to build publishers).
-    def build!(project, build_reason)
-      @project = project
+    def build!(build_reason)
 
-      # First, tell project to checkout to "ourself"
-      @project.checkout(identifier)
+      @project.scm.checkout(identifier)
 
       build = DamageControl::Build.new(self, Time.now.utc, build_reason)
       env = {
         'PKG_BUILD' => identifier.to_s, # Rake standard
         'DAMAGECONTROL_BUILD_LABEL' => identifier.to_s, # For others
-        'DAMAGECONTROL_CHANGED_FILES' => changes.collect{|change| change.path}.join(",")
+        'DAMAGECONTROL_CHANGED_FILES' => self.collect{|change| change.path}.join(",")
       }
       
       # TODO: persist here, not in app.rb
-      build.execute(project.build_command, project.execute_dir, env)
-      yield build
+      build.execute(@project.build_command, @project.execute_dir, env)
+      @project.publish(build)
     end
 
     # Returns an array of existing (archived) Build s.

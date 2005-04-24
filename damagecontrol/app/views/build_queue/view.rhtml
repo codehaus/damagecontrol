@@ -9,7 +9,7 @@
 	<% else %>	
 		<% @queue.each do |req| %>
 			<tr>
-				<td><%= req[:project_name] %></td>
+				<td><%= req[:project_name] %> <%= req[:building] ? " (building)" : "" %></td>
 				<!-- td><%= req[:reasons].join(",") %></td-->
 			</tr>
 		<% end %>
