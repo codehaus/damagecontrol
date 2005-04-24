@@ -62,12 +62,35 @@ module RSCM
     end
     
     def start_serve
+      mode = File::CREAT|File::WRONLY
+      if File.exist?(rcfile)
+        mode = File::APPEND|File::WRONLY
+      end
+
+      begin
+        File.open(rcfile, mode) do |file|
+          file.puts("function get_netsync_anonymous_read_permitted(collection)")
+          file.puts("  return true")
+          file.puts("end")
+
+          file.puts("function get_passphrase(keypair_id)")
+          file.puts("  return \"#{@passphrase}\"")
+          file.puts("end")
+        end
+      rescue => e
+        puts e.message
+        puts e.backtrace.join("\n")
+        raise "Didn't have permission to write to #{rcfile}."
+      end
+
+      @rcfile = rcfile
+      
       @serve_pid = fork do
         #Signal.trap("HUP") { puts "Monotone server shutting down..."; exit }
         monotone("serve #{@server} #{@branch}", db(@central_checkout_dir)) do |io|
-puts "PASSPHRASE: #{@passphrase}"
-          io.puts(@passphrase)
-          io.close_write
+          #puts "PASSPHRASE: #{@passphrase}"
+          #io.puts(@passphrase)
+          #io.close_write
           io.read
         end
       end
