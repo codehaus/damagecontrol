@@ -1,8 +1,8 @@
---- !ruby/object:RSCM::ChangeSets 
-changesets: 
-  - !ruby/object:RSCM::ChangeSet 
-    changes: 
-      - !ruby/object:RSCM::Change 
+--- !ruby/object:RSCM::Revisions 
+revisions: 
+  - !ruby/object:RSCM::Revision 
+    files: 
+      - !ruby/object:RSCM::RevisionFile 
         developer: rinkrank
         message: "En to
 
@@ -16,7 +16,7 @@ changesets:
         revision: "1.43"
         status: MODIFIED
         time: 2004-11-30 04:52:24 Z
-      - !ruby/object:RSCM::Change 
+      - !ruby/object:RSCM::RevisionFile 
         developer: rinkrank
         message: "En to
 
