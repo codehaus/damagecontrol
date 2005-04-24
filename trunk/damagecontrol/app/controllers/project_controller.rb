@@ -20,6 +20,7 @@ class ProjectController < ApplicationController
 
   def new
     @project = DamageControl::Project.new
+    @projects = DamageControl::Project.find_all("#{BASEDIR}/projects")
 
     @scms = RSCM::AbstractSCM.classes.collect {|cls| cls.new}
     first_scm = @scms[0]

@@ -40,9 +40,9 @@ module DamageControl
         Log.info "Loading #{prior} changesets from #{@changesets_dir} (from #{last_changeset_identifier} and down)"
         ids = identifiers
         last = ids.index(last_changeset_identifier)
-        raise "Changeset with identifier #{last_changeset_identifier} (#{last_changeset_identifier.class.name}) not found among #{ids.join(',')}, which are of type #{ids[0].class.name}" unless last
-
         changesets = RSCM::ChangeSets.new
+        return changesets unless last
+
         first = last - prior + 1
         first = 0 if first < 0
 
