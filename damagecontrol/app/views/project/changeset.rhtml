@@ -1,6 +1,7 @@
-<%= link_to(
+<%= link_to_remote(
 	"Trigger build for this changeset",
-	{:controller => "build", :action => "request_build", :id => @changeset.project.name, :params => {"changeset" => @changeset.identifier, "reason" => "Manually triggered via web interface"}}
+	:update => "request_build",
+	:url => {:controller => "build", :action => "request_build", :id => @changeset.project.name, :params => {"changeset" => @changeset.identifier, "reason" => "Manually triggered via web interface"}}
 ) %>
 <div id="request_build"></div>
 
