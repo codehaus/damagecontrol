@@ -30,12 +30,6 @@ module DamageControl
           DamageControl::StandardPersister.new
         end 
       
-        b.builder do
-          # TODO: use some sort of composite builder here.
-          # It must be multithreaded and preferrably configurable via web
-          DamageControl::Builder.new
-        end 
-
         b.queue do
           DamageControl::BuildQueue.new("#{basedir}/build_queue.yaml")
         end 
@@ -49,10 +43,22 @@ module DamageControl
             b.queue.enqueue(changeset, "Detected changesets by polling #{project.scm.name}")
           end
         end
+
+        # We can't use builder - it conflicts with needle
+        b.builder_ do
+          DamageControl::Builder.new(b.queue)
+        end 
+
       end
       
       threads = []
 
+      threads << Thread.new do
+        while(true)
+          registry.builder_.build_next
+          sleep 20
+        end
+      end
       threads << registry.poller.start
       
       # wait for each thread to die

@@ -1,13 +1,18 @@
 module DamageControl
+  # A builder builds a changeset
   class Builder
-    def build(changeset, reason)
-      changeset.build!(project, reason) do |build|
-        changeset.project.publish(build)
-      end
-      
-      def can_build?(changeset)
-        true
-      end
+  
+    def initialize(build_queue)
+      @build_queue = build_queue
+    end
+    
+    # Builds next build request in queue
+    def build_next
+      Log.info "Popping build request from queue..."
+      request = @build_queue.pop(self)
+      Log.info "Building #{request.changeset.project.name}"
+      request.changeset.build!(request.reasons)
+      @build_queue.delete(request)
     end
   end
 end
