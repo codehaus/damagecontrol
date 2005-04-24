@@ -5,11 +5,11 @@ class BuildQueueController < ApplicationController
   layout nil
 
   # Renders the build queue:
-  #
-  # | *** (3 min)  Foo   |
-  # | ** (38 sec)  Bar   |
-  # |              Zap   |
-  # |              Pie   |
+  # #TODO: use html layers for the progress bar!
+  # | **** (3 min left)   Foo   |
+  # | **   (38 sec left)  Bar   |
+  # |                     Zap   |
+  # |                     Pie   |
   def view
     @queue = []
     if(File.exist?("#{BASEDIR}/build_queue.yaml")) 
@@ -17,6 +17,5 @@ class BuildQueueController < ApplicationController
         @queue = YAML::load(io)
       end
     end
-    $stderr.puts @queue.inspect
   end
 end

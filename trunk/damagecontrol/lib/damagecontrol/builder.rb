@@ -1,5 +1,5 @@
 module DamageControl
-  # A builder builds a changeset
+  # A builder builds a revision
   class Builder
   
     def initialize(build_queue)
@@ -9,7 +9,7 @@ module DamageControl
     # Builds next build request in queue
     def build_next
       request = @build_queue.pop(self)
-      request.changeset.build!(request.reasons)
+      request.revision.build!(request.reasons)
       @build_queue.delete(request)
     end
   end

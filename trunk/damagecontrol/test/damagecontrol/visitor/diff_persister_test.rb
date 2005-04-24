@@ -1,5 +1,5 @@
 require 'stringio'
-require 'rscm/changes_fixture'
+require 'rscm/revision_fixture'
 require 'rscm/tempdir'
 require 'damagecontrol/project'
 require 'damagecontrol/visitor/diff_persister'
@@ -7,7 +7,7 @@ require 'damagecontrol/visitor/diff_persister'
 module DamageControl
   module Visitor
     class DiffPersisterTest < Test::Unit::TestCase
-      include RSCM::ChangesFixture
+      include RSCM::RevisionFixture
 
       class MockSCM
         def initialize(diffs)
@@ -27,10 +27,10 @@ module DamageControl
         project.dir = project_dir
 
         setup_changes
-        changeset = RSCM::ChangeSet.new
-        changeset << @change1
-        changeset << @change2
-        changeset.project = project
+        revision = RSCM::Revision.new
+        revision << @change1
+        revision << @change2
+        revision.project = project
 
         diff1 = "This\ris\na\r\ndiff for 1"
         diff2 = "This\ris\na\r\ndiff for 2"
@@ -39,9 +39,9 @@ module DamageControl
         project.scm = scm
         dp = DiffPersister.new
 
-        changeset.accept(dp)
-        assert_equal(diff1, File.open("#{project_dir}/changesets/20040705120004/diffs/path/one.diff").read)
-        assert_equal(diff2, File.open("#{project_dir}/changesets/20040705120004/diffs/path/two.diff").read)
+        revision.accept(dp)
+        assert_equal(diff1, File.open("#{project_dir}/revisions/20040705120004/diffs/path/one.diff").read)
+        assert_equal(diff2, File.open("#{project_dir}/revisions/20040705120004/diffs/path/two.diff").read)
 
       end
 

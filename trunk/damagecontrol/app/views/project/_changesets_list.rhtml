@@ -1,10 +1,10 @@
 <table nowrap="nowrap" class="pane" nowrap="nowrap">
 
 <%
-  if @linkable_changesets.nil?
+  if @linkable_revisions.nil?
 %>
 <%
-  elsif @linkable_changesets.empty?
+  elsif @linkable_revisions.empty?
 %>
   <tr class="pane">
     <td class="pane">
@@ -13,31 +13,31 @@
   </tr>
 <% else %>
   <%
-    @linkable_changesets.reverse.each do |changeset|
+    @linkable_revisions.reverse.each do |revision|
   %>
   <tr class="build-row">
     <td nowrap="nowrap">
-      <%= link_to("#{changeset.identifier} (#{changeset.developer})", :action => "changeset", :id => @project.name, :params => {"changeset" => changeset.identifier}) %>
+      <%= link_to("#{revision.identifier} (#{revision.developer})", :action => "revision", :id => @project.name, :params => {"revision" => revision.identifier}) %>
     </td>
     <td width="100%">
-      <% @project.changeset(changeset.identifier).builds.each do |build| %>
+      <% @project.revision(revision.identifier).builds.each do |build| %>
       <%= tag("img", :src => build.small_image) %>
       <% end %>
     </td>
   </tr>
   <% end %>
 
-  <% if(!@select_changeset_identifiers.empty?) %>
+  <% if(!@select_revision_identifiers.empty?) %>
     <tr class="build-row">
       <td class="build-cell-even">
-        <form method="get" action="<%= url_for(:action => "changeset", :id => @project.name) %>">
+        <form method="get" action="<%= url_for(:action => "revision", :id => @project.name) %>">
           <input type="hidden" name="project_name" value="<%= "bar" %>" />
-          <select name="changeset" onchange="submit()">
+          <select name="revision" onchange="submit()">
           
           <%
-            @select_changeset_identifiers.reverse.each do |changeset_identifier|
+            @select_revision_identifiers.reverse.each do |revision_identifier|
           %>
-            <option value="<%= changeset_identifier %>"><%= changeset_identifier %></option>      
+            <option value="<%= revision_identifier %>"><%= revision_identifier %></option>      
           <% end %>
           
           </select>

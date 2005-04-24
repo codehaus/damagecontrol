@@ -4,7 +4,7 @@ require 'rscm'
 
 module RSCM
   class Darcs < AbstractSCM
-    register self
+    #register self
 
     ann :description => "Directory"
     attr_accessor :dir
@@ -81,12 +81,12 @@ module RSCM
       end
     end
 
-    def changesets(from_identifier, to_identifier=Time.infinity)
+    def revisions(from_identifier, to_identifier=Time.infinity)
       from_identifier = Time.epoch if from_identifier.nil?
       to_identifier = Time.infinity if to_identifier.nil?
       with_working_dir(@checkout_dir) do
         darcs("changes --summary --xml-output") do |stdout|
-          DarcsLogParser.new.parse_changesets(stdout, from_identifier, to_identifier)
+          DarcsLogParser.new.parse_revisions(stdout, from_identifier, to_identifier)
         end
       end
     end

@@ -42,7 +42,7 @@ module DamageControl
 
         @from = email_publisher.from
 
-        @subject = "#{build.changeset.project.name} Build #{build.status_message}"
+        @subject = "#{build.revision.project.name} Build #{build.status_message}"
         @sent_on = Time.new.utc
         @headers['Content-Type'] = "text/html"
         @body["build"] = build

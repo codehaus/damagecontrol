@@ -1,10 +1,10 @@
 module DamageControl
   module Visitor
-    # Visitor that writes RSS for ChangeSets.
+    # Visitor that writes RSS for Revisions.
     class RssWriter
 
       # Creates a new RssWriter that will populate the +rss+
-      # object when it is accepted by a ChangeSets object.
+      # object when it is accepted by a Revisions object.
       def initialize(rss, title, link, description, message_linker, change_linker)
         raise "title" unless title
         raise "link" unless link
@@ -15,27 +15,27 @@ module DamageControl
         @rss, @title, @link, @description, @message_linker, @change_linker = rss, title, link, description, message_linker, change_linker
       end
 
-      def visit_changesets(changesets)
+      def visit_revisions(revisions)
         @rss.channel.title = @title
         @rss.channel.link = @link
         @rss.channel.description = @description
         @rss.channel.generator = "DamageControl"
       end
 
-      def visit_changeset(changeset)
+      def visit_revision(revision)
         @item = @rss.items.new_item
 
-        @item.pubDate = changeset.time
-        @item.author = changeset.developer
-        @item.title = changeset.message
-        @item.link = @change_linker.changeset_url(changeset, true)
+        @item.pubDate = revision.time
+        @item.author = revision.developer
+        @item.title = revision.message
+        @item.link = @change_linker.revision_url(revision, true)
 
-        @item.description = "<b>#{changeset.developer}</b><br/>\n"
-        @item.description << @message_linker.highlight(changeset.message).gsub(/\n/, "<br/>\n") << "<p/>\n"
+        @item.description = "<b>#{revision.developer}</b><br/>\n"
+        @item.description << @message_linker.highlight(revision.message).gsub(/\n/, "<br/>\n") << "<p/>\n"
       end
 
-      def visit_change(change)
-        @item.description << @change_linker.change_url(change, true) << "<br/>\n"
+      def visit_file(change)
+        @item.description << @change_linker.file_url(change, true) << "<br/>\n"
       end
 
     end

@@ -5,60 +5,60 @@ require 'rexml/document'
 
 module RSCM
   class DarcsLogParser
-    def parse_changesets(io, from_identifier=Time.epoch, to_identifier=Time.infinity)
-      changesets = ChangeSets.new
+    def parse_revisions(io, from_identifier=Time.epoch, to_identifier=Time.infinity)
+      revisions = Revisions.new
 
       doc = REXML::Document.new(io)
 
       path_revisions = {}
       doc.elements.each("//patch") do |element|
-        changeset = parse_changeset(element.to_s, path_revisions)
-        if ((from_identifier <= changeset.time) && (changeset.time <= to_identifier))
-          changesets.add(changeset)
+        revision = parse_revision(element.to_s, path_revisions)
+        if ((from_identifier <= revision.time) && (revision.time <= to_identifier))
+          revisions.add(revision)
         end
       end
 
-      changesets.each do |changeset|
-        changeset.each do |change|
+      revisions.each do |revision|
+        revision.each do |change|
           current_index = path_revisions[change.path].index(change.revision)
           change.previous_revision = path_revisions[change.path][current_index + 1]
         end
       end
 
-      changesets
+      revisions
     end
 
-    def parse_changeset(changeset_io, path_revisions)
-      changeset = ChangeSet.new
+    def parse_revision(revision_io, path_revisions)
+      revision = Revision.new
 
-      doc = REXML::Document.new(changeset_io)
+      doc = REXML::Document.new(revision_io)
 
       doc.elements.each("patch") do |element|
-        changeset.revision = element.attributes['hash']
-        changeset.developer = element.attributes['author']
-        changeset.time = Time.parse(element.attributes['local_date'])
-        changeset.message = element.elements["comment"].text
-        changeset.message.lstrip!
-        changeset.message.rstrip!
+        revision.revision = element.attributes['hash']
+        revision.developer = element.attributes['author']
+        revision.time = Time.parse(element.attributes['local_date'])
+        revision.message = element.elements["comment"].text
+        revision.message.lstrip!
+        revision.message.rstrip!
 
         element.elements["summary"].elements.each("add_file") do |file|
-          add_changes(changeset, file.text.strip, Change::ADDED, path_revisions)
+          add_changes(revision, file.text.strip, RevisionFile::ADDED, path_revisions)
         end
         element.elements["summary"].elements.each("modify_file") do |file|
-          add_changes(changeset, file.text.strip, Change::MODIFIED, path_revisions)
+          add_changes(revision, file.text.strip, RevisionFile::MODIFIED, path_revisions)
         end
       end
 
-      changeset
+      revision
     end
 
   private
 
-    def add_changes(changeset, path, state, path_revisions)
-      changeset << Change.new(path, state, changeset.developer, nil, changeset.revision, changeset.time)
+    def add_changes(revision, path, state, path_revisions)
+      revision << RevisionFile.new(path, state, revision.developer, nil, revision.revision, revision.time)
 
       path_revisions[path] ||= []
-      path_revisions[path] << changeset.revision
+      path_revisions[path] << revision.revision
     end
   end
 end

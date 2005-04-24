@@ -1,7 +1,7 @@
 require 'fileutils'
 require 'yaml'
 require 'rscm'
-require 'damagecontrol/changeset_ext'
+require 'damagecontrol/revision_ext'
 require 'damagecontrol/diff_parser'
 require 'damagecontrol/diff_htmlizer'
 require 'damagecontrol/scm_web'
@@ -40,7 +40,7 @@ module DamageControl
     attr_accessor :tracker
     attr_accessor :scm_web
 
-    # How long to sleep between each changesets invocation for non-transactional SCMs  
+    # How long to sleep between each revisions invocation for non-transactional SCMs  
     attr_accessor :quiet_period
     
     attr_accessor :build_command
@@ -140,9 +140,9 @@ module DamageControl
       dependencies.find{|d| d.depends_on?(project)} != nil
     end
     
-    # Sets the time of the first changeset to be retrieved for this project.
+    # Sets the time of the first revision to be retrieved for this project.
     # Will only be used for new projects, and only once.
-    # TODO: rename to first_recorded_changeset_time
+    # TODO: rename to first_recorded_revision_time
     def start_time=(t)
       t = Time.parse_ymdHMS(t) if t.is_a? String
       @start_time = t
@@ -161,6 +161,7 @@ module DamageControl
     # The directory where builds are executed from. Should be a relative path
     # from the root of the SCM's working copy directory.
     def execute_dir
+      @relative_execute_dir ||= "."
       File.expand_path(@scm.checkout_dir + "/" + @relative_execute_dir)
     end
 
@@ -194,50 +195,50 @@ module DamageControl
     # TODO: remove
     # Checks out files to project's checkout directory.
     # Writes the checked out files to +checkout_list_file+.
-    # The +changeset_identifier+ parameter is a String or a Time
-    # representing a changeset.
-    def checkout(changeset_identifier)
-      scm.checkout(changeset_identifier)
+    # The +revision_identifier+ parameter is a String or a Time
+    # representing a revision.
+    def checkout(revision_identifier)
+      scm.checkout(revision_identifier)
     end
 
     # TODO: pass quiet_period as arg here?
-    # Polls SCM for new changesets and yields them to the given block.
+    # Polls SCM for new revisions and yields them to the given block.
     def poll(quiet_period=DEFAULT_QUIET_PERIOD)
-      latest_identifier = DamageControl::Visitor::YamlPersister.new(changesets_dir).latest_identifier
+      latest_identifier = DamageControl::Visitor::YamlPersister.new(revisions_dir).latest_identifier
       from = latest_identifier || @start_time
       
-      Log.info "Polling changesets for #{name}'s #{@scm.name} after #{from}"
-      changesets = @scm.changesets(from)
-      if(changesets.empty?)
-        Log.info "No changesets for #{name}'s #{@scm.name} after #{from}"
+      Log.info "Polling revisions for #{name}'s #{@scm.name} after #{from}"
+      revisions = @scm.revisions(from)
+      if(revisions.empty?)
+        Log.info "No revisions for #{name}'s #{@scm.name} after #{from}"
       else
-        Log.info "There were changesets for #{name}'s #{@scm.name} after #{from}"
+        Log.info "There were revisions for #{name}'s #{@scm.name} after #{from}"
       end
-      if(!changesets.empty? && !@scm.transactional?)
+      if(!revisions.empty? && !@scm.transactional?)
         # We're dealing with a non-transactional SCM (like CVS/StarTeam/ClearCase,
-        # unlike Subversion/Monotone). Sleep a little, get the changesets again.
-        # When the changesets are not changing, we can consider the last commit done
+        # unlike Subversion/Monotone). Sleep a little, get the revisions again.
+        # When the revisions are not changing, we can consider the last commit done
         # and the quiet period elapsed. This is not 100% failsafe, but will work
         # under most circumstances. In the worst case, we'll miss some files in
-        # the changesets for really slow commits, but they will be part of the next 
-        # changeset (on next poll).
+        # the revisions for really slow commits, but they will be part of the next 
+        # revision (on next poll).
         commit_in_progress = true
         while(commit_in_progress)
           Log.info "Sleeping for #{quiet_period} seconds because #{name}'s SCM (#{@scm.name}) is not transactional."
           sleep quiet_period
-          next_changesets = @scm.changesets(from)
-          commit_in_progress = changesets != next_changesets
-          changesets = next_changesets
+          next_revisions = @scm.revisions(from)
+          commit_in_progress = revisions != next_revisions
+          revisions = next_revisions
         end
         Log.info "Quiet period elapsed for #{name}. Commit still in progress: #{commit_in_progress}"
       end
-      changesets.each{|changeset| changeset.project = self}
-      yield changesets
+      revisions.each{|revision| revision.project = self}
+      yield revisions
     end
     
     # Where RSS is written.
-    def changesets_rss_file
-      "#{dir}/changesets.xml"
+    def revisions_rss_file
+      "#{dir}/revisions.xml"
     end
 
     # TODO: remove
@@ -258,41 +259,41 @@ module DamageControl
       File.delete(scm.checkout_dir)
     end
 
-    def changesets_rss_exists?
-      File.exist?(changesets_rss_file)
+    def revisions_rss_exists?
+      File.exist?(revisions_rss_file)
     end
 
-    def changesets_dir
-      "#{dir}/changesets"
+    def revisions_dir
+      "#{dir}/revisions"
     end
     
-    # Loads changesets and sets ourself as each changeset's project
-    def changesets(changeset_identifier, prior)
-      changesets = changesets_persister.load_upto(changeset_identifier, prior)
+    # Loads revisions and sets ourself as each revision's project
+    def revisions(revision_identifier, prior)
+      revisions = revisions_persister.load_upto(revision_identifier, prior)
       # Establish child->parent (backwards) references
-      changesets.each do |changeset| 
-        changeset.project = self
-        changeset.each do |change|
-          change.changeset = changeset
+      revisions.each do |revision| 
+        revision.project = self
+        revision.each do |change|
+          change.revision = revision
         end
       end
-      changesets
+      revisions
     end
     
-    def latest_changeset
-      changeset(latest_changeset_identifier)
+    def latest_revision
+      revision(latest_revision_identifier)
     end
 
-    def changeset(changeset_identifier)
-      changesets(changeset_identifier, 1)[0]
+    def revision(revision_identifier)
+      revisions(revision_identifier, 1)[0]
     end
 
-    def changeset_identifiers
-      changesets_persister.identifiers
+    def revision_identifiers
+      revisions_persister.identifiers
     end
     
-    def latest_changeset_identifier
-      changesets_persister.latest_identifier
+    def latest_revision_identifier
+      revisions_persister.latest_identifier
     end
     
     def delete
@@ -306,8 +307,8 @@ module DamageControl
       name == o.name
     end
 
-    def changesets_persister
-      DamageControl::Visitor::YamlPersister.new(changesets_dir)
+    def revisions_persister
+      DamageControl::Visitor::YamlPersister.new(revisions_dir)
     end
 
   private

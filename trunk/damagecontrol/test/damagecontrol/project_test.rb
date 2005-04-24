@@ -3,7 +3,7 @@ require 'yaml'
 require 'rscm'
 require 'rscm/tempdir'
 require 'rscm/mockit'
-require 'rscm/changes'
+require 'rscm/revision'
 require 'damagecontrol/project'
 require 'damagecontrol/json_ext'
 
@@ -17,21 +17,21 @@ module DamageControl
       @p.name = "blabla"
     end
     
-    def test_poll_should_get_changesets_from_start_time_if_last_change_time_unknown
+    def test_poll_should_get_revisions_from_start_time_if_last_change_time_unknown
       dir = RSCM.new_temp_dir("ProjectTest1")
 
       @p.dir = dir
       @p.scm = new_mock
       @p.scm.__setup(:name) {"MockSCM"}
-      changesets = new_mock
-      changesets.__setup(:empty?) {true}
-      changesets.__expect(:each) {Proc.new{|changeset|}}
-      @p.scm.__expect(:changesets) do |from|
+      revisions = new_mock
+      revisions.__setup(:empty?) {true}
+      revisions.__expect(:each) {Proc.new{|revision|}}
+      @p.scm.__expect(:revisions) do |from|
         assert_equal(@p.start_time, from)
-        changesets
+        revisions
       end
       @p.poll do |cs|
-        assert_equal(changesets, cs)
+        assert_equal(revisions, cs)
       end
     end
 
@@ -41,49 +41,49 @@ module DamageControl
       @p.quiet_period = 0
       @p.scm = new_mock
       @p.scm.__setup(:name) {"mooky"}
-      @p.scm.__expect(:changesets) do |from|
+      @p.scm.__expect(:revisions) do |from|
         assert_equal(@p.start_time, from)
-        cs = RSCM::ChangeSets.new
-        cs.add(RSCM::ChangeSet.new)
+        cs = RSCM::Revisions.new
+        cs.add(RSCM::Revision.new)
         cs
       end
       @p.scm.__expect(:transactional?) {false}
-      @p.scm.__expect(:changesets) do |from|
+      @p.scm.__expect(:revisions) do |from|
         assert_equal(@p.start_time, from)
-        RSCM::ChangeSets.new
+        RSCM::Revisions.new
       end
-      @p.scm.__expect(:changesets) do |from|
+      @p.scm.__expect(:revisions) do |from|
         assert_equal(@p.start_time, from)
-        RSCM::ChangeSets.new
+        RSCM::Revisions.new
       end
       @p.poll do |cs|
-        assert_equal(RSCM::ChangeSets, cs.class)
+        assert_equal(RSCM::Revisions, cs.class)
       end
     end
 
-    def test_poll_should_get_changesets_from_last_change_time_if_known
+    def test_poll_should_get_revisions_from_last_change_time_if_known
       dir = RSCM.new_temp_dir("ProjectTest3")
       @p.dir = dir
 
       a = Time.new.utc
-      FileUtils.mkdir_p("#{@p.changesets_dir}/#{a.ymdHMS}")
-      File.open("#{@p.changesets_dir}/#{a.ymdHMS}/changeset.yaml", "w") do |io|
-        cs = RSCM::ChangeSet.new
-        cs << RSCM::Change.new("path", "aslak", "hello", "55", Time.new.utc)
+      FileUtils.mkdir_p("#{@p.revisions_dir}/#{a.ymdHMS}")
+      File.open("#{@p.revisions_dir}/#{a.ymdHMS}/revision.yaml", "w") do |io|
+        cs = RSCM::Revision.new
+        cs << RSCM::RevisionFile.new("path", "aslak", "hello", "55", Time.new.utc)
         YAML::dump(cs, io)
       end
       @p.scm = new_mock
       @p.scm.__setup(:name) {"MockSCM"}
-      changesets = new_mock
-      changesets.__setup(:empty?) {false}
-      changesets.__expect(:each) {Proc.new{|changeset|}}
-      @p.scm.__expect(:changesets) do |from|
+      revisions = new_mock
+      revisions.__setup(:empty?) {false}
+      revisions.__expect(:each) {Proc.new{|revision|}}
+      @p.scm.__expect(:revisions) do |from|
         assert_equal(a, from)
-        changesets
+        revisions
       end
       @p.scm.__expect(:transactional?) {true}
       @p.poll do |cs|
-        assert_equal(changesets, cs)
+        assert_equal(revisions, cs)
       end
     end
     

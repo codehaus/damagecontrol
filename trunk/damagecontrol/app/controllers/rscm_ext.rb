@@ -38,7 +38,7 @@ class DamageControl::Project
   include DamageControl::Web::Configuration
 end
 
-class RSCM::Change
+class RSCM::RevisionFile
   ICONS = {
     MODIFIED => "/images/16x16/document_edit.png",
     DELETED => "/images/16x16/document_delete.png",

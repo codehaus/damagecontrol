@@ -6,56 +6,56 @@ module RSCM
 
   class MonotoneLogParser
   
-    def parse_changesets(io, from_identifier=Time.epoch, to_identifier=Time.infinity)
+    def parse_revisions(io, from_identifier=Time.epoch, to_identifier=Time.infinity)
       # skip first separator
       io.readline
       
-      all_changesets = []
-      changeset_string = ""
+      all_revisions = []
+      revision_string = ""
       
       # hash of path => [array of revisions]
       path_revisions = {}
       io.each_line do |line|
         if(line =~ /-----------------------------------------------------------------/)
-          changeset = parse_changeset(StringIO.new(changeset_string), path_revisions)
-          all_changesets << changeset
-          changeset_string = ""
+          revision = parse_revision(StringIO.new(revision_string), path_revisions)
+          all_revisions << revision
+          revision_string = ""
         else
-          changeset_string << line
+          revision_string << line
         end
       end
-      changeset = parse_changeset(StringIO.new(changeset_string), path_revisions)
-      all_changesets << changeset
+      revision = parse_revision(StringIO.new(revision_string), path_revisions)
+      all_revisions << revision
       
-      # Filter out the changesets and set the previous revisions, knowing that most recent is at index 0.
+      # Filter out the revisions and set the previous revisions, knowing that most recent is at index 0.
 
-      from_time = time(all_changesets, from_identifier, Time.epoch)
-      to_time = time(all_changesets, to_identifier, Time.infinity)
+      from_time = time(all_revisions, from_identifier, Time.epoch)
+      to_time = time(all_revisions, to_identifier, Time.infinity)
 
-      changesets = ChangeSets.new
+      revisions = Revisions.new
 
-      all_changesets.each do |changeset|
-        if((from_time < changeset.time) && (changeset.time <= to_time))
-          changesets.add(changeset)
-          changeset.each do |change|
+      all_revisions.each do |revision|
+        if((from_time < revision.time) && (revision.time <= to_time))
+          revisions.add(revision)
+          revision.each do |change|
             current_index = path_revisions[change.path].index(change.revision)
             change.previous_revision = path_revisions[change.path][current_index + 1]
           end
         end
       end
-      changesets
+      revisions
     end
     
-    def parse_changeset(changeset_io, path_revisions)
-      changeset = ChangeSet.new
+    def parse_revision(revision_io, path_revisions)
+      revision = Revision.new
       state = nil
-      changeset_io.each_line do |line|
-        if(line =~ /^Revision: (.*)$/ && changeset.revision.nil?)
-          changeset.revision = $1
-        elsif(line =~ /^Author: (.*)$/ && changeset.developer.nil?)
-          changeset.developer = $1
-        elsif(line =~ /^Date: (.*)$/ && changeset.time.nil?)
-          changeset.time = Time.utc(
+      revision_io.each_line do |line|
+        if(line =~ /^Revision: (.*)$/ && revision.revision.nil?)
+          revision.revision = $1
+        elsif(line =~ /^Author: (.*)$/ && revision.developer.nil?)
+          revision.developer = $1
+        elsif(line =~ /^Date: (.*)$/ && revision.time.nil?)
+          revision.time = Time.utc(
             $1[0..3].to_i,
             $1[5..6].to_i,
             $1[8..9].to_i,
@@ -63,44 +63,44 @@ module RSCM
             $1[14..15].to_i,
             $1[17..18].to_i
           )
-        elsif(line =~ /^ChangeLog:\s*$/ && changeset.message.nil?)
+        elsif(line =~ /^ChangeLog:\s*$/ && revision.message.nil?)
           state = :message
-        elsif(state == :message && changeset.message.nil?)
-          changeset.message = ""
-        elsif(state == :message && changeset.message)
-          changeset.message << line
+        elsif(state == :message && revision.message.nil?)
+          revision.message = ""
+        elsif(state == :message && revision.message)
+          revision.message << line
         elsif(line =~ /^Added files:\s*$/)
           state = :added
         elsif(state == :added)
-          add_changes(changeset, line, Change::ADDED, path_revisions)
+          add_changes(revision, line, RevisionFile::ADDED, path_revisions)
         elsif(line =~ /^Modified files:\s*$/)
           state = :modified
         elsif(state == :modified)
-          add_changes(changeset, line, Change::MODIFIED, path_revisions)
+          add_changes(revision, line, RevisionFile::MODIFIED, path_revisions)
         end
       end
-      changeset.message.chomp! rescue changeset.message = ''
-      changeset
+      revision.message.chomp! rescue revision.message = ''
+      revision
     end
     
   private
 
-    def time(changesets, identifier, default)
-      cs = changesets.find do |changeset|
-        changeset.identifier == identifier
+    def time(revisions, identifier, default)
+      cs = revisions.find do |revision|
+        revision.identifier == identifier
       end
       cs ? cs.time : (identifier.is_a?(Time) ? identifier : default)
     end
 
-    def add_changes(changeset, line, state, path_revisions)
+    def add_changes(revision, line, state, path_revisions)
       paths = line.split(" ")
       paths.each do |path|
-        changeset << Change.new(path, state, changeset.developer, nil, changeset.revision, changeset.time)
+        revision << RevisionFile.new(path, state, revision.developer, nil, revision.revision, revision.time)
 
         # now record path revisions so we can keep track of previous rev for each path
         # doesn't work for moved files, and have no idea how to make it work either.
         path_revisions[path] ||= [] 
-        path_revisions[path] << changeset.revision
+        path_revisions[path] << revision.revision
       end
       
     end

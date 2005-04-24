@@ -6,11 +6,11 @@ module RSCM
     def test_should_load_all_scm_classes
       expected_scms_classes = [
         Cvs,
-        Darcs,
+#        Darcs,
         Monotone,
-        Mooky,
-        Perforce,
-        StarTeam,
+#        Mooky,
+#        Perforce,
+#        StarTeam,
         Subversion
       ]
       assert_equal(

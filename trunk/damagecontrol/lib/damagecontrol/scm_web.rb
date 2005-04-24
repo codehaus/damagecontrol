@@ -4,11 +4,11 @@ module DamageControl
   module SCMWeb
 
     class Null
-      def change_url(change, anchor=false)
-        change.path
+      def file_url(file, anchor=false)
+        file.path
       end
 
-      def changeset_url(changeset, anchor=false)
+      def revision_url(revision, anchor=false)
         "http://foo.bar/"
       end
     end
@@ -24,25 +24,25 @@ module DamageControl
         RSCM::PathConverter.ensure_trailing_slash(baseurl)
       end
 
-      def change_url(change, anchor=false)
+      def file_url(file, anchor=false)
         result = nil
-        if(change.previous_revision)
-          result = "#{url}#{change.path}?r1=#{change.previous_revision}&r2=#{change.revision}"
+        if(file.previous_revision)
+          result = "#{url}#{file.path}?r1=#{file.previous_revision}&r2=#{file.revision}"
         else
           # point to the viewcvs (rev) and fisheye (r) revisions (no diff view)
-          result = "#{url}#{change.path}?rev=#{change.revision}&r=#{change.revision}"
+          result = "#{url}#{file.path}?rev=#{file.revision}&r=#{file.revision}"
         end
-        anchor ? "<a href=\"#{result}\">#{change.path}</a>" : result
+        anchor ? "<a href=\"#{result}\">#{file.path}</a>" : result
       end
 
-      def changeset_url(changeset, anchor=false)
+      def revision_url(revision, anchor=false)
         url
       end
     end
 
     class Fisheye < ViewCVS
-      def changeset_url(changeset, anchor=false)
-        # TODO: link to their faked CVS changesets (or proper SVN ones when that happens).
+      def revision_url(revision, anchor=false)
+        # TODO: link to their faked CVS revisions (or proper SVN ones when that happens).
       end
     end
 

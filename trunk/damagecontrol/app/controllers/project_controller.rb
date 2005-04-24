@@ -10,7 +10,7 @@ class ProjectController < ApplicationController
   # Each SCM class should have an available? method
 
   before_filter do
-    @navigation_name = "changesets_list"
+    @navigation_name = "revisions_list"
   end
 
   def index
@@ -41,7 +41,7 @@ class ProjectController < ApplicationController
   def view
     return render_text("No project specified") unless @params["id"]
     @edit = false
-    @navigation_name = "changesets_list"
+    @navigation_name = "revisions_list"
     @projects = DamageControl::Project.find_all("#{BASEDIR}/projects")
     load
   end
@@ -49,14 +49,14 @@ class ProjectController < ApplicationController
   def edit
     @edit = true
     load
-    @navigation_name = "changesets_list"
+    @navigation_name = "revisions_list"
     @projects = DamageControl::Project.find_all("#{BASEDIR}/projects")
     render_action("view")
   end
   
-  def changesets_rss
+  def revisions_rss
     load
-    send_file(@project.changesets_rss_file)
+    send_file(@project.revisions_rss_file)
   end
 
   def save
@@ -84,16 +84,16 @@ class ProjectController < ApplicationController
     redirect_to(:action => "view", :id => project.name)
   end
   
-  def changeset
+  def revision
     load
-    @navigation_name = "changesets_list"
-    changeset_identifier = @params["changeset"]
-    @changeset = @project.changeset(changeset_identifier.to_identifier)
+    @navigation_name = "revisions_list"
+    revision_identifier = @params["revision"]
+    @revision = @project.revision(revision_identifier.to_identifier)
   end
 
-  def latest_changeset_json
+  def latest_revision_json
     load
-    render_text @project.latest_changeset.to_json
+    render_text @project.latest_revision.to_json
   end
   
 protected
@@ -176,13 +176,13 @@ protected
       }
     end
 
-    if(@project.changesets_rss_exists?)
+    if(@project.revisions_rss_exists?)
       @sidebar_links << {
         :controller => "project", 
-        :action     => "changesets_rss", 
+        :action     => "revisions_rss", 
         :id         => @project.name,
         :image      => "/images/rss.gif",
-        :name       => "Changesets RSS"
+        :name       => "Revisions RSS"
       }
     end
 
@@ -208,8 +208,8 @@ private
     @trackers = DamageControl::Tracker::Base.classes.collect {|cls| cls.new}
     @trackers.each_index {|i| @trackers[i] = @project.tracker if @trackers[i].class == @project.tracker.class}
 
-    @linkable_changesets = @project.changesets(@project.latest_changeset_identifier, 10)
-    @select_changeset_identifiers = @project.changeset_identifiers[0..-(@linkable_changesets.length+1)]
+    @linkable_revisions = @project.revisions(@project.latest_revision_identifier, 10)
+    @select_revision_identifiers = @project.revision_identifiers[0..-(@linkable_revisions.length+1)]
 
     set_sidebar_links
   end

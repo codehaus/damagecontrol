@@ -6,13 +6,13 @@ var req;
 function loadXMLDoc(url) {
     if (window.XMLHttpRequest) {
         req = new XMLHttpRequest();
-        req.onreadystatechange = processReqChange;
+        req.onreadystatefile = processReqChange;
         req.open("GET", url, true);
         req.send(null);
     } else if (window.ActiveXObject) {
         req = new ActiveXObject("Microsoft.XMLHTTP");
         if (req) {
-            req.onreadystatechange = processReqChange;
+            req.onreadystatefile = processReqChange;
             req.open("GET", url, true);
             req.send();
         }

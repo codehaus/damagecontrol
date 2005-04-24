@@ -13,9 +13,9 @@ module DamageControl
   #     SomeProject/
   #       project.yaml
   #       checkout/
-  #       changesets/
+  #       revisions/
   #         2802/
-  #           changeset.yaml         (serialised ChangeSet object)
+  #           revision.yaml         (serialised Revision object)
   #           diffs/                 (serialised diff files)
   #           builds/                
   #             2005280271234500/    (timestamp of build start)
@@ -30,28 +30,28 @@ module DamageControl
     #  * Duration of checkpoints (compile, test, javadocs...) - should be configurable in project.
     #  * 
 
-    attr_reader :changeset, :time, :stdout_file, :stderr_file
+    attr_reader :revision, :time, :stdout_file, :stderr_file
   
     # Loads an existing Build from disk
-    def Build.load(changeset, time)
-      raise "ChangeSet can't be nil" if changeset.nil?
-      raise "ChangeSet's project can't be nil" if changeset.project.nil?
-      raise "ChangeSet's dir can't be nil" if changeset.dir.nil?
+    def Build.load(revision, time)
+      raise "Revision can't be nil" if revision.nil?
+      raise "Revision's project can't be nil" if revision.project.nil?
+      raise "Revision's dir can't be nil" if revision.dir.nil?
 
-      reasons_file = "#{changeset.dir}/builds/#{time.ymdHMS}/reasons"
+      reasons_file = "#{revision.dir}/builds/#{time.ymdHMS}/reasons"
       reasons = File.exist?(reasons_file) ? File.open(reason_file).read : "unknown build reason"
-      Build.new(changeset, time, reasons)
+      Build.new(revision, time, reasons)
     end
   
-    # Creates a new Build for a +changeset+, created at +time+ and executed because of +reason+.
-    def initialize(changeset, time, reasons)
-      @changeset, @time, @reasons = changeset, time, reasons
+    # Creates a new Build for a +revision+, created at +time+ and executed because of +reason+.
+    def initialize(revision, time, reasons)
+      @revision, @time, @reasons = revision, time, reasons
 
-      raise "ChangeSet can't be nil" if @changeset.nil?
-      raise "ChangeSet's project can't be nil" if @changeset.project.nil?
-      raise "ChangeSet's dir can't be nil" if @changeset.dir.nil?
+      raise "Revision can't be nil" if @revision.nil?
+      raise "Revision's project can't be nil" if @revision.project.nil?
+      raise "Revision's dir can't be nil" if @revision.dir.nil?
 
-      @dir = File.expand_path("#{@changeset.dir}/builds/#{identifier}")
+      @dir = File.expand_path("#{@revision.dir}/builds/#{identifier}")
       @stdout_file = "#{@dir}/stdout.log"
       @stderr_file = "#{@dir}/stderr.log"
 
@@ -60,7 +60,7 @@ module DamageControl
       @command_file ="#{@dir}/command"
     end
 
-    # Our unique id within the changeset
+    # Our unique id within the revision
     def identifier
       time.ymdHMS
     end
@@ -68,9 +68,9 @@ module DamageControl
     # Executes +command+ with the environment variables +env+ and persists the command for future reference.
     # (This will prevent the same build from being executed in the future.)
     def execute(command, execute_dir, env)
-      raise "ChangeSet can't be nil" if @changeset.nil?
-      raise "ChangeSet's project can't be nil" if changeset.project.nil?
-      raise "ChangeSet's dir can't be nil" if changeset.dir.nil?
+      raise "Revision can't be nil" if @revision.nil?
+      raise "Revision's project can't be nil" if revision.project.nil?
+      raise "Revision's dir can't be nil" if revision.dir.nil?
 
       Log.debug "Executing build. Command file: #{@command_file}"
       raise BuildException.new("This build has already been executed and cannot be re-executed. It was executed with '#{File.open(@command_file).read}'") if File.exist?(@command_file)

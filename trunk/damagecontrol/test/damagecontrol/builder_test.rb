@@ -15,9 +15,9 @@ module DamageControl
       req = new_mock
       queue.__expect(:pop) do |balder|
         assert_same(builder, balder)
-        req.__expect(:changeset) do
-          changeset = new_mock
-          changeset.__expect(:build!) do |reasons|
+        req.__expect(:revision) do
+          revision = new_mock
+          revision.__expect(:build!) do |reasons|
             assert_equal(["just", "because"], reasons)
           end
         end

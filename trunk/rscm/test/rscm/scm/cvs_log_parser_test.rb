@@ -22,14 +22,14 @@ module RSCM
       assert_equal(nil, CvsLogParser.new(StringIO.new("")).next_log_entry)
     end
     
-    def test_parses_entire_log_into_changesets
+    def test_parses_entire_log_into_revisions
       File.open(File.dirname(__FILE__) + "/cvs-test.log") do |io|
         @parser = CvsLogParser.new(io)
-        changesets = @parser.parse_changesets
+        revisions = @parser.parse_revisions
         
-        assert_equal(24, changesets.length)
-        assert_match(/o YAML config \(BuildBootstrapper\)/, changesets[1].message)
-        assert_match(/failure/, changesets[8].message)
+        assert_equal(24, revisions.length)
+        assert_match(/o YAML config \(BuildBootstrapper\)/, revisions[1].message)
+        assert_match(/failure/, revisions[8].message)
       end
     end
     
@@ -37,19 +37,19 @@ module RSCM
     def test_jira_dc_312
       File.open(File.dirname(__FILE__) + "/cvs-dataforge.log") do |io|
         @parser = CvsLogParser.new(io)
-        changesets = @parser.parse_changesets
+        revisions = @parser.parse_revisions
         
-        assert_equal(271, changesets.length)
+        assert_equal(271, revisions.length)
       end
     end
 
     def test_parse_changes
-      changesets = ChangeSets.new
-      @parser.parse_changes(LOG_ENTRY, changesets)
-      changesets.sort!
-      assert_equal(4, changesets.length)
-      assert_equal("src/ruby/damagecontrol/BuildExecutorTest.rb", changesets[0][0].path)
-      assert_match(/linux-windows galore/, changesets[1][0].message)
+      revisions = Revisions.new
+      @parser.parse_changes(LOG_ENTRY, revisions)
+      revisions.sort!
+      assert_equal(4, revisions.length)
+      assert_equal("src/ruby/damagecontrol/BuildExecutorTest.rb", revisions[0][0].path)
+      assert_match(/linux-windows galore/, revisions[1][0].message)
     end
     
     def test_sets_previous_revision_to_one_before_the_current
@@ -101,19 +101,19 @@ I do really want to see the url in irc, it's very, very convenient. thank you ve
 EOF
 
     def test_can_parse_changes_with_deleted_file
-      changesets = ChangeSets.new
-      @parser.parse_changes(LOG_ENTRY_WITH_DELETED_FILE, changesets)
-      assert_equal(1, changesets.length)
-      assert_equal("server/damagecontrol/codehaus.rb", changesets[0][0].path)
-      assert_equal(Change::DELETED, changesets[0][0].status)
+      revisions = Revisions.new
+      @parser.parse_changes(LOG_ENTRY_WITH_DELETED_FILE, revisions)
+      assert_equal(1, revisions.length)
+      assert_equal("server/damagecontrol/codehaus.rb", revisions[0][0].path)
+      assert_equal(RevisionFile::DELETED, revisions[0][0].status)
     end
     
     def test_log_from_e2e_test
       @parser = CvsLogParser.new(StringIO.new(LOG_FROM_E2E_TEST))
-      changesets = @parser.parse_changesets
-      assert_equal(2, changesets.length)
-      assert_match(/foo/, changesets[1].message)
-      assert_match(/bar/, changesets[0].message)
+      revisions = @parser.parse_revisions
+      assert_equal(2, revisions.length)
+      assert_match(/foo/, revisions[1].message)
+      assert_match(/bar/, revisions[0].message)
     end
     
     LOG_FROM_E2E_TEST = <<-EOF
@@ -197,17 +197,17 @@ EOF
       @parser = CvsLogParser.new(StringIO.new(LOG_FROM_05_07_2004_19_41))
       assert_equal(11, @parser.split_entries(LOG_FROM_05_07_2004_19_41).size)
       assert_equal("server/damagecontrol/scm/CVS.rb", @parser.parse_path(@parser.split_entries(LOG_FROM_05_07_2004_19_41)[0]))
-      changesets = @parser.parse_changesets
+      revisions = @parser.parse_revisions
          
-      assert_equal(10, changesets.length)
-      expected_change = Change.new
+      assert_equal(10, revisions.length)
+      expected_change = RevisionFile.new
       expected_change.path = "server/damagecontrol/scm/CVS.rb"
       expected_change.developer = "tirsen"
       expected_change.message = "fixed some stuff in the log parser"
       expected_change.revision = "1.19"
       expected_change.time = Time.utc(2004, 7, 5, 9, 41, 51)
       
-      assert_equal(expected_change, changesets[9][0])
+      assert_equal(expected_change, revisions[9][0])
     end
 
 LOG_FROM_05_07_2004_19_41 = <<-EOF
@@ -359,30 +359,30 @@ EOF
 
     def test_can_parse_LOG_WITH_DELETIONS
       @parser = CvsLogParser.new(StringIO.new(LOG_WITH_DELETIONS))
-      changesets = @parser.parse_changesets
-      assert_equal(2, changesets.length)
+      revisions = @parser.parse_revisions
+      assert_equal(2, revisions.length)
 
-      changeset_delete = changesets[1]
-#      assert_equal("MAIN:rinkrank:20031013000454", changeset_delete.revision)
-      assert_equal(Time.utc(2003,10,13,00,04,54,0), changeset_delete.time)
-      assert_equal("Obsolete", changeset_delete.message)
-      assert_equal("rinkrank", changeset_delete.developer)
-      assert_equal(1, changeset_delete.length)
-      assert_equal("build.xml", changeset_delete[0].path)
-      assert_equal("1.11", changeset_delete[0].revision)
-      assert_equal("1.10", changeset_delete[0].previous_revision)
-      assert(Change::DELETED, changeset_delete[0].status)
+      revision_delete = revisions[1]
+#      assert_equal("MAIN:rinkrank:20031013000454", revision_delete.revision)
+      assert_equal(Time.utc(2003,10,13,00,04,54,0), revision_delete.time)
+      assert_equal("Obsolete", revision_delete.message)
+      assert_equal("rinkrank", revision_delete.developer)
+      assert_equal(1, revision_delete.length)
+      assert_equal("build.xml", revision_delete[0].path)
+      assert_equal("1.11", revision_delete[0].revision)
+      assert_equal("1.10", revision_delete[0].previous_revision)
+      assert(RevisionFile::DELETED, revision_delete[0].status)
 
-      changeset_fix_url = changesets[0]
-#      assert_equal("MAIN:rinkrank:20030725163239", changeset_fix_url.revision)
-      assert_equal(Time.utc(2003,07,25,16,32,39,0), changeset_fix_url.time)
-      assert_equal("fixed broken url (NANO-8)", changeset_fix_url.message)
-      assert_equal("rinkrank", changeset_fix_url.developer)
-      assert_equal(1, changeset_fix_url.length)
-      assert_equal("build.xml", changeset_fix_url[0].path)
-      assert_equal("1.10", changeset_fix_url[0].revision)
-      assert_equal("1.9", changeset_fix_url[0].previous_revision)
-      assert_equal(Change::MODIFIED, changeset_fix_url[0].status)
+      revision_fix_url = revisions[0]
+#      assert_equal("MAIN:rinkrank:20030725163239", revision_fix_url.revision)
+      assert_equal(Time.utc(2003,07,25,16,32,39,0), revision_fix_url.time)
+      assert_equal("fixed broken url (NANO-8)", revision_fix_url.message)
+      assert_equal("rinkrank", revision_fix_url.developer)
+      assert_equal(1, revision_fix_url.length)
+      assert_equal("build.xml", revision_fix_url[0].path)
+      assert_equal("1.10", revision_fix_url[0].revision)
+      assert_equal("1.9", revision_fix_url[0].previous_revision)
+      assert_equal(RevisionFile::MODIFIED, revision_fix_url[0].status)
     end
 
 LOG_WITH_MISSING_ENTRIES = <<EOF
@@ -415,8 +415,8 @@ EOF
 
     def test_can_parse_LOG_WITH_MISSING_ENTRIES
       @parser = CvsLogParser.new(StringIO.new(LOG_WITH_MISSING_ENTRIES))
-      changesets = @parser.parse_changesets
-      assert_equal(0, changesets.length)
+      revisions = @parser.parse_revisions
+      assert_equal(0, revisions.length)
     end
   
 LOG_WITH_NEW_AND_OLD_FILE = <<EOF
@@ -461,12 +461,12 @@ EOF
 
     def test_can_distinguish_new_file_from_old_file
       @parser = CvsLogParser.new(StringIO.new(LOG_WITH_NEW_AND_OLD_FILE))
-      changesets = @parser.parse_changesets
+      revisions = @parser.parse_revisions
 
-      assert_equal(Change::ADDED,    changesets[0][0].status)
-      assert_equal(Change::MODIFIED, changesets[1][0].status)
-      assert_equal(Change::MODIFIED, changesets[2][0].status)
-      assert_equal(Change::ADDED,    changesets[3][0].status)
+      assert_equal(RevisionFile::ADDED,    revisions[0][0].status)
+      assert_equal(RevisionFile::MODIFIED, revisions[1][0].status)
+      assert_equal(RevisionFile::MODIFIED, revisions[2][0].status)
+      assert_equal(RevisionFile::ADDED,    revisions[3][0].status)
     end
 
 # https://sitemesh.dev.java.net/source/browse/sitemesh/.cvsignore
@@ -566,8 +566,8 @@ EOF
 
     def test_can_parse_logs_with_cvs_and_dashes_in_commit_message
       @parser = CvsLogParser.new(StringIO.new(LOG_WITH_WEIRD_CVS_AND_MANY_DASHES))
-      changesets = @parser.parse_changesets
-      assert_equal(6, changesets.length)
+      revisions = @parser.parse_revisions
+      assert_equal(6, revisions.length)
     end
 
   end

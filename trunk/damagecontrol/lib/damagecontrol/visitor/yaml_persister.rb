@@ -1,76 +1,76 @@
 require 'yaml'
-require 'rscm/changes'
+require 'rscm/revision'
 require 'rscm/abstract_scm'
 
 module DamageControl
   module Visitor
-    # Visitor that saves each ChangeSet in a folder with the name
-    # of each ChangeSet's +identifier+.
+    # Visitor that saves each Revision in a folder with the name
+    # of each Revision's +identifier+.
     #
-    # Is also able to load changesets.
+    # Is also able to load revisions.
     #
     class YamlPersister
 
-      def initialize(changesets_dir)
-        @changesets_dir = changesets_dir
+      def initialize(revisions_dir)
+        @revisions_dir = revisions_dir
       end
 
-      def visit_changesets(changesets)
+      def visit_revisions(revisions)
       end
 
-      def visit_changeset(changeset)
-        changeset_file = "#{@changesets_dir}/#{changeset.identifier.to_s}/changeset.yaml"
-        dir = File.dirname(changeset_file)
+      def visit_revision(revision)
+        revision_file = "#{@revisions_dir}/#{revision.identifier.to_s}/revision.yaml"
+        dir = File.dirname(revision_file)
         FileUtils.mkdir_p(dir)
-        File.open(changeset_file, "w") do |io|
-          YAML::dump(changeset, io)
+        File.open(revision_file, "w") do |io|
+          YAML::dump(revision, io)
         end
       end
 
-      def visit_change(change)
+      def visit_file(file)
       end
 
     #### Non-visitor methods (for loading)
 
-      # Loads +prior+ number of changesets upto +last_changeset_identifier+.
-      # +last_changeset_identifier+ should be the dirname of the folder containing 
-      # the last changeset.
+      # Loads +prior+ number of revisions upto +last_revision_identifier+.
+      # +last_revision_identifier+ should be the dirname of the folder containing 
+      # the last revision.
       #
-      def load_upto(last_changeset_identifier, prior)
-        Log.info "Loading #{prior} changesets from #{@changesets_dir} (from #{last_changeset_identifier} and down)"
+      def load_upto(last_revision_identifier, prior)
+        Log.info "Loading #{prior} revisions from #{@revisions_dir} (from #{last_revision_identifier} and down)"
         ids = identifiers
-        last = ids.index(last_changeset_identifier)
-        changesets = RSCM::ChangeSets.new
-        return changesets unless last
+        last = ids.index(last_revision_identifier)
+        revisions = RSCM::Revisions.new
+        return revisions unless last
 
         first = last - prior + 1
         first = 0 if first < 0
 
         ids[first..last].each do |identifier|
-          changeset_yaml = "#{@changesets_dir}/#{identifier.to_s}/changeset.yaml"
-          Log.info "Loading changesets from #{changeset_yaml}"
+          revision_yaml = "#{@revisions_dir}/#{identifier.to_s}/revision.yaml"
+          Log.info "Loading revisions from #{revision_yaml}"
           begin
-            changesets.add(YAML::load_file(changeset_yaml))
+            revisions.add(YAML::load_file(revision_yaml))
           rescue Exception => e
             # Sometimes the yaml files get corrupted
-            Log.error "Error loading changesets file: #{File.expand_path(changeset_yaml)}"
+            Log.error "Error loading revisions file: #{File.expand_path(revision_yaml)}"
             # Todo: delete it and schedule it for re-retrieval somehow.
           end
         end
-        changesets
+        revisions
       end
 
-      # Returns a sorted array of Time or int representing the changeset directories.
+      # Returns a sorted array of Time or int representing the revision directories.
       #
       def identifiers
         # This is pretty quick - even with a lot of directories.
         # TODO: the method is called 5 times for a page refresh!
-        dirs = Dir["#{@changesets_dir}/*"].find_all {|f| File.directory?(f) && File.exist?("#{f}/changeset.yaml")}
+        dirs = Dir["#{@revisions_dir}/*"].find_all {|f| File.directory?(f) && File.exist?("#{f}/revision.yaml")}
         # Turn them into ints so they can be sorted.
         dirs.collect { |dir| File.basename(dir).to_identifier }.sort
       end
 
-      # Returns the identifier of the latest changeset.
+      # Returns the identifier of the latest revision.
       #
       def latest_identifier
         identifiers[-1]

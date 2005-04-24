@@ -23,17 +23,17 @@ module DamageControl
         message = nil
         index = nil
         if(build.successful?)
-          message = "#{build.status_message} build (by #{build.changeset.developer})"
+          message = "#{build.status_message} build (by #{build.revision.developer})"
           index = 0
         else
-          message = "#{build.changeset.developer} broke the build"
+          message = "#{build.revision.developer} broke the build"
           index = 1
         end
         @hosts.split(%r{,\s*}).each do |host|
           begin
-            g = ::Growl.new(host, "DamageControl (#{build.changeset.project.name})", NOTIFICATION_TYPES)
+            g = ::Growl.new(host, "DamageControl (#{build.revision.project.name})", NOTIFICATION_TYPES)
             # A bug in Ruby-Growl (or Growl) prevents the message from being sticky.
-            g.notify(NOTIFICATION_TYPES[index], build.changeset.project.name, message, 0, true)
+            g.notify(NOTIFICATION_TYPES[index], build.revision.project.name, message, 0, true)
           rescue Exception => e
             Log.info("Growl publisher failed to notify #{host}: #{e.message}")
           end

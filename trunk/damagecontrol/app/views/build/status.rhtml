@@ -10,11 +10,11 @@
 
 <div id="stdout" class="console">
   Standard out
-  <iframe src="<%= url_for(:action => "stdout", :id => @params["id"], :params => {"changeset" => @params["changeset"], "build" => @params["build"]}) %>" width="100%" height="400"></iframe>
+  <iframe src="<%= url_for(:action => "stdout", :id => @params["id"], :params => {"revision" => @params["revision"], "build" => @params["build"]}) %>" width="100%" height="400"></iframe>
 </div>
 
 <div id="stderr" class="console">
   Standard err
-  <iframe src="<%= url_for(:action => "stderr", :id => @params["id"], :params => {"changeset" => @params["changeset"], "build" => @params["build"]}) %>" width="100%" height="400"></iframe>
+  <iframe src="<%= url_for(:action => "stderr", :id => @params["id"], :params => {"revision" => @params["revision"], "build" => @params["build"]}) %>" width="100%" height="400"></iframe>
 </div>
 

@@ -56,27 +56,27 @@ sources
 </patch>
 EOF
 
-    def test_should_parse_CHANGESET_to_changeset
+    def test_should_parse_CHANGESET_to_revision
       parser = DarcsLogParser.new
-      changeset = parser.parse_changeset(StringIO.new(CHANGESET), {})
+      revision = parser.parse_revision(StringIO.new(CHANGESET), {})
 
-      assert_equal("imported\nsources", changeset.message)
-      assert_equal('20050327203534-4d520-baeeafb062e7f0d72ce740e1e1f5e6a203321ab4.gz', changeset.revision)
-      assert_equal("tester@test.net", changeset.developer)
-      assert_equal(Time.utc(2005,3,27,20,35,34), changeset.time)
-      assert_equal(4, changeset.length)
+      assert_equal("imported\nsources", revision.message)
+      assert_equal('20050327203534-4d520-baeeafb062e7f0d72ce740e1e1f5e6a203321ab4.gz', revision.revision)
+      assert_equal("tester@test.net", revision.developer)
+      assert_equal(Time.utc(2005,3,27,20,35,34), revision.time)
+      assert_equal(4, revision.length)
     
-      assert_equal("build.xml", changeset[0].path)
-      assert_equal(Change::ADDED, changeset[0].status)
+      assert_equal("build.xml", revision[0].path)
+      assert_equal(RevisionFile::ADDED, revision[0].status)
     
-      assert_equal("project.xml", changeset[1].path)
-      assert_equal(Change::ADDED, changeset[1].status)
+      assert_equal("project.xml", revision[1].path)
+      assert_equal(RevisionFile::ADDED, revision[1].status)
    
-      assert_equal("src/java/com/thoughtworks/damagecontrolled/Thingy.java", changeset[2].path)
-      assert_equal(Change::ADDED, changeset[2].status)
+      assert_equal("src/java/com/thoughtworks/damagecontrolled/Thingy.java", revision[2].path)
+      assert_equal(RevisionFile::ADDED, revision[2].status)
     
-      assert_equal("src/test/com/thoughtworks/damagecontrolled/ThingyTestCase.java", changeset[3].path)
-      assert_equal(Change::ADDED, changeset[3].status)
+      assert_equal("src/test/com/thoughtworks/damagecontrolled/ThingyTestCase.java", revision[3].path)
+      assert_equal(RevisionFile::ADDED, revision[3].status)
     end
 
 CHANGESETS = <<EOF
@@ -148,23 +148,23 @@ sources
 </changelog>
 EOF
 
-    def test_should_parse_CHANGESETS_to_changesets
+    def test_should_parse_CHANGESETS_to_revisions
       parser = DarcsLogParser.new
-      changesets = parser.parse_changesets(StringIO.new(CHANGESETS))
-      assert_equal(2, changesets.length)
-      changeset = changesets[0]
+      revisions = parser.parse_revisions(StringIO.new(CHANGESETS))
+      assert_equal(2, revisions.length)
+      revision = revisions[0]
 
-      assert_equal("build.xml", changeset[0].path)
-      assert_equal(Change::MODIFIED, changeset[0].status)
+      assert_equal("build.xml", revision[0].path)
+      assert_equal(RevisionFile::MODIFIED, revision[0].status)
 
-      assert_equal("src/java/com/thoughtworks/damagecontrolled/Thingy.java", changeset[1].path)
-      assert_equal(Change::MODIFIED, changeset[1].status)
+      assert_equal("src/java/com/thoughtworks/damagecontrolled/Thingy.java", revision[1].path)
+      assert_equal(RevisionFile::MODIFIED, revision[1].status)
     end
 
-    def test_should_parse_CHANGESET_to_changesets
+    def test_should_parse_CHANGESET_to_revisions
       parser = DarcsLogParser.new
-      changesets = parser.parse_changesets(StringIO.new(CHANGESET))
-      assert_equal(1, changesets.length)
+      revisions = parser.parse_revisions(StringIO.new(CHANGESET))
+      assert_equal(1, revisions.length)
     end
   end
 end

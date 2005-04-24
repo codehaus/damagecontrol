@@ -19,20 +19,20 @@ module RSCM
     #  3) Verify that WorkingCopy is not uptodate (not yet checked out)
     #  4) Check out the contents of the central repo to WorkingCopy
     #  5) Verify that the checked out files were those imported
-    #  6) Verify that the initial total changesets (from epoch to infinity) represents those from the import
+    #  6) Verify that the initial total revisions (from epoch to infinity) represents those from the import
     #  7) Verify that WorkingCopy is uptodate
     #  8) Change some files in WorkingCopy without committing them (yet)
     #  9) Check out the contents of the central repo to OtherWorkingCopy
     # 10) Verify that OtherWorkingCopy is uptodate
     # 11) Verify that WorkingCopy is uptodate
     # 12) Commit modifications in WorkingCopy
-    # 13) Verify that there is one changeset since the previous one, and that it corresponds to the changed files in 8.
+    # 13) Verify that there is one revision since the previous one, and that it corresponds to the changed files in 8.
     # 14) Verify that OtherWorkingCopy is *not* uptodate
     # 15) Check out OtherWorkingCopy
     # 16) Verify that OtherWorkingCopy is now uptodate
     # 17) Add and commit a file in WorkingCopy
-    # 18) Verify that the changeset (since last changeset) for CheckoutHereToo contains only one file
-    def Xtest_basics
+    # 18) Verify that the revision (since last revision) for CheckoutHereToo contains only one file
+    def test_basics
       work_dir = RSCM.new_temp_dir("basics")
       checkout_dir = "#{work_dir}/WorkingCopy"
       other_checkout_dir = "#{work_dir}/OtherWorkingCopy"
@@ -76,14 +76,14 @@ module RSCM
       assert_equal("src/test/com/thoughtworks/damagecontrolled/ThingyTestCase.java", files[3])
 
       # 6
-      initial_changesets = scm.changesets(nil, nil)
-      assert_equal(1, initial_changesets.length)
-      initial_changeset = initial_changesets[0]
-      assert_equal("imported\nsources", initial_changeset.message)
-      assert_equal(4, initial_changeset.length)
+      initial_revisions = scm.revisions(nil, nil)
+      assert_equal(1, initial_revisions.length)
+      initial_revision = initial_revisions[0]
+      assert_equal("imported\nsources", initial_revision.message)
+      assert_equal(4, initial_revision.length)
 
       # 7
-      assert(scm.uptodate?(initial_changesets.latest.identifier))
+      assert(scm.uptodate?(initial_revisions.latest.identifier))
 
       # 8
       change_file(scm, "#{checkout_dir}/build.xml")
@@ -99,31 +99,31 @@ module RSCM
       scm.commit("changed\nsomething") 
 
       # 13
-      changesets = scm.changesets(initial_changesets.latest.identifier)
+      revisions = scm.revisions(initial_revisions.latest.identifier)
 
-      assert_equal(1, changesets.length, changesets.collect{|cs| cs.to_s})
-      changeset = changesets[0]
-      assert_equal(2, changeset.length)
+      assert_equal(1, revisions.length, revisions.collect{|cs| cs.to_s})
+      revision = revisions[0]
+      assert_equal(2, revision.length)
 
-      assert_equal("changed\nsomething", changeset.message)
+      assert_equal("changed\nsomething", revision.message)
 
       # why is this nil when running as the dcontrol user on codehaus? --jon
-      #assert_equal(username, changeset.developer)
-      assert(changeset.developer)
-      assert(changeset.identifier)
+      #assert_equal(username, revision.developer)
+      assert(revision.developer)
+      assert(revision.identifier)
 
-      assert_equal("build.xml", changeset[0].path)
-      assert(changeset[0].revision)
-      assert(changeset[0].previous_revision)
-      assert_equal("src/java/com/thoughtworks/damagecontrolled/Thingy.java", changeset[1].path)
-      assert(changeset[1].revision)
-      assert(changeset[1].previous_revision)      
+      assert_equal("build.xml", revision[0].path)
+      assert(revision[0].revision)
+      assert(revision[0].previous_revision)
+      assert_equal("src/java/com/thoughtworks/damagecontrolled/Thingy.java", revision[1].path)
+      assert(revision[1].revision)
+      assert(revision[1].previous_revision)      
 
       # 14
-      assert(!other_scm.uptodate?(changesets.latest.identifier))
-      assert(!other_scm.uptodate?(changesets.latest.identifier))
-      assert(scm.uptodate?(changesets.latest.identifier))
-      assert(scm.uptodate?(changesets.latest.identifier))
+      assert(!other_scm.uptodate?(revisions.latest.identifier))
+      assert(!other_scm.uptodate?(revisions.latest.identifier))
+      assert(scm.uptodate?(revisions.latest.identifier))
+      assert(scm.uptodate?(revisions.latest.identifier))
 
       # 15
       files = other_scm.checkout.sort
@@ -135,14 +135,14 @@ module RSCM
       assert(other_scm.uptodate?(nil))
       add_or_edit_and_commit_file(scm, checkout_dir, "src/java/com/thoughtworks/damagecontrolled/Hello.txt", "Bla bla")
       assert(!other_scm.uptodate?(nil))
-      changesets = other_scm.changesets(changesets.latest.identifier)
-      assert_equal(1, changesets.length)
-      assert_equal(1, changesets[0].length)
-      assert("src/java/com/thoughtworks/damagecontrolled/Hello.txt", changesets[0][0].path)
+      revisions = other_scm.revisions(revisions.latest.identifier)
+      assert_equal(1, revisions.length)
+      assert_equal(1, revisions[0].length)
+      assert("src/java/com/thoughtworks/damagecontrolled/Hello.txt", revisions[0][0].path)
       assert("src/java/com/thoughtworks/damagecontrolled/Hello.txt", other_scm.checkout.sort[0])
     end
 
-    def Xtest_create_destroy
+    def test_create_destroy
       work_dir = RSCM.new_temp_dir("trigger")
       checkout_dir = "#{work_dir}/checkout"
       repository_dir = "#{work_dir}/repository"
@@ -193,7 +193,7 @@ module RSCM
       assert(File.exist?(trigger_proof))
     end
 
-    def Xtest_checkout_changeset_identifier
+    def test_checkout_revision_identifier
       work_dir = RSCM.new_temp_dir("ids")
       checkout_dir = "#{work_dir}/checkout"
       repository_dir = "#{work_dir}/repository"
@@ -205,10 +205,10 @@ module RSCM
       import_damagecontrolled(scm, "#{work_dir}/damagecontrolled")
       scm.checkout
       add_or_edit_and_commit_file(scm, checkout_dir, "before.txt", "Before label")
-      before_cs = scm.changesets(Time.epoch)
+      before_cs = scm.revisions(Time.epoch)
 
       add_or_edit_and_commit_file(scm, checkout_dir, "after.txt", "After label")
-      after_cs = scm.changesets(before_cs.latest.identifier)
+      after_cs = scm.revisions(before_cs.latest.identifier)
       assert_equal(1, after_cs.length)
       assert_equal("after.txt", after_cs[0][0].path)
 
@@ -218,7 +218,7 @@ module RSCM
       assert(!File.exist?("#{checkout_dir}/after.txt"))
     end
 
-    def Xtest_should_allow_creation_with_empty_constructor
+    def test_should_allow_creation_with_empty_constructor
       scm = create_scm(RSCM.new_temp_dir, ".")
       scm2 = scm.class.new
       assert_same(scm.class, scm2.class)
@@ -231,7 +231,7 @@ module RSCM
 +five six
 EOF
     
-    def Xtest_diffs
+    def test_diffs
       work_dir = RSCM.new_temp_dir("diffs")
       checkout_dir = "#{work_dir}/checkout"
       repository_dir = "#{work_dir}/repository"
@@ -259,10 +259,10 @@ EOF
         io.puts("five six")
       end
       scm.commit("Modified file to diff")
-      changesets = scm.changesets(timestamp)
+      revisions = scm.revisions(timestamp)
       
       got_diff = false
-      scm.diff(changesets[0][0]) do |diff_io|
+      scm.diff(revisions[0][0]) do |diff_io|
         got_diff = true
         diff_string = diff_io.read
         assert_match(/^\-one two three/, diff_string)
@@ -313,7 +313,7 @@ EOF
   end
     
   module LabelTest
-    def Xtest_label
+    def test_label
       work_dir = RSCM.new_temp_dir("label")
       checkout_dir = "#{work_dir}/LabelTest"
       repository_dir = "#{work_dir}/repository"

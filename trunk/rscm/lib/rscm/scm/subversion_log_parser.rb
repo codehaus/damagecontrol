@@ -1,25 +1,25 @@
 require 'rscm/parser'
-require 'rscm/changes'
+require 'rscm/revision'
 
 module RSCM
 
   class SubversionLogParser
     def initialize(io, path, checkout_dir)
       @io = io
-      @changeset_parser = SubversionLogEntryParser.new(path, checkout_dir)
+      @revision_parser = SubversionLogEntryParser.new(path, checkout_dir)
     end
     
-    def parse_changesets(&line_proc)
+    def parse_revisions(&line_proc)
       # skip over the first ------
-      @changeset_parser.parse(@io, true, &line_proc)
-      changesets = ChangeSets.new
+      @revision_parser.parse(@io, true, &line_proc)
+      revisions = Revisions.new
       while(!@io.eof?)
-        changeset = @changeset_parser.parse(@io, &line_proc)
-        if(changeset)
-          changesets.add(changeset)
+        revision = @revision_parser.parse(@io, &line_proc)
+        if(revision)
+          revisions.add(revision)
         end
       end
-      changesets
+      revisions
     end
   end
   
@@ -33,15 +33,15 @@ module RSCM
 
     def parse(io, skip_line_parsing=false, &line_proc)
       # We have to trim off the last newline - it's not meant to be part of the message
-      changeset = super
-      changeset.message = changeset.message[0..-2] if changeset
-      changeset
+      revision = super
+      revision.message = revision.message[0..-2] if revision
+      revision
     end
 
   protected
 
     def parse_line(line)
-      if(@changeset.nil?)
+      if(@revision.nil?)
         parse_header(line)
       elsif(line.strip == "")
         @parse_state = :parse_message
@@ -50,40 +50,40 @@ module RSCM
       elsif(@parse_state == :parse_changes)
         change = parse_change(line)
         if change
-          # This unless won't work for new directories or if changesets are computed before checkout (which it usually is!)
+          # This unless won't work for new directories or if revisions are computed before checkout (which it usually is!)
           fullpath = "#{@checkout_dir}/#{change.path}"
-          @changeset << change unless File.directory?(fullpath)
+          @revision << change unless File.directory?(fullpath)
         end
       elsif(@parse_state == :parse_message)
-        @changeset.message << line.chomp << "\n"
+        @revision.message << line.chomp << "\n"
       end
     end
 
     def next_result
-      result = @changeset
-      @changeset = nil
+      result = @revision
+      @revision = nil
       result
     end
 
   private
   
-    STATES = {"M" => Change::MODIFIED, "A" => Change::ADDED, "D" => Change::DELETED} unless defined? STATES
+    STATES = {"M" => RevisionFile::MODIFIED, "A" => RevisionFile::ADDED, "D" => RevisionFile::DELETED} unless defined? STATES
 
     def parse_header(line)
-      @changeset = ChangeSet.new
-      @changeset.message = ""
+      @revision = Revision.new
+      @revision.message = ""
       revision, developer, time, the_rest = line.split("|")
-      @changeset.revision = revision.strip[1..-1].to_i unless revision.nil?
-      @changeset.developer = developer.strip unless developer.nil?
-      @changeset.time = parse_time(time.strip) unless time.nil?
+      @revision.revision = revision.strip[1..-1].to_i unless revision.nil?
+      @revision.developer = developer.strip unless developer.nil?
+      @revision.time = parse_time(time.strip) unless time.nil?
     end
     
     def parse_change(line)
-      change = Change.new
+      change = RevisionFile.new
       path_from_root = nil
       if(line =~ /^   [M|A|D|R] ([^\s]+) \(from (.*)\)/)
         path_from_root = $1
-        change.status = Change::MOVED
+        change.status = RevisionFile::MOVED
       elsif(line =~ /^   ([M|A|D|R]) (.+)$/)
         status = $1
         path_from_root = $2
@@ -99,7 +99,7 @@ module RSCM
       else
         change.path = path_from_root[@path.length+2..-1]
       end
-      change.revision = @changeset.revision
+      change.revision = @revision.revision
       # http://jira.codehaus.org/browse/DC-204
       change.previous_revision = change.revision.to_i - 1;
       change

@@ -1,6 +1,6 @@
 require 'fileutils'
 require 'tempfile'
-require 'rscm/changes'
+require 'rscm/revision'
 require 'rscm/abstract_scm'
 require 'yaml'
 
@@ -18,7 +18,7 @@ module RSCM
   # * Apache Ant (http://ant.apache.org/)
   #
   class StarTeam < AbstractSCM
-    register self
+    #register self
 
     ann :description => "User name"
     attr_accessor :user_name
@@ -49,23 +49,23 @@ module RSCM
       "StarTeam"
     end
     
-    def changesets(checkout_dir, from_identifier=Time.epoch, to_identifier=Time.infinity, &proc)
+    def revisions(checkout_dir, from_identifier=Time.epoch, to_identifier=Time.infinity, &proc)
       # just assuming it is a Time for now, may support labels later.
       # the java class really wants rfc822 and not rfc2822, but this works ok anyway.
       from = from_identifier.to_rfc2822
       to = to_identifier.to_rfc2822      
 
-      changesets = java("getChangeSets(\"#{from}\";\"#{to}\")", &proc)
-      raise "changesets must be of type #{ChangeSets.name} - was #{changesets.class.name}" unless changesets.is_a?(::RSCM::ChangeSets)
+      revisions = java("getRevisions(\"#{from}\";\"#{to}\")", &proc)
+      raise "revisions must be of type #{Revisions.name} - was #{revisions.class.name}" unless revisions.is_a?(::RSCM::Revisions)
 
       # Just a little sanity check
-      if(changesets.latest)
-        latetime = changesets.latest.time
+      if(revisions.latest)
+        latetime = revisions.latest.time
         if(latetime < from_identifier || to_identifier < latetime)
           raise "Latest time (#{latetime}) is not within #{from_identifier}-#{to_identifier}"
         end
       end
-      changesets
+      revisions
     end
 
     def checkout(checkout_dir, to_identifier, &proc)

@@ -1,5 +1,5 @@
 require 'fileutils'
-require 'rscm/changes'
+require 'rscm/revision'
 require 'rscm/path_converter'
 require 'rscm/annotations'
 
@@ -31,7 +31,7 @@ module RSCM
   # copy operations:
   #
   # * checkout
-  # * changesets
+  # * revisions
   # * uptodate?
   # * checked_out?
   # * diff
@@ -86,9 +86,9 @@ module RSCM
     end
 
 
-# TODO: Make changesets yield changesets as they are determined, to avoid
+# TODO: Make revisions yield revisions as they are determined, to avoid
 # having to load them all into memory before the method exits. Careful not to
-# use yielded changesets to do another scm hit - like get diffs. Some SCMs
+# use yielded revisions to do another scm hit - like get diffs. Some SCMs
 # might dead lock on this. Implement a guard for that.
 # TODO: Add some visitor support here too?
 
@@ -207,26 +207,26 @@ module RSCM
       relative_added_file_paths
     end
   
-    # Returns a ChangeSets object for the period specified by +from_identifier+ (exclusive, i.e. after)
+    # Returns a Revisions object for the period specified by +from_identifier+ (exclusive, i.e. after)
     # and +to_identifier+ (inclusive).
     #
-    def changesets(from_identifier, to_identifier=Time.infinity)
+    def revisions(from_identifier, to_identifier=Time.infinity)
       # Should be overridden by subclasses
-      changesets = ChangeSets.new
-      changesets.add(
+      revisions = Revisions.new
+      revisions.add(
         Change.new(
           "up/the/chimney",
           Change::DELETED,
           "DamageControl",
           "The #{name} SCM class doesn't\n" +
-            "correctly implement the changesets method. This is\n" +
-            "not a real changeset, but a hint to the developer to go and implement it.\n\n" +
+            "correctly implement the revisions method. This is\n" +
+            "not a real revision, but a hint to the developer to go and implement it.\n\n" +
             "Do It Now!",
           "999",
           Time.now.utc
         )
       )
-      changesets
+      revisions
     end
 
     # Whether the working copy is in synch with the central
@@ -238,14 +238,14 @@ module RSCM
       # Suboptimal algorithm that works for all SCMs.
       # Subclasses can override this to improve efficiency.
       
-      changesets(identifier).empty?
+      revisions(identifier).empty?
     end
 
     # Whether the project is checked out from the central repository or not.
     # Subclasses should override this to check for SCM-specific administrative
     # files if appliccable
     def checked_out?
-      File.exists?
+      File.exists?(@checkout_dir)
     end
 
     # Whether triggers are supported by this SCM. A trigger is a command that can be executed
