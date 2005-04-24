@@ -109,7 +109,7 @@ module DamageControl
       req = bs.pop(nil)
       assert_equal(hash, bs.as_list)
 
-      bs.remove(req)
+      bs.delete(req)
       hash = [
         {:project_name => "FRED", :reasons => ["fred is cool"], :building => false}
       ]
