@@ -2,7 +2,7 @@ require 'rubygems'
 require 'yaml'
 require 'needle'
 require 'rscm'
-require 'damagecontrol/changeset_ext'
+require 'damagecontrol/revision_ext'
 require 'damagecontrol/poller'
 require 'damagecontrol/builder'
 require 'damagecontrol/build_queue'
@@ -41,11 +41,11 @@ module DamageControl
         end 
 
         b.scm_poller do 
-          DamageControl::Poller.new("#{basedir}/projects") do |project, changesets|
-            b.persister.save_changesets(project, changesets)
+          DamageControl::Poller.new("#{basedir}/projects") do |project, revisions|
+            b.persister.save_revisions(project, revisions)
             b.persister.save_rss(project)
-            changesets.each do |changeset|
-              b.build_queue.enqueue(changeset, "Detected changesets by polling #{project.scm.name}")
+            revisions.each do |revision|
+              b.build_queue.enqueue(revision, "Detected revisions by polling #{project.scm.name}")
             end
           end
         end

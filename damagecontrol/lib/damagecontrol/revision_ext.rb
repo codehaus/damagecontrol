@@ -2,7 +2,7 @@ require 'rscm'
 require 'damagecontrol/build'
 
 module RSCM
-  class ChangeSet
+  class Revision
     attr_accessor :project
 
     def to_yaml_properties
@@ -12,10 +12,10 @@ module RSCM
     end
     
     def dir
-      "#{@project.dir}/changesets/#{identifier}"
+      "#{@project.dir}/revisions/#{identifier}"
     end
 
-    # Creates, persists and executes a Build for this changeset. 
+    # Creates, persists and executes a Build for this revision. 
     # Usually, this method should only be called by a Builder.
     def build!(build_reason)
 
@@ -61,17 +61,17 @@ module RSCM
 
   end
 
-  class Change
-    attr_accessor :changeset
+  class RevisionFile
+    attr_accessor :revision
 
     def to_yaml_properties
       props = instance_variables.dup
-      props.delete("@changeset")
+      props.delete("@revision")
       props.sort!
     end
     
     def diff_file
-      "#{@changeset.dir}/diffs/#{path}.diff"
+      "#{@revision.dir}/diffs/#{path}.diff"
     end
   end
 end

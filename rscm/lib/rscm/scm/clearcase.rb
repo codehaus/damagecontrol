@@ -11,13 +11,13 @@ module RSCM
       "ClearCase"
     end
 
-    def changesets(checkout_dir, from_identifier, to_identifier=Time.infinity)
-      result = ChangeSets.new
+    def revisions(checkout_dir, from_identifier, to_identifier=Time.infinity)
+      result = Revisions.new
       with_working_dir(checkout_dir) do
         since = from_identifier.strftime("%d-%b-%Y.%H:%M:%S")
         cleartool("lshistory -recurse -nco -since #{since} -fmt #{LOG_FORMAT}") do |io|
           io.each_line {|l| puts l}
-          changesets << ChangeSet.new()
+          revisions << Revision.new()
         end
       end
       result

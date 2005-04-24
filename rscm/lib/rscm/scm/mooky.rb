@@ -2,7 +2,7 @@ require 'rscm/abstract_scm'
 
 module RSCM
   class Mooky < AbstractSCM
-    register self
+    #register self
 
     ann :description => "The Foo", :tip => "Foo is nonsense"
     attr_accessor :foo

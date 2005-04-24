@@ -9,27 +9,27 @@ module DamageControl
     attr_reader :projects
 
     # Creates a new poller. Takes a block that will
-    # receive |project, changesets| each time new
-    # +changesets+ are found in a polled +project+
+    # receive |project, revisions| each time new
+    # +revisions+ are found in a polled +project+
     def initialize(projects_dir, sleeptime=60, &proc)
       @projects_dir = projects_dir
       @sleeptime = sleeptime
       @proc = proc
     end
 
-    # Polls all registered projects and persists RSS, changesets and diffs to disk.
-    # If a block is passed, the project and the changesets will be yielded to the block
-    # for each new changesets object.
+    # Polls all registered projects and persists RSS, revisions and diffs to disk.
+    # If a block is passed, the project and the revisions will be yielded to the block
+    # for each new revisions object.
     def poll
       Log.info "Starting polling cycle"
       Project.find_all(@projects_dir).each do |project|
         begin
           if(project.scm_exists?)
-            project.poll do |changesets|
-              if(changesets.empty?)
-                Log.info "No changesets for #{project.name}"
+            project.poll do |revisions|
+              if(revisions.empty?)
+                Log.info "No revisions for #{project.name}"
               else
-                @proc.call(project, changesets)
+                @proc.call(project, revisions)
               end
             end
           else

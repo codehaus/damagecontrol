@@ -116,7 +116,11 @@ module RSCM
       local?
     end
 
-    def exists?
+    def destroy_central
+      FileUtils.rm_rf(svnrootdir)
+    end
+
+    def central_exists?
       if(local?)
         File.exists?("#{svnrootdir}/db")
       else
@@ -167,22 +171,22 @@ module RSCM
       svn(dir, import_cmd)
     end
 
-    def changesets(from_identifier, to_identifier=Time.infinity)
-      # Return empty changeset if the requested revision doesn't exist yet.
-      return ChangeSets.new if(from_identifier.is_a?(Integer) && head_revision <= from_identifier)
+    def revisions(from_identifier, to_identifier=Time.infinity)
+      # Return empty revision if the requested revision doesn't exist yet.
+      return Revisions.new if(from_identifier.is_a?(Integer) && head_revision <= from_identifier)
 
       checkout_dir = PathConverter.filepath_to_nativepath(@checkout_dir, false)
-      changesets = nil
+      revisions = nil
       command = "svn #{changes_command(from_identifier, to_identifier)}"
       yield command if block_given?
 
       with_working_dir(@checkout_dir) do
         safer_popen(command) do |stdout|
           parser = SubversionLogParser.new(stdout, path, checkout_dir)
-          changesets = parser.parse_changesets
+          revisions = parser.parse_revisions
         end
       end
-      changesets
+      revisions
     end
     
     # url pointing to the root of the repo
@@ -213,8 +217,8 @@ module RSCM
       with_working_dir(@checkout_dir) do
         safer_popen(cmd) do |stdout|
           parser = SubversionLogParser.new(stdout, path, checkout_dir)
-          changesets = parser.parse_changesets
-          changesets[0].revision.to_i
+          revisions = parser.parse_revisions
+          revisions[0].revision.to_i
         end
       end
     end

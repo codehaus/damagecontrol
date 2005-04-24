@@ -88,17 +88,17 @@ module RSCM
       files.empty?
     end
 
-    def changesets(from_identifier, to_identifier=Time.infinity)
-      checkout(to_identifier) unless uptodate?(to_identifier) # must checkout to get changesets
+    def revisions(from_identifier, to_identifier=Time.infinity)
+      checkout(to_identifier) unless uptodate?(to_identifier) # must checkout to get revisions
       parse_log(changes_command(from_identifier, to_identifier))
     end
     
     def diff(change)
       with_working_dir(@checkout_dir) do
         opts = case change.status
-          when /#{Change::MODIFIED}/; "#{revision_option(change.previous_revision)} #{revision_option(change.revision)}"
-          when /#{Change::DELETED}/; "#{revision_option(change.previous_revision)}"
-          when /#{Change::ADDED}/; "#{revision_option(Time.epoch)} #{revision_option(change.revision)}"
+          when /#{RevisionFile::MODIFIED}/; "#{revision_option(change.previous_revision)} #{revision_option(change.revision)}"
+          when /#{RevisionFile::DELETED}/; "#{revision_option(change.previous_revision)}"
+          when /#{RevisionFile::ADDED}/; "#{revision_option(Time.epoch)} #{revision_option(change.RevisionFile)}"
         end
         # IMPORTANT! CVS NT has a bug in the -N diff option
         # http://www.cvsnt.org/pipermail/cvsnt-bugs/2004-November/000786.html
@@ -175,7 +175,20 @@ module RSCM
       File.mkpath(path)
       cvs(path, "init")
     end
+
+    def destroy_central
+      FileUtils.rm_rf(path)
+    end
     
+    def central_exists?
+      if(local?)
+        File.exists?("#{path}/CVSROOT/loginfo")
+      else
+        # don't know. assume yes.
+        true
+      end
+    end
+
     def can_create_central?
       begin
         local?
@@ -186,15 +199,6 @@ module RSCM
 
     def supports_trigger?
       true
-    end
-
-    def exists?
-      if(local?)
-        File.exists?("#{path}/CVSROOT/loginfo")
-      else
-        # don't know. assume yes.
-        true
-      end
     end
 
     def checked_out?
@@ -222,21 +226,21 @@ module RSCM
       yield logged_command_line if block_given?
 
       execed_command_line = command_line(cmd, password)
-      changesets = nil
+      revisions = nil
       with_working_dir(@checkout_dir) do
         safer_popen(execed_command_line) do |stdout|
           parser = CvsLogParser.new(stdout)
           parser.cvspath = path
           parser.cvsmodule = mod
-          changesets = parser.parse_changesets
+          revisions = parser.parse_revisions
         end
       end
-      changesets
+      revisions
     end
 
     def changes_command(from_identifier, to_identifier)
       # https://www.cvshome.org/docs/manual/cvs-1.11.17/cvs_16.html#SEC144
-      # -N => Suppress the header if no revisions are selected.
+      # -N => Suppress the header if no RevisionFiles are selected.
       "log #{branch_option} -N #{period_option(from_identifier, to_identifier)}"
     end
 

@@ -9,9 +9,9 @@ module RSCM
       @checkout_dir = "C:\\ClearCase_Storage\\viewroot\\icah_CorpAsstPlan_integration\\merchandising\\MerchandisingRandD"
     end
 
-    def test_changesets
+    def test_revisions
       scm = ClearCase.new
-      changesets = scm.changesets(@checkout_dir, Time.utc(2005,03,03,0,0,0))
+      revisions = scm.revisions(@checkout_dir, Time.utc(2005,03,03,0,0,0))
     end
 
     def Xtest_checkout

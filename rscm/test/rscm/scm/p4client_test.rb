@@ -22,12 +22,12 @@ module RSCM
       def test_correctly_decodes_changes_specifiers
           client = P4Client.new "foo"
           client.expect "changes //...@1200,2036/01/01:00:00:00", ""
-          client.changesets("1200", Time.infinity) 
+          client.revisions("1200", Time.infinity) 
       end
       def test_should_accept_changespecs_for_from_and_to
           client = P4Client.new "foo"
           client.expect "changes //...@1200,@1300", ""
-          client.changesets("1200", "1300") 
+          client.revisions("1200", "1300") 
       end
   end
 end

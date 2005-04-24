@@ -1,4 +1,4 @@
-require 'rscm/changes'
+require 'rscm/revision'
 require 'rscm/abstract_log_parser'
 
 require 'ftools'
@@ -17,19 +17,19 @@ module RSCM
       @log = ""
     end
   
-    def parse_changesets
-      changesets = ChangeSets.new
+    def parse_revisions
+      revisions = Revisions.new
       while(log_entry = next_log_entry)
         @log<<log_entry
         @log<<""
         begin
-          parse_changes(log_entry, changesets)
+          parse_changes(log_entry, revisions)
         rescue Exception => e
           $stderr.puts("could not parse log entry: #{log_entry}\ndue to: #{e.message}\n\t")
           $stderr.puts(e.backtrace.join("\n\t"))
         end
       end
-      changesets.sort!
+      revisions.sort!
     end
     
     def next_log_entry
@@ -48,7 +48,7 @@ module RSCM
       entries
     end
     
-    def parse_changes(log_entry, changesets)
+    def parse_changes(log_entry, revisions)
       entries = split_entries(log_entry)
 
       entries[1..entries.length].each do |entry|
@@ -56,12 +56,12 @@ module RSCM
         next if change.nil?
         change.path = parse_path(entries[0])
 
-        change.status = Change::ADDED if change.revision =~ /1\.1$/
+        change.status = RevisionFile::ADDED if change.revision =~ /1\.1$/
 
-        changeset = changesets.add(change)
-        # CVS doesn't have revision for changesets, use
+        revision = revisions.add(change)
+        # CVS doesn't have revision for revisions, use
         # Fisheye-style revision
-#        changeset.revision = "MAIN:#{change.developer}:#{change.time.utc.strftime('%Y%m%d%H%M%S')}" if changeset
+#        revision.revision = "MAIN:#{change.developer}:#{change.time.utc.strftime('%Y%m%d%H%M%S')}" if revision
       end
       nil
     end
@@ -86,7 +86,7 @@ module RSCM
       raise "can't parse: #{change_entry}" if change_entry =~ REVISION_SEPARATOR
          
       change_entry_lines = change_entry.split(/\r?\n/)
-      change = Change.new
+      change = RevisionFile.new
 
       change.revision = extract_match(change_entry_lines[0], /revision (.*)$/)
       
@@ -154,7 +154,7 @@ module RSCM
     # The state field is "Exp" both for added and modified files. retards!
     # We need some additional logic to figure out whether it is added or not.
     # Maybe look at the revision. (1.1 means new I think. - deal with it later)
-    STATES = {"dead" => Change::DELETED, "Exp" => Change::MODIFIED} unless defined? STATES
+    STATES = {"dead" => RevisionFile::DELETED, "Exp" => RevisionFile::MODIFIED} unless defined? STATES
 
   end
 

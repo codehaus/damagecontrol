@@ -2,7 +2,7 @@ require 'damagecontrol/visitor/diff_persister'
 require 'damagecontrol/diff_parser'
 require 'damagecontrol/diff_htmlizer'
 require 'damagecontrol/visitor/diff_persister'
-require 'damagecontrol/changeset_ext'
+require 'damagecontrol/revision_ext'
 
 class ScmController < ApplicationController
 
@@ -21,10 +21,10 @@ class ScmController < ApplicationController
 
   def change
     load_project
-    changeset_identifier = @params['changeset_identifier'].to_identifier
+    revision_identifier = @params['revision_identifier'].to_identifier
     change_index = @params['change_index'].to_i
-    changeset = @project.changeset(changeset_identifier)
-    change = changeset[change_index]
+    revision = @project.revision(revision_identifier)
+    change = revision[change_index]
     change.accept(DamageControl::Visitor::DiffPersister.new)
 
     html = ""

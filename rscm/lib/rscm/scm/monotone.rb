@@ -138,12 +138,12 @@ module RSCM
       end
     end
 
-    def changesets(from_identifier, to_identifier=Time.infinity)
+    def revisions(from_identifier, to_identifier=Time.infinity)
       checkout(to_identifier)
       to_identifier = Time.infinity if to_identifier.nil?
       with_working_dir(checkout_dir) do
         monotone("log") do |stdout|
-          MonotoneLogParser.new.parse_changesets(stdout, from_identifier, to_identifier)
+          MonotoneLogParser.new.parse_revisions(stdout, from_identifier, to_identifier)
         end
       end
     end

@@ -16,7 +16,7 @@ module RSCM
   # You need the p4/p4d executable on the PATH in order for it to work.
   #
   class Perforce < AbstractSCM
-    register self
+    #register self
 
     include FileUtils
 
@@ -70,8 +70,8 @@ module RSCM
       client.submit(message, &proc)
     end
 
-    def changesets(from_identifier, to_identifier=Time.infinity)
-      client.changesets(from_identifier, to_identifier)
+    def revisions(from_identifier, to_identifier=Time.infinity)
+      client.revisions(from_identifier, to_identifier)
     end
 
     def uptodate?(from_identifier)
@@ -207,7 +207,7 @@ module RSCM
   # Understands operations against a client-workspace
   class P4Client
     DATE_FORMAT = "%Y/%m/%d:%H:%M:%S"
-    STATUS = { "add" => Change::ADDED, "edit" => Change::MODIFIED, "delete" => Change::DELETED }
+    STATUS = { "add" => RevisionFile::ADDED, "edit" => RevisionFile::MODIFIED, "delete" => RevisionFile::DELETED }
     PERFORCE_EPOCH = Time.utc(1970, 1, 1, 6, 0, 1)  #perforce doesn't like Time.utc(1970)
 
     def initialize(name, port = "1666", user = ENV["LOGNAME"], pwd = "")
@@ -218,9 +218,9 @@ module RSCM
       p4("sync -n").empty?
     end
 
-    def changesets(from_identifier, to_identifier)
-      changesets = changelists(from_identifier, to_identifier).collect {|changelist| to_changeset(changelist)}
-      ChangeSets.new(changesets)
+    def revisions(from_identifier, to_identifier)
+      revisions = changelists(from_identifier, to_identifier).collect {|changelist| to_revision(changelist)}
+      Revisions.new(revisions)
     end
 
     def name
@@ -286,20 +286,20 @@ module RSCM
       end
     end
 
-    def to_changeset(changelist)
+    def to_revision(changelist)
       return nil if changelist.nil? # Ugly, but it seems to be nil some times on windows.
       changes = changelist.files.collect do |filespec|
-        change = Change.new(filespec.path, changelist.developer, changelist.message, filespec.revision, changelist.time)
+        change = RevisionFile.new(filespec.path, changelist.developer, changelist.message, filespec.revision, changelist.time)
         change.status = STATUS[filespec.status]
         change.previous_revision = filespec.revision - 1
         change
       end
-      changeset = ChangeSet.new(changes)
-      changeset.revision = changelist.number
-      changeset.developer = changelist.developer
-      changeset.message = changelist.message
-      changeset.time = changelist.time
-      changeset
+      revision = Revision.new(changes)
+      revision.revision = changelist.number
+      revision.developer = changelist.developer
+      revision.message = changelist.message
+      revision.time = changelist.time
+      revision
     end
 
     def p4changes(from_identifier, to_identifier)

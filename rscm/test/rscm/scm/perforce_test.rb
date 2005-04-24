@@ -36,12 +36,12 @@ module RSCM
       assert_equal("src/java/com/thoughtworks/damagecontrolled/Thingy.java", files[2])
       assert_equal("src/test/com/thoughtworks/damagecontrolled/ThingyTestCase.java", files[3])
 
-      initial_changesets = workspace1.changesets(nil, nil) #scm.changesets(checkout_dir, nil, nil)
-      assert_equal(1, initial_changesets.length)
-      initial_changeset = initial_changesets[0]
-      assert_equal("imported\nsources", initial_changeset.message)
-      assert_equal(4, initial_changeset.length)
-      assert(workspace1.uptodate?(initial_changesets.latest.time + 1))   #scm.uptodate?(checkout_dir, initial_changesets.latest.time + 1))
+      initial_revisions = workspace1.revisions(nil, nil) #scm.revisions(checkout_dir, nil, nil)
+      assert_equal(1, initial_revisions.length)
+      initial_revision = initial_revisions[0]
+      assert_equal("imported\nsources", initial_revision.message)
+      assert_equal(4, initial_revision.length)
+      assert(workspace1.uptodate?(initial_revisions.latest.time + 1))   #scm.uptodate?(checkout_dir, initial_revisions.latest.time + 1))
 
       # modify file and commit it
       change_file(workspace1, "#{checkout_dir}/build.xml")
@@ -54,30 +54,30 @@ module RSCM
       workspace1.commit("changed\nsomething")   #scm.commit(checkout_dir, "changed\nsomething")
 
       # check that we now have one more change
-      changesets = workspace1.changesets(initial_changesets.time + 1) #scm.changesets(checkout_dir, initial_changesets.time + 1)
+      revisions = workspace1.revisions(initial_revisions.time + 1) #scm.revisions(checkout_dir, initial_revisions.time + 1)
 
-      assert_equal(1, changesets.length, changesets.collect{|cs| cs.to_s})
-      changeset = changesets[0]
-      assert_equal(2, changeset.length)
+      assert_equal(1, revisions.length, revisions.collect{|cs| cs.to_s})
+      revision = revisions[0]
+      assert_equal(2, revision.length)
 
-      assert_equal("changed\nsomething", changeset.message)
+      assert_equal("changed\nsomething", revision.message)
 
       # why is this nil when running as the dcontrol user on codehaus? --jon
-      #assert_equal(username, changeset.developer)
-      assert(changeset.developer)
-      assert(changeset.identifier)
+      #assert_equal(username, revision.developer)
+      assert(revision.developer)
+      assert(revision.identifier)
 
-      assert_equal("build.xml", changeset[0].path)
-      assert(changeset[0].revision)
-      assert(changeset[0].previous_revision)
-      assert_equal("src/java/com/thoughtworks/damagecontrolled/Thingy.java", changeset[1].path)
-      assert(changeset[1].revision)
-      assert(changeset[1].previous_revision)
+      assert_equal("build.xml", revision[0].path)
+      assert(revision[0].revision)
+      assert(revision[0].previous_revision)
+      assert_equal("src/java/com/thoughtworks/damagecontrolled/Thingy.java", revision[1].path)
+      assert(revision[1].revision)
+      assert(revision[1].previous_revision)
 
-      assert(!workspace2.uptodate?(changesets.latest.time+1))
-      assert(!workspace2.uptodate?(changesets.latest.time+1))
-      assert(workspace1.uptodate?(changesets.latest.time+1))
-      assert(workspace1.uptodate?(changesets.latest.time+1))
+      assert(!workspace2.uptodate?(revisions.latest.time+1))
+      assert(!workspace2.uptodate?(revisions.latest.time+1))
+      assert(workspace1.uptodate?(revisions.latest.time+1))
+      assert(workspace1.uptodate?(revisions.latest.time+1))
 
       files = workspace2.checkout.sort
       assert_equal(2, files.length)
@@ -89,10 +89,10 @@ module RSCM
       #add_or_edit_and_commit_file(scm, checkout_dir, "src/java/com/thoughtworks/damagecontrolled/Hello.txt", "Bla bla")
       add_or_edit_and_commit_file(workspace1, checkout_dir, "src/java/com/thoughtworks/damagecontrolled/Hello.txt", "Bla bla")
       assert(!workspace2.uptodate?(Time.new.utc))
-      changesets = workspace2.changesets(changesets.time + 1)
-      assert_equal(1, changesets.length)
-      assert_equal(1, changesets[0].length)
-      assert("src/java/com/thoughtworks/damagecontrolled/Hello.txt", changesets[0][0].path)
+      revisions = workspace2.revisions(revisions.time + 1)
+      assert_equal(1, revisions.length)
+      assert_equal(1, revisions[0].length)
+      assert("src/java/com/thoughtworks/damagecontrolled/Hello.txt", revisions[0][0].path)
       assert("src/java/com/thoughtworks/damagecontrolled/Hello.txt", workspace2.checkout.sort[0])
     end
 

@@ -3,114 +3,114 @@ require 'rscm/time_ext'
 
 module RSCM
 
-  # A collection of ChangeSet.
-  class ChangeSets
+  # A collection of Revision.
+  class Revisions
     include Enumerable
     include XMLRPC::Marshallable
 
-    attr_reader :changesets
+    attr_reader :revisions
 
-    def initialize(changesets=[])
-      @changesets = changesets
+    def initialize(revisions=[])
+      @revisions = revisions
     end
     
     # Accepts a visitor that will receive callbacks while
     # iterating over this instance's internal structure.
     # The visitor should respond to the following methods:
     #
-    # * visit_changesets(changesets)
-    # * visit_changeset(changeset)
-    # * visit_change(change)
+    # * visit_revisions(revisions)
+    # * visit_revision(revision)
+    # * visit_file(change)
     #
     def accept(visitor)
-      visitor.visit_changesets(self)
-      self.each{|changeset| changeset.accept(visitor)}
+      visitor.visit_revisions(self)
+      self.each{|revision| revision.accept(visitor)}
     end
 
     def [](change)
-      @changesets[change]
+      @revisions[change]
     end
 
     def each(&block)
-      @changesets.each(&block)
+      @revisions.each(&block)
     end
     
     def reverse
-      ChangeSets.new(@changesets.dup.reverse)
+      Revisions.new(@revisions.dup.reverse)
     end
     
     def length
-      @changesets.length
+      @revisions.length
     end
 
     def ==(other)
       return false if !other.is_a?(self.class)
-      @changesets == other.changesets
+      @revisions == other.revisions
     end
     
     def empty?
-      @changesets.empty?
+      @revisions.empty?
     end
     
-    # The set of developers that contributed to all of the contained ChangeSet s.
+    # The set of developers that contributed to all of the contained Revision s.
     def developers
       result = []
-      each do |changeset|
-        result << changeset.developer unless result.index(changeset.developer)
+      each do |revision|
+        result << revision.developer unless result.index(revision.developer)
       end
       result
     end
     
-    # The latest ChangeSet (with the latest time)
+    # The latest Revision (with the latest time)
     # or nil if there are none.
     def latest
       result = nil
-      each do |changeset|
-        result = changeset if result.nil? || result.time < changeset.time
+      each do |revision|
+        result = revision if result.nil? || result.time < revision.time
       end
       result
     end
 
-    # Adds a Change or a ChangeSet.
-    # If the argument is a Change and no corresponding ChangeSet exists,
-    # a new ChangeSet is created, added, and the Change is added to that ChangeSet -
-    # and then finally the newly created ChangeSet is returned.
+    # Adds a File or a Revision.
+    # If the argument is a File and no corresponding Revision exists,
+    # a new Revision is created, added, and the File is added to that Revision -
+    # and then finally the newly created Revision is returned.
     # Otherwise nil is returned.
-    def add(change_or_changeset)
-      if(change_or_changeset.is_a?(ChangeSet))
-        @changesets << change_or_changeset
-        return change_or_changeset
+    def add(change_or_revision)
+      if(change_or_revision.is_a?(Revision))
+        @revisions << change_or_revision
+        return change_or_revision
       else
-        changeset = @changesets.find { |a_changeset| a_changeset.can_contain?(change_or_changeset) }
-        if(changeset.nil?)
-          changeset = ChangeSet.new
-          @changesets << changeset
-          changeset << change_or_changeset
-          return changeset
+        revision = @revisions.find { |a_revision| a_revision.can_contain?(change_or_revision) }
+        if(revision.nil?)
+          revision = Revision.new
+          @revisions << revision
+          revision << change_or_revision
+          return revision
         end
-        changeset << change_or_changeset
+        revision << change_or_revision
         return nil
       end
     end
     
-    def push(*change_or_changesets)
-      change_or_changesets.each { |change_or_changeset| self << (change_or_changeset) }
+    def push(*change_or_revisions)
+      change_or_revisions.each { |change_or_revision| self << (change_or_revision) }
       self
     end
 
-    # Sorts the changesets according to time
+    # Sorts the revisions according to time
     def sort!
-      @changesets.sort!
+      @revisions.sort!
       self
     end
 
   end
 
-  # Represents a collection of Change that were committed at the same time.
-  # Non-transactional SCMs (such as CVS and StarTeam) emulate ChangeSet
-  # by grouping Change s that were committed by the same developer, with the
+  # Represents a collection of File that were committed at the same time.
+  # Non-transactional SCMs (such as CVS and StarTeam) emulate Revision
+  # by grouping File s that were committed by the same developer, with the
   # same commit message, and within a "reasonably" small timespan.
-  class ChangeSet
+  class Revision
     include Enumerable
     include XMLRPC::Marshallable
 
@@ -125,7 +125,7 @@ module RSCM
     end
     
     def accept(visitor)
-      visitor.visit_changeset(self)
+      visitor.visit_revision(self)
       @changes.each{|change| change.accept(visitor)}
     end
 
@@ -163,7 +163,7 @@ module RSCM
       @time <=> other.time
     end
 
-    # Whether this instance can contain a Change. Used
+    # Whether this instance can contain a File. Used
     # by non-transactional SCMs.
     def can_contain?(change)
       self.developer == change.developer &&
@@ -180,16 +180,17 @@ module RSCM
       result
     end
     
-    # Returns the identifier of the changeset. This is the revision 
-    # (if defined) or an UTC time if revision is undefined.
+    # Returns the identifier of the revision. This is the revision 
+    # (if defined) or an UTC time if it is not natively supported by the scm.
     def identifier
       @revision || @time
     end
     
   end
 
-  # Represents a change to an individual file.
-  class Change
+  # Represents a file within a Revision, and also information about how this file
+  # was modified compared with the previous revision.
+  class RevisionFile
     include XMLRPC::Marshallable
 
     MODIFIED = "MODIFIED"
@@ -202,7 +203,7 @@ module RSCM
     attr_accessor :previous_revision
     attr_accessor :revision
 
-    # TODO: Remove redundant attributes that are in ChangeSet
+    # TODO: Remove redundant attributes that are in Revision
     attr_accessor :developer
     attr_accessor :message
     # This is a UTC ruby time
@@ -213,7 +214,7 @@ module RSCM
     end
   
     def accept(visitor)
-      visitor.visit_change(self)
+      visitor.visit_file(self)
     end
 
     def to_s

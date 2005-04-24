@@ -5,17 +5,17 @@ class BuildController < ApplicationController
 
   layout nil
 
-  # Requests a build for a ChangeSet
+  # Requests a build for a Revision
   def request_build
     load_project
-    @changeset_identifier = @params["changeset"].to_identifier
+    @revision_identifier = @params["revision"].to_identifier
     reason = @params["reason"].to_identifier
     # Persist the request so it can be picked up by the daemon
     FileUtils.mkdir_p("#{BASEDIR}/build_requests")
-    File.open("#{BASEDIR}/build_requests/#{@project.name}_#{@changeset_identifier}.yaml", 'w') do |io|
+    File.open("#{BASEDIR}/build_requests/#{@project.name}_#{@revision_identifier}.yaml", 'w') do |io|
       YAML::dump({
         :project_name => @project.name, 
-        :changeset_identifier => @changeset_identifier, 
+        :revision_identifier => @revision_identifier, 
         :reason => reason
       }, io)
     end
@@ -40,9 +40,9 @@ private
 
   def load_build
     load_project
-    changeset_identifier = @params["changeset"].to_identifier
+    revision_identifier = @params["revision"].to_identifier
     build_time = @params["build"].to_identifier
-    @build = @project.changeset(changeset_identifier).build(build_time)
+    @build = @project.revision(revision_identifier).build(build_time)
   end
 
 end
