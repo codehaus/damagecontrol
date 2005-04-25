@@ -88,8 +88,8 @@ module RSCM
       if(!checked_out?)
         false
       else
-        rev = identifier ? identifier : head_revision
-        local_revision == rev
+        rev = identifier ? identifier : head_revision_identifier
+        local_revision_identifier == rev
       end
     end
 
@@ -100,12 +100,12 @@ module RSCM
     end
 
     def label
-      local_revision.to_s
+      local_revision_identifier.to_s
     end
 
-    def diff(change, &block)
+    def diff(file, &block)
       with_working_dir(@checkout_dir) do
-        cmd = "svn diff -r #{change.previous_revision}:#{change.revision} \"#{url}/#{change.path}\""
+        cmd = "svn diff -r #{file.previous_native_revision_identifier}:#{file.native_revision_identifier} \"#{url}/#{file.path}\""
         safer_popen(cmd) do |io|
           return(yield(io))
         end
@@ -173,7 +173,7 @@ module RSCM
 
     def revisions(from_identifier, to_identifier=Time.infinity)
       # Return empty revision if the requested revision doesn't exist yet.
-      return Revisions.new if(from_identifier.is_a?(Integer) && head_revision <= from_identifier)
+      return Revisions.new if(from_identifier.is_a?(Integer) && head_revision_identifier <= from_identifier)
 
       checkout_dir = PathConverter.filepath_to_nativepath(@checkout_dir, false)
       revisions = nil
@@ -203,8 +203,8 @@ module RSCM
 
   private
 
-    def local_revision
-      local_revision = nil
+    def local_revision_identifier
+      local_revision_identifier = nil
       svn(@checkout_dir, "info") do |line|
         if(line =~ /Revision: ([0-9]*)/)
           return $1.to_i
@@ -212,13 +212,13 @@ module RSCM
       end
     end
 
-    def head_revision
+    def head_revision_identifier
       cmd = "svn log #{repourl} -r HEAD"
       with_working_dir(@checkout_dir) do
         safer_popen(cmd) do |stdout|
           parser = SubversionLogParser.new(stdout, path, checkout_dir)
           revisions = parser.parse_revisions
-          revisions[0].revision.to_i
+          revisions[0].identifier.to_i
         end
       end
     end

@@ -28,7 +28,7 @@ module RSCM
       p.build_command = "some command"
 
       c = Revision.new
-      c.revision = "some_id"
+      c.identifier =  "some_id"
       c.project = p
       
       before = Time.new
@@ -47,7 +47,7 @@ module RSCM
       p.dir = project_dir
 
       c = Revision.new
-      c.revision = "some_id"
+      c.identifier =  "some_id"
       c.project = p
 
       now = Time.new.utc

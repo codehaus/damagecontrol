@@ -36,14 +36,14 @@ EOF
     def can_parse_simple_log_entry(parser, entry)
       revision = parser.parse(StringIO.new(entry)) {|line|}
 
-      assert_equal(2, revision.revision)
+      assert_equal(2, revision.identifier)
       assert_equal("ahelleso", revision.developer)
       assert_equal(Time.utc(2004,7,11,13,29,35), revision.time)
       assert_equal("changed something\nelse", revision.message)
 
       assert_equal(2, revision.length)
       assert_equal("build.xml", revision[0].path)
-      assert_equal(2, revision[0].revision)
+      assert_equal(2, revision[0].native_revision_identifier)
       assert_equal(RevisionFile::MODIFIED, revision[0].status)
       assert_equal("src/java/com/thoughtworks/damagecontrolled/Thingy.java", revision[1].path)
       assert_equal(RevisionFile::MODIFIED, revision[1].status)
@@ -70,7 +70,7 @@ EOF
         assert_equal("src/com/thoughtworks/proxy/toys/delegate/DelegatingInvoker.java" , revisions[3][1].path)
         assert_equal(RevisionFile::ADDED , revisions[3][1].status)
         assert_equal(66 , revisions[3][1].revision)
-        assert_equal(65, revisions[3][1].previous_revision)
+        assert_equal(65, revisions[3][1].previous_native_revision_identifier)
 
         assert_equal("src/com/thoughtworks/proxy/toys/delegate/ObjectReference.java" , revisions[3][3].path)
         assert_equal(RevisionFile::MOVED, revisions[3][3].status)
@@ -120,7 +120,7 @@ EOF
     def test_should_retrieve_head_revision
       parser = SubversionLogParser.new(StringIO.new(SVN_R_LOG_HEAD_DATA), "blah", nil)
       revisions = parser.parse_revisions
-      assert_equal(48, revisions[0].revision)
+      assert_equal(48, revisions[0].identifier)
     end
   end
 end

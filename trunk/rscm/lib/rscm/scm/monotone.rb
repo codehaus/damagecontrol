@@ -183,7 +183,7 @@ module RSCM
     def diff(change, &block)
       checkout(change.revision)
       with_working_dir(@checkout_dir) do
-        monotone("diff --revision=#{change.previous_revision} #{change.path}") do |stdout|
+        monotone("diff --revision=#{change.previous_native_revision_identifier} #{change.path}") do |stdout|
           yield stdout
         end
       end

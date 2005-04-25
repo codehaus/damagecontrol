@@ -291,11 +291,11 @@ module RSCM
       changes = changelist.files.collect do |filespec|
         change = RevisionFile.new(filespec.path, changelist.developer, changelist.message, filespec.revision, changelist.time)
         change.status = STATUS[filespec.status]
-        change.previous_revision = filespec.revision - 1
+        change.previous_native_revision_identifier = filespec.revision - 1
         change
       end
       revision = Revision.new(changes)
-      revision.revision = changelist.number
+      revision.native_revision_identifier =  changelist.number
       revision.developer = changelist.developer
       revision.message = changelist.message
       revision.time = changelist.time

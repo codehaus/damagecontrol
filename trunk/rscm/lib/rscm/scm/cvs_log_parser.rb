@@ -23,7 +23,7 @@ module RSCM
         @log<<log_entry
         @log<<""
         begin
-          parse_changes(log_entry, revisions)
+          parse_files(log_entry, revisions)
         rescue Exception => e
           $stderr.puts("could not parse log entry: #{log_entry}\ndue to: #{e.message}\n\t")
           $stderr.puts(e.backtrace.join("\n\t"))
@@ -48,20 +48,20 @@ module RSCM
       entries
     end
     
-    def parse_changes(log_entry, revisions)
+    def parse_files(log_entry, revisions)
       entries = split_entries(log_entry)
 
       entries[1..entries.length].each do |entry|
-        change = parse_change(entry)
-        next if change.nil?
-        change.path = parse_path(entries[0])
+        file = parse_file(entry)
+        next if file.nil?
+        file.path = parse_path(entries[0])
 
-        change.status = RevisionFile::ADDED if change.revision =~ /1\.1$/
+        file.status = RevisionFile::ADDED if file.native_revision_identifier =~ /1\.1$/
 
-        revision = revisions.add(change)
+        revision = revisions.add(file)
         # CVS doesn't have revision for revisions, use
         # Fisheye-style revision
-#        revision.revision = "MAIN:#{change.developer}:#{change.time.utc.strftime('%Y%m%d%H%M%S')}" if revision
+#        revision.native_revision_identifier =  "MAIN:#{file.developer}:#{file.time.utc.strftime('%Y%m%d%H%M%S')}" if revision
       end
       nil
     end
@@ -82,39 +82,39 @@ module RSCM
       convert_all_slashes_to_forward_slashes(file).gsub(/^#{cvspath}\/#{cvsmodule}\//, "")
     end
     
-    def parse_change(change_entry)
-      raise "can't parse: #{change_entry}" if change_entry =~ REVISION_SEPARATOR
+    def parse_file(file_entry)
+      raise "can't parse: #{file_entry}" if file_entry =~ REVISION_SEPARATOR
          
-      change_entry_lines = change_entry.split(/\r?\n/)
-      change = RevisionFile.new
+      file_entry_lines = file_entry.split(/\r?\n/)
+      file = RevisionFile.new
 
-      change.revision = extract_match(change_entry_lines[0], /revision (.*)$/)
+      file.native_revision_identifier =  extract_match(file_entry_lines[0], /revision (.*)$/)
       
-      change.previous_revision = determine_previous_revision(change.revision)
-      change.time = parse_cvs_time(extract_required_match(change_entry_lines[1], /date: (.*?)(;|$)/))
-      change.developer = extract_match(change_entry_lines[1], /author: (.*?);/)
+      file.previous_native_revision_identifier = determine_previous_native_revision_identifier(file.native_revision_identifier)
+      file.time = parse_cvs_time(extract_required_match(file_entry_lines[1], /date: (.*?)(;|$)/))
+      file.developer = extract_match(file_entry_lines[1], /author: (.*?);/)
       
-      state = extract_match(change_entry_lines[1], /state: (.*?);/)
-      change.status = STATES[state]
+      state = extract_match(file_entry_lines[1], /state: (.*?);/)
+      file.status = STATES[state]
       
       message_start = 2
       branches = nil
-      if(change_entry_lines[2] =~ /^branches:\s+(.*);/)
+      if(file_entry_lines[2] =~ /^branches:\s+(.*);/)
         message_start = 3
         branches = $1
       end
 
-      change.message = change_entry_lines[message_start..-1].join("\n")
+      file.message = file_entry_lines[message_start..-1].join("\n")
          
       # Ignore the initial revision from import - we will have two of them
-      if(change.message == "Initial revision" && branches == "1.1.1")
+      if(file.message == "Initial revision" && branches == "1.1.1")
         return nil
       end
 
-      change
+      file
     end
     
-    def determine_previous_revision(revision)
+    def determine_previous_native_revision_identifier(revision)
       if revision =~ /(.*)\.(.*)/
         big_version_number = $1
         small_version_number = $2.to_i

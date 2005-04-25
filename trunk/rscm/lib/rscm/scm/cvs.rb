@@ -96,8 +96,8 @@ module RSCM
     def diff(change)
       with_working_dir(@checkout_dir) do
         opts = case change.status
-          when /#{RevisionFile::MODIFIED}/; "#{revision_option(change.previous_revision)} #{revision_option(change.revision)}"
-          when /#{RevisionFile::DELETED}/; "#{revision_option(change.previous_revision)}"
+          when /#{RevisionFile::MODIFIED}/; "#{revision_option(change.previous_native_revision_identifier)} #{revision_option(change.native_revision_identifier)}"
+          when /#{RevisionFile::DELETED}/; "#{revision_option(change.previous_native_revision_identifier)}"
           when /#{RevisionFile::ADDED}/; "#{revision_option(Time.epoch)} #{revision_option(change.RevisionFile)}"
         end
         # IMPORTANT! CVS NT has a bug in the -N diff option

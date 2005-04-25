@@ -250,11 +250,6 @@ module DamageControl
       File.exists?(project_config_file)
     end
 
-    # TODO: remove
-    def scm_exists?
-      scm.exists?
-    end
-
     def delete_working_copy
       File.delete(scm.checkout_dir)
     end
@@ -274,7 +269,7 @@ module DamageControl
       revisions.each do |revision| 
         revision.project = self
         revision.each do |change|
-          change.revision = revision
+          change.native_revision_identifier =  revision
         end
       end
       revisions

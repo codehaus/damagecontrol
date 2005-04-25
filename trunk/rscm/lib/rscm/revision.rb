@@ -116,7 +116,7 @@ module RSCM
     include XMLRPC::Marshallable
 
     attr_reader :files
-    attr_accessor :revision
+    attr_writer :identifier
     attr_accessor :developer
     attr_accessor :message
     attr_accessor :time
@@ -174,7 +174,7 @@ module RSCM
 
     # String representation that can be used for debugging.
     def to_s
-      result = "#{revision} | #{developer} | #{time} | #{message}\n"
+      result = "#{identifier} | #{developer} | #{time} | #{message}\n"
       self.each do |file|
         result << " " << file.to_s << "\n"
       end
@@ -184,7 +184,7 @@ module RSCM
     # Returns the identifier of the revision. This is the revision 
     # (if defined) or an UTC time if it is not natively supported by the scm.
     def identifier
-      @revision || @time
+      @identifier || @time
     end
     
   end
