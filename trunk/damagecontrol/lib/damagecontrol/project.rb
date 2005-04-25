@@ -268,8 +268,8 @@ module DamageControl
       # Establish child->parent (backwards) references
       revisions.each do |revision| 
         revision.project = self
-        revision.each do |change|
-          change.native_revision_identifier =  revision
+        revision.each do |file|
+          file.revision =  revision
         end
       end
       revisions
