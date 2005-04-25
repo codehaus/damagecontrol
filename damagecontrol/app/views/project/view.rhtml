@@ -40,7 +40,7 @@ tabs = ["projects", "scms", "publishers", "trackers"]
 </div>
 
 <div id="publishers" style="display:none">
-Publishers give feedback of the results of a build. Publishers run after a build is executed. 
+Publishers give feedback of the results of a build. They are executed after a build is executed (regardless of whether the build was successful or not). 
   <%= tab_pane("publishers", @project.publishers) %>
 </div>
 
@@ -55,6 +55,5 @@ look for, as well as a base url of the bug tracker, so it can create a full link
 
 <% if(@edit) %>
   <input type="submit" value="Save"/>
-  
 </form>
 <% end %>

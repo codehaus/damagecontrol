@@ -28,13 +28,13 @@
   %>
     <tr>
       <td width="5%"><%= tag("img", :src => file.icon) %></td>
-      <td width="5%"><%= file.revision %></td>
+      <td width="5%"><%= file.native_revision_identifier %></td>
       <td width="90%">
         <%= link_to_remote file.path, :update => "diff_#{i}", :url => { 
               :controller => "scm", 
               :action => "file", 
               :id => @project.name, 
-              :params => {"revision_identifier" => @revision.identifier, "file_index" => i}
+              :params => {"revision_identifier" => file.native_revision_identifier, "file_index" => i}
             } %>
         <div id="diff_<%=i%>"></div>
       </td>
