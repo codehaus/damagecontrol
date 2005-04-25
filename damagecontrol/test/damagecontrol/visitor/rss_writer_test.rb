@@ -15,9 +15,9 @@ module DamageControl
         setup_changes
         revisions = RSCM::Revisions.new
         # we have to set the revisions on the changes so the view_cvs links are correct
-        @change1.revision = "1.1"
-        @change2.revision = "1.2"
-        @change3.revision = "1.3"
+        @change1.native_revision_identifier =  "1.1"
+        @change2.native_revision_identifier =  "1.2"
+        @change3.native_revision_identifier =  "1.3"
         revisions.add(@change1)
         revisions.add(@change2)
         revisions.add(@change3)

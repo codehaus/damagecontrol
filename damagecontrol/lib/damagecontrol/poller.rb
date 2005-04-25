@@ -24,7 +24,7 @@ module DamageControl
       Log.info "Starting polling cycle"
       Project.find_all(@projects_dir).each do |project|
         begin
-          if(project.scm_exists?)
+          if(project.scm.central_exists?)
             project.poll do |revisions|
               if(revisions.empty?)
                 Log.info "No revisions for #{project.name}"
@@ -33,7 +33,7 @@ module DamageControl
               end
             end
           else
-            Log.info "Not polling #{project.name} since its scm doesn't exist"
+            Log.info "Not polling #{project.name} since its central scm repo doesn't seem to exist"
           end
         rescue => e
           Log.error "Error polling #{project.name}"

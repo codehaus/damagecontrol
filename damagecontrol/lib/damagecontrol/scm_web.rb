@@ -26,11 +26,11 @@ module DamageControl
 
       def file_url(file, anchor=false)
         result = nil
-        if(file.previous_revision)
-          result = "#{url}#{file.path}?r1=#{file.previous_revision}&r2=#{file.revision}"
+        if(file.previous_native_revision_identifier)
+          result = "#{url}#{file.path}?r1=#{file.previous_native_revision_identifier}&r2=#{file.native_revision_identifier}"
         else
           # point to the viewcvs (rev) and fisheye (r) revisions (no diff view)
-          result = "#{url}#{file.path}?rev=#{file.revision}&r=#{file.revision}"
+          result = "#{url}#{file.path}?rev=#{file.native_revision_identifier}&r=#{file.native_revision_identifier}"
         end
         anchor ? "<a href=\"#{result}\">#{file.path}</a>" : result
       end

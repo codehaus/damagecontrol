@@ -21,7 +21,7 @@ module RSCM
       revisions.each do |revision|
         revision.each do |change|
           current_index = path_revisions[change.path].index(change.revision)
-          change.previous_revision = path_revisions[change.path][current_index + 1]
+          change.previous_native_revision_identifier = path_revisions[change.path][current_index + 1]
         end
       end
 
@@ -34,7 +34,7 @@ module RSCM
       doc = REXML::Document.new(revision_io)
 
       doc.elements.each("patch") do |element|
-        revision.revision = element.attributes['hash']
+        revision.native_revision_identifier =  element.attributes['hash']
         revision.developer = element.attributes['author']
         revision.time = Time.parse(element.attributes['local_date'])
         revision.message = element.elements["comment"].text
@@ -55,10 +55,10 @@ module RSCM
   private
 
     def add_changes(revision, path, state, path_revisions)
-      revision << RevisionFile.new(path, state, revision.developer, nil, revision.revision, revision.time)
+      revision << RevisionFile.new(path, state, revision.developer, nil, revision.identifier, revision.time)
 
       path_revisions[path] ||= []
-      path_revisions[path] << revision.revision
+      path_revisions[path] << revision.identifier
     end
   end
 end

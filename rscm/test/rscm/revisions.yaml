@@ -12,8 +12,8 @@ revisions:
 
           "
         path: server/damagecontrol/web/AbstractAdminServlet.rb
-        previous_revision: "1.42"
-        revision: "1.43"
+        previous_native_revision_identifier: "1.42"
+        native_revision_identifier: "1.43"
         status: MODIFIED
         time: 2004-11-30 04:52:24 Z
       - !ruby/object:RSCM::RevisionFile 
@@ -26,8 +26,8 @@ revisions:
 
           "
         path: server/damagecontrol/web/ProjectServlet.rb
-        previous_revision: "1.71"
-        revision: "1.72"
+        previous_native_revision_identifier: "1.71"
+        native_revision_identifier: "1.72"
         status: MODIFIED
         time: 2004-11-30 04:53:23 Z
     developer: rinkrank

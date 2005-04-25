@@ -26,7 +26,7 @@ EOF
       parser = MonotoneLogParser.new
       revision = parser.parse_revision(StringIO.new(CHANGESET), {})
 
-      assert_equal("a2c58e276439de7d9da549870e245776c592c7e8", revision.revision)
+      assert_equal("a2c58e276439de7d9da549870e245776c592c7e8", revision.identifier)
       assert_equal("tester@test.net", revision.developer)
       assert_equal(Time.utc(2005,3,2,6,32,43), revision.time)
 
@@ -109,7 +109,7 @@ EOF
       parser = MonotoneLogParser.new
       revisions = parser.parse_revisions(StringIO.new(CHANGESETS), "a2c58e276439de7d9da549870e245776c592c7e8")
       assert_equal(1, revisions.length)
-      assert_equal("a2c58e276439de7d9da549870e245776c592c7e8", revisions[0][0].previous_revision)
+      assert_equal("a2c58e276439de7d9da549870e245776c592c7e8", revisions[0][0].previous_native_revision_identifier)
       assert_equal("abbe1eb8f75bdf9b27d440340ec329816c13985c", revisions[0][0].revision)
 
 

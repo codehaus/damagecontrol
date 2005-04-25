@@ -17,7 +17,7 @@ module DamageControl
       p1 = Project.new("foo")
       p1.dir = "#{tmp}/foo"
       p1.scm = new_mock
-      p1.scm.__expect(:exists?) {true}
+      p1.scm.__expect(:central_exists?) {true}
       p1.scm.__expect(:revisions) {revisions1}
       p1.scm.__expect(:transactional?) {true}
       p1.scm.__setup(:name) {"MockSCM1"}

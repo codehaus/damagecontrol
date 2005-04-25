@@ -1,0 +1,43 @@
+<%= link_to_remote(
+	"Trigger build for this revision",
+	:update => "request_build",
+	:url => {:controller => "build", :action => "request_build", :id => @revision.project.name, :params => {"revision" => @revision.identifier, "reason" => "Manually triggered via web interface"}}
+) %>
+<div id="request_build"></div>
+
+<ul class="foldertab">
+  <li><a href="javascript:setTab('revisions')"><img src="/images/16x16/document_exfile.png"> Changesets</a></li>
+  <% @revision.builds.each do |build| %>
+  <li><%= link_to(build.identifier, 
+          :controller => "build", :action => "status", :id => @project.name, :params => 
+          {"revision" => @revision.identifier, "build" => build.identifier}) %></li>
+  <% end %>
+</ul>
+<table class="pane">
+  <tr class="pane">
+    <td colspan="3" class="revision">
+      <div class="revision-message">
+        <b><%= @revision.developer %></b>
+        (<%= @revision.time.to_human %> UTC)<br/>
+        <%= @project.tracker.highlight(@revision.message) %>
+      </div>
+    </td>
+  </tr>
+  <%
+  @revision.each_with_index do |file, i|
+  %>
+    <tr>
+      <td width="5%"><%= tag("img", :src => file.icon) %></td>
+      <td width="5%"><%= file.revision %></td>
+      <td width="90%">
+        <%= link_to_remote file.path, :update => "diff_#{i}", :url => { 
+              :controller => "scm", 
+              :action => "file", 
+              :id => @project.name, 
+              :params => {"revision_identifier" => @revision.identifier, "file_index" => i}
+            } %>
+        <div id="diff_<%=i%>"></div>
+      </td>
+    </tr>
+  <% end %>
+</table>

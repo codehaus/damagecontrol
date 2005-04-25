@@ -61,7 +61,7 @@ EOF
       revision = parser.parse_revision(StringIO.new(CHANGESET), {})
 
       assert_equal("imported\nsources", revision.message)
-      assert_equal('20050327203534-4d520-baeeafb062e7f0d72ce740e1e1f5e6a203321ab4.gz', revision.revision)
+      assert_equal('20050327203534-4d520-baeeafb062e7f0d72ce740e1e1f5e6a203321ab4.gz', revision.identifier)
       assert_equal("tester@test.net", revision.developer)
       assert_equal(Time.utc(2005,3,27,20,35,34), revision.time)
       assert_equal(4, revision.length)

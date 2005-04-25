@@ -52,7 +52,7 @@ module DamageControl
         if(req_with_same_project.revision != revision)
           # it's a request for a different (presumably later) revision for the same project.
           # replace the request's revision and void the reasons (which were for the old one)
-          req_with_same_project.revision = revision
+          req_with_same_project.revision =  revision
           req_with_same_project.reasons.clear
         end
         req_with_same_project.reasons << reason

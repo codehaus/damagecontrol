@@ -69,10 +69,10 @@ module RSCM
 
       assert_equal("build.xml", revision[0].path)
       assert(revision[0].revision)
-      assert(revision[0].previous_revision)
+      assert(revision[0].previous_native_revision_identifier)
       assert_equal("src/java/com/thoughtworks/damagecontrolled/Thingy.java", revision[1].path)
       assert(revision[1].revision)
-      assert(revision[1].previous_revision)
+      assert(revision[1].previous_native_revision_identifier)
 
       assert(!workspace2.uptodate?(revisions.latest.time+1))
       assert(!workspace2.uptodate?(revisions.latest.time+1))

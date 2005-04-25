@@ -43,29 +43,29 @@ module RSCM
       end
     end
 
-    def test_parse_changes
+    def test_parse_files
       revisions = Revisions.new
-      @parser.parse_changes(LOG_ENTRY, revisions)
+      @parser.parse_files(LOG_ENTRY, revisions)
       revisions.sort!
       assert_equal(4, revisions.length)
       assert_equal("src/ruby/damagecontrol/BuildExecutorTest.rb", revisions[0][0].path)
       assert_match(/linux-windows galore/, revisions[1][0].message)
     end
     
-    def test_sets_previous_revision_to_one_before_the_current
-      change = @parser.parse_change(CHANGE_ENTRY)
-      assert_equal("1.20", change.revision)
-      assert_equal("1.19", change.previous_revision)
+    def test_sets_previous_native_revision_identifier_to_one_before_the_current
+      change = @parser.parse_file(CHANGE_ENTRY)
+      assert_equal("1.20", change.native_revision_identifier)
+      assert_equal("1.19", change.previous_native_revision_identifier)
     end
     
-    def test_can_determine_previous_revisions_from_tricky_input
-      assert_equal("2.2.1.1", @parser.determine_previous_revision("2.2.1.2"))
-      assert_equal(nil, @parser.determine_previous_revision("2.2.1.1"))
+    def test_can_determine_previous_native_revision_identifiers_from_tricky_input
+      assert_equal("2.2.1.1", @parser.determine_previous_native_revision_identifier("2.2.1.2"))
+      assert_equal(nil, @parser.determine_previous_native_revision_identifier("2.2.1.1"))
     end
 
-    def test_parse_change
-      change = @parser.parse_change(CHANGE_ENTRY)
-      assert_equal("1.20", change.revision)
+    def test_parse_file
+      change = @parser.parse_file(CHANGE_ENTRY)
+      assert_equal("1.20", change.native_revision_identifier)
       assert_equal(Time.utc(2003,11,9,17,53,37), change.time)
       assert_equal("tirsen", change.developer)
       assert_match(/Quiet period is configurable for each project/, change.message)
@@ -100,9 +100,9 @@ remove username check (doesn't work on beaver)
 I do really want to see the url in irc, it's very, very convenient. thank you very much ;-)
 EOF
 
-    def test_can_parse_changes_with_deleted_file
+    def test_can_parse_files_with_deleted_file
       revisions = Revisions.new
-      @parser.parse_changes(LOG_ENTRY_WITH_DELETED_FILE, revisions)
+      @parser.parse_files(LOG_ENTRY_WITH_DELETED_FILE, revisions)
       assert_equal(1, revisions.length)
       assert_equal("server/damagecontrol/codehaus.rb", revisions[0][0].path)
       assert_equal(RevisionFile::DELETED, revisions[0][0].status)
@@ -204,7 +204,7 @@ EOF
       expected_change.path = "server/damagecontrol/scm/CVS.rb"
       expected_change.developer = "tirsen"
       expected_change.message = "fixed some stuff in the log parser"
-      expected_change.revision = "1.19"
+      expected_change.native_revision_identifier =  "1.19"
       expected_change.time = Time.utc(2004, 7, 5, 9, 41, 51)
       
       assert_equal(expected_change, revisions[9][0])
@@ -257,7 +257,7 @@ debugging cvs timestamps
 ----------------------------
 revision 1.12
 date: 2004/07/03 19:25:19;  author: rinkrank;  state: Exp;  lines: +20 -3
-support for previous_revision in modifications
+support for previous_native_revision_identifier in modifications
 ----------------------------
 revision 1.11
 date: 2004/07/02
@@ -369,8 +369,8 @@ EOF
       assert_equal("rinkrank", revision_delete.developer)
       assert_equal(1, revision_delete.length)
       assert_equal("build.xml", revision_delete[0].path)
-      assert_equal("1.11", revision_delete[0].revision)
-      assert_equal("1.10", revision_delete[0].previous_revision)
+      assert_equal("1.11", revision_delete[0].native_revision_identifier)
+      assert_equal("1.10", revision_delete[0].previous_native_revision_identifier)
       assert(RevisionFile::DELETED, revision_delete[0].status)
 
       revision_fix_url = revisions[0]
@@ -380,8 +380,8 @@ EOF
       assert_equal("rinkrank", revision_fix_url.developer)
       assert_equal(1, revision_fix_url.length)
       assert_equal("build.xml", revision_fix_url[0].path)
-      assert_equal("1.10", revision_fix_url[0].revision)
-      assert_equal("1.9", revision_fix_url[0].previous_revision)
+      assert_equal("1.10", revision_fix_url[0].native_revision_identifier)
+      assert_equal("1.9", revision_fix_url[0].previous_native_revision_identifier)
       assert_equal(RevisionFile::MODIFIED, revision_fix_url[0].status)
     end
 

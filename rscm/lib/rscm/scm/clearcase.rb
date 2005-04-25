@@ -25,7 +25,7 @@ module RSCM
     
     def diff(checkout_dir, change)
       with_working_dir(checkout_dir) do
-        cleartool("diff -diff_format #{change.path}@@#{change.previous_revision} #{change.path}@@#{change.revision}")
+        cleartool("diff -diff_format #{change.path}@@#{change.previous_native_revision_identifier} #{change.path}@@#{change.revision}")
       end
     end
 

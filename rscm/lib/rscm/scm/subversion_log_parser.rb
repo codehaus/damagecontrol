@@ -46,13 +46,13 @@ module RSCM
       elsif(line.strip == "")
         @parse_state = :parse_message
       elsif(line =~ /Changed paths/)
-        @parse_state = :parse_changes
-      elsif(@parse_state == :parse_changes)
-        change = parse_change(line)
-        if change
+        @parse_state = :parse_files
+      elsif(@parse_state == :parse_files)
+        file = parse_file(line)
+        if file
           # This unless won't work for new directories or if revisions are computed before checkout (which it usually is!)
-          fullpath = "#{@checkout_dir}/#{change.path}"
-          @revision << change unless File.directory?(fullpath)
+          fullpath = "#{@checkout_dir}/#{file.path}"
+          @revision << file unless File.directory?(fullpath)
         end
       elsif(@parse_state == :parse_message)
         @revision.message << line.chomp << "\n"
@@ -73,36 +73,36 @@ module RSCM
       @revision = Revision.new
       @revision.message = ""
       revision, developer, time, the_rest = line.split("|")
-      @revision.revision = revision.strip[1..-1].to_i unless revision.nil?
+      @revision.identifier = revision.strip[1..-1].to_i unless revision.nil?
       @revision.developer = developer.strip unless developer.nil?
       @revision.time = parse_time(time.strip) unless time.nil?
     end
     
-    def parse_change(line)
-      change = RevisionFile.new
+    def parse_file(line)
+      file = RevisionFile.new
       path_from_root = nil
       if(line =~ /^   [M|A|D|R] ([^\s]+) \(from (.*)\)/)
         path_from_root = $1
-        change.status = RevisionFile::MOVED
+        file.status = RevisionFile::MOVED
       elsif(line =~ /^   ([M|A|D|R]) (.+)$/)
         status = $1
         path_from_root = $2
-        change.status = STATES[status]
+        file.status = STATES[status]
       else
-        raise "could not parse change line: '#{line}'"
+        raise "could not parse file line: '#{line}'"
       end
 
       path_from_root.gsub!(/\\/, "/")
       return nil unless path_from_root =~ /^\/#{@path}/
       if(@path.length+1 == path_from_root.length)
-        change.path = path_from_root[@path.length+1..-1]
+        file.path = path_from_root[@path.length+1..-1]
       else
-        change.path = path_from_root[@path.length+2..-1]
+        file.path = path_from_root[@path.length+2..-1]
       end
-      change.revision = @revision.revision
+      file.native_revision_identifier =  @revision.identifier
       # http://jira.codehaus.org/browse/DC-204
-      change.previous_revision = change.revision.to_i - 1;
-      change
+      file.previous_native_revision_identifier = file.native_revision_identifier.to_i - 1;
+      file
     end
 
     def parse_time(svn_time)

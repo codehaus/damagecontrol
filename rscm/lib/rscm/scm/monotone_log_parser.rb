@@ -39,7 +39,7 @@ module RSCM
           revisions.add(revision)
           revision.each do |change|
             current_index = path_revisions[change.path].index(change.revision)
-            change.previous_revision = path_revisions[change.path][current_index + 1]
+            change.previous_native_revision_identifier = path_revisions[change.path][current_index + 1]
           end
         end
       end
@@ -50,8 +50,8 @@ module RSCM
       revision = Revision.new
       state = nil
       revision_io.each_line do |line|
-        if(line =~ /^Revision: (.*)$/ && revision.revision.nil?)
-          revision.revision = $1
+        if(line =~ /^Revision: (.*)$/ && revision.identifier.nil?)
+          revision.native_revision_identifier =  $1
         elsif(line =~ /^Author: (.*)$/ && revision.developer.nil?)
           revision.developer = $1
         elsif(line =~ /^Date: (.*)$/ && revision.time.nil?)
@@ -95,12 +95,12 @@ module RSCM
     def add_changes(revision, line, state, path_revisions)
       paths = line.split(" ")
       paths.each do |path|
-        revision << RevisionFile.new(path, state, revision.developer, nil, revision.revision, revision.time)
+        revision << RevisionFile.new(path, state, revision.developer, nil, revision.identifier, revision.time)
 
         # now record path revisions so we can keep track of previous rev for each path
         # doesn't work for moved files, and have no idea how to make it work either.
         path_revisions[path] ||= [] 
-        path_revisions[path] << revision.revision
+        path_revisions[path] << revision.identifier
       end
       
     end
