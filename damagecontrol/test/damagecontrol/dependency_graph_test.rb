@@ -1,6 +1,7 @@
 require 'test/unit'
 require 'rscm/mockit'
 require 'rscm/tempdir'
+require 'rscm/difftool_test'
 require 'damagecontrol/dependency_graph'
 
 module DamageControl
@@ -21,11 +22,21 @@ module DamageControl
       ruby.__setup(:dependencies) { [] }
 
       dir = RSCM.new_temp_dir("dependency_graph")
-      file = "#{dir}/dependency_graph.png"
-
       dg = DependencyGraph.new([dc, rscm, ruby])
-      dg.write_to(file)
-      assert(File.exist?(file))
+
+      png_file = "#{dir}/dependency_graph.png"
+      dot_file = "#{dir}/dependency_graph.dot"
+      html_file = "#{dir}/dependency_graph.html"
+
+      dg.write_to(png_file)
+
+      expected_dot = File.dirname(__FILE__) + "/expected_dependency_graph.dot"
+      assert_equal_with_diff(File.open(expected_dot).read, File.open(dot_file).read)
+
+      expected_html = File.dirname(__FILE__) + "/expected_dependency_graph.html"
+      assert_equal_with_diff(File.open(expected_html).read, File.open(html_file).read)
+
+      assert(File.exist?(png_file))
     end
   end
  end

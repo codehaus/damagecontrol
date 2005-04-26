@@ -1,0 +1,19 @@
+digraph G  {
+    label = ""
+    "RSCM" [
+        URL = "ajax/RSCM"
+    ]
+
+    "Ruby" [
+        URL = "ajax/Ruby"
+    ]
+
+    "DamageControl" [
+        URL = "ajax/DamageControl"
+    ]
+
+    "RSCM" -> "Ruby"
+    "DamageControl" -> "RSCM"
+    "DamageControl" -> "Ruby"
+}
+
