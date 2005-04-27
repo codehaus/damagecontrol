@@ -14,7 +14,7 @@ module RSCM
       revisions = scm.revisions(@checkout_dir, Time.utc(2005,03,03,0,0,0))
     end
 
-    def Xtest_checkout
+    def test_checkout
       # delete some local files (so we get some checkouts!)
       build_xml = "build.xml"
       actions_xml = "JavaSource/actions.xml"

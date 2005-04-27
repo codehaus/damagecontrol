@@ -17,12 +17,16 @@ module DamageControl
       rscm.__setup(:name) { "RSCM" }
       ruby.__setup(:name) { "Ruby" }
 
+      dc.__setup(:depends_on?) {|p| p == ruby || p == rscm }
+      rscm.__setup(:depends_on?) {|p| p == ruby }
+      ruby.__setup(:depends_on?) {|p| false }
+
       dc.__setup(:dependencies) { [ruby, rscm] }
       rscm.__setup(:dependencies) { [ruby] }
       ruby.__setup(:dependencies) { [] }
 
       dir = RSCM.new_temp_dir("dependency_graph")
-      dg = DependencyGraph.new([dc, rscm, ruby])
+      dg = DependencyGraph.new(rscm, [dc, rscm, ruby], String)
 
       png_file = "#{dir}/dependency_graph.png"
       dot_file = "#{dir}/dependency_graph.dot"

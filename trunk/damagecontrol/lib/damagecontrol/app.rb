@@ -25,6 +25,9 @@ module DamageControl
   # The main entry point for the DC daemon
   class App
     def run
+      # Delete the old build queue
+      File.rm_rf("#{basedir}/build_queue.yaml") if File.exist?("#{basedir}/build_queue.yaml")
+    
       # Wire up the whole DamageControl app with Needle's nice block based DI framework.
       # I wonder - is BDI (Block Dependency Injection) a new flavour of DI?
       registry = Needle::Registry.define do |b|

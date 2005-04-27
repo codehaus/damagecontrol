@@ -29,7 +29,14 @@ module RSCM
       }
       
       # TODO: persist here, not in app.rb
-      build.execute(@project.build_command, @project.execute_dir, env)
+      begin
+        build.execute(@project.build_command, @project.execute_dir, env)
+      rescue => e
+        File.open(build.stderr_file, "w") do |io|
+          e.write("DamageControl failed. This may or may not be a bug!\n\n")
+          e.write(e.backtrace.join("\n"))
+        end
+      end
       @project.publish(build)
     end
 

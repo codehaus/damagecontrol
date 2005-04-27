@@ -1,15 +1,19 @@
 digraph G  {
     label = ""
     "RSCM" [
-        URL = "ajax/RSCM"
+        style = filled
+        fillcolor = yellow
     ]
 
     "Ruby" [
-        URL = "ajax/Ruby"
+        URL = "javascript:new Ajax.Updater('dependency_graph', '/projects/RSCM/remove_dependency/Ruby', {asynchronous:true});"
+        style = filled
+        fillcolor = white
     ]
 
     "DamageControl" [
-        URL = "ajax/DamageControl"
+        style = filled
+        fillcolor = white
     ]
 
     "RSCM" -> "Ruby"

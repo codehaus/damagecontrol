@@ -6,7 +6,7 @@ class DependencyController < ApplicationController
 
   # Renders a dependency graph of all projects
   def image_map_html
-    from_name = "DamageControl" #@params["id"]
+    from_name = @params["id"]
     from = DamageControl::Project.load("#{BASEDIR}/projects/#{from_name}/project.yaml")
     projects = DamageControl::Project.find_all("#{BASEDIR}/projects")
     dg = DamageControl::DependencyGraph.new(from, projects)
