@@ -43,7 +43,7 @@ var project_start_time_tip = "<div class='tp1'>Date from which revisions will be
 <%= link_to_remote(
 	"Show project dependencies", 
 	:update => "dependency_graph",
-	:url => {:controller => "dependency", :action => "image_map_html"}
+	:url => {:controller => "dependency", :action => "image_map_html", :id => project.name}
 	)
 %>
 </div>

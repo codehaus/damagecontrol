@@ -171,8 +171,7 @@ module RSCM
       @scm = scm
       
       # Verify that install/uninstall works
-      touch = WINDOWS ? File.dirname(__FILE__) + "../../bin/touch.exe" : "touch"
-      touch = PathConverter.filepath_to_nativepath(touch, false)
+      touch = WINDOWS ? PathConverter.filepath_to_nativepath(File.dirname(__FILE__) + "../../bin/touch.exe", false) : "touch"
       trigger_command = "#{touch} " + PathConverter.filepath_to_nativepath(trigger_proof, false)
       trigger_files_checkout_dir = File.expand_path("#{checkout_dir}/../trigger")
       (1..3).each do |i|
