@@ -16,6 +16,10 @@ ActionController::Routing::Routes.draw do |map|
   
   map.connect '', :controller => 'project'
 
+  # Project dependencies
+  map.connect 'projects/:id/add_dependency/:to', :controller => 'dependency', :action => "add_dependency"
+  map.connect 'projects/:id/remove_dependency/:to', :controller => 'dependency', :action => "remove_dependency"
+
   map.connect 'projects/:id', :controller => 'project', :action => "view"
   map.connect 'projects/:id/changesets/:changeset', :controller => 'project', :action => "changeset"
   map.connect 'projects/:id/changesets/:changeset/builds/:build', :controller => 'build', :action => "status"

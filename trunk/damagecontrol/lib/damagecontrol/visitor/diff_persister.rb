@@ -1,4 +1,3 @@
-require 'rscm/changes'
 require 'rscm/logging'
 require 'damagecontrol/revision_ext.rb'
 

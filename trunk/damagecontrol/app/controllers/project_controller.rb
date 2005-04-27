@@ -119,7 +119,7 @@ protected
 #      }
 #    end
 
-    if(@project.exists? && @project.scm && @project.scm.can_create_central? && !@project.scm.exists?)
+    if(@project.exists? && @project.scm && @project.scm.can_create_central? && !@project.scm.central_exists?)
       @sidebar_links << {
         :controller => "scm", 
         :action     => "create", 

@@ -9,7 +9,6 @@ require 'damagecontrol/scm_web'
 require 'damagecontrol/publisher/base'
 require 'rscm_ext'
 require 'rails_ext'
-require 'damagecontrol/json_ext'
 
 # From damagecontrol/app
 BASEDIR = basedir unless defined? BASEDIR

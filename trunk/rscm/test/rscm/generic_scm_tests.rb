@@ -100,7 +100,7 @@ module RSCM
 
       # 13
       revisions = scm.revisions(initial_revisions.latest.identifier)
-
+      assert(revisions[0].identifier)
       assert_equal(1, revisions.length, revisions.collect{|cs| cs.to_s})
       revision = revisions[0]
       assert_equal(2, revision.length)
@@ -171,7 +171,9 @@ module RSCM
       @scm = scm
       
       # Verify that install/uninstall works
-      trigger_command = "touch " + PathConverter.filepath_to_nativepath(trigger_proof, false)
+      touch = WINDOWS ? File.dirname(__FILE__) + "../../bin/touch.exe" : "touch"
+      touch = PathConverter.filepath_to_nativepath(touch, false)
+      trigger_command = "#{touch} " + PathConverter.filepath_to_nativepath(trigger_proof, false)
       trigger_files_checkout_dir = File.expand_path("#{checkout_dir}/../trigger")
       (1..3).each do |i|
         assert(!scm.trigger_installed?(trigger_command, trigger_files_checkout_dir))

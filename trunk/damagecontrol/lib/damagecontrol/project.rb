@@ -120,6 +120,10 @@ module DamageControl
       @dependencies << project.name
     end
 
+    def remove_dependency(project)
+      @dependencies.delete(project.name)
+    end
+    
     def clear_dependencies
       @dependencies ||= []
       @dependencies.clear
