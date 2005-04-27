@@ -116,7 +116,7 @@ module RSCM
     include XMLRPC::Marshallable
 
     attr_reader :files
-    attr_writer :identifier
+    attr_accessor :identifier
     attr_accessor :developer
     attr_accessor :message
     attr_accessor :time
@@ -132,7 +132,10 @@ module RSCM
 
     def << (file)
       @files << file
-      self.time = file.time if self.time.nil? || self.time < file.time unless file.time.nil?
+      if(self.time.nil? || self.time < file.time unless file.time.nil?)
+        self.time = file.time
+        self.identifier = self.time if(self.identifier.nil? || self.identifier.is_a?(Time))
+      end
       self.developer = file.developer if file.developer
       self.message = file.message if file.message
     end
@@ -183,7 +186,7 @@ module RSCM
     
     # Returns the identifier of the revision. This is the revision 
     # (if defined) or an UTC time if it is not natively supported by the scm.
-    def identifier
+    def identifierAA
       @identifier || @time
     end
     
