@@ -33,9 +33,13 @@ module RSCM
         # TODO: persist here, not in app.rb
         build.execute(@project.build_command, @project.execute_dir, env)
       rescue => e
+        # Something fatal went wrong in checkout or build. Shouldn't normally happen.
+        FileUtils.mkdir_p(File.dirname(build.stderr_file))
         File.open(build.stderr_file, "w") do |io|
-          e.write("DamageControl failed. This may or may not be a bug!\n\n")
-          e.write(e.backtrace.join("\n"))
+          io.write("DamageControl failed. This may or may not be a bug!\n\n")
+          io.write(e.message)
+          io.puts
+          io.write(e.backtrace.join("\n"))
         end
       end
       @project.publish(build)
