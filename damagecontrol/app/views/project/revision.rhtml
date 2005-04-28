@@ -8,7 +8,7 @@
 </div>
 
 <ul class="foldertab">
-  <li><a href="javascript:setTab('revisions')"><img src="/images/16x16/document_exfile.png"> Changes</a></li>
+  <li><a href="javascript:setTab('revisions')"><img src="/images/16x16/document_exfile.png"/> Changes</a></li>
   <% @revision.builds.each do |build| %>
   <li><%= link_to(build.identifier, 
           :controller => "build", :action => "status", :id => @project.name, :params => 
@@ -29,7 +29,7 @@
   @revision.each_with_index do |file, i|
   %>
     <tr>
-      <td width="5%"><%= tag("img", :src => file.icon) %></td>
+      <td width="5%"><%= tag("img", :src => file.icon, :alt => file.description) %></td>
       <td width="5%"><%= file.native_revision_identifier %></td>
       <td width="90%">
         <%= link_to_remote file.path, :update => "diff_#{i}", :url => { 

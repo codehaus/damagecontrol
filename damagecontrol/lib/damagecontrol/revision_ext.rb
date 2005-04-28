@@ -19,17 +19,18 @@ module RSCM
     # Usually, this method should only be called by a Builder.
     def build!(build_reason)
 
-      @project.scm.checkout(identifier)
-
       build = DamageControl::Build.new(self, Time.now.utc, build_reason)
-      env = {
-        'PKG_BUILD' => identifier.to_s, # Rake standard
-        'DAMAGECONTROL_BUILD_LABEL' => identifier.to_s, # For others
-        'DAMAGECONTROL_CHANGED_FILES' => self.collect{|change| change.path}.join(",")
-      }
-      
-      # TODO: persist here, not in app.rb
+
       begin
+        @project.scm.checkout(identifier)
+
+        env = {
+          'PKG_BUILD' => identifier.to_s, # Rake standard
+          'DAMAGECONTROL_BUILD_LABEL' => identifier.to_s, # For others
+          'DAMAGECONTROL_CHANGED_FILES' => self.collect{|change| change.path}.join(",")
+        }
+      
+        # TODO: persist here, not in app.rb
         build.execute(@project.build_command, @project.execute_dir, env)
       rescue => e
         File.open(build.stderr_file, "w") do |io|

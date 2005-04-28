@@ -9,7 +9,7 @@ class BuildController < ApplicationController
   def request_build
     load_project
     @revision_identifier = @params["revision"].to_identifier
-    reason = @params["reason"].to_identifier
+    reason = @params["reason"] || "Triggered via HTTP (unknown why)"
     # Persist the request so it can be picked up by the daemon
     FileUtils.mkdir_p("#{BASEDIR}/build_requests")
     File.open("#{BASEDIR}/build_requests/#{@project.name}_#{@revision_identifier}.yaml", 'w') do |io|
