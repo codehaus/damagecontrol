@@ -31,7 +31,7 @@ module DamageControl
             project.tracker || Tracker::Null.new, 
             project.scm_web || SCMWeb::Null.new        
           )
-          last_15_revisions.accept(rss_writer)
+          last_15_revisions.reverse.accept(rss_writer)
           io.write(rss.to_rss)
         end
       end

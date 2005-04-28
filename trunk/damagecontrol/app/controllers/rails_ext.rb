@@ -75,22 +75,7 @@ protected
 end
 
 module ActionView
-  module Helpers
-    module UrlHelper
-      # Modify the original behaviour of +link_to+ so that the link
-      # includes the client's timezone as URL param +timezone+ in the request.
-      # Can be used by server to adjust formatting of UTC dates so they match the client's time zone.
-      def convert_confirm_option_to_javascript!(html_options)
-        # We're adding this JS call to add the timezone info as a URL param.
-        html_options["onclick"] = "intercept(this);"
-        if html_options.include?(:confirm)
-          html_options["onclick"] += "return confirm('#{html_options[:confirm]}');"
-          html_options.delete(:confirm)
-        end
-      end
-    end
-  end
-  
+
   class Base
     include Inflector
 

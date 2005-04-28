@@ -9,7 +9,7 @@ module RSCM
     include Enumerable
     include XMLRPC::Marshallable
 
-    attr_reader :revisions
+    attr_accessor :revisions
 
     def initialize(revisions=[])
       @revisions = revisions
@@ -37,7 +37,9 @@ module RSCM
     end
     
     def reverse
-      Revisions.new(@revisions.dup.reverse)
+      r = clone
+      r.revisions = @revisions.dup.reverse
+      r
     end
     
     def length

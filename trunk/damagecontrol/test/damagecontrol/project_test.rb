@@ -30,7 +30,7 @@ module DamageControl
         assert_equal(@p.start_time, from)
         revisions
       end
-      @p.poll do |cs|
+      @p.poll(0) do |cs|
         assert_equal(revisions, cs)
       end
     end
@@ -56,7 +56,7 @@ module DamageControl
         assert_equal(@p.start_time, from)
         RSCM::Revisions.new
       end
-      @p.poll do |cs|
+      @p.poll(0) do |cs|
         assert_equal(RSCM::Revisions, cs.class)
       end
     end
@@ -82,7 +82,7 @@ module DamageControl
         revisions
       end
       @p.scm.__expect(:transactional?) {true}
-      @p.poll do |cs|
+      @p.poll(0) do |cs|
         assert_equal(revisions, cs)
       end
     end
