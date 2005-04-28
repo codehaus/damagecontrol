@@ -14,7 +14,7 @@ puts "\n#{cmd}"
     proc.call(io)
   end
   exit_code = $? >> 8
-  raise "#{cmd} failed with code #{exit_code} in #{Dir.pwd}. Expected exit code: #{expected_exit}" if exit_code != expected_exit
+  raise "Command\n'#{cmd}'\nfailed with code #{exit_code} in\n#{Dir.pwd}\nExpected exit code: #{expected_exit}" if exit_code != expected_exit
   ret
 end
 
