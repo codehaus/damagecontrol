@@ -43,10 +43,21 @@ class RSCM::RevisionFile
     MODIFIED => "/images/16x16/document_edit.png",
     DELETED => "/images/16x16/document_delete.png",
     ADDED => "/images/16x16/document_add.png",
-    MOVED => "/images/16x16/document_exchange.png",
+    MOVED => "/images/16x16/document_exchange.png"
   }
     
+  DESCRIPTIONS = {
+    MODIFIED => "Changed",
+    DELETED => "Removed",
+    ADDED => "Added",
+    MOVED => "Moved"
+  }
+
   def icon
     ICONS[@status] || "/images/16x16/document_warning.png"
+  end
+
+  def description
+    DESCRIPTIONS[@status] || "Unknown"
   end
 end
