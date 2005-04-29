@@ -1,5 +1,6 @@
-require 'damagecontrol/publisher/base'
+begin
 require 'ruby-growl'
+require 'damagecontrol/publisher/base'
 
 module DamageControl
   module Publisher
@@ -41,4 +42,8 @@ module DamageControl
       end
     end
   end
+end
+
+rescue LoadError
+  # appropriate gems not installed, disabiling growl support
 end

@@ -91,9 +91,9 @@ module ActionView
       elsif(:type == "password")
         "********"
       elsif(options[:value] =~ /^http?:\/\//)
-        content_tag("a", options[:value], "href" => options[:value] ? options[:value] : "")
+        content_tag("a", options[:value], :href => options[:value] ? options[:value] : "")
       else
-        options[:value] ? options[:value] : ""
+        options[:value] ? content_tag("span", options[:value], :id => options[:name]) : ""
       end
     end
 

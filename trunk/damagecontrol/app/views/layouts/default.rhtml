@@ -38,12 +38,13 @@
 
 <table id="main-table" width="100%" border="0" style="height:70%;">
 	<tr>
-		<td id="side-panel" width="20%">
+		<td id="side-panel" width="20%" nowrap="nowrap">
 			<div id="tasks">  
 				<% @sidebar_links.each do |link| 
 					image = link.delete(:image)
 					name  = link.delete(:name)
 					href = link.delete(:href)
+					id = name.downcase.gsub(/\W/, '_')
 					if(href) %>
 		      			<div class="task">
 							<%= content_tag("a", 
@@ -53,11 +54,11 @@
       								:height => "24"
       							), 
 		      					{:href => href}) 
-							%> <%= content_tag("a", name, {:href => href}) %>
+							%> <%= content_tag("a", name, {:href => href, :id => id}) %>
 						</div>
 					<% else %>  
 						<div class="task">
-							<%= link_to_image(image, link, {:size => "24x24"}) %> <%= link_to(name, link) %>
+							<%= link_to_image(image, link, :size => "24x24") %> <%= link_to(name, link, :id => id) %>
 						</div>
     					<% end %>
 				<% end %>

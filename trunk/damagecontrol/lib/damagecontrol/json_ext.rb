@@ -1,3 +1,5 @@
+begin
+  
 require 'yaml'
 require 'rubygems'
 require_gem 'ruby-json'
@@ -12,4 +14,8 @@ class Object
     end
     r.to_json
   end
+end
+
+rescue Gem::LoadError
+  # appropriate gem not installed, disabling json support
 end

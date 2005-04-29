@@ -1,6 +1,11 @@
-# Need to know the basedir - same as damagecontrol daemon process
-require 'damagecontrol/app'
-BASEDIR = basedir
+#!/usr/local/bin/ruby
 
-rails_webrick_server = File.dirname(__FILE__) + "/../script/server"
-load(rails_webrick_server)
+scriptdir = File.dirname(__FILE__) + '/../script'
+if !File.directory?(scriptdir)
+  ENV['RAILS_ENV'] ||= 'production'
+  # run via gem, let's load the latest version
+  gems = Gem.source_index.find_name('damagecontrol', nil)
+  raise "could not find damagecontrol gem" if gems.length < 1
+  scriptdir = gems[0].full_gem_path + '/script'
+end
+load scriptdir + '/server'
