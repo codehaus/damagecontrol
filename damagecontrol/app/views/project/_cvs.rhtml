@@ -133,27 +133,27 @@ var cvs_mod_tip  = "<div class='tp1'>Note that you can't use trigged build if yo
   <tr>
     <td>User name</td>
     <td>&nbsp;</td>
-    <td width="75%"><%= text_or_input(@edit, :onKeyUp => "updateCvsRootField()", :id => "cvsuser") %></td>
+    <td width="75%"><%= text_or_input(@edit, :onKeyUp => "updateCvsRootField()", :onblur => "updateCvsRootField()", :id => "cvsuser") %></td>
   </tr>
   <tr>
     <td>Password</td>
     <td><%= tip(:txt => 'scm_password_tip') %></td>
-    <td width="75%"><%= text_or_input(@edit, :type => "password", :name => "scms[RSCM::Cvs][@password]", :value => cvs.password, :onKeyUp => "updateCvsRootField()", :id => "cvspassword") %></td>
+    <td width="75%"><%= text_or_input(@edit, :type => "password", :name => "scms[RSCM::Cvs][@password]", :value => cvs.password, :onKeyUp => "updateCvsRootField()", :onblur => "updateCvsRootField()", :id => "cvspassword") %></td>
   </tr>
   <tr>
     <td>Server</td>
     <td>&nbsp;</td>
-    <td width="75%"><%= text_or_input(@edit, :onKeyUp => "updateCvsRootField()", :id => "cvsserver") %></td>
+    <td width="75%"><%= text_or_input(@edit, :onKeyUp => "updateCvsRootField()", :onblur => "updateCvsRootField()", :id => "cvsserver") %></td>
   </tr>
   <tr>
     <td>Port</td>
     <td>&nbsp;</td>
-    <td width="75%"><%= text_or_input(@edit, :onKeyUp => "updateCvsRootField()", :id => "cvsport") %></td>
+    <td width="75%"><%= text_or_input(@edit, :onKeyUp => "updateCvsRootField()", :onblur => "updateCvsRootField()", :id => "cvsport") %></td>
   </tr>
   <tr>
     <td>Repository directory</td>
     <td>&nbsp;</td>
-    <td width="75%"><%= text_or_input(@edit, :onKeyUp => "updateCvsRootField()", :id => "cvsrepodir") %></td>
+    <td width="75%"><%= text_or_input(@edit, :onKeyUp => "updateCvsRootField()", :onblur => "updateCvsRootField()", :id => "cvsrepodir") %></td>
   </tr>
 <% end %>
   <tr>
