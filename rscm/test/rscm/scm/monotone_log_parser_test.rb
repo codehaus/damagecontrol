@@ -110,7 +110,7 @@ EOF
       revisions = parser.parse_revisions(StringIO.new(CHANGESETS), "a2c58e276439de7d9da549870e245776c592c7e8")
       assert_equal(1, revisions.length)
       assert_equal("a2c58e276439de7d9da549870e245776c592c7e8", revisions[0][0].previous_native_revision_identifier)
-      assert_equal("abbe1eb8f75bdf9b27d440340ec329816c13985c", revisions[0][0].revision)
+      assert_equal("abbe1eb8f75bdf9b27d440340ec329816c13985c", revisions[0][0].native_revision_identifier)
 
 
       revisions = parser.parse_revisions(StringIO.new(CHANGESETS), "abbe1eb8f75bdf9b27d440340ec329816c13985c")

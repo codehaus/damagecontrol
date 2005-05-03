@@ -38,7 +38,7 @@ module RSCM
         if((from_time < revision.time) && (revision.time <= to_time))
           revisions.add(revision)
           revision.each do |change|
-            current_index = path_revisions[change.path].index(change.revision)
+            current_index = path_revisions[change.path].index(change.native_revision_identifier)
             change.previous_native_revision_identifier = path_revisions[change.path][current_index + 1]
           end
         end
@@ -51,7 +51,7 @@ module RSCM
       state = nil
       revision_io.each_line do |line|
         if(line =~ /^Revision: (.*)$/ && revision.identifier.nil?)
-          revision.native_revision_identifier =  $1
+          revision.identifier =  $1
         elsif(line =~ /^Author: (.*)$/ && revision.developer.nil?)
           revision.developer = $1
         elsif(line =~ /^Date: (.*)$/ && revision.time.nil?)
