@@ -25,22 +25,27 @@ class ScmController < ApplicationController
     file_index = @params['file_index'].to_i
     revision = @project.revision(revision_identifier)
     file = revision[file_index]
-    file.accept(DamageControl::Visitor::DiffPersister.new)
+    html = ""
+    diff_file = file.diff_file
+
+    # persist the diff file if it doesn't exist
+    if(!File.exist?(diff_file))
+      file.accept(DamageControl::Visitor::DiffPersister.new)
+      if(!File.exist?(diff_file))
+        render_text("Unable to retrieve diff")
+        return
+      end
+    end
 
     html = ""
     dp = DamageControl::DiffParser.new
-    diff_file = file.diff_file
-    if(File.exist?(diff_file))
-      File.open(diff_file) do |diffs_io|
-        diffs = dp.parse_diffs(diffs_io)
-        dh = DamageControl::DiffHtmlizer.new(html)
-        diffs.accept(dh)
-        if(html == "")
-          html = "Diff was calculated, but was empty. (This may be a bug - new, moved and binary files and are not supported yet)."
-        end
+    File.open(diff_file) do |diffs_io|
+      diffs = dp.parse_diffs(diffs_io)
+      dh = DamageControl::DiffHtmlizer.new(html)
+      diffs.accept(dh)
+      if(html == "")
+        html = "Diff was calculated, but was empty. (This may be a bug - new, moved and binary files and are not supported yet)."
       end
-    else
-      html = "Diff not calculated yet."
     end
     render_text(html)
 
