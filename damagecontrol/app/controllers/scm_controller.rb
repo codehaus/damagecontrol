@@ -29,7 +29,8 @@ class ScmController < ApplicationController
     diff_file = file.diff_file
 
     # persist the diff file if it doesn't exist
-    if(!File.exist?(diff_file))
+    retrieve_diff = !File.exist?(diff_file) || (File.exist?(diff_file) && File.open(diff_file).read == "")
+    if(retrieve_diff)
       file.accept(DamageControl::Visitor::DiffPersister.new)
       if(!File.exist?(diff_file))
         render_text("Unable to retrieve diff")

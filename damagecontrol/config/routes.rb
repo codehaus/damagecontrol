@@ -20,7 +20,8 @@ ActionController::Routing::Routes.draw do |map|
   map.connect 'projects/:id/add_dependency/:to', :controller => 'dependency', :action => "add_dependency"
   map.connect 'projects/:id/remove_dependency/:to', :controller => 'dependency', :action => "remove_dependency"
 
-  map.connect 'projects/:id', :controller => 'project', :action => "view"
+  map.connect 'projects/:id/view', :controller => 'project', :action => "view"
+  map.connect 'projects/:id/edit', :controller => 'project', :action => "edit"
   map.connect 'projects/:id/revisions.rss', :controller => "project", :action => "revisions_rss"
   map.connect 'projects/:id/revisions/:revision', :controller => "project", :action => "revision"
   map.connect 'projects/:id/revisions/:revision/request_build', :controller => "build", :action => "request_build"

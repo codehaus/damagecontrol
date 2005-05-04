@@ -29,16 +29,27 @@
   @revision.each_with_index do |file, i|
   %>
     <tr>
-      <td width="5%"><%= tag("img", :src => file.icon, :alt => file.description) %></td>
+      <td width="5%"><%= image_tag(file.icon, :alt => file.description) %></td>
       <td width="5%"><%= file.native_revision_identifier %></td>
       <td width="90%">
-        <%= link_to_remote file.path, :update => "diff_#{i}", :url => { 
-              :controller => "scm", 
-              :action => "diff_with_previous", 
-              :id => @project.name, 
-              :params => {"revision_identifier" => file.native_revision_identifier, "file_index" => i}
-            } %>
-        <div id="diff_<%=i%>"></div>
+        <%= link_to_remote(
+              file.path, {
+                :update => "diff_#{i}", 
+                :loading => "Element.show('diff_#{i}');$('diff_link_#{i}').onclick=function(){}",
+                :loaded => "$('diff_link_#{i}').onclick=function(){Element.toggle('diff_#{i}')}",
+                :url => { 
+                  :controller => "scm", 
+                  :action => "diff_with_previous", 
+                  :id => @project.name, 
+                  :params => {
+                    "revision_identifier" => @revision.identifier, 
+                    "file_index" => i
+                  }
+                }
+              },
+              {"id" => "diff_link_#{i}"}
+            ) %>
+        <div style="display:none;" id="diff_<%=i%>"><%= image_tag("spinner.gif") %> Loading diff...</div>
       </td>
     </tr>
   <% end %>

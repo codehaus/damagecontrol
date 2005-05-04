@@ -284,7 +284,8 @@ module DamageControl
     end
 
     def revision(revision_identifier)
-      revisions(revision_identifier, 1)[0]
+      revs = revisions(revision_identifier, 1)
+      revs[0]
     end
 
     def revision_identifiers
