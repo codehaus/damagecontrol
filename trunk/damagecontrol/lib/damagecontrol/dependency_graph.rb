@@ -6,10 +6,11 @@ module DamageControl
   # This class knows how to generate a GraphViz DOT image map for the project
   # dependencies
   class DependencyGraph
-    def initialize(current_project, projects, dummy_class=Time)
+    def initialize(current_project, projects, dummy_class, with_map=true)
       @current_project = current_project
       @projects = projects
       @dummy_class = dummy_class
+      @with_map = with_map
     end
 
     def write_to(file)
@@ -35,7 +36,11 @@ module DamageControl
       # Write the full HTML
       File.open("#{base}.html", 'w') do |io|
         # The dummy is to fool the browser to re-request the image.
-        io.puts("<img src=\"/dependency/image?dummy=#{@dummy_class.new.to_s}\" usemap=\"#project_dependencies\">")
+        if(@with_map)
+          io.puts("<img src=\"/dependency/image?dummy=#{@dummy_class.new.to_s}\" usemap=\"#project_dependencies\">")
+        else
+          io.puts("<img src=\"/dependency/image?dummy=#{@dummy_class.new.to_s}\">")
+        end
         io.puts("<map name=\"project_dependencies\">")
         # replace anchor attributes in the dot-generated map so they are fired by onclick (ajax)
         io.puts(File.open("#{base}.cmap").read.gsub(/href=/, "href=\"#\" onclick="))

@@ -21,7 +21,15 @@
     </td>
     <td width="100%">
       <% @project.revision(revision.identifier).builds.each do |build| %>
-      <%= tag("img", :src => build.small_image) %>
+        <%= link_to_image(
+              build.small_image, 
+              {
+                :controller => "build", 
+                :action => "status", 
+                :id => @project.name, 
+                :params => {"revision" => revision.identifier, "build" => build.identifier}
+              }
+            ) %>
       <% end %>
     </td>
   </tr>
