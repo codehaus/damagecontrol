@@ -150,6 +150,10 @@ module RSCM
       @files.each(&block)
     end
     
+    def pop
+      @files.pop
+    end
+    
     def length
       @files.length
     end

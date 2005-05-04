@@ -38,8 +38,9 @@ module DamageControl
       raise "Revision's project can't be nil" if revision.project.nil?
       raise "Revision's dir can't be nil" if revision.dir.nil?
 
+# TODO: use YAML! revision, time, reasons, exit_code, pid, command - stdout and stderr are methods, @dir excluded from YAML
       reasons_file = "#{revision.dir}/builds/#{time.ymdHMS}/reasons"
-      reasons = File.exist?(reasons_file) ? File.open(reason_file).read : "unknown build reason"
+      reasons = File.exist?(reasons_file) ? File.open(reasons_file).read : "unknown build reason"
       Build.new(revision, time, reasons)
     end
   

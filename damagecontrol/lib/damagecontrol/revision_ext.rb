@@ -17,9 +17,9 @@ module RSCM
 
     # Creates, persists and executes a Build for this revision. 
     # Usually, this method should only be called by a Builder.
-    def build!(build_reason)
+    def build!(reasons)
 
-      build = DamageControl::Build.new(self, Time.now.utc, build_reason)
+      build = DamageControl::Build.new(self, Time.now.utc, reasons)
 
       begin
         @project.scm.checkout(identifier)
@@ -43,6 +43,7 @@ module RSCM
         end
       end
       @project.publish(build)
+      build
     end
 
     # Returns an array of existing (archived) Build s.
