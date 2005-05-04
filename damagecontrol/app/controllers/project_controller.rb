@@ -81,7 +81,7 @@ class ProjectController < ApplicationController
     
     project.save
 
-    redirect_to(:action => "view", :id => project.name)
+    redirect_to(:action => "edit", :id => project.name)
   end
   
   def revision
@@ -99,6 +99,16 @@ class ProjectController < ApplicationController
 protected
 
   def set_sidebar_links
+    if(@project.exists?)
+      @sidebar_links << {
+        :controller => "project", 
+        :action     => "view",
+        :id         => @project.name,
+        :image      => "/images/24x24/nut_and_bolt.png",
+        :name       => "View #{@project.name} settings",
+      }
+    end
+
     if(@project.exists?)
       @sidebar_links << {
         :controller => "project", 

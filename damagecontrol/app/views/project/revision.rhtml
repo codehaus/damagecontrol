@@ -1,20 +1,13 @@
 <h1><%= @revision.project.name %> revision <%= @revision.identifier %></h1>
+<p>
 <div id="request_build">
 <%= link_to_remote(
-	"Trigger build for this revision",
+	"Schedule new build for this revision",
 	:update => "request_build",
 	:url => {:controller => "build", :action => "request_build", :id => @revision.project.name, :params => {"revision" => @revision.identifier, "reason" => "Manually triggered via web interface"}}
 ) %>
 </div>
-
-<ul class="foldertab">
-  <li><a href="javascript:setTab('revisions')"><img src="/images/16x16/document_exfile.png"/> Changes</a></li>
-  <% @revision.builds.each do |build| %>
-  <li><%= link_to(build.identifier, 
-          :controller => "build", :action => "status", :id => @project.name, :params => 
-          {"revision" => @revision.identifier, "build" => build.identifier}) %></li>
-  <% end %>
-</ul>
+</p>
 <table class="pane">
   <tr class="pane">
     <td colspan="3" class="revision">
