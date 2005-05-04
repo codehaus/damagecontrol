@@ -72,10 +72,6 @@ module RSCM
           file.puts("function get_netsync_anonymous_read_permitted(collection)")
           file.puts("  return true")
           file.puts("end")
-
-          file.puts("function get_passphrase(keypair_id)")
-          file.puts("  return \"#{@passphrase}\"")
-          file.puts("end")
         end
       rescue => e
         puts e.message
@@ -88,10 +84,9 @@ module RSCM
       @serve_pid = fork do
         #Signal.trap("HUP") { puts "Monotone server shutting down..."; exit }
         monotone("serve #{@server} #{@branch}", db(@central_checkout_dir)) do |io|
-          #puts "PASSPHRASE: #{@passphrase}"
-          #io.puts(@passphrase)
-          #io.close_write
-          io.read
+          puts "PASSPHRASE: #{@passphrase}"
+          io.puts(@passphrase)
+          io.close_write
         end
       end
       Process.detach(@serve_pid)
