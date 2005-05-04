@@ -5,6 +5,7 @@ require 'damagecontrol/publisher/base'
 
 module DamageControl
   # Polls all projects in intervals.
+  # TODO: rename to ScmPoller
   class Poller
     attr_reader :projects
 

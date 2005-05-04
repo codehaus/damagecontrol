@@ -17,12 +17,11 @@ module RSCM
     include PathConverter
     
     ann :description => "Repository URL"
-#    ann :tip => "If you specify a local URL (starting with file://) DamageControl can create the repository for you after you save (unless the repository already exists).<br>Using a file:// URL will also give you the option to have DamageControl install a trigger in Subversion, so that you don't have to use polling to detect changes.<br>On Windows, file URLs must look like file:///C:/jupiter/mars"
     ann :tip => "If you use ssh, specify the URL as svn+ssh://username@server/path/to/repo"
     attr_accessor :url
 
     ann :description => "Path"
-    ann :tip => "This is the relative path from the start of the repository <br>to the end of the URL. For example, if your URL is <br>svn://your.server/path/to/repository/path/within/repository <br>then this value should be path/within/repository."
+    ann :tip => "You only need to specify this if you want to be able to automatically create the repository. This should be the relative path from the start of the repository <br>to the end of the URL. For example, if your URL is <br>svn://your.server/path/to/repository/path/within/repository <br>then this value should be path/within/repository."
     attr_accessor :path
 
     def initialize(url="", path="trunk")
@@ -182,7 +181,7 @@ module RSCM
 
       with_working_dir(@checkout_dir) do
         safer_popen(command) do |stdout|
-          parser = SubversionLogParser.new(stdout, path, checkout_dir)
+          parser = SubversionLogParser.new(stdout, @url)
           revisions = parser.parse_revisions
         end
       end
@@ -216,7 +215,7 @@ module RSCM
       cmd = "svn log #{repourl} -r HEAD"
       with_working_dir(@checkout_dir) do
         safer_popen(cmd) do |stdout|
-          parser = SubversionLogParser.new(stdout, path, checkout_dir)
+          parser = SubversionLogParser.new(stdout, @url)
           revisions = parser.parse_revisions
           revisions[0].identifier.to_i
         end

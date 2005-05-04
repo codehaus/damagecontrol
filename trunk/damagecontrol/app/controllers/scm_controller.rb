@@ -19,17 +19,17 @@ class ScmController < ApplicationController
     redirect_to :controller => "project", :action => "view", :id => @project.name
   end
 
-  def change
+  def diff_with_previous
     load_project
     revision_identifier = @params['revision_identifier'].to_identifier
-    change_index = @params['change_index'].to_i
+    file_index = @params['file_index'].to_i
     revision = @project.revision(revision_identifier)
-    change = revision[change_index]
-    change.accept(DamageControl::Visitor::DiffPersister.new)
+    file = revision[file_index]
+    file.accept(DamageControl::Visitor::DiffPersister.new)
 
     html = ""
     dp = DamageControl::DiffParser.new
-    diff_file = change.diff_file
+    diff_file = file.diff_file
     if(File.exist?(diff_file))
       File.open(diff_file) do |diffs_io|
         diffs = dp.parse_diffs(diffs_io)

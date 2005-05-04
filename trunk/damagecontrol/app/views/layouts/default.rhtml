@@ -72,7 +72,7 @@
 			<%= @content_for_layout %>
 		</td>
 		<td width="10%">
-			<%= periodically_call_remote(:update => "build_queue", :frequency => 4, :url => {:controller => "build_queue", :action => "view"}) %>
+			<%= periodically_call_remote(:update => "build_queue", :frequency => 10, :url => {:controller => "build_queue", :action => "view"}) %>
 			<div id="build_queue">Build queue loading...</div>
 		</td>
 	</tr>

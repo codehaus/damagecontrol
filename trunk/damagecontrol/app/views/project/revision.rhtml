@@ -34,7 +34,7 @@
       <td width="90%">
         <%= link_to_remote file.path, :update => "diff_#{i}", :url => { 
               :controller => "scm", 
-              :action => "file", 
+              :action => "diff_with_previous", 
               :id => @project.name, 
               :params => {"revision_identifier" => file.native_revision_identifier, "file_index" => i}
             } %>

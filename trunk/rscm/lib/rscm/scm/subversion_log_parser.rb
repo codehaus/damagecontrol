@@ -4,9 +4,9 @@ require 'rscm/revision'
 module RSCM
 
   class SubversionLogParser
-    def initialize(io, path, checkout_dir)
+    def initialize(io, url)
       @io = io
-      @revision_parser = SubversionLogEntryParser.new(path, checkout_dir)
+      @revision_parser = SubversionLogEntryParser.new(url)
     end
     
     def parse_revisions(&line_proc)
@@ -25,10 +25,9 @@ module RSCM
   
   class SubversionLogEntryParser < Parser
 
-    def initialize(path, checkout_dir)
+    def initialize(url)
       super(/^------------------------------------------------------------------------/)
-      @path = path ? path : ""
-      @checkout_dir = checkout_dir
+      @url = url
     end
 
     def parse(io, skip_line_parsing=false, &line_proc)
@@ -38,6 +37,22 @@ module RSCM
       revision
     end
 
+    def relative_path(url, repo_path)
+      url_tokens = url.split('/')
+      repo_path_tokens = repo_path.split('/')
+      
+      max_similar = repo_path_tokens.length
+      while(max_similar > 0)
+        url = url_tokens[-max_similar..-1]
+        path = repo_path_tokens[0..max_similar-1]
+        if(url == path)
+          break
+        end
+        max_similar -= 1
+      end
+      max_similar == 0 ? nil : repo_path_tokens[max_similar..-1].join("/")
+    end
+    
   protected
 
     def parse_line(line)
@@ -49,10 +64,18 @@ module RSCM
         @parse_state = :parse_files
       elsif(@parse_state == :parse_files)
         file = parse_file(line)
-        if file
-          # This unless won't work for new directories or if revisions are computed before checkout (which it usually is!)
-          fullpath = "#{@checkout_dir}/#{file.path}"
-          @revision << file unless File.directory?(fullpath)
+        if(file)
+          previously_added_file = @revision[-1]
+          if(previously_added_file)
+            # remove previous revision_file it if it's a dir
+            previous_tokens = previously_added_file.path.split("/")
+            current_tokens = file.path.split("/")
+            current_tokens.pop
+            if(previous_tokens == current_tokens)
+              @revision.pop
+            end
+          end
+          @revision << file
         end
       elsif(@parse_state == :parse_message)
         @revision.message << line.chomp << "\n"
@@ -93,12 +116,18 @@ module RSCM
       end
 
       path_from_root.gsub!(/\\/, "/")
-      return nil unless path_from_root =~ /^\/#{@path}/
-      if(@path.length+1 == path_from_root.length)
-        file.path = path_from_root[@path.length+1..-1]
-      else
-        file.path = path_from_root[@path.length+2..-1]
-      end
+      path_from_root = path_from_root[1..-1]
+      rp = relative_path(@url, path_from_root)
+      return if rp.nil?
+      file.path = rp
+
+      
+#      if(@path.length+1 == path_from_root.length)
+#        file.path = path_from_root[@path.length+1..-1]
+#      else
+#        file.path = path_from_root[@path.length+2..-1]
+#      end
+
       file.native_revision_identifier =  @revision.identifier
       # http://jira.codehaus.org/browse/DC-204
       file.previous_native_revision_identifier = file.native_revision_identifier.to_i - 1;

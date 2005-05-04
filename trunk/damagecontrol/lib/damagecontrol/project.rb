@@ -27,8 +27,8 @@ module DamageControl
   class Project
     include ObjectTemplate
   
-    # TODO: move to scms? not sure....
-    DEFAULT_QUIET_PERIOD = 10 unless defined? DEFAULT_QUIET_PERIOD
+    # TODO: move to scms? not sure.... I think so!!
+    DEFAULT_QUIET_PERIOD = 15 unless defined? DEFAULT_QUIET_PERIOD
 
     attr_accessor :name
     attr_accessor :home_page
@@ -205,7 +205,7 @@ module DamageControl
       scm.checkout(revision_identifier)
     end
 
-    # TODO: pass quiet_period as arg here?
+    # TODO: Move te WorkingCopy class!
     # Polls SCM for new revisions and yields them to the given block.
     def poll(quiet_period=DEFAULT_QUIET_PERIOD)
       latest_identifier = DamageControl::Visitor::YamlPersister.new(revisions_dir).latest_identifier

@@ -55,7 +55,7 @@ module DamageControl
 
         # We can't use builder - it conflicts with needle
         b.builder_ do
-          DamageControl::Builder.new(b.build_queue)
+          DamageControl::Builder.new(b.build_queue, "#{basedir}/projects")
         end 
 
       end
@@ -75,6 +75,8 @@ module DamageControl
         end
       end
 
+# TODO: race condition for Dir.pwd with execution!!!!!! fork builds?
+# TODO: 3 processes? scm_poller, builder and webapp? HMMMM..... I wish Dir.pwd was thread specific!!!!!!
       threads << registry.scm_poller.start
 
       # wait for each thread to die
