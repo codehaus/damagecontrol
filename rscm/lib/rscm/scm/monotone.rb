@@ -79,11 +79,9 @@ module RSCM
         raise "Didn't have permission to write to #{rcfile}."
       end
 
-      @rcfile = rcfile
-      
       @serve_pid = fork do
         #Signal.trap("HUP") { puts "Monotone server shutting down..."; exit }
-        monotone("serve #{@server} #{@branch}", db(@central_checkout_dir)) do |io|
+        monotone("serve --rcfile=\"#{rcfile}\" #{@server} #{@branch}", db(@central_checkout_dir)) do |io|
           puts "PASSPHRASE: #{@passphrase}"
           io.puts(@passphrase)
           io.close_write
