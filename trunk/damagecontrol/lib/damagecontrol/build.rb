@@ -39,6 +39,7 @@ module DamageControl
       raise "Revision's dir can't be nil" if revision.dir.nil?
 
 # TODO: use YAML! revision, time, reasons, exit_code, pid, command - stdout and stderr are methods, @dir excluded from YAML
+# TODO: use ActiveRecord instead.
       reasons_file = "#{revision.dir}/builds/#{time.ymdHMS}/reasons"
       reasons = File.exist?(reasons_file) ? File.open(reasons_file).read : "unknown build reason"
       Build.new(revision, time, reasons)
@@ -73,7 +74,7 @@ module DamageControl
       raise "Revision's project can't be nil" if revision.project.nil?
       raise "Revision's dir can't be nil" if revision.dir.nil?
 
-      Log.debug "Executing build. Command file: #{@command_file}"
+#      Log.debug "Executing build. Command file: #{@command_file}"
       raise BuildException.new("This build has already been executed and cannot be re-executed. It was executed with '#{File.open(@command_file).read}'") if File.exist?(@command_file)
       FileUtils.mkdir_p(@dir) unless File.exist?(@dir)
       File.open(@command_file, "w") do |io|
@@ -81,28 +82,29 @@ module DamageControl
       end
       command_line = "#{command} > \"#{@stdout_file}\" 2> \"#{@stderr_file}\""
 
-      begin
-        with_working_dir(execute_dir) do
-          env.each {|k,v| ENV[k]=v}
-          Log.info "Executing '#{command_line}'"
-          Log.info "Execution environment:"
-          ENV.each {|k,v| Log.info("#{k}=#{v}")}
-          IO.popen(command_line) do |io|
-            File.open(@pid_file, "w") do |pid_io|
-              pid_io.write("TODO: get the pid")
-            end
-            
-            # there is nothing to read, since we're redirecting to file,
-            # but we still need to read in order to block until the process is done.
-            # TODO: don't redirect stdout - we want to intercept checkpoints/stages
-            io.read
+      with_working_dir(execute_dir) do
+        env.each {|k,v| ENV[k]=v}
+#        Log.info "Executing '#{command_line}'"
+#        Log.info "Execution environment:"
+#        ENV.each {|k,v| Log.info("#{k}=#{v}")}
+        IO.popen(command_line) do |io|
+          File.open(@pid_file, "w") do |pid_io|
+            pid_io.write("TODO: get the pid")
           end
+          
+          # there is nothing to read, since we're redirecting to file,
+          # but we still need to read in order to block until the process is done.
+          # TODO: don't redirect stdout - we want to intercept checkpoints/stages
+          io.read
         end
-#      ensure
-        exit_code = $? >> 8
-        File.open(@exit_code_file, "w") do |io|
-          io.write(exit_code)
-        end
+      end
+
+      exit_code = $? >> 8
+      # This is equivalent, but seems to be broken on Windows (?)
+      # exit_code = $?.exitstatus
+
+      File.open(@exit_code_file, "w") do |io|
+        io.write(exit_code)
       end
     end
 
