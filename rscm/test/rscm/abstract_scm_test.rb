@@ -9,7 +9,7 @@ module RSCM
 #        Darcs,
         Monotone,
 #        Mooky,
-#        Perforce,
+        Perforce,
 #        StarTeam,
         Subversion
       ]

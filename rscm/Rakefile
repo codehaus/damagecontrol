@@ -25,7 +25,8 @@ fl.exclude('test/**/mooky*.rb')
 fl.exclude('test/**/monotone*.rb') # Incomplete/unsupported for now - reactivate when more complete!
 fl.exclude('test/**/clearcase*.rb')    # Incomplete/unsupported for now - reactivate when more complete!
 fl.exclude('test/**/darcs*.rb')    # Incomplete/unsupported for now - reactivate when more complete!
-fl.exclude('test/**/perforce*.rb') # Incomplete/unsupported for now - reactivate when more complete!
+#fl.exclude('test/**/perforce*.rb') # Incomplete/unsupported for now - reactivate when more complete!
+fl.exclude('test/**/p4client*.rb') # Incomplete/unsupported for now - reactivate when more complete!
 fl.exclude('test/**/starteam*.rb') # Too bloody hard to test without a StarTeam server license! Tested ad-hoc.
 Rake::TestTask.new { |t|
   t.libs << "test"
