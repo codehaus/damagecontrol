@@ -142,7 +142,7 @@ module RSCM
       assert("src/java/com/thoughtworks/damagecontrolled/Hello.txt", other_scm.checkout.sort[0])
     end
 
-    def Xtest_create_destroy
+    def test_create_destroy
       work_dir = RSCM.new_temp_dir("trigger")
       checkout_dir = "#{work_dir}/checkout"
       repository_dir = "#{work_dir}/repository"
@@ -160,7 +160,7 @@ module RSCM
       puts "DONE"
     end
     
-    def Xtest_trigger
+    def test_trigger
       work_dir = RSCM.new_temp_dir("trigger")
       checkout_dir = "#{work_dir}/checkout"
       repository_dir = "#{work_dir}/repository"
@@ -191,7 +191,7 @@ module RSCM
       assert(File.exist?(trigger_proof))
     end
 
-    def Xtest_checkout_revision_identifier
+    def test_checkout_revision_identifier
       work_dir = RSCM.new_temp_dir("ids")
       checkout_dir = "#{work_dir}/checkout"
       repository_dir = "#{work_dir}/repository"
@@ -216,7 +216,7 @@ module RSCM
       assert(!File.exist?("#{checkout_dir}/after.txt"))
     end
 
-    def Xtest_should_allow_creation_with_empty_constructor
+    def test_should_allow_creation_with_empty_constructor
       scm = create_scm(RSCM.new_temp_dir, ".")
       scm2 = scm.class.new
       assert_same(scm.class, scm2.class)
@@ -229,7 +229,7 @@ module RSCM
 +five six
 EOF
     
-    def Xtest_diffs
+    def test_diffs
       work_dir = RSCM.new_temp_dir("diffs")
       checkout_dir = "#{work_dir}/checkout"
       repository_dir = "#{work_dir}/repository"
