@@ -1,5 +1,6 @@
 class Class
   @@anns = {}
+  @@attr_anns = {}
 
   # Defines annotation(s) for the next defined +attr_reader+ or
   # +attr_accessor+. The +anns+ argument should be a Hash defining annotations
@@ -23,28 +24,45 @@ class Class
   # You may also use annotations to specify more programmatically meaningful metadata. More power to you.
   # 
   def ann(anns)
-    $attr_anns ||= {}
-    $attr_anns.merge!(anns)
+    @@attr_anns ||= {}
+    @@attr_anns.merge!(anns)
   end
-
+  
   def method_missing(sym, *args) #:nodoc:
     anns = @@anns[self]
-    return superclass.method_missing(sym, *args) if(anns.nil?)
-    anns[sym]
+    return anns[sym] if(anns && anns[sym])
+    return superclass.method_missing(sym, *args) if superclass
+    return {}
   end
 
   alias old_attr_reader attr_reader #:nodoc:
   def attr_reader(*syms) #:nodoc:
     @@anns[self] ||= {}
     syms.each do |sym|
-      @@anns[self][sym] = $attr_anns.dup if $attr_anns
+      @@anns[self][sym] = @@attr_anns.dup if @@attr_anns
     end
-    $attr_anns = nil
+    @@attr_anns = nil
     old_attr_reader(*syms)
   end
 
   def attr_accessor(*syms) #:nodoc:
     attr_reader(*syms)
     attr_writer(*syms)
+  end
+end
+
+class Object
+  def anns(attr_name)
+    self.class.send(attr_name)
+  end
+
+  def __attr_accessors
+    attrs = []
+    methods.each do |method|
+      if(method =~ /(.*)=/)
+        attrs << "@#{$1}" if methods.index($1) && $1 != "=="
+      end
+    end
+    attrs.sort
   end
 end

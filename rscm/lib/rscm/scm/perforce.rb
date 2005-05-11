@@ -8,12 +8,6 @@ require 'pp'
 require 'parsedate'
 require 'stringio'
 
-    def pause
-      puts "press enter to continue"
-      $stdin.gets
-    end
-
-
 module RSCM
   # Perforce RSCM implementation.
   #
@@ -237,7 +231,7 @@ module RSCM
 
     def execute(cmd)
       cmd = format_cmd(cmd)
-      puts "> executing: #{cmd}"
+      $stderr.puts "> executing: #{cmd}"
       `#{cmd}`
     end
 
@@ -250,7 +244,6 @@ module RSCM
   class P4Client
     DATE_FORMAT = "%Y/%m/%d:%H:%M:%S"
     STATUS = { "add" => RevisionFile::ADDED, "edit" => RevisionFile::MODIFIED, "delete" => RevisionFile::DELETED }
-    PERFORCE_EPOCH = Time.utc(1971) #perforce doesn't like Time.utc(1970)
 
     def initialize(checkout_dir, name, port, user, pwd)
       @checkout_dir, @name, @port, @user, @pwd = checkout_dir, name, port, user, pwd
@@ -294,7 +287,7 @@ module RSCM
       cmd = to_identifier.nil? ? "sync" : "sync //...@#{to_identifier}"
       checked_out_files = []
       p4(cmd).collect do |output|
-        puts "output: '#{output}'"
+        #puts "output: '#{output}'"
         if(output =~ /.* - (added as|updating|deleted as) #{rootdir}[\/|\\](.*)/)
           path = $2.gsub(/\\/, "/")
           checked_out_files << path
@@ -355,16 +348,16 @@ module RSCM
     end
 
     def p4changes(from_identifier, to_identifier)
-      from = p4timespec(from_identifier, PERFORCE_EPOCH)
+      from = p4timespec(from_identifier, Time.epoch)
       to = p4timespec(to_identifier, Time.infinity)
-      puts "in p4changes translated #{from_identifier},#{to_identifier} to #{from},#{to}"
+      $stderr.puts "in p4changes translated #{from_identifier},#{to_identifier} to #{from},#{to}"
       p4("changes //...@#{from},#{to}")
     end
 
     def p4timespec(identifier, default)
-      identifier= default if identifier.nil?
+      identifier = default if identifier.nil?
       if identifier.is_a?(Time)
-        identifier = PERFORCE_EPOCH if identifier < PERFORCE_EPOCH
+        identifier = Time.epoch if identifier < Time.epoch
         identifier.strftime(DATE_FORMAT)
       else
         "#{identifier + 1}"
@@ -377,9 +370,9 @@ module RSCM
 
     def p4(cmd)
       cmd = "#{p4cmd(cmd)}"
-      puts "> executing: #{cmd}"
+      $stderr.puts "> executing: #{cmd}"
       output = `#{cmd}`
-      puts output
+      #puts output
       output
     end
 
@@ -479,7 +472,7 @@ module Kernel
 
   #todo: replace with logger
   def debug(msg)
-    puts msg
+    #puts msg
   end
 
 end

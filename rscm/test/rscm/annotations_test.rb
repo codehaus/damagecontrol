@@ -4,16 +4,18 @@ require 'rscm/annotations'
 module RSCM
   class Whatever
     attr_accessor :no_annotation
+
     ann :boo => "huba luba", :pip => "pip pip"
     attr_accessor :foo
   
     ann :desc => "bang bang"
     ann :tip => "a top tip"
-    attr_accessor :bar, :zap
+    attr_accessor :bar, :zap, :titi
   end
 
   class Other
     attr_accessor :no_annotation
+
     ann :boo => "boo"
     ann :pip => "pip"
     attr_accessor :foo
@@ -23,6 +25,8 @@ module RSCM
   end
   
   class Subclass < Other
+    ann :desc => "desc", :tip => "tip"
+    attr_accessor :other
   end
 
   class AnnotationsTest < Test::Unit::TestCase
@@ -51,18 +55,16 @@ module RSCM
     def test_should_inherit_attribute_annotations
       assert_equal("boo", Subclass.foo[:boo])
       assert_equal({:boo => "boo", :pip => "pip"}, Subclass.send("foo"))
-      assert_nil(Whatever.send("no_annotation"))
+      assert_equal({}, Whatever.send("no_annotation"))
     end
     
-    def test_should_get_annotations
+    def test_should_get_annotations_from_object
       assert_equal({:boo => "huba luba", :pip => "pip pip"}, Whatever.new.anns("foo"))
     end
     
-  end
-end
-
-class Object
-  def anns(attr_name)
-    self.class.send(attr_name)
+    def test_should_get_annotations_from_class
+      assert_equal(["@bar", "@foo", "@no_annotation", "@other", "@zap"], Subclass.new.__attr_accessors)
+    end
+    
   end
 end
