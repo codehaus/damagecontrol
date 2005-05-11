@@ -10,13 +10,13 @@ module DamageControl
       register self
 
       ann :description => "DamageControl Jabber Id/Resource"
-      attr_reader :id_resource
+      attr_accessor :id_resource
 
       ann :description => "DamageControl Jabber Password"
-      attr_reader :password
+      attr_accessor :password
 
       ann :description => "DamageControl's Friends"
-      attr_reader :friends
+      attr_accessor :friends
 
       def initialize
         @id_resource = "damagecontrol@jabber.codehaus.org/damagecontrol"
