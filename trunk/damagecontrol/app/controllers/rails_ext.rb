@@ -182,7 +182,7 @@ module ActionView
         render_partial(underscored_name, o)
       else
         r = "<table>\n"
-        o.instance_variables.each do |attr_name|
+        o.__attr_accessors.each do |attr_name|
           attr_anns = o.class.send(attr_name[1..-1])
           if(attr_anns && attr_anns[:description])
             # Only render attributes with :description annotations

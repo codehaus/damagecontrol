@@ -20,6 +20,14 @@ module RSCM
     ann :tip => "If you use ssh, specify the URL as svn+ssh://username@server/path/to/repo"
     attr_accessor :url
 
+    ann :description => "Username"
+    ann :tip => "This only applies to svn:// URLs."
+    attr_accessor :username
+
+    ann :description => "Password"
+    ann :tip => "This only applies to svn:// URLs."
+    attr_accessor :password
+
     ann :description => "Path"
     ann :tip => "You only need to specify this if you want to be able to automatically create the repository. This should be the relative path from the start of the repository <br>to the end of the URL. For example, if your URL is <br>svn://your.server/path/to/repository/path/within/repository <br>then this value should be path/within/repository."
     attr_accessor :path
@@ -212,7 +220,7 @@ module RSCM
     end
 
     def head_revision_identifier
-      cmd = "svn log #{repourl} -r HEAD"
+      cmd = "svn log #{login_options} #{repourl} -r HEAD"
       with_working_dir(@checkout_dir) do
         safer_popen(cmd) do |stdout|
           parser = SubversionLogParser.new(stdout, @url)
@@ -278,19 +286,28 @@ module RSCM
     
     def checkout_command(to_identifier)
       checkout_dir = "\"#{checkout_dir}\""
-      "checkout #{url} #{checkout_dir} #{revision_option(nil,to_identifier)}"
+      "checkout #{login_options} #{url} #{checkout_dir} #{revision_option(nil,to_identifier)}"
     end
 
     def update_command(to_identifier)
-      "update #{revision_option(nil,to_identifier)}"
+      "update #{login_options} #{revision_option(nil,to_identifier)}"
     end
     
     def changes_command(from_identifier, to_identifier)
       # http://svnbook.red-bean.com/svnbook-1.1/svn-book.html#svn-ch-3-sect-3.3
       # file_list = files.join('\n')
 # WEIRD cygwin bug garbles this!?!?!?!
-      cmd = "log --verbose #{revision_option(from_identifier, to_identifier)} #{url}"
+      cmd = "log --verbose #{login_options} #{revision_option(from_identifier, to_identifier)} #{url}"
       cmd
+    end
+
+    def login_options
+      result = ""
+      u = @username ? @username.strip : nil
+      p = @password ? @password.strip : nil
+      result << "--username #{u} " if u
+      result << "--password #{p} " if p
+      result
     end
 
     def revision_option(from_identifier, to_identifier)

@@ -32,7 +32,7 @@ module RSCM
     # 16) Verify that OtherWorkingCopy is now uptodate
     # 17) Add and commit a file in WorkingCopy
     # 18) Verify that the revision (since last revision) for CheckoutHereToo contains only one file
-    def test_basics
+    def Xtest_basics
       work_dir = RSCM.new_temp_dir("basics")
       checkout_dir = "#{work_dir}/WorkingCopy"
       other_checkout_dir = "#{work_dir}/OtherWorkingCopy"
@@ -142,7 +142,7 @@ module RSCM
       assert("src/java/com/thoughtworks/damagecontrolled/Hello.txt", other_scm.checkout.sort[0])
     end
 
-    def test_create_destroy
+    def Xtest_create_destroy
       work_dir = RSCM.new_temp_dir("trigger")
       checkout_dir = "#{work_dir}/checkout"
       repository_dir = "#{work_dir}/repository"
@@ -160,7 +160,7 @@ module RSCM
       puts "DONE"
     end
     
-    def test_trigger
+    def Xtest_trigger
       work_dir = RSCM.new_temp_dir("trigger")
       checkout_dir = "#{work_dir}/checkout"
       repository_dir = "#{work_dir}/repository"
@@ -191,7 +191,7 @@ module RSCM
       assert(File.exist?(trigger_proof))
     end
 
-    def test_checkout_revision_identifier
+    def Xtest_checkout_revision_identifier
       work_dir = RSCM.new_temp_dir("ids")
       checkout_dir = "#{work_dir}/checkout"
       repository_dir = "#{work_dir}/repository"
@@ -216,7 +216,7 @@ module RSCM
       assert(!File.exist?("#{checkout_dir}/after.txt"))
     end
 
-    def test_should_allow_creation_with_empty_constructor
+    def Xtest_should_allow_creation_with_empty_constructor
       scm = create_scm(RSCM.new_temp_dir, ".")
       scm2 = scm.class.new
       assert_same(scm.class, scm2.class)
@@ -258,6 +258,7 @@ EOF
       end
       scm.commit("Modified file to diff")
       revisions = scm.revisions(timestamp)
+      raise "No revisions since #{timestamp}" if revisions.empty?
       
       got_diff = false
       scm.diff(revisions[0][0]) do |diff_io|
