@@ -10,7 +10,7 @@ module DamageControl
       NOTIFICATION_TYPES = ["Build Successful", "Build Failed"] unless defined? NOTIFICATION_TYPES
     
       ann :description => "Hosts", :tip => "Comma-separated list of (OS X) hosts that will receive Growl notifications. Requires Growl 0.6 or later."
-      attr_reader :hosts
+      attr_accessor :hosts
 
       def initialize
         @hosts = "localhost"
