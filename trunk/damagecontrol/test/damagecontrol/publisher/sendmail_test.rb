@@ -7,9 +7,18 @@ module DamageControl
     class EmailTest < Test::Unit::TestCase
       include Fixture
   
-      def test_should_send_email_on_publish
+      def test_should_send_email_with_sendmail_on_publish
+        #verify_email(Sendmail.new)
+      end
+  
+      def test_should_send_email_with_smtp_on_publish
+        smtp = Smtp.new
+        smtp.port = 2005
+        verify_email(smtp)
+      end
+  
+      def verify_email(publisher)
         BuildMailer.template_root = File.expand_path(File.dirname(__FILE__) + "/../../../app/views")
-        publisher = Email.new
         tmail = BuildMailer.create_email(mock_build(true), publisher)
         body = tmail.body_port.ropen.read
         assert(body.index("Successful build (by aslak)"))

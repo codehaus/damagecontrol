@@ -3,35 +3,29 @@ require 'damagecontrol/publisher/base'
 
 module DamageControl
   module Publisher
-    class Email < Base
-      register self
-    
+    class AbstractEmail < Base
       attr_accessor :enabled
 
-      ann :description => "How to deliver email [\"sendmail\"|\"smtp\"]"
-      attr_accessor :delivery_method
-
-      ann :description => "Recipients (comma separated)"
+      ann :tip => "Specify as many email addresses as you like, separated with comma or whitespace."
+      ann :description => "To"
       attr_accessor :to
 
-      ann :description => "Who sends the email"
+      ann :tip => "Who the emails should appear to be from."
+      ann :description => "From"
       attr_accessor :from
       
       def initialize
-        @delivery_method = "sendmail"
         @to = ""
         @from = "\"DamageControl\" <dcontrol@codehaus.org>"
       end
       
-      def name
-        "Email"
-      end
-    
       def publish(build)
         BuildMailer.template_root = File.expand_path(File.dirname(__FILE__) + "/../../../app/views")
-        BuildMailer.delivery_method = @delivery_method      
+        BuildMailer.server_settings = server_settings
+        BuildMailer.delivery_method = delivery_method      
         BuildMailer.deliver_email(build, self)
       end
+
     end
 
     class BuildMailer < ActionMailer::Base

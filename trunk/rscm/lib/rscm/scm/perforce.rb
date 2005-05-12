@@ -255,7 +255,9 @@ module RSCM
 
     def revisions(from_identifier, to_identifier)
       revisions = changelists(from_identifier, to_identifier).collect {|changelist| to_revision(changelist)}
-      Revisions.new(revisions)
+      # We have to reverse the revisions in order to make them appear in chronological order,
+      # P4 lists the newest ones first.
+      Revisions.new(revisions).reverse
     end
 
     def name
@@ -358,7 +360,7 @@ module RSCM
       identifier = default if identifier.nil?
       if identifier.is_a?(Time)
         identifier = Time.epoch if identifier < Time.epoch
-        identifier.strftime(DATE_FORMAT)
+        (identifier+1).strftime(DATE_FORMAT)
       else
         "#{identifier + 1}"
       end

@@ -32,7 +32,7 @@ module RSCM
     # 16) Verify that OtherWorkingCopy is now uptodate
     # 17) Add and commit a file in WorkingCopy
     # 18) Verify that the revision (since last revision) for CheckoutHereToo contains only one file
-    def Xtest_basics
+    def test_basics
       work_dir = RSCM.new_temp_dir("basics")
       checkout_dir = "#{work_dir}/WorkingCopy"
       other_checkout_dir = "#{work_dir}/OtherWorkingCopy"
@@ -142,8 +142,8 @@ module RSCM
       assert("src/java/com/thoughtworks/damagecontrolled/Hello.txt", other_scm.checkout.sort[0])
     end
 
-    def Xtest_create_destroy
-      work_dir = RSCM.new_temp_dir("trigger")
+    def test_create_destroy
+      work_dir = RSCM.new_temp_dir("create_destroy")
       checkout_dir = "#{work_dir}/checkout"
       repository_dir = "#{work_dir}/repository"
       scm = create_scm(repository_dir, "killme")
@@ -160,7 +160,7 @@ module RSCM
       puts "DONE"
     end
     
-    def Xtest_trigger
+    def test_trigger
       work_dir = RSCM.new_temp_dir("trigger")
       checkout_dir = "#{work_dir}/checkout"
       repository_dir = "#{work_dir}/repository"
@@ -191,7 +191,7 @@ module RSCM
       assert(File.exist?(trigger_proof))
     end
 
-    def Xtest_checkout_revision_identifier
+    def test_checkout_revision_identifier
       work_dir = RSCM.new_temp_dir("ids")
       checkout_dir = "#{work_dir}/checkout"
       repository_dir = "#{work_dir}/repository"
@@ -216,7 +216,7 @@ module RSCM
       assert(!File.exist?("#{checkout_dir}/after.txt"))
     end
 
-    def Xtest_should_allow_creation_with_empty_constructor
+    def test_should_allow_creation_with_empty_constructor
       scm = create_scm(RSCM.new_temp_dir, ".")
       scm2 = scm.class.new
       assert_same(scm.class, scm2.class)
@@ -230,7 +230,7 @@ module RSCM
 EOF
     
     def test_diffs
-      work_dir = RSCM.new_temp_dir("diffs")
+      work_dir = RSCM.new_temp_dir("diff")
       checkout_dir = "#{work_dir}/checkout"
       repository_dir = "#{work_dir}/repository"
       import_dir = "#{work_dir}/import/diffing"
@@ -241,14 +241,20 @@ EOF
       
       mkdir_p(import_dir)
       File.open("#{import_dir}/afile.txt", "w") do |io|
+        io.puts("just some")
+        io.puts("initial content")
+      end      
+      scm.import_central(import_dir, "Initial revision")
+      scm.checkout
+      initial_revision = scm.revisions(nil).latest
+      sleep(1)
+
+      scm.edit("#{checkout_dir}/afile.txt")
+      File.open("#{checkout_dir}/afile.txt", "w") do |io|
         io.puts("one two three")
         io.puts("four five six")
-      end      
-      scm.import_central(import_dir, "Imported a file to diff against")
-      scm.checkout
-
-      sleep(1)
-      timestamp = Time.now.utc
+      end
+      scm.commit("Modified existing file")
       sleep(1)
 
       scm.edit("#{checkout_dir}/afile.txt")
@@ -256,12 +262,15 @@ EOF
         io.puts("one two three four")
         io.puts("five six")
       end
-      scm.commit("Modified file to diff")
-      revisions = scm.revisions(timestamp)
-      raise "No revisions since #{timestamp}" if revisions.empty?
+      scm.commit("Modified same file again")
+
+      revisions = scm.revisions(initial_revision.identifier)
+      assert_equal(2, revisions.length)
+      assert_equal("Modified existing file", revisions[0].message)
+      assert_equal("Modified same file again", revisions[1].message)
       
       got_diff = false
-      scm.diff(revisions[0][0]) do |diff_io|
+      scm.diff(revisions[1][0]) do |diff_io|
         got_diff = true
         diff_string = diff_io.read
         assert_match(/^\-one two three/, diff_string)
@@ -275,7 +284,6 @@ EOF
   private
 
     def import_damagecontrolled(scm, import_copy_dir)
-      Log.info("-- IMPORTING INTO CENTRAL REPO --")
       mkdir_p(import_copy_dir)
       path = File.dirname(__FILE__) + "/../../testproject/damagecontrolled"
       path = File.expand_path(path)
@@ -312,7 +320,7 @@ EOF
   end
     
   module LabelTest
-    def Xtest_label
+    def test_label
       work_dir = RSCM.new_temp_dir("label")
       checkout_dir = "#{work_dir}/LabelTest"
       repository_dir = "#{work_dir}/repository"

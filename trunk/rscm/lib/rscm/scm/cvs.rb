@@ -98,7 +98,7 @@ module RSCM
         opts = case change.status
           when /#{RevisionFile::MODIFIED}/; "#{revision_option(change.previous_native_revision_identifier)} #{revision_option(change.native_revision_identifier)}"
           when /#{RevisionFile::DELETED}/; "#{revision_option(change.previous_native_revision_identifier)}"
-          when /#{RevisionFile::ADDED}/; "#{revision_option(Time.epoch)} #{revision_option(change.RevisionFile)}"
+          when /#{RevisionFile::ADDED}/; "#{revision_option(Time.epoch)} #{revision_option(change.native_revision_identifier)}"
         end
         # IMPORTANT! CVS NT has a bug in the -N diff option
         # http://www.cvsnt.org/pipermail/cvsnt-bugs/2004-November/000786.html

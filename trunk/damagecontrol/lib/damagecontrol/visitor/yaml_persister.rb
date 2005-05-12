@@ -50,7 +50,11 @@ module DamageControl
           revision_yaml = "#{@revisions_dir}/#{identifier.to_s}/revision.yaml"
           Log.info "Loading revisions from #{revision_yaml}"
           begin
-            revisions.add(YAML::load_file(revision_yaml))
+            revision = YAML::load_file(revision_yaml)
+            revisions.add(revision)
+            revision.each do |file|
+              file.revision = revision
+            end
           rescue Exception => e
             # Sometimes the yaml files get corrupted
             Log.error "Error loading revisions file: #{File.expand_path(revision_yaml)}"

@@ -8,11 +8,12 @@ module DamageControl
         expected = [
           #AmbientOrb,
           #BuildDuration,
-          Email,
           #Execute,
           Growl,
           #Irc,
           Jabber,
+          Sendmail,
+          Smtp,
           #X10Cm11A,
           #X10Cm17A,
           #Yahoo

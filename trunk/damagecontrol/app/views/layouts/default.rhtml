@@ -2,9 +2,9 @@
 
 <html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
 <head>
-    <title>DamageControl</title>
-    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
-    <meta http-equiv="Content-Language" content="en-us" />
+    <title><%= @title %></title>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+    <meta http-equiv="Content-Language" content="en-us"/>
 	<%= stylesheet_link_tag(
 			"/javascripts/jscalendar/calendar-win2k-2",
 			"style.css",
@@ -20,6 +20,13 @@
 			"/javascripts/jscalendar/lang/calendar-en.js"
 		)
 	%>
+	<% @feeds.each do |feed| %>
+	  <%= tag(
+            "link", "rel" => "alternate", "type" => "application/#{feed.type}+xml", "title" => feed.title,
+            "href" => url_for(feed.options.merge(:only_path => false))
+          )
+      %>	  
+	<% end %>
   </head>
   <body onload="executeOnLoad()">
 

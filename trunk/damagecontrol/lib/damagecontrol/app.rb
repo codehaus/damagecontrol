@@ -7,7 +7,6 @@ require 'damagecontrol/poller'
 require 'damagecontrol/builder'
 require 'damagecontrol/build_queue'
 require 'damagecontrol/build_request_poller'
-require 'damagecontrol/standard_persister'
 require 'damagecontrol/publisher/base'
 
 def basedir
@@ -31,10 +30,6 @@ module DamageControl
       # Wire up the whole DamageControl app with Needle's nice block based DI framework.
       # I wonder - is BDI (Block Dependency Injection) a new flavour of DI?
       registry = Needle::Registry.define do |b|
-        b.persister do
-          DamageControl::StandardPersister.new
-        end 
-
         b.build_queue do
           DamageControl::BuildQueue.new("#{basedir}/build_queue.yaml")
         end 
@@ -45,8 +40,7 @@ module DamageControl
 
         b.scm_poller do 
           DamageControl::Poller.new("#{basedir}/projects") do |project, revisions|
-            b.persister.save_revisions(project, revisions)
-            b.persister.save_rss(project)
+            revisions.accept(project.revisions_persister)
             revisions.each do |revision|
               b.build_queue.enqueue(revision, "Detected revisions by polling #{project.scm.name}")
             end

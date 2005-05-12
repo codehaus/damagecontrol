@@ -55,7 +55,7 @@ begin
   LOG_DIR = File.expand_path("#{basedir}/log")
   FileUtils.mkdir_p(LOG_DIR)
   Log = RAILS_DEFAULT_LOGGER = Logger.new("#{LOG_DIR}/#{RAILS_ENV}.log")
-rescue StandardError
+rescue StandardError => e
   RAILS_DEFAULT_LOGGER = Logger.new(STDERR)
   RAILS_DEFAULT_LOGGER.level = Logger::WARN
   RAILS_DEFAULT_LOGGER.warn(
