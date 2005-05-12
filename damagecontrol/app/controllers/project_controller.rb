@@ -1,5 +1,8 @@
+require 'rss/maker'
 require 'rscm'
 require 'damagecontrol/project'
+require 'damagecontrol/scm_web'
+require 'damagecontrol/tracker'
 require 'damagecontrol/diff_parser'
 require 'damagecontrol/diff_htmlizer'
 require 'damagecontrol/publisher/base'
@@ -16,6 +19,8 @@ class ProjectController < ApplicationController
   def index
     @projects = DamageControl::Project.find_all("#{BASEDIR}/projects")
     @navigation_name = "null"
+    @feeds = @projects.collect{|project| Feed.new(project.name, {:controller => "project", :action => "revisions_rss", :id => project.name})}
+    @title = "DamageControl Dashboard"
   end
 
   def new
@@ -34,6 +39,7 @@ class ProjectController < ApplicationController
       true
     end
     @edit = true
+    @title = "New DamageControl Project"
     @new_project = true
     render_action("view")
   end
@@ -43,6 +49,7 @@ class ProjectController < ApplicationController
     @edit = false
     @navigation_name = "revisions_list"
     @projects = DamageControl::Project.find_all("#{BASEDIR}/projects")
+    
     load
   end
 
@@ -56,7 +63,19 @@ class ProjectController < ApplicationController
   
   def revisions_rss
     load
-    send_file(@project.revisions_rss_file)
+    # The RSS spec says max 15 items in a channel,
+    # (http://www.chadfowler.com/ruby/rss/)
+    last_15_revisions = @project.revisions_persister.load_upto(@project.revisions_persister.latest_identifier, 15)
+    RSS::Maker.make("2.0") do |rss|
+      rss_writer = DamageControl::Visitor::RssWriter.new(
+        rss,
+        @project,
+        self,
+        @project.tracker || DamageControl::Tracker::Null.new
+      )
+      last_15_revisions.reverse.accept(rss_writer)
+      render_text(rss.to_rss)
+    end
   end
 
   def save
@@ -221,6 +240,8 @@ private
     @linkable_revisions = @project.revisions(@project.latest_revision_identifier, 10)
     @select_revision_identifiers = @project.revision_identifiers[0..-(@linkable_revisions.length+1)]
 
+    @feeds = [Feed.new(@project.name, {:controller => "project", :action => "revisions_rss", :id => @project.name})]
+    @title = "#{@project.name} (DamageControl)"
     set_sidebar_links
   end
 end

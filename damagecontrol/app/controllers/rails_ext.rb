@@ -1,5 +1,13 @@
 require 'rscm/annotations'
 
+class Feed
+  attr_reader :title, :options, :type
+  
+  def initialize(title, options, type="rss")
+    @title, @options, @type = title, options, type
+  end
+end
+
 class ActionController::Base
 
   # Instantiates an Array of object from +class_name_2_attr_hash_hash+

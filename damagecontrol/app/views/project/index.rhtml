@@ -17,7 +17,7 @@
       %>
       <%= tag("img", :src => img) %>
     </td>
-    <td align="left"><%= link_to_image("rss.gif", :action => "revisions_rss", :id => project.name) %></td>
+    <td align="left"><%= link_to_image("rss.gif", {:action => "revisions_rss", :id => project.name}, {"title" => "#{project.name} RSS feed"}) %></td>
   </tr>
 <% end %>
 </table>

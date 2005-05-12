@@ -18,6 +18,10 @@ class ApplicationController < ActionController::Base
   layout 'default'
   before_filter :init_sidebar_links
 
+  def initialize
+    @feeds = []
+  end
+
 protected
 
   def init_sidebar_links
