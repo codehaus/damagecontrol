@@ -1,0 +1,8 @@
+project_3_1:
+  id: 1
+  depending_id: 3
+  dependant_id: 1
+project_3_2:
+  id: 2
+  depending_id: 3
+  dependant_id: 2

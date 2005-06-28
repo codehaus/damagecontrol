@@ -1,0 +1,10 @@
+build_1:
+  id: 1
+  status: COMPLETE 
+  stdout: oh no
+  stderr: oh yes 
+  pid: 1971
+  exitstatus: 5
+  reason: parce que je le vaut bien
+  timepoint: 1971-02-28 23:45:00 Z
+  revision_id: 1
