@@ -21,7 +21,7 @@ module Rake
   class TestTask < TaskLib
     def initialize(name=:test)
       @name = name
-      @libs = ["lib", "../rscm/lib", "../rscm/test"]
+      @libs = ["lib", "../../trunk/rscm/lib", "../../trunk/rscm/test"]
       @pattern = nil
       @options = nil
       @test_files = nil
