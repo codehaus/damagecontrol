@@ -1,0 +1,11 @@
+#!/usr/local/bin/ruby
+
+scriptdir = File.dirname(__FILE__) + '/../script'
+if !File.directory?(scriptdir)
+  ENV['RAILS_ENV'] ||= 'production'
+  # run via gem, let's load the latest version
+  gems = Gem.source_index.find_name('damagecontrol', nil)
+  raise "could not find damagecontrol gem" if gems.length < 1
+  scriptdir = gems[0].full_gem_path + '/script'
+end
+load scriptdir + '/server'

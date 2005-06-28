@@ -1,0 +1,60 @@
+<table class="pane">
+
+<%
+  if @linkable_revisions.nil?
+%>
+<%
+  elsif @linkable_revisions.empty?
+%>
+  <tr class="pane">
+    <td class="pane">
+      No revisions
+    </td>
+  </tr>
+<% else %>
+  <%
+    @linkable_revisions.reverse.each do |revision|
+  %>
+  <tr class="build-row">
+    <td nowrap="nowrap">
+      <%= link_to("#{revision.identifier} (#{revision.developer})", :action => "revision", :id => @project.name, :params => {"revision" => revision.identifier}) %>
+    </td>
+    <td width="100%">
+      <% @project.revision(revision.identifier).builds.each do |build| %>
+        <%= link_to_image(
+              build.small_image, 
+              {
+                :controller => "build", 
+                :action => "status", 
+                :id => @project.name, 
+                :params => {"revision" => revision.identifier, "build" => build.identifier}
+              }
+            ) %>
+      <% end %>
+    </td>
+  </tr>
+  <% end %>
+
+  <% if(!@select_revision_identifiers.empty?) %>
+    <tr class="build-row">
+      <td class="build-cell-even">
+        <form method="get" action="<%= url_for(:action => "revision", :id => @project.name) %>">
+          <input type="hidden" name="project_name" value="<%= "bar" %>" />
+          <select name="revision" onchange="submit()">
+          
+          <%
+            @select_revision_identifiers.reverse.each do |revision_identifier|
+          %>
+            <option value="<%= revision_identifier %>"><%= revision_identifier %></option>      
+          <% end %>
+          
+          </select>
+        </form>
+      </td>
+    </tr>
+  <% end %>
+
+<% end %>
+
+</table>
+

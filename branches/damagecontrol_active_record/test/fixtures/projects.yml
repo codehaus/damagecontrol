@@ -1,0 +1,11 @@
+project_1:
+  id: 1
+  name: project_1
+  build_command: touch built
+  relative_build_path: build_here
+project_2:
+  id: 2
+  name: project_2
+project_3:
+  id: 3
+  name: project_3

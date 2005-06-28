@@ -1,0 +1,12 @@
+development:
+  adapter: sqlite
+  dbfile: db/rails-development.db
+  schema: db/schema.sql
+
+test:
+  adapter: sqlite
+  dbfile: db/rails-test.db
+
+production:
+  adapter: sqlite
+  dbfile: db/rails-production.db

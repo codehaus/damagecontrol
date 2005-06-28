@@ -1,0 +1,23 @@
+body {background-color:#ffffff;}
+.file {border:1px solid #eeeeee;margin-top:1em;margin-bottom:1em;}
+.pathname {font-family:monospace; float:right;}
+.fileheader {margin-bottom:.5em;}
+.diff {margin:0;}
+.tasklist {padding:4px;border:1px dashed #000000;margin-top:1em;}
+.tasklist ul {margin-top:0;margin-bottom:0;}
+tr.alt {background-color:#eeeeee}
+#added {background-color:#ddffdd;}
+#addedchars {background-color:#99ff99;font-weight:bolder;}
+tr.alt #added {background-color:#ccf7cc;}
+#removed {background-color:#ffdddd;}
+#removedchars {background-color:#ff9999;font-weight:bolder;}
+tr.alt #removed {background-color:#f7cccc;}
+#info {color:#888888;}
+#context {background-color:#eeeeee;}
+td {padding-left:.3em;padding-right:.3em;}
+tr.head {border-bottom-width:1px;border-bottom-style:solid;}
+tr.head td {padding:0;padding-top:.2em;}
+.code_task {background-color:#ffff00;}
+.comment {padding:4px;border:1px dashed #000000;background-color:#ffffdd}
+.error {color:red;}
+hr {border-width:0px;height:2px;background:black;}

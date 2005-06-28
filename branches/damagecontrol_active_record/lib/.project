@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<projectDescription>
+	<name>damagecontrol_lib</name>
+	<comment></comment>
+	<projects>
+		<project>rscm_lib</project>
+		<project>rscm_test</project>
+	</projects>
+	<buildSpec>
+	</buildSpec>
+	<natures>
+		<nature>org.rubypeople.rdt.core.rubynature</nature>
+	</natures>
+</projectDescription>

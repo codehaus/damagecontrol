@@ -1,0 +1,5 @@
+#!/usr/local/bin/ruby
+
+load File.dirname(__FILE__) + '/../config/environment.rb'
+require 'damagecontrol/app'
+DamageControl::App.new.run

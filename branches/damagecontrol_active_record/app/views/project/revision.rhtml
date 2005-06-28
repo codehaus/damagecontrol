@@ -1,0 +1,49 @@
+<h1><%= @revision.project.name %> revision <%= @revision.identifier %></h1>
+<p>
+<div id="request_build">
+<%= link_to_remote(
+	"Schedule new build for this revision",
+	:update => "request_build",
+	:url => {:controller => "build", :action => "request_build", :id => @revision.project.name, :params => {"revision" => @revision.identifier, "reason" => "Manually triggered via web interface"}}
+) %>
+</div>
+</p>
+<table class="pane">
+  <tr class="pane">
+    <td colspan="3" class="revision">
+      <div class="revision-message">
+        <b><%= @revision.developer %></b>
+        (<%= @revision.time.to_human %> UTC)<br/>
+        <%= @project.tracker.highlight(@revision.message) %>
+      </div>
+    </td>
+  </tr>
+  <%
+  @revision.each_with_index do |file, i|
+  %>
+    <tr>
+      <td width="5%"><%= image_tag(file.icon, :alt => file.description) %></td>
+      <td width="5%"><%= file.native_revision_identifier %></td>
+      <td width="90%">
+        <%= link_to_remote(
+              file.path, {
+                :update => "diff_#{i}", 
+                :loading => "Element.show('diff_#{i}');$('diff_link_#{i}').onclick=function(){}",
+                :loaded => "$('diff_link_#{i}').onclick=function(){Element.toggle('diff_#{i}')}",
+                :url => { 
+                  :controller => "scm", 
+                  :action => "diff_with_previous", 
+                  :id => @project.name, 
+                  :params => {
+                    "revision_identifier" => @revision.identifier, 
+                    "file_index" => i
+                  }
+                }
+              },
+              {"id" => "diff_link_#{i}"}
+            ) %>
+        <div style="display:none;" id="diff_<%=i%>"><%= image_tag("spinner.gif") %> Loading diff...</div>
+      </td>
+    </tr>
+  <% end %>
+</table>
