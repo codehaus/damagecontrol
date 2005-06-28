@@ -1,5 +1,4 @@
 require 'rscm/annotations'
-require 'damagecontrol/project'
 
 module DamageControl
   module Publisher
