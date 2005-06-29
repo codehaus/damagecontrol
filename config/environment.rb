@@ -1,3 +1,4 @@
+require File.dirname(__FILE__) + '/dc_environment'
 RAILS_ROOT = File.dirname(__FILE__) + "/../"
 RAILS_ENV  = ENV['RAILS_ENV'] || 'development'
 

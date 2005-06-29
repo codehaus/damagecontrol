@@ -14,14 +14,20 @@
 # 2) edit the line with: task :test_units => [ :clone_structure_to_test ] to:
 #    task :test_units => [ :clean_target, :recreate_schema, :clone_structure_to_test ]
 #
+# 3) add the following line to the top of config/environment.rb:
+#    require File.dirname(__FILE__) + '/dc_environment'
+#
 require 'rake'
 require 'rake/tasklib'
+
+LIBS = ["lib", "../../trunk/rscm/lib", "../../trunk/rscm/test"]
+$: << LIBS.join(':')
 
 module Rake
   class TestTask < TaskLib
     def initialize(name=:test)
       @name = name
-      @libs = ["lib", "../../trunk/rscm/lib", "../../trunk/rscm/test"]
+      @libs = LIBS
       @pattern = nil
       @options = nil
       @test_files = nil
@@ -52,4 +58,14 @@ task :recreate_schema => :environment do
     else 
       raise "Unknown database adapter '#{abcs["test"]["adapter"]}'"
   end
+end
+
+desc "Run the Webapp"
+task :webapp do
+  ruby "-I#{LIBS.join(':')} script/server"
+end
+
+desc "Run the Daemon"
+task :daemon do
+  ruby "-I#{LIBS.join(':')} lib/damagecontrol/daemon.rb"
 end

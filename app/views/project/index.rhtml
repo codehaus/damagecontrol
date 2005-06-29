@@ -6,11 +6,12 @@
   </tr>
 <% @projects.each do |project| %>
   <tr>
-    <td align="left"><%= link_to(project.name, {:controller => "project", :action => "view", :id => project.name}) %></td>
+    <td align="left"><%= link_to(project.name, {:controller => "project", :action => "view", :id => project.id}) %></td>
     <td align="left">
       <% 
         img = "/images/grey-16.gif"
-        build = project.latest_revision ? project.latest_revision.latest_build : nil
+        latest_revision = project.revisions[-1]
+        build = latest_revision ? latest_revision.builds[-1] : nil
         if(build)
           img = build.small_image
         end

@@ -23,7 +23,7 @@ class ProjectTest < Test::Unit::TestCase
   end
   
   def test_should_create_basedir_after_load
-    expected_base_dir = ENV["DC_ROOT"] + "/projects/#{@project_1.id}"
+    expected_base_dir = ENV["DAMAGECONTROL_HOME"] + "/projects/#{@project_1.id}"
     assert(File.exist?(expected_base_dir), "Should exist: #{expected_base_dir}")
   end
 
@@ -32,7 +32,7 @@ class ProjectTest < Test::Unit::TestCase
     @project_1.save
     @project_1.reload
 
-    expected_wc_dir = ENV["DC_ROOT"] + "/projects/#{@project_1.id}/working_copy"
+    expected_wc_dir = ENV["DAMAGECONTROL_HOME"] + "/projects/#{@project_1.id}/working_copy"
     assert(File.exist?(expected_wc_dir), "Should exist: #{expected_wc_dir}")
     assert_equal(@project_1.working_copy_dir, @project_1.scm.checkout_dir)
   end

@@ -1,4 +1,4 @@
-ENV["DC_ROOT"] = File.expand_path(__FILE__ + "/../../target")
+ENV["DAMAGECONTROL_HOME"] = File.expand_path(__FILE__ + "/../../target")
 ENV["RAILS_ENV"] = "test"
 require File.dirname(__FILE__) + "/../config/environment"
 require 'application'

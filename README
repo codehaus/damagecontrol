@@ -1,5 +1,7 @@
 = DamageControl - a cross platform continuous integration server.
 
+= If you upgrade Rails, see upgrade instructions in rake_ext.rb
+
 = Feature overview
 
 * Builds projects of any kind:
