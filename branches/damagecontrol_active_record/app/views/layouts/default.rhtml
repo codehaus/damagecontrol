@@ -2,102 +2,20 @@
 
 <html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
 <head>
-    <title><%= @title %></title>
-    <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
-    <meta http-equiv="Content-Language" content="en-us"/>
-	<%= stylesheet_link_tag(
-			"/javascripts/jscalendar/calendar-win2k-2",
-			"style.css",
-			"diff.css"
-    		)
-	%>
-    <%= javascript_include_tag(
-			"prototype",
-			"toggle_div",
-			"dateFormat",
-			"/javascripts/jscalendar/calendar",
-			"/javascripts/jscalendar/calendar-setup.js",		
-			"/javascripts/jscalendar/lang/calendar-en.js"
-		)
-	%>
-	<% @feeds.each do |feed| %>
-	  <%= tag(
-            "link", "rel" => "alternate", "type" => "application/#{feed.type}+xml", "title" => feed.title,
-            "href" => url_for(feed.options.merge(:only_path => false))
-          )
-      %>	  
-	<% end %>
-  </head>
-  <body onload="executeOnLoad()">
-
-<table id="header" cellpadding="0" cellspacing="0" width="100%" border="0">
-  <tr id="top-panel">
-    <td>
-      <a href="http://damagecontrol.codehaus.org/"><!--img class="logo" src="images/damagecontrol-logo.gif"/--></a>
-    </td>
-  </tr>
-  <tr id="top-nav">
-    <td id="left-top-nav">
-      <%= breadcrumbs %>
-    </td>
-  </tr>
-</table>
-
-<table id="main-table" width="100%" border="0" style="height:70%;">
-	<tr>
-		<td id="side-panel" width="20%" nowrap="nowrap">
-			<div id="tasks">  
-				<% @sidebar_links.each do |link| 
-					image = link.delete(:image)
-					name  = link.delete(:name)
-					href = link.delete(:href)
-					id = name.downcase.gsub(/\W/, '_')
-					if(href) %>
-		      			<div class="task">
-							<%= content_tag("a", 
- 								tag("img", 
-      								:src => image, :alt=>"", 
-      								:width => "24", 
-      								:height => "24"
-      							), 
-		      					{:href => href}) 
-							%> <%= content_tag("a", name, {:href => href, :id => id}) %>
-						</div>
-					<% else %>  
-						<div class="task">
-							<%= link_to_image(image, link, :size => "24x24") %> <%= link_to(name, link, :id => id) %>
-						</div>
-    					<% end %>
-				<% end %>
-			</div>
-			<div id="navigation">
-				<% $stderr.puts "NAVIGATION = #{@navigation_name}" %>
-				<%= render_partial(@navigation_name, nil) if @navigation_name %>
- 			</div>
-		</td>
-		<td id="main-panel" width="70%" height="100%">
-			<%= @content_for_layout %>
-		</td>
-		<td width="10%">
-			<%= periodically_call_remote(:update => "build_queue", :frequency => 10, :url => {:controller => "build_queue", :action => "view"}) %>
-			<div id="build_queue">Build queue loading...</div>
-		</td>
-	</tr>
-
-	<tr>
-		<td id="footer" colspan="3" style="background: white url(/images/footer.gif) repeat-x ">
-			This stuff displays best in a Gecko based browser. Try <a href="http://www.mozilla.org/products/firefox/">Firefox</a>.
-			<br/>
-		</td>
-	</tr>
-</table>
-
-<!-- These scripts must be inside or after the body tag since they check for the presence of document.body -->
-<script src="/javascripts/dw_tooltip.js" type="text/javascript"></script>
-<script src="/javascripts/dw_event.js" type="text/javascript"></script>
-<script src="/javascripts/dw_viewport.js" type="text/javascript"></script>
-<!--[if gte IE 5.5000]>
-<script type="text/javascript" src="/javascripts/pngfix.js"></script>
-<![endif]-->
+  <title><%= @title %></title>
+  <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+  <meta http-equiv="Content-Language" content="en-us"/>
+	<%= stylesheet_link_tag("/javascripts/jscalendar/calendar-win2k-2", "style.css", "diff.css") %>
+  <%= javascript_include_tag(
+		"prototype",
+		"toggle_div",
+		"dateFormat",
+		"/javascripts/jscalendar/calendar",
+		"/javascripts/jscalendar/calendar-setup.js",		
+		"/javascripts/jscalendar/lang/calendar-en.js"
+	) %>
+</head>
+<body>
+	<%= @content_for_layout %>
 </body>
 </html>

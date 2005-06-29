@@ -44,7 +44,7 @@ class Project < ActiveRecord::Base
   end
 
   def after_find
-    @basedir = ENV["DC_ROOT"] + "/projects/#{id}"
+    @basedir = ENV["DAMAGECONTROL_HOME"] + "/projects/#{id}"
     mkdir @basedir
     self.scm.checkout_dir = working_copy_dir unless self.scm.nil?
   end

@@ -20,7 +20,7 @@ tabs = ["projects", "scms", "publishers", "trackers"]
 </ul>
 
 <% if(@edit) %>
-<form name="project_form" action="/project/save">
+<form action="<%= url_for(:action => 'create') %>">
 <% end %>
 
 <div id="projects" style="display:block">
