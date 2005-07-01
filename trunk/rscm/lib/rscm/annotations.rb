@@ -1,4 +1,5 @@
 class Class
+
   @@anns = {}
   @@attr_anns = {}
 

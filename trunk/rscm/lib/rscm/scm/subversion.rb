@@ -32,7 +32,7 @@ module RSCM
     ann :tip => "You only need to specify this if you want to be able to automatically create the repository. This should be the relative path from the start of the repository <br>to the end of the URL. For example, if your URL is <br>svn://your.server/path/to/repository/path/within/repository <br>then this value should be path/within/repository."
     attr_accessor :path
 
-    def initialize(url="", path="trunk")
+    def initialize(url="", path="")
       @url, @path = url, path
     end
 
@@ -113,7 +113,7 @@ module RSCM
     def diff(file, &block)
       with_working_dir(@checkout_dir) do
         cmd = "svn diff -r #{file.previous_native_revision_identifier}:#{file.native_revision_identifier} \"#{url}/#{file.path}\""
-        safer_popen(cmd) do |io|
+        Better.popen(cmd) do |io|
           return(yield(io))
         end
       end
@@ -136,7 +136,7 @@ module RSCM
         # on stdout (and an error msg on std err).
         exists = false
         cmd = "svn log #{url} -r HEAD"
-        safer_popen(cmd) do |stdout|
+        Better.popen(cmd) do |stdout|
           stdout.each_line do |line|
             exists = true
           end
@@ -188,7 +188,7 @@ module RSCM
       yield command if block_given?
 
       with_working_dir(@checkout_dir) do
-        safer_popen(command) do |stdout|
+        Better.popen(command) do |stdout|
           parser = SubversionLogParser.new(stdout, @url)
           revisions = parser.parse_revisions
         end
@@ -220,9 +220,13 @@ module RSCM
     end
 
     def head_revision_identifier
-      cmd = "svn log #{login_options} #{repourl} -r HEAD"
+      # This command only seems to yield any changesets if the url is the root of
+      # the repo, which we don't know in the case where path is not specified (likely)
+      # We therefore don't specify it and get the latest revision from the full url instead.
+      # cmd = "svn log #{login_options} #{repourl} -r HEAD"
+      cmd = "svn log #{login_options} #{url}"
       with_working_dir(@checkout_dir) do
-        safer_popen(cmd) do |stdout|
+        Better.popen(cmd) do |stdout|
           parser = SubversionLogParser.new(stdout, @url)
           revisions = parser.parse_revisions
           revisions[0].identifier.to_i
@@ -276,7 +280,7 @@ module RSCM
       command_line = "#{executable} #{cmd}"
       dir = File.expand_path(dir)
       with_working_dir(dir) do
-        safer_popen(command_line) do |stdout|
+        Better.popen(command_line) do |stdout|
           stdout.each_line do |line|
             yield line if block_given?
           end
@@ -317,13 +321,17 @@ module RSCM
         from = svndate(from_identifier + 1)
       elsif(from_identifier.is_a?(Numeric))
         from = from_identifier + 1
+      elsif(!from_identifier.nil?)
+        raise "from_identifier must be Numeric, Time or nil. Was: #{from_identifier} (#{from_identifier.class.name})"
       end
 
       to = nil
       if(to_identifier.is_a?(Time))
         to = svndate(to_identifier)
-      else
+      elsif(to_identifier.is_a?(Numeric))
         to = to_identifier
+      elsif(!from_identifier.nil?)
+        raise "to_identifier must be Numeric, Time or nil. Was: #{to_identifier} (#{to_identifier.class.name})"
       end
 
       revision_option = nil

@@ -108,7 +108,7 @@ module RSCM
     def darcs(darcs_cmd)
       cmd = "darcs #{darcs_cmd}"
 
-      safer_popen(cmd, "r+") do |io|
+      Better.popen(cmd, "r+") do |io|
         if(block_given?)
           return(yield(io))
         else

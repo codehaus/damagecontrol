@@ -103,7 +103,7 @@ module RSCM
         # IMPORTANT! CVS NT has a bug in the -N diff option
         # http://www.cvsnt.org/pipermail/cvsnt-bugs/2004-November/000786.html
         cmd = command_line("diff -Nu #{opts} #{change.path}")
-        safer_popen(cmd, "r", 1) do |io|
+        Better.popen(cmd, "r", 1) do |io|
           return(yield(io))
         end
       end
@@ -213,7 +213,7 @@ module RSCM
       dir = File.expand_path(dir)
       execed_command_line = command_line(cmd, password, simulate)
       with_working_dir(dir) do
-        safer_popen(execed_command_line) do |stdout|
+        Better.popen(execed_command_line) do |stdout|
           stdout.each_line do |progress|
             yield progress if block_given?
           end
@@ -228,7 +228,7 @@ module RSCM
       execed_command_line = command_line(cmd, password)
       revisions = nil
       with_working_dir(@checkout_dir) do
-        safer_popen(execed_command_line) do |stdout|
+        Better.popen(execed_command_line) do |stdout|
           parser = CvsLogParser.new(stdout)
           parser.cvspath = path
           parser.cvsmodule = mod
