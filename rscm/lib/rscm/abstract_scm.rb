@@ -3,24 +3,6 @@ require 'rscm/revision'
 require 'rscm/path_converter'
 require 'rscm/annotations'
 
-class String
-  # Turns a String into a Time if possible
-  def to_identifier
-    if(self =~ /20\d\d\d\d\d\d\d\d\d\d\d\d/)
-      # Assume it's a timestamp string - convert to time.
-      Time.parse_ymdHMS(self)
-    else
-      self.to_i
-    end
-  end
-end
-
-class Time
-  def to_s
-    self.ymdHMS
-  end
-end
-
 module RSCM
   # This class defines the RSCM API. The documentation of the various methods
   # uses CVS and Subversion's terminology. (For example, checkout means 'get working copy',
