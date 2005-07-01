@@ -1,5 +1,4 @@
 require File.dirname(__FILE__) + '/../test_helper'
-require 'damagecontrol/publisher/base'
 
 class PublisherTest < Test::Unit::TestCase
   fixtures :publishers

@@ -1,5 +1,6 @@
 require 'rscm/annotations'
 
+# TODO: move up to publisher.rb
 module DamageControl
   module Publisher
   

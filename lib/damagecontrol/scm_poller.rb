@@ -1,5 +1,7 @@
 module DamageControl
   class ScmPoller
+    cattr_accessor :logger
+    
     # default time to wait for scm to be quiet (applies to non-transactional scms only)
     DEFAULT_QUIET_PERIOD = 15 unless defined? DEFAULT_QUIET_PERIOD
 
@@ -15,16 +17,18 @@ module DamageControl
             persist_build_for_lates_revision(project)
           end
         rescue => e
-          Log.error "Error polling #{project.name}"
-          Log.error  e.message
-          Log.error "  " + e.backtrace.join("  \n")
+          if(logger)
+            logger.error "Error polling #{project.name}"
+            logger.error  e.message
+            logger.error "  " + e.backtrace.join("  \n")
+          end
         end
       end
     end
 
     # Stores revisions in the database 
     def persist_revisions(project, revisions)
-      Log.info "Persisting #{revisions.length} revision(s) for #{project.name}"
+      logger.info "Persisting #{revisions.length} revision(s) for #{project.name}" if logger
       start_time = Time.now.utc
       revisions.each do |revision|
         # We're not doing:
@@ -35,8 +39,8 @@ module DamageControl
       end
       duration = Time.now.utc - start_time
       rev_per_sec = revisions.length / duration
-      Log.info "Done persisting #{revisions.length} revision(s) for #{project.name} " + 
-        "in #{duration} seconds (#{rev_per_sec}) revisions/sec"
+      logger.info "Done persisting #{revisions.length} revision(s) for #{project.name} " + 
+        "in #{duration} seconds (#{rev_per_sec}) revisions/sec" if logger
     end
     
     # Persists a new build (to be picked up by a BuildExecutor)
@@ -57,17 +61,17 @@ module DamageControl
         from = project.start_time
         if(latest_revision)
           from = latest_revision.identifier
-          Log.info "Latest revision for #{project.name}'s #{scm.name} was #{from}"
+          logger.info "Latest revision for #{project.name}'s #{scm.name} was #{from}" if logger
         else
-          Log.info "Latest revision for #{project.name}'s #{scm.name} is not known. Using project start time: #{from}"
+          logger.info "Latest revision for #{project.name}'s #{scm.name} is not known. Using project start time: #{from}" if logger
         end
 
-        Log.info "Polling revisions for #{project.name}'s #{scm.name} after #{from} (#{from.class.name})"
+        logger.info "Polling revisions for #{project.name}'s #{scm.name} after #{from} (#{from.class.name})" if logger
         revisions = scm.revisions(from)
         if(revisions.empty?)
-          Log.info "No revisions for #{project.name}'s #{scm.name} after #{from}"
+          logger.info "No revisions for #{project.name}'s #{scm.name} after #{from}" if logger
         else
-          Log.info "There were #{revisions.length} new revision(s) in #{project.name}'s #{scm.name} after #{from}"
+          logger.info "There were #{revisions.length} new revision(s) in #{project.name}'s #{scm.name} after #{from}" if logger
         end
         if(!revisions.empty? && !scm.transactional?)
           # We're dealing with a non-transactional SCM (like CVS/StarTeam/ClearCase,
@@ -80,20 +84,20 @@ module DamageControl
           commit_in_progress = true
           quiet_period = project.quiet_period || DEFAULT_QUIET_PERIOD
           while(commit_in_progress)
-            Log.info "Sleeping for #{quiet_period} seconds because #{project.name}'s SCM (#{scm.name}) is not transactional."
+            logger.info "Sleeping for #{quiet_period} seconds because #{project.name}'s SCM (#{scm.name}) is not transactional." if logger
             sleep(quiet_period)
             previous_revisions = revisions
             revisions = scm.revisions(from)
             commit_in_progress = revisions != previous_revisions
             if(commit_in_progress)
-              Log.info "Commit still in progress in #{project.name}'s #{scm.name}."
+              logger.info "Commit still in progress in #{project.name}'s #{scm.name}." if logger
             end
           end
-          Log.info "Quiet period elapsed for #{project.name}."
+          logger.info "Quiet period elapsed for #{project.name}." if logger
         end
         return revisions
       else
-        Log.info "Not polling #{project.name} since its central scm repo doesn't seem to exist"
+        logger.info "Not polling #{project.name} since its central scm repo doesn't seem to exist" if logger
       end
     end
   end

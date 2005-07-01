@@ -1,4 +1,9 @@
-# Creates default projects
+#!/usr/local/bin/ruby
+
+load File.dirname(__FILE__) + '/../config/environment.rb'
+
+# Create some default projects
+
 if(!Project.find_by_name("DamageControl (damagecontrol_active_record branch)"))
   damagecontrol = Project.create(
     :name => "DamageControl (damagecontrol_active_record branch)",
