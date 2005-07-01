@@ -2,9 +2,23 @@
 
 load File.dirname(__FILE__) + '/../config/dc_environment.rb'
 
-scm_poller_thread = Thread.new do
-  scm_poller = DamageControl::ScmPoller.new
-  scm_poller.poll_all_projects
+threads = []
+
+scm_poller = DamageControl::ScmPoller.new
+build_executor = DamageControl::BuildExecutor.new
+
+threads << Thread.new do
+  while(true)
+    scm_poller.poll_all_projects
+    sleep 20
+  end
 end
+
+threads << Thread.new do
+  while(true)
+    build_executor.build_next
+  end
+end
+
 puts "DamageControl daemon started"
-scm_poller_thread.join
+threads.each{|t| t.join}

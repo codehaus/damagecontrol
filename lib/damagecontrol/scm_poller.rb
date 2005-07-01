@@ -49,8 +49,10 @@ module DamageControl
     # This method picks the latest revision.
     def persist_build_for_lates_revision(project)
       # TODO: optimize this query.
+      logger.info "Requesting build for #{project.name}" if logger
       last_revision = project.revisions(true)[-1]
       last_revision.builds.create
+      logger.info "Requested build for #{project.name}" if logger
     end
 
     def poll_new_revisions(project)

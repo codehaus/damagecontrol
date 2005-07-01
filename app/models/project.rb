@@ -2,6 +2,8 @@ require 'rgl/adjacency'
 require 'rgl/connected_components'
 
 class Project < ActiveRecord::Base
+  cattr_accessor :logger
+
   has_many :revisions, :order => "timepoint"
   has_many :publishers
   has_and_belongs_to_many :dependencies, 
@@ -19,11 +21,15 @@ class Project < ActiveRecord::Base
   # Tells each enabled publisher to publish the build
   # and creates a build request for each dependant project
   def build_complete(build)
+    logger.info "Build complete for #{name}'s revision #{build.revision.identifier}" if logger
+    logger.info "Successful build: #{build.successful?}" if logger
+
     publishers.each do |publisher| 
       publisher.publish(build) if publisher.enabled
     end
     
     if(build.successful?)
+      logger.info "Requesting build of dependant projects of #{name}: #{dependants.collect{|p| p.name}.join(',')}" if logger
       dependants.each do |project|
         project.create_build_request("Successful build of dependant project #{self.name}")
       end

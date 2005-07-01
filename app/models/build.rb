@@ -14,6 +14,8 @@ require 'tempfile'
 # In order to reexecute a build, create a new instance (via Revision.builds.create)
 #
 class Build < ActiveRecord::Base
+  cattr_accessor :logger
+
   belongs_to :revision
   serialize :env
 
@@ -50,8 +52,8 @@ class Build < ActiveRecord::Base
     self.timepoint = timepoint
     self.command = self.revision.project.build_command
     self.env = {
-      "DAMAGECONTROL_BUILD_LABEL" => revision.identifier,
-      "PKG_BUILD" => revision.identifier,
+      "DAMAGECONTROL_BUILD_LABEL" => revision.identifier.to_s,
+      "PKG_BUILD" => revision.identifier.to_s,
       "DAMAGECONTROL_CHANGED_FILES" => revision.revision_files.collect{|f| f.path}.join(',')
     }
     
@@ -63,12 +65,11 @@ class Build < ActiveRecord::Base
       # Make sure the working copy is in sync
       revision.sync_working_copy
       
-      # Execute the build with the given environment variables (which are persisted for reference).
       env.each{|k,v| ENV[k]=v}
-      ENV.each{|k,v| env[k]=v}
       Dir.chdir(revision.project.build_dir) do
         begin
           redirected_cmd = "#{command} > #{stdout_file.path} 2> #{stderr_file.path}"
+          logger.info "Executing build for #{revision.project.name}'s revision #{revision.identifier}" if logger
           exec redirected_cmd
         rescue Errno::ENOENT => e
           File.open(stderr_file.path) {|io| self.stderr = e.message}

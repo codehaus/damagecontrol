@@ -11,8 +11,8 @@ CREATE TABLE projects(
 
 CREATE TABLE projects_projects(
   id INTEGER PRIMARY KEY,
-  dependant_id INTEGER,
-  depending_id INTEGER
+  depending_id INTEGER,
+  dependant_id INTEGER
 );
 
 CREATE TABLE revisions(
