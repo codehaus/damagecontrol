@@ -1,6 +1,12 @@
-require 'rubygems'
-require_gem 'log4r'
+require 'logger'
 
-Log = Log4r::Logger.new("rscm")
-Log.level = ENV["LOG4R_LEVEL"] ? ENV["LOG4R_LEVEL"].to_i : 0
-Log.add Log4r::Outputter.stderr
+begin
+  RSCM_DEFAULT_LOGGER = Logger.new("#{HOMEDIR}/.rscm.log")
+rescue StandardError
+  RSCM_DEFAULT_LOGGER = Logger.new(STDERR)
+  RSCM_DEFAULT_LOGGER.level = Logger::WARN
+  RSCM_DEFAULT_LOGGER.warn(
+    "RSCM Error: Unable to access log file. Please ensure that #{HOMEDIR}/.rscm.log exists and is chmod 0666. " +
+    "The log level has been raised to WARN and the output directed to STDERR until the problem is fixed."
+  )
+end

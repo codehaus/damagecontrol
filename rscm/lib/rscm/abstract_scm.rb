@@ -65,7 +65,7 @@ module RSCM
   # (according to the SCM's native label/revision scheme).
   #
   # If +from_identifier+ or +to_identifier+ are +nil+ they should respectively default to
-  # epoch or the infinite future.
+  # Time.epoch or Time.infinite.
   #
   # TODO: rename this superclass to 'Base'
   #

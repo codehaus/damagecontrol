@@ -16,7 +16,6 @@ module RSCM
     # the parent Revision's 
     attr_accessor :native_revision_identifier
 
-    # TODO: Remove redundant attributes that are in Revision
     attr_accessor :developer
     attr_accessor :message
     # This is a UTC ruby time

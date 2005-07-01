@@ -321,7 +321,7 @@ module RSCM
       key_opt = key ? "--key=\"#{key}\"" : ""
       rcfile_opt = @rcfile ? "--rcfile=\"#{@rcfile}\"" : ""
       cmd = "monotone #{db_opt} #{branch_opt} #{key_opt} #{rcfile_opt} #{monotone_cmd}"
-      safer_popen(cmd, "r+") do |io|
+      Better.popen(cmd, "r+") do |io|
         if(block_given?)
           return(yield(io))
         else

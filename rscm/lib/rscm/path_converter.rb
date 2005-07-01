@@ -1,21 +1,14 @@
-require 'fileutils'
-require 'rscm/logging'
-
 WIN32 = RUBY_PLATFORM == "i386-mswin32"
 CYGWIN = RUBY_PLATFORM == "i386-cygwin"
 WINDOWS = WIN32 || CYGWIN
-
-# TODO: change to override IO.popen, using that neat trick we
-# used in threadfile.rb (which is now gone)
-def safer_popen(cmd, mode="r", expected_exit=0, &proc)
-  Log.info "Executing command: '#{cmd}'"
-  ret = IO.popen(cmd, mode) do |io|
-    proc.call(io)
-  end
-  exit_code = $? >> 8
-  raise "Command\n'#{cmd}'\nfailed with code #{exit_code} in\n#{Dir.pwd}\nExpected exit code: #{expected_exit}" if exit_code != expected_exit
-  ret
+if(WINDOWS)
+  HOMEDIR = RSCM::PathConverter.nativepath_to_filepath("#{ENV['HOMEDRIVE']}#{ENV['HOMEPATH']}").gsub(/\\/, "/")
+else
+  HOMEDIR = ENV['HOME']
 end
+
+require 'fileutils'
+require 'rscm/logging'
 
 def with_working_dir(dir)
   # Can't use Dir.chdir{ block } - will fail with multithreaded code.
@@ -27,10 +20,6 @@ def with_working_dir(dir)
     FileUtils.mkdir_p(dir)
     Dir.chdir(dir)
     yield
-  rescue => e
-    Log.error("dir:#{dir}")
-    Log.error(e.backtrace.join("\n"))
-    raise e
   ensure
     Dir.chdir(prev)
   end
@@ -46,7 +35,7 @@ module RSCM
         path.gsub(/\//, "\\")
       elsif(CYGWIN)
         cmd = "cygpath --windows #{path}"
-        safer_popen(cmd) do |io|
+        Better.popen(cmd) do |io|
           cygpath = io.read.chomp
           escaped ? cygpath.gsub(/\\/, "\\\\\\\\") : cygpath
         end
@@ -72,7 +61,7 @@ module RSCM
       elsif(CYGWIN)
         path = path.gsub(/\\/, "/")
         cmd = "cygpath --unix #{path}"
-        safer_popen(cmd) do |io|
+        Better.popen(cmd) do |io|
           io.read.chomp
         end
       else

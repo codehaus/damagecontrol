@@ -1,6 +1,6 @@
-= RSCM - Ruby Source Control Management (0.2.0)
+= RSCM - Ruby Source Control Management (0.3.0)
 
-RSCM is to SCM what DBI/JDBC/ODBC are to databases - an SCM-independent API for accessing a wide variety of SCMs. The features are roughly:
+RSCM is to SCM what DBI/JDBC/ODBC are to databases - an SCM-independent API for accessing different SCMs. The features are roughly:
 
 * Check out a working copy (with possibility to specify branch/date/label)
 * Get changesets (changesets are emulated for non-transactional SCMs like CVS and StarTeam)
@@ -8,15 +8,25 @@ RSCM is to SCM what DBI/JDBC/ODBC are to databases - an SCM-independent API for 
 * Add and commit files
 * Manipluate triggers
 
+Although RSCM's main focus is operations on a working copy of an SCM repository, the API also allows some level of interaction
+with the SCM repository itself, like creating new repositories.
+
 == Download
 
 RSCM is available as a RubyGem, and can be installed like this:
 
   gem install rscm
 
+(You may need administer access to do this on a POSIX system).
 If you want the latest and greatest, you can get the sources, which live alongside DamageControl's sources:
 
-  http://damagecontrol.codehaus.org/Installing
+* See the DamageControl Developer Guide at http://hieraki.lavalamp.ca/
+
+== Team
+* Aslak Hellesoy - All
+* Steven Baker - Monotone
+* Jon Tirsen - CVS, Subversion
+* Yogi Kulkarni - Perforce
 
 == Supported SCMs
 
@@ -46,29 +56,30 @@ Here is an example of how to use RSCM to get a list of changesets from a CVS rep
   require 'rscm'
   
   scm = RSCM::Subversion.new("svn://some.server/some/path/trunk", "trunk")
+  scm.checkout_dir = "/my/working/copy"
 
-  scm.checkout("mycheckout")
-  changesets = scm.changesets("mycheckout", Time.utc(2004, 11, 10, 12, 34, 22))
-  changesets.each do |changeset|
-    puts changeset
+  scm.checkout
+  revisions = scm.revisions(Time.utc(2004, 11, 10, 12, 34, 22))
+  revisions.each do |revision|
+    puts revision # or do something more funky with it
   end
 
 === Using visitors
 
-Although ChangeSets and ChangeSet support external iteration (as in the example above), the preferred way 
-to operate on them is to let a ChangeSets object +accept+ a visitor. A visitor
+Although the Revisions and Revision classes support external iteration 
+(with +each+ as in the example above), they also support 
+visitor traversal via their +accept+ methods. A visitor
 must respond to the following methods:
 
-  def visit_changesets(changesets); end
-  def visit_changeset(changeset); end
-  def visit_change(change); end
+  def visit_revisions(revisions); end
+  def visit_revision(revision); end
+  def visit_file(revision_file); end
 
 === Getting diffs
 
-RSCM allows you to get diffs for changesets. This is done in the following way:
-
-See the DamageControl sources for more detailed examples (DamageControl persists diffs to disk
-and presents them as colourised diffs in its user interface).
+RSCM allows you to get diffs for changesets. See the DamageControl sources for more detailed 
+examples (DamageControl persists diffs to disk and presents them as colourised diffs in its 
+user interface).
 
 == Future plans
 
@@ -84,7 +95,7 @@ the central SCM and one that you set up on your local machine.
 = Implementing support for a new SCM
 
 We'd be happy to receive contributions for more SCMs. You can always
-file a JIRA issue and hope for someone to implement it for you, or
+file a JIRA issue (http://jira.codehaus.org/browse/DC) and hope for someone to implement it for you, or
 you can do it yourself. The rest of this file should get you started.
 
 N.B. IF YOU START IMPLEMENTING A NEW RSCM PLUGIN, PLEASE SUBMIT YOUR CODE
@@ -178,6 +189,6 @@ Now change to the RSCM root directory and type
 
 This will create a gem for RSCM. To install this gem, you have to change to the pgk directory and type
 
-  sudo gem install pkg/rscm-0.1.0.gem
+  sudo gem install pkg/rscm-0.3.0.gem
   
-Now you can use RSCM in other Ruby apps.
+Now you can use RSCM in other Ruby apps with a simple require 'rscm'.

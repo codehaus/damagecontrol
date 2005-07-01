@@ -71,7 +71,7 @@ module RSCM
   
     def cleartool(cleartool_cmd)
       cmd = "cleartool #{cleartool_cmd}"
-      safer_popen(cmd, "r+") do |io|
+      Better.popen(cmd, "r+") do |io|
         if(block_given?)
           return(yield(io))
         else

@@ -304,7 +304,7 @@ module RSCM
       from = r.previous_native_revision_identifier
       to = r.native_revision_identifier
       cmd = p4cmd("diff2 -du #{path}@#{from} #{path}@#{to}")
-      safer_popen(cmd) do |io|
+      Better.popen(cmd) do |io|
         return(yield(io))
       end
     end
