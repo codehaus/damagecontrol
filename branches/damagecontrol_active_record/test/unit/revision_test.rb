@@ -60,5 +60,30 @@ class RevisionTest < Test::Unit::TestCase
     
     scm.__verify
   end
+  
+  def test_should_persist_identifier_as_time
+    now = Time.now.utc
+    time_rscm_revision = RSCM::Revision.new
+    time_rscm_revision.identifier = now
+    time_revision = Revision.create(time_rscm_revision)
+    time_revision.reload
+    assert_equal(now, time_revision.identifier)
+  end
+
+  def test_should_persist_identifier_as_string
+    time_rscm_revision = RSCM::Revision.new
+    time_rscm_revision.identifier = "koko"
+    time_revision = Revision.create(time_rscm_revision)
+    time_revision.reload
+    assert_equal("koko", time_revision.identifier)
+  end
+
+  def test_should_persist_identifier_as_int
+    time_rscm_revision = RSCM::Revision.new
+    time_rscm_revision.identifier = 999
+    time_revision = Revision.create(time_rscm_revision)
+    time_revision.reload
+    assert_equal(999, time_revision.identifier)
+  end
 
 end
