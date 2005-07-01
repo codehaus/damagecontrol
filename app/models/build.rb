@@ -2,7 +2,7 @@ require 'tempfile'
 
 # Represents the execution and status of a build for a particular Revision. Has the following properties:
 #
-# * command - the command that was executed
+# * command - the command that was executed (taken from Project)
 # * env - the environment variables at the time of execution
 # * stdout - standard output
 # * stderr - standard error
@@ -19,7 +19,7 @@ class Build < ActiveRecord::Base
 
   REQUESTED = "REQUESTED"
   EXECUTING = "EXECUTING"
-  COMPLETE = "COMPLETE"
+  COMPLETE  = "COMPLETE"
   PUBLISHED = "PUBLISHED"
 
   # Alias for +revision.project+ (mainly to simplify testing,
@@ -43,13 +43,17 @@ class Build < ActiveRecord::Base
   # 2) The project's build command is executed
   # 3) The project is notified via Project.build_complete when the build is complete
   #
-  def execute!(env, timepoint=Time.now.utc)
+  def execute!(timepoint=Time.now.utc)
     # TODO: we need to use proctable and look up the pid.
     raise "Already executed" if self.status != REQUESTED
     
     self.timepoint = timepoint
     self.command = self.revision.project.build_command
-    self.env = env
+    self.env = {
+      "DAMAGECONTROL_BUILD_LABEL" => revision.identifier,
+      "PKG_BUILD" => revision.identifier,
+      "DAMAGECONTROL_CHANGED_FILES" => revision.revision_files.collect{|f| f.path}.join(',')
+    }
     
     stdout_file = Tempfile.new("dc_build_stdout_#{id}.")
     stderr_file = Tempfile.new("dc_build_stderr_#{id}.")
@@ -59,9 +63,9 @@ class Build < ActiveRecord::Base
       # Make sure the working copy is in sync
       revision.sync_working_copy
       
-      # Execute the build with the given environment variables.
+      # Execute the build with the given environment variables (which are persisted for reference).
       env.each{|k,v| ENV[k]=v}
-      env.merge!(ENV)
+      ENV.each{|k,v| env[k]=v}
       Dir.chdir(revision.project.build_dir) do
         begin
           redirected_cmd = "#{command} > #{stdout_file.path} 2> #{stderr_file.path}"

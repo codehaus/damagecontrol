@@ -4,6 +4,14 @@ class Revision < ActiveRecord::Base
   belongs_to :project
   has_many :revision_files
   has_many :builds
+  # identifier can be String, Numeric or Time, so we YAML it to the database.
+  # we hahave to fool AR to do this by wrapping it in an array - serialize doesn't work
+  def identifier=(i)
+    self[:identifier] = YAML::dump([i])
+  end
+  def identifier
+     (YAML::load(self[:identifier]))[0]
+  end
   
   def self.create(rscm_revision)
     revision = super(rscm_revision)

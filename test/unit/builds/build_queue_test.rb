@@ -1,7 +1,8 @@
 require File.dirname(__FILE__) + '/../../test_helper'
 require 'rscm/mockit'
+require 'damagecontrol/build_queue'
 
-class BuildQueueTest < Test::Unit::TestCase
+class DamageControl::BuildQueueTest < Test::Unit::TestCase
   fixtures :projects, :revisions, :builds
 
   def test_should_build_all_requested_builds

@@ -12,6 +12,7 @@ module DamageControl
           if(revisions && !revisions.empty?)
             # persist revisions to the database
             persist_revisions(project, revisions)
+            persist_build_for_lates_revision(project)
           end
         rescue => e
           Log.error "Error polling #{project.name}"
@@ -20,9 +21,11 @@ module DamageControl
         end
       end
     end
-    
+
+    # Stores revisions in the database 
     def persist_revisions(project, revisions)
       Log.info "Persisting #{revisions.length} revision(s) for #{project.name}"
+      start_time = Time.now.utc
       revisions.each do |revision|
         # We're not doing:
         #   project.revisions.create(revision)
@@ -30,20 +33,41 @@ module DamageControl
         revision.project_id = project.id
         Revision.create(revision)
       end
-      Log.info "Done persisting #{revisions.length} revision(s) for #{project.name}"
+      duration = Time.now.utc - start_time
+      rev_per_sec = revisions.length / duration
+      Log.info "Done persisting #{revisions.length} revision(s) for #{project.name} " + 
+        "in #{duration} seconds (#{rev_per_sec}) revisions/sec"
     end
     
+    # Persists a new build (to be picked up by a BuildExecutor)
+    # for the last revision. Done separately since the RSCM adapter
+    # may not be implemented to return revisions in the right order.
+    # This method picks the latest revision.
+    def persist_build_for_lates_revision(project)
+      # TODO: optimize this query.
+      last_revision = project.revisions(true)[-1]
+      last_revision.builds.create
+    end
+
     def poll_new_revisions(project)
       scm = project.scm
       if(scm.central_exists?)
         latest_revision = project.revisions[-1]
-        from = latest_revision ? latest_revision.identifier : project.start_time
+        
+        from = project.start_time
+        if(latest_revision)
+          from = latest_revision.identifier
+          Log.info "Latest revision for #{project.name}'s #{scm.name} was #{from}"
+        else
+          Log.info "Latest revision for #{project.name}'s #{scm.name} is not known. Using project start time: #{from}"
+        end
 
+        Log.info "Polling revisions for #{project.name}'s #{scm.name} after #{from} (#{from.class.name})"
         revisions = scm.revisions(from)
         if(revisions.empty?)
           Log.info "No revisions for #{project.name}'s #{scm.name} after #{from}"
         else
-          Log.info "There was #{revisions.length} new revision(s) for #{project.name}'s #{scm.name} after #{from}"
+          Log.info "There were #{revisions.length} new revision(s) in #{project.name}'s #{scm.name} after #{from}"
         end
         if(!revisions.empty? && !scm.transactional?)
           # We're dealing with a non-transactional SCM (like CVS/StarTeam/ClearCase,
@@ -56,13 +80,13 @@ module DamageControl
           commit_in_progress = true
           quiet_period = project.quiet_period || DEFAULT_QUIET_PERIOD
           while(commit_in_progress)
-            Log.info "Sleeping for #{quiet_period} seconds because #{project.name}'s SCM (#{@scm.name}) is not transactional."
+            Log.info "Sleeping for #{quiet_period} seconds because #{project.name}'s SCM (#{scm.name}) is not transactional."
             sleep(quiet_period)
             previous_revisions = revisions
             revisions = scm.revisions(from)
             commit_in_progress = revisions != previous_revisions
             if(commit_in_progress)
-              Log.info "Commit still in progress for #{project.name}."
+              Log.info "Commit still in progress in #{project.name}'s #{scm.name}."
             end
           end
           Log.info "Quiet period elapsed for #{project.name}."

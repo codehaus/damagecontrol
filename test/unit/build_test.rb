@@ -14,7 +14,7 @@ class BuildTest < Test::Unit::TestCase
   
   def test_should_not_allow_reexecution
     assert_raise RuntimeError do
-      @build_1.execute!({})
+      @build_1.execute!
     end
   end
   
@@ -22,22 +22,21 @@ class BuildTest < Test::Unit::TestCase
     build_proof = ENV["DAMAGECONTROL_HOME"] + "/projects/#{@project_1.id}/working_copy/build_here/built"
     build = @revision_1.builds.create
     assert(!File.exist?(build_proof), "Should not exist: #{build_proof}")
-    assert_equal(0, build.execute!({}))
+    assert_equal(0, build.execute!)
     assert(File.exist?(build_proof), "Should exist: #{build_proof}")
   end
 
   def test_should_persist_build_info
-    @project_1.build_command = "echo hello $DC_TEST"
+    @project_1.build_command = "echo hello $DAMAGECONTROL_BUILD_LABEL"
     @project_1.save
     build = @revision_1.builds.create
     t = Time.now.utc
-    assert_equal(0, build.execute!({'DC_TEST' => 'world'}, t))
+    assert_equal(0, build.execute!(t))
     build.reload
     
-    assert_equal("hello world\n", build.stdout)
+    assert_equal("echo hello $DAMAGECONTROL_BUILD_LABEL", build.command)
+    assert_equal("hello xyz\n", build.stdout)
     assert_equal("", build.stderr)
-    assert_equal({'DC_TEST' => 'world'}, build.env)
-    assert_equal("echo hello $DC_TEST", build.command)
     assert_equal(0, build.exitstatus)
     assert(build.pid)
     assert(0 < build.pid)
@@ -49,7 +48,7 @@ class BuildTest < Test::Unit::TestCase
     @project_1.build_command = "w_t_f"
     @project_1.save
     build = @revision_1.builds.create
-    assert_equal(127, build.execute!({}))
+    assert_equal(127, build.execute!)
     assert_equal("", build.stdout)
     assert_equal("sh: line 1: w_t_f: command not found\n", build.stderr)
   end
@@ -58,7 +57,7 @@ class BuildTest < Test::Unit::TestCase
     @project_1.build_command = "svn wtf"
     @project_1.save
     build = @revision_1.builds.create
-    assert_equal(1, build.execute!({}))
+    assert_equal(1, build.execute!)
     assert_equal("", build.stdout)
     assert_equal("Unknown command: 'wtf'\nType 'svn help' for usage.\n", build.stderr)
   end
