@@ -1,5 +1,7 @@
 require File.dirname(__FILE__) + '/environment'
 
+# TODO: fix when we start using gem RSCM
+$:.unshift("../../trunk/rscm/lib")
 require 'damagecontrol'
 unless defined? DAMAGECONTROL_HOME
   if(ENV['DAMAGECONTROL_HOME'])
@@ -15,15 +17,13 @@ unless defined? DAMAGECONTROL_HOME
   end
 end
 
-begin
-  DAMAGECONTROL_DEFAULT_LOGGER = Logger.new("#{DAMAGECONTROL_HOME}/log/damagecontrol.log")
-rescue StandardError
-  DAMAGECONTROL_DEFAULT_LOGGER = Logger.new(STDERR)
-  DAMAGECONTROL_DEFAULT_LOGGER.level = Logger::WARN
-  DAMAGECONTROL_DEFAULT_LOGGER.warn(
-    "Rails Error: Unable to access log file. Please ensure that #{DAMAGECONTROL_HOME}/log/damagecontrol.log exists and is chmod 0666. " +
-    "The log level has been raised to WARN and the output directed to STDERR until the problem is fixed."
-  )
+def create_logger(cls)
+  log_name = Inflector.underscore(Inflector.demodulize(cls.name))
+  log_file = "#{DAMAGECONTROL_HOME}/log/#{log_name}.log"
+  dir = File.dirname(log_file)
+  FileUtils.mkdir_p(dir) unless File.exist?(dir)
+  Logger.new(log_file)
 end
 
-[DamageControl::ScmPoller].each { |cls| cls.logger ||= DAMAGECONTROL_DEFAULT_LOGGER }
+# TODO: Ues thread-specific loggers - easier to follow
+[DamageControl::ScmPoller, Build, Project, Publisher, Revision].each { |cls| cls.logger = create_logger(cls) }

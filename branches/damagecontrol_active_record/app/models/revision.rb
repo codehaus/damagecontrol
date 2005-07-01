@@ -1,4 +1,5 @@
 class Revision < ActiveRecord::Base
+  cattr_accessor :logger
   ActiveRecord::Base.default_timezone = :utc
   
   belongs_to :project
@@ -25,7 +26,9 @@ class Revision < ActiveRecord::Base
 
   # Syncs the working copy of the project with this revision.
   def sync_working_copy
+    logger.info "Syncing working copy for #{project.name} with revision #{identifier} ..." if logger
     project.scm.checkout(identifier) if project.scm
+    logger.info "Done Syncing working copy for #{project.name} with revision #{identifier}" if logger
   end
 
 end

@@ -50,7 +50,7 @@ Rake::TestTask.new("test_units") { |t|
   t.pattern = 'test/unit/**/*_test.rb'
   t.verbose = true
 }
-task :test_units => [ :clean_target, :recreate_schema, :clone_structure_to_test ]
+task :test_units => [ :clean_target, :clone_structure_to_test ]
 
 desc "Run the functional tests in test/functional"
 Rake::TestTask.new("test_functional") { |t|

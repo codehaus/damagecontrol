@@ -14,18 +14,13 @@
 # 1) Add a require at the top after the others:
 #    require 'rake_ext'
 #
-# 2) edit the line with: task :test_units => [ :clone_structure_to_test ] to:
-#    task :test_units => [ :clean_target, :recreate_schema, :clone_structure_to_test ]
-#
-# 3) edit the :environment task to load 'dc_environment' instead of 'environment'
+# 2) edit the :environment task to load 'dc_environment' instead of 'environment'
 #
 require 'rake'
 require 'rake/tasklib'
 
 LIBS = ["lib", "../../trunk/rscm/lib", "../../trunk/rscm/test"]
 $: << LIBS.join(':')
-
-DAMAGECONTROL_HOME = File.dirname(__FILE__) + '/target'
 
 module Rake
   class TestTask < TaskLib
@@ -64,12 +59,20 @@ task :recreate_schema => :environment do
   end
 end
 
-desc "Run the Webapp"
+desc "Run the DamageControl Webapp"
 task :webapp do
   ruby "-I#{LIBS.join(':')} script/server"
 end
 
-desc "Run the Daemon"
+desc "Run the DamageControl Daemon"
 task :daemon do
   ruby "-I#{LIBS.join(':')} script/daemon"
 end
+
+desc "Create sample projects"
+task :create_sample_projects do
+  ruby "-I#{LIBS.join(':')} script/create_sample_projects"
+end
+
+desc "Recreate database, create sample projects and run daemon"
+task :daemon_from_scratch => [:recreate_schema, :create_sample_projects, :daemon]
