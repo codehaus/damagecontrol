@@ -19,7 +19,7 @@ class BuildTest < Test::Unit::TestCase
   end
   
   def test_should_execute_in_project_build_dir
-    build_proof = ENV["DAMAGECONTROL_HOME"] + "/projects/#{@project_1.id}/working_copy/build_here/built"
+    build_proof = "#{DAMAGECONTROL_HOME}/projects/#{@project_1.id}/working_copy/build_here/built"
     build = @revision_1.builds.create
     assert(!File.exist?(build_proof), "Should not exist: #{build_proof}")
     assert_equal(0, build.execute!)
@@ -40,7 +40,9 @@ class BuildTest < Test::Unit::TestCase
     assert_equal(0, build.exitstatus)
     assert(build.pid)
     assert(0 < build.pid)
-    assert_equal(t, build.timepoint)
+    assert_equal(Time, build.timepoint.class)
+    assert(build.timepoint.utc?)
+    assert_equal(t.to_s, build.timepoint.to_s)
     assert_equal("COMPLETE", build.status)
   end
 

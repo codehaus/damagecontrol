@@ -13,7 +13,7 @@ task :default => [ :test_units, :test_functional ]
 desc 'Require application environment.'
 task :environment do
   unless defined? RAILS_ROOT
-    require File.dirname(__FILE__) + '/config/environment'
+    require File.dirname(__FILE__) + '/config/dc_environment'
   end
 end
 

@@ -5,6 +5,9 @@
 #
 #    rails .
 #
+# Answer 'y' to all overwrite questions except:
+#    config/database.yml
+#
 # When the project is upgraded to a new RoR (creating a new Rakefile),
 # edit the Rakefile in the following way:
 #
@@ -14,14 +17,15 @@
 # 2) edit the line with: task :test_units => [ :clone_structure_to_test ] to:
 #    task :test_units => [ :clean_target, :recreate_schema, :clone_structure_to_test ]
 #
-# 3) add the following line to the top of config/environment.rb:
-#    require File.dirname(__FILE__) + '/dc_environment'
+# 3) edit the :environment task to load 'dc_environment' instead of 'environment'
 #
 require 'rake'
 require 'rake/tasklib'
 
 LIBS = ["lib", "../../trunk/rscm/lib", "../../trunk/rscm/test"]
 $: << LIBS.join(':')
+
+DAMAGECONTROL_HOME = File.dirname(__FILE__) + '/target'
 
 module Rake
   class TestTask < TaskLib
@@ -67,5 +71,5 @@ end
 
 desc "Run the Daemon"
 task :daemon do
-  ruby "-I#{LIBS.join(':')} lib/damagecontrol/daemon.rb"
+  ruby "-I#{LIBS.join(':')} script/daemon"
 end

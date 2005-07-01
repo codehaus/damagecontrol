@@ -1,5 +1,3 @@
-require 'rscm'
-
 require File.dirname(__FILE__) + '/../test_helper'
 
 class ScmPollerTest < Test::Unit::TestCase
