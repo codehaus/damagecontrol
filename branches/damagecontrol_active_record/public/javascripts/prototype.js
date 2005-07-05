@@ -193,16 +193,26 @@ Ajax.Request.prototype = (new Ajax.Base()).extend({
       }
               
       this.transport.setRequestHeader('X-Requested-With', 'XMLHttpRequest');
-      this.transport.setRequestHeader('X-Prototype-Version', Prototype.Version);
+      this.transport.setRequestHeader('X-Prototype-Version',
+        Prototype.Version);
 
       if (this.options.method == 'post') {
         this.transport.setRequestHeader('Connection', 'close');
         this.transport.setRequestHeader('Content-type',
           'application/x-www-form-urlencoded');
       }
-      
-      this.transport.send(this.options.method == 'post' ? 
-        this.options.parameters + '&_=' : null);
+
+      if (this.options.requestHeaders) {
+         for (var i=0; i< (this.options.requestHeaders.length-1);i+=2)
+            this.transport.setRequestHeader(this.options.requestHeaders[i],
+                                            this.options.requestHeaders[i+1]);
+      }
+
+      var sendData = this.options.postBody   ? this.options.postBody
+                   : this.options.parameters ? this.options.parameters + '&_'
+                   : null;
+
+      this.transport.send(this.options.method == 'post' ? sendData : null );
                       
     } catch (e) {
     }    
@@ -230,7 +240,7 @@ Ajax.Updater.prototype = (new Ajax.Base()).extend({
       this.onComplete = this.options.onComplete;
       this.options.onComplete = this.updateContent.bind(this);
     }
-    
+
     this.request = new Ajax.Request(url, this.options);
     
     if (!this.options.asynchronous)
@@ -238,15 +248,18 @@ Ajax.Updater.prototype = (new Ajax.Base()).extend({
   },
   
   updateContent: function() {
-    if (this.options.insertion) {
-      new this.options.insertion(this.container,
+    if (this.request.transport.status == 200) {
+      if (this.options.insertion) {
+        new this.options.insertion(this.container,
         this.request.transport.responseText);
-    } else {
-      this.container.innerHTML = this.request.transport.responseText;
-    }
+      } else {
+        this.container.innerHTML = this.request.transport.responseText;
+      }
+    }  
 
     if (this.onComplete) {
-      setTimeout((function() {this.onComplete(this.request)}).bind(this), 10);
+      setTimeout((function() {this.onComplete(
+        this.request.transport)}).bind(this), 10);
     }
   }
 });
