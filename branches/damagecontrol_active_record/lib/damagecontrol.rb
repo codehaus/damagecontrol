@@ -1,5 +1,5 @@
 require 'rscm'
-require 'damagecontrol/scm_poller'
-require 'damagecontrol/build_queue'
 require 'damagecontrol/build_executor'
-require 'damagecontrol/publisher/base'
+require 'damagecontrol/build_queue'
+require 'damagecontrol/publisher'
+require 'damagecontrol/scm_poller'

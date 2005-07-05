@@ -1,12 +1,9 @@
+require 'active_record'
 module DamageControl
-  # This class is responsible for managing the queue of requested builds
+  # This class is responsible for managing the queue of requested builds.
+  # It currently doesn't apply any particular algorithm to decide what gets
+  # built in what order (in the case when there are several requested builds).
   class BuildQueue
-  
-    # Creates a new BuildQueue. +build_finder+ can be passed in
-    # to improve testability.
-    def initialize(build_finder=::Build)
-      @build_finder = build_finder
-    end
   
     # Returns the next build to be executed.
     def next
@@ -30,7 +27,8 @@ module DamageControl
     end
 
     def load_requested
-      @build_finder.find_all_by_status(::Build::REQUESTED)
+      # All builds without status (yet) are considered requested
+      Build.find_all_by_state(nil)
     end
   end
 end

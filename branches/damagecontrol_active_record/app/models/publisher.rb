@@ -1,9 +1,14 @@
 class Publisher < ActiveRecord::Base
-  cattr_accessor :logger
   serialize :delegate
+  
+  def before_create
+    self.enabling_states = [] unless enabling_states
+  end
 
   def publish(build)
-    logger.info("Publishing build for #{build.revision.project.name} via #{delegate.name}")
-    delegate.publish(build)
+    state_class = build.state.class
+    if(enabling_states.index(build.state.class))
+      delegate.publish(build)
+    end
   end
 end

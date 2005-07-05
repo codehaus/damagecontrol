@@ -6,7 +6,7 @@ module DamageControl
       #register self
     
       def name
-        "Execute"
+        "FTP"
       end    
 
       def publish(build)

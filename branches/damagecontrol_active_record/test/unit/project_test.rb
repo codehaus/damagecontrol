@@ -68,11 +68,11 @@ class ProjectTest < Test::Unit::TestCase
     # TODO: how the heck do we get the 2 sub graphs?
   end
   
-  def test_should_create_requested_build_for_latest_revision
+  def test_should_create_pending_build_for_latest_revision
     assert_equal(0, @revision_3.builds.size)
-    @project_1.create_build_request("testing")
+    @project_1.create_build_request(Build::SUCCESSFUL_DEPENDENCY)
     assert_equal(1, @revision_3.builds.size)
-    assert_equal("testing", @revision_3.builds[0].reason)
+    assert_equal(Build::SUCCESSFUL_DEPENDENCY, @revision_3.builds[0].reason)
   end
 
 end

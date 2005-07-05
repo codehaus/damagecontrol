@@ -1,12 +1,11 @@
 class Revision < ActiveRecord::Base
-  cattr_accessor :logger
   ActiveRecord::Base.default_timezone = :utc
   
   belongs_to :project
   has_many :revision_files
-  has_many :builds
+  has_many :builds, :order => "position"
   # identifier can be String, Numeric or Time, so we YAML it to the database.
-  # we hahave to fool AR to do this by wrapping it in an array - serialize doesn't work
+  # We hahave to fool AR to do this by wrapping it in an array - serialize doesn't work
   def identifier=(i)
     self[:identifier] = YAML::dump([i])
   end
