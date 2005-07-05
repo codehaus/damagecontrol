@@ -1,39 +1,53 @@
 require 'tempfile'
 
-# Represents the execution and status of a build for a particular Revision. Has the following properties:
+# Represents the execution and status of a build for a particular Revision. Has the following attributes:
 #
 # * command - the command that was executed (taken from Project)
 # * env - the environment variables at the time of execution
 # * stdout - standard output
 # * stderr - standard error
 # * pid - the process id
-# * exitstatus - the result of the execution
-# * timepoint - the time when the execution started
+# * exitstatus - the exit code of the build command
+# * reason - the reason for the build
+# * status - One of: nil (pending), Build::Executing, Build::Successful, Build::Fixed, Build::Broken, Build::RepeatedlyBroken
 #
 # A build can only be executed once, and will raise an exception if it has already been executed.
 # In order to reexecute a build, create a new instance (via Revision.builds.create)
 #
 class Build < ActiveRecord::Base
-  cattr_accessor :logger
+  SCM_POLLED = "SCM_POLLED"
+  SCM_TRIGGERED = "SCM_TRIGGERED"
+  MANUALLY_TRIGGERED = "MANUALLY_TRIGGERED"
+  SUCCESSFUL_DEPENDENCY = "SUCCESSFUL_DEPENDENCY"
 
+  acts_as_list :scope => :revision
   belongs_to :revision
+  has_many :artifacts
   serialize :env
+  serialize :state
 
-  REQUESTED = "REQUESTED"
-  EXECUTING = "EXECUTING"
-  COMPLETE  = "COMPLETE"
-  PUBLISHED = "PUBLISHED"
+  validates_inclusion_of :reason, :in => [SCM_POLLED, SCM_TRIGGERED, MANUALLY_TRIGGERED, SUCCESSFUL_DEPENDENCY]
 
+  # A short description of the reason for this build
+  def reason_description
+    # TODO: use case - can't remember syntax
+    if(reason == SCM_POLLED)
+      "Commit by #{revision.developer}"
+    end
+  end
+  
+  # The previous build. First looks within the same revision. If none are found,
+  # looks in previous revision that has at least one build and takes the last from there.
+  def previous
+    higher_item
+  end
+  
   # Alias for +revision.project+ (mainly to simplify testing,
   # since it reduces coupling)
   def project
     self.revision.project
   end
 
-  def before_create
-    self.status = REQUESTED
-  end
-  
   def successful?
     exitstatus == 0
   end
@@ -46,9 +60,8 @@ class Build < ActiveRecord::Base
   # 3) The project is notified via Project.build_complete when the build is complete
   #
   def execute!(timepoint=Time.now.utc)
-    # TODO: we need to use proctable and look up the pid.
-    raise "Already executed" if self.status != REQUESTED
-    
+    raise "Alreade executed" if exitstatus
+    self.state = Executing.new
     self.timepoint = timepoint
     self.command = self.revision.project.build_command
     self.env = {
@@ -56,6 +69,7 @@ class Build < ActiveRecord::Base
       "PKG_BUILD" => revision.identifier.to_s,
       "DAMAGECONTROL_CHANGED_FILES" => revision.revision_files.collect{|f| f.path}.join(',')
     }
+    save
     
     stdout_file = Tempfile.new("dc_build_stdout_#{id}.")
     stderr_file = Tempfile.new("dc_build_stderr_#{id}.")
@@ -80,15 +94,69 @@ class Build < ActiveRecord::Base
     
     # Wait for the subprocess to complete and publish the result
     self.pid, status = Process.waitpid2(pid)
+    self.exitstatus = status.exitstatus
+    determine_state
     File.open(stdout_file.path) {|io| self.stdout = io.read}
     File.open(stderr_file.path) {|io| self.stderr = io.read}
-    self.exitstatus = status.exitstatus
-    self.status = COMPLETE
+    
     save
     
     project.build_complete(self)
     
     self.exitstatus
+  end
+
+  # :nodoc:
+  def determine_state
+    self.state = previous_state.send(successful? ? :succeed : :fail)
+  end
+
+private 
+
+  # The state of the previous build, or Broken if
+  # there is no previous build.
+  def previous_state
+    prev = previous
+    prev ? prev.state : Successful.new
+  end  
+  
+  class Executing
+  end
+
+  class Successful
+    def succeed
+      Successful.new
+    end
+    def fail
+      Broken.new
+    end
+    def description
+      "Successful"
+    end
+  end
+
+  class Fixed < Successful
+    def description
+      "Fixed"
+    end
+  end
+
+  class Broken
+    def succeed
+      Fixed.new
+    end
+    def fail
+      RepeatedlyBroken.new
+    end
+    def description
+      "Broken"
+    end
+  end
+
+  class RepeatedlyBroken < Broken
+    def description
+      "Repeatedly broken"
+    end
   end
 
 end

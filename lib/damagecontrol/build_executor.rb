@@ -6,7 +6,7 @@ module DamageControl
     end
     
     def build_next
-      build = build_queue.next
+      build = @build_queue.next
       build.execute!
     end
   end

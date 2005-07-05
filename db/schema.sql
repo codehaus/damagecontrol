@@ -1,11 +1,11 @@
 CREATE TABLE projects(
-  id INTEGER PRIMARY KEY, 
-  name TEXT, 
-  home_page TEXT, 
-  start_time TIMESTAMP, 
-  relative_build_path TEXT, 
-  quiet_period INTEGER, 
-  build_command TEXT, 
+  id INTEGER PRIMARY KEY,
+  name TEXT,
+  home_page TEXT,
+  start_time TIMESTAMP,
+  relative_build_path TEXT,
+  quiet_period INTEGER,
+  build_command TEXT,
   scm TEXT
 );
 
@@ -24,13 +24,6 @@ CREATE TABLE revisions(
   project_id INTEGER
 );
 
-CREATE TABLE publishers(
-  id INTEGER PRIMARY KEY, 
-  delegate TEXT, 
-  enabled BOOLEAN, 
-  project_id INTEGER
-);
-
 CREATE TABLE revision_files(
   id INTEGER PRIMARY KEY, 
   status TEXT, 
@@ -41,9 +34,17 @@ CREATE TABLE revision_files(
   revision_id INTEGER
 );
 
-CREATE TABLE builds(
+CREATE TABLE publishers(
   id INTEGER PRIMARY KEY, 
-  status TEXT, 
+  delegate TEXT, 
+  enabling_states TEXT,
+  project_id INTEGER
+);
+
+CREATE TABLE builds(
+  id INTEGER PRIMARY KEY,
+  position INTEGER,
+  state TEXT, 
   stdout TEXT, 
   stderr TEXT, 
   pid INTEGER, 
@@ -51,6 +52,11 @@ CREATE TABLE builds(
   reason TEXT,
   env TEXT,
   command TEXT,
-  timepoint TIMESTAMP, 
+  timepoint TIMESTAMP,
   revision_id INTEGER
+);
+
+CREATE TABLE artifacts(
+  id INTEGER PRIMARY KEY,
+  build_id INTEGER
 );

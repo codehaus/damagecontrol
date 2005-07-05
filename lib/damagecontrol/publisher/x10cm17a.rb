@@ -1,5 +1,3 @@
-require 'damagecontrol/publisher/base'
-
 # http://blade.nagaokaut.ac.jp/cgi-bin/scat.rb/ruby/ruby-talk/124460
 module DamageControl
   module Publisher

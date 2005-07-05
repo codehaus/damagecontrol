@@ -1,8 +1,10 @@
 require 'rgl/adjacency'
 require 'rgl/connected_components'
 
+# A Project record contains information about a project to be continuously
+# built by DamageControl.
 class Project < ActiveRecord::Base
-  cattr_accessor :logger
+  attr_reader :basedir
 
   has_many :revisions, :order => "timepoint"
   has_many :publishers
@@ -31,7 +33,7 @@ class Project < ActiveRecord::Base
     if(build.successful?)
       logger.info "Requesting build of dependant projects of #{name}: #{dependants.collect{|p| p.name}.join(',')}" if logger
       dependants.each do |project|
-        project.create_build_request("Successful build of dependant project #{self.name}")
+        project.create_build_request(Build::SUCCESSFUL_DEPENDENCY)
       end
     end
   end

@@ -1,8 +1,4 @@
-begin
-  
 require 'jabber4r/jabber4r'
-require 'damagecontrol/publisher/base'
-
 
 module DamageControl
   module Publisher
@@ -67,8 +63,4 @@ module DamageControl
       end
     end
   end
-end
-
-rescue LoadError
-  # appropriate gems not installed, disabling jabber publisher
 end

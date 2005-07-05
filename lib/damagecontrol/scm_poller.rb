@@ -2,7 +2,7 @@ module DamageControl
   class ScmPoller
     cattr_accessor :logger
     
-    # default time to wait for scm to be quiet (applies to non-transactional scms only)
+    # Default time to wait for scm to be quiet (applies to non-transactional scms only)
     DEFAULT_QUIET_PERIOD = 15 unless defined? DEFAULT_QUIET_PERIOD
 
     # Polls all registered projects for new revisions since last time and persists them
@@ -63,17 +63,23 @@ module DamageControl
         from = project.start_time
         if(latest_revision)
           from = latest_revision.identifier
-          logger.info "Latest revision for #{project.name}'s #{scm.name} was #{from}" if logger
+          logger.info "Latest revision for #{project.name}'s #{scm.name} "+
+            "was #{from}" if logger
         else
-          logger.info "Latest revision for #{project.name}'s #{scm.name} is not known. Using project start time: #{from}" if logger
+          logger.info "Latest revision for #{project.name}'s #{scm.name} is " +
+            "not known. Using project start time: #{from}" if logger
         end
 
-        logger.info "Polling revisions for #{project.name}'s #{scm.name} after #{from} (#{from.class.name})" if logger
+        logger.info "Polling revisions for #{project.name}'s #{scm.name} " +
+          "after #{from} (#{from.class.name})" if logger
+        
         revisions = scm.revisions(from)
         if(revisions.empty?)
-          logger.info "No revisions for #{project.name}'s #{scm.name} after #{from}" if logger
+          logger.info "No revisions for #{project.name}'s #{scm.name} after " +
+            "#{from}" if logger
         else
-          logger.info "There were #{revisions.length} new revision(s) in #{project.name}'s #{scm.name} after #{from}" if logger
+          logger.info "There were #{revisions.length} new revision(s) in " +
+            "#{project.name}'s #{scm.name} after #{from}" if logger
         end
         if(!revisions.empty? && !scm.transactional?)
           # We're dealing with a non-transactional SCM (like CVS/StarTeam/ClearCase,
@@ -86,7 +92,9 @@ module DamageControl
           commit_in_progress = true
           quiet_period = project.quiet_period || DEFAULT_QUIET_PERIOD
           while(commit_in_progress)
-            logger.info "Sleeping for #{quiet_period} seconds because #{project.name}'s SCM (#{scm.name}) is not transactional." if logger
+            logger.info "Sleeping for #{quiet_period} seconds because " + 
+              "#{project.name}'s SCM (#{scm.name}) is not transactional." if logger
+            
             sleep(quiet_period)
             previous_revisions = revisions
             revisions = scm.revisions(from)

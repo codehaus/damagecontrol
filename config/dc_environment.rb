@@ -2,7 +2,7 @@ require File.dirname(__FILE__) + '/environment'
 
 # TODO: fix when we start using gem RSCM
 $:.unshift("../../trunk/rscm/lib")
-require 'damagecontrol'
+require 'rscm'
 unless defined? DAMAGECONTROL_HOME
   if(ENV['DAMAGECONTROL_HOME'])
     DAMAGECONTROL_HOME = ENV['DAMAGECONTROL_HOME']
@@ -16,6 +16,7 @@ unless defined? DAMAGECONTROL_HOME
     end
   end
 end
+require 'damagecontrol'
 
 def create_logger(cls)
   log_name = Inflector.underscore(Inflector.demodulize(cls.name))

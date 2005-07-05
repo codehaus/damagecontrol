@@ -1,6 +1,3 @@
-require 'rscm/path_converter'
-require 'rscm/annotations'
-
 module DamageControl
   module Tracker
 
