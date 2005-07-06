@@ -57,17 +57,17 @@ module DamageControl
           prefix_length = a.common_prefix_length(b)+1
           suffix_len = a.reverse.common_prefix_length(b.reverse)
           # prevent prefix/suffix having overlap,
-          suffix_len = min(suffix_len, min(line.length,prev.length)-prefix_length)
+          suffix_len = min(suffix_len, min(line.length, prev.length)-prefix_length)
           remove_infix_length = prev.length - (prefix_length+suffix_len)
           add_infix_length = line.length - (prefix_length+suffix_len)
           oversize_change = remove_infix_length*100/prev.length>33 || add_infix_length*100/line.length>33
 
-          if prefix_length==1 && suffix_len==0 || remove_infix_length<=0 || oversize_change
+          if(prefix_length==1 && suffix_len==0 || remove_infix_length<=0 || oversize_change)
           else
             prev.removed_range = (prefix_length..prefix_length+remove_infix_length-1)
           end
 
-          if prefix_length==1 && suffix_len==0 || add_infix_length<=0 || oversize_change
+          if(prefix_length==1 && suffix_len==0 || add_infix_length<=0 || oversize_change)
           else
             line.added_range = (prefix_length..prefix_length+add_infix_length-1)
           end
