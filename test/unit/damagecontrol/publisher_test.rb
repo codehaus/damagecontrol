@@ -6,7 +6,7 @@ module DamageControl
       def test_should_load_all_publisher_classes
         expected = [
           #AmbientOrb,
-          #ArtifactArchiver,
+          ArtifactArchiver,
           #BuildDuration,
           Email::Sendmail,
           Email::Smtp,

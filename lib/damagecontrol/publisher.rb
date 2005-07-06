@@ -1,4 +1,4 @@
-require 'damagecontrol/publisher/base'
+require File.dirname(__FILE__) + "/publisher/base.rb"
 
 class Class
   def <=>(o)

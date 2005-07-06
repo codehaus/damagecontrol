@@ -1,4 +1,5 @@
 require 'jabber4r/jabber4r'
+require 'damagecontrol/publisher/base'
 
 module DamageControl
   module Publisher
