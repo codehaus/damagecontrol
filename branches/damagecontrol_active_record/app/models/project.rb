@@ -7,7 +7,7 @@ class Project < ActiveRecord::Base
   attr_reader :basedir
 
   has_many :revisions, :order => "timepoint"
-  has_many :publishers
+  has_many :publishers, :order => "delegate"
   has_and_belongs_to_many :dependencies, 
     :class_name => "Project", 
     :foreign_key => "depending_id", 
@@ -19,7 +19,7 @@ class Project < ActiveRecord::Base
   
   serialize :scm
   
-  # Indicates that a build is complete
+  # Indicates that a build is complete (regardless of its successfulness)
   # Tells each enabled publisher to publish the build
   # and creates a build request for each dependant project
   def build_complete(build)
@@ -27,7 +27,7 @@ class Project < ActiveRecord::Base
     logger.info "Successful build: #{build.successful?}" if logger
 
     publishers.each do |publisher| 
-      publisher.publish(build) if publisher.enabled
+      publisher.publish(build)
     end
     
     if(build.successful?)
@@ -35,6 +35,13 @@ class Project < ActiveRecord::Base
       dependants.each do |project|
         project.create_build_request(Build::SUCCESSFUL_DEPENDENCY)
       end
+    end
+  end
+
+  # Indicates that a build has started
+  def build_executing(build)
+    publishers.each do |publisher| 
+      publisher.publish(build)
     end
   end
   
@@ -55,6 +62,8 @@ class Project < ActiveRecord::Base
     @basedir = "#{DAMAGECONTROL_HOME}/projects/#{id}"
     mkdir @basedir
     self.scm.checkout_dir = working_copy_dir unless self.scm.nil?
+    
+    create_missing_publishers
   end
   
   # Returns an RGL::DirectedAdjacencyGraph representing all projects
@@ -69,11 +78,30 @@ class Project < ActiveRecord::Base
     g
   end
   
+  # Where temporary stdout log is written
+  def stdout_file
+    "#{@basedir}/stdout.log"
+  end
+
+  # Where temporary stderr log is written
+  def stderr_file
+    "#{@basedir}/stderr.log"
+  end
+  
 private
 
   # creates dir if it doesn't exist and returns path to it
   def mkdir(dir)
     FileUtils.mkdir_p(dir) unless File.exist?(dir)
     dir
+  end
+  
+  def create_missing_publishers
+    associated_publisher_classes = publishers.collect{|publisher| publisher.delegate.class}
+    available_publisher_classes = DamageControl::Publisher::Base.classes
+    missing_publisher_classes = available_publisher_classes - associated_publisher_classes
+    missing_publisher_classes.each do |cls|
+      publishers.create(:delegate => cls.new)
+    end
   end
 end

@@ -18,7 +18,7 @@ module DamageControl
       while(true)
         result = load_requested
         if(result.empty?)
-          sleep(2)
+          sleep(10)
         else
           break
         end
@@ -27,7 +27,7 @@ module DamageControl
     end
 
     def load_requested
-      # All builds without status (yet) are considered requested
+      # All builds without state (yet) are considered requested
       Build.find_all_by_state(nil)
     end
   end

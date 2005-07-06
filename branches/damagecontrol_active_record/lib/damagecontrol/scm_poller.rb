@@ -51,7 +51,7 @@ module DamageControl
       # TODO: optimize this query.
       logger.info "Requesting build for #{project.name}" if logger
       last_revision = project.revisions(true)[-1]
-      last_revision.builds.create
+      last_revision.builds.create(:reason => Build::SCM_POLLED)
       logger.info "Requested build for #{project.name}" if logger
     end
 

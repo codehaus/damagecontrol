@@ -2,6 +2,16 @@
 
 load File.dirname(__FILE__) + '/../config/dc_environment.rb'
 
+# We want notification for all states of a build
+all_build_states = [
+  Build::Executing.new,
+  Build::Successful.new,
+  Build::Fixed.new,
+  Build::Broken.new,
+  Build::RepeatedlyBroken.new
+]
+growl = DamageControl::Publisher::Growl.new
+
 # Create some default projects
 
 if(!Project.find_by_name("RSCM (trunk)"))
@@ -13,6 +23,8 @@ if(!Project.find_by_name("RSCM (trunk)"))
     :build_command => "rake", 
     :scm => RSCM::Subversion.new("svn://beaver.codehaus.org/damagecontrol/scm/trunk/rscm")
   )
+  
+  rscm.publishers.create(:delegate => growl, :enabling_states => all_build_states)
 end
 
 if(!Project.find_by_name("DamageControl (damagecontrol_active_record branch)"))
@@ -24,6 +36,8 @@ if(!Project.find_by_name("DamageControl (damagecontrol_active_record branch)"))
     :build_command => "rake", 
     :scm => RSCM::Subversion.new("svn://beaver.codehaus.org/damagecontrol/scm/branches/damagecontrol_active_record")
   )
+
+  damagecontrol_ar.publishers.create(:delegate => growl, :enabling_states => all_build_states)
   damagecontrol_ar.dependencies << rscm
   damagecontrol_ar.save
 end
@@ -37,6 +51,8 @@ if(!Project.find_by_name("DamageControl (trunk)"))
     :build_command => "rake", 
     :scm => RSCM::Subversion.new("svn://beaver.codehaus.org/damagecontrol/scm/trunk/damagecontrol")
   )
+
+  damagecontrol.publishers.create(:delegate => growl, :enabling_states => all_build_states)
 end
 
 if(!Project.find_by_name("Ruby (trunk)"))
@@ -48,5 +64,7 @@ if(!Project.find_by_name("Ruby (trunk)"))
     :build_command => "autoconf;./configure;make", 
     :scm => RSCM::Cvs.new(":pserver:anonymous@cvs.ruby-lang.org:/src", "ruby")
   )
+
+  ruby.publishers.create(:delegate => growl, :enabling_states => all_build_states)
 end
 

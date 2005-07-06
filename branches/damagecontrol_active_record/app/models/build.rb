@@ -1,5 +1,3 @@
-require 'tempfile'
-
 # Represents the execution and status of a build for a particular Revision. Has the following attributes:
 #
 # * command - the command that was executed (taken from Project)
@@ -70,9 +68,7 @@ class Build < ActiveRecord::Base
       "DAMAGECONTROL_CHANGED_FILES" => revision.revision_files.collect{|f| f.path}.join(',')
     }
     save
-    
-    stdout_file = Tempfile.new("dc_build_stdout_#{id}.")
-    stderr_file = Tempfile.new("dc_build_stderr_#{id}.")
+    project.build_executing(self)
     
     # Do all the hard work in a sub process. Dir.chdir is global in ruby.
     pid = fork do
@@ -82,7 +78,7 @@ class Build < ActiveRecord::Base
       env.each{|k,v| ENV[k]=v}
       Dir.chdir(revision.project.build_dir) do
         begin
-          redirected_cmd = "#{command} > #{stdout_file.path} 2> #{stderr_file.path}"
+          redirected_cmd = "#{command} > #{revision.project.stdout_file} 2> #{revision.project.stderr_file}"
           logger.info "Executing build for #{revision.project.name}'s revision #{revision.identifier}" if logger
           exec redirected_cmd
         rescue Errno::ENOENT => e
@@ -96,9 +92,9 @@ class Build < ActiveRecord::Base
     self.pid, status = Process.waitpid2(pid)
     self.exitstatus = status.exitstatus
     determine_state
-    File.open(stdout_file.path) {|io| self.stdout = io.read}
-    File.open(stderr_file.path) {|io| self.stderr = io.read}
-    
+    File.open(revision.project.stdout_file) {|io| self.stdout = io.read}
+    File.open(revision.project.stderr_file) {|io| self.stderr = io.read}
+
     save
     
     project.build_complete(self)
@@ -121,6 +117,9 @@ private
   end  
   
   class Executing
+    def description
+      "Executing"
+    end
   end
 
   class Successful
@@ -158,5 +157,7 @@ private
       "Repeatedly broken"
     end
   end
+  
+  STATES = [Executing.new, Successful.new, Fixed.new, Broken.new, RepeatedlyBroken.new]
 
 end

@@ -18,7 +18,8 @@ class PublisherTest < Test::Unit::TestCase
     pub.publish(build)
     pub.delegate.__verify
 
-    pub.enabling_states = [Build::Fixed]
+    pub.enabling_states = [Build::Fixed.new]
+    pub.save
     pub.delegate.__expect(:publish){|b| assert_same(build, b)}
     pub.publish(build)
     pub.delegate.__verify
