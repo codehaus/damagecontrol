@@ -81,6 +81,7 @@ class ProjectTest < Test::Unit::TestCase
     project.reload
     
     expected = [
+      DamageControl::Publisher::ArtifactArchiver,
       DamageControl::Publisher::Email::Sendmail,
       DamageControl::Publisher::Email::Smtp,
       DamageControl::Publisher::Growl,
@@ -88,8 +89,8 @@ class ProjectTest < Test::Unit::TestCase
     ]
     publisher_classes = project.publishers.collect{|pub| pub.delegate.class}
     assert_equal(expected, publisher_classes)
-    assert_equal("some.where.else", project.publishers[2].delegate.hosts)
-    assert_equal(Build::Broken, project.publishers[2].enabling_states[0].class)
+    assert_equal("some.where.else", project.publishers[3].delegate.hosts)
+    assert_equal(Build::Broken, project.publishers[3].enabling_states[0].class)
   end
 
 end

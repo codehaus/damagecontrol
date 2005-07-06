@@ -1,13 +1,14 @@
+require 'damagecontrol/publisher/base'
+
 module DamageControl
   module Publisher
     # Copies build artifacts (files) over to a more permanent location
     # where they can be served via the web server.
     class ArtifactArchiver < Base
-      register self
-      
       ROOT_DIR = "#{DAMAGECONTROL_HOME}/artifacts"
       FileUtils.mkdir_p(ROOT_DIR) unless File.exist?(ROOT_DIR)
 
+      register self      
       attr_accessor :files
       
       def initialize
@@ -15,11 +16,10 @@ module DamageControl
       end
 
       def name
-        "ArtifactArchiver"
+        "Artifact Archiver"
       end    
 
       def publish(build)
-        
         @files.each do |src, dest|
           full_src = build.revision.project.working_copy_dir + '/' + src
           full_dest = ROOT_DIR + '/' + dest

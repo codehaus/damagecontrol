@@ -24,7 +24,8 @@ module DamageControl
         ann :description => "Password"
         attr_accessor :password
 
-        ann :tip => "If your SMTP server requires authentication, you need to specify the authentication type here. This is one of 'plain', 'login', 'cram_md5'"
+        ann :tip => "If your SMTP server requires authentication, you need to specify " +
+                    "the authentication type here. This is one of 'plain', 'login', 'cram_md5'"
         ann :description => "Authentication"
         attr_accessor :authentication
 

@@ -1,4 +1,5 @@
 require 'ruby-growl'
+require 'damagecontrol/publisher/base'
 
 module DamageControl
   module Publisher
