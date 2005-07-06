@@ -19,10 +19,10 @@ module DamageControl
     
     def visitLine(line)
       if(line.removed?)
-        @io << "<pre class='diff' id='removed'>"
+        @io << "<pre class='diff-removed'>"
         if(line.removed)
           @io << line.prefix.html_encoded
-          @io << "<span id='removedchars'>"
+          @io << "<span class='diff-removedchars'>"
           @io << line.removed.html_encoded
           @io << "</span>"
           @io << line.suffix.html_encoded
@@ -31,10 +31,10 @@ module DamageControl
         end
         @io << "</pre>"
       elsif(line.added?)
-        @io << "<pre class='diff' id='added'>"
+        @io << "<pre class='diff-added'>"
         if(line.added)
           @io << line.prefix.html_encoded
-          @io << "<span id='addedchars'>"
+          @io << "<span class='diff-addedchars'>"
           @io << line.added.html_encoded
           @io << "</span>"
           @io << line.suffix.html_encoded
@@ -43,7 +43,7 @@ module DamageControl
         end
         @io << "</pre>"
       else
-        @io << "<pre class='diff' id='context'>"
+        @io << "<pre class='diff-context'>"
         @io << line.html_encoded
         @io << "</pre>"
       end

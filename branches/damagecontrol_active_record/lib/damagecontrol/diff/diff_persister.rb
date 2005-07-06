@@ -1,6 +1,3 @@
-require 'rscm/logging'
-require 'damagecontrol/revision_ext.rb'
-
 module DamageControl
   module Visitor
 
@@ -25,7 +22,6 @@ module DamageControl
             end
           end
         end
-        Log.info "Wrote diff for #{file.path} -> #{diff_file}"
       end
 
     end
