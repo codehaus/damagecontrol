@@ -1,10 +1,8 @@
 require 'test/unit'
-require 'rscm/tempdir'
 require 'rscm/path_converter'
-require 'damagecontrol/diff_parser'
+require 'rscm/tempdir'
+require 'damagecontrol/diff/diff_parser'
 
-# TODO: how do we make this work cross platform in a nicer way?
-# Play more with $/, $\ and such
 if(WINDOWS)
   NL = "\n"
 else
