@@ -45,10 +45,6 @@ class ProjectTest < Test::Unit::TestCase
     assert_equal([@project_3], @project_2.dependants)
   end
   
-  def test_should_have_publishers
-    assert_equal([@publisher_1], @project_1.publishers)
-  end
-  
   def test_should_create_rgl_graph
     graph = Project.dependency_graph
     assert_equal(2, graph.edges.size)
@@ -73,6 +69,27 @@ class ProjectTest < Test::Unit::TestCase
     @project_1.create_build_request(Build::SUCCESSFUL_DEPENDENCY)
     assert_equal(1, @revision_3.builds.size)
     assert_equal(Build::SUCCESSFUL_DEPENDENCY, @revision_3.builds[0].reason)
+  end
+  
+  def test_should_create_missing_publishers_on_reload
+    project = Project.create
+
+    growl = DamageControl::Publisher::Growl.new
+    growl.hosts = "some.where.else"
+    project.publishers.create(:delegate => growl, :enabling_states => [Build::Broken.new])
+    
+    project.reload
+    
+    expected = [
+      DamageControl::Publisher::Email::Sendmail,
+      DamageControl::Publisher::Email::Smtp,
+      DamageControl::Publisher::Growl,
+      DamageControl::Publisher::Jabber
+    ]
+    publisher_classes = project.publishers.collect{|pub| pub.delegate.class}
+    assert_equal(expected, publisher_classes)
+    assert_equal("some.where.else", project.publishers[2].delegate.hosts)
+    assert_equal(Build::Broken, project.publishers[2].enabling_states[0].class)
   end
 
 end
