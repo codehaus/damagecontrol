@@ -12,14 +12,16 @@ module DamageControl
         File.open("#{artifact_dir}/dummy.gem", "w") do |io|
           io.puts("blah")
         end
+
+        expected_archived_file = DAMAGECONTROL_HOME + '/artifacts/gems/dummy.gem'
+        File.rm(expected_archived_file) if File.exist?(expected_archived_file)
         
         aa = ArtifactArchiver.new
         aa.files = {
-            "pkg/dummy.gem" => "gems"
-          }
+          "pkg/*.gem" => "gems"
+        }
         aa.publish(@build_1)
-        archived_file = DAMAGECONTROL_HOME + '/artifacts/gems/dummy.gem'
-        assert(File.exist?(archived_file), "Should exist: #{archived_file}")
+        assert(File.exist?(expected_archived_file), "Should exist: #{expected_archived_file}")
       end
     end
   end
