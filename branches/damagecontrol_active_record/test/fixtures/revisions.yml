@@ -8,11 +8,17 @@ revision_1:
 revision_2:
   id: 2
   project_id: 1
+  identifier: [1]
   timepoint: 1971-02-28 23:45:01 Z
 revision_3:
   id: 3
   project_id: 1
+  identifier: [3]
   timepoint: 1971-02-28 23:45:02 Z
 revision_4:
   id: 4
   project_id: 2
+  identifier: [4]
+rails_1735:
+  id: 1735
+  identifier: [1735]

@@ -4,8 +4,8 @@ class Revision < ActiveRecord::Base
   belongs_to :project
   has_many :revision_files
   has_many :builds, :order => "position"
-  # identifier can be String, Numeric or Time, so we YAML it to the database.
-  # We hahave to fool AR to do this by wrapping it in an array - serialize doesn't work
+  # identifier can be String, Numeric or Time, so we YAML it to the database to preserve type info.
+  # We have to fool AR to do this by wrapping it in an array - serialize doesn't work
   def identifier=(i)
     self[:identifier] = YAML::dump([i])
   end
