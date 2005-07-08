@@ -1,7 +1,6 @@
 require 'rake'
 require 'rake/testtask'
 require 'rake/rdoctask'
-require 'rake_ext'
 
 $VERBOSE = nil
 TEST_CHANGES_SINCE = Time.now - 600
@@ -13,11 +12,11 @@ task :default => [ :test_units, :test_functional ]
 desc 'Require application environment.'
 task :environment do
   unless defined? RAILS_ROOT
-    require File.dirname(__FILE__) + '/config/dc_environment'
+    require File.dirname(__FILE__) + '/config/environment'
   end
 end
 
-desc "Generate API documentatio, show coding stats"
+desc "Generate API documentation, show coding stats"
 task :doc => [ :appdoc, :stats ]
 
 
@@ -50,7 +49,7 @@ Rake::TestTask.new("test_units") { |t|
   t.pattern = 'test/unit/**/*_test.rb'
   t.verbose = true
 }
-task :test_units => [ :clean_target, :clone_structure_to_test ]
+task :test_units => [ :clone_structure_to_test ]
 
 desc "Run the functional tests in test/functional"
 Rake::TestTask.new("test_functional") { |t|
@@ -132,7 +131,7 @@ task :clone_structure_to_test => [ :db_structure_dump, :purge_test_database ] do
     when "postgresql"
       ENV['PGHOST']     = abcs["test"]["host"] if abcs["test"]["host"]
       ENV['PGPORT']     = abcs["test"]["port"].to_s if abcs["test"]["port"]
-      ENV['PGPASSWORD'] = abcs["test"]["password"]
+      ENV['PGPASSWORD'] = abcs["test"]["password"].to_s if abcs["test"]["password"]
       `psql -U "#{abcs["test"]["username"]}" -f db/#{RAILS_ENV}_structure.sql #{abcs["test"]["database"]}`
     when "sqlite", "sqlite3"
       `#{abcs[RAILS_ENV]["adapter"]} #{abcs["test"]["dbfile"]} < db/#{RAILS_ENV}_structure.sql`
@@ -151,7 +150,7 @@ task :db_structure_dump => :environment do
     when "postgresql"
       ENV['PGHOST']     = abcs[RAILS_ENV]["host"] if abcs[RAILS_ENV]["host"]
       ENV['PGPORT']     = abcs[RAILS_ENV]["port"].to_s if abcs[RAILS_ENV]["port"]
-      ENV['PGPASSWORD'] = abcs[RAILS_ENV]["password"]
+      ENV['PGPASSWORD'] = abcs[RAILS_ENV]["password"].to_s if abcs[RAILS_ENV]["password"]
       `pg_dump -U "#{abcs[RAILS_ENV]["username"]}" -s -x -O -f db/#{RAILS_ENV}_structure.sql #{abcs[RAILS_ENV]["database"]}`
     when "sqlite", "sqlite3"
       `#{abcs[RAILS_ENV]["adapter"]} #{abcs[RAILS_ENV]["dbfile"]} .schema > db/#{RAILS_ENV}_structure.sql`
@@ -170,7 +169,7 @@ task :purge_test_database => :environment do
     when "postgresql"
       ENV['PGHOST']     = abcs["test"]["host"] if abcs["test"]["host"]
       ENV['PGPORT']     = abcs["test"]["port"].to_s if abcs["test"]["port"]
-      ENV['PGPASSWORD'] = abcs["test"]["password"]
+      ENV['PGPASSWORD'] = abcs["test"]["password"].to_s if abcs["test"]["password"]
       `dropdb -U "#{abcs["test"]["username"]}" #{abcs["test"]["database"]}`
       `createdb -T template0 -U "#{abcs["test"]["username"]}" #{abcs["test"]["database"]}`
     when "sqlite","sqlite3"
@@ -186,4 +185,9 @@ task :clear_logs => :environment do
     f = File.open(log_file, "w")
     f.close
   end
+end
+
+desc "Migrate the database according to the migrate scripts in db/migrate"
+task :migrate => :environment do
+  ActiveRecord::Migrator.up(File.dirname(__FILE__) + '/db/migrate/')
 end

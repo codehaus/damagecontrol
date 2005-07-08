@@ -15,11 +15,6 @@ module DamageControl
       ann :description => "DamageControl's Friends"
       attr_accessor :friends
 
-      def initialize
-        @id_resource = "damagecontrol@jabber.codehaus.org/damagecontrol"
-        @friends = "aslak@jabber.codehaus.org"
-      end
-    
       def name
         "Jabber"
       end
@@ -28,17 +23,12 @@ module DamageControl
         session = nil
         begin
           session = login
-          message = nil
-          if(build.successful?)
-            message = "#{build.revision.project.name}: #{build.status_message} build (by #{build.revision.developer})"
-          else
-            message = "#{build.revision.project.name}: #{build.revision.developer} broke the build"
-          end
+          message = "#{build.revision.project.name}: #{build.state.description} build (#{build.reason_description})"
           @friends.split(%r{,\s*}).each do |friend|
             begin
               session.new_message(friend).set_subject(message).set_body(message).send
             rescue Exception => e
-              Log.error "Failed to send Jabber message to #{friend}"
+              logger.error "Failed to send Jabber message to #{friend}" if logger
             end
           end
         ensure

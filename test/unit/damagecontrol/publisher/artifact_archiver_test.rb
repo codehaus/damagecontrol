@@ -7,7 +7,7 @@ module DamageControl
 
       def test_should_archive_in_project_directory
         artifact_dir = "#{@project_1.working_copy_dir}/pkg"
-        FileUtils.rmdir(artifact_dir) if File.exist?(artifact_dir)
+        FileUtils.rm_rf(artifact_dir) if File.exist?(artifact_dir)
         FileUtils.mkdir_p(artifact_dir)
         File.open("#{artifact_dir}/dummy.gem", "w") do |io|
           io.puts("blah")

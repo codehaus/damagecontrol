@@ -30,7 +30,7 @@ class Build < ActiveRecord::Base
   def reason_description
     # TODO: use case - can't remember syntax
     if(reason == SCM_POLLED)
-      "Commit by #{revision.developer}"
+      "commit by #{revision.developer}"
     end
   end
   

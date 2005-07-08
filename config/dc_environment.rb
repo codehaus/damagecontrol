@@ -1,8 +1,9 @@
 require File.dirname(__FILE__) + '/environment'
 
-# TODO: fix when we start using gem RSCM
-$:.unshift("../../trunk/rscm/lib")
+LIBS = ["lib", "../../trunk/rscm/lib", "../../trunk/rscm/test"]
+$:.unshift(LIBS.join(':'))
 require 'rscm'
+
 unless defined? DAMAGECONTROL_HOME
   if(ENV['DAMAGECONTROL_HOME'])
     DAMAGECONTROL_HOME = ENV['DAMAGECONTROL_HOME']

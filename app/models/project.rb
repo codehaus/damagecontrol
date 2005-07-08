@@ -47,7 +47,7 @@ class Project < ActiveRecord::Base
   
   def create_build_request(reason)
     last_revision = revisions[-1]
-    last_revision.builds.create(:reason => reason) if last_revision
+    last_revision.builds.create(:reason => reason) #if last_revision
   end
   
   def working_copy_dir

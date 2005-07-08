@@ -7,7 +7,9 @@ module DamageControl
         def name
           "Sendmail"
         end
-    
+
+      protected
+
         def delivery_method
           "sendmail"
         end

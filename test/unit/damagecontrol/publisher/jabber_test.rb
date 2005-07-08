@@ -7,7 +7,10 @@ module DamageControl
 
       def test_should_send_message_on_publish
         if (ENV['DC_TEST_JABBER_ENABLE'])
-          Jabber.new.publish(@build_1)
+          jabber = Jabber.new
+          jabber.id_resource = "damagecontrol@jabber.codehaus.org/damagecontrol"
+          jabber.friends = "aslak@jabber.codehaus.org"
+          jabber.publish(@build_1)
           # hard to assert success. verify manually.
         else
           # todo: ping somewhere to figure out automatically
