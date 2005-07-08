@@ -45,15 +45,20 @@ CREATE TABLE builds(
   id INTEGER PRIMARY KEY,
   position INTEGER,
   state TEXT, 
-  stdout TEXT, 
-  stderr TEXT, 
   pid INTEGER, 
   exitstatus INTEGER, 
   reason TEXT,
   env TEXT,
   command TEXT,
   timepoint TIMESTAMP,
+  stdout_id INTEGER,
+  stderr_id INTEGER,
   revision_id INTEGER
+);
+
+CREATE TABLE build_logs(
+  id INTEGER PRIMARY KEY,
+  data TEXT
 );
 
 CREATE TABLE artifacts(

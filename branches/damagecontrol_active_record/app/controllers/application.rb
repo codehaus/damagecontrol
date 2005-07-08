@@ -2,3 +2,9 @@
 # Likewise will all the methods added be available for all controllers.
 class ApplicationController < ActionController::Base
 end
+
+class Build < ActiveRecord::Base
+  def small_image
+    "foo"
+  end
+end

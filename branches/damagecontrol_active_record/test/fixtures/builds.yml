@@ -1,7 +1,5 @@
 build_1:
   id: 1
-  stdout: oh no
-  stderr: oh yes 
   pid: 1971
   exitstatus: 0
   state: !ruby/object:Build::Successful {}
