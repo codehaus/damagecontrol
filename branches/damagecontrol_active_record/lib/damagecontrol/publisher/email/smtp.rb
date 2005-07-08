@@ -39,7 +39,9 @@ module DamageControl
         def name
           "SMTP"
         end
-    
+      
+      protected
+
         def delivery_method
           "smtp"
         end

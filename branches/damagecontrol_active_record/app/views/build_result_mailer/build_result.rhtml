@@ -1,6 +1,5 @@
 <html>
-<h1><%= @build.revision.project.name %>: <%= @build.state.description%></h1>
-<h2>Reason: <%= @build.reason_description %></h2>
+<h2><%= @headline %></h2>
 <h2>Changed files:</h2>
 <ul>
 <% @build.revision.revision_files.each do |file| %>

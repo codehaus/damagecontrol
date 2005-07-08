@@ -18,34 +18,12 @@ module DamageControl
         end
       
         def publish(build)
-          BuildMailer.server_settings = server_settings
-          BuildMailer.delivery_method = delivery_method      
-          BuildMailer.deliver_email(build, self)
+          BuildResultMailer.server_settings = server_settings
+          BuildResultMailer.delivery_method = delivery_method    
+          
+          BuildResultMailer.deliver_build_result(to.split(%r{,\s*}), from, build)
         end
 
-      end
-
-      class BuildMailer < ActionMailer::Base
-        self.template_root = File.dirname(__FILE__)
-
-        def email(build, email_publisher, foo=nil, bar=nil)
-          @delivery_method = email_publisher.delivery_method
-          @recipients = email_publisher.to.split(%r{,\s*})
-          @from = email_publisher.from
-          @subject = "#{build.revision.project.name} Build #{build.state.description}"
-          @sent_on = Time.new.utc
-          @headers['Content-Type'] = "text/html"
-          @body["build"] = build
-
-          logger.info("Sending email to #{email_publisher.to.inspect} via #{@delivery_method}") if logger
-        end
-      
-        # We have to define this, since our name is used to find the email template
-        class << self
-          def to_s
-            "Build"
-          end        
-        end
       end
     end
   end

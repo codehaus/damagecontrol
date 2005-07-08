@@ -7,44 +7,25 @@
 #
 # Answer 'y' to all overwrite questions except:
 #    config/database.yml
+#    test/test_helper.rb
 #
-# When the project is upgraded to a new RoR (creating a new Rakefile),
-# edit the Rakefile in the following way:
 #
-# 1) Add a require at the top after the others:
-#    require 'rake_ext'
-#
-# 2) edit the :environment task to load 'dc_environment' instead of 'environment'
-#
-require 'rake'
-require 'rake/tasklib'
 
-LIBS = ["lib", "../../trunk/rscm/lib", "../../trunk/rscm/test"]
-$: << LIBS.join(':')
+load File.dirname(__FILE__) + '/Rakefile'
 
-module Rake
-  class TestTask < TaskLib
-    def initialize(name=:test)
-      @name = name
-      @libs = LIBS
-      @pattern = nil
-      @options = nil
-      @test_files = nil
-      @verbose = false
-      @warning = false
-      @loader = :rake
-      yield self if block_given?
-      @pattern = 'test/test*.rb' if @pattern.nil? && @test_files.nil?
-      define
-    end
-  
+desc 'Require DamageControl environment.'
+task :dc_environment do
+  unless defined? RAILS_ROOT
+    require File.dirname(__FILE__) + '/config/dc_environment'
   end
 end
+task :environment => [ :dc_environment ]
 
 desc "Delete files generated during test"
 task :clean_target do
   FileUtils.rm_rf 'target'
 end
+task :clone_structure_to_test => [:clean_target]
 
 desc "Recreate the dev database from schema.sql"
 task :recreate_schema => :environment do

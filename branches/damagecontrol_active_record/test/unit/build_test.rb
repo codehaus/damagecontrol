@@ -137,6 +137,6 @@ class BuildTest < Test::Unit::TestCase
   def test_should_report_committer_when_reason_is_polled
     b = @revision_1.builds.create(:reason => Build::SCM_POLLED)
     b.reload
-    assert_equal("Commit by aslak", b.reason_description)
+    assert_equal("commit by aslak", b.reason_description)
   end
 end

@@ -9,3 +9,7 @@ revision_file_1_1:
 revision_file_1_2:
   id: 2
   revision_id: 1
+  status: ADDED
+  path: see/how/they/run.rb 
+  previous_native_revision_identifier: 1.2.3
+  native_revision_identifier: 1.2.4
