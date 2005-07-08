@@ -47,12 +47,12 @@ end
 
 desc "Run the DamageControl Daemon"
 task :daemon do
-  ruby "-I#{LIBS.join(':')} script/daemon"
+  ruby "script/daemon"
 end
 
 desc "Create sample projects"
 task :create_sample_projects do
-  ruby "-I#{LIBS.join(':')} script/create_sample_projects"
+  ruby "script/create_sample_projects"
 end
 
 desc "Recreate database, create sample projects and run daemon"

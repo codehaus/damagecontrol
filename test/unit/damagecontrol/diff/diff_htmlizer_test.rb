@@ -9,7 +9,7 @@ module DamageControl
     def test_should_parse_diff_to_object_model
       p = DiffParser.new
 
-      html_file = File.dirname(__FILE__) + "/../../../target/diff.html"
+      html_file = File.dirname(__FILE__) + "/../../../../target/diff.html"
       File.delete(html_file) if File.exist?(html_file)
       FileUtils.mkdir(File.dirname(html_file)) unless File.exist?(File.dirname(html_file))
 
