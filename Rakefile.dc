@@ -41,8 +41,8 @@ task :recreate_schema => :environment do
 end
 
 desc "Run the DamageControl Webapp"
-task :webapp do
-  ruby "-I#{LIBS.join(':')} script/server"
+task :webrick do
+  ruby "script/webrick"
 end
 
 desc "Run the DamageControl Daemon"

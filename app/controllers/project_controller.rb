@@ -3,10 +3,6 @@ class ProjectController < ApplicationController
   # TODO: check if the various SCMs are installed and disable them with a warning if not.
   # Each SCM class should have an available? method
 
-  before_filter do
-    @navigation_name = "revisions_list"
-  end
-
   def index
     @projects = Project.find(:all)
     @title = "DamageControl Dashboard"

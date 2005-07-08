@@ -34,6 +34,14 @@ class Build < ActiveRecord::Base
     end
   end
   
+  def stdout
+    connection.select_one("SELECT data FROM build_logs WHERE id=#{stdout_id}")["data"]
+  end
+
+  def stderr
+    connection.select_one("SELECT data FROM build_logs WHERE id=#{stderr_id}")["data"]
+  end
+  
   # The previous build. First looks within the same revision. If none are found,
   # looks in previous revision that has at least one build and takes the last from there.
   def previous
@@ -92,8 +100,12 @@ class Build < ActiveRecord::Base
     self.pid, status = Process.waitpid2(pid)
     self.exitstatus = status.exitstatus
     determine_state
-    File.open(revision.project.stdout_file) {|io| self.stdout = io.read}
-    File.open(revision.project.stderr_file) {|io| self.stderr = io.read}
+    File.open(revision.project.stdout_file) do |io| 
+      self.stdout_id = connection.insert("INSERT INTO build_logs (data) VALUES('#{connection.quote_string(io.read)}')")
+    end
+    File.open(revision.project.stderr_file) do |io| 
+      self.stderr_id = connection.insert("INSERT INTO build_logs (data) VALUES('#{connection.quote_string(io.read)}')")
+    end
 
     save
     
