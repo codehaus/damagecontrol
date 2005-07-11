@@ -101,7 +101,11 @@ private
     available_publisher_classes = DamageControl::Publisher::Base.classes
     missing_publisher_classes = available_publisher_classes - associated_publisher_classes
     missing_publisher_classes.each do |cls|
-      publishers.create(:delegate => cls.new)
+      begin
+        publishers.create(:delegate => cls.new)
+      rescue
+        $stderr.puts "Can't instantiate #{cls.name}"
+      end
     end
   end
 end

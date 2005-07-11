@@ -3,11 +3,16 @@ module DamageControl
     class Bugzilla < Base
       register self
 
-      ann :description => "Bugzilla URL", :tip => "The URL of the Bugzilla installation."
+      ann :description => "Bugzilla URL"
+      ann :tip => "The URL of the Bugzilla installation."
       attr_accessor :url
 
-      def initialize(url="http://bugzilla.org/")
-        @url = url
+      def self.identifier_examples
+        ["#5", "#239"]
+      end
+
+      def initialize
+        @url = "http://bugzilla.org/"
       end
       
       def name

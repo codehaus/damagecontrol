@@ -3,11 +3,17 @@ module DamageControl
     class Trac < Base
       register self
 
-      ann :description => "Trac URL", :tip => "The URL of the Trac installation. This URL should include no trailing slash. Example: http://my.trac.home/cgi-bin/trac.cgi"
+      def self.identifier_examples
+        ["#5", "#239"]
+      end
+
+      ann :description => "Trac URL"
+      ann :tip => "The URL of the Trac installation. This URL should include no trailing slash. Example: http://my.trac.home/cgi-bin/trac.cgi"
       attr_accessor :url
 
-      def initialize(url="http://www.edgewall.com/trac/")
-        @url = url
+      def initialize
+        # TODO: point to their own one
+        @url = "http://www.edgewall.com/trac"
       end
       
       def name

@@ -1,5 +1,5 @@
 module DamageControl
-  module Publisher
+  module ScmWeb
     class Base < ClassList
       become_parent
     end

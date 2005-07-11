@@ -1,0 +1,7 @@
+<%= form_remote_tag :url => { :controller => "project", :action => "save" } %>
+</form>
+
+<%= link_to_remote "Project Details", :update => "form_content", :url => {:controller => "project", :action => "list"} %> |
+<%= link_to_remote "Source Control", :update => "form_content", :url => {:controller => "scm", :action => "list"} %>
+<div id="form_content">
+</div>

@@ -1,20 +1,19 @@
-<table width="100%">
+<table>
   <tr>
-    <td width="25%" class="setting-name">Project name</td>
-    <td width="75%">
-      <%= text_or_input(@new_project, :name => "project[name]", :value => project.name) %>
-      <% if(@edit) %>
-        <%= tag("input", :type => "hidden", :name => "project[name]", :value => project.name) %>
-      <% end %>
-    </td>
+    <td class="attribute-description">Project name</td>
+    <td><%= text_field("project", "name") %></td>
   </tr>
   <tr>
-    <td>Build command</td>
-    <td><%= text_or_input(@edit, :name => "project[build_command]", :value => project.build_command) %></td>
+    <td class="attribute-description">Build command</td>
+    <td><%= text_field("project", "build_command") %></td>
   </tr>
   <tr>
-    <td>Project home page</td>
-    <td><%= text_or_input(@edit, :name => "project[home_page]", :value => project.home_page) %></td>
+    <td class="attribute-description">Relative build path</td>
+    <td><%= text_field("project", "relative_build_path") %></td>
+  </tr>
+  <tr>
+    <td class="attribute-description">Home page</td>
+    <td><%= text_field("project", "home_page") %></td>
   </tr>
   <tr>
     <td>Start date</td>
