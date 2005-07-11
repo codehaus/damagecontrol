@@ -1,13 +1,16 @@
-<table id="projectstatus" class="pane">
-  <tr>
-    <th align="left">Project</th>
-    <th align="left">Latest Build</th>
-    <th align="left">Changeset RSS</th>
-  </tr>
-<% @projects.each do |project| %>
-  <tr>
-    <td align="left"><%= link_to(project.name, {:controller => "project", :action => "view", :id => project.id}) %></td>
-    <td align="left">
+<table>
+  <thead>
+    <tr>
+      <th align="left">Project</th>
+      <th align="left">Latest Build</th>
+      <th align="left">Changeset RSS</th>
+    </tr>
+  </thead>
+  <tbody>
+  <% @projects.each do |project| %>
+    <tr>
+      <td align="left"><%= link_to(project.name, {:controller => "project", :action => "view", :id => project.id}) %></td>
+      <td align="left">
       <% 
         img = "/images/grey-16.gif"
         latest_revision = project.revisions[-1]
@@ -17,8 +20,9 @@
         end
       %>
       <%= tag("img", :src => img) %>
-    </td>
-    <td align="left"><%= link_to_image("rss.gif", {:action => "revisions_rss", :id => project.name}, {"title" => "#{project.name} RSS feed"}) %></td>
-  </tr>
+      </td>
+      <td align="left"><%= link_to_image("rss.gif", {:action => "revisions_rss", :id => project.name}, {"title" => "#{project.name} RSS feed"}) %></td>
+    </tr>
 <% end %>
+  <tbody>
 </table>

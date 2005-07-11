@@ -2,20 +2,25 @@
 
 <html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
 <head>
-  <title><%= @title %></title>
+  <title>DamageControl</title>
   <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
   <meta http-equiv="Content-Language" content="en-us"/>
 	<%= stylesheet_link_tag("/javascripts/jscalendar/calendar-win2k-2", "style.css", "diff.css") %>
   <%= javascript_include_tag(
-		"prototype",
-		"toggle_div",
-		"dateFormat",
-		"/javascripts/jscalendar/calendar",
-		"/javascripts/jscalendar/calendar-setup.js",		
-		"/javascripts/jscalendar/lang/calendar-en.js"
+    "prototype"
+#    "control",
+#    "dragdrop",
+#    "effects",
+#    "rico"
+#		"/javascripts/jscalendar/calendar",
+#		"/javascripts/jscalendar/calendar-setup.js",		
+#		"/javascripts/jscalendar/lang/calendar-en.js"
 	) %>
 </head>
 <body>
+  <p>
+  <%= link_to "New Project", :controller => "project", :action => "new" %>
+  </p>
 	<%= @content_for_layout %>
 </body>
 </html>

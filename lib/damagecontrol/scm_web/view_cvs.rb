@@ -1,11 +1,9 @@
 module DamageControl
   module ScmWeb
-    class ViewCvs
-      attr_accessor :baseurl
+    class ViewCvs < Base
+      register self
 
-      def initialize(baseurl)
-        @baseurl = baseurl
-      end
+      attr_accessor :baseurl
 
       def url
         RSCM::PathConverter.ensure_trailing_slash(baseurl)

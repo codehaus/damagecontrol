@@ -12,6 +12,5 @@ class BuildResultMailer < ActionMailer::Base
     self.content_type = "text/html"
 
     logger.info("Sending email to #{recipients.inspect} via #{delivery_method}") if logger
-    puts("Sending email to #{recipients.inspect} via #{delivery_method}") 
   end
 end

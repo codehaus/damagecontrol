@@ -3,14 +3,21 @@ module DamageControl
     class Scarab < Base
       register self
 
-      ann :description => "Base URL", :tip => "The URL of the Scarab installation."
+      def self.identifier_examples
+        ["#5", "#239"]
+      end
+
+      ann :description => "Base URL"
+      ann :tip => "The URL of the Scarab installation."
       attr_accessor :baseurl
 
-      ann :description => "Scarab Module", :tip => "The Scarab Module key."
+      ann :description => "Scarab Module"
+      ann :tip => "The Scarab Module key."
       attr_accessor :module_key
 
-      def initialize(baseurl="http://scarab.org/", module_key="")
-        @baseurl, @module_key = baseurl, module_key
+      def initialize
+        @baseurl = "http://scarab.org/"
+        @module_key = ""
       end
 
       def name

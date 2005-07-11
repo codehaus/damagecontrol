@@ -10,8 +10,7 @@ class ProjectControllerTest < Test::Unit::TestCase
     @request, @response = ActionController::TestRequest.new, ActionController::TestResponse.new
   end
 
-  # Replace this with your real tests.
-  def test_truth
-    assert true
+  def test_should_load_scms_on_view
+    get :view
   end
 end

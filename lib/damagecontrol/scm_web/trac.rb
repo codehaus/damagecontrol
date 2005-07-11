@@ -1,6 +1,8 @@
 module DamageControl
   module ScmWeb
-    class Trac
+    class Trac < Base
+      register self
+
       attr_accessor :changeset_url
       
       def file_url(revision_file)
