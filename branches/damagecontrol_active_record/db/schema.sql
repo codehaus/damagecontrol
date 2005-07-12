@@ -52,7 +52,9 @@ CREATE TABLE builds(
   reason TEXT,
   env TEXT,
   command TEXT,
-  timepoint TIMESTAMP,
+  create_time TIMESTAMP,
+  begin_time TIMESTAMP,
+  end_time TIMESTAMP,
   stdout_id INTEGER,
   stderr_id INTEGER,
   revision_id INTEGER
