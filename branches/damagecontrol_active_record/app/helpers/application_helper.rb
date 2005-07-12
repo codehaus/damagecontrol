@@ -52,6 +52,7 @@ module ApplicationHelper
     render :partial => 'shared/select_pane', 
            :locals => {:objects_name => objects_name, :objects => objects, :selected => selected}
   end
+
 end
 
 

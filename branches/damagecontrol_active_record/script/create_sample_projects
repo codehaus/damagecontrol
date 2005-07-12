@@ -55,16 +55,16 @@ if(!Project.find_by_name("DamageControl (trunk)"))
   damagecontrol.publishers.create(:delegate => growl, :enabling_states => all_build_states)
 end
 
-if(!Project.find_by_name("Ruby (trunk)"))
-  ruby = Project.create(
-    :name => "Ruby (trunk)",
-    :home_page => "http://ruby-lang.org/",
-    :start_time => 2.weeks.ago.utc, 
-    :relative_build_path => "", 
-    :build_command => "autoconf;./configure;make", 
-    :scm => RSCM::Cvs.new(":pserver:anonymous@cvs.ruby-lang.org:/src", "ruby")
-  )
-
-  ruby.publishers.create(:delegate => growl, :enabling_states => all_build_states)
-end
+#if(!Project.find_by_name("Ruby (trunk)"))
+#  ruby = Project.create(
+#    :name => "Ruby (trunk)",
+#    :home_page => "http://ruby-lang.org/",
+#    :start_time => 2.weeks.ago.utc, 
+#    :relative_build_path => "", 
+#    :build_command => "autoconf;./configure;make", 
+#    :scm => RSCM::Cvs.new(":pserver:anonymous@cvs.ruby-lang.org:/src", "ruby")
+#  )
+#
+#  ruby.publishers.create(:delegate => growl, :enabling_states => all_build_states)
+#end
 

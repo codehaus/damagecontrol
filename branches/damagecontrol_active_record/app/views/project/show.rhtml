@@ -1,5 +1,6 @@
-<% @project.revisions.each do |revision| %>
-<ul>
-  <li><%= revision.identifier %> <%= revision.developer %></li>
-</ul>
-<% end %>
+<%= periodically_call_remote(
+  :update => "revisions", 
+  :url => {:controller => "revision", :action => "list", :id => @project.id},
+  :frequency => 5
+) %>
+<div id="revisions">Loading revisions...</div>

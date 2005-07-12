@@ -1,12 +1,28 @@
 require File.dirname(__FILE__) + '/../test_helper'
 
 class ProjectTest < Test::Unit::TestCase
-  fixtures :projects, :revisions, :projects_projects, :publishers
+  fixtures :projects, :revisions, :builds, :projects_projects, :publishers
 
   def test_should_have_revisions
     assert_equal(3, @project_1.revisions.length)
   end
   
+  def test_should_find_latest_revision
+    assert_equal(@revision_3, @project_1.latest_revision)
+  end
+  
+  def test_should_find_latest_build
+    assert_equal(@build_2, @project_1.latest_build)
+  end
+
+  def test_should_find_latest_build_before
+    assert_equal(@build_1, @project_1.latest_build(nil, Time.utc(1971,02,28,23,45,01)))
+  end
+
+  def test_should_find_latest_successful_build
+    assert_equal(@build_1, @project_1.latest_build(Build::Successful))
+  end
+
   def test_should_persist_scm
     cvs = RSCM::Cvs.new("a_root", "a_mod", "a_branch", "a_password")
     @project_1.scm = cvs

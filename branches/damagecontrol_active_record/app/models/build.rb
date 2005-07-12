@@ -7,7 +7,7 @@
 # * pid - the process id
 # * exitstatus - the exit code of the build command
 # * reason - the reason for the build
-# * status - One of: nil (pending), Build::Executing, Build::Successful, Build::Fixed, Build::Broken, Build::RepeatedlyBroken
+# * state - One of: nil (pending), Build::Executing, Build::Successful, Build::Fixed, Build::Broken, Build::RepeatedlyBroken
 #
 # A build can only be executed once, and will raise an exception if it has already been executed.
 # In order to reexecute a build, create a new instance (via Revision.builds.create)
@@ -43,9 +43,10 @@ class Build < ActiveRecord::Base
   end
   
   # The previous build. First looks within the same revision. If none are found,
-  # looks in previous revision that has at least one build and takes the last from there.
+  # gets project's latest build before ourself
   def previous
-    higher_item
+    h = higher_item
+    h ? h : revision.project.latest_build(nil, timepoint)
   end
   
   # Alias for +revision.project+ (mainly to simplify testing,
@@ -66,7 +67,7 @@ class Build < ActiveRecord::Base
   # 3) The project is notified via Project.build_complete when the build is complete
   #
   def execute!(timepoint=Time.now.utc)
-    raise "Alreade executed" if exitstatus
+    raise "Already executed" if exitstatus
     self.state = Executing.new
     self.timepoint = timepoint
     self.command = self.revision.project.build_command
@@ -116,18 +117,13 @@ class Build < ActiveRecord::Base
 
   # :nodoc:
   def determine_state
-    self.state = previous_state.send(successful? ? :succeed : :fail)
+    prev = previous
+    prev_state = prev ? (prev.state ? prev.state : Successful.new) : Successful.new
+    self.state = prev_state.send(successful? ? :succeed : :fail)
   end
 
 private 
 
-  # The state of the previous build, or Broken if
-  # there is no previous build.
-  def previous_state
-    prev = previous
-    prev ? prev.state : Successful.new
-  end  
-  
   class Executing
     def description
       "Executing"

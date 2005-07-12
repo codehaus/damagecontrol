@@ -50,7 +50,7 @@ module DamageControl
     def persist_build_for_lates_revision(project)
       # TODO: optimize this query.
       logger.info "Requesting build for #{project.name}" if logger
-      last_revision = project.revisions(true)[-1]
+      last_revision = project.latest_revision
       last_revision.builds.create(:reason => Build::SCM_POLLED)
       logger.info "Requested build for #{project.name}" if logger
     end
@@ -58,7 +58,7 @@ module DamageControl
     def poll_new_revisions(project)
       scm = project.scm
       if(scm.central_exists?)
-        latest_revision = project.revisions[-1]
+        latest_revision = project.latest_revision
         
         from = project.start_time
         if(latest_revision)

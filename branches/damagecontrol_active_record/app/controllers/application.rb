@@ -18,6 +18,10 @@ end
 
 class Build < ActiveRecord::Base
   def small_image
-    "foo"
+    if(successful?)
+      "green-32.gif"
+    else
+      "red-32.gif"
+    end
   end
 end

@@ -6,3 +6,11 @@ build_1:
   reason: SCM_POLLED
   timepoint: 1971-02-28 23:45:00 Z
   revision_id: 1
+build_2:
+  id: 2
+  pid: 1971
+  exitstatus: 0
+  state: !ruby/object:Build::Broken {}
+  reason: SCM_POLLED
+  timepoint: 1971-02-28 23:45:01 Z
+  revision_id: 2
