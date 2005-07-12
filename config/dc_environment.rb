@@ -29,3 +29,16 @@ end
 
 # TODO: Ues thread-specific loggers - easier to follow
 [DamageControl::ScmPoller, Build, Project, Publisher, Revision].each { |cls| cls.logger = create_logger(cls) }
+
+class ActiveRecord::ConnectionAdapters::AbstractAdapter
+  # Expose connection. We need to set the busy_handler
+  attr_reader :connection
+end
+
+# Make SQLite retry if the database is busy.
+sqlite = ActiveRecord::Base.connection.connection
+sqlite.busy_timeout(5000)
+sqlite.busy_handler do |resource, retries|
+  $stderr.puts "Busy: #{resource}, #{retries}"
+  true
+end

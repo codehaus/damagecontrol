@@ -21,7 +21,7 @@ class BuildTest < Test::Unit::TestCase
     build = @revision_1.builds.create(:reason => Build::SCM_POLLED)
     assert(!File.exist?(build_proof), "Should not exist: #{build_proof}")
     assert_equal(0, build.execute!)
-    assert_equal(Build::Successful, build.state.class)
+    assert_equal(Build::Fixed, build.state.class)
     assert(File.exist?(build_proof), "Should exist: #{build_proof}")
   end
 
@@ -37,13 +37,13 @@ class BuildTest < Test::Unit::TestCase
     assert_equal("hello xyz\n", build.stdout)
     assert_equal("", build.stderr)
     assert_equal(0, build.exitstatus)
-    assert_equal(Build::Successful, build.state.class)
+    assert_equal(Build::Fixed, build.state.class)
     assert(build.pid)
     assert(0 < build.pid)
     assert_equal(Time, build.timepoint.class)
     assert(build.timepoint.utc?)
     assert_equal(t.to_s, build.timepoint.to_s)
-    assert_equal(Build::Successful, build.state.class)
+    assert_equal(Build::Fixed, build.state.class)
   end
 
   def test_should_store_info_for_nonexistant_command
@@ -51,7 +51,7 @@ class BuildTest < Test::Unit::TestCase
     @project_1.save
     build = @revision_1.builds.create(:reason => Build::SCM_POLLED)
     assert_equal(127, build.execute!)
-    assert_equal(Build::Broken, build.state.class)
+    assert_equal(Build::RepeatedlyBroken, build.state.class)
     assert_equal("", build.stdout)
     assert_equal("sh: line 1: w_t_f: command not found\n", build.stderr)
   end
@@ -61,7 +61,7 @@ class BuildTest < Test::Unit::TestCase
     @project_1.save
     build = @revision_1.builds.create(:reason => Build::SCM_POLLED)
     assert_equal(1, build.execute!)
-    assert_equal(Build::Broken, build.state.class)
+    assert_equal(Build::RepeatedlyBroken, build.state.class)
     assert_equal("", build.stdout)
     assert_equal("Unknown command: 'wtf'\nType 'svn help' for usage.\n", build.stderr)
   end
@@ -138,5 +138,12 @@ class BuildTest < Test::Unit::TestCase
     b = @revision_1.builds.create(:reason => Build::SCM_POLLED)
     b.reload
     assert_equal("commit by aslak", b.reason_description)
+  end
+  
+  def test_should_look_at_projects_latest_build_to_determine_state
+    b = @revision_3.builds.create(:exitstatus => 1, :reason => Build::SCM_POLLED, :timepoint => Time.utc(1971,02,28,23,45,2))
+    b.determine_state
+    b.save
+    assert_equal(Build::RepeatedlyBroken, b.state.class)
   end
 end

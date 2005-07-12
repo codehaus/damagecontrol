@@ -22,7 +22,8 @@ CREATE TABLE revisions(
   developer TEXT, 
   message TEXT, 
   timepoint TIMESTAMP, 
-  project_id INTEGER
+  project_id INTEGER,
+  UNIQUE(project_id, identifier)
 );
 
 CREATE TABLE revision_files(

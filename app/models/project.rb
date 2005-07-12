@@ -19,6 +19,32 @@ class Project < ActiveRecord::Base
   
   serialize :scm
   
+  # Same as revisions[0], but faster since it only loads one record
+  def latest_revision
+    Revision.find_by_sql(["SELECT * FROM revisions WHERE project_id=? ORDER BY timepoint DESC LIMIT 1", self.id])[0]
+  end
+
+  # Finds the latest build of a particular +state+ (or just the latest build if state is unspecified)
+  # If the +before+ argument is specified (UTC time), the build will be before that timepoint.
+  def latest_build(state=nil, before=nil)
+    state_criterion = state ? "AND b.state='#{state.new.to_yaml}'" : ""
+    before_criterion = before ? "AND b.timepoint<#{quote(before)}" : ""
+    
+    sql = <<-EOS
+SELECT b.* 
+FROM builds b, revisions r, projects p 
+WHERE r.project_id=?
+AND b.revision_id=r.id 
+AND b.exitstatus IS NOT NULL
+#{state_criterion}
+#{before_criterion}
+ORDER BY b.timepoint DESC
+LIMIT 1
+    EOS
+
+    Build.find_by_sql([sql, self.id])[0]
+  end
+  
   # Indicates that a build is complete (regardless of its successfulness)
   # Tells each enabled publisher to publish the build
   # and creates a build request for each dependant project
