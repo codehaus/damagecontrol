@@ -1,0 +1,5 @@
+<% @project.revisions.each do |revision| %>
+<ul>
+  <li><%= revision.identifier %> <%= revision.developer %></li>
+</ul>
+<% end %>

@@ -6,7 +6,7 @@ require 'rgl/connected_components'
 class Project < ActiveRecord::Base
   attr_reader :basedir
 
-  has_many :revisions, :order => "timepoint"
+  has_many :revisions, :order => "timepoint DESC"
   has_many :publishers, :order => "delegate"
   has_and_belongs_to_many :dependencies, 
     :class_name => "Project", 
@@ -46,7 +46,7 @@ class Project < ActiveRecord::Base
   end
   
   def create_build_request(reason)
-    last_revision = revisions[-1]
+    last_revision = revisions[0]
     last_revision.builds.create(:reason => reason) #if last_revision
   end
   
