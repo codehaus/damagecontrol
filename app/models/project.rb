@@ -24,11 +24,12 @@ class Project < ActiveRecord::Base
     Revision.find_by_sql(["SELECT * FROM revisions WHERE project_id=? ORDER BY timepoint DESC LIMIT 1", self.id])[0]
   end
 
-  # Finds the latest build of a particular +state+ (or just the latest build if state is unspecified)
-  # If the +before+ argument is specified (UTC time), the build will be before that timepoint.
+  # Finds the latest build of a particular +state+, based on the build's +begin_time+'
+  # (or just the latest build if state is unspecified)
+  # If the +before+ argument is specified (UTC time), the build will be before that begin_time.
   def latest_build(state=nil, before=nil)
     state_criterion = state ? "AND b.state='#{state.new.to_yaml}'" : ""
-    before_criterion = before ? "AND b.timepoint<#{quote(before)}" : ""
+    before_criterion = before ? "AND b.begin_time<#{quote(before)}" : ""
     
     sql = <<-EOS
 SELECT b.* 
@@ -38,7 +39,7 @@ AND b.revision_id=r.id
 AND b.exitstatus IS NOT NULL
 #{state_criterion}
 #{before_criterion}
-ORDER BY b.timepoint DESC
+ORDER BY b.begin_time DESC
 LIMIT 1
     EOS
 

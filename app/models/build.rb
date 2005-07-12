@@ -1,13 +1,16 @@
 # Represents the execution and status of a build for a particular Revision. Has the following attributes:
 #
-# * command - the command that was executed (taken from Project)
-# * env - the environment variables at the time of execution
-# * stdout - standard output
-# * stderr - standard error
-# * pid - the process id
-# * exitstatus - the exit code of the build command
-# * reason - the reason for the build
-# * state - One of: nil (pending), Build::Executing, Build::Successful, Build::Fixed, Build::Broken, Build::RepeatedlyBroken
+# * +command+ - The command that was executed (taken from Project)
+# * +env+ - The environment variables at the time of execution
+# * +stdout+ - Standard output
+# * +stderr+ - Standard error
+# * +pid+ - The process id
+# * +exitstatus+ - The exit code of the build command
+# * +reason+ - The reason for the build
+# * +state+ - One of: nil (pending), Build::Executing, Build::Successful, Build::Fixed, Build::Broken, Build::RepeatedlyBroken
+# * +create_time+ - The time the build was created (requested).
+# * +begin_time+ - The time the build began.
+# * +end_time+ - The time the build ended.
 #
 # A build can only be executed once, and will raise an exception if it has already been executed.
 # In order to reexecute a build, create a new instance (via Revision.builds.create)
@@ -46,7 +49,7 @@ class Build < ActiveRecord::Base
   # gets project's latest build before ourself
   def previous
     h = higher_item
-    h ? h : revision.project.latest_build(nil, timepoint)
+    h ? h : revision.project.latest_build(nil, begin_time)
   end
   
   # Alias for +revision.project+ (mainly to simplify testing,
@@ -66,10 +69,10 @@ class Build < ActiveRecord::Base
   # 2) The project's build command is executed
   # 3) The project is notified via Project.build_complete when the build is complete
   #
-  def execute!(timepoint=Time.now.utc)
+  def execute!(begin_time=Time.now.utc)
     raise "Already executed" if exitstatus
     self.state = Executing.new
-    self.timepoint = timepoint
+    self.begin_time = begin_time
     self.command = self.revision.project.build_command
     self.env = {
       "DAMAGECONTROL_BUILD_LABEL" => revision.identifier.to_s,
@@ -100,6 +103,7 @@ class Build < ActiveRecord::Base
     # Wait for the subprocess to complete and publish the result
     self.pid, status = Process.waitpid2(pid)
     self.exitstatus = status.exitstatus
+    self.end_time = Time.now.utc
     determine_state
     File.open(revision.project.stdout_file) do |io| 
       self.stdout_id = connection.insert("INSERT INTO build_logs (data) VALUES('#{connection.quote_string(io.read)}')")
@@ -121,8 +125,6 @@ class Build < ActiveRecord::Base
     prev_state = prev ? (prev.state ? prev.state : Successful.new) : Successful.new
     self.state = prev_state.send(successful? ? :succeed : :fail)
   end
-
-private 
 
   class Executing
     def description

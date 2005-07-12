@@ -4,7 +4,9 @@ build_1:
   exitstatus: 0
   state: !ruby/object:Build::Successful {}
   reason: SCM_POLLED
-  timepoint: 1971-02-28 23:45:00 Z
+  create_time: 1971-02-28 23:44:00 Z
+  begin_time: 1971-02-28 23:45:00 Z
+  end_time: 1971-02-28 23:47:00 Z
   revision_id: 1
 build_2:
   id: 2
@@ -12,5 +14,7 @@ build_2:
   exitstatus: 0
   state: !ruby/object:Build::Broken {}
   reason: SCM_POLLED
-  timepoint: 1971-02-28 23:45:01 Z
+  create_time: 1971-02-28 23:43:01 Z
+  begin_time: 1971-02-28 23:45:01 Z
+  end_time: 1971-02-28 23:48:01 Z
   revision_id: 2

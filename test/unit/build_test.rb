@@ -40,9 +40,9 @@ class BuildTest < Test::Unit::TestCase
     assert_equal(Build::Fixed, build.state.class)
     assert(build.pid)
     assert(0 < build.pid)
-    assert_equal(Time, build.timepoint.class)
-    assert(build.timepoint.utc?)
-    assert_equal(t.to_s, build.timepoint.to_s)
+    assert_equal(Time, build.begin_time.class)
+    assert(build.begin_time.utc?)
+    assert_equal(t.to_s, build.begin_time.to_s)
     assert_equal(Build::Fixed, build.state.class)
   end
 
@@ -141,7 +141,7 @@ class BuildTest < Test::Unit::TestCase
   end
   
   def test_should_look_at_projects_latest_build_to_determine_state
-    b = @revision_3.builds.create(:exitstatus => 1, :reason => Build::SCM_POLLED, :timepoint => Time.utc(1971,02,28,23,45,2))
+    b = @revision_3.builds.create(:exitstatus => 1, :reason => Build::SCM_POLLED, :begin_time => Time.utc(1971,02,28,23,45,2))
     b.determine_state
     b.save
     assert_equal(Build::RepeatedlyBroken, b.state.class)
