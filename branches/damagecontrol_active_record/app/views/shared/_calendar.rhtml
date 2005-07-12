@@ -1,0 +1,19 @@
+<input type="hidden" id="#{options[:name]}" name="#{options[:name]}" value="" />
+<div id="#{options[:name]}_calendar"></div>
+<script type="text/javascript">
+<!--
+$('#{options[:name]}').value = #{js_date}.#{js_format}
+function #{js_function}(calendar) {    
+  if (calendar.dateClicked) {      
+    $('#{options[:name]}').value = calendar.date.#{js_format};
+  }  
+};  
+
+Calendar.setup( {
+  flat         : "#{options[:name]}_calendar", // ID of the parent element      
+  flatCallback : #{js_function},           // our callback function
+  showsTime    : true,
+  date         : #{js_date}    
+});
+-->
+</script>

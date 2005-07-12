@@ -46,15 +46,33 @@ Effect.Transitions.wobble = function(pos) {
   return (-Math.cos(pos*Math.PI*(9*pos))/2) + 0.5;
 }
 Effect.Transitions.pulse = function(pos) {
-   return (Math.floor(pos*10) % 2 == 0 ? 
+  return (Math.floor(pos*10) % 2 == 0 ? 
     (pos*10-Math.floor(pos*10)) : 1-(pos*10-Math.floor(pos*10)));
 }
-
 Effect.Transitions.none = function(pos) {
-    return 0;
+  return 0;
 }
 Effect.Transitions.full = function(pos) {
-    return 1;
+  return 1;
+}
+
+/* ------------- element ext -------------- */
+
+Element.makePositioned = function(element) {
+  element = $(element);
+  if(element.style.position == "")
+    element.style.position = "relative";
+}
+
+Element.makeClipping = function(element) {
+  element = $(element);
+  element._overflow = element.style.overflow || 'visible';
+  if(element._overflow!='hidden') element.style.overflow = 'hidden';
+}
+
+Element.undoClipping = function(element) {
+  element = $(element);
+  if(element._overflow!='hidden') element.style.overflow = element._overflow;
 }
 
 /* ------------- core effects ------------- */
@@ -62,33 +80,33 @@ Effect.Transitions.full = function(pos) {
 Effect.Base = function() {};
 Effect.Base.prototype = {
   setOptions: function(options) {
-    this.options = {
+    this.options = Object.extend({
       transition: Effect.Transitions.sinoidal,
       duration:   1.0,   // seconds
       fps:        25.0,  // max. 100fps
       sync:       false, // true for combining
       from:       0.0,
       to:         1.0
-    }.extend(options || {});
+    }, options || {});
   },
   start: function(options) {
     this.setOptions(options || {});
-    this.currentFrame    = 0;
-    this.startOn  = new Date().getTime();
-    this.finishOn = this.startOn + (this.options.duration*1000);
+    this.currentFrame = 0;
+    this.startOn      = new Date().getTime();
+    this.finishOn     = this.startOn + (this.options.duration*1000);
     if(this.options.beforeStart) this.options.beforeStart(this);
     if(!this.options.sync) this.loop();  
   },
   loop: function() {
-    timePos = new Date().getTime();
+    var timePos = new Date().getTime();
     if(timePos >= this.finishOn) {
       this.render(this.options.to);
       if(this.finish) this.finish(); 
       if(this.options.afterFinish) this.options.afterFinish(this);
       return;  
     }
-    pos   = (timePos - this.startOn) / (this.finishOn - this.startOn);
-    frame = Math.round(pos * this.options.fps * this.options.duration);
+    var pos   = (timePos - this.startOn) / (this.finishOn - this.startOn);
+    var frame = Math.round(pos * this.options.fps * this.options.duration);
     if(frame > this.currentFrame) {
       this.render(pos);
       this.currentFrame = frame;
@@ -97,7 +115,7 @@ Effect.Base.prototype = {
   },
   render: function(pos) {
     if(this.options.transition) pos = this.options.transition(pos);
-    pos  = pos * (this.options.to-this.options.from);
+    pos *= (this.options.to-this.options.from);
     pos += this.options.from; 
     if(this.options.beforeUpdate) this.options.beforeUpdate(this);
     if(this.update) this.update(pos);
@@ -109,32 +127,32 @@ Effect.Base.prototype = {
 }
 
 Effect.Parallel = Class.create();
-  Effect.Parallel.prototype = (new Effect.Base()).extend({
-    initialize: function(effects) {
-      this.effects = effects || [];
-       this.start(arguments[1]);
-    },
-    update: function(position) {
-       for (var i = 0; i < this.effects.length; i++)
-        this.effects[i].render(position);  
-    },
-    finish: function(position) {
-       for (var i = 0; i < this.effects.length; i++)
-          if(this.effects[i].finish) this.effects[i].finish(position);
-    }
-  });
+Object.extend(Object.extend(Effect.Parallel.prototype, Effect.Base.prototype), {
+  initialize: function(effects) {
+    this.effects = effects || [];
+    this.start(arguments[1]);
+  },
+  update: function(position) {
+    for (var i = 0; i < this.effects.length; i++)
+      this.effects[i].render(position);  
+  },
+  finish: function(position) {
+    for (var i = 0; i < this.effects.length; i++)
+      if(this.effects[i].finish) this.effects[i].finish(position);
+  }
+});
 
 // Internet Explorer caveat: works only on elements the have
 // a 'layout', meaning having a given width or height. 
 // There is no way to safely set this automatically.
 Effect.Opacity = Class.create();
-Effect.Opacity.prototype = (new Effect.Base()).extend({
+Object.extend(Object.extend(Effect.Opacity.prototype, Effect.Base.prototype), {
   initialize: function(element) {
     this.element = $(element);
-    options = {
+    options = Object.extend({
       from: 0.0,
       to:   1.0
-    }.extend(arguments[1] || {});
+    }, arguments[1] || {});
     this.start(options);
   },
   update: function(position) {
@@ -148,45 +166,44 @@ Effect.Opacity.prototype = (new Effect.Base()).extend({
 });
 
 Effect.MoveBy = Class.create();
- Effect.MoveBy.prototype = (new Effect.Base()).extend({
-   initialize: function(element, toTop, toLeft) {
-     this.element      = $(element);
-     this.originalTop  = parseFloat(this.element.style.top || '0');
-     this.originalLeft = parseFloat(this.element.style.left || '0');
-     this.toTop        = toTop;
-     this.toLeft       = toLeft;
-     if(this.element.style.position == "")
-       this.element.style.position = "relative";
-     this.start(arguments[3]);
-   },
-   update: function(position) {
-     topd  = this.toTop  * position + this.originalTop;
-     leftd = this.toLeft * position + this.originalLeft;
-     this.setPosition(topd, leftd);
-   },
-   setPosition: function(topd, leftd) {
-     this.element.style.top  = topd  + "px";
-     this.element.style.left = leftd + "px";
-   }
+Object.extend(Object.extend(Effect.MoveBy.prototype, Effect.Base.prototype), {
+  initialize: function(element, toTop, toLeft) {
+    this.element      = $(element);
+    this.originalTop  = parseFloat(this.element.style.top || '0');
+    this.originalLeft = parseFloat(this.element.style.left || '0');
+    this.toTop        = toTop;
+    this.toLeft       = toLeft;
+    Element.makePositioned(this.element);
+    this.start(arguments[3]);
+  },
+  update: function(position) {
+    topd  = this.toTop  * position + this.originalTop;
+    leftd = this.toLeft * position + this.originalLeft;
+    this.setPosition(topd, leftd);
+  },
+  setPosition: function(topd, leftd) {
+    this.element.style.top  = topd  + "px";
+    this.element.style.left = leftd + "px";
+  }
 });
 
 Effect.Scale = Class.create();
-Effect.Scale.prototype = (new Effect.Base()).extend({
+Object.extend(Object.extend(Effect.Scale.prototype, Effect.Base.prototype), {
   initialize: function(element, percent) {
     this.element = $(element)
-    options = {
+    options = Object.extend({
       scaleX: true,
       scaleY: true,
       scaleContent: true,
       scaleFromCenter: false,
       scaleMode: 'box',        // 'box' or 'contents' or {} with provided values
       scaleFrom: 100.0
-    }.extend(arguments[2] || {});
+    }, arguments[2] || {});
     this.originalTop    = this.element.offsetTop;
     this.originalLeft   = this.element.offsetLeft;
-    if (this.element.style.fontSize=="") this.sizeEm = 1.0;
-    if (this.element.style.fontSize && this.element.style.fontSize.indexOf("em")>0)
-       this.sizeEm      = parseFloat(this.element.style.fontSize);
+    if(this.element.style.fontSize=="") this.sizeEm = 1.0;
+    if(this.element.style.fontSize && this.element.style.fontSize.indexOf("em")>0)
+      this.sizeEm      = parseFloat(this.element.style.fontSize);
     this.factor = (percent/100.0) - (options.scaleFrom/100.0);
     if(options.scaleMode=='box') {
       this.originalHeight = this.element.clientHeight;
@@ -207,8 +224,8 @@ Effect.Scale.prototype = (new Effect.Base()).extend({
     if(this.options.scaleContent && this.sizeEm) 
       this.element.style.fontSize = this.sizeEm*currentScale + "em";
     this.setDimensions(
-     this.originalWidth * currentScale, 
-     this.originalHeight * currentScale);
+      this.originalWidth * currentScale, 
+      this.originalHeight * currentScale);
   },
 
   setDimensions: function(width, height) {
@@ -229,7 +246,7 @@ Effect.Scale.prototype = (new Effect.Base()).extend({
 });
 
 Effect.Highlight = Class.create();
-Effect.Highlight.prototype = (new Effect.Base()).extend({
+Object.extend(Object.extend(Effect.Highlight.prototype, Effect.Base.prototype), {
   initialize: function(element) {
     this.element = $(element);
     
@@ -242,10 +259,11 @@ Effect.Highlight.prototype = (new Effect.Base()).extend({
       var cols = current.slice(4,current.length-1).split(',');
       var i=0; do { endcolor += parseInt(cols[i]).toColorPart() } while (++i<3); }
       
-    var options = {
-      startcolor: "#ffff99",
-      endcolor:   endcolor
-    }.extend(arguments[1] || {});
+    var options = Object.extend({
+      startcolor:   "#ffff99",
+      endcolor:     endcolor,
+      restorecolor: current 
+    }, arguments[1] || {});
     
     // init color calculations
     this.colors_base = [
@@ -266,25 +284,49 @@ Effect.Highlight.prototype = (new Effect.Base()).extend({
       Math.round(this.colors_base[2]+(this.colors_delta[2]*position)) ];
     this.element.style.backgroundColor = "#" +
       colors[0].toColorPart() + colors[1].toColorPart() + colors[2].toColorPart();
+  },
+  finish: function() {
+    this.element.style.backgroundColor = this.options.restorecolor;
   }
 });
 
+Effect.ScrollTo = Class.create();
+Object.extend(Object.extend(Effect.ScrollTo.prototype, Effect.Base.prototype), {
+  initialize: function(element) {
+    this.element = $(element);
+    Position.prepare();
+    var offsets = Position.cumulativeOffset(this.element);
+    var max = window.innerHeight ? 
+      window.height - window.innerHeight :
+      document.body.scrollHeight - 
+        (document.documentElement.clientHeight ? 
+          document.documentElement.clientHeight : document.body.clientHeight);
+    this.scrollStart = Position.deltaY;
+    this.delta  = (offsets[1] > max ? max : offsets[1]) - this.scrollStart;
+    this.start(arguments[1] || {});
+  },
+  update: function(position) {
+    Position.prepare();
+    window.scrollTo(Position.deltaX, 
+      this.scrollStart + (position*this.delta));
+  }
+});
 
 /* ------------- prepackaged effects ------------- */
 
-Effect.Fade =  function(element) {
-  options = {
+Effect.Fade = function(element) {
+  options = Object.extend({
   from: 1.0,
   to:   0.0,
   afterFinish: function(effect) 
     { Element.hide(effect.element);
       effect.setOpacity(1); } 
-  }.extend(arguments[1] || {});
+  }, arguments[1] || {});
   new Effect.Opacity(element,options);
 }
 
-Effect.Appear =  function(element) {
-  options = {
+Effect.Appear = function(element) {
+  options = Object.extend({
   from: 0.0,
   to:   1.0,
   beforeStart: function(effect)  
@@ -292,7 +334,7 @@ Effect.Appear =  function(element) {
       Element.show(effect.element); },
   afterUpdate: function(effect)  
     { Element.show(effect.element); }
-  }.extend(arguments[1] || {});
+  }, arguments[1] || {});
   new Effect.Opacity(element,options);
 }
 
@@ -310,34 +352,32 @@ Effect.Puff = function(element) {
 }
 
 Effect.BlindUp = function(element) {
-  $(element)._overflow = $(element).style.overflow || 'visible';
-  $(element).style.overflow = 'hidden';
+  Element.makeClipping(element);
   new Effect.Scale(element, 0, 
-    { scaleContent: false, 
+    Object.extend({ scaleContent: false, 
       scaleX: false, 
       afterFinish: function(effect) 
         { 
           Element.hide(effect.element);
-          effect.element.style.overflow = effect.element._overflow;
+          Element.undoClipping(effect.element);
         } 
-    }.extend(arguments[1] || {})
+    }, arguments[1] || {})
   );
 }
 
 Effect.BlindDown = function(element) {
   $(element).style.height   = '0px';
-  $(element)._overflow = $(element).style.overflow || 'visible';
-  $(element).style.overflow = 'hidden';
+  Element.makeClipping(element);
   Element.show(element);
   new Effect.Scale(element, 100, 
-    { scaleContent: false, 
+    Object.extend({ scaleContent: false, 
       scaleX: false, 
       scaleMode: 'contents',
       scaleFrom: 0,
       afterFinish: function(effect) {
-        effect.element.style.overflow = effect.element._overflow;
+        Element.undoClipping(effect.element);
       }
-    }.extend(arguments[1] || {})
+    }, arguments[1] || {})
   );
 }
 
@@ -346,7 +386,7 @@ Effect.SwitchOff = function(element) {
     { duration: 0.4,
      transition: Effect.Transitions.flicker,
      afterFinish: function(effect)
-      {  effect.element.style.overflow = 'hidden';
+      { effect.element.style.overflow = 'hidden';
         new Effect.Scale(effect.element, 1, 
          { duration: 0.3, scaleFromCenter: true,
           scaleX: false, scaleContent: false,
@@ -356,7 +396,7 @@ Effect.SwitchOff = function(element) {
           afterFinish: function(effect) { Element.hide(effect.element); }
          } )
       }
-    } )
+    } );
 }
 
 Effect.DropOut = function(element) {
@@ -386,13 +426,14 @@ Effect.Shake = function(element) {
 }
 
 Effect.SlideDown = function(element) {
-  $(element)._overflow = $(element).style.overflow || 'visible';
-  $(element).style.height   = '0px';
-  $(element).style.overflow = 'hidden';
-  $(element).firstChild.style.position = 'relative';
+  element = $(element);
+  element.style.height   = '0px';
+  Element.makeClipping(element);
+  Element.cleanWhitespace(element);
+  Element.makePositioned(element.firstChild);
   Element.show(element);
   new Effect.Scale(element, 100, 
-   { scaleContent: false, 
+   Object.extend({ scaleContent: false, 
     scaleX: false, 
     scaleMode: 'contents',
     scaleFrom: 0,
@@ -400,18 +441,19 @@ Effect.SlideDown = function(element) {
       { effect.element.firstChild.style.bottom = 
           (effect.originalHeight - effect.element.clientHeight) + 'px'; },
     afterFinish: function(effect) 
-      {  effect.element.style.overflow = effect.element._overflow; }
-    }.extend(arguments[1] || {})
+      {  Element.undoClipping(effect.element); }
+    }, arguments[1] || {})
   );
 }
   
 Effect.SlideUp = function(element) {
-  $(element)._overflow = $(element).style.overflow || 'visible';
-  $(element).style.overflow = 'hidden';
-  $(element).firstChild.style.position = 'relative';
+  element = $(element);
+  Element.makeClipping(element);
+  Element.cleanWhitespace(element);
+  Element.makePositioned(element.firstChild);
   Element.show(element);
   new Effect.Scale(element, 0, 
-   { scaleContent: false, 
+   Object.extend({ scaleContent: false, 
     scaleX: false, 
     afterUpdate: function(effect) 
       { effect.element.firstChild.style.bottom = 
@@ -419,9 +461,9 @@ Effect.SlideUp = function(element) {
     afterFinish: function(effect)
       { 
         Element.hide(effect.element);
-        effect.element.style.overflow = effect.element._overflow; 
+        Element.undoClipping(effect.element);
       }
-   }.extend(arguments[1] || {})
+   }, arguments[1] || {})
   );
 }
 
@@ -540,14 +582,14 @@ Effect.Pulsate = function(element) {
   var reverser   = function(pos){ return transition(1-Effect.Transitions.pulse(pos)) };
   reverser.bind(transition);
   new Effect.Opacity(element, 
-    {  duration: 3.0,
+    Object.extend(Object.extend({  duration: 3.0,
        afterFinish: function(effect) { Element.show(effect.element); }
-    }.extend(options).extend({transition: reverser}));
+    }, options), {transition: reverser}));
 }
 
 Effect.Fold = function(element) {
  $(element).style.overflow = 'hidden';
- new Effect.Scale(element, 5, {   
+ new Effect.Scale(element, 5, Object.extend({   
    scaleContent: false,
    scaleTo: 100,
    scaleX: false,
@@ -557,7 +599,7 @@ Effect.Fold = function(element) {
      scaleTo: 0,
      scaleY: false,
      afterFinish: function(effect) { Element.hide(effect.element) } });
- }}.extend(arguments[1] || {}));
+ }}, arguments[1] || {}));
 }
 
 // old: new Effect.ContentZoom(element, percent)

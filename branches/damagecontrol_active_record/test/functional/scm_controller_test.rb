@@ -11,8 +11,6 @@ class ScmControllerTest < Test::Unit::TestCase
     @response   = ActionController::TestResponse.new
   end
 
-  def test_should_load_all_scms_on_list
-    get :list
-    assert(assigns["scms"].length > 0)
+  def test_truth
   end
 end
