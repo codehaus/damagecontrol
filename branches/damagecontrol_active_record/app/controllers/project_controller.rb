@@ -28,14 +28,12 @@ class ProjectController < ApplicationController
 
   def edit
     @project = Project.find(@params[:id])
-    @action = "update"
     define_scms(@project)
     render :action => "edit"
   end
 
-  def view
+  def show
     @project = Project.find(@params[:id])
-    render :action => "edit"
   end
   
 private

@@ -38,7 +38,7 @@ class RevisionTest < Test::Unit::TestCase
 
     Revision.create(rscm_revision)
     
-    ar_revision = @project_2.revisions(true)[1]
+    ar_revision = @project_2.revisions(true)[0]
     assert_equal(@project_2, ar_revision.project)
     assert_equal("qwerty", ar_revision.identifier)
     assert_equal("hellesoy", ar_revision.developer)
