@@ -1,7 +1,20 @@
-<%= form_remote_tag :url => { :controller => "project", :action => "save" } %>
-</form>
+<script type="text/javascript">
+toplevelTabIds = ["project", "scms", "publishers", "trackers"];
+</script>
 
-<%= link_to_remote "Project Details", :update => "form_content", :url => {:controller => "project", :action => "list"} %> |
-<%= link_to_remote "Source Control", :update => "form_content", :url => {:controller => "scm", :action => "list"} %>
-<div id="form_content">
-</div>
+<table cellpadding="0" cellspacing="0">
+  <tr>
+    <td><%= tab_link("General", "wrench", "project", "toplevelTabIds") %></td>
+    <td><%= tab_link("Source Control", "safe", "scms", "toplevelTabIds") %></td>
+    <td><%= tab_link("Publishers", "megaphone", "publishers", "toplevelTabIds") %></td>
+    <td><%= tab_link("Issue Tracking", "bug_green", "trackers", "toplevelTabIds") %></td>
+  </tr>
+</table>
+
+<%= form_tag(:controller => "project", :action => "update", :id => @project.id) %>
+<div id="project" style="display:block"><%= render_partial("project", @project) %></div>
+<div id="scms" style="display:none"><%= select_pane("scms", @project.scm) %></div>
+<div id="publishers" style="display:none">PUB</div>
+<div id="trackers" style="display:none">TRACK</div>
+<%= submit_tag("Save changes") %>
+</form>

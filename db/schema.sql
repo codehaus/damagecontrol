@@ -6,7 +6,8 @@ CREATE TABLE projects(
   relative_build_path TEXT,
   quiet_period INTEGER,
   build_command TEXT,
-  scm TEXT
+  scm TEXT,
+  tracker TEXT
 );
 
 CREATE TABLE projects_projects(

@@ -1,0 +1,10 @@
+<table>
+  <tbody>
+    <% object.to_yaml_properties.each do |attr_name| %>
+    <tr>
+      <td><%= description(object.class, attr_name) %></td>
+      <td><%= field(object, object_name, attr_name) %></td>
+    </tr>
+    <% end %>
+  </tbody>
+</table>

@@ -1,0 +1,21 @@
+<script type="text/javascript">
+<!--
+<%= objects_name %>_array = [<%= objects.collect{|o| "\"#{o.class.name}\""}.join(",") %>];
+-->
+</script>
+
+<table>
+  <tr>
+    <td>
+      <select name="<%= objects_name[0..-2] %>" onchange="showElement(this.value, <%= objects_name %>_array)">
+        <%= options_for_select(objects.collect{|o| [o.name, o.class.name]}, selected.class.name) %>
+      </select>
+    </td>
+  </tr>
+</table>
+
+<% objects.each do |o| %>
+  <div id="<%= o.class.name %>" style="<% if(o.class == selected.class)%>display:block<%else%>display:none<%end%>">
+    <%= render_object_with_name(o, "#{objects_name}[#{o.class.name}]") %>
+  </div>
+<% end %>
