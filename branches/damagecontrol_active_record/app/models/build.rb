@@ -52,12 +52,24 @@ class Build < ActiveRecord::Base
     h ? h : revision.project.latest_build(nil, begin_time)
   end
   
+  # The estimated duration of this build, or nil if it cannot be determined.
+  def estimated_duration
+    lb = revision.project.latest_build(true)
+    lb ? lb.duration : nil
+  end
+  
+  # Duration of this build or nil if it isn't complete.
+  def duration
+    end_time ? end_time - begin_time : nil
+  end
+  
   # Alias for +revision.project+ (mainly to simplify testing,
   # since it reduces coupling)
-  def project
+  def project :nodoc:
     self.revision.project
   end
 
+  # Whether this build was successful. Also see +state+ for a more detailed description.
   def successful?
     exitstatus == 0
   end

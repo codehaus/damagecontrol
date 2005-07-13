@@ -1,0 +1,50 @@
+<html>
+ <style>
+.progress-bg {
+ background-color: #FFFFFF;
+ border-color:#33FF33;
+ border-width:1;
+ border-style:solid;
+
+ position:relative;
+ height:14px;
+ width:100%;
+}
+
+.progress {
+ background-color:#33FF33;
+
+ position:relative;
+ top:-15px;
+ left:1px;
+ height:14px;
+ width:30%;
+}
+
+.progress-text {
+ position:relative;
+ top:-30px;
+ left:1px;
+ height:14px;
+ width:30px;
+ white-space:nowrap;
+}
+</style>
+   <div class="progress-bg"></div>
+   <div id="p1" class="progress"></div>
+   <div class="progress-text">this is some cool progress</div>
+
+<script>
+
+a = 10;
+
+function progressit() {
+prog = document.getElementById('p1');
+prog.style.width="" + a + "%";
+ a = a+1;
+ setTimeout("progressit()", 1000);
+}
+
+progressit();
+</script>
+</html>

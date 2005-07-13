@@ -2,7 +2,7 @@ build_1:
   id: 1
   pid: 1971
   exitstatus: 0
-  state: !ruby/object:Build::Successful {}
+  state: !ruby/object:Build::Fixed {}
   reason: SCM_POLLED
   create_time: 1971-02-28 23:44:00 Z
   begin_time: 1971-02-28 23:45:00 Z
@@ -11,10 +11,10 @@ build_1:
 build_2:
   id: 2
   pid: 1971
-  exitstatus: 0
+  exitstatus: 1
   state: !ruby/object:Build::Broken {}
   reason: SCM_POLLED
-  create_time: 1971-02-28 23:43:01 Z
+  create_time: 1971-02-28 23:41:01 Z
   begin_time: 1971-02-28 23:45:01 Z
-  end_time: 1971-02-28 23:48:01 Z
+  end_time: 1971-02-28 23:50:01 Z
   revision_id: 2
