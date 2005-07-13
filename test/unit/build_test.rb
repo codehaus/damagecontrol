@@ -146,4 +146,9 @@ class BuildTest < Test::Unit::TestCase
     b.save
     assert_equal(Build::RepeatedlyBroken, b.state.class)
   end
+  
+  def test_should_estimate_duration
+    b = @revision_3.builds.create
+    assert_equal(120, b.estimated_duration)
+  end
 end

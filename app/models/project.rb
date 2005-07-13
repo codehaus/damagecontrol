@@ -27,8 +27,9 @@ class Project < ActiveRecord::Base
   # Finds the latest build of a particular +state+, based on the build's +begin_time+'
   # (or just the latest build if state is unspecified)
   # If the +before+ argument is specified (UTC time), the build will be before that begin_time.
-  def latest_build(state=nil, before=nil)
-    state_criterion = state ? "AND b.state='#{state.new.to_yaml}'" : ""
+  def latest_build(successful=nil, before=nil)
+    raise "successful must be bool" if successful && !(successful.class==TrueClass || successful.class==FalseClass)
+    success_criterion = successful ? "AND b.exitstatus=0" : ""
     before_criterion = before ? "AND b.begin_time<#{quote(before)}" : ""
     
     sql = <<-EOS
@@ -37,7 +38,7 @@ FROM builds b, revisions r, projects p
 WHERE r.project_id=?
 AND b.revision_id=r.id 
 AND b.exitstatus IS NOT NULL
-#{state_criterion}
+#{success_criterion}
 #{before_criterion}
 ORDER BY b.begin_time DESC
 LIMIT 1

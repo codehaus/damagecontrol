@@ -20,7 +20,7 @@ class ProjectTest < Test::Unit::TestCase
   end
 
   def test_should_find_latest_successful_build
-    assert_equal(@build_1, @project_1.latest_build(Build::Successful))
+    assert_equal(@build_1, @project_1.latest_build(true))
   end
 
   def test_should_persist_scm
