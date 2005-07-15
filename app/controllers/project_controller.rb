@@ -29,7 +29,7 @@ class ProjectController < ApplicationController
   end
   
   def dashboard
-    render :partial => "dashboard"
+    render :partial => "project/dashboard"
   end
   
 private
