@@ -9,16 +9,17 @@
     <tr>
       <td>
       <%
-      link = {:controller => "project", :action => "index"}
+      link = {:controller => "project", :action => "show", :id => project.id}
       if(project.latest_revision)
         link = {:controller => "revision", :action => "show", :id => project.latest_revision.id}
       end
       %>
-      <%= render :partial => "shared/progress", :locals => {:project => project, :link => link} %>
+      <%= render :partial => "summary", :locals => {:project => project, :link => link} %>
       </td>
     </tr>
   <% end %>
   </tbody>
 </table>
-The idea is to show all the projects here. Projects that are currently being built will have a progress bar that updates smoothly with Javascript using setTimeout and an interval of 1 second (no HTTP refresh). The whole section is updated with AJAX every 30 seconds to get more accurate info from the server.
+The idea is to show a condensed overview all the projects here. Projects that are currently being built will have a progress bar that updates smoothly with Javascript using setTimeout and an interval of 1 second (no HTTP refresh). The whole section is updated with AJAX every 30 seconds to get more accurate info from the server. Each project will also show a bulb indicating latest build status, time etc. This is a lot of info, so some js/ajax magic should allow to expand an individual project (or maybe all of them) to see more.
+
 

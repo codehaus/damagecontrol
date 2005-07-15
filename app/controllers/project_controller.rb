@@ -28,6 +28,10 @@ class ProjectController < ApplicationController
     update_or_save(Project.find(@params[:id]))
   end
   
+  def show
+    @project = Project.find(@params[:id])
+  end
+  
   def dashboard
   end
   
