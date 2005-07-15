@@ -14,7 +14,7 @@
       <div class="revision-message">
         <b><%= @revision.developer %></b>
         (<%= @revision.timepoint %>)<br/>
-        @project.tracker.highlight(@revision.message)
+        <%= textilize(@revision.message) %>
       </div>
     </td>
   </tr>
