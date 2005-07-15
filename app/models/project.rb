@@ -61,7 +61,7 @@ LIMIT 1
     if(build.successful?)
       logger.info "Requesting build of dependant projects of #{name}: #{dependants.collect{|p| p.name}.join(',')}" if logger
       dependants.each do |project|
-        project.create_build_request(Build::SUCCESSFUL_DEPENDENCY)
+        project.request_build(Build::SUCCESSFUL_DEPENDENCY)
       end
     end
   end
@@ -73,9 +73,15 @@ LIMIT 1
     end
   end
   
-  def create_build_request(reason)
-    last_revision = revisions[0]
-    last_revision.builds.create(:reason => reason) #if last_revision
+  # Creates a new (pending) build for the latest revision
+  # of this project. Returns the created Build object.
+  def request_build(reason)
+    lr = latest_revision
+    if(lr)
+      lr.request_build(reason)
+    else
+      nil
+    end
   end
   
   def working_copy_dir

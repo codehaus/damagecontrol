@@ -1,0 +1,18 @@
+<table>
+  <thead>
+    <tr>
+      <th>Project</th>
+    </tr>
+  </thead>
+  <tbody>
+  <% @projects.each do |project| %>
+    <tr>
+      <td>
+      <%= render :partial => "shared/progress", :locals => {:project => project} %>
+      </td>
+    </tr>
+  <% end %>
+  </tbody>
+</table>
+The idea is to show all the projects here. Projects that are currently being built will have a progress bar that updates smoothly with Javascript using setTimeout and an interval of 1 second (no HTTP refresh). The whole section is updated with AJAX every 30 seconds to get more accurate info from the server.
+

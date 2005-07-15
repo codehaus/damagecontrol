@@ -1,0 +1,27 @@
+.progress-bg {
+  background-color: #FFFFFF;
+  border-color:#FF0000;
+  border-width:1;
+  border-style:solid;
+  position:relative;
+  height:14px;
+  width:100%;
+}
+
+.progress {
+  background-color:#33FF33;
+  position:relative;
+  top:-15px;
+  left:1px;
+  height:14px;
+  width:0%;
+}
+
+.progress-text {
+  position:relative;
+  top:-30px;
+  left:1px;
+  height:14px;
+  width:30px;
+  white-space:nowrap;
+}

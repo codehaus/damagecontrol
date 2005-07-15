@@ -13,16 +13,16 @@
     <td colspan="3" class="revision">
       <div class="revision-message">
         <b><%= @revision.developer %></b>
-        (<%= @revision.time.to_human %> UTC)<br/>
-        <%= @project.tracker.highlight(@revision.message) %>
+        (<%= @revision.timepoint %>)<br/>
+        @project.tracker.highlight(@revision.message)
       </div>
     </td>
   </tr>
   <%
-  @revision.each_with_index do |file, i|
+  @revision.revision_files.each_with_index do |file, i|
   %>
     <tr>
-      <td width="5%"><%= image_tag(file.icon, :alt => file.description) %></td>
+      <td width="5%"><%= image_tag(file.small_image) %></td>
       <td width="5%"><%= file.native_revision_identifier %></td>
       <td width="90%">
         <%= link_to_remote(
