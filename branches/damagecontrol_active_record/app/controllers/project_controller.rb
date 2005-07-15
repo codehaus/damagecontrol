@@ -1,5 +1,5 @@
 class ProjectController < ApplicationController
-  layout "default", :except => :dashboard
+  layout "application", :except => :dashboard
   
   def index
   end
@@ -26,14 +26,6 @@ class ProjectController < ApplicationController
 
   def update
     update_or_save(Project.find(@params[:id]))
-  end
-  
-  def show
-    @project = Project.find(@params[:id])
-    @revisions = @project.revisions
-    @template_for_left_column = "revision/list"
-    @revision = @project.latest_revision
-    render "revision/show"
   end
   
   def dashboard

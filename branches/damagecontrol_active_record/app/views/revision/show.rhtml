@@ -33,7 +33,7 @@
                 :url => { 
                   :controller => "scm", 
                   :action => "diff_with_previous", 
-                  :id => @project.name, 
+                  :id => @revision.project.name, 
                   :params => {
                     "revision_identifier" => @revision.identifier, 
                     "file_index" => i
