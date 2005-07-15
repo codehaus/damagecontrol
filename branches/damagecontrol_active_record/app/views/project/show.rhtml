@@ -1,6 +1,1 @@
-<%= periodically_call_remote(
-  :update => "revisions", 
-  :url => {:controller => "revision", :action => "list", :id => @project.id},
-  :frequency => 5
-) %>
-<div id="revisions">Loading revisions...</div>
+<h1><%= @project.name %></h1>

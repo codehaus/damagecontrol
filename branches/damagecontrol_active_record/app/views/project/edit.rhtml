@@ -11,10 +11,10 @@ toplevelTabIds = ["project", "scms", "publishers", "trackers"];
   </tr>
 </table>
 
-<%= form_tag(:controller => "project", :action => "update", :id => @project.id) %>
+<%= form_tag(:controller => "project", :action => @submit_action, :id => @project.id) %>
 <div id="project" style="display:block"><%= render_partial("project", @project) %></div>
 <div id="scms" style="display:none"><%= select_pane("scms", @project.scm) %></div>
 <div id="publishers" style="display:none">PUB</div>
 <div id="trackers" style="display:none">TRACK</div>
-<%= submit_tag("Save changes") %>
+<%= submit_tag(@submit_text) %>
 </form>

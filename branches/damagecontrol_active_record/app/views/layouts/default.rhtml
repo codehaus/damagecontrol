@@ -23,6 +23,30 @@
   <p>
   <%= link_to "New Project", :controller => "project", :action => "new" %>
   </p>
-	<%= @content_for_layout %>
+
+  <table width="100%">
+    <tr>
+      <td width="10%">
+        <% if(@template_for_left_column) %>
+          <%= render(@template_for_left_column) %>
+        <% else %>
+        TODO: assign @template_for_left_column to have it rendered here!
+        <% end %>
+      </td>
+      <td width="80%">
+        <%= @content_for_layout %>
+      </td>
+      <td width="10%">
+        <%= periodically_call_remote(
+          :frequency => 30,
+          :update => "dashboard",
+          :url => {:controller => "project", :action => "dashboard"}
+        ) %>
+        <div id="dashboard">
+          <%= render :partial => "dashboard" %>
+        </div>
+      </td>
+    </tr>
+  </table>
 </body>
 </html>

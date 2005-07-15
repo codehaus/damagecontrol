@@ -65,7 +65,7 @@ class Build < ActiveRecord::Base
   
   # Alias for +revision.project+ (mainly to simplify testing,
   # since it reduces coupling)
-  def project :nodoc:
+  def project #:nodoc:
     self.revision.project
   end
 

@@ -30,6 +30,11 @@ class Revision < ActiveRecord::Base
     logger.info "Done Syncing working copy for #{project.name} with revision #{identifier}" if logger
   end
 
+  # Creates a new (pending) build for this revision
+  # Returns the created Build object.
+  def request_build(reason)
+    builds.create(:reason => reason)
+  end
 end
 
 # Adaptation to make it possible to create an AR Revision
