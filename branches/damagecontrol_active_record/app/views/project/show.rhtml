@@ -1,0 +1,16 @@
+<h1><%= @project.name %></h1>
+No revisions detected yet. Possible causes:
+<ul>
+  <li>Daemon might not be running (webapp should detect this with a ping)</li>
+  <li>Nothing changed in SCM since project's start date (<%= @project.start_time %>)</li>
+  <li>SCM location misconfigured (webapp or daemon should detect this and show it)</li>
+  <li>DC doesn't have the right permissions to check out from the SCM</li>
+  <li>Daemon is currently looking for revisions (should show up in dashboard as current status)</li>
+  <li>This project is configured to use SCM trigged builds (ehm, not implemented yet), and the trigger is broken. Possible causes would be:
+    <ul>
+      <li>SCM machine can't reach the daemon process running on [ip:port] (HTTP POST via curl)</li>
+      <li>The trigger is badly configured (we should show it here)</li>
+    </ul>
+  </li>
+</ul>
+All of these should link to a troubleshooting page (integrated with DC of course)
