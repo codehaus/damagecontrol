@@ -9,7 +9,11 @@ class Publisher < ActiveRecord::Base
   # Publishes +build+ to our delegate if +build+'s state is
   # among our +enabling_states+.
   def publish(build)
-    if(enabling_states.collect{|state| state.class}.index(build.state.class))
+    state_classes = enabling_states.collect do |state| 
+      state.class
+    end
+    should_publish = state_classes.index(build.state.class)
+    if(should_publish)
       delegate.publish(build)
     end
   end

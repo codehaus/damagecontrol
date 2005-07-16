@@ -26,25 +26,19 @@
 
   <table width="100%">
     <tr>
-      <td width="10%">
+      <td width="20%">
         <% if(@template_for_left_column) %>
           <%= render(@template_for_left_column) %>
         <% else %>
         TODO: assign @template_for_left_column to have it rendered here!
         <% end %>
       </td>
-      <td width="80%">
+      <td width="60%">
         <%= @content_for_layout %>
       </td>
-      <td width="10%">
-        <%= periodically_call_remote(
-          :frequency => 30,
-          :update => "dashboard",
-          :url => {:controller => "project", :action => "dashboard"}
-        ) %>
-        <div id="dashboard">
-          <%= render "project/dashboard" %>
-        </div>
+      <td width="20%">
+        <% @project_list_refresh = true %>
+        <%= render("project/list") %>
       </td>
     </tr>
   </table>

@@ -36,7 +36,26 @@ class Build < ActiveRecord::Base
 end
 
 class RevisionFile < ActiveRecord::Base
-  def small_image
-    "green-32.gif"
+  IMAGES = {
+    RSCM::RevisionFile::ADDED => "document_new",
+    RSCM::RevisionFile::DELETED => "document_delete",
+    RSCM::RevisionFile::MODIFIED => "document_edit",
+    RSCM::RevisionFile::MOVED => "document_exchange"
+  }
+  
+  DESCRIPTIONS = {
+    RSCM::RevisionFile::ADDED => "New file",
+    RSCM::RevisionFile::DELETED => "Deleted file",
+    RSCM::RevisionFile::MODIFIED => "Modified file",
+    RSCM::RevisionFile::MOVED => "Moved file"
+  }
+  
+  def image
+    IMAGES[status]
   end
+  
+  def status_description
+    DESCRIPTIONS[status]
+  end
+
 end

@@ -1,15 +1,26 @@
-<table>
-<% @revisions.each do |revision| %>
-  <tr>
-    <td nowrap="nowrap">
-      <%= link_to(revision.identifier, :controller => "revision", :action => "show", :id => revision.id) %>
-    </td>
-    <td width="100%">
-      <% revision.builds.each do |build| %>
-        <%= link_to(image_tag(build.small_image, :border => 0), "http://www.example.com") %>
-      <% end %>
-    </td>
-  </tr>
-<% end %>
-</table>
+<div id="revisions">
+  <table>
+  <% @revisions.each do |revision| %>
+    <tr>
+      <td nowrap="nowrap">
+        <%= link_to(revision.identifier, :controller => "revision", :action => "show", :id => revision.id) %>
+      </td>
+      <td>
+        <% revision.builds.each do |build| %>
+          <%= link_to(image_tag(build.small_image, :border => 0), 
+                :controller => "build", :action => "show", :id => build.id) %>
+        <% end %>
+      </td>
+    </tr>
+  <% end %>
+  </table>
+</div>
 
+<% if(@revision_list_refresh) %>
+  <%= periodically_call_remote(
+    :update => "revisions",
+    :url => {:controller => "revision", :action => "list", :id => @project.id},
+    :frequency => 29, # prime increases dispersion
+    :failure => "alert('AJAX problem for revision/list/#{@project.id}')"
+  ) %>
+<% end %>
