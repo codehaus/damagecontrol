@@ -7,7 +7,8 @@ class ProjectController; def rescue_action(e) raise e end; end
 class ProjectControllerTest < Test::Unit::TestCase
   def setup
     @controller = ProjectController.new
-    @request, @response = ActionController::TestRequest.new, ActionController::TestResponse.new
+    @request    = ActionController::TestRequest.new
+    @response   = ActionController::TestResponse.new
   end
 
   def test_should_select_scm_on_edit

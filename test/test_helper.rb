@@ -1,3 +1,4 @@
+# We redefine DAMAGECONTROL_HOME here so that files go into target. Ignore warnings.
 DAMAGECONTROL_HOME = File.expand_path(__FILE__ + "/../../target")
 require File.dirname(__FILE__) + "/../config/dc_environment"
 require 'rscm/mockit'

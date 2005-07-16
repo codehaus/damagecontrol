@@ -8,23 +8,24 @@
 ) %>
 </div>
 </p>
-<table class="pane">
-  <tr class="pane">
-    <td colspan="3" class="revision">
-      <div class="revision-message">
-        <b><%= @revision.developer %></b>
-        (<%= @revision.timepoint %>)<br/>
-        <%= textilize(@revision.message) %>
-      </div>
-    </td>
-  </tr>
+
+<div>
+  <b><%= @revision.developer %></b>
+  (<%= @revision.timepoint %>)<br/>
+  <%= textilize(@revision.message) %>
+</div>
+
+<table>
   <%
+  show_native_file_revision = !@revision.project.scm.transactional?
   @revision.revision_files.each_with_index do |file, i|
   %>
     <tr>
-      <td width="5%"><%= image_tag(file.small_image) %></td>
-      <td width="5%"><%= file.native_revision_identifier %></td>
-      <td width="90%">
+      <% if(show_native_file_revision) %>
+        <td><%= file.native_revision_identifier %></td>
+      <% end %>
+      <td><%= image_tag(file.image, :size => "16x16", :title => file.status_description) %></td>
+      <td>
         <%= link_to_remote(
               file.path, {
                 :update => "diff_#{i}", 
@@ -42,7 +43,7 @@
               },
               {"id" => "diff_link_#{i}"}
             ) %>
-        <div style="display:none;" id="diff_<%=i%>"><%= image_tag("spinner.gif") %> Loading diff...</div>
+        <div style="display:none;" id="diff_<%=i%>"><%= image_tag("spinner.gif") %> Loading diff... (THIS IS CURRENTLY BROKEN. FIXME!)</div>
       </td>
     </tr>
   <% end %>

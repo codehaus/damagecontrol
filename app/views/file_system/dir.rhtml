@@ -1,0 +1,5 @@
+<div class="file_system">
+<% @dir.files.each do |file| %>
+  <div><a href="/artifacts/<%= file.path.join('/') %>"></a></div>
+<% end %>
+</div>

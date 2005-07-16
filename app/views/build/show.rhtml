@@ -1,0 +1,39 @@
+<table>
+  <tbody>
+  <tr>
+    <td>Reason:</td>
+    <td><%= @build.reason %></td>
+  </tr>
+  <tr>
+    <td>Command:</td>
+    <td><%= @build.command %></td>
+  </tr>
+  <tr>
+    <td>Environment variables set by DamageControl:</td>
+    <td><%= @build.env.inspect %></td>
+  </tr>
+  <tr>
+    <td>Status:</td>
+    <td><%= @build.state.description %></td>
+  </tr>
+  <tr>
+    <td>Exit status:</td>
+    <td><%= @build.exitstatus %></td>
+  </tr>
+  <tr>
+    <td>Duration:</td>
+    <td><%= @build.duration %> seconds</td>
+  </tr>
+  <tr>
+    <td>When:</td>
+    <td><%= (Time.now.utc - @build.end_time).to_i %> seconds ago</td>
+  </tr>
+  <tr>
+    <td>Artifacts:</td>
+    <td><%= @build.artifacts.collect{ |a| a.link }.join("<br>\n") %></td>
+  </tr>
+  </tbody>
+</table>
+
+<%= link_to("Standard out", :action => "stdout", :id => @build.id) %> |
+<%= link_to("Standard error", :action => "stderr", :id => @build.id) %>

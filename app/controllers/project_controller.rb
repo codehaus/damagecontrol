@@ -1,5 +1,5 @@
 class ProjectController < ApplicationController
-  layout "application", :except => :dashboard
+  layout "application", :except => :list
   
   def index
   end
@@ -32,7 +32,7 @@ class ProjectController < ApplicationController
     @project = Project.find(@params[:id])
   end
   
-  def dashboard
+  def list
   end
   
 private
