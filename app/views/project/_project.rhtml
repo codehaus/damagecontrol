@@ -1,28 +1,18 @@
 <table>
   <tr>
-    <td class="attribute-description">Project name</td>
+    <td>Project name</td>
     <td><%= text_field("project", "name") %></td>
   </tr>
   <tr>
-    <td class="attribute-description">Build command</td>
+    <td>Build command</td>
     <td><%= text_field("project", "build_command") %></td>
   </tr>
   <tr>
-    <td class="attribute-description">Relative build path</td>
+    <td>Relative build path</td>
     <td><%= text_field("project", "relative_build_path") %></td>
   </tr>
   <tr>
-    <td class="attribute-description">Home page</td>
+    <td>Home page</td>
     <td><%= text_field("project", "home_page") %></td>
-  </tr>
-  <tr>
-    <td>Start date</td>
-    <td>
-      <table>
-        <tr>
-          <td>calendar(:name => "project[start_time]", :time => project.start_time ? project.start_time : Time.new.utc)</td>
-        </tr>
-      </table>
-    </td>
   </tr>
 </table>

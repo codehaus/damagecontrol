@@ -1,12 +1,9 @@
 <h1><%= @revision.project.name %> revision <%= @revision.identifier %></h1>
 <p>
-<div id="request_build">
 <%= link_to_remote(
-	"Schedule new build for this revision",
-	:update => "request_build",
-	:url => {:controller => "build", :action => "request_build", :id => @revision.project.name, :params => {"revision" => @revision.identifier, "reason" => "Manually triggered via web interface"}}
+	"Request build for this revision",
+	:url => {:controller => "revision", :action => "build", :id => @revision.id}
 ) %>
-</div>
 </p>
 
 <div>

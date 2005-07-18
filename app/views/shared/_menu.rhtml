@@ -1,0 +1,13 @@
+<div id="root" style="display:block">
+  <table>
+    <% rows.each do |row| %>
+      <tr>
+        <% row.each do |object| %>
+          <td>
+            <%= link_to_function(image_tag(object.icon, :size=>"48x48", :border=>0), "settings.show('#{object.class.name}')") %>
+          </td>
+        <% end %>
+      </tr>
+    <% end %>
+  </table>
+</div>

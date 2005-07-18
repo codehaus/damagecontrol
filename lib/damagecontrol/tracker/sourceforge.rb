@@ -21,10 +21,6 @@ module DamageControl
         @group_id, @tracker_id = "", ""
       end
 
-      def name
-        "SourceForge"
-      end
-
       def url
         "http://sourceforge.net/tracker/?group_id=#{group_id}"
       end

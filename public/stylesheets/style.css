@@ -1,3 +1,14 @@
+#prefs div {
+  border-color:#FF0000;
+  border-width:1;
+  border-style:solid;
+  position:absolute;
+  top:100px;
+  left:200px;
+  height:400px;
+  width:400px;
+}
+
 .progress-bg {
   background-color: #FFFFFF;
   border-color:#FF0000;

@@ -21,10 +21,6 @@ module DamageControl
                       "group_id=426&amp;atid=1698"
       attr_accessor :tracker_id
 
-      def name
-        "RubyForge"
-      end
-
       def url
         "http://rubyforge.org/tracker/?group_id=#{group_id}"
       end

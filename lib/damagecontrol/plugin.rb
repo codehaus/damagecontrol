@@ -1,7 +1,7 @@
 module DamageControl
   # Base class for plugins. Each plugin family should subclass this class, and each
   # plugin in that family should extend that class.
-  class ClassList
+  class Plugin
     cattr_accessor :logger
 
     def self.become_parent
@@ -19,7 +19,10 @@ module DamageControl
       end
     end
     
-    # 
+    def name
+      self.class.name.demodulize
+    end
+    
     def htmlize(str)
       str.gsub(/\n/, "<br/>")
     end

@@ -20,10 +20,6 @@ module DamageControl
         @project_id = ""
       end
 
-      def name
-        "JIRA"
-      end
-
       def url
         "#{RSCM::PathConverter.ensure_trailing_slash(baseurl)}browse/#{project_id}"
       end
