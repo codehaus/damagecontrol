@@ -6,7 +6,7 @@ module DamageControl
       fixtures :revisions, :revision_files
       
       def setup
-        @trac = DamageControl::ScmWeb::Trac.new
+        @trac = Trac.new
         @trac.changeset_url = "http://dev.rubyonrails.com/changeset"
       end
 

@@ -20,10 +20,6 @@ module DamageControl
         @module_key = ""
       end
 
-      def name
-        "Scarab"
-      end
-
       def url
         baseurl
       end

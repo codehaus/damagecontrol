@@ -6,18 +6,21 @@ class ProjectController < ApplicationController
 
   def new
     @project = Project.new
-    define_scms(@project)
+    @project.scm = RSCM::Cvs.new
+    define_plugins
+
     @submit_action = "create"
     @submit_text = "Create project"
-    render :action => "edit"
+    render :action => "settings"
   end
 
   def edit
     @project = Project.find(@params[:id])
-    define_scms(@project)
+    define_plugins
+
     @submit_action = "update"
     @submit_text = "Update project"
-    render :action => "edit"
+    render :action => "settings"
   end
 
   def create
@@ -45,9 +48,20 @@ private
     redirect_to :action => "edit", :id => project.id
   end
 
-  def define_scms(project)
+  def define_plugins
+    define_scms
+    @publishers = DamageControl::Publisher::Base.classes.collect{|cls| cls.new}
+    @trackers = DamageControl::Tracker::Base.classes.collect{|cls| cls.new}
+    @scm_webs = DamageControl::ScmWeb::Base.classes.collect{|cls| cls.new}
+    
+    @rows = [[@project], @scms, @publishers, @trackers, @scm_webs]
+  end
+
+  # Instantiates all known SCMs. The project's persisted scm
+  # will also be among these, and will have the persisted attribute values.
+  def define_scms
     scms = RSCM::Base.classes.collect{|cls| cls.new}
-    @scms = scms.collect{|scm| scm.class == project.scm.class ? project.scm : scm}
+    @scms = scms.collect{|scm| scm.class == @project.scm.class ? @project.scm : scm}
   end
 
 end

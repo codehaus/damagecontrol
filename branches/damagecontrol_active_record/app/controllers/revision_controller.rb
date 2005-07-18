@@ -16,4 +16,10 @@ class RevisionController < ApplicationController
     @template_for_left_column = "revision/list"
   end
 
+  # Requests a build. Nothing is rendered.
+  def build
+    @revision = Revision.find(@params[:id])
+    @revision.request_build(Build::MANUALLY_TRIGGERED)
+    render :nothing => true
+  end
 end

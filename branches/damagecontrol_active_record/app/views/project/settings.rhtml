@@ -1,0 +1,22 @@
+<script type="text/javascript">
+var settings = new Settings("root");
+</script>
+<%= link_to_function(image_tag("wrench"), "settings.show('root')") %>
+
+<%= form_tag(:controller => "project", :action => @submit_action, :id => @project.id) %>
+<div id="settings">
+  <%= render :partial => "shared/menu", :locals => {:rows => @rows} %>
+  <% @rows.each do |row| %>
+    <% row.each do |object| %>
+      <div id="<%= object.class.name %>" style="display:none;">
+        <% if(has_template(object.family, object)) %>
+          <%= render :partial => template_for(object.family, object), :locals => {:object => object} %>
+        <% else %>
+          <%= render_object_with_name(object, "#{object.family}[#{object.class.name}]") %>
+        <% end %>
+      </div>
+    <% end %>
+  <% end %>
+</div>
+<%= submit_tag(@submit_text) %>
+</form>

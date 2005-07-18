@@ -8,7 +8,7 @@ module DamageControl
       end
       
       ann :description => "Base URL"
-      ann :tip => "The URL of the Scarab installation."
+      ann :tip => "The URL of the FogBugz installation."
       attr_accessor :url
 
       def initialize

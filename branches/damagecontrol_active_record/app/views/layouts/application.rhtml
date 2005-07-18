@@ -10,12 +10,12 @@
     "prototype",
 #    "control",
 #    "dragdrop",
-#    "effects",
+    "effects",
 #    "rico"
-		"/javascripts/jscalendar/calendar",
-		"/javascripts/jscalendar/calendar-setup.js",		
-		"/javascripts/jscalendar/lang/calendar-en.js",
-		"dateformat",
+#		"/javascripts/jscalendar/calendar",
+#		"/javascripts/jscalendar/calendar-setup.js",		
+#		"/javascripts/jscalendar/lang/calendar-en.js",
+#		"dateformat",
 		"damagecontrol"
 	) %>
 </head>
@@ -28,7 +28,7 @@
     <tr>
       <td width="20%">
         <% if(@template_for_left_column) %>
-          <%= render(@template_for_left_column) %>
+          render(@template_for_left_column)
         <% else %>
         TODO: assign @template_for_left_column to have it rendered here!
         <% end %>
@@ -38,7 +38,7 @@
       </td>
       <td width="20%">
         <% @project_list_refresh = true %>
-        <%= render("project/list") %>
+        render("project/list")
       </td>
     </tr>
   </table>

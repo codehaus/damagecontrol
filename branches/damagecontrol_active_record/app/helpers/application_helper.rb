@@ -43,16 +43,80 @@ module ApplicationHelper
            :locals => {:js_function => js_function, :js_format => js_format, :js_date => js_date, :options => options}
   end
   
-  # Renders a pane (div) with a combo (select) that will
-  # Show one of the objects in the array (which are rendered with render_object).
-  # If one of the objects in the array respond to selected? and return true,
-  # it is preselected in the combo.
+  # Renders a pane (div) with a combo (select) that contains the objects.
+  # There will be a div for each object, rendered by render_object, or by a
+  # custom Erb template if one exists.
   def select_pane(objects_name, selected)
     objects = instance_variable_get("@#{objects_name}") 
     render :partial => 'shared/select_pane', 
            :locals => {:objects_name => objects_name, :objects => objects, :selected => selected}
   end
 
+  def has_template(objects_name, object)
+    template_file = File.expand_path(RAILS_ROOT + 
+      "/app/views/#{objects_name}/_#{object.class.name.demodulize.underscore}.rhtml")
+    File.exist?(template_file)
+  end
+  
+  def template_for(objects_name, object)
+    template_name = "#{objects_name}/#{object.class.name.demodulize.underscore}"
+  end
+end
+
+########### Add methods required by view ########### 
+
+class Project < ActiveRecord::Base
+  def icon
+    "goldbar"
+  end
+  
+  def family
+    ""
+  end
+end
+
+module RSCM
+  class Base
+    def icon
+      "/images/#{family}/#{self.class.name.demodulize.underscore}.png"
+    end
+    
+    def family
+      "scm"
+    end
+  end
+end
+
+module DamageControl
+  class Plugin
+    def icon
+      "/images/#{family}/#{self.class.name.demodulize.underscore}.png"
+    end
+  end
+  
+  module Publisher
+    class Base
+      def family
+        "publisher"
+      end
+    end
+  end
+
+  module Tracker
+    class Base
+      def family
+        "tracker"
+      end
+    end
+  end
+
+  module ScmWeb
+    class Base
+      def family
+        "scm_web"
+      end
+    end
+  end
 end
 
 

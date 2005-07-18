@@ -1,6 +1,6 @@
 module DamageControl
   module ScmWeb
-    class Base < ClassList
+    class Base < Plugin
       become_parent
     end
   end

@@ -115,12 +115,12 @@ var cvs_mod_tip  = "<div class='tp1'>Note that you can't use trigged build if yo
   <tr>
     <td width="25%" class="setting-name">CVSROOT</td>
     <td>&nbsp;</td>
-    <td width="75%"><%= text_or_input(@edit, :name => "scms[RSCM::Cvs][@root]", :value => cvs.root, :onKeyUp => "cvs_init()", :id => "cvsroot") %></td>
+    <td width="75%"><%= tag("input", :name => "scms[RSCM::Cvs][root]", :value => object.root, :onkeyup => "cvs_init()", :id => "cvsroot") %></td>
   </tr>
-<% if(@edit) %>
+<% if(true) %>
   <tr>
     <td>Protocol</td>
-    <td><%= tip(:txt => 'cvs_protocol_tip') %></td>
+    <td>&nbsp;</td>
     <td>
       <select class="setting-input" id="cvsprotocol" onchange="updateCvsRootField()">
         <option value=""></option>
@@ -133,38 +133,38 @@ var cvs_mod_tip  = "<div class='tp1'>Note that you can't use trigged build if yo
   <tr>
     <td>User name</td>
     <td>&nbsp;</td>
-    <td width="75%"><%= text_or_input(@edit, :onKeyUp => "updateCvsRootField()", :onblur => "updateCvsRootField()", :id => "cvsuser") %></td>
+    <td width="75%"><%= tag("input", :onkeyup => "updateCvsRootField()", :onblur => "updateCvsRootField()", :id => "cvsuser") %></td>
   </tr>
   <tr>
     <td>Password</td>
-    <td><%= tip(:txt => 'scm_password_tip') %></td>
-    <td width="75%"><%= text_or_input(@edit, :type => "password", :name => "scms[RSCM::Cvs][@password]", :value => cvs.password, :onKeyUp => "updateCvsRootField()", :onblur => "updateCvsRootField()", :id => "cvspassword") %></td>
+    <td>&nbsp;</td>
+    <td width="75%"><%= tag("input", :type => "password", :name => "scms[RSCM::Cvs][password]", :value => object.password, :onkeyup => "updateCvsRootField()", :onblur => "updateCvsRootField()", :id => "cvspassword") %></td>
   </tr>
   <tr>
     <td>Server</td>
     <td>&nbsp;</td>
-    <td width="75%"><%= text_or_input(@edit, :onKeyUp => "updateCvsRootField()", :onblur => "updateCvsRootField()", :id => "cvsserver") %></td>
+    <td width="75%"><%= tag("input", :onkeyup => "updateCvsRootField()", :onblur => "updateCvsRootField()", :id => "cvsserver") %></td>
   </tr>
   <tr>
     <td>Port</td>
     <td>&nbsp;</td>
-    <td width="75%"><%= text_or_input(@edit, :onKeyUp => "updateCvsRootField()", :onblur => "updateCvsRootField()", :id => "cvsport") %></td>
+    <td width="75%"><%= tag("input", :onkeyup => "updateCvsRootField()", :onblur => "updateCvsRootField()", :id => "cvsport") %></td>
   </tr>
   <tr>
     <td>Repository directory</td>
     <td>&nbsp;</td>
-    <td width="75%"><%= text_or_input(@edit, :onKeyUp => "updateCvsRootField()", :onblur => "updateCvsRootField()", :id => "cvsrepodir") %></td>
+    <td width="75%"><%= tag("input", :onKeyUp => "updateCvsRootField()", :onblur => "updateCvsRootField()", :id => "cvsrepodir") %></td>
   </tr>
 <% end %>
   <tr>
     <td>Module</td>
     <td>&nbsp;</td>
-    <td width="75%"><%= text_or_input(@edit, :name => "scms[RSCM::Cvs][@mod]", :value => cvs.mod, :id => "cvsmodule") %></td>
+    <td width="75%"><%= tag("input", :name => "scms[RSCM::Cvs][mod]", :value => object.mod, :id => "cvsmodule") %></td>
   </tr>
   <tr>
     <td>Branch</td>
     <td>&nbsp;</td>
-    <td width="75%"><%= text_or_input(@edit, :name => "scms[RSCM::Cvs][@branch]", :value => cvs.branch, :id => "cvsbranch") %></td>
+    <td width="75%"><%= tag("input", :name => "scms[RSCM::Cvs][branch]", :value => object.branch, :id => "cvsbranch") %></td>
   </tr>
 </table>
 

@@ -14,7 +14,7 @@
   </tr>
   <tr>
     <td>Status:</td>
-    <td><%= @build.state.description %></td>
+    <td><%= @build.state_description %></td>
   </tr>
   <tr>
     <td>Exit status:</td>
@@ -26,7 +26,7 @@
   </tr>
   <tr>
     <td>When:</td>
-    <td><%= (Time.now.utc - @build.end_time).to_i %> seconds ago</td>
+    <td><%= @build.seconds_since_end %> seconds ago</td>
   </tr>
   <tr>
     <td>Artifacts:</td>

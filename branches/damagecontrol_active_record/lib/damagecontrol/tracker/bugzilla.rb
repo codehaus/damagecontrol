@@ -15,10 +15,6 @@ module DamageControl
         @url = "http://bugzilla.org/"
       end
       
-      def name
-        "Bugzilla"
-      end
-      
       def highlight(s)
         url = RSCM::PathConverter.ensure_trailing_slash(@url)
         if (url)

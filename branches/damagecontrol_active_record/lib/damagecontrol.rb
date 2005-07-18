@@ -1,5 +1,5 @@
 require 'rscm'
-require 'damagecontrol/class_list'
+require 'damagecontrol/plugin'
 require 'damagecontrol/publisher/base'
 require 'damagecontrol/scm_web/base'
 require 'damagecontrol/tracker/base'

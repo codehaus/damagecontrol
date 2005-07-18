@@ -6,6 +6,7 @@ module DamageControl
       def test_should_load_all_publisher_classes
         expected = [
           Chora,
+          DamageControl,
           Fisheye,
           Trac,
           ViewCvs
