@@ -1,9 +1,12 @@
-*0.2.1*
+= RSCM Changelog
 
-* implemented add method for monotone [srbaker]
+== Version 0.3.0
 
-* Fixed monotone test and added some doco [rinkrank]
+* Removed checkout_dir from all methods. It's now a mandatory attribute on the SCM objects.
 
-* add server and port options to Monotone::initialize [srbaker]
+== Version 0.2.1
 
-* Added changelog file [rinkrank]
+* Implemented add method for monotone
+* Fixed monotone test and added some doco
+* Add server and port options to Monotone::initialize
+* Added changelog file

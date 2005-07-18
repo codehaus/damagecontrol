@@ -1,4 +1,4 @@
-require 'rscm/abstract_scm'
+require 'rscm/base'
 require 'rscm/path_converter'
 require 'rscm/line_editor'
 require 'rscm/scm/cvs_log_parser'
@@ -10,7 +10,7 @@ module RSCM
   # You need a cvs executable on the PATH in order for it to work.
   #
   # NOTE: On Cygwin this has to be the win32 build of cvs and not the Cygwin one.
-  class Cvs < AbstractSCM
+  class Cvs < Base
     register self
 
     ann :description => "CVSROOT"

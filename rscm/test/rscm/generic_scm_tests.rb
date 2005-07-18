@@ -157,7 +157,6 @@ module RSCM
       end
 
       assert(!scm.central_exists?)
-      puts "DONE"
     end
     
     def test_trigger

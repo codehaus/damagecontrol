@@ -4,14 +4,13 @@ require 'rake/testtask'
 require 'rake/rdoctask'
 require 'rake/packagetask'
 require 'rake/gempackagetask'
-require 'rake/contrib/compositepublisher'
 require 'rake/contrib/sshpublisher'
 require 'rake/contrib/rubyforgepublisher'
-require 'lib/rubyforge_file_publisher'
+require 'xforge'
 
 PKG_BUILD     = ENV['PKG_BUILD'] ? '.' + ENV['PKG_BUILD'] : ''
 PKG_NAME      = 'rscm'
-PKG_VERSION   = '0.2.1' + PKG_BUILD
+PKG_VERSION   = '0.3.0' + PKG_BUILD
 PKG_FILE_NAME = "#{PKG_NAME}-#{PKG_VERSION}"
 
 desc "Default Task"
@@ -26,7 +25,7 @@ fl.exclude('test/**/monotone*.rb') # Incomplete/unsupported for now - reactivate
 fl.exclude('test/**/clearcase*.rb')    # Incomplete/unsupported for now - reactivate when more complete!
 fl.exclude('test/**/darcs*.rb')    # Incomplete/unsupported for now - reactivate when more complete!
 #fl.exclude('test/**/perforce*.rb') # Incomplete/unsupported for now - reactivate when more complete!
-fl.exclude('test/**/p4client*.rb') # Incomplete/unsupported for now - reactivate when more complete!
+#fl.exclude('test/**/p4client*.rb') # Incomplete/unsupported for now - reactivate when more complete!
 fl.exclude('test/**/starteam*.rb') # Too bloody hard to test without a StarTeam server license! Tested ad-hoc.
 Rake::TestTask.new { |t|
   t.libs << "test"
@@ -111,29 +110,24 @@ else
   end
 end
 
-task :publish => [:rdoc] do
-  publisher = Rake::CompositePublisher.new
-  publisher.add Rake::RubyForgePublisher.new('rscm', 'aslak_hellesoy')
+task :release => [:publish_doc, :publish_files]
+
+task :publish_files => [:gem] do
+  release_files = FileList[
+    "pkg/#{PKG_FILE_NAME}.gem", 
+    "CHANGELOG"
+  ]
+
+  Rake::XForge::Release.new(PKG_NAME) do |xf|
+    # Never hardcode user name and password in the Rakefile!
+    xf.user_name = ENV['RUBYFORGE_USER']
+    xf.password = ENV['RUBYFORGE_PASSWORD']
+    xf.files = release_files.to_a
+    xf.release_name = "XForge #{PKG_VERSION}"
+  end
+end
+
+task :publish_doc => [:rdoc] do
+  publisher = Rake::RubyForgePublisher.new('rscm', 'aslak_hellesoy')
   publisher.upload
-
-#  RUBYFORGE_GROUP_ID = 490
-#  RUBYFORGE_PACKAGE_ID = 552
-#  RUBYFORGE_RELEASE_NAME = "rakedrelease"
-#
-#  Rake::RubyForgeFilePublisher.new(
-#    RUBYFORGE_GROUP_ID, 
-#    "aslak_hellesoy", 
-#    "README",
-#    #"pkg/#{PKG_FILE_NAME}.gem", 
-#    RUBYFORGE_PACKAGE_ID,
-#    RUBYFORGE_RELEASE_NAME
-#  ) do |p|
-#    p.type_id = 8100
-#    p.processor_id = 2000
-#    p.preformatted = 1
-#    p.release_name = "come on"
-#    p.release_changes = "now"
-#    p.release_date = Time.utc(2005, 2, 19, 23, 42, 0)
-#  end
-
 end

@@ -1,4 +1,4 @@
-require 'rscm/abstract_scm'
+require 'rscm/base'
 require 'rscm/path_converter'
 require 'rscm/line_editor'
 require 'rscm/scm/subversion_log_parser'
@@ -10,7 +10,7 @@ module RSCM
   # You need the svn/svnadmin executable on the PATH in order for it to work.
   #
   # NOTE: On Cygwin these have to be the win32 builds of svn/svnadmin and not the Cygwin ones.
-  class Subversion < AbstractSCM
+  class Subversion < Base
     register self
 
     include FileUtils

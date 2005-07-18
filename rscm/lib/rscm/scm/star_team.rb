@@ -1,7 +1,7 @@
 require 'fileutils'
 require 'tempfile'
 require 'rscm/revision'
-require 'rscm/abstract_scm'
+require 'rscm/base'
 require 'yaml'
 
 class Time
@@ -17,7 +17,7 @@ module RSCM
   # * StarTeam SDK
   # * Apache Ant (http://ant.apache.org/)
   #
-  class StarTeam < AbstractSCM
+  class StarTeam < Base
     #register self
 
     ann :description => "User name"

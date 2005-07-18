@@ -1,4 +1,4 @@
-require 'rscm/abstract_scm'
+require 'rscm/base'
 require 'rscm/path_converter'
 require 'rscm/line_editor'
 
@@ -14,7 +14,7 @@ module RSCM
   # Understands operations against multiple client-workspaces
   # You need the p4/p4d executable on the PATH in order for it to work.
   #
-  class Perforce < AbstractSCM
+  class Perforce < Base
     register self
 
     include FileUtils
