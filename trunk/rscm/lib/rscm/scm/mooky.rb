@@ -1,7 +1,7 @@
-require 'rscm/abstract_scm'
+require 'rscm/base'
 
 module RSCM
-  class Mooky < AbstractSCM
+  class Mooky < Base
     #register self
 
     ann :description => "The Foo", :tip => "Foo is nonsense"

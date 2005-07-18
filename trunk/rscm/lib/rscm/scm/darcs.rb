@@ -3,7 +3,7 @@ require 'fileutils'
 require 'rscm'
 
 module RSCM
-  class Darcs < AbstractSCM
+  class Darcs < Base
     #register self
 
     ann :description => "Directory"

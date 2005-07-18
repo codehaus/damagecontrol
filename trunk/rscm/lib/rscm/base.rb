@@ -51,7 +51,7 @@ module RSCM
   #
   # TODO: rename this superclass to 'Base'
   #
-  class AbstractSCM
+  class Base
     include FileUtils
 
     @@classes = []
@@ -64,7 +64,7 @@ module RSCM
 
     # Load all sources under scm, so SCM classes can register themselves
     Dir[File.dirname(__FILE__) + "/scm/*.rb"].each do |src|
-      load(src)
+      require src
     end
 
 
@@ -138,12 +138,6 @@ module RSCM
       self.class.name
     end
 
-    # Gets the label for the working copy currently checked out in +checkout_dir+.
-    #
-    def label
-      # TODO: what do we need this for? If we need it, rename to revision?
-    end
-
     # Open a file for edit - required by scms that checkout files in read-only mode e.g. perforce
     #
     def edit(file)
@@ -196,11 +190,11 @@ module RSCM
       # Should be overridden by subclasses
       revisions = Revisions.new
       revisions.add(
-        Change.new(
+        Revision.new(
           "up/the/chimney",
-          Change::DELETED,
+          Revision::DELETED,
           "DamageControl",
-          "The #{name} SCM class doesn't\n" +
+          "The #{name} class doesn't\n" +
             "correctly implement the revisions method. This is\n" +
             "not a real revision, but a hint to the developer to go and implement it.\n\n" +
             "Do It Now!",

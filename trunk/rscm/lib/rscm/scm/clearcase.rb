@@ -1,9 +1,9 @@
-require 'rscm/abstract_scm'
+require 'rscm/base'
 require 'rscm/path_converter'
 require 'fileutils'
 
 module RSCM
-  class ClearCase < AbstractSCM
+  class ClearCase < Base
   
     LOG_FORMAT = "Developer:%u\\nTime:%Nd\\nExtendedName:%Xn\\nVersionId:%Vn\\nPreviousVersionId:%PVn\\nElementName:%En\\nOID:%On\\nO:%o\\nMessage:%Nc\\n------------------------------------------\\n"
   

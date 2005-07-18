@@ -3,7 +3,7 @@ require 'fileutils'
 require 'rscm'
 
 module RSCM
-  class Monotone < AbstractSCM
+  class Monotone < Base
     register self
 
     ann :description => "Database file"
