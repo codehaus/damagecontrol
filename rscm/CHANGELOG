@@ -3,6 +3,7 @@
 == Version 0.3.0
 
 * Removed checkout_dir from all methods. It's now a mandatory attribute on the SCM objects.
+* Made logging more pluggable
 
 == Version 0.2.1
 
