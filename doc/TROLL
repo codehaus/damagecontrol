@@ -1,0 +1,46 @@
+== TROLL DSL
+
+TROLL is an attempt to define a domain-specific language for SCM commit messages that will ease the integration between SCM management, Issue tracking and Release management.
+
+Some work has already been done on this in Trac. See
+http://projects.edgewall.com/trac/wiki/TracLinks
+http://projects.edgewall.com/trac/file/trunk/contrib/trac-post-commit-hook
+
+Why TROLL? It's a cool name and we have trolls in Norway.
+
+== Linking Issues to SCM Revisions
+
+
+
+== Verifying commit messages
+
+Most SCMs have hooks that can be run prior to a commit. This hook could verify the correctness of a commit message and abort the commit if it's on the wrong format.
+
+== Determining the user
+
+Some SCMs may not be able to identify the user in the precommit. If that's the case, enforce the username in the commit message (DSL). Hopefully this will not be necessary.
+
+NOTE: The RSCM API must be changed to differentiate between pre- and post-commit triggers. Should be easy enough.
+
+== Grammar
+
+command ::= [tracker-update issue-id] | [release release-id]
+
+tracker-update ::= [close | comment]
+
+close ::= ["fixed", "fixes", "closed", "closes"] # Trac
+
+comment ::= ["references", "refs", "addresses", "addressed", "re"] # Trac
+
+# A fairly complicated example of what you can do is with a commit message
+# of:
+#
+#    Changed blah and foo to do this or that. Fixes #10 and #12, and refs #12.
+#
+# This will close #10 and #12, and add a note to #12.
+
+release :: = ["release", "released", "releases"]
+
+issue-id ::= TEXT
+release-id ::= TEXT
+

@@ -14,6 +14,7 @@ module DamageControl
           Growl,
           #Irc,
           Jabber,
+          Sound
           #X10Cm11A,
           #X10Cm17A,
           #Yahoo

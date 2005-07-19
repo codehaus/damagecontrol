@@ -1,6 +1,14 @@
 <div id="root" style="display:block">
   <table>
-    <% rows.each do |row| %>
+    <%
+      max_row_length = rows.collect{|row| row.length}.max 
+      rows.each do |row| 
+    %>
+      <tr>
+        <td colspan="<%= max_row_length %>">
+          <%= row[0].family.pluralize.capitalize %>
+        </td>
+      </tr>
       <tr>
         <% row.each do |object| %>
           <td>
