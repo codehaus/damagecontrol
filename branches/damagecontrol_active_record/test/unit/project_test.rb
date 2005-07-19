@@ -101,7 +101,8 @@ class ProjectTest < Test::Unit::TestCase
       DamageControl::Publisher::Email::Sendmail,
       DamageControl::Publisher::Email::Smtp,
       DamageControl::Publisher::Growl,
-      DamageControl::Publisher::Jabber
+      DamageControl::Publisher::Jabber,
+      DamageControl::Publisher::Sound
     ]
     publisher_classes = project.publishers.collect{|pub| pub.delegate.class}
     assert_equal(expected, publisher_classes)
