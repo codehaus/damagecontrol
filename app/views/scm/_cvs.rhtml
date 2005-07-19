@@ -115,7 +115,7 @@ var cvs_mod_tip  = "<div class='tp1'>Note that you can't use trigged build if yo
   <tr>
     <td width="25%" class="setting-name">CVSROOT</td>
     <td>&nbsp;</td>
-    <td width="75%"><%= tag("input", :name => "scms[RSCM::Cvs][root]", :value => object.root, :onkeyup => "cvs_init()", :id => "cvsroot") %></td>
+    <td width="75%"><%= tag("input", :name => "scm[RSCM::Cvs][root]", :value => object.root, :onkeyup => "cvs_init()", :id => "cvsroot") %></td>
   </tr>
 <% if(true) %>
   <tr>
@@ -138,7 +138,7 @@ var cvs_mod_tip  = "<div class='tp1'>Note that you can't use trigged build if yo
   <tr>
     <td>Password</td>
     <td>&nbsp;</td>
-    <td width="75%"><%= tag("input", :type => "password", :name => "scms[RSCM::Cvs][password]", :value => object.password, :onkeyup => "updateCvsRootField()", :onblur => "updateCvsRootField()", :id => "cvspassword") %></td>
+    <td width="75%"><%= tag("input", :type => "password", :name => "scm[RSCM::Cvs][password]", :value => object.password, :onkeyup => "updateCvsRootField()", :onblur => "updateCvsRootField()", :id => "cvspassword") %></td>
   </tr>
   <tr>
     <td>Server</td>
@@ -159,13 +159,11 @@ var cvs_mod_tip  = "<div class='tp1'>Note that you can't use trigged build if yo
   <tr>
     <td>Module</td>
     <td>&nbsp;</td>
-    <td width="75%"><%= tag("input", :name => "scms[RSCM::Cvs][mod]", :value => object.mod, :id => "cvsmodule") %></td>
+    <td width="75%"><%= tag("input", :name => "scm[RSCM::Cvs][mod]", :value => object.mod, :id => "cvsmodule") %></td>
   </tr>
   <tr>
     <td>Branch</td>
     <td>&nbsp;</td>
-    <td width="75%"><%= tag("input", :name => "scms[RSCM::Cvs][branch]", :value => object.branch, :id => "cvsbranch") %></td>
+    <td width="75%"><%= tag("input", :name => "scm[RSCM::Cvs][branch]", :value => object.branch, :id => "cvsbranch") %></td>
   </tr>
 </table>
-
-<img src="/images/cvs.png" alt=""/>

@@ -71,7 +71,7 @@ class Project < ActiveRecord::Base
   end
   
   def family
-    ""
+    "project"
   end
 end
 

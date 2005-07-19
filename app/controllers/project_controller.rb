@@ -41,6 +41,7 @@ class ProjectController < ApplicationController
 private
   
   def update_or_save(project)
+    $stderr.puts @params.to_yaml
     project_attrs = @params[:project].dup
     project_attrs[:scm] = extract(:scm)
 
