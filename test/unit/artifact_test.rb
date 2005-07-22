@@ -17,7 +17,8 @@ class ArtifactTest < Test::Unit::TestCase
       io.puts("yo")
     end
     
-    artifact = Artifact.create(:name => "something.else", :directory_id => @usr.id, :file_reference => "artifact.txt")
+    artifact = Artifact.create(
+      :name => "something.else", :directory_id => @usr.id, :file_reference => "artifact.txt")
     artifact.open do |io|
       assert_equal("yo\n", io.read)
     end

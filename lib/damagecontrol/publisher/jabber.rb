@@ -15,15 +15,12 @@ module DamageControl
       ann :description => "DamageControl's Friends"
       attr_accessor :friends
 
-      def name
-        "Jabber"
-      end
-
       def publish(build)
         session = nil
         begin
           session = login
-          message = "#{build.revision.project.name}: #{build.state.description} build (#{build.reason_description})"
+          message = "#{build.revision.project.name}: #{build.state.description} build " + 
+                    "(#{build.reason_description})"
           @friends.split(%r{,\s*}).each do |friend|
             begin
               session.new_message(friend).set_subject(message).set_body(message).send

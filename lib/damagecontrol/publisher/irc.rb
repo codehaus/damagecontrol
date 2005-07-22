@@ -16,7 +16,7 @@ module DamageControl
     
       def initialize
         @server = "irc.codehaus.org"
-        @channel = "#xxxxxx"
+        @channel = "#damagecontrol"
         @nick = "dcontrol"
       end
 

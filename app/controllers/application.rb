@@ -1,18 +1,22 @@
-# The filters added to this controller will be run for all controllers in the application.
-# Likewise will all the methods added be available for all controllers.
 class ApplicationController < ActionController::Base
 
   before_filter :load_projects
   
-  # Extracts an object from @params
-  def extract(name)
-    plural_name = "#{name}s".to_sym
-    class_name = @params[name]
+  def deserialize_to_array(hash)
+    result = []
+    hash.each do |class_name, values|
+      result << deserialize(class_name, values)
+    end
+    result
+  end
+
+  # Deserialises an object from a Hash where one attribute is the class name
+  # and the rest of them are attribute values.
+  def deserialize(class_name, attributes)
     object = eval(class_name).new
-    attrs = @params[plural_name][class_name]
-    attrs.each do |attr_name, attr_value|
+    attributes.each do |attr_name, attr_value|
       setter = "#{attr_name}=".to_sym
-      object.__send__(setter, attr_value) if object.respond_to?(setter)
+      object.__send__(setter, attr_value) #if object.respond_to?(setter)
     end
     object
   end
@@ -22,6 +26,19 @@ private
   # Loads all projects so that the right column can be populated properly
   def load_projects
     @projects = Project.find(:all)
+  end
+end
+
+class RSCM::Base
+  # Change detection types
+  POLLING = "POLLING"
+  TRIGGER = "TRIGGER"
+  
+  attr_accessor :selected
+  attr_accessor :change_detection
+  
+  def <=> (o)
+    self.class.name <=> o.class.name
   end
 end
 

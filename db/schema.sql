@@ -7,6 +7,8 @@ CREATE TABLE projects(
   quiet_period INTEGER,
   build_command TEXT,
   scm TEXT,
+  publishers TEXT,
+  scm_web TEXT,
   tracker TEXT
 );
 
@@ -34,13 +36,6 @@ CREATE TABLE revision_files(
   native_revision_identifier TEXT, 
   timepoint TIMESTAMP, 
   revision_id INTEGER
-);
-
-CREATE TABLE publishers(
-  id INTEGER PRIMARY KEY, 
-  delegate TEXT, 
-  enabling_states TEXT,
-  project_id INTEGER
 );
 
 CREATE TABLE builds(

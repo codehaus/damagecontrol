@@ -15,10 +15,6 @@ module DamageControl
         @hosts = "localhost"
       end
 
-      def name
-        "Growl"
-      end    
-
       def publish(build)
         @hosts.split(%r{,\s*}).each do |host|
           begin

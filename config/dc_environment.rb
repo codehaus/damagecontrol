@@ -28,7 +28,7 @@ def create_logger(cls)
 end
 
 # TODO: Ues thread-specific loggers - easier to follow
-[DamageControl::ScmPoller, Build, Project, Publisher, Revision].each { |cls| cls.logger = create_logger(cls) }
+[DamageControl::ScmPoller, Build, Project, Revision].each { |cls| cls.logger = create_logger(cls) }
 
 class ActiveRecord::ConnectionAdapters::AbstractAdapter
   # Expose connection. We need to set the busy_handler

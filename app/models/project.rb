@@ -7,7 +7,6 @@ class Project < ActiveRecord::Base
   attr_reader :basedir
 
   has_many :revisions, :order => "timepoint DESC"
-  has_many :publishers, :order => "delegate"
   has_and_belongs_to_many :dependencies, 
     :class_name => "Project", 
     :foreign_key => "depending_id", 
@@ -18,15 +17,30 @@ class Project < ActiveRecord::Base
     :association_foreign_key => "depending_id"
   
   serialize :scm
-  
+  serialize :scm_web
+  serialize :tracker
+  serialize :publishers
+
+  # Returns an RGL::DirectedAdjacencyGraph representing all projects
+  # and their dependencies
+  def self.dependency_graph
+    g = RGL::DirectedAdjacencyGraph.new
+    self.find(:all).each do |from|
+      from.dependencies.each do |to|
+        g.add_edge(from, to)
+      end
+    end
+    g
+  end
+
   # Same as revisions[0], but faster since it only loads one record
   def latest_revision
     Revision.find_by_sql(["SELECT * FROM revisions WHERE project_id=? ORDER BY timepoint DESC LIMIT 1", self.id])[0]
   end
 
-  # Finds the latest build of a particular +state+, based on the build's +begin_time+'
-  # (or just the latest build if state is unspecified)
-  # If the +before+ argument is specified (UTC time), the build will be before that begin_time.
+  # Finds the latest build +successful+ or not.
+  # If the +before+ argument is specified (UTC time), 
+  # the build's +begin_time+ will be before that time.
   def latest_build(successful=nil, before=nil)
     raise "successful must be bool" if successful && !(successful.class==TrueClass || successful.class==FalseClass)
     success_criterion = successful ? "AND b.exitstatus=0" : ""
@@ -55,7 +69,7 @@ LIMIT 1
     logger.info "Successful build: #{build.successful?}" if logger
 
     publishers.each do |publisher| 
-      publisher.publish(build)
+      publisher.publish_maybe(build)
     end
     
     if(build.successful?)
@@ -69,7 +83,7 @@ LIMIT 1
   # Indicates that a build has started
   def build_executing(build)
     publishers.each do |publisher| 
-      publisher.publish(build)
+      publisher.publish_maybe(build)
     end
   end
   
@@ -96,20 +110,6 @@ LIMIT 1
     @basedir = "#{DAMAGECONTROL_HOME}/projects/#{id}"
     mkdir @basedir
     self.scm.checkout_dir = working_copy_dir unless self.scm.nil?
-    
-    create_missing_publishers
-  end
-  
-  # Returns an RGL::DirectedAdjacencyGraph representing all projects
-  # and their dependencies
-  def self.dependency_graph
-    g = RGL::DirectedAdjacencyGraph.new
-    self.find(:all).each do |from|
-      from.dependencies.each do |to|
-        g.add_edge(from, to)
-      end
-    end
-    g
   end
   
   # Where temporary stdout log is written
@@ -129,17 +129,5 @@ private
     FileUtils.mkdir_p(dir) unless File.exist?(dir)
     dir
   end
-  
-  def create_missing_publishers
-    associated_publisher_classes = publishers.collect{|publisher| publisher.delegate.class}
-    available_publisher_classes = DamageControl::Publisher::Base.classes
-    missing_publisher_classes = available_publisher_classes - associated_publisher_classes
-    missing_publisher_classes.each do |cls|
-      begin
-        publishers.create(:delegate => cls.new)
-      rescue
-        $stderr.puts "Can't instantiate #{cls.name}"
-      end
-    end
-  end
+
 end

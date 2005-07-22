@@ -2,7 +2,7 @@ require 'damagecontrol/publisher/base'
 
 module DamageControl
   module Publisher
-    class Execute < Base
+    class Ftp < Base
       #register self
     
       def name

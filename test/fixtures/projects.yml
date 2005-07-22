@@ -3,9 +3,12 @@ project_1:
   name: project_1
   build_command: touch built
   relative_build_path: build_here
+  publishers: []
 project_2:
   id: 2
   name: project_2
+  publishers: []
 project_3:
   id: 3
   name: project_3
+  publishers: []
