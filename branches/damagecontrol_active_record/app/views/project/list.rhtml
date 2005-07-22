@@ -1,11 +1,8 @@
 <div id="projects">
   <table>
-    <thead>
-      <tr>
-        <th>Project</th>
-      </tr>
-    </thead>
-    <tbody>
+    <tr>
+      <th>Project</th>
+    </tr>
     <% @projects.each do |project| %>
       <tr>
         <td>
@@ -19,7 +16,6 @@
         </td>
       </tr>
     <% end %>
-    </tbody>
   </table>
   The idea is to show a condensed overview all the projects here. Projects that are currently being built will have a progress bar that updates smoothly with Javascript using setTimeout and an interval of 1 second (no HTTP refresh). The whole section is updated with AJAX every 30 seconds to get more accurate info from the server. Each project will also show a bulb indicating latest build status, time etc. This is a lot of info, so some js/ajax magic should allow to expand an individual project (or maybe all of them) to see more.
 </div>

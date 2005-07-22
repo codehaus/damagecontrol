@@ -1,12 +1,8 @@
 module DamageControl
   module Publisher
-    class Execute < Base
+    class Scp < Base
       #register self
     
-      def name
-        "Execute"
-      end    
-
       def publish(build)
       end
     end

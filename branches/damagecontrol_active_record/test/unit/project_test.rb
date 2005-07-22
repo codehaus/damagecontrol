@@ -1,7 +1,7 @@
 require File.dirname(__FILE__) + '/../test_helper'
 
 class ProjectTest < Test::Unit::TestCase
-  fixtures :projects, :revisions, :builds, :projects_projects, :publishers
+  fixtures :projects, :revisions, :builds, :projects_projects
 
   def test_should_have_revisions
     assert_equal(3, @project_1.revisions.length)
@@ -25,10 +25,11 @@ class ProjectTest < Test::Unit::TestCase
 
   def test_should_persist_scm
     cvs = RSCM::Cvs.new("a_root", "a_mod", "a_branch", "a_password")
+
     @project_1.scm = cvs
     @project_1.save
-    
     @project_1.reload
+
     assert_equal(cvs, @project_1.scm)
 
     @project_1.scm.root = "jalla"
@@ -37,6 +38,16 @@ class ProjectTest < Test::Unit::TestCase
     assert_equal("jalla", @project_1.scm.root)
   end
   
+  def test_should_persist_publishers
+    publishers = DamageControl::Publisher::Base.classes.collect{|cls| cls.new}
+    @project_1.publishers = publishers
+    @project_1.save
+    @project_1_found = Project.find(@project_1.id)
+    assert_not_same(@project_1, @project_1_found)
+
+    assert_equal(DamageControl::Publisher::Base.classes, @project_1_found.publishers.collect{|pub| pub.class})
+  end
+
   def test_should_create_basedir_after_load
     expected_base_dir = "#{DAMAGECONTROL_HOME}/projects/#{@project_1.id}"
     assert(File.exist?(expected_base_dir), "Should exist: #{expected_base_dir}")
@@ -87,27 +98,4 @@ class ProjectTest < Test::Unit::TestCase
     assert_equal(Build::SUCCESSFUL_DEPENDENCY, @revision_3.builds[0].reason)
   end
   
-  def test_should_create_missing_publishers_on_reload
-    project = Project.create
-
-    growl = DamageControl::Publisher::Growl.new
-    growl.hosts = "some.where.else"
-    project.publishers.create(:delegate => growl, :enabling_states => [Build::Broken.new])
-    
-    project.reload
-    
-    expected = [
-      DamageControl::Publisher::ArtifactArchiver,
-      DamageControl::Publisher::Email::Sendmail,
-      DamageControl::Publisher::Email::Smtp,
-      DamageControl::Publisher::Growl,
-      DamageControl::Publisher::Jabber,
-      DamageControl::Publisher::Sound
-    ]
-    publisher_classes = project.publishers.collect{|pub| pub.delegate.class}
-    assert_equal(expected, publisher_classes)
-    assert_equal("some.where.else", project.publishers[3].delegate.hosts)
-    assert_equal(Build::Broken, project.publishers[3].enabling_states[0].class)
-  end
-
 end

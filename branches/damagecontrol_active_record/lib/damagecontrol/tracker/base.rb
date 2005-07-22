@@ -7,6 +7,7 @@ module DamageControl
     # issue tracker installation running somewhere else.
     class Base < Plugin
       become_parent
+      attr_accessor :selected
     end
   end
 end

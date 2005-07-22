@@ -74,7 +74,7 @@ def egrep(pattern)
   end
 end
 
-desc "Look for TODO and FIXME tags in the code"
+desc "Look for TODO and FIXME comments in the code"
 task :todo do
   egrep /#.*(FIXME|TODO|TBD)/
 end

@@ -52,14 +52,14 @@ module ApplicationHelper
            :locals => {:objects_name => objects_name, :objects => objects, :selected => selected}
   end
 
-  def has_template(objects_name, object)
+  def has_template(category, name)
     template_file = File.expand_path(RAILS_ROOT + 
-      "/app/views/#{objects_name}/_#{object.class.name.demodulize.underscore}.rhtml")
+      "/app/views/#{category}/_#{name}.rhtml")
     File.exist?(template_file)
   end
   
-  def template_for(objects_name, object)
-    template_name = "#{objects_name}/#{object.class.name.demodulize.underscore}"
+  def template_for(category, name)
+    template_name = "#{category}/#{name}"
   end
 end
 

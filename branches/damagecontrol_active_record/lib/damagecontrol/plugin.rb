@@ -23,6 +23,10 @@ module DamageControl
       self.class.name.demodulize
     end
     
+    def <=> (other)
+      self.class.name <=> other.class.name
+    end
+    
     def htmlize(str)
       str.gsub(/\n/, "<br/>")
     end

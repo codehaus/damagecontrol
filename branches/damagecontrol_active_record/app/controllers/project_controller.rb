@@ -6,8 +6,9 @@ class ProjectController < ApplicationController
 
   def new
     @project = Project.new
-    @project.scm = RSCM::Cvs.new
-    define_plugins
+    @project.publishers = []
+
+    define_plugin_rows
 
     @submit_action = "create"
     @submit_text = "Create project"
@@ -16,7 +17,8 @@ class ProjectController < ApplicationController
 
   def edit
     @project = Project.find(@params[:id])
-    define_plugins
+    
+    define_plugin_rows
 
     @submit_action = "update"
     @submit_text = "Update project"
@@ -41,28 +43,52 @@ class ProjectController < ApplicationController
 private
   
   def update_or_save(project)
-    $stderr.puts @params.to_yaml
-    project_attrs = @params[:project].dup
-    project_attrs[:scm] = extract(:scm)
 
-    project.update_attributes(project_attrs)    
+    project.scm        = deserialize_to_array(@params[:scm]).find{|scm| scm.selected}
+#    project.tracker    = deserialize_to_array(@params[:tracker]).find{|tracker| tracker.selected}
+#    project.scm_web    = deserialize_to_array(@params[:scm_web]).find{|scm_web| scm_web.selected}
+    project.publishers = deserialize_to_array(@params[:publisher])
+    project.update_attributes(@params[:project])
+
+    $stderr.puts "UOS:PUBS:#{project.publishers}"
+    $stderr.puts "UOS:PUBS CLASS:#{project.publishers.class}"
+
     redirect_to :action => "edit", :id => project.id
   end
 
-  def define_plugins
-    define_scms
-    @publishers = DamageControl::Publisher::Base.classes.collect{|cls| cls.new}
-    @trackers = DamageControl::Tracker::Base.classes.collect{|cls| cls.new}
-    @scm_webs = DamageControl::ScmWeb::Base.classes.collect{|cls| cls.new}
-    
-    @rows = [[@project], @scms, @publishers, @trackers, @scm_webs]
+  def define_plugin_rows
+    # Workaround for AR bug
+    @project.publishers = YAML::load(@project.publishers) if @project.publishers.class == String
+
+    @rows = [[@project], scms, publishers, trackers, scm_webs]
   end
 
   # Instantiates all known SCMs. The project's persisted scm
   # will also be among these, and will have the persisted attribute values.
-  def define_scms
-    scms = RSCM::Base.classes.collect{|cls| cls.new}
-    @scms = scms.collect{|scm| scm.class == @project.scm.class ? @project.scm : scm}
+  def scms
+    RSCM::Base.classes.collect{|cls| cls.new}.collect do |scm|
+      scm.class == @project.scm.class ? @project.scm : scm
+    end.sort
   end
 
+  def publishers
+    DamageControl::Publisher::Base.classes.collect{|cls| cls.new}.collect do |publisher|
+      already = @project.publishers.find do |p| 
+        p.class.name == publisher.class.name
+      end
+      already ? already : publisher
+    end.sort
+  end
+
+  def trackers
+    DamageControl::Tracker::Base.classes.collect{|cls| cls.new}.collect do |tracker|
+      tracker.class == @project.tracker.class ? @project.tracker : tracker
+    end.sort
+  end
+
+  def scm_webs
+    DamageControl::ScmWeb::Base.classes.collect{|cls| cls.new}.collect do |scm_web|
+      scm_web.class == @project.scm_web.class ? @project.scm_web : scm_web
+    end.sort
+  end
 end

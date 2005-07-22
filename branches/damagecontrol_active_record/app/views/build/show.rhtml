@@ -1,5 +1,4 @@
 <table>
-  <tbody>
   <tr>
     <td>Reason:</td>
     <td><%= @build.reason %></td>
@@ -32,7 +31,6 @@
     <td>Artifacts:</td>
     <td><%= @build.artifacts.collect{ |a| a.link }.join("<br>\n") %></td>
   </tr>
-  </tbody>
 </table>
 
 <%= link_to("Standard out", :action => "stdout", :id => @build.id) %> |

@@ -3,7 +3,7 @@ module DamageControl
     class Sound < Base
       register self
       
-      attr_reader :executing_sound, :successful_sound, :fixed_sound, :broken_sound, :repeatedly_broken_sound
+      attr_accessor :executing_sound, :successful_sound, :fixed_sound, :broken_sound, :repeatedly_broken_sound
 
       def initialize
         @executing_sound = File.expand_path(File.dirname(__FILE__) + "/sound/better.wav")
