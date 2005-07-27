@@ -45,13 +45,10 @@ private
   def update_or_save(project)
 
     project.scm        = deserialize_to_array(@params[:scm]).find{|scm| scm.selected}
-#    project.tracker    = deserialize_to_array(@params[:tracker]).find{|tracker| tracker.selected}
-#    project.scm_web    = deserialize_to_array(@params[:scm_web]).find{|scm_web| scm_web.selected}
+    project.tracker    = deserialize_to_array(@params[:tracker]).find{|tracker| tracker.selected}
+    project.scm_web    = deserialize_to_array(@params[:scm_web]).find{|scm_web| scm_web.selected}
     project.publishers = deserialize_to_array(@params[:publisher])
     project.update_attributes(@params[:project])
-
-    $stderr.puts "UOS:PUBS:#{project.publishers}"
-    $stderr.puts "UOS:PUBS CLASS:#{project.publishers.class}"
 
     redirect_to :action => "edit", :id => project.id
   end

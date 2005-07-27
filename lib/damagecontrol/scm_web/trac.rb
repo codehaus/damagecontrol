@@ -5,6 +5,10 @@ module DamageControl
 
       attr_accessor :changeset_url
       
+      def initialize
+        @changeset_url = ""
+      end
+
       def file_url(revision_file)
         revision = revision_file.revision
         # Trac doesn't seem to order files alphabetically!

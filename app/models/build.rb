@@ -188,7 +188,7 @@ class Build < ActiveRecord::Base
     def description
       "Repeatedly broken"
     end
-  end
+  end 
   
   STATES = [Executing.new, Successful.new, Fixed.new, Broken.new, RepeatedlyBroken.new]
 

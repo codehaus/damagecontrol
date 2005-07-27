@@ -85,6 +85,7 @@ task :greyscale do
 
   colour_pngs = FileList.new('public/images/**/*.png')
   colour_pngs.exclude('public/images/**/*_grey.png')
+  colour_pngs.exclude('public/images/raw/**/*')
   colour_pngs.to_a.each do |png|
     img = Magick::ImageList.new(png)
     img = img.quantize(256, Magick::GRAYColorspace)
@@ -92,5 +93,24 @@ task :greyscale do
     grey_png = png.gsub(/\.png/, "_grey.png")
     puts "writing greyscale image #{grey_png}"
     img.write(grey_png)
+  end
+end
+
+desc "Make square pngs from raw images"
+task :square_from_raw do
+  require 'RMagick'
+
+  raws = FileList.new('public/images/raw/**/*')
+  raws.to_a.each do |raw|
+    img = Magick::ImageList.new(raw)
+    puts img[0]
+    img.resize!(48, 48)
+#    img = img.quantize(256, Magick::GRAYColorspace)
+
+    suffix = File.extname(raw)
+    basename = File.basename(raw, suffix)
+    colour_png = "public/images/#{basename}.png"
+    puts "writing square colour image #{colour_png}"
+    img.write(colour_png)
   end
 end
