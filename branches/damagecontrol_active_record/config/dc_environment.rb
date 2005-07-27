@@ -1,11 +1,14 @@
-require File.dirname(__FILE__) + '/environment'
+raise 'load environment.rb instead of dc_environment.rb' unless defined?(RAILS_ENV)
 
 LIBS = ["lib", "../../trunk/rscm/lib", "../../trunk/rscm/test"]
 $:.unshift(LIBS.join(':'))
 require 'rscm'
 
 unless defined? DAMAGECONTROL_HOME
-  if(ENV['DAMAGECONTROL_HOME'])
+  if(['test', 'development'].include?(RAILS_ENV))
+    # DAMAGECONTROL_HOME goes into target for these environments.
+    DAMAGECONTROL_HOME = File.expand_path(__FILE__ + "/../../target/#{RAILS_ENV}")
+  elsif(ENV['DAMAGECONTROL_HOME'])
     DAMAGECONTROL_HOME = ENV['DAMAGECONTROL_HOME']
   else
     if(WINDOWS)

@@ -84,4 +84,4 @@ Controllers = Dependencies::LoadingModule.root(
 )
 
 # Include your app's configuration here:
-
+require File.dirname(__FILE__) + '/dc_environment'

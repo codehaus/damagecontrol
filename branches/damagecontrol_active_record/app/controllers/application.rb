@@ -16,7 +16,7 @@ class ApplicationController < ActionController::Base
     object = eval(class_name).new
     attributes.each do |attr_name, attr_value|
       setter = "#{attr_name}=".to_sym
-      object.__send__(setter, attr_value) #if object.respond_to?(setter)
+      object.__send__(setter, attr_value)
     end
     object
   end
@@ -27,52 +27,4 @@ private
   def load_projects
     @projects = Project.find(:all)
   end
-end
-
-class RSCM::Base
-  # Change detection types
-  POLLING = "POLLING"
-  TRIGGER = "TRIGGER"
-  
-  attr_accessor :selected
-  attr_accessor :change_detection
-  
-  def <=> (o)
-    self.class.name <=> o.class.name
-  end
-end
-
-class Build < ActiveRecord::Base
-  def small_image
-    if(successful?)
-      "green-32.gif"
-    else
-      "red-32.gif"
-    end
-  end
-end
-
-class RevisionFile < ActiveRecord::Base
-  IMAGES = {
-    RSCM::RevisionFile::ADDED => "document_new",
-    RSCM::RevisionFile::DELETED => "document_delete",
-    RSCM::RevisionFile::MODIFIED => "document_edit",
-    RSCM::RevisionFile::MOVED => "document_exchange"
-  }
-  
-  DESCRIPTIONS = {
-    RSCM::RevisionFile::ADDED => "New file",
-    RSCM::RevisionFile::DELETED => "Deleted file",
-    RSCM::RevisionFile::MODIFIED => "Modified file",
-    RSCM::RevisionFile::MOVED => "Moved file"
-  }
-  
-  def image
-    IMAGES[status]
-  end
-  
-  def status_description
-    DESCRIPTIONS[status]
-  end
-
 end

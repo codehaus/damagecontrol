@@ -1,8 +1,8 @@
 /* absolute positioning is the easiest way to achieve smooth fade/appear */
 .setting {
   position:absolute;
-  top:140px;
-  left:280px;
+  top:200px;
+  left:260px;
   height:500px;
 }
 

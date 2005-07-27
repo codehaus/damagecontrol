@@ -9,47 +9,9 @@ module ApplicationHelper
     attr_name[1..-1]
   end
 
-  def render_object(object_name)
-    object = instance_variable_get("@#{object_name}") 
+  def render_object_with_name(object, prefix)
     render :partial => 'shared/object', 
-           :locals => {:object => object, :object_name => object_name}
-  end
-
-  def render_object_with_name(object, name)
-    render :partial => 'shared/object', 
-           :locals => {:object => object, :object_name => name}
-  end
-
-  def tab_link(text, image, element_id, element_group)
-    content_tag("a", 
-                image_tag(image) << text, 
-                :href => "#", :onclick => "javascript:showElement('#{element_id}', #{element_group});")
-  end
-
-  # Renders a Calendar widget
-  # The view (or layout) must load the jscalendar and dateFormat javascripts
-  # Note that the value is posted back as a ymdHMS string
-  #
-  # * <tt>:name</tt> - The name of the (hidden) field containing the date
-  # * <tt>:time</tt> - The time to initialise the widget with
-  # * <tt>:editable</tt> - Whether or not to make the widget editable
-  def calendar(options)
-    t = options[:time]
-    name = options[:name]
-    js_function = "change" + name.gsub(/:/, '_').gsub(/@/, '_').gsub(/\[/, '_').gsub(/\]/, '_')
-    js_format = "format('%yyyy%%mm%%dd%%hh%%nn%%ss%')"
-    js_date = "new Date(#{t.year}, #{t.month - 1}, #{t.day}, #{t.hour}, #{t.min}, #{t.sec})"
-    render :partial => 'shared/calendar', 
-           :locals => {:js_function => js_function, :js_format => js_format, :js_date => js_date, :options => options}
-  end
-  
-  # Renders a pane (div) with a combo (select) that contains the objects.
-  # There will be a div for each object, rendered by render_object, or by a
-  # custom Erb template if one exists.
-  def select_pane(objects_name, selected)
-    objects = instance_variable_get("@#{objects_name}") 
-    render :partial => 'shared/select_pane', 
-           :locals => {:objects_name => objects_name, :objects => objects, :selected => selected}
+           :locals => {:object => object, :prefix => prefix}
   end
 
   def has_template(category, name)
@@ -77,8 +39,20 @@ end
 
 module RSCM
   class Base
+    # Change detection types
+    POLLING = "POLLING" unless defined? POLLING
+    TRIGGER = "TRIGGER" unless defined? TRIGGER
+
+    attr_accessor :selected
+    attr_accessor :change_detection
+
+    def <=> (o)
+      self.class.name <=> o.class.name
+    end
+
     def icon
-      "/images/#{family}/#{self.class.name.demodulize.underscore}.png"
+      base = "/images/#{family}/#{self.class.name.demodulize.underscore}"
+      selected ? "#{base}.png" : "#{base}_grey.png"
     end
     
     def family
@@ -120,3 +94,37 @@ module DamageControl
 end
 
 
+class Build < ActiveRecord::Base
+  def small_image
+    if(successful?)
+      "green-32.gif"
+    else
+      "red-32.gif"
+    end
+  end
+end
+
+class RevisionFile < ActiveRecord::Base
+  IMAGES = {
+    RSCM::RevisionFile::ADDED => "document_new",
+    RSCM::RevisionFile::DELETED => "document_delete",
+    RSCM::RevisionFile::MODIFIED => "document_edit",
+    RSCM::RevisionFile::MOVED => "document_exchange"
+  }
+  
+  DESCRIPTIONS = {
+    RSCM::RevisionFile::ADDED => "New file",
+    RSCM::RevisionFile::DELETED => "Deleted file",
+    RSCM::RevisionFile::MODIFIED => "Modified file",
+    RSCM::RevisionFile::MOVED => "Moved file"
+  }
+  
+  def image
+    IMAGES[status]
+  end
+  
+  def status_description
+    DESCRIPTIONS[status]
+  end
+
+end

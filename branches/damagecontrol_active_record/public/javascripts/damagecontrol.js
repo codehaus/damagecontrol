@@ -1,18 +1,12 @@
-// TODO: DEPRECATED
-function showElement(selectedId, elementIds) {
-  for(i = 0; i < elementIds.length; i++) {
-    var id = elementIds[i];
-    var style = "none";
-    if(id == selectedId) {
-      style = "block";
-    }
-    $(id).style.display = style;
-  }
-}
-
+/**
+ * Manages panels on the settings screen.
+ */
 Settings = function(initial) {
   this.current = initial;
 
+  /**
+   * Fade currently showing element and make new one appear.
+   */
   this.show = function(element) {
     new Effect.Fade(this.current);
     new Effect.Appear(element);

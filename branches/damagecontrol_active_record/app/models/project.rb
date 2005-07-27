@@ -61,6 +61,10 @@ LIMIT 1
     Build.find_by_sql([sql, self.id])[0]
   end
   
+  def latest_revision_has_builds?
+    latest_revision.builds.empty?
+  end
+  
   # Indicates that a build is complete (regardless of its successfulness)
   # Tells each enabled publisher to publish the build
   # and creates a build request for each dependant project

@@ -1,24 +1,9 @@
 #!/usr/local/bin/ruby
 
-load File.dirname(__FILE__) + '/../config/dc_environment.rb'
+load File.dirname(__FILE__) + '/../config/environment.rb'
 
-threads = []
+# set up logging
+::DamageControl::ScmPoller.logger = Logger.new(STDOUT)
+::DamageControl::Publisher::Base.logger = Logger.new(STDOUT)
 
-scm_poller = DamageControl::ScmPoller.new
-build_executor = DamageControl::BuildExecutor.new
-
-threads << Thread.new do
-  while(true)
-    scm_poller.poll_all_projects
-    sleep 20
-  end
-end
-
-threads << Thread.new do
-  while(true)
-    build_executor.build_next
-  end
-end
-
-puts "DamageControl daemon started"
-threads.each{|t| t.join}
+DamageControl::BuildDaemon.new.run

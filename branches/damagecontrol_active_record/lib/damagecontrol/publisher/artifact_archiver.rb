@@ -26,6 +26,8 @@ module DamageControl
           fl = Rake::FileList.new
           fl.include(full_src)
           fl.to_a.each do |fl_src|
+            FileUtils.mkdir_p(Artifact::ROOT_DIR)
+            logger.info("Copying #{fl_src} to #{Artifact::ROOT_DIR}") if logger
             FileUtils.cp(fl_src, Artifact::ROOT_DIR)
             
             dir = Directory.lookup(dest.split("/"), true)

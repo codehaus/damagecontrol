@@ -1,25 +1,41 @@
 <script type="text/javascript">
 var settings = new Settings("root");
 </script>
-<%= link_to_function(image_tag("wrench"), "settings.show('root')") %>
+<p>
+  <%= link_to_function(image_tag("wrench", :size=>"48x48", :border=>0), "settings.show('root')") %>
+</p>
+<p>
+  Show All
+</p>
 
 <%= form_tag(:controller => "project", :action => @submit_action, :id => @project.id) %>
 <div>
   <%= render :partial => "shared/menu", :locals => {:rows => @rows} %>
+  <!-- Now, render a hidden form for each plugin -->
   <% @rows.flatten.each do |object| %>
-      <div class="setting" id="<%= object.class.name %>" style="display:none;">
-        <div>
-          <%= image_tag(object.icon, :size=>"48x48", :border=>0) %> <%= object.name %>
-        </div>
-        <div>
-          <%= render :partial => template_for(object.family, object.family), :locals => {:object => object} %>
-          <% if(has_template(object.family, object.class.name.demodulize.underscore)) %>
-            <%= render :partial => template_for(object.family, object.class.name.demodulize.underscore), :locals => {:object => object} %>
-          <% else %>
-            <%= render_object_with_name(object, "#{object.family}[#{object.class.name}]") %>
-          <% end %>
-        </div>
+    <div class="setting" id="<%= object.class.name %>" style="display:none;">
+      <div>
+        <p>
+          <%= image_tag(object.icon, :size=>"48x48", :border=>0) %>
+        </p>
+        <p>
+          <%= object.name %>
+        </p>
       </div>
+      <div>
+        <!-- Family-common part of form -->
+        <%= render :partial => template_for(object.family, object.family), :locals => {:object => object} %>
+        
+        <!-- Render the object itself -->
+        <% if(has_template(object.family, object.class.name.demodulize.underscore)) %>
+          <!-- Custom template -->
+          <%= render :partial => template_for(object.family, object.class.name.demodulize.underscore), :locals => {:object => object} %>
+        <% else %>
+          <!-- Use generic template -->
+          <%= render_object_with_name(object, "#{object.family}[#{object.class.name}]") %>
+        <% end %>
+      </div>
+    </div>
   <% end %>
 </div>
 <%= submit_tag(@submit_text) %>

@@ -1,6 +1,22 @@
 <table>
   <tr>
+    <td>Successful</td>
+    <td><%= check_box_tag("#{object.family}[#{object.class.name}][Build::Successful]", "1") %></td>
+  </tr>
+  <tr>
     <td>Fixed</td>
     <td><%= check_box_tag("#{object.family}[#{object.class.name}][Build::Fixed]", "1") %></td>
+  </tr>
+  <tr>
+    <td>Broken</td>
+    <td><%= check_box_tag("#{object.family}[#{object.class.name}][Build::Broken]", "1") %></td>
+  </tr>
+  <tr>
+    <td>Repeatedly Broken</td>
+    <td><%= check_box_tag("#{object.family}[#{object.class.name}][Build::RepeatedlyBroken]", "1") %></td>
+  </tr>
+  <tr>
+    <td>Executing</td>
+    <td><%= check_box_tag("#{object.family}[#{object.class.name}][Build::Executing]", "1") %></td>
   </tr>
 </table>

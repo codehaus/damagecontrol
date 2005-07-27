@@ -1,0 +1,50 @@
+== Usability
+
+We've asked a number of users in different categories, and some of theis expectations are:
+
+* A tool that is *extremely* easy to install
+* A tool that is *extremely* easy to configure and use
+* A tool that has an intuitive user interface
+* A tool that can improve my configuration management process (*)
+* A tool that is reliable
+* A tool that is free
+* A tool that integrates with *my* tools (scm, tracker, scm_web, publisher)
+* A tool that stays out of my way
+* A tool that simplifies my work (*)
+* A tool that makes it more fun to work (*)
+* A tool that can help me adopt an agile dev process
+* A tool that can help me integrate sofware (mave/gems/swcasts + patterns)
+* A tool that has a future, with a large dev base (?)
+* A tool that is on the forefront (all the inventions)
+* A tool that suppports several platforms
+* A tool that doesn't require trained staff and consultants
+* A tool that is OSS
+* A tool that can help me discover other tools
+* A tool that simplifies my build scripts
+* A tool that reduces my need for build mgmt
+* A tool that can guide me as I go along
+* A tool that is prove to work
+* A tool that is performant
+* A tool that is extensible
+* A tool I can grok
+* A tool that has good and uptodate doco
+* A tool that has a community behind it
+* A tool that is at the forefront of its competitors
+* A tool with a cool logo
+* A tool that makes me look good
+
+We believe DamageControl meets all of those
+
+== Versatility
+
+Environments, technological platforms, software development processes, teams and skills are always different. DamageControl offers a platform that is:
+
+* Easy to install and get running (1)
+* Intuitive, with integrated documentation (2)
+* Configurable for the choosy (3)
+* Extensible for the picky (4)
+
+1) Just gem install and .....
+2) Most screens have a help button
+3) Provides a lot of out-of-the-box tunings via web intf
+4) 3 web-service interfaces (SOAP/XML-RPC/REST) and a plugin API

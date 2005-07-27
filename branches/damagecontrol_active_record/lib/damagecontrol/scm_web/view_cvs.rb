@@ -5,6 +5,10 @@ module DamageControl
 
       attr_accessor :baseurl
 
+      def initialize
+        @baseurl = ""
+      end
+
       def url
         RSCM::PathConverter.ensure_trailing_slash(baseurl)
       end
