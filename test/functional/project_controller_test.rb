@@ -1,4 +1,5 @@
 require File.dirname(__FILE__) + '/../test_helper'
+require 'project_controller'
 
 # Re-raise errors caught by the controller.
 class ProjectController; def rescue_action(e) raise e end; end
@@ -22,7 +23,7 @@ class ProjectControllerTest < Test::Unit::TestCase
     assert_tag :tag => "input", :attributes => {:value => "svn://show/this/please"}
   end
 
-  def test_should_save_scm_and_publishers_on_update
+  def test_should_save_plugins_on_update
     project = Project.create
     post :update, 
       :id => project.id,
@@ -37,6 +38,25 @@ class ProjectControllerTest < Test::Unit::TestCase
         "RSCM::Cvs" => {
           :selected => false,
           :root => "blah"
+        }
+      },
+      :tracker => {
+        "DamageControl::Tracker::Bugzilla" => {
+          :selected => false,
+          :url => "http://bugzilla.org/bugs"
+        },
+        "DamageControl::Tracker::Jira" => {
+          :selected => true,
+          :baseurl => "http://jira.codehaus.org/"
+        }
+      },
+      :scm_web => {
+        "DamageControl::ScmWeb::Trac" => {
+          :selected => true,
+          :changeset_url => "http://trac.org/changesets"
+        },
+        "DamageControl::ScmWeb::Chora" => {
+          :selected => false
         }
       },
       :publisher => {
@@ -55,10 +75,15 @@ class ProjectControllerTest < Test::Unit::TestCase
     assert_equal(RSCM::Subversion, project.scm.class)
     assert_equal("svn://some/where", project.scm.url)
     
-    growl = project.publishers.find{|p| p.class == DamageControl::Publisher::Growl}
-    jabber = project.publishers.find{|p| p.class == DamageControl::Publisher::Jabber}
+    assert_equal(DamageControl::Tracker::Jira, project.tracker.class)
+    assert_equal("http://jira.codehaus.org/", project.tracker.baseurl)
 
+    assert_equal(DamageControl::ScmWeb::Trac, project.scm_web.class)
+    assert_equal("http://trac.org/changesets", project.scm_web.changeset_url)
+
+    growl = project.publishers.find{|p| p.class == DamageControl::Publisher::Growl}
     assert_equal("codehaus.org", growl.hosts)
+    jabber = project.publishers.find{|p| p.class == DamageControl::Publisher::Jabber}
     assert_equal("aslak@jabber.org", jabber.friends)
   end
 end
