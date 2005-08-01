@@ -1,6 +1,6 @@
 module DamageControl
-  # Base class for plugins. Each plugin family should subclass this class, and each
-  # plugin in that family should extend that class.
+  # Base class for plugins. Each plugin category should subclass this class, and each
+  # plugin in that category should extend that class.
   class Plugin
     cattr_accessor :logger
 

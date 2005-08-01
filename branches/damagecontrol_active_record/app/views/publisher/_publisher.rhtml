@@ -1,22 +1,27 @@
-<table>
-  <tr>
-    <td>Successful</td>
-    <td><%= check_box_tag("#{object.family}[#{object.class.name}][Build::Successful]", "1") %></td>
-  </tr>
-  <tr>
-    <td>Fixed</td>
-    <td><%= check_box_tag("#{object.family}[#{object.class.name}][Build::Fixed]", "1") %></td>
-  </tr>
-  <tr>
-    <td>Broken</td>
-    <td><%= check_box_tag("#{object.family}[#{object.class.name}][Build::Broken]", "1") %></td>
-  </tr>
-  <tr>
-    <td>Repeatedly Broken</td>
-    <td><%= check_box_tag("#{object.family}[#{object.class.name}][Build::RepeatedlyBroken]", "1") %></td>
-  </tr>
-  <tr>
-    <td>Executing</td>
-    <td><%= check_box_tag("#{object.family}[#{object.class.name}][Build::Executing]", "1") %></td>
-  </tr>
-</table>
+<div id="<%= object.dom_id %>">
+  <table>
+    <tr>
+      <td colspan="2">Build states that will activate <%= object.name %></td>
+    </tr>
+    <tr>
+      <td>Successful</td>
+      <td><%= enabling_state_tag(object, "Build::Successful") %></td>
+    </tr>
+    <tr>
+      <td>Fixed</td>
+      <td><%= enabling_state_tag(object, "Build::Fixed") %></td>
+    </tr>
+    <tr>
+      <td>Broken</td>
+      <td><%= enabling_state_tag(object, "Build::Broken") %></td>
+    </tr>
+    <tr>
+      <td>Repeatedly Broken</td>
+      <td><%= enabling_state_tag(object, "Build::RepeatedlyBroken") %></td>
+    </tr>
+    <tr>
+      <td>Executing</td>
+      <td><%= enabling_state_tag(object, "Build::Executing") %></td>
+    </tr>
+  </table>
+</div>

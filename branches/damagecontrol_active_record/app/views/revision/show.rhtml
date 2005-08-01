@@ -21,7 +21,7 @@
       <% if(show_native_file_revision) %>
         <td><%= file.native_revision_identifier %></td>
       <% end %>
-      <td><%= image_tag(file.image, :size => "16x16", :title => file.status_description) %></td>
+      <td><%= image_tag(file.icon, :size => "16x16", :title => file.status_description) %></td>
       <td>
         <%= link_to_remote(
               file.path, {

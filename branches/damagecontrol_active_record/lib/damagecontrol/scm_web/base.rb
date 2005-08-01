@@ -2,7 +2,7 @@ module DamageControl
   module ScmWeb
     class Base < Plugin
       become_parent
-      attr_accessor :selected
+      attr_accessor :enabled
     end
   end
 end
