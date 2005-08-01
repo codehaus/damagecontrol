@@ -1,0 +1,28 @@
+<h1>Build Lifecycle</h1>
+<p>
+When a build is <%= link_to "triggered", :action=>"build_triggering" %> it will go through a lifecycle of different states. These states are divided in two categories: <em>executing</em> and <em>completed</em>.
+</p>
+
+<h2>Executing States</h2>
+<p>
+The <em>executing</em> states (orange) make it possible to monitor the progress of the build while it is executing. 
+</p>
+
+<%= image_tag("/images/docs/executing_build_states.png", :border => 0) %>
+
+<p>
+In a future version of DamageControl you may even be able to define custom sub-states of the <em>running</em> state (such as <em>compiling</em>, <em>testing</em>, etc). This can be used for just-in-time feedback, as well as gathering of statistics of build durations.
+</p>
+
+<h2>Completed States</h2>
+<p>
+The execution of a build can either succeed or fail. The state of a completed build depends on the state of the previous completed build for the same project:
+</p>
+
+<%= image_tag("/images/docs/completed_build_states.png", :border => 0) %>
+
+<h2>Build states and Publishers</h2>
+<p>
+The <%= link_to "publishers", :action=>"publisher" %> of a project can be associated with one or more of the possible build states. This way you have fine control over what build information you want to publish, and via what publishing channels.
+</p>
+
