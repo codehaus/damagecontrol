@@ -1,0 +1,13 @@
+<h1>Revisions</h1>
+<p>
+A revision is a "snapshot" of the state of an <%= link_to("scm", action=>"scm") %> at a particular time (and possibly associated with a particular branch). Every time a developer commits (checks in) files to the <%= link_to("scm", action=>"scm") %>, a new revision is created. 
+</p>
+<p>
+Transactional <%= link_to("scm", action=>"scm") %>s associate each revision with a set of files (typically the ones that went into the same commit), while non-transactional ones manage revisions on a per-file basis.
+</p>
+<p>
+It is often 
+</p>
+<p>
+DamageControl knows how to detect new revivions via its <%= link_to("trigger", action=>"trigger") %> mechanism.
+</p>
