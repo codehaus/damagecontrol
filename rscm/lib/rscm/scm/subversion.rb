@@ -146,7 +146,10 @@ module RSCM
     end
 
     def supports_trigger?
-      local?
+      true
+      # we'll assume it supports trigger even if not local. this is to ensure user interfaces
+      # can display appropriate options, even if the object is not 'fully initialised'
+      # local?
     end
 
     def create_central

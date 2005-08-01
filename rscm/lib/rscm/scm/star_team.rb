@@ -73,6 +73,10 @@ module RSCM
       files = java("checkout(\"#{checkout_dir}\")", &proc)
       files
     end
+
+    def supports_trigger?
+      true
+    end
     
   private
   

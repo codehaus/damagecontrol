@@ -91,6 +91,10 @@ module RSCM
       end
     end
   
+    def supports_trigger?
+      true
+    end
+
   protected
 
     def checkout_silent(to_identifier) # :yield: file

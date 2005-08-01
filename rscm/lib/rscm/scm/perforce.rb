@@ -69,6 +69,10 @@ module RSCM
       true
     end
 
+    def supports_trigger?
+      true
+    end
+
     def name
       "Perforce"
     end
