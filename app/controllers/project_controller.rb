@@ -44,9 +44,9 @@ private
   
   def update_or_save(project)
 
-    project.scm        = deserialize_to_array(@params[:scm]).find{|scm| scm.selected}
-    project.tracker    = deserialize_to_array(@params[:tracker]).find{|tracker| tracker.selected}
-    project.scm_web    = deserialize_to_array(@params[:scm_web]).find{|scm_web| scm_web.selected}
+    project.scm        = deserialize_to_array(@params[:scm]).find{|scm| scm.enabled}
+    project.tracker    = deserialize_to_array(@params[:tracker]).find{|tracker| tracker.enabled}
+    project.scm_web    = deserialize_to_array(@params[:scm_web]).find{|scm_web| scm_web.enabled}
     project.publishers = deserialize_to_array(@params[:publisher])
     project.update_attributes(@params[:project])
 

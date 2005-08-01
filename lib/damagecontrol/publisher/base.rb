@@ -8,6 +8,10 @@ module DamageControl
         @enabling_states = []
       end
       
+      def enabled
+        @enabling_states && !@enabling_states.empty?
+      end
+      
       # Publishes +build+ if its state is
       # among our +enabling_states+.
       def publish_maybe(build)

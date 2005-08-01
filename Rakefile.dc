@@ -13,14 +13,6 @@
 
 load File.dirname(__FILE__) + '/Rakefile'
 
-desc 'Require DamageControl environment.'
-task :dc_environment do
-  unless defined? RAILS_ROOT
-    require File.dirname(__FILE__) + '/config/dc_environment'
-  end
-end
-task :environment => [ :dc_environment ]
-
 desc "Delete files generated during test"
 task :clean_target do
   FileUtils.rm_rf 'target'
@@ -34,7 +26,7 @@ task :recreate_schema => :environment do
     when "sqlite", "sqlite3"
       db = "#{abcs['development']['dbfile']}"
       File.delete(db) if File.exist?(db)
-      `#{abcs[RAILS_ENV]["adapter"]} #{db} < db/schema.sql`
+      `#{abcs[RAILS_ENV]["adapter"]} #{db} < db/schema_#{abcs["test"]["adapter"]}.sql`
     else 
       raise "Unknown database adapter '#{abcs["test"]["adapter"]}'"
   end

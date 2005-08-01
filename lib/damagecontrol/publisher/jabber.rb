@@ -14,6 +14,12 @@ module DamageControl
 
       ann :description => "DamageControl's Friends"
       attr_accessor :friends
+      
+      def initialize
+        @id_resource = "dcontrol"
+        @password = "dcontrol"
+        @friends = ""
+      end
 
       def publish(build)
         session = nil

@@ -13,10 +13,20 @@ var settings = new Settings("root");
   <%= render :partial => "shared/menu", :locals => {:rows => @rows} %>
   <!-- Now, render a hidden form for each plugin -->
   <% @rows.flatten.each do |object| %>
+    <script type="text/javascript">
+      if(categories['<%= object.category %>'] == undefined) {
+        categories['<%= object.category %>'] = new Array();
+      }
+      categories['<%= object.category %>'].push('<%= object.dom_id %>');
+      var <%= object.dom_id %>_img_disabled = new Image();
+      <%= object.dom_id %>_img_disabled.src = '<%= object.disabled_icon %>';
+      var <%= object.dom_id %>_img_enabled = new Image();
+      <%= object.dom_id %>_img_enabled.src = '<%= object.enabled_icon %>';
+    </script>
     <div class="setting" id="<%= object.class.name %>" style="display:none;">
       <div>
         <p>
-          <%= image_tag(object.icon, :size=>"48x48", :border=>0) %>
+          <%= image_tag(object.current_icon, :size=>"48x48", :border => 0, :id => object.dom_id + "_img") %>
         </p>
         <p>
           <%= object.name %>
@@ -24,15 +34,19 @@ var settings = new Settings("root");
       </div>
       <div>
         <!-- Family-common part of form -->
-        <%= render :partial => template_for(object.family, object.family), :locals => {:object => object} %>
-        
+        <% unless(object.category == "project") %>
+          <%= render :partial => template_for(object.category, object.category), 
+              :locals => {:object => object} %>
+        <% end %>
+      
         <!-- Render the object itself -->
-        <% if(has_template(object.family, object.class.name.demodulize.underscore)) %>
+        <% if(has_template(object.category, object.class.name.demodulize.underscore)) %>
           <!-- Custom template -->
-          <%= render :partial => template_for(object.family, object.class.name.demodulize.underscore), :locals => {:object => object} %>
+          <%= render :partial => template_for(object.category, object.class.name.demodulize.underscore), 
+              :locals => {:object => object} %>
         <% else %>
           <!-- Use generic template -->
-          <%= render_object_with_name(object, "#{object.family}[#{object.class.name}]") %>
+          <%= render_object(object, "#{object.category}[#{object.class.name}]") %>
         <% end %>
       </div>
     </div>

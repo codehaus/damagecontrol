@@ -1,8 +1,14 @@
 <table>
-  <% object.to_yaml_properties.each do |attr_name| %>
+  <% 
+    object.to_yaml_properties.each do |attr_name| 
+      unless default_render_excludes.index(attr_name[1..-1].to_sym)
+  %>
     <tr>
       <td><%= description(object.class, attr_name) %></td>
       <td><%= field(object, prefix, attr_name) %></td>
     </tr>
-  <% end %>
+  <% 
+      end 
+    end 
+  %>
 </table>

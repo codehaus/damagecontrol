@@ -32,31 +32,31 @@ class ProjectControllerTest < Test::Unit::TestCase
       },
       :scm => {
         "RSCM::Subversion" => {
-          :selected => true,
+          :enabled => true,
           :url => "svn://some/where"
         },
         "RSCM::Cvs" => {
-          :selected => false,
+          :enabled => false,
           :root => "blah"
         }
       },
       :tracker => {
         "DamageControl::Tracker::Bugzilla" => {
-          :selected => false,
+          :enabled => false,
           :url => "http://bugzilla.org/bugs"
         },
         "DamageControl::Tracker::Jira" => {
-          :selected => true,
+          :enabled => true,
           :baseurl => "http://jira.codehaus.org/"
         }
       },
       :scm_web => {
         "DamageControl::ScmWeb::Trac" => {
-          :selected => true,
+          :enabled => true,
           :changeset_url => "http://trac.org/changesets"
         },
         "DamageControl::ScmWeb::Chora" => {
-          :selected => false
+          :enabled => false
         }
       },
       :publisher => {
