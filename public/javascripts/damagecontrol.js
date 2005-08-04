@@ -13,10 +13,11 @@ Settings = function(initial) {
     var pluginIds = categories[category];
     if(exclusive) {
       for(i=0; i<pluginIds.length; i++) {
-        setImage(pluginIds[i], pluginIds[i]==pluginId)
+        var enabled = pluginIds[i]==pluginId;
+        setImage(pluginIds[i], enabled);
+        setEnabled(pluginIds[i], enabled);
       }
     }
-//    setImage(pluginId, imageName);
     
     new Effect.Fade(this.current);
     new Effect.Appear(element);
@@ -38,6 +39,14 @@ function setImage(pluginId, enabled) {
   var imageName = enabled ? pluginId + '_img_enabled' : pluginId + '_img_disabled';
   $(pluginId + '_img').src = eval(imageName).src;
   $(pluginId + '_img_menu').src = eval(imageName).src;
+}
+
+/**
+ * Sets the value in the hidden 'enabled' field.
+ */
+function setEnabled(pluginId, enabled) {
+  var enabledId = pluginId + '_enabled';
+  $(enabledId).value = enabled;
 }
 
 /**

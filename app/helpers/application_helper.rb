@@ -2,8 +2,18 @@ require_dependency 'build'
 
 module ApplicationHelper
   
-  def field(object, name, attr_name)
-    tag("input", :name => "#{name}[#{attr_name[1..-1]}]", :value => object.instance_variable_get(attr_name))
+  def field(object, name, attr_name, type="text", id=nil)
+    tag("input", 
+      :name => "#{name}[#{attr_name[1..-1]}]", 
+      :value => object.instance_variable_get(attr_name),
+      :type => type,
+      :id => id
+    )
+  end
+  
+  def enabled_field(object)
+    field(object, "#{object.category}[#{object.class.name}]", "@enabled", "hidden", object.enabled_id)
+    # <input id="<%= object.enabled_id %>" name="scm[<%= object.class.name %>][enabled]" value="<%= object.enabled %>">
   end
   
   def description(clazz, attr_name)
@@ -64,7 +74,11 @@ module DamageControl
     def dom_id
       "#{category}_#{self.class.name.demodulize.underscore}"
     end
-    
+
+    def enabled_id
+      "#{dom_id}_enabled"
+    end
+
   end
 end
 
@@ -117,6 +131,10 @@ module RSCM
     def exclusive?
       true
     end
+
+    def default_render_excludes
+      [:enabled, :fileutils_label, :fileutils_output]
+    end
   end
 end
 
@@ -127,6 +145,10 @@ module DamageControl
     
     def icon_base
       "/images/#{category}/#{self.class.name.demodulize.underscore}"
+    end
+
+    def default_render_excludes
+      [:enabled, :fileutils_label, :fileutils_output]
     end
   end
   
@@ -143,7 +165,7 @@ module DamageControl
       # Exclude default rendering of enabling_states. It's handled by the _publisher.rhtml
       # template.
       def default_render_excludes
-        [:enabling_states]
+        [:enabling_states, :fileutils_label, :fileutils_output]
       end
     end
   end

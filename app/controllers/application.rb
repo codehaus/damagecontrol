@@ -1,4 +1,6 @@
+# TODO: shouldn't be necessary, but sometimes we get errors...!!??
 require_dependency 'build'
+require_dependency 'project'
 
 class ApplicationController < ActionController::Base
 
@@ -12,13 +14,20 @@ class ApplicationController < ActionController::Base
     result
   end
 
-  # Deserialises an object from a Hash where one attribute is the class name
-  # and the rest of them are attribute values. A special rule applies to Array
-  # values; they are converted to classes and new'ed
+  # Deserialises an object from a Hash holding attribute values. 
+  # Special rules:
+  # * Array values are eval'ed to classes and new'ed
+  # * "true" and "false" strings are turned into booleans.
   def deserialize(class_name, attributes)
     object = eval(class_name).new
     attributes.each do |attr_name, attr_value|
       setter = "#{attr_name}=".to_sym
+      if(attr_value == "true")
+        attr_value = true
+      end
+      if(attr_value == "false")
+        attr_value = false
+      end
       if(attr_value.is_a?(Array))
         attr_value = instantiate_array(attr_value)
       end
@@ -30,7 +39,6 @@ class ApplicationController < ActionController::Base
 private
 
   def instantiate_array(array)
-    STDERR.puts(array.join('+'))
     result = array.collect do |cls_name| 
       eval(cls_name).new
     end

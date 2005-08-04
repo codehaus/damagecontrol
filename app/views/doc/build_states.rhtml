@@ -11,12 +11,12 @@ The <em>executing</em> states (orange) make it possible to monitor the progress 
 <%= image_tag("/images/docs/executing_build_states.png", :border => 0) %>
 
 <p>
-In a future version of DamageControl you may even be able to define custom sub-states of the <em>running</em> state (such as <em>compiling</em>, <em>testing</em>, etc). This can be used for just-in-time feedback, as well as gathering of statistics of build durations.
+In a future version of DamageControl you may even be able to define custom sub-states of the <em>running</em> state (such as <em>compiling</em>, <em>testing</em>, etc). This can be used for more detailed information about build progress as well as gathering of statistics of build durations.
 </p>
 
 <h2>Completed States</h2>
 <p>
-The execution of a build can either succeed or fail. The state of a completed build depends on the state of the previous completed build for the same project:
+A build is complete when it has either gone successfully through all the steps of the build process, or it may fail at some step. In addition to this, the final state of a completed build also depends on the final state of the <em>previous</em> build for the same project:
 </p>
 
 <%= image_tag("/images/docs/completed_build_states.png", :border => 0) %>

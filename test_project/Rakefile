@@ -1,0 +1,41 @@
+require 'rake/testtask'
+require 'rscm'
+
+task :default => [:edit_files, :update_astray, :commit_changes, :sleep, :test]
+
+Rake::TestTask.new do |t|
+  t.libs << "test"
+  t.test_files = FileList['*/**/*_test.rb']
+  t.verbose = true
+end
+
+desc "Edit files (required for some SCMs like P4)"
+task :edit_files do |t|
+  scm = YAML::load(File.open('scm.yaml').read)
+  scm.checkout_dir = File.expand_path(".")
+  scm.edit('lib/astray.rb')
+end
+
+desc "Increment the number in astray.rb"
+task :update_astray do |t|
+  astray = File.open('lib/astray.rb').read
+  numbers = /([\d]+)/n
+  if(astray =~ numbers)
+    n = $1.to_i + 1
+    File.open('lib/astray.rb', 'w') do |io|
+      io.write astray.gsub(numbers, n.to_s)
+    end
+  end
+end
+
+desc "Sleep a while to make this build seem a little longer"
+task :sleep do |t|
+  sleep 10
+end
+
+desc "Commit changes back to the SCM"
+task :commit_changes do |t|
+  scm = YAML::load(File.open('scm.yaml').read)
+  scm.checkout_dir = File.expand_path(".")
+  scm.commit("Went a little astray")
+end

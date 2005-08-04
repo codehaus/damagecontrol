@@ -22,6 +22,11 @@
           </td>
         <% end %>
       </tr>
+      <tr>
+        <% row.each do |object| %>
+          <td><%= object.name %></td>
+        <% end %>
+      </tr>
     <% end %>
   </table>
 </div>
