@@ -8,8 +8,6 @@ class DependencyController < ApplicationController
   def image_map_html
     from_name = @params["id"]
     edit = @params["edit"] == "true"
-$stderr.puts @params["edit"]
-$stderr.puts @params["edit"].class.name
     from = DamageControl::Project.load("#{BASEDIR}/projects/#{from_name}/project.yaml")
     projects = DamageControl::Project.find_all("#{BASEDIR}/projects")
     dg = DamageControl::DependencyGraph.new(from, projects, Time, edit)

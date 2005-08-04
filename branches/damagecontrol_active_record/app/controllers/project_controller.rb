@@ -1,3 +1,5 @@
+require_dependency 'build'
+
 class ProjectController < ApplicationController
   layout "application", :except => :list
   
@@ -43,7 +45,6 @@ class ProjectController < ApplicationController
 private
   
   def update_or_save(project)
-
     project.scm        = deserialize_to_array(@params[:scm]).find{|scm| scm.enabled}
     project.tracker    = deserialize_to_array(@params[:tracker]).find{|tracker| tracker.enabled}
     project.scm_web    = deserialize_to_array(@params[:scm_web]).find{|scm_web| scm_web.enabled}

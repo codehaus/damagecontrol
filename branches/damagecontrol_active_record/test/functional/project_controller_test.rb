@@ -11,18 +11,6 @@ class ProjectControllerTest < Test::Unit::TestCase
     @response   = ActionController::TestResponse.new
   end
 
-  def Xtest_should_select_scm_on_edit
-    scm = RSCM::Subversion.new
-    scm.url = "svn://show/this/please"
-    project = Project.create(:scm => scm)
-    get :edit, :id => project.id
-    
-    # <option value="RSCM::Perforce">Perforce</option>
-    assert_tag :tag => "option", :attributes => {:value => "RSCM::Perforce"}
-    assert_tag :tag => "option", :attributes => {:value => "RSCM::Subversion", :selected => "selected"}
-    assert_tag :tag => "input", :attributes => {:value => "svn://show/this/please"}
-  end
-
   def test_should_save_plugins_on_update
     project = Project.create
     post :update, 

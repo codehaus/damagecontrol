@@ -47,8 +47,8 @@ task :create_sample_projects do
   ruby "script/create_sample_projects"
 end
 
-desc "Recreate database, create sample projects and run daemon"
-task :daemon_from_scratch => [:recreate_schema, :create_sample_projects, :daemon]
+desc "Recreate database, create test project and run daemon"
+task :daemon_from_scratch => [:recreate_schema, :create_test_project, :daemon]
 
 # Support Tasks ------------------------------------------------------
 
@@ -104,5 +104,35 @@ task :square_from_raw do
     colour_png = "public/images/#{basename}.png"
     puts "writing square colour image #{colour_png}"
     img.write(colour_png)
+  end
+end
+
+desc "Create repo for test_project"
+task :create_test_project => [:environment] do
+  # TODO: make a copy before we import, to avoid .svn files...
+  flunk "DOME!"
+  require 'rscm'
+  scm = RSCM::Subversion.new
+  path = File.expand_path('target/test_project_repo')
+  FileUtils.rm_rf(path) if File.exist?(path)
+  scm = RSCM::Subversion.new(RSCM::PathConverter.filepath_to_nativeurl(path))
+  # yaml the scm. test_project's build script needs it to commit changes to itself.
+  File.open("test_project/scm.yaml", "w") do |io|
+    io.write(scm.to_yaml)
+  end
+
+  scm.create_central  
+  scm.import_central('test_project', "importing")
+
+  if(!Project.find_by_name("test_project"))
+    test_project = Project.create(
+      :name => "test_project",
+      :home_page => "http://hieraki.lavalamp.ca/",
+      :start_time => 2.weeks.ago.utc, 
+      :relative_build_path => "", 
+      :build_command => "rake", 
+      :scm => scm,
+      :publishers => []
+    )
   end
 end
