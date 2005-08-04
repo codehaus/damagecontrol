@@ -74,8 +74,8 @@ module RSCM
       checked_out_files
     end
     
-    def commit(message, &proc)
-      cvs(@checkout_dir, commit_command(message), &proc)
+    def commit(message)
+      cvs(@checkout_dir, commit_command(message))
     end
 
     def uptodate?(identifier)
