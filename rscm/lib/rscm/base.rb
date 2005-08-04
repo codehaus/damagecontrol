@@ -110,13 +110,13 @@ module RSCM
       raise "Not implemented"
     end
     
-    # Destroysthe central repository. Shuts down any server processes and deletes the repository.
-    # WARNING: calling this may result in loss of data. Only call this if you really want to wipe it out for good!
+    # Destroys the central repository. Shuts down any server processes and deletes the repository.
+    # WARNING: calling this may result in loss of data. Only call this if you really want to wipe 
+    # it out for good!
     def destroy_central
     end
 
     # Whether a repository can be created.
-    #
     def can_create_central?
       false
     end
@@ -125,22 +125,23 @@ module RSCM
     def add(relative_filename)
     end
 
-    # Recursively imports files from a directory into the central scm
-    #
+    # Recursively imports files from a +dir+ into the central scm
     def import_central(dir, message)
       raise "Not implemented"
     end
 
     # The display name of this SCM
-    #
     def name
       # Should be overridden by subclasses to display a nicer name
       self.class.name
     end
 
-    # Open a file for edit - required by scms that checkout files in read-only mode e.g. perforce
-    #
+    # Open a file for edit - required by scms that check out files in read-only mode e.g. perforce
     def edit(file)
+    end
+    
+    # Commit (check in) modified files.
+    def commit(message)
     end
 
     # Checks out or updates contents from a central SCM to +checkout_dir+ - a local working copy.
