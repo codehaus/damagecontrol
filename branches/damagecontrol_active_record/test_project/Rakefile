@@ -1,3 +1,12 @@
+# This is a test project that modifies itself and checks in when built.
+# The purpose is to have a project that commits new versions all the time
+# to the SCM and use it for ad-hoc testing. In order to activate this project,
+# stand in  the root of damagecontrol and run:
+#
+#  rake recreate_schema
+#  rake create_test_project
+#  script/daemon
+#
 require 'rake/testtask'
 require 'rscm'
 
