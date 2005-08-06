@@ -15,8 +15,7 @@ ActionController::Routing::Routes.draw do |map|
   # instead of a file named 'wsdl'
   map.connect ':controller/service.wsdl', :action => 'wsdl'
 
-#  map.connect 'artifacts', :controller => 'file_system', :action => 'dir', :path => ''
-  map.connect 'artifacts/*path', :controller => 'file_system', :action => 'dir'
+  map.connect 'artifacts/*path', :controller => 'file_system', :action => 'artifacts'
 
   # Install the default route as the lowest priority.
   map.connect ':controller/:action/:id'

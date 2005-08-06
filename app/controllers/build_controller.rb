@@ -2,6 +2,11 @@ class BuildController < ApplicationController
   
   def show
     find
+    # TODO: optimize
+    @project = @build.project
+    @revisions = @build.revision.project.revisions
+    load_builds_for_sparkline(@project)
+    @template_for_left_column = "revision/list"
   end
 
   def stdout

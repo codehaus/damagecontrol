@@ -1,10 +1,13 @@
+require_dependency 'sparklines'
 # TODO: shouldn't be necessary, but sometimes we get errors...!!??
 require_dependency 'build'
 require_dependency 'project'
 
 class ApplicationController < ActionController::Base
+  SPARKLINE_COUNT = 20
 
   before_filter :load_projects
+  helper :sparklines
   
   def deserialize_to_array(hash)
     result = []
@@ -34,6 +37,12 @@ class ApplicationController < ActionController::Base
       object.__send__(setter, attr_value)
     end
     object
+  end
+
+protected
+  
+  def load_builds_for_sparkline(project)
+    @builds = project.builds(nil, nil, SPARKLINE_COUNT)
   end
 
 private

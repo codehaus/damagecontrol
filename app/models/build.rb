@@ -49,12 +49,12 @@ class Build < ActiveRecord::Base
   # gets project's latest build before ourself
   def previous
     h = higher_item
-    h ? h : revision.project.latest_build(nil, begin_time)
+    h ? h : revision.project.builds(nil, begin_time)[0]
   end
   
   # The estimated duration of this build, or nil if it cannot be determined.
   def estimated_duration
-    lb = revision.project.latest_build(true)
+    lb = revision.project.builds(true)[0]
     lb ? lb.duration : nil
   end
   

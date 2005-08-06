@@ -22,17 +22,6 @@ unless defined? DAMAGECONTROL_HOME
 end
 require 'damagecontrol'
 
-def create_logger(cls)
-  log_name = Inflector.underscore(Inflector.demodulize(cls.name))
-  log_file = "#{DAMAGECONTROL_HOME}/log/#{log_name}.log"
-  dir = File.dirname(log_file)
-  FileUtils.mkdir_p(dir) unless File.exist?(dir)
-  Logger.new(log_file)
-end
-
-# TODO: Ues thread-specific loggers - easier to follow
-[DamageControl::ScmPoller, Build, Project, Revision].each { |cls| cls.logger = create_logger(cls) }
-
 class ActiveRecord::ConnectionAdapters::AbstractAdapter
   # Expose connection. We need to set the busy_handler
   attr_reader :connection

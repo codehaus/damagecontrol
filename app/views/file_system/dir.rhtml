@@ -1,5 +1,12 @@
 <div class="file_system">
-<% @dir.files.each do |file| %>
-  <div><a href="/artifacts/<%= file.path.join('/') %>"></a></div>
+<% @dir.children.each do |child| %>
+  <div>
+    <%= link_to(
+      image_tag(child.icon, :size => "16x16", :border => 0) + child.basename, 
+      :controller => "file_system", 
+      :action => "artifacts", 
+      :params => {:path => @path_array.dup << child.basename}
+    ) %>
+  </div>
 <% end %>
 </div>

@@ -12,15 +12,15 @@ class ProjectTest < Test::Unit::TestCase
   end
   
   def test_should_find_latest_build
-    assert_equal(@build_2, @project_1.latest_build)
+    assert_equal(@build_2, @project_1.builds[0])
   end
 
   def test_should_find_latest_build_before
-    assert_equal(@build_1, @project_1.latest_build(nil, Time.utc(1971,02,28,23,45,01)))
+    assert_equal(@build_1, @project_1.builds(nil, Time.utc(1971,02,28,23,45,01))[0])
   end
 
   def test_should_find_latest_successful_build
-    assert_equal(@build_1, @project_1.latest_build(true))
+    assert_equal(@build_1, @project_1.builds(true)[0])
   end
 
   def test_should_persist_scm

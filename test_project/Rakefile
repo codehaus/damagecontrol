@@ -1,7 +1,7 @@
 require 'rake/testtask'
 require 'rscm'
 
-task :default => [:edit_files, :update_astray, :commit_changes, :sleep, :test]
+task :default => [:clean, :update_astray, :write_artifacts, :sleep, :commit_changes, :test]
 
 Rake::TestTask.new do |t|
   t.libs << "test"
@@ -9,15 +9,18 @@ Rake::TestTask.new do |t|
   t.verbose = true
 end
 
-desc "Edit files (required for some SCMs like P4)"
-task :edit_files do |t|
-  scm = YAML::load(File.open('scm.yaml').read)
-  scm.checkout_dir = File.expand_path(".")
-  scm.edit('lib/astray.rb')
+desc "Clean generated files"
+task :clean do |t|
+  FileUtils.rm_rf("pkg") if File.exist?("pkg")
 end
 
 desc "Increment the number in astray.rb"
 task :update_astray do |t|
+  # Edit files (required for some SCMs like P4)
+  scm = YAML::load(File.open('scm.yaml').read)
+  scm.checkout_dir = File.expand_path(".")
+  scm.edit('lib/astray.rb')
+
   astray = File.open('lib/astray.rb').read
   numbers = /([\d]+)/n
   if(astray =~ numbers)
@@ -30,7 +33,9 @@ end
 
 desc "Sleep a while to make this build seem a little longer"
 task :sleep do |t|
-  sleep 10
+  time = (rand * 10).to_i + 10
+  STDERR.puts "Making build appear longer by sleeping #{time} seconds"
+  sleep(time)
 end
 
 desc "Commit changes back to the SCM"
@@ -38,4 +43,14 @@ task :commit_changes do |t|
   scm = YAML::load(File.open('scm.yaml').read)
   scm.checkout_dir = File.expand_path(".")
   scm.commit("Went a little astray")
+end
+
+desc "Writes some artifacts"
+task :write_artifacts do |t|
+  gem = "pkg/test_project-#{ENV['PKG_BUILD']}.gem"
+  puts "Creating gem in #{gem}"
+  FileUtils.mkdir_p("pkg") unless File.exist?("pkg")
+  File.open(gem, "w") do |io|
+    io.puts "just a test gem for version #{ENV['DAMAGECONTROL_BUILD_LABEL']}"
+  end
 end

@@ -38,10 +38,11 @@ class Project < ActiveRecord::Base
     Revision.find_by_sql(["SELECT * FROM revisions WHERE project_id=? ORDER BY timepoint DESC LIMIT 1", self.id])[0]
   end
 
-  # Finds the latest build +successful+ or not.
+  # Finds builds (+successful+ or not), ordered in descending order of their +begin_time+.
   # If the +before+ argument is specified (UTC time), 
-  # the build's +begin_time+ will be before that time.
-  def latest_build(successful=nil, before=nil)
+  # the builds' +begin_time+ will be before that time.
+  # The number of returned builds will be maximum +max_count+.
+  def builds(successful=nil, before=nil, max_count=1)
     raise "successful must be bool" if successful && !(successful.class==TrueClass || successful.class==FalseClass)
     success_criterion = successful ? "AND b.exitstatus=0" : ""
     before_criterion = before ? "AND b.begin_time<#{quote(before)}" : ""
@@ -55,10 +56,10 @@ AND b.exitstatus IS NOT NULL
 #{success_criterion}
 #{before_criterion}
 ORDER BY b.begin_time DESC
-LIMIT 1
+LIMIT #{max_count}
     EOS
 
-    Build.find_by_sql([sql, self.id])[0]
+    Build.find_by_sql([sql, self.id])
   end
   
   def latest_revision_has_builds?

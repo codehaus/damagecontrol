@@ -1,5 +1,17 @@
 <div id="revisions">
   <table>
+    <tr>
+      <td>
+        <%= sparkline_tag @builds.reverse.collect{|b| b.duration.to_i*10}, 
+          :type => 'smooth',
+          :has_last => true
+        %>
+      </td>
+      <td>
+        build duration
+      </td>
+    </tr>
+
   <% @revisions.each do |revision| %>
     <tr>
       <td nowrap="nowrap">
@@ -7,7 +19,7 @@
       </td>
       <td>
         <% revision.builds.each do |build| %>
-          <%= link_to(image_tag(build.icon, :border => 0), 
+          <%= link_to(image_tag(build.icon, :border => 0, :size => "16x16"), 
                 :controller => "build", :action => "show", :id => build.id) %>
         <% end %>
       </td>
@@ -16,11 +28,16 @@
   </table>
 </div>
 
-<% if(@revision_list_refresh) %>
+<% unless(@params[:no_init_of_revision_list_refresh]) %>
   <%= periodically_call_remote(
     :update => "revisions",
-    :url => {:controller => "revision", :action => "list", :id => @project.id},
-    :frequency => 29, # prime increases dispersion
+    :url => {
+      :controller => "revision", 
+      :action => "list", 
+      :id => @project.id, 
+      :params => {:no_init_of_revision_list_refresh => true}
+    },
+    :frequency => 29, # prime increases dispersion of other ajax calls
     :failure => "alert('AJAX problem for revision/list/#{@project.id}')"
   ) %>
 <% end %>
