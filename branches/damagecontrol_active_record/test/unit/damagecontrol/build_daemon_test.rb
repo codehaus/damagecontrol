@@ -38,12 +38,17 @@ module DamageControl
       
       # create new project
       archiver = ::DamageControl::Publisher::ArtifactArchiver.new
-      archiver.files = {"result.txt" => "Test"}
+      archiver.files = {"result.txt" => "results"}
       archiver.enabling_states = [Build::Successful.new]
       
       scm = RSCM::Subversion.new
       scm.url = "file://#{central_repo}"
-      project = Project.create(:name => "Test", :scm => scm, :publishers => [archiver], :build_command => 'cp input.txt result.txt')
+      project = Project.create(
+        :name => "Test", 
+        :scm => scm, 
+        :publishers => [archiver], 
+        :build_command => 'cp input.txt result.txt'
+      )
       
       # create svn repository
       scm.create_central
@@ -67,7 +72,7 @@ module DamageControl
       assert_equal(1, project.revisions.length)
       assert_equal(1, project.latest_revision.builds.length)
       assert(project.latest_revision.builds[0].successful?)
-      assert_equal("This is a test", File.open(Artifact::ROOT_DIR + "/result.txt").read)
+      assert_equal("This is a test", File.open(Artifact::ROOT_DIR + "/results/result.txt").read)
     end
 
   end

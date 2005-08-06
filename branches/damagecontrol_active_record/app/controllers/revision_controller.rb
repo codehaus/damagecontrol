@@ -1,9 +1,12 @@
 class RevisionController < ApplicationController
+
   layout "application", :except => :list
 
   def list
     @project = Project.find(@params[:id])
     @revisions = @project.revisions
+    
+    load_builds_for_sparkline(@project)
   end
   
   def show
@@ -12,8 +15,9 @@ class RevisionController < ApplicationController
     # first rendering of revision list
     @project = @revision.project
     @revisions = @revision.project.revisions
-    @revision_list_refresh = true
     @template_for_left_column = "revision/list"
+
+    load_builds_for_sparkline(@project)
   end
 
   # Requests a build. Nothing is rendered.
@@ -22,4 +26,5 @@ class RevisionController < ApplicationController
     @revision.request_build(Build::MANUALLY_TRIGGERED)
     render :nothing => true
   end
+  
 end

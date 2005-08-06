@@ -29,7 +29,7 @@
   </tr>
   <tr>
     <td>Artifacts:</td>
-    <td><%= @build.artifacts.collect{ |a| a.link }.join("<br>\n") %></td>
+    <td><%= @build.artifacts.collect{ |artifact| artifact_link(artifact) }.join("<br>\n") %></td>
   </tr>
 </table>
 

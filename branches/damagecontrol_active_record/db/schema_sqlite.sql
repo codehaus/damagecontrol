@@ -60,16 +60,8 @@ CREATE TABLE build_logs(
   data TEXT
 );
 
-CREATE TABLE directories(
-  id INTEGER PRIMARY KEY,
-  name TEXT,
-  parent_id INTEGER
-);
-
 CREATE TABLE artifacts(
   id INTEGER PRIMARY KEY,
-  name TEXT,
-  build_id INTEGER,
-  file_reference TEXT,
-  directory_id
+  relative_path TEXT,
+  build_id INTEGER
 );

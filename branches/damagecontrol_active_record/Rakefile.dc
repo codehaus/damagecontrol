@@ -32,16 +32,6 @@ task :recreate_schema => :environment do
   end
 end
 
-desc "Run the DamageControl Webapp"
-task :webrick do
-  ruby "script/webrick"
-end
-
-desc "Run the DamageControl Daemon"
-task :daemon do
-  ruby "script/daemon"
-end
-
 desc "Create sample projects"
 task :create_sample_projects do
   ruby "script/create_sample_projects"
@@ -110,7 +100,6 @@ end
 desc "Create repo for test_project"
 task :create_test_project => [:environment] do
   # TODO: make a copy before we import, to avoid .svn files...
-  flunk "DOME!"
   require 'rscm'
   scm = RSCM::Subversion.new
   path = File.expand_path('target/test_project_repo')
@@ -125,6 +114,13 @@ task :create_test_project => [:environment] do
   scm.import_central('test_project', "importing")
 
   if(!Project.find_by_name("test_project"))
+    aa = DamageControl::Publisher::ArtifactArchiver.new
+    aa.files = {"pkg/*.gem" => "gems"}
+    aa.enabling_states = [Build::Successful.new, Build::Fixed.new]
+
+    growl = DamageControl::Publisher::Growl.new
+    growl.enabling_states = [Build::Broken.new, Build::Fixed.new]
+  
     test_project = Project.create(
       :name => "test_project",
       :home_page => "http://hieraki.lavalamp.ca/",
@@ -132,7 +128,7 @@ task :create_test_project => [:environment] do
       :relative_build_path => "", 
       :build_command => "rake", 
       :scm => scm,
-      :publishers => []
+      :publishers => [aa, growl]
     )
   end
 end

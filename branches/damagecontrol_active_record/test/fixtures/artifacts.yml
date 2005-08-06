@@ -1,6 +1,6 @@
 artifact_1:
   id: 1
-  build_id: 1
+  build_id: 2
 artifact_2:
   id: 2
-  build_id: 1
+  build_id: 2

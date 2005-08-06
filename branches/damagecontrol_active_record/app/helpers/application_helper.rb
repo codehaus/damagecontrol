@@ -10,6 +10,13 @@ module ApplicationHelper
       :id => id
     )
   end
+
+  def artifact_link(artifact)
+    link_to(
+      File.basename(artifact.relative_path), 
+      :controller => "file_system", :action => "artifacts", :params => {:path => artifact.relative_path.split('/')}
+    )
+  end
   
   def enabled_field(object)
     field(object, "#{object.category}[#{object.class.name}]", "@enabled", "hidden", object.enabled_id)
@@ -195,7 +202,6 @@ module DamageControl
   end
 end
 
-
 class Build < ActiveRecord::Base
   def icon
     if(successful?)
@@ -229,4 +235,13 @@ class RevisionFile < ActiveRecord::Base
     DESCRIPTIONS[status]
   end
 
+end
+
+class Pathname
+  DEFAULT_ICON_PATH = '/images/filetypes/txt.gif'
+  
+  def icon
+    icon_path = '/images/filetypes/#{extname}.gif'
+    File.exist?(RAILS_ROOT + '/public' + icon_path) ? icon_path : DEFAULT_ICON_PATH
+  end
 end

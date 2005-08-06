@@ -72,7 +72,7 @@ class BuildTest < Test::Unit::TestCase
   end
   
   def test_should_have_artifacts
-    assert_equal([@artifact_1, @artifact_2], @build_1.artifacts)
+    assert_equal([@artifact_1, @artifact_2], @build_2.artifacts)
   end
   
   def test_should_save_status_based_on_previous

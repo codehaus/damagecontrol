@@ -3,7 +3,10 @@
 load File.dirname(__FILE__) + '/../config/environment.rb'
 
 # set up logging
-::DamageControl::ScmPoller.logger = Logger.new(STDOUT)
-::DamageControl::Publisher::Base.logger = Logger.new(STDOUT)
-
+[DamageControl::ScmPoller, 
+DamageControl::Publisher::Base, 
+Build, 
+Project, 
+Revision].each { |cls| cls.logger = Logger.new(STDOUT) }
+ 
 DamageControl::BuildDaemon.new.run
