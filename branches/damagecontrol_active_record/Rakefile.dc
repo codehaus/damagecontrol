@@ -101,10 +101,9 @@ desc "Create repo for test_project"
 task :create_test_project => [:environment] do
   # TODO: make a copy before we import, to avoid .svn files...
   require 'rscm'
-  scm = RSCM::Subversion.new
   path = File.expand_path('target/test_project_repo')
   FileUtils.rm_rf(path) if File.exist?(path)
-  scm = RSCM::Subversion.new(RSCM::PathConverter.filepath_to_nativeurl(path))
+  scm = RSCM::Subversion.new(RSCM::PathConverter.filepath_to_nativeurl(path + "/trunk/foo"), "trunk/foo")
   # yaml the scm. test_project's build script needs it to commit changes to itself.
   File.open("test_project/scm.yaml", "w") do |io|
     io.write(scm.to_yaml)
