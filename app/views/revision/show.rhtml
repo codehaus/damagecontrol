@@ -1,10 +1,21 @@
 <h1><%= @revision.project.name %> revision <%= @revision.identifier %></h1>
 <p>
-<%= link_to_remote(
-	"Request build for this revision",
-	:url => {:controller => "revision", :action => "build", :id => @revision.id}
-) %>
+<% unless @revision.builds.empty? %>
+  Builds:
+  <% @revision.builds.each do |build| %>
+    <%= link_to(build.create_time,
+    	:controller => "build", :action => "show", :id => build.id
+    ) %>
+  <% end %>
+<% end %>
 </p>
+<div id="request_build">
+  <%= link_to_remote(
+  	"Request new build for this revision",
+  	:url => {:controller => "revision", :action => "build", :id => @revision.id},
+  	:update => "request_build"
+  ) %>
+</div>
 
 <div>
   <b><%= @revision.developer %></b>

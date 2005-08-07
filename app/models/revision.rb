@@ -33,7 +33,7 @@ class Revision < ActiveRecord::Base
   # Creates a new (pending) build for this revision
   # Returns the created Build object.
   def request_build(reason)
-    builds.create(:reason => reason)
+    builds.create(:reason => reason, :create_time => Time.now.utc)
   end
 end
 
