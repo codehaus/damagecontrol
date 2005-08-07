@@ -156,6 +156,15 @@ module RSCM
       native_path = PathConverter.filepath_to_nativepath(svnrootdir, true)
       mkdir_p(PathConverter.nativepath_to_filepath(native_path))
       svnadmin(svnrootdir, "create #{native_path}")
+      if(@path && @path != "")
+        # create the directories
+        paths = @path.split("/")
+        paths.each_with_index do |p,i|
+          p = paths[0..i]
+          u = "#{repourl}/#{p.join('/')}"
+          svn(".", "mkdir #{u} -m \"Adding directories\"")
+        end
+      end
     end
 
     def install_trigger(trigger_command, damagecontrol_install_dir)
@@ -188,7 +197,6 @@ module RSCM
       checkout_dir = PathConverter.filepath_to_nativepath(@checkout_dir, false)
       revisions = nil
       command = "svn #{changes_command(from_identifier, to_identifier)}"
-      yield command if block_given?
 
       with_working_dir(@checkout_dir) do
         Better.popen(command) do |stdout|
