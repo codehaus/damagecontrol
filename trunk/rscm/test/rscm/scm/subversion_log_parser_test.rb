@@ -182,5 +182,6 @@ EOF
       assert_equal("boo/build.xml", slep.relative_path(url, "trunk/xstream/boo/build.xml"))
       assert_equal(nil, slep.relative_path(url, "trunk/xstream-website/boo/build.xml"))
     end
+
   end
 end

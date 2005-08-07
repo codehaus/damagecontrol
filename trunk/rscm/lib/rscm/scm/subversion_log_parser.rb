@@ -50,7 +50,11 @@ module RSCM
         end
         max_similar -= 1
       end
-      max_similar == 0 ? nil : repo_path_tokens[max_similar..-1].join("/")
+      if(max_similar == 0) 
+        nil
+      else
+        repo_path_tokens[max_similar..-1].join("/")
+      end
     end
     
   protected
