@@ -24,7 +24,7 @@ class RevisionController < ApplicationController
   def build
     @revision = Revision.find(@params[:id])
     @revision.request_build(Build::MANUALLY_TRIGGERED)
-    render :nothing => true
+    render :text => "Build requested"
   end
   
 end
