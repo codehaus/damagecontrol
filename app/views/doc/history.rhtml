@@ -1,0 +1,41 @@
+<h1>History</h1>
+<p>
+Like most &quot;new&quot; things, DamageControl is not an entirely new invention. DamageControl owes its feature set to a lot of different products and ideas:
+</p>
+<h2>CruiseControl</h2>
+<p>
+<a href="http://cruisecontrol.sourceforge.net/">CruiseControl</a> was the first CI system to gain mainstream acceptance. CruiseControl's marketshare owes a lot of its success to Matt Foemmel and Martin Fowler's <a href="http://www.martinfowler.com/articles/continuousIntegration.html">seminal article</a> on Continuous Integration as well as the CruiseControl team's ability to support a wide range of SCMs and publishing channels.
+</p>
+<h2>Maven</h2>
+<p>
+<a href="http://maven.apache.org/">Maven</a> is a project management tool that focuses on reusable build tasks, release management and software development metrics. Maven has been criticised for being too hard to use and debug, and to lack a clear vision. DamageControl realises Maven's strong assets and attempts to implement them in a more managable way:
+<ul>
+  <li>Release management</li>
+  <li>Software Metrics and Reports (buld time, build reliability, build frequency)</li>
+  <li>Project metadata (where is the SCM, tracker and other project scaffolding)</li>
+</ul>
+</p>
+<h2>ViewCVS</h2>
+<p>
+<a href="http://viewcvs.sourceforge.net/">ViewCVS</a> allows users to browse the contents of CVS and Subversion repositories over The Web. DamageControl takes the concept a step further by offering this capability to more SCMs. DamageControl also integrates SCM browsing with build reports and bug reports.
+</p>
+<h2>Ruby on Rails</h2>
+<p>
+David Heinemeier Hansson contacted the DamageControl team before Ruby on Rails had gained the enormous popularity it is enjoying today. Having already rolled our own small MVC framework for WebRick, we didn't see the point in migrating to RoR at that time. What a mistake! DamageControl has since been completely rewritten to taqke advantage of the RoR stack. First the web-tier, then the persistence tier. This has resulted in a codebase that is approximately 50% smaller than the original (not counitng new features added after the fact). The RoR migration has also resulted in a cleaner codebase that we hope will attract more RoR developers to help us improve DamageControl and help it become the leader in the CI space.
+</p>
+<h2>Sparklines</h2>
+<p>
+Stupid at first glance, ingenious at the next. <a href="http://www.edwardtufte.com/bboard/q-and-a-fetch-msg?msg_id=0001Eb&topic_id=1">Sparklines</a> is simply a near-typographic way of representing scalar data in a form that is as expressive as text, if not more. DamageControl uses 's <a href="http://nubyonrails.topfunky.com/articles/2005/07/28/sparklines-graph-library-for-ruby">Geoff Grosenbach's sparklines library</a> to represent metrics wherever possible. Examples are build duration, build frequency and build reliability. Future versions of DamageControl will also allow users to easily define custom metrics that will be displayed with sparklines.
+</p>
+<h2>Trac</h2>
+<p>
+Trac is a truly awesome project management tool, not unlike DamageControl. Except that Trac (currently) doesn't support any sort of build management (if this changes, let us know). DamageControl borrows several of Trac's features like SCM browsing (like ViewCVS, smart commit messages and issue tracker/scm integration). DamageControl however attempts to implement similar functionality in a product-neutral manner (allowing users to use other SCMs and issue trackers.)
+</p>
+<h2>Other CI engines</h2>
+<p>
+Distributedness, ease of setup, see the matrix....
+</p>
+<h1>The DamageControl Cocktail</h1>
+<p>
+All of the tools and techniques above have contributed significant impact on the software industry. DamageControl attempts to integrate all of the above into one product
+</p>
