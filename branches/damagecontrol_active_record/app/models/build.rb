@@ -23,17 +23,39 @@ class Build < ActiveRecord::Base
 
   acts_as_list :scope => :revision
   belongs_to :revision
+  belongs_to :triggering_build, :class_name => "Build"
   has_many :artifacts
   serialize :env
   serialize :state
 
   validates_inclusion_of :reason, :in => [SCM_POLLED, SCM_TRIGGERED, MANUALLY_TRIGGERED, SUCCESSFUL_DEPENDENCY]
 
+  def before_create
+    self.create_time = Time.now.utc
+  end
+  
+  # The 'owner' of this build depends on the +reason+ for the build:
+  #
+  #   * SCM_POLLED => revision.developer
+  #   * SCM_TRIGGERED => revision.developer
+  #   * MANUALLY_TRIGGERED => revision.developer
+  #   * SUCCESSFUL_DEPENDENCY => other_build.revision.developer
+  def owner
+    case reason
+      when SCM_POLLED then revision.developer
+      when SCM_TRIGGERED then revision.developer
+      when MANUALLY_TRIGGERED then revision.developer # TODO: use user auth here!
+      when SUCCESSFUL_DEPENDENCY then triggering_build.revision.project.name
+    end
+  end
+
   # A short description of the reason for this build
   def reason_description
-    # TODO: use case - can't remember syntax
-    if(reason == SCM_POLLED)
-      "commit by #{revision.developer}"
+    case reason
+      when SCM_POLLED then "commit by #{revision.developer}"
+      when SCM_TRIGGERED then "commit by #{revision.developer}"
+      when MANUALLY_TRIGGERED then "manually triggered"
+      when SUCCESSFUL_DEPENDENCY then "successful build of #{triggering_build.revision.project.name}"
     end
   end
   

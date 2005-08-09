@@ -114,7 +114,7 @@ task :create_test_project => [:environment] do
 
   if(!Project.find_by_name("test_project"))
     aa = DamageControl::Publisher::ArtifactArchiver.new
-    aa.files = {"pkg/*.gem" => "gems"}
+    aa.files = {"pkggem" => "gems"}
     aa.enabling_states = [Build::Successful.new, Build::Fixed.new]
 
     growl = DamageControl::Publisher::Growl.new

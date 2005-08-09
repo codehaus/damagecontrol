@@ -9,11 +9,14 @@ revision_2:
   id: 2
   project_id: 1
   identifier: [1]
+  developer: tirsen
+  message: ibsen
   timepoint: 1971-02-28 23:45:01 Z
 revision_3:
   id: 3
   project_id: 1
   identifier: [3]
+  message: hamsun
   timepoint: 1971-02-28 23:45:02 Z
 revision_4:
   id: 4

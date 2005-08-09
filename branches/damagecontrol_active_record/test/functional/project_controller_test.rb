@@ -5,6 +5,8 @@ require 'project_controller'
 class ProjectController; def rescue_action(e) raise e end; end
 
 class ProjectControllerTest < Test::Unit::TestCase
+  fixtures :projects, :revisions, :builds, :artifacts
+  
   def setup
     @controller = ProjectController.new
     @request    = ActionController::TestRequest.new
@@ -73,5 +75,29 @@ class ProjectControllerTest < Test::Unit::TestCase
     assert_equal("codehaus.org", growl.hosts)
     jabber = project.publishers.find{|p| p.class == DamageControl::Publisher::Jabber}
     assert_equal("aslak@jabber.org", jabber.friends)
+  end
+
+  def test_should_create_revisions_rss
+    jira = DamageControl::Tracker::Jira.new
+    jira.baseurl = "http://jira.codehaus.org/"
+    jira.project_id = "DC"
+    jira.enabled = true
+    @project_1.tracker = jira
+    @project_1.save
+    post :revisions_rss, :id => @project_1.id
+    assert @response.body.index("<pubDate>Sun, 28 Feb 1971 23:45:02 -0000<pubDate>") != 0
+  end
+
+  def test_should_create_builds_rss
+    @artifact_1.file.parent.mkpath
+    @artifact_1.file.open("w") {|io| io.puts "a one" }
+    @artifact_2.file.parent.mkpath
+    @artifact_2.file.open("w") {|io| io.puts "a twoooo" }
+    
+    post :builds_rss, :id => @project_1.id
+    assert @response.body.index("<enclosure url=\"http://test.host/artifacts/hoppe/sa/gaasa.gem\"") != 0
+    assert @response.body.index("length=\"9\"") != 0
+    
+    #puts @response.body
   end
 end

@@ -26,7 +26,7 @@ var settings = new Settings("root");
     <div class="setting" id="<%= object.class.name %>" style="display:none;">
       <div>
         <p>
-          <%= image_tag(object.current_icon, :size=>"48x48", :border => 0, :id => object.dom_id + "_img") %>
+          <%= image_tag(object.icon, :size=>"48x48", :border => 0, :id => object.dom_id + "_img") %>
         </p>
         <p>
           <%= object.name %>

@@ -1,5 +1,7 @@
 require 'rgl/adjacency'
 require 'rgl/connected_components'
+require 'rss/maker'
+require 'damagecontrol/core_ext/pathname'
 
 # A Project record contains information about a project to be continuously
 # built by DamageControl.
@@ -35,7 +37,12 @@ class Project < ActiveRecord::Base
 
   # Same as revisions[0], but faster since it only loads one record
   def latest_revision
-    Revision.find_by_sql(["SELECT * FROM revisions WHERE project_id=? ORDER BY timepoint DESC LIMIT 1", self.id])[0]
+    latest_revisions(1)[0]
+  end
+
+  # The +count+ latest revisions ordered by descending timepoint
+  def latest_revisions(count)
+    Revision.find_by_sql(["SELECT * FROM revisions WHERE project_id=? ORDER BY timepoint DESC LIMIT ?", self.id, count])
   end
 
   # Finds builds (+successful+ or not), ordered in descending order of their +begin_time+.
@@ -74,13 +81,19 @@ LIMIT #{max_count}
     logger.info "Successful build: #{build.successful?}" if logger
 
     publishers.each do |publisher| 
-      publisher.publish_maybe(build)
+      begin
+        publisher.publish_maybe(build)
+      rescue => e
+        logger.error(e.message)
+        logger.error(e.backrace.join("\n"))
+      end
     end
     
+    # TODO: Make this a post-build task
     if(build.successful?)
       logger.info "Requesting build of dependant projects of #{name}: #{dependants.collect{|p| p.name}.join(',')}" if logger
       dependants.each do |project|
-        project.request_build(Build::SUCCESSFUL_DEPENDENCY)
+        project.request_build(Build::SUCCESSFUL_DEPENDENCY, build)
       end
     end
   end
@@ -94,10 +107,10 @@ LIMIT #{max_count}
   
   # Creates a new (pending) build for the latest revision
   # of this project. Returns the created Build object.
-  def request_build(reason)
+  def request_build(reason, triggering_build=nil)
     lr = latest_revision
     if(lr)
-      lr.request_build(reason)
+      lr.request_build(reason, triggering_build)
     else
       nil
     end
@@ -115,6 +128,10 @@ LIMIT #{max_count}
     @basedir = "#{DAMAGECONTROL_HOME}/projects/#{id}"
     mkdir @basedir
     self.scm.checkout_dir = working_copy_dir unless self.scm.nil?
+
+    self.scm.enabled = true unless self.scm.nil?
+    self.tracker.enabled = true unless self.tracker.nil?
+    self.scm_web.enabled = true unless self.scm_web.nil?
   end
   
   # Where temporary stdout log is written
@@ -127,6 +144,74 @@ LIMIT #{max_count}
     "#{@basedir}/stderr.log"
   end
   
+  def revisions_rss(controller, rss_version="2.0")
+    rss = RSS::Maker.make(rss_version) do |maker|
+      maker.channel.title = "#{name} revisions"
+      maker.channel.link =  controller.url_for(:controller => "project", :action => "show", :id => id)
+      maker.channel.description = "#{name} revisions"
+      maker.channel.generator = "DamageControl"
+
+      #maker.channel.language = "language"
+      #maker.image.url = "maker.image.url"
+      #maker.image.title = "maker.image.title"
+
+      # The RSS spec says max 15 items
+      latest_revisions(15).each do |revision|
+        item = maker.items.new_item
+
+        item.pubDate = revision.timepoint
+        item.author = revision.developer
+        item.title = "#{revision.identifier}: #{revision.message}"
+        item.link = controller.url_for(:controller => "revision", :action => "show", :id => revision.id)
+        item.description = "<b>#{revision.developer}</b><br/>\n"
+        item.description << tracker.highlight(revision.message).gsub(/\n/, "<br/>\n") << "<p/>\n"
+        
+        revision.revision_files.each do |file|
+          # TODO: make internal(expandable) or external links to file diffs
+          item.description << "#{file.path}<br/>\n"
+        end
+      end
+    end
+    rss.to_s
+  end
+  
+  def builds_rss(controller, rss_version="2.0")
+    rss = RSS::Maker.make(rss_version) do |maker|
+      maker.channel.title = "#{name} builds"
+      maker.channel.link =  controller.url_for(:controller => "project", :action => "show", :id => id)
+      maker.channel.description = "#{name} builds"
+      maker.channel.generator = "DamageControl"
+
+      #maker.channel.language = "language"
+      #maker.image.url = "maker.image.url"
+      #maker.image.title = "maker.image.title"
+
+      # The RSS spec says max 15 items
+      builds(nil, nil, 15).each do |build|
+        item = maker.items.new_item
+
+        item.pubDate = build.begin_time
+        item.author = build.owner
+        item.title = build.reason_description
+        item.link = controller.url_for(:controller => "build", :action => "show", :id => build.id)
+        
+        headline = "#{build.revision.project.name}: #{build.state.description} build (#{build.reason_description})"
+        item.description = "<b>#{headline}</b><br/>\n"
+
+        build.artifacts.each do |artifact|
+          # TODO: make visible link
+          item.description << "#{artifact.relative_path}<br/>\n"
+
+          enclosure = item.enclosure
+          item.enclosure.url = controller.url_for(:controller => "file_system", :action=> "artifacts", :params => {:path => artifact.relative_path.split('/')})
+          enclosure.length = artifact.file.size
+          enclosure.type = artifact.file.type
+        end
+      end
+    end
+    rss.to_s
+  end
+
 private
 
   # creates dir if it doesn't exist and returns path to it

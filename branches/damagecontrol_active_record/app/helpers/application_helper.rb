@@ -69,7 +69,7 @@ module DamageControl
 
     # Returns +enabled_icon+ if the instance is +enabled+, or
     # +disabled_icon+ if not.
-    def current_icon
+    def icon
       enabled ? enabled_icon : disabled_icon
     end
   end
@@ -108,6 +108,10 @@ class Project < ActiveRecord::Base
   def exclusive?
     false
   end
+
+  def has_link?
+    false
+  end
 end
 
 module RSCM
@@ -142,6 +146,10 @@ module RSCM
     def default_render_excludes
       [:enabled, :fileutils_label, :fileutils_output]
     end
+
+    def has_link?
+      false
+    end
   end
 end
 
@@ -156,6 +164,10 @@ module DamageControl
 
     def default_render_excludes
       [:enabled, :fileutils_label, :fileutils_output]
+    end
+
+    def has_link?
+      false
     end
   end
   
@@ -175,6 +187,7 @@ module DamageControl
         [:enabling_states, :fileutils_label, :fileutils_output]
       end
     end
+    
   end
 
   module Tracker
