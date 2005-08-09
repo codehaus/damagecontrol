@@ -17,7 +17,7 @@ module DamageControl
       end
 
       def name
-        "Artifact Archiver"
+        "Artifacts"
       end    
 
       def publish(build)

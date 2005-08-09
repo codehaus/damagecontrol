@@ -11,10 +11,10 @@ class ArtifactTest < Test::Unit::TestCase
     end
     
     artifact = Artifact.create(:relative_path => "artifact.txt")
-    artifact.open do |io|
+    artifact.file.open do |io|
       assert_equal("yo\n", io.read)
     end
 
-    assert_equal("yo\n", artifact.open.read)
+    assert_equal("yo\n", artifact.file.open.read)
   end
 end

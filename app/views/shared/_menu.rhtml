@@ -12,13 +12,23 @@
       <tr>
         <% row.each do |object| %>
           <td>
-            <%= link_to_function(
+            <% if(object.has_link?) %>
+            <%= link_to(
                   image_tag(
-                    object.current_icon, 
-                    :size=>"48x48", :border => 0, :id => object.dom_id + "_img_menu"
+                    object.icon, 
+                    :size=>"48x48", :border => 0
                   ), 
-                  "settings.show('#{object.class.name}', '#{object.category}', '#{object.dom_id}', #{object.exclusive?})"
+                  object.link(self)
                 ) %>
+            <% else %>
+              <%= link_to_function(
+                    image_tag(
+                      object.icon, 
+                      :size=>"48x48", :border => 0, :id => object.dom_id + "_img_menu"
+                    ), 
+                    "settings.show('#{object.class.name}', '#{object.category}', '#{object.dom_id}', #{object.exclusive?})"
+                  ) %>
+            <% end %>
           </td>
         <% end %>
       </tr>

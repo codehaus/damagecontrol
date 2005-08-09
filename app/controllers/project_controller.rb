@@ -18,7 +18,7 @@ class ProjectController < ApplicationController
   end
 
   def edit
-    @project = Project.find(@params[:id])
+    find
     
     define_plugin_rows
 
@@ -32,17 +32,31 @@ class ProjectController < ApplicationController
   end
 
   def update
-    update_or_save(Project.find(@params[:id]))
+    update_or_save(find)
   end
   
   def show
-    @project = Project.find(@params[:id])
+    find
   end
   
   def list
   end
   
+  def revisions_rss
+    find
+    render :text => @project.revisions_rss(self)
+  end
+
+  def builds_rss
+    find
+    render :text => @project.builds_rss(self)
+  end
+
 private
+
+  def find
+    @project = Project.find(@params[:id])
+  end
   
   def update_or_save(project)
     project.scm        = deserialize_to_array(@params[:scm]).find{|scm| scm.enabled}

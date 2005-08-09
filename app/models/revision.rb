@@ -32,9 +32,10 @@ class Revision < ActiveRecord::Base
 
   # Creates a new (pending) build for this revision
   # Returns the created Build object.
-  def request_build(reason)
-    builds.create(:reason => reason, :create_time => Time.now.utc)
+  def request_build(reason, triggering_build=nil)
+    builds.create(:reason => reason, :triggering_build => triggering_build)
   end
+  
 end
 
 # Adaptation to make it possible to create an AR Revision

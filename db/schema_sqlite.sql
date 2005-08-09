@@ -52,7 +52,8 @@ CREATE TABLE builds(
   end_time TIMESTAMP,
   stdout_id INTEGER,
   stderr_id INTEGER,
-  revision_id INTEGER
+  revision_id INTEGER,
+  triggering_build_id INTEGER
 );
 
 CREATE TABLE build_logs(
