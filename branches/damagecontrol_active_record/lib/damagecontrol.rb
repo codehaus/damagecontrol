@@ -1,4 +1,6 @@
 require 'rscm'
+require 'damagecontrol/dom'
+require 'damagecontrol/rscm_ext/base'
 require 'damagecontrol/plugin'
 require 'damagecontrol/publisher/base'
 require 'damagecontrol/scm_web/base'
@@ -7,9 +9,5 @@ require 'damagecontrol/scm_poller'
 require 'damagecontrol/build_executor'
 require 'damagecontrol/build_queue'
 require 'damagecontrol/build_daemon'
-
-class Class
-  def <=>(o)
-    name <=> o.name
-  end
-end
+require 'damagecontrol/core_ext/pathname'
+require 'damagecontrol/core_ext/class'

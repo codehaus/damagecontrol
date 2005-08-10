@@ -36,8 +36,37 @@ class ProjectTest < Test::Unit::TestCase
     @project_1.save
     @project_1.reload
     assert_equal("jalla", @project_1.scm.root)
+    assert_equal(true, @project_1.scm.enabled)
   end
-  
+
+  def test_should_persist_tracker
+    jira = DamageControl::Tracker::Jira.new
+
+    @project_1.tracker = jira
+    @project_1.save
+    @project_1.reload
+
+    @project_1.tracker.baseurl = "jalla"
+    @project_1.save
+    @project_1.reload
+    assert_equal("jalla", @project_1.tracker.baseurl)
+    assert_equal(true, @project_1.tracker.enabled)
+  end
+
+  def test_should_persist_scm_web
+    view_cvs = DamageControl::ScmWeb::ViewCvs.new
+
+    @project_1.scm_web = view_cvs
+    @project_1.save
+    @project_1.reload
+
+    @project_1.scm_web.baseurl = "jalla"
+    @project_1.save
+    @project_1.reload
+    assert_equal("jalla", @project_1.scm_web.baseurl)
+    assert_equal(true, @project_1.scm_web.enabled)
+  end
+
   def test_should_persist_publishers
     publishers = DamageControl::Publisher::Base.classes.collect{|cls| cls.new}
     @project_1.publishers = publishers

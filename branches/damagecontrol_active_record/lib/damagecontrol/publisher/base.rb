@@ -24,6 +24,20 @@ module DamageControl
           publish(build)
         end
       end
+
+      def category
+        "publisher"
+      end
+
+      def exclusive?
+        false
+      end
+
+      # Exclude default rendering of enabling_states. It's handled by the _publisher.rhtml
+      # template.
+      def default_render_excludes
+        [:enabling_states, :fileutils_label, :fileutils_output]
+      end
     end
   end
 end

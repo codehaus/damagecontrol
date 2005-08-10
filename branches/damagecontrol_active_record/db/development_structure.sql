@@ -1,6 +1,7 @@
 CREATE TABLE artifacts(
   id INTEGER PRIMARY KEY,
   relative_path TEXT,
+  is_primary BOOLEAN,
   build_id INTEGER
 );
 CREATE TABLE build_logs(
@@ -21,7 +22,8 @@ CREATE TABLE builds(
   end_time TIMESTAMP,
   stdout_id INTEGER,
   stderr_id INTEGER,
-  revision_id INTEGER
+  revision_id INTEGER,
+  triggering_build_id INTEGER
 );
 CREATE TABLE projects(
   id INTEGER PRIMARY KEY,

@@ -42,6 +42,10 @@ class ProjectController < ApplicationController
   def list
   end
   
+  def rss
+    revisions_rss
+  end
+  
   def revisions_rss
     find
     render :text => @project.revisions_rss(self)
