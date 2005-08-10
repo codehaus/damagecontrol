@@ -64,5 +64,6 @@ CREATE TABLE build_logs(
 CREATE TABLE artifacts(
   id INTEGER PRIMARY KEY,
   relative_path TEXT,
+  is_primary BOOLEAN,
   build_id INTEGER
 );

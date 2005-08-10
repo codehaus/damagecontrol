@@ -1,7 +1,7 @@
 require 'rgl/adjacency'
 require 'rgl/connected_components'
 require 'rss/maker'
-require 'damagecontrol/core_ext/pathname'
+require 'damagecontrol'
 
 # A Project record contains information about a project to be continuously
 # built by DamageControl.
@@ -55,7 +55,7 @@ class Project < ActiveRecord::Base
     before_criterion = before ? "AND b.begin_time<#{quote(before)}" : ""
     
     sql = <<-EOS
-SELECT b.* 
+SELECT DISTINCT b.* 
 FROM builds b, revisions r, projects p 
 WHERE r.project_id=?
 AND b.revision_id=r.id 
@@ -68,7 +68,7 @@ LIMIT #{max_count}
 
     Build.find_by_sql([sql, self.id])
   end
-  
+
   def latest_revision_has_builds?
     latest_revision.builds.empty?
   end
@@ -85,7 +85,7 @@ LIMIT #{max_count}
         publisher.publish_maybe(build)
       rescue => e
         logger.error(e.message)
-        logger.error(e.backrace.join("\n"))
+        logger.error(e.backtrace.join("\n"))
       end
     end
     
@@ -161,7 +161,7 @@ LIMIT #{max_count}
 
         item.pubDate = revision.timepoint
         item.author = revision.developer
-        item.title = "#{revision.identifier}: #{revision.message}"
+        item.title = "Revision #{revision.identifier}: #{revision.message}"
         item.link = controller.url_for(:controller => "revision", :action => "show", :id => revision.id)
         item.description = "<b>#{revision.developer}</b><br/>\n"
         item.description << tracker.highlight(revision.message).gsub(/\n/, "<br/>\n") << "<p/>\n"
@@ -192,24 +192,48 @@ LIMIT #{max_count}
 
         item.pubDate = build.begin_time
         item.author = build.owner
-        item.title = build.reason_description
+        item.title = "#{build.state.description} build (#{build.reason_description}, revision #{build.revision.identifier})"
         item.link = controller.url_for(:controller => "build", :action => "show", :id => build.id)
         
         headline = "#{build.revision.project.name}: #{build.state.description} build (#{build.reason_description})"
         item.description = "<b>#{headline}</b><br/>\n"
 
-        build.artifacts.each do |artifact|
+        # We have to use detect and not find. find seems to collide with AR.
+        primary_artifact = build.artifacts.detect{|a| a.is_primary}
+        if(primary_artifact)
           # TODO: make visible link
-          item.description << "#{artifact.relative_path}<br/>\n"
+          item.description << "#{primary_artifact.relative_path}<br/>\n"
 
           enclosure = item.enclosure
-          item.enclosure.url = controller.url_for(:controller => "file_system", :action=> "artifacts", :params => {:path => artifact.relative_path.split('/')})
-          enclosure.length = artifact.file.size
-          enclosure.type = artifact.file.type
+          item.enclosure.url = controller.url_for(:controller => "file_system", :action=> "artifacts", :params => {:path => primary_artifact.relative_path.split('/')})
+          enclosure.length = primary_artifact.file.size
+          enclosure.type = primary_artifact.file.type
         end
       end
     end
     rss.to_s
+  end
+
+  include ::DamageControl::Dom
+
+  def icon_base
+    "goldbar"
+  end
+
+  def enabled
+    true
+  end
+
+  def category
+    "project"
+  end
+
+  def exclusive?
+    false
+  end
+
+  def has_link?
+    false
   end
 
 private

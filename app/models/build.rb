@@ -170,6 +170,14 @@ class Build < ActiveRecord::Base
     self.state = prev_state.send(successful? ? :succeed : :fail)
   end
 
+  def icon
+    if(successful?)
+      "green-32.gif"
+    else
+      "red-32.gif"
+    end
+  end
+
   class Executing
     def description
       "Executing"

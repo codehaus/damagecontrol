@@ -97,7 +97,5 @@ class ProjectControllerTest < Test::Unit::TestCase
     post :builds_rss, :id => @project_1.id
     assert @response.body.index("<enclosure url=\"http://test.host/artifacts/hoppe/sa/gaasa.gem\"") != 0
     assert @response.body.index("length=\"9\"") != 0
-    
-    #puts @response.body
   end
 end

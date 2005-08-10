@@ -3,6 +3,14 @@ module DamageControl
     class Base < Plugin
       become_parent
       attr_accessor :enabled
+
+      def category
+        "scm_web"
+      end
+
+      def exclusive?
+        true
+      end
     end
   end
 end

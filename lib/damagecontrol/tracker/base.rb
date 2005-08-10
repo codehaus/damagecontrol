@@ -8,7 +8,16 @@ module DamageControl
     class Base < Plugin
       become_parent
       attr_accessor :enabled
+
+      def category
+        "tracker"
+      end
+
+      def exclusive?
+        true
+      end
     end
+
   end
 end
 

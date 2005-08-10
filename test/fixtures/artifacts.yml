@@ -2,7 +2,9 @@ artifact_1:
   id: 1
   build_id: 2
   relative_path: hei/tjola/hopp.gem
+  is_primary: false
 artifact_2:
   id: 2
   build_id: 2
   relative_path: hoppe/sa/gaasa.gem
+  is_primary: true

@@ -6,6 +6,29 @@ class RevisionFile < ActiveRecord::Base
   def timepoint
     self[:timepoint] || revision.timepoint
   end
+
+  ICONS = {
+    RSCM::RevisionFile::ADDED => "document_new",
+    RSCM::RevisionFile::DELETED => "document_delete",
+    RSCM::RevisionFile::MODIFIED => "document_edit",
+    RSCM::RevisionFile::MOVED => "document_exchange"
+  }
+
+  DESCRIPTIONS = {
+    RSCM::RevisionFile::ADDED => "New file",
+    RSCM::RevisionFile::DELETED => "Deleted file",
+    RSCM::RevisionFile::MODIFIED => "Modified file",
+    RSCM::RevisionFile::MOVED => "Moved file"
+  }
+
+  def icon
+    ICONS[status]
+  end
+
+  def status_description
+    DESCRIPTIONS[status]
+  end
+
 end
 
 # Adaptation to make it possible to create an AR RevisionFile

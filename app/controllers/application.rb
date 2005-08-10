@@ -2,6 +2,7 @@ require_dependency 'sparklines'
 # TODO: shouldn't be necessary, but sometimes we get errors...!!??
 require_dependency 'build'
 require_dependency 'project'
+require_dependency 'damagecontrol'
 
 class ApplicationController < ActionController::Base
   SPARKLINE_COUNT = 20

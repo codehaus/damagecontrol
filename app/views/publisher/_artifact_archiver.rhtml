@@ -4,6 +4,17 @@
     <td>Destination</td>
   </tr>
 </table>
+<p>
+Specify above what files and directories should be archived and made available for download via DamageControl's
+integrated <%= link_to "artifact", :controller=>"doc", :action=>"artifact" %> distribution.
+</p>
+<p>
+It is highly recommended that the build script uses the DAMAGECONTROL_BUILD_LABEL environment variable in the file names of the generated artifacts. This is to avoid that older artifacts get overwritten (as artifacts are stored on the file system and not in the database).
+</p>
+<p>
+<b>Important!</b> The first artifact will be considered the <em>primary</em> artifact for each build,
+and will also be published in the RSS feed as an <%= link_to "Appcast", :controller=>"doc", :action=>"appcast" %>.
+</p>
 
 <script type="text/javascript">
 artifact_archiver_files_counter = <%= object.files.size %>;

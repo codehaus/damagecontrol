@@ -15,7 +15,7 @@
 <body>
   <p>
   <%= link_to "New Project", :controller => "project", :action => "new" %> |
-  <%= link_to "Artifacts", :controller => "file_system", :action => "artifacts" %>
+  <%= link_to "Artifacts", :controller => "file_system", :action => "artifacts" %> |
   <% if(@project) %>
     <%= link_to "RSS", :controller => "project", :action => "rss", :id => @project.id %>
   <% end %>

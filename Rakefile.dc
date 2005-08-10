@@ -101,6 +101,7 @@ desc "Create repo for test_project"
 task :create_test_project => [:environment] do
   # TODO: make a copy before we import, to avoid .svn files...
   require 'rscm'
+  require 'build'
   path = File.expand_path('target/test_project_repo')
   FileUtils.rm_rf(path) if File.exist?(path)
   scm = RSCM::Subversion.new(RSCM::PathConverter.filepath_to_nativeurl(path + "/trunk/foo"), "trunk/foo")
@@ -114,11 +115,14 @@ task :create_test_project => [:environment] do
 
   if(!Project.find_by_name("test_project"))
     aa = DamageControl::Publisher::ArtifactArchiver.new
-    aa.files = {"pkggem" => "gems"}
+    aa.files = {"pkg/*.gem" => "gems"}
     aa.enabling_states = [Build::Successful.new, Build::Fixed.new]
 
     growl = DamageControl::Publisher::Growl.new
     growl.enabling_states = [Build::Broken.new, Build::Fixed.new]
+  
+    jira = DamageControl::Tracker::Jira.new
+    dc_web = DamageControl::ScmWeb::DamageControl.new    
   
     test_project = Project.create(
       :name => "test_project",
@@ -127,6 +131,8 @@ task :create_test_project => [:environment] do
       :relative_build_path => "", 
       :build_command => "rake", 
       :scm => scm,
+      :tracker => jira,
+      :scm_web => dc_web,
       :publishers => [aa, growl]
     )
   end
