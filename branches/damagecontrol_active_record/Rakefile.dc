@@ -70,7 +70,9 @@ task :greyscale do
   colour_pngs.exclude('public/images/raw/**/*')
   colour_pngs.to_a.each do |png|
     img = Magick::ImageList.new(png)
+    # img = img.sepiatone
     img = img.quantize(256, Magick::GRAYColorspace)
+    img = img.colorize(0.30, 0.30, 0.30, '#cc9933')
 
     grey_png = png.gsub(/\.png/, "_grey.png")
     puts "writing greyscale image #{grey_png}"
