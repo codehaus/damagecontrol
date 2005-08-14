@@ -1,5 +1,6 @@
 require File.dirname(__FILE__) + '/../test_helper'
 require 'project_controller'
+require 'damagecontrol'
 
 # Re-raise errors caught by the controller.
 class ProjectController; def rescue_action(e) raise e end; end
@@ -78,24 +79,43 @@ class ProjectControllerTest < Test::Unit::TestCase
   end
 
   def test_should_create_revisions_rss
+    setup_project_for_rss
+
+    post :revisions_rss, :id => @project_1.id
+    assert @response.body.index("<pubDate>Sun, 28 Feb 1971 23:45:02 -0000</pubDate>")
+  end
+
+  def test_should_create_builds_rss
+    setup_project_for_rss
+
+    post :builds_rss, :id => @project_1.id
+    assert @response.body.index("<enclosure url=\"http://test.host/artifacts/hoppe/sa/gaasa.gem\"") != -1
+    assert @response.body.index("length=\"9\"") != 0
+    assert @response.body.index("<pubDate>Sun, 28 Feb 1971 23:45:01 -0000</pubDate>")
+  end
+
+  def test_should_create_mixed_rss
+    setup_project_for_rss
+
+    post :rss, :id => @project_1.id
+    assert @response.body.index("<enclosure url=\"http://test.host/artifacts/hoppe/sa/gaasa.gem\"") != -1
+    assert @response.body.index("length=\"9\"") != 0
+    assert @response.body.index("<pubDate>Sun, 28 Feb 1971 23:45:02 -0000</pubDate>")
+  end
+
+private
+
+  def setup_project_for_rss
     jira = DamageControl::Tracker::Jira.new
     jira.baseurl = "http://jira.codehaus.org/"
     jira.project_id = "DC"
     jira.enabled = true
     @project_1.tracker = jira
     @project_1.save
-    post :revisions_rss, :id => @project_1.id
-    assert @response.body.index("<pubDate>Sun, 28 Feb 1971 23:45:02 -0000<pubDate>") != 0
-  end
 
-  def test_should_create_builds_rss
     @artifact_1.file.parent.mkpath
     @artifact_1.file.open("w") {|io| io.puts "a one" }
     @artifact_2.file.parent.mkpath
     @artifact_2.file.open("w") {|io| io.puts "a twoooo" }
-    
-    post :builds_rss, :id => @project_1.id
-    assert @response.body.index("<enclosure url=\"http://test.host/artifacts/hoppe/sa/gaasa.gem\"") != 0
-    assert @response.body.index("length=\"9\"") != 0
   end
 end

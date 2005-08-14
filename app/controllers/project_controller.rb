@@ -1,9 +1,31 @@
 require_dependency 'build'
+require 'xforge'
 
 class ProjectController < ApplicationController
   layout "application", :except => :list
   
   def index
+  end
+
+  def new_rubyforge
+    project_name = @params[:project_name]
+    rf_project = XForge::RubyForge.new.project(project_name)
+
+    home_page = rf_project.home_page_uri
+    scm_web = rf_project.scm_web
+    
+    # find scm. prefer the one that has same name as the project
+    scms = scm_web.scms
+    scm = scms.find{|s| s.mod == project_name}
+    scm = scms[0] if scm.nil?
+    
+    project = Project.create(
+      :name => project_name,
+      :home_page => home_page,
+      :scm => scm,
+      :publishers => []
+    )
+    redirect_to :action => "edit", :id => project.id
   end
 
   def new
@@ -43,7 +65,8 @@ class ProjectController < ApplicationController
   end
   
   def rss
-    revisions_rss
+    find
+    render :text => @project.rss(self)
   end
   
   def revisions_rss
