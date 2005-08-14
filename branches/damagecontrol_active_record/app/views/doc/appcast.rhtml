@@ -3,8 +3,11 @@
 Appcasting is a mechanism for software delivery. Appcasting is based on the same concept as <a href="http://en.wikipedia.org/wiki/Podcast">podcasting</a> and was first described (to our knowledge) by <a href="http://www.speirs.org/appcasting/">Frasier Speirs</a>.
 </p>
 <p>
-DamageControl supports Appcasting through built-in RSS feeds. In order to use Appcasting you need an &lt;enclosure&gt; aware RSS reader such as <a href="">NetNewsWire</a>.
+DamageControl supports Appcasting through built-in RSS feeds. In order to use Appcasting you need an &lt;enclosure&gt; aware RSS reader such as <a href="http://ranchero.com/netnewswire/">NetNewsWire</a> (OS X), <a href="http://www.bradsoft.com/feeddemon/">FeedDemon</a> (Windows) or <a href="http://rasterweb.net/raster/code/renko.html">Renko</a> (Linux).
 </p>
 <p>
 By subscribing to the RSS feed of a project your &lt;enclosure&gt; aware RSS reader will ask you if you want to download build artifacts as they become available.
+</p>
+<p>
+You can define Appcasts for your project by enabling the ArtifactArchiver publisher. The first artifact defined for the artifact publisher will automatically included as an appcast in the project's RSS feed. You can specify several artifacts for each build, but only the first one will serve as an appcast. (Currently the order is defined by alphabetical order. Later DamageControl versions will probably allow you to specify exactly what artifact(s) you want to publish via appcasting).
 </p>

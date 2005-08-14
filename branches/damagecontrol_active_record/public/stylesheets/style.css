@@ -1,35 +1,69 @@
-/* absolute positioning is the easiest way to achieve smooth fade/appear */
+body {  
+  color: #333333;
+
+  background-color: #FFFFFF;
+  background-image: url(/images/header_backdrop.png);
+  background-repeat: repeat-x;
+  background-position: 0 -25px;
+
+  font-size: 80%;  
+  font-family: verdana, helvetica, arial, sans-serif;
+  line-height: 1.7em;
+
+  /* Center in IE5.5 */
+  /* text-align:  center; */
+}
+
+h1 {
+  font-size: 2em;
+  font-weight: normal;
+  letter-spacing: -0.04em;
+}
+
+h2 {
+  font-size: 1.5em;
+  font-weight: normal;
+  letter-spacing: -0.04em;
+}
+
+.framed_box {
+  padding: 10px;
+  background: #eee;
+  border: 1px solid #ccc;
+}
+
+/* Styles for project menu */
 .setting {
-  position:absolute;
-  top:200px;
-  left:260px;
-  height:500px;
+  position: absolute;
+  top: 200px;
+  left: 260px;
+  height: 500px;
 }
 
 .progress-bg {
   background-color: #FFFFFF;
-  border-color:#FF0000;
-  border-width:1;
-  border-style:solid;
-  position:relative;
-  height:14px;
-  width:100%;
+  border-color: #FF0000;
+  border-width: 1;
+  border-style: solid;
+  position: relative;
+  height: 14px;
+  width: 100%;
 }
 
 .progress {
-  background-color:#33FF33;
-  position:relative;
-  top:-15px;
-  left:1px;
-  height:14px;
-  width:0%;
+  background-color: #33FF33;
+  position: relative;
+  top: -15px;
+  left: 1px;
+  height: 14px;
+  width: 0%;
 }
 
 .progress-text {
-  position:relative;
-  top:-30px;
-  left:1px;
-  height:14px;
-  width:30px;
-  white-space:nowrap;
+  position: relative;
+  top: -30px;
+  left: 1px;
+  height: 14px;
+  width: 30px;
+  white-space: nowrap;
 }

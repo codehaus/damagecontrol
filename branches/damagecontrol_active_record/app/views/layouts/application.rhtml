@@ -14,10 +14,10 @@
 </head>
 <body>
   <p>
-  <%= link_to "New Project", :controller => "project", :action => "new" %> |
-  <%= link_to "Artifacts", :controller => "file_system", :action => "artifacts" %> |
+  <%= link_to "New Project", :controller => "project", :action => "new_menu" %>
+| <%= link_to "Artifacts", :controller => "file_system", :action => "artifacts" %>
   <% if(@project) %>
-    <%= link_to "RSS", :controller => "project", :action => "rss", :id => @project.id %>
+    | <%= link_to "RSS", :controller => "project", :action => "rss", :id => @project.id %>
   <% end %>
   </p>
 
@@ -31,7 +31,9 @@
         <% end %>
       </td>
       <td width="60%">
-        <%= @content_for_layout %>
+        <div id="content_for_layout">
+          <%= @content_for_layout %>
+        </div>
       </td>
       <td width="20%">
         <% @project_list_refresh = true %>

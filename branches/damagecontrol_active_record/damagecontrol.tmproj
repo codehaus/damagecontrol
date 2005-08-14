@@ -3,7 +3,7 @@
 <plist version="1.0">
 <dict>
 	<key>currentDocument</key>
-	<string>app/views/revision/show.rhtml</string>
+	<string>app/controllers/project_controller.rb</string>
 	<key>documents</key>
 	<array>
 		<dict>
@@ -47,20 +47,6 @@
 			<key>firstVisibleLine</key>
 			<integer>0</integer>
 		</dict>
-		<key>Rakefile.dc</key>
-		<dict>
-			<key>caret</key>
-			<dict>
-				<key>column</key>
-				<integer>43</integer>
-				<key>line</key>
-				<integer>120</integer>
-			</dict>
-			<key>firstVisibleColumn</key>
-			<integer>0</integer>
-			<key>firstVisibleLine</key>
-			<integer>95</integer>
-		</dict>
 		<key>app/controllers/file_system_controller.rb</key>
 		<dict>
 			<key>caret</key>
@@ -75,28 +61,28 @@
 			<key>firstVisibleLine</key>
 			<integer>0</integer>
 		</dict>
-		<key>app/controllers/revision_controller.rb</key>
+		<key>app/controllers/project_controller.rb</key>
 		<dict>
 			<key>caret</key>
 			<dict>
 				<key>column</key>
-				<integer>0</integer>
+				<integer>29</integer>
 				<key>line</key>
-				<integer>0</integer>
+				<integer>46</integer>
 			</dict>
 			<key>firstVisibleColumn</key>
 			<integer>0</integer>
 			<key>firstVisibleLine</key>
-			<integer>0</integer>
+			<integer>27</integer>
 		</dict>
-		<key>app/helpers/application_helper.rb</key>
+		<key>app/models/project.rb</key>
 		<dict>
 			<key>caret</key>
 			<dict>
 				<key>column</key>
-				<integer>19</integer>
+				<integer>0</integer>
 				<key>line</key>
-				<integer>240</integer>
+				<integer>239</integer>
 			</dict>
 			<key>firstVisibleColumn</key>
 			<integer>0</integer>
@@ -131,20 +117,6 @@
 			<key>firstVisibleLine</key>
 			<integer>0</integer>
 		</dict>
-		<key>app/views/revision/show.rhtml</key>
-		<dict>
-			<key>caret</key>
-			<dict>
-				<key>column</key>
-				<integer>28</integer>
-				<key>line</key>
-				<integer>5</integer>
-			</dict>
-			<key>firstVisibleColumn</key>
-			<integer>0</integer>
-			<key>firstVisibleLine</key>
-			<integer>0</integer>
-		</dict>
 		<key>config/dc_environment.rb</key>
 		<dict>
 			<key>caret</key>
@@ -159,35 +131,19 @@
 			<key>firstVisibleLine</key>
 			<integer>0</integer>
 		</dict>
-		<key>lib/damagecontrol/publisher/artifact_archiver.rb</key>
+		<key>lib/damagecontrol.rb</key>
 		<dict>
 			<key>caret</key>
 			<dict>
 				<key>column</key>
-				<integer>18</integer>
+				<integer>0</integer>
 				<key>line</key>
-				<integer>7</integer>
+				<integer>13</integer>
 			</dict>
-			<key>columnSelection</key>
-			<false/>
 			<key>firstVisibleColumn</key>
 			<integer>0</integer>
 			<key>firstVisibleLine</key>
 			<integer>0</integer>
-			<key>selectFrom</key>
-			<dict>
-				<key>column</key>
-				<integer>4</integer>
-				<key>line</key>
-				<integer>7</integer>
-			</dict>
-			<key>selectTo</key>
-			<dict>
-				<key>column</key>
-				<integer>18</integer>
-				<key>line</key>
-				<integer>7</integer>
-			</dict>
 		</dict>
 		<key>script/daemon</key>
 		<dict>
@@ -197,6 +153,34 @@
 				<integer>0</integer>
 				<key>line</key>
 				<integer>10</integer>
+			</dict>
+			<key>firstVisibleColumn</key>
+			<integer>0</integer>
+			<key>firstVisibleLine</key>
+			<integer>0</integer>
+		</dict>
+		<key>test/functional/project_controller_test.rb</key>
+		<dict>
+			<key>caret</key>
+			<dict>
+				<key>column</key>
+				<integer>52</integer>
+				<key>line</key>
+				<integer>92</integer>
+			</dict>
+			<key>firstVisibleColumn</key>
+			<integer>0</integer>
+			<key>firstVisibleLine</key>
+			<integer>71</integer>
+		</dict>
+		<key>test/unit/project_test.rb</key>
+		<dict>
+			<key>caret</key>
+			<dict>
+				<key>column</key>
+				<integer>50</integer>
+				<key>line</key>
+				<integer>0</integer>
 			</dict>
 			<key>firstVisibleColumn</key>
 			<integer>0</integer>
@@ -220,18 +204,11 @@
 	</dict>
 	<key>openDocuments</key>
 	<array>
-		<string>config/dc_environment.rb</string>
-		<string>script/daemon</string>
-		<string>Rakefile.dc</string>
-		<string>lib/damagecontrol/publisher/artifact_archiver.rb</string>
-		<string>app/helpers/application_helper.rb</string>
-		<string>app/views/file_system/dir.rhtml</string>
-		<string>test_project/Rakefile</string>
-		<string>app/views/revision/show.rhtml</string>
-		<string>app/controllers/revision_controller.rb</string>
-		<string>../../trunk/rscm/lib/rscm/revision.rb</string>
-		<string>app/models/revision.rb</string>
-		<string>app/controllers/file_system_controller.rb</string>
+		<string>app/models/project.rb</string>
+		<string>lib/damagecontrol.rb</string>
+		<string>app/controllers/project_controller.rb</string>
+		<string>test/unit/project_test.rb</string>
+		<string>test/functional/project_controller_test.rb</string>
 	</array>
 	<key>showFileHierarchyDrawer</key>
 	<true/>

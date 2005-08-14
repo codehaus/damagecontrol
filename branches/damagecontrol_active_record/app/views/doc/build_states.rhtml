@@ -16,13 +16,19 @@ In a future version of DamageControl you may even be able to define custom sub-s
 
 <h2>Completed States</h2>
 <p>
-A build is complete when it has either gone successfully through all the steps of the build process, or it may fail at some step. In addition to this, the final state of a completed build also depends on the final state of the <em>previous</em> build for the same project:
+A build is complete when the build script has executed. By that time the build will either have completed successfully through all the steps of the build process, or it may fail have failed at some step. 
+</p>
+<p>
+DamageControl uses the build process' exit code to determine whether the build was successful or not.
+</p>
+<p>
+The state of a completed build is determined based on the state of the <em>previous</em> build for the same project:
 </p>
 
 <%= image_tag("/images/docs/completed_build_states.png", :border => 0) %>
 
 <h2>Build states and Publishers</h2>
 <p>
-The <%= link_to "publishers", :action=>"publisher" %> of a project can be associated with one or more of the possible build states. This way you have fine control over what build information you want to publish, and via what publishing channels.
+The <%= link_to "publishers", :action=>"publisher" %> of a project can be associated with one or more of the possible build states. This way you can decide when you want certain publishers to be invoked.
 </p>
 

@@ -1,6 +1,7 @@
 require 'rgl/adjacency'
 require 'rgl/connected_components'
 require 'rss/maker'
+require 'rss/parser'
 require 'damagecontrol'
 
 # A Project record contains information about a project to be continuously
@@ -164,7 +165,8 @@ LIMIT #{max_count}
         item.title = "Revision #{revision.identifier}: #{revision.message}"
         item.link = controller.url_for(:controller => "revision", :action => "show", :id => revision.id)
         item.description = "<b>#{revision.developer}</b><br/>\n"
-        item.description << tracker.highlight(revision.message).gsub(/\n/, "<br/>\n") << "<p/>\n"
+        message = tracker ? tracker.highlight(revision.message) : revision.message
+        item.description << message.gsub(/\n/, "<br/>\n") << "<p/>\n"
         
         revision.revision_files.each do |file|
           # TODO: make internal(expandable) or external links to file diffs
@@ -210,6 +212,31 @@ LIMIT #{max_count}
           enclosure.type = primary_artifact.file.type
         end
       end
+    end
+    rss.to_s
+  end
+  
+  # RSS for this project. Contains a mix of revision and build items
+  def rss(controller, rss_version="2.0")
+    # http://www.cozmixng.org/~rwiki/?cmd=view;name=RSS+Parser%3A%3ATutorial.en
+    # http://www.ruby-lang.org/cgi-bin/cvsweb.cgi/ruby/sample/rss/blend.rb?rev=1.2
+    feeds = []
+    feeds << RSS::Parser.parse(revisions_rss(controller, rss_version), false)
+    feeds << RSS::Parser.parse(builds_rss(controller, rss_version), false)
+    
+    rss = RSS::Maker.make(rss_version) do |maker|
+      maker.channel.title = "#{name} builds and revisions"
+      maker.channel.link =  controller.url_for(:controller => "project", :action => "show", :id => id)
+      maker.channel.description = "#{name} builds and revisions"
+      maker.channel.generator = "DamageControl"
+      
+      feeds.each do |feed|
+        feed.items.each do |item|
+          item.setup_maker(maker)
+        end
+      end
+      maker.items.do_sort = true
+      maker.items.max_size = 15
     end
     rss.to_s
   end
