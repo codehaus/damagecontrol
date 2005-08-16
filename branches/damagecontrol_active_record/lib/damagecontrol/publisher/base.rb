@@ -1,7 +1,26 @@
 module DamageControl
   module Publisher
-    class Base < Plugin
-      become_parent
+    class Base
+      include Plugin
+
+      def self.classes
+        [
+          #AmbientOrb,
+          ArtifactArchiver,
+          #BuildDuration,
+          Email::Sendmail,
+          Email::Smtp,
+          #Execute,
+          Growl,
+          #Irc,
+          Jabber,
+          Sound
+          #X10Cm11A,
+          #X10Cm17A,
+          #Yahoo
+        ]
+      end
+
       attr_accessor :enabling_states
       
       def initialize

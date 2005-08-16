@@ -1,7 +1,18 @@
 module DamageControl
   module ScmWeb
-    class Base < Plugin
-      become_parent
+    class Base
+      include Plugin
+
+      def self.classes
+        [
+          Chora,
+          DamageControl,
+          Fisheye,
+          Trac,
+          ViewCvs
+        ]
+      end
+
       attr_accessor :enabled
 
       def category

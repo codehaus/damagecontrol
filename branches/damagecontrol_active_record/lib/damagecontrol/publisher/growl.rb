@@ -4,7 +4,6 @@ require 'damagecontrol/publisher/base'
 module DamageControl
   module Publisher
     class Growl < Base
-      register self
     
       ann :description => "Hosts"
       ann :tip => "Comma-separated list of (OS X) hosts that will receive Growl notifications. " + 
