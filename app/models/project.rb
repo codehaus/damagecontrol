@@ -1,5 +1,5 @@
-require 'rgl/adjacency'
-require 'rgl/connected_components'
+#require 'rgl/adjacency'
+#require 'rgl/connected_components'
 require 'rss/maker'
 require 'rss/parser'
 require 'damagecontrol'

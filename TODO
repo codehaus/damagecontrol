@@ -1,0 +1,26 @@
+These are important TODOs that must be fixed before release and RubyConf.
+
+== General stuff ==
+* Fix SQLite concurrency problems
+* Get DC to work with lighttpd (too damn slow with WEBRick). script/lighttpd
+  Problems:
+    * lighttpd often dies on http://localhost:8000/project/list
+    * if it doesn't die, I get:
+      NameError in Project#list
+      uninitialized constant Project
+      /app/controllers/application.rb:70:in `load_projects' 
+    * see application.rb. I tried some require_dependency, but it doesn't help
+    * this NameError also occurs sometimes with WEBrick
+* Move doco under public/doc so that a stable web server can serve it even when DC is down
+* Avoid NameError with WEBrick that occur randomly (see above)
+* Make sure DC runs on Windows/Linux (people are going to be disappointed if the release only works on os x)
+* Make DC run against PostgreSQL (MySQL is not popular at Codehaus)
+
+== UI stuff ==
+* Fix diff logic so diffs can be shown in web
+* Integrate scm_web and tracker with XForge (lots of stuff moved here)
+* Fix the project overview to the right
+* Fix settings bug that unsets SCM if saved w/o clicking SCM
+* Align build/revision content to the top
+* Use a proper 3-col layout
+* General ui CSS niceness (logo and professional looking layout can wait)

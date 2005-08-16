@@ -5,8 +5,21 @@ module DamageControl
     # They know how to recognise issue identifiers in strings (typically from SCM commit
     # messages) and turn these into HTML links that point to the associated issue on an
     # issue tracker installation running somewhere else.
-    class Base < Plugin
-      become_parent
+    class Base
+      include Plugin
+
+      def self.classes
+        [
+          Bugzilla,
+          FogBugz,
+          Jira,
+          RubyForge,
+          Scarab,
+          SourceForge,
+          Trac
+        ]
+      end
+
       attr_accessor :enabled
 
       def category

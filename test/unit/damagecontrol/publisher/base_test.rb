@@ -7,7 +7,6 @@ module DamageControl
         expected = [
           #AmbientOrb,
           ArtifactArchiver,
-          MockPublisher,
           #BuildDuration,
           Email::Sendmail,
           Email::Smtp,
@@ -21,12 +20,12 @@ module DamageControl
           #Yahoo
         ]
         assert_equal(
-          expected.collect{|c| c.name},
-          Base.classes.collect{|c| c.name})
+          expected,
+          Base.classes
+        )
       end
 
       class MockPublisher < Base
-        register self
         attr_reader :published
         
         def publish(build)
