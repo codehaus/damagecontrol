@@ -165,7 +165,9 @@ LIMIT #{max_count}
         item.title = "Revision #{revision.identifier}: #{revision.message}"
         item.link = controller.url_for(:controller => "revision", :action => "show", :id => revision.id)
         item.description = "<b>#{revision.developer}</b><br/>\n"
-        message = tracker ? tracker.highlight(revision.message) : revision.message
+        # TODO: this will most likely go on the Internet to fetch issue summaries.
+        # TODO: Find a way to configure trackers to do that or not! -And also cache the RSS!
+        message = tracker ? tracker.markup(revision.message) : revision.message
         item.description << message.gsub(/\n/, "<br/>\n") << "<p/>\n"
         
         revision.revision_files.each do |file|
