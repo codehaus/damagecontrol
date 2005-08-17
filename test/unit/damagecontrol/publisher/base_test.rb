@@ -21,8 +21,7 @@ module DamageControl
         ]
         assert_equal(
           expected,
-          Base.classes
-        )
+          Base.classes.collect{|c| c.new.class})
       end
 
       class MockPublisher < Base

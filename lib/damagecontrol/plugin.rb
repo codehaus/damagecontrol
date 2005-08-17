@@ -1,6 +1,5 @@
 module DamageControl
-  # Base class for plugins. Each plugin category should subclass this class, and each
-  # plugin in that category should extend that class.
+
   module Plugin
     
     def name

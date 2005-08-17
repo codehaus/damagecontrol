@@ -40,30 +40,30 @@ class ProjectTest < Test::Unit::TestCase
   end
 
   def test_should_persist_tracker
-    jira = DamageControl::Tracker::Jira.new
+    jira = Tracker::Jira::Project.new
 
     @project_1.tracker = jira
     @project_1.save
     @project_1.reload
 
-    @project_1.tracker.baseurl = "jalla"
+    @project_1.tracker.host = "jalla"
     @project_1.save
     @project_1.reload
-    assert_equal("jalla", @project_1.tracker.baseurl)
+    assert_equal("jalla", @project_1.tracker.host)
     assert_equal(true, @project_1.tracker.enabled)
   end
 
   def test_should_persist_scm_web
-    view_cvs = DamageControl::ScmWeb::ViewCvs.new
+    view_cvs = ScmWeb::ViewCvs.new
 
     @project_1.scm_web = view_cvs
     @project_1.save
     @project_1.reload
 
-    @project_1.scm_web.baseurl = "jalla"
+    @project_1.scm_web.cvs_server_path = "jalla"
     @project_1.save
     @project_1.reload
-    assert_equal("jalla", @project_1.scm_web.baseurl)
+    assert_equal("jalla", @project_1.scm_web.cvs_server_path)
     assert_equal(true, @project_1.scm_web.enabled)
   end
 
