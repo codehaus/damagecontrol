@@ -32,6 +32,7 @@
       </td>
       <td width="60%">
         <div id="content_for_layout">
+          <% if @flash["notice"] %><div class="notice"><%= @flash["notice"] %></div><% end %>
           <%= @content_for_layout %>
         </div>
       </td>

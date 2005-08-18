@@ -1,6 +1,3 @@
-require_dependency 'build'
-require 'xforge'
-
 class ProjectController < ApplicationController
   layout "application", :except => :list
   
@@ -12,6 +9,7 @@ class ProjectController < ApplicationController
     rf_project = XForge::RubyForge.new.project(project_name)
 
     home_page = rf_project.home_page_uri
+    tracker = rf_project.tracker
     scm_web = rf_project.scm_web
     
     # find scm. prefer the one that has same name as the project
@@ -19,12 +17,23 @@ class ProjectController < ApplicationController
     scm = scms.find{|s| s.mod == project_name}
     scm = scms[0] if scm.nil?
     
+    # assume project follows the rake convention to use Rake and put gems in pkg
+    build_command = "rake"
+    artifact_archiver = DamageControl::Publisher::ArtifactArchiver.new
+    artifact_archiver.files = {"pkg/*.gem", "rubygems"}
+    artifact_archiver.enabling_states = [Build::Successful.new, Build::Fixed.new]
+    
     project = Project.create(
       :name => project_name,
+      :start_time => 2.weeks.ago,
+      :build_command => build_command,
       :home_page => home_page,
       :scm => scm,
-      :publishers => []
+      :tracker => tracker,
+      :scm_web => scm_web,
+      :publishers => [artifact_archiver]
     )
+    flash["notice"] = "Successfully imported settings for #{project_name} from Rubyforge."
     redirect_to :action => "edit", :id => project.id
   end
 
@@ -120,13 +129,13 @@ private
   end
 
   def trackers
-    DamageControl::Tracker::Base.classes.collect{|cls| cls.new}.collect do |tracker|
+    ::Tracker::Base.classes.collect{|cls| cls.new}.collect do |tracker|
       tracker.class == @project.tracker.class ? @project.tracker : tracker
     end.sort
   end
 
   def scm_webs
-    DamageControl::ScmWeb::Base.classes.collect{|cls| cls.new}.collect do |scm_web|
+    ::ScmWeb::Base.classes.collect{|cls| cls.new}.collect do |scm_web|
       scm_web.class == @project.scm_web.class ? @project.scm_web : scm_web
     end.sort
   end

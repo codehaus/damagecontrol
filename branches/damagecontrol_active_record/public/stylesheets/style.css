@@ -26,6 +26,12 @@ h2 {
   letter-spacing: -0.04em;
 }
 
+.notice {
+  padding: 4px;
+  background: #FF66FF;
+  border: 1px solid #FF00FF;
+}
+
 .framed_box {
   padding: 10px;
   background: #eee;

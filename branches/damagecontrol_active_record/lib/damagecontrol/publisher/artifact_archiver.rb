@@ -16,10 +16,6 @@ module DamageControl
         @files = {}
       end
 
-      def name
-        "Artifacts"
-      end    
-
       def publish(build)
         # only the 1st artifact of each build will be considered 'primary'
         # and will be made available as an <enclosure> in the RSS feed (Appcast).

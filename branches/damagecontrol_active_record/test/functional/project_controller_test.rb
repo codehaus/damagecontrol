@@ -32,19 +32,19 @@ class ProjectControllerTest < Test::Unit::TestCase
         }
       },
       :tracker => {
-        "Tracker::Trac::Project" => {
+        "Tracker::Trac::TracProject" => {
           :enabled => false,
           :uri => "http://dev.rubyonrails.com/",
           :svn_path => "trunk/activerecord"
         },
-        "Tracker::Jira::Project" => {
+        "Tracker::Jira::JiraProject" => {
           :enabled => true,
           :host => "http://jira.codehaus.org/",
           :identifier => "DC"
         }
       },
       :scm_web => {
-        "Tracker::Trac::Project" => {
+        "Tracker::Trac::TracProject" => {
           :enabled => false,
           :uri => "http://dev.rubyonrails.com/",
           :svn_path => "trunk/activerecord"
@@ -59,11 +59,7 @@ class ProjectControllerTest < Test::Unit::TestCase
               "http://foo.com/html/\#{path}?r=\#{revision}", 
               "http://foo.com/diff/\#{path}?r1=\#{previous_revision}&r2=\#{revision}", 
             ],
-          },
-          :cvs_host_name => "foo.com", 
-          :cvs_server_path => "/foo/bar", 
-          :project_unix_name => "ruby", 
-          :module_regexp => nil #not needed here, only for project setup wizard
+          }
         }
       },
       :publisher => {
@@ -82,7 +78,7 @@ class ProjectControllerTest < Test::Unit::TestCase
     assert_equal(RSCM::Subversion, project.scm.class)
     assert_equal("svn://some/where", project.scm.url)
     
-    assert_equal(Tracker::Jira::Project, project.tracker.class)
+    assert_equal(Tracker::Jira::JiraProject, project.tracker.class)
     assert_equal("http://jira.codehaus.org/", project.tracker.host)
     assert_equal("DC", project.tracker.identifier)
 
@@ -126,7 +122,7 @@ class ProjectControllerTest < Test::Unit::TestCase
 private
 
   def setup_project_for_rss
-    trac = Tracker::Trac::Project.new
+    trac = Tracker::Trac::TracProject.new
     trac.uri = "http://dev.rubyonrails.com/"
     trac.svn_path = "trunk/activerecord"
     trac.enabled = true

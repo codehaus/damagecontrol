@@ -40,7 +40,7 @@ class ProjectTest < Test::Unit::TestCase
   end
 
   def test_should_persist_tracker
-    jira = Tracker::Jira::Project.new
+    jira = Tracker::Jira::JiraProject.new
 
     @project_1.tracker = jira
     @project_1.save

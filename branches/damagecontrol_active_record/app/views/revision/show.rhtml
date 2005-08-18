@@ -1,4 +1,4 @@
-<h1><%= @revision.project.name %> revision <%= @revision.identifier %></h1>
+<h1><%= link_to(@project.name, :controller => "project", :action => "edit", :id => @project.id) %> revision <%= @revision.identifier %></h1>
 <p>
 <% unless @revision.builds.empty? %>
   Builds:
@@ -20,39 +20,122 @@
 <div>
   <b><%= @revision.developer %></b>
   (<%= @revision.timepoint %>)<br/>
-  <%= textilize(@revision.message) %>
+  <%= textilize(@revision_message) %>
 </div>
 
 <table>
   <%
-  show_native_file_revision = !@revision.project.scm.transactional?
   @revision.revision_files.each_with_index do |file, i|
+    revision_url = @project.scm_web.uri(
+      @project.scm.view_cvs_full_path(file), 
+      {
+        :type => "html",
+        :previous_revision => file.previous_native_revision_identifier,
+        :revision => file.native_revision_identifier
+      }
+    )
+    diff_url = @project.scm_web.uri(
+      @project.scm.view_cvs_full_path(file), 
+      {
+        :type => "diff",
+        :previous_revision => file.previous_native_revision_identifier,
+        :revision => file.native_revision_identifier
+      }
+    )
+    overview_url = @project.scm_web.uri(
+      @project.scm.view_cvs_full_path(file), 
+      {
+        :type => "overview",
+        :previous_revision => file.previous_native_revision_identifier,
+        :revision => file.native_revision_identifier
+      }
+    )
+    
+    #                revision               icon                path
+    # added          Show new file          Show added rev X    Show history
+    # modified       Show modified file     Show diff           Show history
+    # moved          Show moved file        Show diff           Show history
+    # deleted        Show deleted file      Show deleted rev X  Show history
+
+    added_rev_tip = "Show new file"
+    modified_rev_tip = "Show modified file"
+    moved_rev_tip = "Show moved file"
+    deleted_rev_tip = "Show removed file"
+    diff_tip = "Show diff"
+    history_tip = "Show history"
   %>
     <tr>
-      <% if(show_native_file_revision) %>
+      <% if(@project.scm_web.nil?) %>
         <td><%= file.native_revision_identifier %></td>
+      <% else %>
+        <td>
+          <%= 
+            content_tag(
+              "a", 
+              file.native_revision_identifier, 
+              {
+                :href=> revision_url,
+                :title => case(file.status)
+                  when "ADDED" then added_rev_tip
+                  when "MODIFIED" then modified_rev_tip
+                  when "MOVED" then moved_rev_tip
+                  when "DELETED" then deleted_rev_tip
+                end
+              }
+            )
+          %>
+        </td>
       <% end %>
-      <td><%= image_tag(file.icon, :size => "16x16", :title => file.status_description) %></td>
-      <td>
-        <%= link_to_remote(
-              file.path, {
-                :update => "diff_#{i}", 
-                :loading => "Element.show('diff_#{i}');$('diff_link_#{i}').onclick=function(){}",
-                :loaded => "$('diff_link_#{i}').onclick=function(){Element.toggle('diff_#{i}')}",
-                :url => { 
-                  :controller => "scm", 
-                  :action => "diff_with_previous", 
-                  :id => @revision.project.name, 
-                  :params => {
-                    "revision_identifier" => @revision.identifier, 
-                    "file_index" => i
-                  }
+
+      <% if(@project.scm_web.nil?) %>
+        <td><%= image_tag(file.icon, :size => "16x16", :title => file.status_description) %></td>
+      <% else %>
+        <td>
+          <%= 
+            content_tag(
+              "a", 
+              image_tag(
+                file.icon, 
+                {
+                  :size => "16x16", 
+                  :title => case(file.status)
+                    when "ADDED" then added_rev_tip
+                    when "MODIFIED" then diff_tip
+                    when "MOVED" then diff_tip
+                    when "DELETED" then deleted_rev_tip
+                  end,
+                  :border=>"0"
                 }
-              },
-              {"id" => "diff_link_#{i}"}
-            ) %>
-        <div style="display:none;" id="diff_<%=i%>"><%= image_tag("spinner.gif") %> Loading diff... (THIS IS CURRENTLY BROKEN. FIXME!)</div>
-      </td>
+              ), 
+              {
+                :href => case(file.status)
+                  when "ADDED" then revision_url
+                  when "MODIFIED" then diff_url
+                  when "MOVED" then diff_url
+                  when "DELETED" then revision_url
+                end
+              }
+            ) 
+          %>
+        </td>
+      <% end %>
+
+      <% if(@project.scm_web.nil?) %>
+        <td><%= file.path %></td>
+      <% else %>
+        <td>
+          <%= 
+            content_tag(
+              "a", 
+              file.path, 
+              {
+                :href => overview_url,
+                :title => history_tip
+              }
+            ) 
+          %>
+        </td>
+      <% end %>
     </tr>
   <% end %>
 </table>
