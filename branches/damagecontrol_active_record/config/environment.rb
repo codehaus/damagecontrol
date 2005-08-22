@@ -3,6 +3,12 @@
 #
 # Be sure to restart your webserver when you modify this file.
 
+# Uncomment to set UTF-8 as the encoding for strings. The Ruby default
+# is US-ASCII (may differ on different platforms though). This setting is
+# required if you need to return non-ASCII UTF-8 strings from ActionWebService.
+#
+# $KCODE = 'UTF8'
+
 # The path to the root directory of your application.
 RAILS_ROOT = File.join(File.dirname(__FILE__), '..')
 
@@ -55,7 +61,7 @@ require 'action_web_service'
 
 # Environment-specific configuration.
 require_dependency "environments/#{RAILS_ENV}"
-ActiveRecord::Base.configurations = File.open("#{RAILS_ROOT}/config/database.yml") { |f| YAML::load(f) }
+ActiveRecord::Base.configurations = YAML::load(ERB.new((IO.read("#{RAILS_ROOT}/config/database.yml"))).result)
 ActiveRecord::Base.establish_connection
 
 
@@ -85,3 +91,4 @@ Controllers = Dependencies::LoadingModule.root(
 
 # Include your app's configuration here:
 require File.dirname(__FILE__) + '/dc_environment'
+
