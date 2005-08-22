@@ -137,6 +137,11 @@ task :clone_structure_to_test => [ :db_structure_dump, :purge_test_database ] do
       `#{abcs[RAILS_ENV]["adapter"]} #{abcs["test"]["dbfile"]} < db/#{RAILS_ENV}_structure.sql`
     when "sqlserver"
       `osql -E -S #{abcs["test"]["host"]} -d #{abcs["test"]["database"]} -i db\\#{RAILS_ENV}_structure.sql`
+    when "oci", 
+      ActiveRecord::Base.establish_connection(:test)
+      IO.readlines("db/#{RAILS_ENV}_structure.sql").join.split(";\n\n").each do |ddl|
+        ActiveRecord::Base.connection.execute(ddl)
+      end
     else 
       raise "Unknown database adapter '#{abcs["test"]["adapter"]}'"
   end
@@ -146,7 +151,7 @@ desc "Dump the database structure to a SQL file"
 task :db_structure_dump => :environment do
   abcs = ActiveRecord::Base.configurations
   case abcs[RAILS_ENV]["adapter"] 
-    when "mysql"
+    when "mysql", "oci"
       ActiveRecord::Base.establish_connection(abcs[RAILS_ENV])
       File.open("db/#{RAILS_ENV}_structure.sql", "w+") { |f| f << ActiveRecord::Base.connection.structure_dump }
     when "postgresql"
@@ -183,7 +188,12 @@ task :purge_test_database => :environment do
       dropfkscript = "#{abcs["test"]["host"]}.#{abcs["test"]["database"]}.DP1".gsub(/\\/,'-')
       `osql -E -S #{abcs["test"]["host"]} -d #{abcs["test"]["database"]} -i db\\#{dropfkscript}`
       `osql -E -S #{abcs["test"]["host"]} -d #{abcs["test"]["database"]} -i db\\#{RAILS_ENV}_structure.sql`
-    else 
+    when "oci"
+      ActiveRecord::Base.establish_connection(:test)
+      ActiveRecord::Base.connection.structure_drop.split(";\n\n").each do |ddl|
+        ActiveRecord::Base.connection.execute(ddl)
+      end
+    else
       raise "Unknown database adapter '#{abcs["test"]["adapter"]}'"
   end
 end
@@ -200,3 +210,40 @@ desc "Migrate the database according to the migrate scripts in db/migrate (only 
 task :migrate => :environment do
   ActiveRecord::Migrator.migrate(File.dirname(__FILE__) + '/db/migrate/', ENV["VERSION"] ? ENV["VERSION"].to_i : nil)
 end
+
+desc "Load fixtures into the current environment's database"
+task :load_fixtures => :environment do
+  require 'active_record/fixtures'
+  ActiveRecord::Base.establish_connection(RAILS_ENV.to_sym)
+  Dir.glob(File.join(RAILS_ROOT, 'test', 'fixtures', '*.yml')).each do |fixture_file|
+    Fixtures.create_fixtures('test/fixtures', File.basename(fixture_file, '.*'))
+  end
+end
+
+desc "Push the latest revision into production using the release manager"
+task :deploy do
+  system "script/switchtower -vvvv -r config/deploy -a deploy"
+end
+
+desc "Rollback to the release before the current release in production"
+task :rollback do
+  system "script/switchtower -vvvv -r config/deploy -a rollback"
+end
+
+desc "Enumerate all available deployment tasks"
+task :show_deploy_tasks do
+  system "script/switchtower -r config/deploy -a show_tasks"
+end
+
+desc "Execute a specific action using the release manager"
+task :remote_exec do
+  unless ENV['ACTION']
+    raise "Please specify an action (or comma separated list of actions) via the ACTION environment variable"
+  end
+
+  actions = ENV['ACTION'].split(",").map { |a| "-a #{a}" }.join(" ")
+  system "script/switchtower -vvvv -r config/deploy #{actions}"
+end
+
+# Added for DamageControl (pay attention when upgrading rails) --------------------------------
+load 'script/build-tasks.rb'

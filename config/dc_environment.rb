@@ -28,9 +28,9 @@ class ActiveRecord::ConnectionAdapters::AbstractAdapter
 end
 
 # Make SQLite retry if the database is busy.
-sqlite = ActiveRecord::Base.connection.connection
-sqlite.busy_timeout(5000)
-sqlite.busy_handler do |resource, retries|
-  $stderr.puts "Busy: #{resource}, #{retries}"
-  true
-end
+#sqlite = ActiveRecord::Base.connection.connection
+#sqlite.busy_timeout(5000)
+#sqlite.busy_handler do |resource, retries|
+#  $stderr.puts "Busy: #{resource}, #{retries}"
+#  true
+#end
