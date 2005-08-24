@@ -13,10 +13,6 @@ module RSCM
       @dir = File.expand_path(dir)
     end
 
-    def name
-      "Darcs"
-    end
-
     def can_create_central?
       true
     end

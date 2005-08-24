@@ -36,12 +36,12 @@ module RSCM
       @url, @path = url, path
     end
 
-    def name
-      "Subversion"
-    end
-
     def add(relative_filename)
       svn(@checkout_dir, "add #{relative_filename}")
+    end
+
+    def move(relative_src, relative_dest)
+      svn(@checkout_dir, "mv #{relative_src} #{relative_dest}")
     end
 
     def transactional?

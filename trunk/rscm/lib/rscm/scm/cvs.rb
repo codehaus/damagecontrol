@@ -29,10 +29,6 @@ module RSCM
       @root, @mod, @branch, @password = root, mod, branch, password
     end
 
-    def name
-      "CVS"
-    end
-    
     def import_central(dir, message)
       modname = File.basename(dir)
       cvs(dir, "import -m \"#{message}\" #{modname} VENDOR START")
@@ -40,6 +36,13 @@ module RSCM
     
     def add(relative_filename)
       cvs(@checkout_dir, "add #{relative_filename}")
+    end
+
+    def move(relative_src, relative_dest)
+      FileUtils.mv(@checkout_dir + '/' + relative_src, @checkout_dir + '/' + relative_dest, :force=>true)
+      cvs(@checkout_dir, "rm #{relative_src}")
+      # This will fail if the directories are new. More advanced support for adding can be added if needed.
+      cvs(@checkout_dir, "add #{relative_dest}")
     end
 
     # The extra simulate parameter is not in accordance with the AbstractSCM API,

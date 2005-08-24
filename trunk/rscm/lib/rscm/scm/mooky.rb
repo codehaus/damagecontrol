@@ -13,9 +13,5 @@ module RSCM
     def initialize(foo="", bar="chocolate bar")
     end
   
-    def name
-      "Mooky"
-    end
-
   end
 end

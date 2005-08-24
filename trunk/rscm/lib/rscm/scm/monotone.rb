@@ -33,10 +33,6 @@ module RSCM
       @central_checkout_dir = File.expand_path(central_checkout_dir) unless central_checkout_dir.nil?
     end
 
-    def name
-      "Monotone"
-    end
-
     def add(relative_filename)
       db = db(@checkout_dir)
       with_working_dir(@checkout_dir) do
@@ -150,6 +146,10 @@ module RSCM
           io.read
         end
       end
+    end
+
+    def supports_trigger?
+      true
     end
 
     # http://www.venge.net/monotone/monotone.html#Hook-Reference
