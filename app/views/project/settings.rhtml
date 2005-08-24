@@ -1,8 +1,8 @@
 <script type="text/javascript">
-var settings = new Settings("root");
+var settings = new Settings("setting-icons");
 </script>
 <p>
-  <%= link_to_function(image_tag("wrench", :size=>"48x48", :border=>0), "settings.show('root')") %>
+  <%= link_to_function(image_tag("wrench", :size=>"48x48", :border=>0), "settings.show('setting-icons')") %>
 </p>
 <p>
   Show All
@@ -10,7 +10,36 @@ var settings = new Settings("root");
 
 <%= form_tag(:controller => "project", :action => @submit_action, :id => @project.id) %>
 <div>
-  <%= render :partial => "shared/menu", :locals => {:rows => @rows} %>
+  <div class="settings-container">
+    <div id="setting-icons" style="display:block">
+      <%
+        @rows.each do |row| 
+      %>
+        <div class="setting-category-row">
+          <%= row[0].category.pluralize.capitalize %>
+        </div>
+        <div class="setting-icon-row">
+          <% row.each do |object| %>
+            <div class="setting-icon-column">
+              <%= link_to_function(
+                    image_tag(
+                      object.icon, 
+                      :size=>"48x48", :border => 0, :id => object.dom_id + "_img_menu"
+                    ), 
+                    "settings.show('#{object.class.name}', '#{object.category}', '#{object.dom_id}', #{object.exclusive?})"
+                  ) %>
+            </div>
+          <% end %>
+        </div>
+        <div class="setting-names-row">
+          <% row.each do |object| %>
+            <div class="setting-name-column"><%= object.visual_name %></div>
+          <% end %>
+        </div>
+      <% end %>
+    </div>
+  </div>
+  
   <!-- Now, render a hidden form for each plugin -->
   <% @rows.flatten.each do |object| %>
     <script type="text/javascript">
@@ -23,7 +52,7 @@ var settings = new Settings("root");
       var <%= object.dom_id %>_img_enabled = new Image();
       <%= object.dom_id %>_img_enabled.src = '<%= object.enabled_icon %>';
     </script>
-    <div class="setting" id="<%= object.class.name %>" style="display:none;">
+    <div class="settings-container" id="<%= object.class.name %>" style="display:none;">
       <div>
         <p>
           <%= image_tag(object.icon, :size=>"48x48", :border => 0, :id => object.dom_id + "_img") %>

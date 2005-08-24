@@ -14,8 +14,8 @@ body {
   /* text-align:  center; */
 }
 
-/* Styles for project menu */
-.setting {
+/* Styles for project settings panel */
+.settings-container {
   position: absolute;
   top: 200px;
   left: 260px;
