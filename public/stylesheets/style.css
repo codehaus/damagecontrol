@@ -14,6 +14,43 @@ body {
   /* text-align:  center; */
 }
 
+/* Styles for project menu */
+.setting {
+  position: absolute;
+  top: 200px;
+  left: 260px;
+  height: 500px;
+}
+
+.setting-icon-row {
+  position: relative;
+  height: 48px;
+}
+
+.setting-icon-column {
+  padding-left: 12px;
+  float: left;
+  width: 48px;
+}
+
+.setting-names-row {
+  position: relative;
+  height: 20px;
+}
+
+.setting-name-column {
+  padding-left: 12px;
+  float: left;
+  width: 48px;
+  height: 20px;
+}
+
+.setting-category-row {
+  position: relative;
+  height: 20px;
+}
+
+
 h1 {
   font-size: 2em;
   font-weight: normal;
@@ -28,7 +65,7 @@ h2 {
 
 .notice {
   padding: 4px;
-  background: #FF66FF;
+  background-color: #006600;
   border: 1px solid #FF00FF;
 }
 
@@ -36,14 +73,6 @@ h2 {
   padding: 10px;
   background: #eee;
   border: 1px solid #ccc;
-}
-
-/* Styles for project menu */
-.setting {
-  position: absolute;
-  top: 200px;
-  left: 260px;
-  height: 500px;
 }
 
 .progress-bg {

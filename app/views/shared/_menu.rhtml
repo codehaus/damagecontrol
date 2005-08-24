@@ -1,17 +1,14 @@
 <div class="setting" id="root" style="display:block">
-  <table>
+  <div class="table">
     <%
-      max_row_length = rows.collect{|row| row.length}.max 
       rows.each do |row| 
     %>
-      <tr>
-        <td colspan="<%= max_row_length %>">
-          <%= row[0].category.pluralize.capitalize %>
-        </td>
-      </tr>
-      <tr>
+      <div class="setting-category-row">
+        <%= row[0].category.pluralize.capitalize %>
+      </div>
+      <div class="setting-icon-row">
         <% row.each do |object| %>
-          <td>
+          <div class="setting-icon-column">
             <%= link_to_function(
                   image_tag(
                     object.icon, 
@@ -19,14 +16,14 @@
                   ), 
                   "settings.show('#{object.class.name}', '#{object.category}', '#{object.dom_id}', #{object.exclusive?})"
                 ) %>
-          </td>
+          </div>
         <% end %>
-      </tr>
-      <tr>
+      </div>
+      <div class="setting-names-row">
         <% row.each do |object| %>
-          <td><%= object.visual_name %></td>
+          <div class="setting-name-column"><%= object.visual_name %></div>
         <% end %>
-      </tr>
+      </div>
     <% end %>
-  </table>
+  </div>
 </div>
