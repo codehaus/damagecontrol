@@ -2,6 +2,8 @@ These are important TODOs that must be fixed before release and RubyConf.
 
 == General stuff ==
 * Fix SQLite concurrency problems
+* Make daemon do more than just SCM polling. Also has to build manually requested builds/dependency triggered builds!
+* Make daemon sleep before it starts thr project loop again
 * Get DC to work with lighttpd (too damn slow with WEBRick). script/lighttpd
   Problems:
     * lighttpd often dies on http://localhost:8000/project/list
@@ -15,6 +17,11 @@ These are important TODOs that must be fixed before release and RubyConf.
 * Avoid NameError with WEBrick that occur randomly (see above)
 * Make sure DC runs on Windows/Linux (people are going to be disappointed if the release only works on os x)
 * Make DC run against PostgreSQL (MySQL is not popular at Codehaus)
+* Use XForge for release in DC and RSCM
+* Merge branch back to trunk
+* Use migrations (i.e. get them to work on sqlite!)
+* Grok how to use switchtower to deploy dc to codehaus
+* Make DC self hosting
 
 == UI stuff ==
 * Fix diff logic so diffs can be shown in web

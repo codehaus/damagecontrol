@@ -40,30 +40,25 @@ class ProjectTest < Test::Unit::TestCase
   end
 
   def test_should_persist_tracker
-    jira = Tracker::Jira::JiraProject.new
+    # TODO: fix this nil!
+    rf = MetaProject::Tracker::XForge::RubyForgeTracker.new("http://rubyforge.org/tracker/?group_id=801", nil)
 
-    @project_1.tracker = jira
+    @project_1.tracker = rf
     @project_1.save
     @project_1.reload
 
-    @project_1.tracker.host = "jalla"
-    @project_1.save
-    @project_1.reload
-    assert_equal("jalla", @project_1.tracker.host)
+    assert_equal("http://rubyforge.org/tracker/?group_id=801", @project_1.tracker.overview)
     assert_equal(true, @project_1.tracker.enabled)
   end
 
   def test_should_persist_scm_web
-    view_cvs = ScmWeb::ViewCvs.new
+    scm_web = MetaProject::ScmWeb.new("a", "b", "c", "d", "e")
 
-    @project_1.scm_web = view_cvs
+    @project_1.scm_web = scm_web
     @project_1.save
     @project_1.reload
 
-    @project_1.scm_web.cvs_server_path = "jalla"
-    @project_1.save
-    @project_1.reload
-    assert_equal("jalla", @project_1.scm_web.cvs_server_path)
+    assert_equal("a", @project_1.scm_web.overview)
     assert_equal(true, @project_1.scm_web.enabled)
   end
 

@@ -11,29 +11,11 @@ task :recreate_schema => :environment do
     when "sqlite", "sqlite3"
       db = "#{abcs['development']['dbfile']}"
       File.delete(db) if File.exist?(db)
-      `#{abcs[RAILS_ENV]["adapter"]} #{db} < db/schema.sql`
+      `#{abcs[RAILS_ENV]["adapter"]} #{db} < db/schema_sqlite.sql`
     else 
       raise "Unknown database adapter '#{abcs["test"]["adapter"]}'"
   end
 end
-
-desc "Run the DamageControl Webapp"
-task :webrick do
-  ruby "script/server"
-end
-
-desc "Run the DamageControl Daemon"
-task :daemon do
-  ruby "script/daemon"
-end
-
-desc "Create sample projects"
-task :create_sample_projects do
-  ruby "script/create_sample_projects"
-end
-
-desc "Recreate database, create sample projects and run daemon"
-task :daemon_from_scratch => [:recreate_schema, :create_sample_projects, :daemon]
 
 # Support Tasks ------------------------------------------------------
 
@@ -56,7 +38,7 @@ task :todo do
   egrep /#.*(FIXME|TODO|TBD)/
 end
 
-desc "Make greyscale images"
+desc "Make greyscale (sepia) images"
 task :greyscale do
   require 'RMagick'
 
@@ -65,7 +47,9 @@ task :greyscale do
   colour_pngs.exclude('public/images/raw/**/*')
   colour_pngs.to_a.each do |png|
     img = Magick::ImageList.new(png)
+    # img = img.sepiatone
     img = img.quantize(256, Magick::GRAYColorspace)
+    img = img.colorize(0.30, 0.30, 0.30, '#cc9933')
 
     grey_png = png.gsub(/\.png/, "_grey.png")
     puts "writing greyscale image #{grey_png}"
@@ -73,21 +57,46 @@ task :greyscale do
   end
 end
 
-desc "Make square pngs from raw images"
-task :square_from_raw do
-  require 'RMagick'
+desc "Create self-updating test project"
+task :create_test_project => [:environment] do
+  # TODO: make a copy before we import, to avoid .svn files...
+  require 'rscm'
+  require 'build'
+  path = File.expand_path('target/test_project_repo')
+  FileUtils.rm_rf(path) if File.exist?(path)
+  scm = RSCM::Subversion.new(RSCM::PathConverter.filepath_to_nativeurl(path + "/trunk/foo"), "trunk/foo")
+  # yaml the scm. test_project's build script needs it to commit changes to itself.
+  File.open("test_project/scm.yaml", "w") do |io|
+    io.write(scm.to_yaml)
+  end
 
-  raws = FileList.new('public/images/raw/**/*')
-  raws.to_a.each do |raw|
-    img = Magick::ImageList.new(raw)
-    puts img[0]
-    img.resize!(48, 48)
-#    img = img.quantize(256, Magick::GRAYColorspace)
+  scm.create_central  
+  scm.import_central('test_project', "importing")
 
-    suffix = File.extname(raw)
-    basename = File.basename(raw, suffix)
-    colour_png = "public/images/#{basename}.png"
-    puts "writing square colour image #{colour_png}"
-    img.write(colour_png)
+  if(!Project.find_by_name("test_project"))
+    aa = DamageControl::Publisher::ArtifactArchiver.new
+    aa.files = {"pkg/*.gem" => "gems"}
+    aa.enabling_states = [Build::Successful.new, Build::Fixed.new]
+
+    growl = DamageControl::Publisher::Growl.new
+    growl.enabling_states = [Build::Broken.new, Build::Fixed.new]
+
+    sound = DamageControl::Publisher::Sound.new
+    sound.enabling_states = [Build::Broken.new, Build::Fixed.new]
+
+    jira = Tracker::Jira::JiraProject.new
+    scm_web = ScmWeb::DamageControl.new    
+
+    test_project = Project.create(
+      :name => "test_project",
+      :home_page => "http://hieraki.lavalamp.ca/",
+      :start_time => 2.weeks.ago.utc, 
+      :relative_build_path => "", 
+      :build_command => "rake", 
+      :scm => scm,
+      :tracker => jira,
+      :scm_web => scm_web,
+      :publishers => [aa, growl, sound]
+    )
   end
 end

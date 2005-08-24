@@ -64,6 +64,7 @@ module DamageControl
       
       latest_revision = project.latest_revision
       
+      # TODO: gradually go backwards in time if there is nothing since project.begiin_time
       # Default value for start time (in case there are no detected revisions yet)
       from = project.start_time
       if(latest_revision)

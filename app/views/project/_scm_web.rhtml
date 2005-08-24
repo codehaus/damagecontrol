@@ -1,0 +1,80 @@
+<table>
+  <tr>
+    <td>Overview:</td>
+    <td>
+      <input name="scm_web[overview_spec]" value="<%= CGI.escapeHTML(object.overview_spec) %>"/>
+    </td>
+  </tr>
+  <tr>
+    <td>History:</td>
+    <td>
+      <input name="scm_web[history_spec]" value="<%= CGI.escapeHTML(object.history_spec) %>"/>
+    </td>
+  </tr>
+  <tr>
+    <td>Raw:</td>
+    <td>
+      <input name="scm_web[raw_spec]" value="<%= CGI.escapeHTML(object.raw_spec) %>"/>
+    </td>
+  </tr>
+  <tr>
+    <td>HTML:</td>
+    <td>
+      <input name="scm_web[html_spec]" value="<%= CGI.escapeHTML(object.html_spec) %>"/>
+    </td>
+  </tr>
+  <tr>
+    <td>Diff:</td>
+    <td>
+      <input name="scm_web[diff_spec]" value="<%= CGI.escapeHTML(object.diff_spec) %>"/>
+    </td>
+  </tr>
+</table>
+<p>
+Example:
+</p>
+
+<table>
+  <tr>
+    <td>Overview:</td>
+    <td><b>http://rubyforge.org/cgi-bin/viewcvs.cgi/#{path}?cvsroot=xforge</b></td>
+  </tr>
+  <tr>
+    <td>History:</td>
+    <td><b>http://rubyforge.org/cgi-bin/viewcvs.cgi/#{path}?cvsroot=xforge</b></td>
+  </tr>
+  <tr>
+    <td>Raw:</td>
+    <td><b>http://rubyforge.org/cgi-bin/viewcvs.cgi/*checkout*/#{path}?cvsroot=xforge&amp;rev=#{revision}</b></td>
+  </tr>
+  <tr>
+    <td>HTML:</td>
+    <td><b>http://rubyforge.org/cgi-bin/viewcvs.cgi/#{path}?cvsroot=xforge&amp;rev=#{revision}&amp;content-type=text/vnd.viewcvs-markup</b></td>
+  </tr>
+  <tr>
+    <td>Diff:</td>
+    <td><b>http://rubyforge.org/cgi-bin/viewcvs.cgi/#{path}.diff?cvsroot=xforge&amp;r1=#{previous_revision}&amp;r2=#{revision}</b></td>
+  </tr>
+</table>
+
+<p>
+SCM browser URL schemes are specific to each SCM browser, their configuration and where in the file hierarchy the root for the project is. </p>
+<p>
+There are five different URL schemes that can be specified for the SCM browser of a project: overview, history, raw, html and diff. These schemes will be used when generating URLs for file revisions on the project's revision pages. You can (and should!) use three variables in these schemes:
+<table>
+  <tr>
+    <td><b>#{path}</b></td>
+    <td>the relative path of the changed file</td>
+  </tr>
+  <tr>
+    <td><b>#{revision}</b></td>
+    <td>the revision of the changed file</td>
+  </tr>
+  <tr>
+    <td><b>#{previous_revision}</b></td>
+    <td>the revision of the changed file's previous revision (used for diffs)</td>
+  </tr>
+</table>
+<p>
+Browse around in your project's ViewCvs to figure out what parts of these URLs can be made static, and what parts that should be replaced with <b>#{path}</b>, <b>#{revision}</b> and <b>#{previous_revision}</b>.
+</p>

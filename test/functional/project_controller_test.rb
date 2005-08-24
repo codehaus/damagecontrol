@@ -32,35 +32,22 @@ class ProjectControllerTest < Test::Unit::TestCase
         }
       },
       :tracker => {
-        "Tracker::Trac::TracProject" => {
+        "MetaProject::Tracker::Trac::TracTracker" => {
           :enabled => false,
-          :uri => "http://dev.rubyonrails.com/",
-          :svn_path => "trunk/activerecord"
+          :trac_base_url => "http://dev.rubyonrails.com/"
         },
-        "Tracker::Jira::JiraProject" => {
+        "MetaProject::Tracker::Jira::JiraTracker" => {
           :enabled => true,
-          :host => "http://jira.codehaus.org/",
+          :rooturl => "http://jira.codehaus.org/",
           :identifier => "DC"
         }
       },
       :scm_web => {
-        "Tracker::Trac::TracProject" => {
-          :enabled => false,
-          :uri => "http://dev.rubyonrails.com/",
-          :svn_path => "trunk/activerecord"
-        },
-        "ScmWeb::ViewCvs" => {
-          :enabled => true,
-          :uri_specs => {
-            :keys => ["overview", "raw", "html", "diff"],
-            :values => [
-              "http://foo.com/overview/\#{path}", 
-              "http://foo.com/raw/\#{path}?r=\#{revision}", 
-              "http://foo.com/html/\#{path}?r=\#{revision}", 
-              "http://foo.com/diff/\#{path}?r1=\#{previous_revision}&r2=\#{revision}", 
-            ],
-          }
-        }
+        :overview_spec => "http://foo.com/overview/", 
+        :history_spec => "http://foo.com/history/\#{path}", 
+        :raw_spec => "http://foo.com/raw/\#{path}?r=\#{revision}", 
+        :html_spec => "http://foo.com/html/\#{path}?r=\#{revision}", 
+        :diff_spec => "http://foo.com/diff/\#{path}?r1=\#{previous_revision}&r2=\#{revision}"
       },
       :publisher => {
         "DamageControl::Publisher::Growl" => {
@@ -78,14 +65,14 @@ class ProjectControllerTest < Test::Unit::TestCase
     assert_equal(RSCM::Subversion, project.scm.class)
     assert_equal("svn://some/where", project.scm.url)
     
-    assert_equal(Tracker::Jira::JiraProject, project.tracker.class)
-    assert_equal("http://jira.codehaus.org/", project.tracker.host)
+    assert_equal(MetaProject::Tracker::Jira::JiraTracker, project.tracker.class)
+    assert_equal("http://jira.codehaus.org/", project.tracker.rooturl)
     assert_equal("DC", project.tracker.identifier)
 
-    assert_equal(ScmWeb::ViewCvs, project.scm_web.class)
+    assert_equal(MetaProject::ScmWeb, project.scm_web.class)
     assert_equal(
       "http://foo.com/diff/where/is/this.rb?r1=x&r2=y", 
-      project.scm_web.uri("where/is/this.rb", {:type => "diff", :previous_revision => "x", :revision => "y"}))
+      project.scm_web.diff("where/is/this.rb", "y", "x"))
 
     growl = project.publishers.find{|p| p.class == DamageControl::Publisher::Growl}
     assert_equal("codehaus.org", growl.hosts)
@@ -122,9 +109,8 @@ class ProjectControllerTest < Test::Unit::TestCase
 private
 
   def setup_project_for_rss
-    trac = Tracker::Trac::TracProject.new
-    trac.uri = "http://dev.rubyonrails.com/"
-    trac.svn_path = "trunk/activerecord"
+    trac = MetaProject::Tracker::Trac::TracTracker.new
+    trac.trac_base_url = "http://dev.rubyonrails.com/"
     trac.enabled = true
     @project_1.tracker = trac
     @project_1.save

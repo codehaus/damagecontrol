@@ -12,29 +12,19 @@
       <tr>
         <% row.each do |object| %>
           <td>
-            <% if(object.has_link?) %>
-            <%= link_to(
+            <%= link_to_function(
                   image_tag(
                     object.icon, 
-                    :size=>"48x48", :border => 0
+                    :size=>"48x48", :border => 0, :id => object.dom_id + "_img_menu"
                   ), 
-                  object.link(self)
+                  "settings.show('#{object.class.name}', '#{object.category}', '#{object.dom_id}', #{object.exclusive?})"
                 ) %>
-            <% else %>
-              <%= link_to_function(
-                    image_tag(
-                      object.icon, 
-                      :size=>"48x48", :border => 0, :id => object.dom_id + "_img_menu"
-                    ), 
-                    "settings.show('#{object.class.name}', '#{object.category}', '#{object.dom_id}', #{object.exclusive?})"
-                  ) %>
-            <% end %>
           </td>
         <% end %>
       </tr>
       <tr>
         <% row.each do |object| %>
-          <td><%= object.name %></td>
+          <td><%= object.visual_name %></td>
         <% end %>
       </tr>
     <% end %>
