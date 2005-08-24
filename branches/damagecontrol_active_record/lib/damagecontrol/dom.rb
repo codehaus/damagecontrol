@@ -24,5 +24,25 @@ module DamageControl
       "#{dom_id}_enabled"
     end
 
+    def visual_name
+      self.class.name.demodulize
+    end
+
+    def underscored_name
+      self.class.name.demodulize.underscore
+    end
+
+    def icon_base
+      "/images/#{category}/#{underscored_name}"
+    end
+
+    def default_render_excludes
+      [:enabled, :fileutils_label, :fileutils_output]
+    end
+
+    def <=> (other)
+      self.class.name <=> other.class.name
+    end
+
   end
 end

@@ -1,7 +1,7 @@
 module DamageControl
   module Publisher
     class Base
-      include Plugin
+      include Dom
 
       def self.classes
         [
@@ -30,6 +30,14 @@ module DamageControl
         @enabling_states && !@enabling_states.empty?
       end
       
+      def category
+        "publisher"
+      end
+
+      def exclusive?
+        false
+      end
+
       # Publishes +build+ if its state is
       # among our +enabling_states+.
       def publish_maybe(build)
@@ -43,19 +51,6 @@ module DamageControl
         end
       end
 
-      def category
-        "publisher"
-      end
-
-      def exclusive?
-        false
-      end
-
-      # Exclude default rendering of enabling_states. It's handled by the _publisher.rhtml
-      # template.
-      def default_render_excludes
-        [:enabling_states, :fileutils_label, :fileutils_output]
-      end
     end
   end
 end

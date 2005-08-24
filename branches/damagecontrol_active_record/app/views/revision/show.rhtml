@@ -26,24 +26,26 @@
 <table>
   <%
   @revision.revision_files.each_with_index do |file, i|
-    revision_url = @project.scm_web.uri(
-      @project.scm.view_cvs_full_path(file), 
+    full_path = @project.scm.send(@project.scm_web.underscored_name + "_full_path", file)
+
+    revision_url = @project.scm_web.file_uri(
+      full_path, 
       {
         :type => "html",
         :previous_revision => file.previous_native_revision_identifier,
         :revision => file.native_revision_identifier
       }
     )
-    diff_url = @project.scm_web.uri(
-      @project.scm.view_cvs_full_path(file), 
+    diff_url = @project.scm_web.file_uri(
+      full_path, 
       {
         :type => "diff",
         :previous_revision => file.previous_native_revision_identifier,
         :revision => file.native_revision_identifier
       }
     )
-    overview_url = @project.scm_web.uri(
-      @project.scm.view_cvs_full_path(file), 
+    overview_url = @project.scm_web.file_uri(
+      full_path, 
       {
         :type => "overview",
         :previous_revision => file.previous_native_revision_identifier,
@@ -58,9 +60,9 @@
     # deleted        Show deleted file      Show deleted rev X  Show history
 
     added_rev_tip = "Show new file"
-    modified_rev_tip = "Show modified file"
-    moved_rev_tip = "Show moved file"
-    deleted_rev_tip = "Show removed file"
+    modified_rev_tip = "Show revision #{file.native_revision_identifier} (modified file)"
+    moved_rev_tip = "Show revision #{file.native_revision_identifier} (moved file)"
+    deleted_rev_tip = "Show revision #{file.native_revision_identifier} (removed file)"
     diff_tip = "Show diff"
     history_tip = "Show history"
   %>

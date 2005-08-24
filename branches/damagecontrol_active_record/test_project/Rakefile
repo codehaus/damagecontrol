@@ -10,13 +10,7 @@
 require 'rake/testtask'
 require 'rscm'
 
-task :default => [:clean, :update_astray, :write_artifacts, :sleep, :commit_changes, :test]
-
-Rake::TestTask.new do |t|
-  t.libs << "test"
-  t.test_files = FileList['*/**/*_test.rb']
-  t.verbose = true
-end
+task :default => [:clean, :update_astray_and_move_other_file, :write_artifacts, :sleep, :commit_changes, :test]
 
 desc "Clean generated files"
 task :clean do |t|
@@ -24,19 +18,106 @@ task :clean do |t|
 end
 
 desc "Increment the number in astray.rb"
-task :update_astray do |t|
+task :update_astray_and_move_other_file do |t|
   # Edit files (required for some SCMs like P4)
   scm = YAML::load(File.open('scm.yaml').read)
   scm.checkout_dir = File.expand_path(".")
   scm.edit('lib/astray.rb')
 
   astray = File.open('lib/astray.rb').read
+
   numbers = /([\d]+)/n
   if(astray =~ numbers)
     n = $1.to_i + 1
     File.open('lib/astray.rb', 'w') do |io|
       io.write astray.gsub(numbers, n.to_s)
     end
+  end
+
+  to_move = /(\w+\/\w+\.rb.*
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+
+
+   
+   
+   
+``  
+  
+  
+  
+  )/n
+  if(astray =~ to_move)
+    from = $1
+    to = from + "x"
+    File.open('lib/astray.rb', 'w') do |io|
+      io.write astray.gsub(numbers, to)
+    end
+  end
+end
+
+desc "Writes some artifacts"
+task :write_artifacts do |t|
+  gem = "pkg/test_project-#{ENV['PKG_BUILD']}.gem"
+  puts "Creating gem in #{gem}"
+  FileUtils.mkdir_p("pkg") unless File.exist?("pkg")
+  File.open(gem, "w") do |io|
+    io.puts "just a test gem for version #{ENV['DAMAGECONTROL_BUILD_LABEL']}"
   end
 end
 
@@ -54,12 +135,8 @@ task :commit_changes do |t|
   scm.commit("Went a little astray")
 end
 
-desc "Writes some artifacts"
-task :write_artifacts do |t|
-  gem = "pkg/test_project-#{ENV['PKG_BUILD']}.gem"
-  puts "Creating gem in #{gem}"
-  FileUtils.mkdir_p("pkg") unless File.exist?("pkg")
-  File.open(gem, "w") do |io|
-    io.puts "just a test gem for version #{ENV['DAMAGECONTROL_BUILD_LABEL']}"
-  end
+Rake::TestTask.new do |t|
+  t.libs << "test"
+  t.test_files = FileList['*/**/*_test.rb']
+  t.verbose = true
 end

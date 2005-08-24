@@ -1,40 +1,8 @@
 class ProjectController < ApplicationController
+  
   layout "application", :except => :list
   
   def index
-  end
-
-  def new_rubyforge
-    project_name = @params[:project_name]
-    rf_project = XForge::RubyForge.new.project(project_name)
-
-    home_page = rf_project.home_page_uri
-    tracker = rf_project.tracker
-    scm_web = rf_project.scm_web
-    
-    # find scm. prefer the one that has same name as the project
-    scms = scm_web.scms
-    scm = scms.find{|s| s.mod == project_name}
-    scm = scms[0] if scm.nil?
-    
-    # assume project follows the rake convention to use Rake and put gems in pkg
-    build_command = "rake"
-    artifact_archiver = DamageControl::Publisher::ArtifactArchiver.new
-    artifact_archiver.files = {"pkg/*.gem", "rubygems"}
-    artifact_archiver.enabling_states = [Build::Successful.new, Build::Fixed.new]
-    
-    project = Project.create(
-      :name => project_name,
-      :start_time => 2.weeks.ago,
-      :build_command => build_command,
-      :home_page => home_page,
-      :scm => scm,
-      :tracker => tracker,
-      :scm_web => scm_web,
-      :publishers => [artifact_archiver]
-    )
-    flash["notice"] = "Successfully imported settings for #{project_name} from Rubyforge."
-    redirect_to :action => "edit", :id => project.id
   end
 
   def new
@@ -88,7 +56,24 @@ class ProjectController < ApplicationController
     render :text => @project.builds_rss(self)
   end
 
+  # TODO: fix me
+  def import_ruby_forgeX
+    project = import_ruby_forge_project(@params[:project_name])
+    redirect_after_import(project, "RubyForge")
+  end
+
+  # TODO: fix me
+  def import_tracX
+    project = import_trac_project(@params[:project_name], @params[:browse_uri], @params[:svnroot_uri], @params[:svn_path])
+    redirect_after_import(project, "Trac")
+  end
+
 private
+
+  def redirect_after_import(project, source)
+    flash["notice"] = "Successfully imported settings for #{project.name} from #{source}."
+    redirect_to :action => "edit", :id => project.id
+  end
 
   def find
     @project = Project.find(@params[:id])
@@ -97,8 +82,15 @@ private
   def update_or_save(project)
     project.scm        = deserialize_to_array(@params[:scm]).find{|scm| scm.enabled}
     project.tracker    = deserialize_to_array(@params[:tracker]).find{|tracker| tracker.enabled}
-    project.scm_web    = deserialize_to_array(@params[:scm_web]).find{|scm_web| scm_web.enabled}
     project.publishers = deserialize_to_array(@params[:publisher])
+    project.scm_web    = MetaProject::ScmWeb.new
+
+    project.scm_web.overview_spec = @params[:scm_web][:overview_spec]
+    project.scm_web.history_spec  = @params[:scm_web][:history_spec]
+    project.scm_web.raw_spec      = @params[:scm_web][:raw_spec]
+    project.scm_web.html_spec     = @params[:scm_web][:html_spec]
+    project.scm_web.diff_spec     = @params[:scm_web][:diff_spec]
+
     project.update_attributes(@params[:project])
 
     redirect_to :action => "edit", :id => project.id
@@ -108,7 +100,8 @@ private
     # Workaround for AR bug
     @project.publishers = YAML::load(@project.publishers) if @project.publishers.class == String
 
-    @rows = [[@project], scms, publishers, trackers, scm_webs]
+    top_row = [@project, @project.scm_web, DamageControl::Importer::Import.new]
+    @rows = [top_row, scms, publishers, trackers]
   end
 
   # Instantiates all known SCMs. The project's persisted scm
@@ -129,14 +122,9 @@ private
   end
 
   def trackers
-    ::Tracker::Base.classes.collect{|cls| cls.new}.collect do |tracker|
+    MetaProject::Tracker::Base.classes.collect{|cls| cls.new}.collect do |tracker|
       tracker.class == @project.tracker.class ? @project.tracker : tracker
     end.sort
   end
 
-  def scm_webs
-    ::ScmWeb::Base.classes.collect{|cls| cls.new}.collect do |scm_web|
-      scm_web.class == @project.scm_web.class ? @project.scm_web : scm_web
-    end.sort
-  end
 end

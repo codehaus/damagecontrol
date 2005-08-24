@@ -171,10 +171,15 @@ class Build < ActiveRecord::Base
   end
 
   def icon
-    if(successful?)
-      "green-32.gif"
-    else
-      "red-32.gif"
+    # Don't ask me why we have to case on the class name and not the class itself
+    case state.class.name
+      when Successful.name       then "green-32.gif"
+      when Fixed.name            then "green-32.gif"
+      when Broken.name           then "red-32.gif"
+      when RepeatedlyBroken.name then "red-32.gif"
+      when Executing.name        then "spinner.gif"
+      when NilClass.name         then "grey-32.gif"
+      else "red-pulse-32.gif"
     end
   end
 

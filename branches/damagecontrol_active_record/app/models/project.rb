@@ -36,6 +36,17 @@ class Project < ActiveRecord::Base
     g
   end
 
+  def initialize(*args)
+    super(*args)
+    self.scm_web = MetaProject::ScmWeb.new(
+      "/revision_parser/overview",
+      "/revision_parser/history/\#{path}",
+      "/revision_parser/raw/\#{path}?revision=\#{revision}",
+      "/revision_parser/html/\#{path}?revision=\#{revision}",
+      "/revision_parser/diff/\#{path}?previous_revision=\#{previous_revision}&?revision=\#{revision}"
+    ) if self.scm_web.nil?
+  end
+
   # Same as revisions[0], but faster since it only loads one record
   def latest_revision
     latest_revisions(1)[0]
@@ -132,7 +143,6 @@ LIMIT #{max_count}
 
     self.scm.enabled = true unless self.scm.nil?
     self.tracker.enabled = true unless self.tracker.nil?
-    self.scm_web.enabled = true unless self.scm_web.nil?
   end
   
   # Where temporary stdout log is written
@@ -245,10 +255,6 @@ LIMIT #{max_count}
 
   include ::DamageControl::Dom
 
-  def icon_base
-    "goldbar"
-  end
-
   def enabled
     true
   end
@@ -258,10 +264,6 @@ LIMIT #{max_count}
   end
 
   def exclusive?
-    false
-  end
-
-  def has_link?
     false
   end
 
