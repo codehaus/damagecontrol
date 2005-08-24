@@ -1,19 +1,45 @@
 <script type="text/javascript">
 var settings = new Settings("setting-icons");
 </script>
-<p>
-  <%= link_to_function(image_tag("wrench", :size=>"48x48", :border=>0), "settings.show('setting-icons')") %>
-</p>
-<p>
-  Show All
-</p>
 
 <%= form_tag(:controller => "project", :action => @submit_action, :id => @project.id) %>
+<%= submit_tag(@submit_text) %>
 <div>
-  <div class="settings-container">
+  <div class="settings-containerXX">
+
+    <!-- The top 'fixed' settings row -->
+    <div class="setting-category-row">
+      General settings
+    </div>
+
+    <div class="setting-icon-row">
+      <div class="setting-icon-column">
+        <%= link_to_function(image_tag("wrench", :size=>"48x48", :border=>0), "settings.show('setting-icons')") %>
+      </div>
+      <% @rows[0].each do |object| %>
+        <div class="setting-icon-column">
+          <%= link_to_function(
+                image_tag(
+                  object.icon, 
+                  :size=>"48x48", :border => 0, :id => object.dom_id + "_img_menu"
+                ), 
+                "settings.show('#{object.class.name}', '#{object.category}', '#{object.dom_id}', #{object.exclusive?})"
+              ) %>
+        </div>
+      <% end %>
+    </div>
+    <div class="setting-names-row">
+      <div class="setting-name-column">Show All</div>
+      <% @rows[0].each do |object| %>
+        <div class="setting-name-column"><%= object.visual_name %></div>
+      <% end %>
+    </div>
+
+
+
     <div id="setting-icons" style="display:block">
       <%
-        @rows.each do |row| 
+        @rows[1..-1].each do |row| 
       %>
         <div class="setting-category-row">
           <%= row[0].category.pluralize.capitalize %>
@@ -81,5 +107,4 @@ var settings = new Settings("setting-icons");
     </div>
   <% end %>
 </div>
-<%= submit_tag(@submit_text) %>
 </form>
