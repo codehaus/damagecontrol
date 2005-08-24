@@ -73,10 +73,6 @@ module RSCM
       true
     end
 
-    def name
-      "Perforce"
-    end
-
     def transactional?
       true
     end

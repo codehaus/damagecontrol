@@ -45,10 +45,6 @@ module RSCM
       @user_name, @password, @server_name, @server_port, @project_name, @view_name, @folder_name = user_name, password, server_name, server_port, project_name, view_name, folder_name
     end
 
-    def name
-      "StarTeam"
-    end
-    
     def revisions(checkout_dir, from_identifier=Time.epoch, to_identifier=Time.infinity, &proc)
       # just assuming it is a Time for now, may support labels later.
       # the java class really wants rfc822 and not rfc2822, but this works ok anyway.

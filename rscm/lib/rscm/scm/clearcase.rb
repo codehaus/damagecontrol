@@ -7,10 +7,6 @@ module RSCM
   
     LOG_FORMAT = "Developer:%u\\nTime:%Nd\\nExtendedName:%Xn\\nVersionId:%Vn\\nPreviousVersionId:%PVn\\nElementName:%En\\nOID:%On\\nO:%o\\nMessage:%Nc\\n------------------------------------------\\n"
   
-    def name
-      "ClearCase"
-    end
-
     def revisions(checkout_dir, from_identifier, to_identifier=Time.infinity)
       result = Revisions.new
       with_working_dir(checkout_dir) do

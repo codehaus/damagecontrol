@@ -130,12 +130,6 @@ module RSCM
       raise "Not implemented"
     end
 
-    # The display name of this SCM
-    def name
-      # Should be overridden by subclasses to display a nicer name
-      self.class.name
-    end
-
     # Open a file for edit - required by scms that check out files in read-only mode e.g. perforce
     def edit(file)
     end

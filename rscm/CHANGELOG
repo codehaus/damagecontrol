@@ -1,5 +1,9 @@
 = RSCM Changelog
 
+== Version 0.3.1
+
+* Added move method to Subversion
+
 == Version 0.3.0
 
 * Removed checkout_dir from all methods. It's now a mandatory attribute on the SCM objects.
