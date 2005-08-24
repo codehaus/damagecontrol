@@ -24,10 +24,10 @@ These are important TODOs that must be fixed before release and RubyConf.
 * Make DC self hosting
 
 == UI stuff ==
-* Fix diff logic so diffs can be shown in web
-* Integrate scm_web and tracker with XForge (lots of stuff moved here)
+* Fix diff logic so diffs can be shown in web (LOW PRI, OTHER SCM WEB IS WORKING)
+* DONE Integrate scm_web and tracker with XForge (lots of stuff moved here)
 * Fix the project overview to the right
-* Fix settings bug that unsets SCM if saved w/o clicking SCM
+* Fix settings bug that unsets SCM if saved w/o clicking SCM (use hidden radios perhaps? see damagecontrol.js and enabled_field macro)
 * Align build/revision content to the top
 * Use a proper 3-col layout
 * General ui CSS niceness (logo and professional looking layout can wait)
