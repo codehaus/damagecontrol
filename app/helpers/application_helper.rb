@@ -53,4 +53,12 @@ module ApplicationHelper
     enabled = object.enabling_states && !object.enabling_states.find{|state| state.class.name == state_class_name}.nil?
     check_box_tag("#{object.category}[#{object.class.name}][enabling_states][]", state_class_name, enabled, {:onchange => "publisherChanged('#{object.dom_id}');return false;", :id => nil})
   end
+  
+  # Tag that shows a tip icon. Must be closed with a </div> !
+  def tip_box
+    <<-EOT
+    <div class="tip-box">
+      #{image_tag("atom", :size => "24x24")} Tip!<br/>
+    EOT
+  end
 end

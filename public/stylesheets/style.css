@@ -69,10 +69,29 @@ h2 {
   border: 1px solid #FF00FF;
 }
 
-.framed_box {
+.framed-box {
   padding: 10px;
-  background: #eee;
-  border: 1px solid #ccc;
+  background: #EEEEEE;
+  border: 1px solid #CCCCCC;
+}
+
+.tip-box {
+  padding: 4px;
+  background: #EEEEEE;
+  border: 1px solid #CCCCCC;
+}
+
+.pre-box {
+  font-family: courier;  
+  padding: 4px;
+  background: #FFFFFF;
+  border: 1px solid #CCCCCC;
+}
+
+.sample-box {
+  padding: 4px;
+  background: #FFFFFF;
+  border: 1px solid #CCCCCC;
 }
 
 .progress-bg {

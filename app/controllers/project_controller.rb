@@ -1,6 +1,7 @@
 class ProjectController < ApplicationController
   
   layout "application", :except => :list
+  before_filter :random_tip
   
   def index
   end
@@ -16,7 +17,7 @@ class ProjectController < ApplicationController
     render :action => "settings"
   end
 
-  def edit
+  def edit    
     find
     
     define_plugin_rows
