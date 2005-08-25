@@ -1,11 +1,13 @@
 require_dependency 'sparklines'
+require 'damagecontrol'
 
 class ApplicationController < ActionController::Base
   SPARKLINE_COUNT = 20
   
   TIPS = [
-    "tips/bug_ids_commit_msg",
-    "tips/triggering"
+    "bug_ids_commit_msg",
+    "triggering",
+    "importing"
   ]
 
   before_filter :load_projects
@@ -63,7 +65,11 @@ protected
 
   def random_tip
     # TODO: perhaps keep a counter in the session and show sequentially?
-    @template_for_left_column = TIPS[rand(TIPS.length)]
+    tip(TIPS[rand(TIPS.length)])
+  end
+  
+  def tip(template_name)
+    @template_for_left_column = "tips/#{template_name}"
   end
 
 private

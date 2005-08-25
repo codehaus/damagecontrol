@@ -28,13 +28,19 @@ module RSCM
 
   end
   
-  class Cvs    
-    def view_cvs_full_path(revision_file)
+  class Cvs < Base
+    def scm_web_path(revision_file)
       deleted_prefix = revision_file.status == RevisionFile::DELETED ? "Attic/" : ""
       path_elements = revision_file.path.split("/")
       dir = path_elements[0..-2].join("/") + "/"
       file = path_elements[-1]
-      "#{self.mod}/#{dir}#{deleted_prefix}#{file}"
+      "#{dir}#{deleted_prefix}#{file}"
+    end
+  end
+
+  class Subversion < Base
+    def scm_web_path(revision_file)
+      revision_file.path
     end
   end
 

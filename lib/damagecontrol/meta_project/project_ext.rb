@@ -1,20 +1,12 @@
 module MetaProject
   module Project
-    module XForge
-      class RubyForge
-        def build_command
-          "rake"
-        end
-        
-        def publishers
-          artifact_archiver = DamageControl::Publisher::ArtifactArchiver.new
-          artifact_archiver.files = {"pkg/*.gem", "rubygems"}
-          artifact_archiver.enabling_states = [Build::Successful.new, Build::Fixed.new]
-          
-          # TODO: add mailing lists here
-          [artifact_archiver]
-        end
+
+    class Base
+      # TODO: look at the scm_web to figure out what build tool to use!
+      def build_tool
+        BuildTool::Ant.new
       end
+      
     end
   end
 end

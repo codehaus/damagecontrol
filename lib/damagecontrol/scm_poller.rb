@@ -69,23 +69,23 @@ module DamageControl
       from = project.start_time
       if(latest_revision)
         from = latest_revision.identifier
-        logger.info "Latest revision for #{project.name}'s #{scm.name} "+
+        logger.info "Latest revision for #{project.name}'s #{scm.visual_name} "+
           "was #{from}" if logger
       else
-        logger.info "Latest revision for #{project.name}'s #{scm.name} is " +
+        logger.info "Latest revision for #{project.name}'s #{scm.visual_name} is " +
           "not known. Using project start time: #{from}" if logger
       end
 
-      logger.info "Polling revisions for #{project.name}'s #{scm.name} " +
+      logger.info "Polling revisions for #{project.name}'s #{scm.visual_name} " +
         "after #{from} (#{from.class.name})" if logger
       
       revisions = scm.revisions(from)
       if(revisions.empty?)
-        logger.info "No revisions for #{project.name}'s #{scm.name} after " +
+        logger.info "No revisions for #{project.name}'s #{scm.visual_name} after " +
           "#{from}" if logger
       else
         logger.info "There were #{revisions.length} new revision(s) in " +
-          "#{project.name}'s #{scm.name} after #{from}" if logger
+          "#{project.name}'s #{scm.visual_name} after #{from}" if logger
       end
       if(!revisions.empty? && !scm.transactional?)
         # We're dealing with a non-transactional SCM (like CVS/StarTeam/ClearCase,
@@ -99,14 +99,14 @@ module DamageControl
         quiet_period = project.quiet_period || DEFAULT_QUIET_PERIOD
         while(commit_in_progress)
           logger.info "Sleeping for #{quiet_period} seconds because " + 
-            "#{project.name}'s SCM (#{scm.name}) is not transactional." if logger
+            "#{project.name}'s SCM (#{scm.visual_name}) is not transactional." if logger
           
           sleep(quiet_period)
           previous_revisions = revisions
           revisions = scm.revisions(from)
           commit_in_progress = revisions != previous_revisions
           if(commit_in_progress)
-            logger.info "Commit still in progress in #{project.name}'s #{scm.name}." if logger
+            logger.info "Commit still in progress in #{project.name}'s #{scm.visual_name}." if logger
           end
         end
         logger.info "Quiet period elapsed for #{project.name}." if logger

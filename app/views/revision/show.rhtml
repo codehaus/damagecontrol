@@ -26,31 +26,21 @@
 <table>
   <%
   @revision.revision_files.each_with_index do |file, i|
-    full_path = @project.scm.send(@project.scm_web.underscored_name + "_full_path", file)
+    full_path = @project.scm.scm_web_path(file)
 
-    revision_url = @project.scm_web.file_uri(
-      full_path, 
-      {
-        :type => "html",
-        :previous_revision => file.previous_native_revision_identifier,
-        :revision => file.native_revision_identifier
-      }
+    overview_url = @project.scm_web.history(
+      full_path
     )
-    diff_url = @project.scm_web.file_uri(
+
+    revision_url = @project.scm_web.html(
       full_path, 
-      {
-        :type => "diff",
-        :previous_revision => file.previous_native_revision_identifier,
-        :revision => file.native_revision_identifier
-      }
+      file.native_revision_identifier
     )
-    overview_url = @project.scm_web.file_uri(
+
+    diff_url = @project.scm_web.diff(
       full_path, 
-      {
-        :type => "overview",
-        :previous_revision => file.previous_native_revision_identifier,
-        :revision => file.native_revision_identifier
-      }
+      file.previous_native_revision_identifier,
+      file.native_revision_identifier
     )
     
     #                revision               icon                path

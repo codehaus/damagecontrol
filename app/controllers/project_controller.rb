@@ -1,5 +1,6 @@
 class ProjectController < ApplicationController
-  
+  include MetaProject::ProjectAnalyzer
+
   layout "application", :except => :list
   before_filter :random_tip
   
@@ -14,6 +15,7 @@ class ProjectController < ApplicationController
 
     @submit_action = "create"
     @submit_text = "Create project"
+    tip("importing")
     render :action => "settings"
   end
 
@@ -28,7 +30,9 @@ class ProjectController < ApplicationController
   end
 
   def create
-    update_or_save(Project.create(@params[:project]))
+    project = Project.create(@params[:project])
+    project.start_time = 2.weeks.ago
+    import_or_update_or_save(project)
   end
 
   def update
@@ -57,27 +61,30 @@ class ProjectController < ApplicationController
     render :text => @project.builds_rss(self)
   end
 
-  # TODO: fix me
-  def import_ruby_forgeX
-    project = import_ruby_forge_project(@params[:project_name])
-    redirect_after_import(project, "RubyForge")
-  end
-
-  # TODO: fix me
-  def import_tracX
-    project = import_trac_project(@params[:project_name], @params[:browse_uri], @params[:svnroot_uri], @params[:svn_path])
-    redirect_after_import(project, "Trac")
-  end
-
 private
-
-  def redirect_after_import(project, source)
-    flash["notice"] = "Successfully imported settings for #{project.name} from #{source}."
-    redirect_to :action => "edit", :id => project.id
-  end
 
   def find
     @project = Project.find(@params[:id])
+  end
+  
+  def import_or_update_or_save(project)
+    import_settings = @params[:import]
+    if(import_settings[:scm_web_url] && import_settings[:scm_web_url].strip != "")
+      import(project, import_settings)
+    else
+      update_or_save(project)
+    end
+  end
+  
+  def import(project, import_settings)
+    import_from_meta_project(
+      project, 
+      import_settings[:scm_web_url],
+      import_settings
+    )
+
+    flash["notice"] = "Successfully imported settings for #{project.name}."
+    redirect_to :action => "edit", :id => project.id
   end
   
   def update_or_save(project)

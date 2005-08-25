@@ -22,6 +22,7 @@ These are important TODOs that must be fixed before release and RubyConf.
 * Use migrations (i.e. get them to work on sqlite!)
 * Grok how to use switchtower to deploy dc to codehaus
 * Make DC self hosting
+* Implement project deletion
 
 == UI stuff ==
 * Fix diff logic so diffs can be shown in web (LOW PRI, OTHER SCM WEB IS WORKING)

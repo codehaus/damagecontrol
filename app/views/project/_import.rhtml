@@ -1,1 +1,28 @@
-Let's import :-)
+<table>
+  <tr>
+    <td>Link to project in SCM browser:</td>
+    <td>
+      <input name="import[scm_web_url]"/>
+    </td>
+  </tr>
+  <tr>
+    <td>JIRA project id (Codehaus only):</td>
+    <td>
+      <input name="import[jira_project_id]"/>
+    </td>
+  </tr>
+  <tr>
+    <td>Svn root url (Trac only)</td>
+    <td>
+      <input name="import[trac_svn_root_url]"/>
+    </td>
+  </tr>
+</table>
+<p>
+If you specify a link to a project in an SCM browser on Codehaus, RubyForge, SourceForge or a Trac installation here,
+DamageControl will import a lot of project settings automatically.
+</p>
+<p>
+<b>IMPORTANT!</b> By doing this all the other settings will be overwritten. However, you can come back to the settings
+after you have imported and adjust the imported settings. They will then take effect (as long as you don't specify anything on this page again).
+</p>
