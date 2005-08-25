@@ -42,6 +42,7 @@ module DamageControl
       attr_accessor :delivery_method
 
       def initialize
+        @content_type = "text/html"
         @to = ""
         @from = "\"DamageControl\" <dcontrol@codehaus.org>"
         @delivery_method = "smtp"

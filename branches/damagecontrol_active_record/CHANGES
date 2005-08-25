@@ -1,0 +1,7 @@
+= DamageControl Changelog
+
+== Version 0.6.0
+
+* Fixed DC-438: Content Type not set properly when using action_mailer-1.0.1
+* Fixed DC-437: Error sending email - Was working before
+* Fixed DC-421: A build in progress is shown as broken (red dot). This patch changes it to a blue dot
