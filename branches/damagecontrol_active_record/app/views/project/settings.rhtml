@@ -5,65 +5,60 @@ var settings = new Settings("setting-icons");
 <%= form_tag(:controller => "project", :action => @submit_action, :id => @project.id) %>
 <%= submit_tag(@submit_text) %>
 <div>
-  <div class="settings-containerXX">
+  <!-- The top 'fixed' settings row -->
+  <div class="setting-category-row">
+    General settings
+  </div>
 
-    <!-- The top 'fixed' settings row -->
-    <div class="setting-category-row">
-      General settings
+  <div class="setting-icon-row">
+    <div class="setting-icon-column">
+      <%= link_to_function(image_tag("wrench", :size=>"48x48", :border=>0), "settings.show('setting-icons')") %>
     </div>
-
-    <div class="setting-icon-row">
+    <% @rows[0].each do |object| %>
       <div class="setting-icon-column">
-        <%= link_to_function(image_tag("wrench", :size=>"48x48", :border=>0), "settings.show('setting-icons')") %>
+        <%= link_to_function(
+              image_tag(
+                object.icon, 
+                :size=>"48x48", :border => 0, :id => object.dom_id + "_img_menu"
+              ), 
+              "settings.show('#{object.class.name}', '#{object.category}', '#{object.dom_id}', #{object.exclusive?})"
+            ) %>
       </div>
-      <% @rows[0].each do |object| %>
-        <div class="setting-icon-column">
-          <%= link_to_function(
-                image_tag(
-                  object.icon, 
-                  :size=>"48x48", :border => 0, :id => object.dom_id + "_img_menu"
-                ), 
-                "settings.show('#{object.class.name}', '#{object.category}', '#{object.dom_id}', #{object.exclusive?})"
-              ) %>
-        </div>
-      <% end %>
-    </div>
-    <div class="setting-names-row">
-      <div class="setting-name-column">Show All</div>
-      <% @rows[0].each do |object| %>
-        <div class="setting-name-column"><%= object.visual_name %></div>
-      <% end %>
-    </div>
+    <% end %>
+  </div>
+  <div class="setting-names-row">
+    <div class="setting-name-column">Show All</div>
+    <% @rows[0].each do |object| %>
+      <div class="setting-name-column"><%= object.visual_name %></div>
+    <% end %>
+  </div>
 
-
-
-    <div id="setting-icons" style="display:block">
-      <%
-        @rows[1..-1].each do |row| 
-      %>
-        <div class="setting-category-row">
-          <%= row[0].category.pluralize.capitalize %>
-        </div>
-        <div class="setting-icon-row">
-          <% row.each do |object| %>
-            <div class="setting-icon-column">
-              <%= link_to_function(
-                    image_tag(
-                      object.icon, 
-                      :size=>"48x48", :border => 0, :id => object.dom_id + "_img_menu"
-                    ), 
-                    "settings.show('#{object.class.name}', '#{object.category}', '#{object.dom_id}', #{object.exclusive?})"
-                  ) %>
-            </div>
-          <% end %>
-        </div>
-        <div class="setting-names-row">
-          <% row.each do |object| %>
-            <div class="setting-name-column"><%= object.visual_name %></div>
-          <% end %>
-        </div>
-      <% end %>
-    </div>
+  <div id="setting-icons" style="display:block">
+    <%
+      @rows[1..-1].each do |row| 
+    %>
+      <div class="setting-category-row">
+        <%= row[0].category.pluralize.capitalize %>
+      </div>
+      <div class="setting-icon-row">
+        <% row.each do |object| %>
+          <div class="setting-icon-column">
+            <%= link_to_function(
+                  image_tag(
+                    object.icon, 
+                    :size=>"48x48", :border => 0, :id => object.dom_id + "_img_menu"
+                  ), 
+                  "settings.show('#{object.class.name}', '#{object.category}', '#{object.dom_id}', #{object.exclusive?})"
+                ) %>
+          </div>
+        <% end %>
+      </div>
+      <div class="setting-names-row">
+        <% row.each do |object| %>
+          <div class="setting-name-column"><%= object.visual_name %></div>
+        <% end %>
+      </div>
+    <% end %>
   </div>
   
   <!-- Now, render a hidden form for each plugin -->

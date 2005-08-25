@@ -4,8 +4,10 @@ task :clean_target do
 end
 task :clone_structure_to_test => [:clean_target]
 
-desc "Recreate the dev database from schema.sql"
+# TODO: remove this and replace with migrations.
+desc "Recreate the dev database"
 task :recreate_schema => :environment do
+  FileUtils.rm_rf(DAMAGECONTROL_HOME) if File.exist?(DAMAGECONTROL_HOME)
   abcs = ActiveRecord::Base.configurations
   case abcs["development"]["adapter"]
     when "sqlite", "sqlite3"
