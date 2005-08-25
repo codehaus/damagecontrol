@@ -32,8 +32,11 @@ module DamageControl
         # We're not doing:
         #   project.revisions.create(revision)
         # because of the way Revision.create is implemented (overridden).
-        # TODO: chop up in smaller txns! This will reduce the likelyhood of collision with web ui
+        # TODO: chop up in smaller txns! This will reduce the likelihood of collision with web ui
         revision.project_id = project.id
+        
+        # This will go on the web and scrape issue summaries...
+        revision.message = project.tracker.markup(revision.message)
         Revision.create(revision)
       end
     end

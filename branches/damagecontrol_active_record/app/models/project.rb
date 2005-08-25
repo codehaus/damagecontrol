@@ -45,6 +45,8 @@ class Project < ActiveRecord::Base
       "/revision_parser/html/\#{path}?revision=\#{revision}",
       "/revision_parser/diff/\#{path}?previous_revision=\#{previous_revision}&?revision=\#{revision}"
     ) if self.scm_web.nil?
+    
+    self.tracker = MetaProject::Tracker::NullTracker.new if self.tracker.nil?
   end
 
   # Same as revisions[0], but faster since it only loads one record
@@ -175,10 +177,7 @@ LIMIT #{max_count}
         item.title = "Revision #{revision.identifier}: #{revision.message}"
         item.link = controller.url_for(:controller => "revision", :action => "show", :id => revision.id)
         item.description = "<b>#{revision.developer}</b><br/>\n"
-        # TODO: this will most likely go on the Internet to fetch issue summaries.
-        # TODO: Find a way to configure trackers to do that or not! -And also cache the RSS!
-        message = tracker ? tracker.markup(revision.message) : revision.message
-        item.description << message.gsub(/\n/, "<br/>\n") << "<p/>\n"
+        item.description << revision.message.gsub(/\n/, "<br/>\n") << "<p/>\n"
         
         revision.revision_files.each do |file|
           # TODO: make internal(expandable) or external links to file diffs

@@ -18,6 +18,12 @@ module MetaProject
         true
       end
     end
+    
+    class NullTracker < Base
+      def markup(message)
+        message
+      end
+    end
 
   end
 end
