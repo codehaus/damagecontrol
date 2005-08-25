@@ -38,8 +38,8 @@ class ProjectControllerTest < Test::Unit::TestCase
         },
         "MetaProject::Tracker::Jira::JiraTracker" => {
           :enabled => true,
-          :rooturl => "http://jira.codehaus.org/",
-          :identifier => "DC"
+          :jira_base_url => "http://jira.codehaus.org/",
+          :jira_project_id => "DC"
         }
       },
       :scm_web => {
@@ -66,8 +66,8 @@ class ProjectControllerTest < Test::Unit::TestCase
     assert_equal("svn://some/where", project.scm.url)
     
     assert_equal(MetaProject::Tracker::Jira::JiraTracker, project.tracker.class)
-    assert_equal("http://jira.codehaus.org/", project.tracker.rooturl)
-    assert_equal("DC", project.tracker.identifier)
+    assert_equal("http://jira.codehaus.org/", project.tracker.jira_base_url)
+    assert_equal("DC", project.tracker.jira_project_id)
 
     assert_equal(MetaProject::ScmWeb, project.scm_web.class)
     assert_equal(

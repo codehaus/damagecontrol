@@ -17,7 +17,6 @@ class RevisionController < ApplicationController
     @revisions = @revision.project.revisions
     @template_for_left_column = "revision/list"
     
-    #@revision_message = @project.tracker.markup(@revision.message)
     @revision_message = @revision.message
 
     load_builds_for_sparkline(@project)

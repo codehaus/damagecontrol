@@ -31,9 +31,9 @@ module DamageControl
       begin
         poller.persist_revisions(project, poller.poll_new_revisions(project))
       rescue => e
-        logger.error "Error polling #{project.name}"
-        logger.error  e.message
-        logger.error "  " + e.backtrace.join("  \n")        
+        STDERR.puts "Error polling #{project.name}"
+        STDERR.puts  e.message
+        STDERR.puts "  " + e.backtrace.join("  \n")        
       end
     end
   end
