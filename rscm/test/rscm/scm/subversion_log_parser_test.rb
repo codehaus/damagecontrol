@@ -183,5 +183,26 @@ EOF
       assert_equal(nil, slep.relative_path(url, "trunk/xstream-website/boo/build.xml"))
     end
 
+    # http://jira.codehaus.org/browse/DC-427
+
+    FUNNY_CHAR_LOG = <<-EOF
+------------------------------------------------------------------------
+r593 | joe | 2005-04-30 07:56:45 -0400 (Sat, 30 Apr 2005) | 1 line
+Changed paths:
+   M /trunk/abit/funny++/bla/bla
+   M /trunk/abit/funny?/bla/bla
+   M /trunk/abit/funny*/bla/bla
+
+Funny chars is ok
+------------------------------------------------------------------------
+EOF
+    
+    def test_regexp_char_entry
+      parser = SubversionLogParser.new(StringIO.new(FUNNY_CHAR_LOG), "svn://mooky/funny/trunk")
+      revisions = parser.parse_revisions
+      assert_equal("abit/funny++/bla/bla", revisions[0][0].path)
+      assert_equal("abit/funny?/bla/bla", revisions[0][1].path)
+      assert_equal("abit/funny*/bla/bla", revisions[0][2].path)
+    end
   end
 end

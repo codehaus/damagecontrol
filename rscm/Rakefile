@@ -6,7 +6,7 @@ require 'rake/packagetask'
 require 'rake/gempackagetask'
 require 'rake/contrib/sshpublisher'
 require 'rake/contrib/rubyforgepublisher'
-require 'xforge'
+require 'meta_project'
 
 PKG_BUILD     = ENV['PKG_BUILD'] ? '.' + ENV['PKG_BUILD'] : ''
 PKG_NAME      = 'rscm'
@@ -110,24 +110,43 @@ else
   end
 end
 
-task :release => [:publish_doc, :publish_files]
+task :release => [:verify_env_vars, :release_files, :publish_doc, :publish_news, :tag]
 
-task :publish_files => [:gem] do
-  release_files = FileList[
-    "pkg/#{PKG_FILE_NAME}.gem", 
-    "CHANGELOG"
-  ]
-
-  Rake::XForge::Release.new(PKG_NAME) do |xf|
-    # Never hardcode user name and password in the Rakefile!
-    xf.user_name = ENV['RUBYFORGE_USER']
-    xf.password = ENV['RUBYFORGE_PASSWORD']
-    xf.files = release_files.to_a
-    xf.release_name = "XForge #{PKG_VERSION}"
-  end
+task :verify_env_vars do
+  raise "RUBYFORGE_USER environment variable not set!" unless ENV['RUBYFORGE_USER']
+  raise "RUBYFORGE_PASSWORD environment variable not set!" unless ENV['RUBYFORGE_PASSWORD']
 end
 
 task :publish_doc => [:rdoc] do
-  publisher = Rake::RubyForgePublisher.new('rscm', 'aslak_hellesoy')
+  publisher = Rake::RubyForgePublisher.new('xforge', ENV['RUBYFORGE_USER'])
   publisher.upload
+end
+
+desc "Release files on RubyForge"
+task :release_files => [:gem] do
+  release_files = FileList[
+    "pkg/#{PKG_FILE_NAME}.gem"
+  ]
+
+  Rake::XForge::Release.new(MetaProject::Project::XForge::RubyForge.new(PKG_NAME)) do |release|
+    # Never hardcode user name and password in the Rakefile!
+    release.user_name = ENV['RUBYFORGE_USER']
+    release.password = ENV['RUBYFORGE_PASSWORD']
+    release.files = release_files.to_a
+    release.release_name = "MetaProject #{PKG_VERSION}"
+    # The rest of the options are defaults (among others, release_notes and release_changes, parsed from CHANGES)
+  end
+end
+
+desc "Publish news on RubyForge"
+task :publish_news => [:gem] do
+  release_files = FileList[
+    "pkg/#{PKG_FILE_NAME}.gem"
+  ]
+
+  Rake::XForge::NewsPublisher.new(MetaProject::Project::XForge::RubyForge.new(PKG_NAME)) do |news|
+    # Never hardcode user name and password in the Rakefile!
+    news.user_name = ENV['RUBYFORGE_USER']
+    news.password = ENV['RUBYFORGE_PASSWORD']
+  end
 end
