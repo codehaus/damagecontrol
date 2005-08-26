@@ -1,7 +1,7 @@
 require File.dirname(__FILE__) + '/../test_helper'
 
 class ProjectTest < Test::Unit::TestCase
-  fixtures :projects, :revisions, :builds, :projects_projects
+  fixtures :projects, :revisions, :builds
 
   def test_should_have_revisions
     assert_equal(3, @project_1.revisions.length)
@@ -87,15 +87,35 @@ class ProjectTest < Test::Unit::TestCase
     assert_equal(@project_1.working_copy_dir, @project_1.scm.checkout_dir)
   end
   
-  def test_should_find_dependencies
-    assert_equal([@project_1, @project_2], @project_3.dependencies)
+  # fred   ->    wilma
+  #  +-> barney <-+
+  def FIXMEtest_should_find_dependencies_and_dependants
+    fred = Project.create(:name => "fred")
+    barney = Project.create(:name => "barney")
+    wilma = Project.create(:name => "wilma")
+    
+    fred.dependencies.add(wilma)
+    fred.dependencies.add(barney)
+    wilma.dependencies.add(barney)
+    
+    assert_equal([barney, wilma], fred.dependencies)
+    assert_equal([], barney.dependencies)
+    assert_equal([barney], wilma.dependencies)
+
+    assert_equal([], fred.dependants)
+    assert_equal([fred, wilma], barney.dependants)
+    assert_equal([fred], wilma.dependants)
+    
+    wilma.destroy
+
+    assert_equal([barney], fred.dependencies)
+    assert_equal([], barney.dependencies)
+
+    assert_equal([], fred.dependants)
+    assert_equal([fred], barney.dependants)
+    
   end
 
-  def test_should_find_dependants
-    assert_equal([@project_3], @project_1.dependants)
-    assert_equal([@project_3], @project_2.dependants)
-  end
-  
   def FIXMEtest_should_create_rgl_graph
     graph = Project.dependency_graph
     assert_equal(2, graph.edges.size)

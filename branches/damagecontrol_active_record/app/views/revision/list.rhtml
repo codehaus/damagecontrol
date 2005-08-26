@@ -16,6 +16,7 @@
     <tr>
       <td nowrap="nowrap">
         <%= link_to(revision.identifier, :controller => "revision", :action => "show", :id => revision.id) %>
+        (<%= revision.developer %>)
       </td>
       <td>
         <% revision.builds.each do |build| %>

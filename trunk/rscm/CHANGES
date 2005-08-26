@@ -2,7 +2,10 @@
 
 == Version 0.3.1
 
+This is a bugfix release.
+
 * Added move method to Subversion
+* Fixed DC-427 (couldn't parse regexp chars *,+ and ? in subversion logs)
 
 == Version 0.3.0
 
