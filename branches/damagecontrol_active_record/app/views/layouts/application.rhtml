@@ -37,6 +37,7 @@
         </div>
       </td>
       <td width="20%">
+        <%= render(@template_for_tip) %>
         <% @project_list_refresh = true %>
         render("project/list")
       </td>

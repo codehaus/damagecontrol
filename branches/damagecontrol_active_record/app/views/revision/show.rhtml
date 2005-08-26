@@ -9,15 +9,15 @@
   <% end %>
 <% end %>
 </p>
-<div id="request_build">
+<div id="request-build">
   <%= link_to_remote(
   	"Request new build for this revision",
   	:url => {:controller => "revision", :action => "build", :id => @revision.id},
-  	:update => "request_build"
+  	:update => "request-build"
   ) %>
 </div>
 
-<div>
+<div class="revision-summary">
   <b><%= @revision.developer %></b>
   (<%= @revision.timepoint %>)<br/>
   <%= textilize(@revision_message) %>
