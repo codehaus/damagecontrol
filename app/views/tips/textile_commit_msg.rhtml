@@ -1,0 +1,19 @@
+<%
+msg = <<-EOM
+* Added a new tip about textile
+* Made lists have nice arrows
+* Introduced tip categories
+EOM
+%>
+<%= tip_box %>
+  Did you know that you can use textile markup in your SCM commit messages and have them rendered by DamageControl?
+  <div class="pre-box">
+    <%= msg %>
+  </div>
+  becomes:
+  <div class="revision-summary">
+    <b>rinkrank</b>
+    (<%= Time.now.utc %>)<br/>
+    <%= textilize(msg) %>
+  </div>
+</div>

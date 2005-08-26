@@ -1,3 +1,4 @@
+
 module DamageControl
   class ScmPoller
     cattr_accessor :logger
@@ -36,7 +37,15 @@ module DamageControl
         revision.project_id = project.id
         
         # This will go on the web and scrape issue summaries...
-        revision.message = project.tracker.markup(revision.message)
+        begin
+          revision.message = project.tracker.markup(revision.message)
+        rescue => e
+          if(logger)
+            logger.error "Error getting issue summaries for #{project.name}"
+            logger.error  e.message
+            logger.error "  " + e.backtrace.join("  \n")
+          end
+        end
         Revision.create(revision)
       end
     end

@@ -2,7 +2,6 @@ class ProjectController < ApplicationController
   include MetaProject::ProjectAnalyzer
 
   layout "application", :except => :list
-  before_filter :random_tip
   
   def index
   end
@@ -67,6 +66,12 @@ class ProjectController < ApplicationController
   def builds_rss
     find
     render :text => @project.builds_rss(self)
+  end
+
+protected
+
+  def tip_category
+    :project_settings
   end
 
 private

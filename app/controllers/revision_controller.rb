@@ -29,4 +29,11 @@ class RevisionController < ApplicationController
     render :text => "Build requested"
   end
   
+protected
+
+  def tip_category
+    :commit_msg
+  end
+
+  
 end

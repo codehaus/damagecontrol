@@ -50,6 +50,20 @@ body {
   height: 20px;
 }
 
+/* arrows on textiled lists in revision summary */
+.revision-summary {
+  margin-left: 0;
+  padding-left: 0;
+  list-style: none;
+}
+
+.revision-summary li {
+  padding-left: 10px;
+  /* TODO: how to deal with absolute URLs on e.g. codehaus where the context is not at root? */
+  background-image: url(/images/list-arrow.gif);
+  background-repeat: no-repeat;
+  background-position: 0px;
+}
 
 h1 {
   font-size: 2em;

@@ -4,13 +4,22 @@ require 'damagecontrol'
 class ApplicationController < ActionController::Base
   SPARKLINE_COUNT = 20
   
-  TIPS = [
+  COMMIT_MSG_TIPS = [
     "bug_ids_commit_msg",
-    "triggering",
+    "textile_commit_msg",
+    "bug_edit_commit_msg"
+  ]
+  PROJECT_SETTING_TIPS = [
+#    "triggering",
     "importing"
   ]
+  TIPS = {
+    :project_settings => PROJECT_SETTING_TIPS,
+    :commit_msg => COMMIT_MSG_TIPS,
+    :any => COMMIT_MSG_TIPS + PROJECT_SETTING_TIPS
+  }
 
-  before_filter :load_projects
+  before_filter :load_projects, :random_tip
   helper :sparklines
   
   def deserialize_to_array(hash)
@@ -65,11 +74,18 @@ protected
 
   def random_tip
     # TODO: perhaps keep a counter in the session and show sequentially?
-    tip(TIPS[rand(TIPS.length)])
+    tips = TIPS[tip_category]
+    tip(tips[rand(tips.length)])
   end
   
+  # subclasses can override this method to specify a more specific tip category
+  def tip_category
+    :any
+  end
+  
+  # call this method from an action to display a specific tip
   def tip(template_name)
-    @template_for_left_column = "tips/#{template_name}"
+    @template_for_tip = "tips/#{template_name}"
   end
 
 private
