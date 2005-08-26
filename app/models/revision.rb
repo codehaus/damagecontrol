@@ -2,8 +2,8 @@ class Revision < ActiveRecord::Base
   ActiveRecord::Base.default_timezone = :utc
   
   belongs_to :project
-  has_many :revision_files
-  has_many :builds, :order => "position"
+  has_many :revision_files, :dependent => true
+  has_many :builds, :order => "position", :dependent => true
   # identifier can be String, Numeric or Time, so we YAML it to the database to preserve type info.
   # We have to fool AR to do this by wrapping it in an array - serialize doesn't work
   def identifier=(i)

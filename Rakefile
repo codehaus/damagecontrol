@@ -1,7 +1,6 @@
 require 'rake'
 require 'rake/testtask'
 require 'rake/rdoctask'
-load File.dirname(__FILE__) + '/script/build-tasks.rb'
 
 $VERBOSE = nil
 TEST_CHANGES_SINCE = Time.now - 600

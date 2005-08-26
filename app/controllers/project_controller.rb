@@ -39,10 +39,18 @@ class ProjectController < ApplicationController
     update_or_save(find)
   end
   
+  def destroy
+    project = find
+    project.destroy
+    flash["notice"] = "Successfully deleted #{project.name}"
+    redirect_to :action => "index"
+  end
+  
   def show
     find
   end
   
+  # This should only be called via AJAX to display the right column.
   def list
   end
   

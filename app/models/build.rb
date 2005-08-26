@@ -24,7 +24,7 @@ class Build < ActiveRecord::Base
   acts_as_list :scope => :revision
   belongs_to :revision
   belongs_to :triggering_build, :class_name => "Build"
-  has_many :artifacts
+  has_many :artifacts, :dependent => true
   serialize :env
   serialize :state
 
@@ -34,6 +34,20 @@ class Build < ActiveRecord::Base
     self.create_time = Time.now.utc
   end
   
+  def before_destroy
+    connection.delete("DELETE FROM build_logs WHERE id=?", self.stdout_id)
+    connection.delete("DELETE FROM build_logs WHERE id=?", self.stderr_id)
+  end
+
+  # TODO: use has_one here?
+  def stdout
+    connection.select_one("SELECT data FROM build_logs WHERE id=#{stdout_id}")["data"]
+  end
+
+  def stderr
+    connection.select_one("SELECT data FROM build_logs WHERE id=#{stderr_id}")["data"]
+  end
+
   # The 'owner' of this build depends on the +reason+ for the build:
   #
   #   * SCM_POLLED => revision.developer
@@ -57,14 +71,6 @@ class Build < ActiveRecord::Base
       when MANUALLY_TRIGGERED then "manually triggered"
       when SUCCESSFUL_DEPENDENCY then "successful build of #{triggering_build.revision.project.name}"
     end
-  end
-  
-  def stdout
-    connection.select_one("SELECT data FROM build_logs WHERE id=#{stdout_id}")["data"]
-  end
-
-  def stderr
-    connection.select_one("SELECT data FROM build_logs WHERE id=#{stderr_id}")["data"]
   end
   
   # The previous build. First looks within the same revision. If none are found,

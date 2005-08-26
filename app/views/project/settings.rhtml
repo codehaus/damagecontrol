@@ -2,6 +2,12 @@
 var settings = new Settings("setting-icons");
 </script>
 
+<% if(@submit_action != "create")  %>
+  <%= form_tag(:controller => "project", :action => "destroy", :id => @project.id) %>
+    <%= submit_tag("Delete") %>
+  </form>
+<% end %>
+
 <%= form_tag(:controller => "project", :action => @submit_action, :id => @project.id) %>
 <%= submit_tag(@submit_text) %>
 <div>

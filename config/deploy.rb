@@ -10,8 +10,8 @@
 # correspond to. The deploy_to path must be the path on each machine that will
 # form the root of the application path.
 
-set :application, "damagecontrol"
-set :repository, "svn+ssh://tirsen@beaver.codehaus.org/home/projects/damagecontrol/scm/branches/damagecontrol_active_record"
+set :application, "."
+set :repository, "svn://beaver.codehaus.org/damagecontrol/scm/branches/damagecontrol_active_record"
 
 # =============================================================================
 # ROLES
@@ -29,7 +29,7 @@ role :db,  "cheddar.codehaus.org"
 # =============================================================================
 # OPTIONAL VARIABLES
 # =============================================================================
-set :deploy_to, "/home/tirsen/apps/#{application}" # defaults to "/u/apps/#{application}"
+set :deploy_to, "/home/dcontrol/apps/#{application}" # defaults to "/u/apps/#{application}"
 # set :user, "flippy"            # defaults to the currently logged in user
 # set :scm, :darcs               # defaults to :subversion
 # set :svn, "/path/to/svn"       # defaults to searching the PATH

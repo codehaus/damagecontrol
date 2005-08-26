@@ -9,20 +9,28 @@ require 'damagecontrol'
 class Project < ActiveRecord::Base
   attr_reader :basedir
 
-  has_many :revisions, :order => "timepoint DESC"
+  has_many :revisions, :order => "timepoint DESC", :dependent => true
   has_and_belongs_to_many :dependencies, 
     :class_name => "Project", 
     :foreign_key => "depending_id", 
-    :association_foreign_key => "dependant_id"
+    :association_foreign_key => "dependant_id",
+    :order => "name"
   has_and_belongs_to_many :dependants, 
     :class_name => "Project", 
     :foreign_key => "dependant_id", 
-    :association_foreign_key => "depending_id"
+    :association_foreign_key => "depending_id",
+    :order => "name"
   
   serialize :scm
   serialize :scm_web
   serialize :tracker
   serialize :publishers
+
+  def before_destroy
+    connection.delete("DELETE FROM projects_projects WHERE depending_id=?", self.id)
+    connection.delete("DELETE FROM projects_projects WHERE dependant_id=?", self.id)
+    FileUtils.rm_rf(@basedir) if File.exist?(@basedir)
+  end
 
   # Returns an RGL::DirectedAdjacencyGraph representing all projects
   # and their dependencies
