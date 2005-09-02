@@ -14,8 +14,9 @@ PKG_VERSION   = '0.3.1' + PKG_BUILD
 PKG_FILE_NAME = "#{PKG_NAME}-#{PKG_VERSION}"
 
 desc "Default Task"
-task :default => [ :all ]
-task :all => [:ant, :gem]
+task :default => [:gem]
+task :gem => [:test]
+task :test => [:starteam]
 
 # Run the unit tests
 # To run a specific test: rake test TEST=path/to/test
@@ -37,14 +38,14 @@ rd = Rake::RDocTask.new { |rdoc|
   rdoc.title    = 'RSCM - Ruby Source Control Management API'
   rdoc.options << '--line-numbers' << '--inline-source'
   rdoc.rdoc_files.include('README')
-  rdoc.rdoc_files.include('CHANGELOG')
+  rdoc.rdoc_files.include('CHANGES')
   rdoc.rdoc_files.include('lib/**/*.rb')
   rdoc.rdoc_files.include('docs/**/*.rd')
 }
 
-task :ant do |t|
+task :starteam do |t|
   if(!ENV['RSCM_STARTEAM'])
-    puts "WARNING - NOT BUILDING STARTEAM SUPPORT SINCE 'RSCM_STARTEAM' IS NOT DEFINED."
+    puts "WARNING - NOT BUILDING STARTEAM SUPPORT SINCE 'RSCM_STARTEAM' IS NOT DEFINED. It should point to the StarTeam SDK directory"
   else
     ant = RUBY_PLATFORM == "i386-mswin32" ? "ant.bat" : system("which ant.sh") ? "ant.sh" : "ant" 
     IO.popen("#{ant} -f ext/java/build.xml clean jar") do |io|
@@ -110,16 +111,11 @@ else
   end
 end
 
-task :release => [:verify_env_vars, :release_files, :publish_doc, :publish_news, :tag]
+task :release => [:verify_env_vars, :release_files, :publish_doc, :publish_news]
 
 task :verify_env_vars do
   raise "RUBYFORGE_USER environment variable not set!" unless ENV['RUBYFORGE_USER']
   raise "RUBYFORGE_PASSWORD environment variable not set!" unless ENV['RUBYFORGE_PASSWORD']
-end
-
-task :publish_doc => [:rdoc] do
-  publisher = Rake::RubyForgePublisher.new('xforge', ENV['RUBYFORGE_USER'])
-  publisher.upload
 end
 
 desc "Release files on RubyForge"
@@ -129,13 +125,18 @@ task :release_files => [:gem] do
   ]
 
   Rake::XForge::Release.new(MetaProject::Project::XForge::RubyForge.new(PKG_NAME)) do |release|
-    # Never hardcode user name and password in the Rakefile!
-    release.user_name = ENV['RUBYFORGE_USER']
+    # Never hardcode user name and password in the Rakefile!
+    release.user_name = ENV['RUBYFORGE_USER']
     release.password = ENV['RUBYFORGE_PASSWORD']
     release.files = release_files.to_a
-    release.release_name = "MetaProject #{PKG_VERSION}"
+    release.release_name = "MetaProject #{PKG_VERSION}"
     # The rest of the options are defaults (among others, release_notes and release_changes, parsed from CHANGES)
   end
+end
+
+task :publish_doc => [:rdoc] do
+  publisher = Rake::RubyForgePublisher.new(PKG_NAME, ENV['RUBYFORGE_USER'])
+  publisher.upload
 end
 
 desc "Publish news on RubyForge"
@@ -145,8 +146,8 @@ task :publish_news => [:gem] do
   ]
 
   Rake::XForge::NewsPublisher.new(MetaProject::Project::XForge::RubyForge.new(PKG_NAME)) do |news|
-    # Never hardcode user name and password in the Rakefile!
-    news.user_name = ENV['RUBYFORGE_USER']
+    # Never hardcode user name and password in the Rakefile!
+    news.user_name = ENV['RUBYFORGE_USER']
     news.password = ENV['RUBYFORGE_PASSWORD']
   end
 end

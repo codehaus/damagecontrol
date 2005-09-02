@@ -40,6 +40,13 @@ module RSCM
       end
     end
 
+    def move(relative_src, relative_dest)
+      with_working_dir(@checkout_dir) do
+        monotone("rename #{relative_src} #{relative_dest}", db)
+        FileUtils.mv(relative_src, relative_dest)
+      end
+    end
+
     def can_create_central?
       @server == "localhost" && !@central_checkout_dir.nil?
     end
@@ -104,7 +111,7 @@ module RSCM
     end
 
     def import_central(dir, message)
-      cp_r(Dir["#{dir}/*"], @central_checkout_dir)
+      FileUtils.cp_r(Dir["#{dir}/*"], @central_checkout_dir)
       with_working_dir(@central_checkout_dir) do
         monotone("add .")
         commit_in_dir(message, @central_checkout_dir)
