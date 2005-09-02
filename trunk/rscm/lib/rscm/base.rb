@@ -12,12 +12,14 @@ module RSCM
   # as well as an associated 'central' repository. The main responsibility is working
   # copy operations:
   #
+  # * add
   # * checkout
-  # * revisions
-  # * uptodate?
   # * checked_out?
   # * diff
   # * edit
+  # * move
+  # * revisions
+  # * uptodate?
   #
   # In addition to operations related to working copies, the same instance should provide
   # methods to administer the working copy's associated 'central' repository. These are:
@@ -26,19 +28,19 @@ module RSCM
   # * create_central
   # * can_create_central?
   # * import_central
+  # * install_trigger
   # * supports_trigger? # TODO: rename to can_install_trigger?
   # * trigger_installed?
-  # * install_trigger
   # * uninstall_trigger
   #
   # Some methods are a bit fuzzy with respect to their relevance to the working copy or
   # the associated central repository, as it depends on the nature of the individual underlying 
   # SCMs. These methods are:
   #
+  # * checkout_command_line
   # * label
   # * name
   # * transactional?
-  # * checkout_command_line
   # * update_command_line
   #
   # Some of the methods in this API use +from_identifier+ and +to_identifier+.
@@ -122,6 +124,12 @@ module RSCM
 
     # Adds +relative_filename+ to the working copy.
     def add(relative_filename)
+    end
+
+    # Schedules a move of +relative_src+ to +relative_dest+
+    # Should not take effect in the central repository until
+    # +commit+ is invoked.
+    def move(relative_src, relative_dest)
     end
 
     # Recursively imports files from a +dir+ into the central scm

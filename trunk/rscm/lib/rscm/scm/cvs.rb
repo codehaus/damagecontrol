@@ -62,7 +62,7 @@ module RSCM
         prefix = File.basename(@checkout_dir)
         path_regex = /^[U|P] #{prefix}\/(.*)/
         # This is a workaround for the fact that -d . doesn't work - must be an existing sub folder.
-        mkdir_p(@checkout_dir) unless File.exist?(@checkout_dir)
+        FileUtils.mkdir_p(@checkout_dir) unless File.exist?(@checkout_dir)
         target_dir = File.basename(@checkout_dir)
         run_checkout_command_dir = File.dirname(@checkout_dir)
         # -D is sticky, but subsequent updates will reset stickiness with -A
