@@ -1,14 +1,8 @@
 WIN32 = RUBY_PLATFORM == "i386-mswin32"
 CYGWIN = RUBY_PLATFORM == "i386-cygwin"
 WINDOWS = WIN32 || CYGWIN
-if(WINDOWS)
-  HOMEDIR = RSCM::PathConverter.nativepath_to_filepath("#{ENV['HOMEDRIVE']}#{ENV['HOMEPATH']}").gsub(/\\/, "/")
-else
-  HOMEDIR = ENV['HOME']
-end
 
 require 'fileutils'
-require 'rscm/logging'
 
 def with_working_dir(dir)
   # Can't use Dir.chdir{ block } - will fail with multithreaded code.
