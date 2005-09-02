@@ -15,7 +15,7 @@ PKG_FILE_NAME = "#{PKG_NAME}-#{PKG_VERSION}"
 
 desc "Default Task"
 task :default => [:gem]
-task :gem => [:test]
+#task :gem => [:test]
 task :test => [:starteam]
 
 # Run the unit tests
@@ -129,7 +129,7 @@ task :release_files => [:gem] do
     release.user_name = ENV['RUBYFORGE_USER']
     release.password = ENV['RUBYFORGE_PASSWORD']
     release.files = release_files.to_a
-    release.release_name = "MetaProject #{PKG_VERSION}"
+    release.release_name = PKG_FILE_NAME
     # The rest of the options are defaults (among others, release_notes and release_changes, parsed from CHANGES)
   end
 end
