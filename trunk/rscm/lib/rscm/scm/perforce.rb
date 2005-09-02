@@ -17,8 +17,6 @@ module RSCM
   class Perforce < Base
     register self
 
-    include FileUtils
-
     @@counter = 0
 
     ann :description => "P4CLIENT: workspace name"
@@ -92,6 +90,10 @@ module RSCM
       p4client.add(relative_filename)
     end
 
+    def move(relative_src, relative_dest)
+      p4client.move(checkout_dir, relative_src, relative_dest)
+    end
+
     def commit(message, &proc)
       p4client.submit(message, &proc)
     end
@@ -130,7 +132,7 @@ module RSCM
       raise "needs a block" unless block_given?
       rootdir = File.expand_path(rootdir)
       with_working_dir(rootdir) do
-        mkdir_p(rootdir)
+        FileUtils.mkdir_p(rootdir)
         client = p4admin.create_client(rootdir, Perforce.next_client_name)
         begin
           yield client
@@ -271,6 +273,18 @@ module RSCM
 
     def add(relative_path)
       add_file(rootdir + "/" + relative_path)
+    end
+    
+    # http://www.perforce.com/perforce/doc.051/manuals/cmdref/rename.html#1040665
+    def move(checkout_dir, relative_src, relative_dest)
+      with_working_dir(checkout_dir) do
+        absolute_src = PathConverter.filepath_to_nativepath(relative_src, true)
+        absolute_dest = PathConverter.filepath_to_nativepath(relative_dest, true)
+        FileUtils.mv(absolute_src, absolute_dest)
+        p4("integrate #{absolute_src} #{absolute_dest}")
+        p4("delete #{absolute_src}")
+      end
+#      p4("submit #{absolute_src}")
     end
 
     def add_all(files)

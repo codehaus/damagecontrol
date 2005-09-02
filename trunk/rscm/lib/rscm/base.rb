@@ -52,7 +52,6 @@ module RSCM
   # TODO: rename this superclass to 'Base'
   #
   class Base
-    include FileUtils
 
     @@classes = []
     def self.register(cls) 

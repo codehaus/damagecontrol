@@ -4,7 +4,8 @@
 
 This is a bugfix release.
 
-* Added move method to Subversion
+* Added move method to Subversion, CVS, Monotone and Perforce (although it doesn't work on the latter two)
+* SCM classes no longer include FileUtils (conflicted with new move method)
 * Fixed DC-427 (couldn't parse regexp chars *,+ and ? in subversion logs)
 
 == Version 0.3.0

@@ -48,7 +48,6 @@ module RSCM
       # 1
       scm.create_central
       @scm = scm
-      assert(scm.name)
 
       # 2
       import_damagecontrolled(scm, "#{work_dir}/damagecontrolled")
@@ -219,7 +218,6 @@ module RSCM
       work_dir = RSCM.new_temp_dir("move")
       checkout_dir = "#{work_dir}/checkout"
       repository_dir = "#{work_dir}/repository"
-      trigger_proof = "#{work_dir}/trigger_proof"
       scm = create_scm(repository_dir, "damagecontrolled")
       scm.checkout_dir = checkout_dir
       scm.create_central 
