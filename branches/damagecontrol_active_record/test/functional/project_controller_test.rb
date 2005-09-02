@@ -69,7 +69,7 @@ class ProjectControllerTest < Test::Unit::TestCase
     assert_equal("http://jira.codehaus.org/", project.tracker.jira_base_url)
     assert_equal("DC", project.tracker.jira_project_id)
 
-    assert_equal(MetaProject::ScmWeb, project.scm_web.class)
+    assert_equal(MetaProject::ScmWeb::Browser, project.scm_web.class)
     assert_equal(
       "http://foo.com/diff/where/is/this.rb?r1=x&r2=y", 
       project.scm_web.diff("where/is/this.rb", "y", "x"))

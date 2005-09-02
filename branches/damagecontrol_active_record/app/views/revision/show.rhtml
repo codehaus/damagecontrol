@@ -39,11 +39,12 @@
 
     diff_url = @project.scm_web.diff(
       full_path, 
-      file.previous_native_revision_identifier,
-      file.native_revision_identifier
+      file.native_revision_identifier,
+      file.previous_native_revision_identifier
     )
     
-    #                revision               icon                path
+    # status         revision id            icon                path
+    # ----------------------------------------------------------------------
     # added          Show new file          Show added rev X    Show history
     # modified       Show modified file     Show diff           Show history
     # moved          Show moved file        Show diff           Show history

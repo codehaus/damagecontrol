@@ -29,6 +29,7 @@ class ProjectController < ApplicationController
   end
 
   def create
+STDERR.puts @params[:project].to_yaml
     project = Project.create(@params[:project])
     project.start_time = 2.weeks.ago
     import_or_update_or_save(project)
@@ -104,7 +105,7 @@ private
     project.scm        = deserialize_to_array(@params[:scm]).find{|scm| scm.enabled}
     project.tracker    = deserialize_to_array(@params[:tracker]).find{|tracker| tracker.enabled}
     project.publishers = deserialize_to_array(@params[:publisher])
-    project.scm_web    = MetaProject::ScmWeb.new
+    project.scm_web    = MetaProject::ScmWeb::Browser.new
 
     project.scm_web.overview_spec = @params[:scm_web][:overview_spec]
     project.scm_web.history_spec  = @params[:scm_web][:history_spec]

@@ -7,6 +7,8 @@ require 'damagecontrol'
 # A Project record contains information about a project to be continuously
 # built by DamageControl.
 class Project < ActiveRecord::Base
+  
+  include DamageControl::Dom
   attr_reader :basedir
 
   has_many :revisions, :order => "timepoint DESC", :dependent => true
@@ -46,7 +48,7 @@ class Project < ActiveRecord::Base
 
   def initialize(*args)
     super(*args)
-    self.scm_web = MetaProject::ScmWeb.new(
+    self.scm_web = MetaProject::ScmWeb::Browser.new(
       "/revision_parser/overview",
       "/revision_parser/history/\#{path}",
       "/revision_parser/raw/\#{path}?revision=\#{revision}",
