@@ -2,9 +2,14 @@ module MetaProject
   module Project
 
     class Base
-      # TODO: look at the scm_web to figure out what build tool to use!
       def build_tool
-        BuildTool::Ant.new
+        return nil unless scm_web
+        
+        scm_web.root.children.each do |file|
+          return BuildTool::Rake.new if !file.directory? && file.basename =~ /Rakefile/
+          return BuildTool::Ant.new  if !file.directory? && file.basename == "build.xml"
+        end
+        return BuildTool::Unknown.new # Didn't recognise any
       end
       
     end

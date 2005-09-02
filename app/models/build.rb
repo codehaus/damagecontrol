@@ -39,13 +39,33 @@ class Build < ActiveRecord::Base
     connection.delete("DELETE FROM build_logs WHERE id=?", self.stderr_id)
   end
 
+  NOT_STARTED_LOG = "The build has not started yet. It's probably waiting for a daemon to execute it"
+
   # TODO: use has_one here?
   def stdout
-    connection.select_one("SELECT data FROM build_logs WHERE id=#{stdout_id}")["data"]
+    # Read from file if the build is currently running (it won't be in the database yet)
+    if self.exitstatus.nil?
+      if(File.exist?(revision.project.stdout_file))
+        File.open(revision.project.stdout_file).read
+      else
+        NOT_STARTED_LOG
+      end
+    else
+      connection.select_one("SELECT data FROM build_logs WHERE id=#{stdout_id}")["data"]
+    end
   end
 
   def stderr
-    connection.select_one("SELECT data FROM build_logs WHERE id=#{stderr_id}")["data"]
+    # Read from file if the build is currently running (it won't be in the database yet)
+    if self.exitstatus.nil?
+      if(File.exist?(revision.project.stderr_file))
+        File.open(revision.project.stderr_file).read
+      else
+        NOT_STARTED_LOG
+      end
+    else
+      connection.select_one("SELECT data FROM build_logs WHERE id=#{stderr_id}")["data"]
+    end
   end
 
   # The 'owner' of this build depends on the +reason+ for the build:

@@ -52,7 +52,7 @@ class ProjectTest < Test::Unit::TestCase
   end
 
   def test_should_persist_scm_web
-    scm_web = MetaProject::ScmWeb.new("a", "b", "c", "d", "e")
+    scm_web = MetaProject::ScmWeb::Browser.new("a", "b", "c", "d", "e", "f", "g")
 
     @project_1.scm_web = scm_web
     @project_1.save

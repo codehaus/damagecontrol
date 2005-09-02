@@ -6,8 +6,9 @@ class ApplicationController < ActionController::Base
   
   COMMIT_MSG_TIPS = [
     "bug_ids_commit_msg",
-    "textile_commit_msg",
-    "bug_edit_commit_msg"
+    "textile_commit_msg"
+    # TODO: only display this if the tracker supports it via tracker.can_close?/can_comment?
+    # "bug_edit_commit_msg"
   ]
   PROJECT_SETTING_TIPS = [
 #    "triggering",
