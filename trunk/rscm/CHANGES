@@ -1,5 +1,11 @@
 = RSCM Changelog
 
+== Version 0.3.2
+
+This is a bugfix release.
+
+* Moved difftool_test.rb and tempdir.rb from test to lib (damagecontrol's tests are using it)
+
 == Version 0.3.1
 
 This is a bugfix release.

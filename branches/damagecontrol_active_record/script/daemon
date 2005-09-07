@@ -12,4 +12,4 @@ load File.dirname(__FILE__) + '/../config/environment.rb'
   Revision
 ].each { |cls| cls.logger = Logger.new(STDOUT) }
  
-DamageControl::BuildDaemon.new.run
+DamageControl::BuildDaemon.new(DamageControl::ScmPoller.new).run

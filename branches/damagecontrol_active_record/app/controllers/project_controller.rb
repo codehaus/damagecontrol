@@ -28,11 +28,27 @@ class ProjectController < ApplicationController
     render :action => "settings"
   end
 
+  def show_import
+  end
+  
+  def import
+    project = @params[:id] ? find : Project.new
+    import_settings = @params[:import]
+
+    import_from_meta_project(
+      project, 
+      import_settings[:scm_web_url],
+      import_settings
+    )
+
+    project.save
+    flash["notice"] = "Successfully imported settings for #{project.name}."
+    redirect_to :action => "edit", :id => project.id
+  end
+
   def create
-STDERR.puts @params[:project].to_yaml
     project = Project.create(@params[:project])
-    project.start_time = 2.weeks.ago
-    import_or_update_or_save(project)
+    update_or_save(project)
   end
 
   def update
@@ -81,33 +97,13 @@ private
     @project = Project.find(@params[:id])
   end
   
-  def import_or_update_or_save(project)
-    import_settings = @params[:import]
-    if(import_settings[:scm_web_url] && import_settings[:scm_web_url].strip != "")
-      import(project, import_settings)
-    else
-      update_or_save(project)
-    end
-  end
-  
-  def import(project, import_settings)
-    import_from_meta_project(
-      project, 
-      import_settings[:scm_web_url],
-      import_settings
-    )
-
-    flash["notice"] = "Successfully imported settings for #{project.name}."
-    redirect_to :action => "edit", :id => project.id
-  end
-  
   def update_or_save(project)
     project.scm        = deserialize_to_array(@params[:scm]).find{|scm| scm.enabled}
     project.tracker    = deserialize_to_array(@params[:tracker]).find{|tracker| tracker.enabled}
     project.publishers = deserialize_to_array(@params[:publisher])
     project.scm_web    = MetaProject::ScmWeb::Browser.new
 
-    project.scm_web.overview_spec = @params[:scm_web][:overview_spec]
+    project.scm_web.dir_spec      = @params[:scm_web][:dir_spec]
     project.scm_web.history_spec  = @params[:scm_web][:history_spec]
     project.scm_web.raw_spec      = @params[:scm_web][:raw_spec]
     project.scm_web.html_spec     = @params[:scm_web][:html_spec]
@@ -122,7 +118,7 @@ private
     # Workaround for AR bug
     @project.publishers = YAML::load(@project.publishers) if @project.publishers.class == String
 
-    top_row = [@project, @project.scm_web, DamageControl::Importer::Import.new]
+    top_row = [@project, @project.scm_web]
     @rows = [top_row, scms, publishers, trackers]
   end
 

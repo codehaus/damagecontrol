@@ -1,69 +1,53 @@
 
 module DamageControl
+  
   class ScmPoller
     cattr_accessor :logger
     
     # Default time to wait for scm to be quiet (applies to non-transactional scms only)
     DEFAULT_QUIET_PERIOD = 15 unless defined? DEFAULT_QUIET_PERIOD
-
-    # Polls all registered projects for new revisions since last time and persists them
-    # to the database.
-    def poll_all_projects
-      ::Project.find(:all).each do |project|
-        begin
-          revisions = poll_new_revisions(project)
-          if(revisions && !revisions.empty?)
-            # persist revisions to the database
-            persist_revisions(project, revisions)
-            persist_build_for_lates_revision(project)
-          end
-        rescue => e
-          if(logger)
-            logger.error "Error polling #{project.name}"
-            logger.error  e.message
-            logger.error "  " + e.backtrace.join("  \n")
-          end
-        end
-      end
+    
+    # Polls for new revisions in the SCM and persists them.
+    # The latest revision is returned.
+    def poll_and_persist_new_revisions(project)
+      rscm_revisions = poll_new_revisions(project)
+      persist_revisions(project, rscm_revisions) unless rscm_revisions.length == 0
     end
+    
+  private
 
-    # Stores revisions in the database 
-    def persist_revisions(project, revisions)
-      revisions.each do |revision|
+    # Stores revisions in the database and returns the latest persisted revision.
+    def persist_revisions(project, rscm_revisions)
+      rev = nil
+      logger.info "Persisting #{rscm_revisions.length} new revisions for #{project.name}" if logger
+      rscm_revisions.each do |rscm_revision|
         # We're not doing:
         #   project.revisions.create(revision)
         # because of the way Revision.create is implemented (overridden).
         # TODO: chop up in smaller txns! This will reduce the likelihood of collision with web ui
-        revision.project_id = project.id
+        rscm_revision.project_id = project.id
         
-        # This will go on the web and scrape issue summaries...
+        # This will go on the web and scrape issue summaries. Might take a little while....
         begin
-          revision.message = project.tracker.markup(revision.message)
+          # TODO: parse patois messages here too.
+          rscm_revision.message = project.tracker.markup(rscm_revision.message) if project.tracker
         rescue => e
-          if(logger)
-            logger.error "Error getting issue summaries for #{project.name}"
-            logger.error  e.message
-            logger.error "  " + e.backtrace.join("  \n")
-          end
+          logger.warn "Error marking up issue summaries for #{project.name}: #{e.message}" if logger
         end
-        Revision.create(revision)
+        rev = Revision.create(rscm_revision)
       end
+      rev
     end
     
-    # Persists a new build (to be picked up by a BuildExecutor)
-    # for the last revision. Done separately since the RSCM adapter
-    # may not be implemented to return revisions in the right order.
-    # This method picks the latest revision.
-    # TODO: deprecated by BuildDaemon
-    def persist_build_for_lates_revision(project)
-      # TODO: optimize this query.
-      logger.info "Requesting build for #{project.name}" if logger
-      last_revision = project.latest_revision
-      last_revision.builds.create(:reason => Build::SCM_POLLED)
-      logger.info "Requested build for #{project.name}" if logger
-    end
-
-    def poll_new_revisions(project)
+    # Polls new revisions for +project+ since last persisted revision,
+    # or if no revision is persisted yet, polls since 'now' - +seconds_before_now+.
+    # If no revisions are found AND the poll was using +seconds_before_now+
+    # (i.e. it's the first poll, and no revisions were found),
+    # calls itself recursively with twice the +seconds_before_now+.
+    # This happens until revisions are found, ot until the +seconds_before_now+
+    # Exceeds 32 weeks, which means it's probably not worth looking further in
+    # the past, the project is either completely idle or not yet active.
+    def poll_new_revisions(project, seconds_before_now=2.weeks)
       scm = project.scm
       if(!scm)
         logger.info "Not polling #{project.name} it doesn't seem to have a proper scm configuration" if logger
@@ -76,16 +60,20 @@ module DamageControl
       
       latest_revision = project.latest_revision
       
-      # TODO: gradually go backwards in time if there is nothing since project.begiin_time
       # Default value for start time (in case there are no detected revisions yet)
-      from = project.start_time
+      from = seconds_before_now.ago
       if(latest_revision)
         from = latest_revision.identifier
         logger.info "Latest revision for #{project.name}'s #{scm.visual_name} "+
           "was #{from}" if logger
       else
-        logger.info "Latest revision for #{project.name}'s #{scm.visual_name} is " +
-          "not known. Using project start time: #{from}" if logger
+        if(from < 32.weeks.ago)
+          logger.info "Checked for revisions as far back as 32 weeks ago (#{32.weeks.ago}). There were none, so we give up." if logger
+          return []
+        else
+          logger.info "Latest revision for #{project.name}'s #{scm.visual_name} is " +
+            "not known. Checking for revisions since: #{from}" if logger
+        end
       end
 
       logger.info "Polling revisions for #{project.name}'s #{scm.visual_name} " +
@@ -95,6 +83,12 @@ module DamageControl
       if(revisions.empty?)
         logger.info "No revisions for #{project.name}'s #{scm.visual_name} after " +
           "#{from}" if logger
+        unless(latest_revision)
+          double_seconds_before_now = 2*seconds_before_now
+          logger.info "We still haven't determined when the last revision in #{project.name}'s #{scm.visual_name} occurred, " +
+            "so we'll check since #{double_seconds_before_now.ago}" if logger
+          return poll_new_revisions(project, double_seconds_before_now)
+        end
       else
         logger.info "There were #{revisions.length} new revision(s) in " +
           "#{project.name}'s #{scm.visual_name} after #{from}" if logger

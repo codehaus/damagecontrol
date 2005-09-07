@@ -16,11 +16,11 @@ class ProjectTest < Test::Unit::TestCase
   end
 
   def test_should_find_latest_build_before
-    assert_equal(@build_1, @project_1.builds(nil, Time.utc(1971,02,28,23,45,01))[0])
+    assert_equal(@build_1, @project_1.builds(:before => Time.utc(1971,02,28,23,45,01))[0])
   end
 
   def test_should_find_latest_successful_build
-    assert_equal(@build_1, @project_1.builds(true)[0])
+    assert_equal(@build_1, @project_1.builds(:exitstatus => 0)[0])
   end
 
   def test_should_persist_scm
@@ -52,13 +52,21 @@ class ProjectTest < Test::Unit::TestCase
   end
 
   def test_should_persist_scm_web
-    scm_web = MetaProject::ScmWeb::Browser.new("a", "b", "c", "d", "e", "f", "g")
+    scm_web = MetaProject::ScmWeb::Browser.new(
+      "dir/\#{path}", 
+      "history/\#{path}", 
+      "raw/\#{path}/\#{revision}", 
+      "html/\#{path}\#{revision}", 
+      "diff/\#{path}\#{revision}", 
+      "f", 
+      "g"
+    )
 
     @project_1.scm_web = scm_web
     @project_1.save
     @project_1.reload
 
-    assert_equal("a", @project_1.scm_web.overview)
+    assert_equal("dir/foo", @project_1.scm_web.dir("foo"))
     assert_equal(true, @project_1.scm_web.enabled)
   end
 
@@ -140,6 +148,19 @@ class ProjectTest < Test::Unit::TestCase
     @project_1.request_build(Build::SUCCESSFUL_DEPENDENCY)
     assert_equal(1, @revision_3.builds(true).size)
     assert_equal(Build::SUCCESSFUL_DEPENDENCY, @revision_3.builds[0].reason)
+  end
+  
+  def test_should_lock_project
+    p = Project.create(:name => "lock me")
+    assert !p.lock_time
+    p.lock_time = Time.now.utc
+    assert p.lock_time
+  end
+  
+  def test_should_have_next_pending_build
+    assert_nil @project_1.next_pending_build
+    pending = @revision_3.request_build(Build::SCM_POLLED)
+    assert_equal(pending, @project_1.next_pending_build)
   end
   
 end

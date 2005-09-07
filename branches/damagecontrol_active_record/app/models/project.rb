@@ -49,7 +49,7 @@ class Project < ActiveRecord::Base
   def initialize(*args)
     super(*args)
     self.scm_web = MetaProject::ScmWeb::Browser.new(
-      "/revision_parser/overview",
+      "/revision_parser/dir/\#{path}",
       "/revision_parser/history/\#{path}",
       "/revision_parser/raw/\#{path}?revision=\#{revision}",
       "/revision_parser/html/\#{path}?revision=\#{revision}",
@@ -57,6 +57,7 @@ class Project < ActiveRecord::Base
     ) if self.scm_web.nil?
     
     self.tracker = MetaProject::Tracker::NullTracker.new if self.tracker.nil?
+    self.uses_polling = true # trigger not implemented yet
   end
 
   # Same as revisions[0], but faster since it only loads one record
@@ -69,28 +70,41 @@ class Project < ActiveRecord::Base
     Revision.find_by_sql(["SELECT * FROM revisions WHERE project_id=? ORDER BY timepoint DESC LIMIT ?", self.id, count])
   end
 
-  # Finds builds (+successful+ or not), ordered in descending order of their +begin_time+.
-  # If the +before+ argument is specified (UTC time), 
-  # the builds' +begin_time+ will be before that time.
-  # The number of returned builds will be maximum +max_count+.
-  def builds(successful=nil, before=nil, max_count=1)
-    raise "successful must be bool" if successful && !(successful.class==TrueClass || successful.class==FalseClass)
-    success_criterion = successful ? "AND b.exitstatus=0" : ""
-    before_criterion = before ? "AND b.begin_time<#{quote(before)}" : ""
+  # Finds builds ordered in descending order of their +begin_time+. Valid options:
+  #  * :exitstatus (Integer)
+  #  * :before (UTC Time)
+  #  * :pending (true/false)
+  #  * :count (Integer)
+  def builds(options={})
+    default_options = {
+      :exitstatus => nil, 
+      :before => nil, 
+      :pending => false,      
+      :count => 1,
+    }
+    options = default_options.merge(options)
+
+    exitstatus_criterion = options[:exitstatus] ? "AND b.exitstatus=0" : ""
+    before_criterion = options[:before] ? "AND b.begin_time<#{quote(options[:before])}" : ""
+    pending_criterion = options[:pending] ? "AND b.state IS NULL" : ""
     
     sql = <<-EOS
 SELECT DISTINCT b.* 
 FROM builds b, revisions r, projects p 
-WHERE r.project_id=?
-AND b.revision_id=r.id 
-AND b.exitstatus IS NOT NULL
-#{success_criterion}
+WHERE r.project_id = ?
+AND b.revision_id = r.id 
+#{exitstatus_criterion}
 #{before_criterion}
+#{pending_criterion}
 ORDER BY b.begin_time DESC
-LIMIT #{max_count}
+LIMIT #{options[:count]}
     EOS
 
     Build.find_by_sql([sql, self.id])
+  end
+  
+  def next_pending_build
+    builds(:pending => true)[0]
   end
 
   def latest_revision_has_builds?
@@ -210,7 +224,7 @@ LIMIT #{max_count}
       #maker.image.title = "maker.image.title"
 
       # The RSS spec says max 15 items
-      builds(nil, nil, 15).each do |build|
+      builds(:count => 15).each do |build|
         item = maker.items.new_item
 
         item.pubDate = build.begin_time

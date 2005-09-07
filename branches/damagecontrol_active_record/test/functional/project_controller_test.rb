@@ -43,7 +43,7 @@ class ProjectControllerTest < Test::Unit::TestCase
         }
       },
       :scm_web => {
-        :overview_spec => "http://foo.com/overview/", 
+        :dir_spec => "http://foo.com/dir/\#{path}", 
         :history_spec => "http://foo.com/history/\#{path}", 
         :raw_spec => "http://foo.com/raw/\#{path}?r=\#{revision}", 
         :html_spec => "http://foo.com/html/\#{path}?r=\#{revision}", 
