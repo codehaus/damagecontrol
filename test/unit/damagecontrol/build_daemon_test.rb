@@ -34,7 +34,7 @@ module DamageControl
     end
 
     def test_should_execute_build_when_change_committed      
-      daemon = BuildDaemon.new
+      daemon = BuildDaemon.new(ScmPoller.new)
       
       # create new project
       archiver = ::DamageControl::Publisher::ArtifactArchiver.new
@@ -54,7 +54,7 @@ module DamageControl
       scm.create_central
 
       # nothing should have happened yet
-      daemon.run_once
+      daemon.handle_all_projects_once
       assert_equal(0, project.revisions.length)
       
       # check out, change file and commit
@@ -65,7 +65,7 @@ module DamageControl
       scm.commit("This is just a test")
       
       # this should execute a build
-      daemon.run_once
+      daemon.handle_all_projects_once
 
       # check build executed
       project.reload

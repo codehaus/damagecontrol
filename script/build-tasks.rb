@@ -5,6 +5,7 @@ end
 
 task :clone_structure_to_test => [:clean_target_unless_production]
 task :migrate => [:clean_target_unless_production]
+task :db_structure_dump => [:migrate, :environment]
 
 # Support Tasks ------------------------------------------------------
 

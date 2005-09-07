@@ -21,7 +21,6 @@ class Build < ActiveRecord::Base
   MANUALLY_TRIGGERED = "MANUALLY_TRIGGERED"
   SUCCESSFUL_DEPENDENCY = "SUCCESSFUL_DEPENDENCY"
 
-  acts_as_list :scope => :revision
   belongs_to :revision
   belongs_to :triggering_build, :class_name => "Build"
   has_many :artifacts, :dependent => true
@@ -93,16 +92,9 @@ class Build < ActiveRecord::Base
     end
   end
   
-  # The previous build. First looks within the same revision. If none are found,
-  # gets project's latest build before ourself
-  def previous
-    h = higher_item
-    h ? h : revision.project.builds(nil, begin_time)[0]
-  end
-  
   # The estimated duration of this build, or nil if it cannot be determined.
   def estimated_duration
-    lb = revision.project.builds(true)[0]
+    lb = project.builds(:exitstatus => 0)[0]
     lb ? lb.duration : nil
   end
   
@@ -187,6 +179,11 @@ class Build < ActiveRecord::Base
   # Number of seconds since the build ended, or nil if it hasn't ended yet
   def seconds_since_end
     end_time ? (Time.now.utc - end_time).to_i : nil
+  end
+
+  # The previous build for the associated project. May be within the same revision or not.
+  def previous
+    project.builds(:before => begin_time)[0]
   end
 
   # :nodoc:

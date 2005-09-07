@@ -70,7 +70,7 @@ class ApplicationController < ActionController::Base
 protected
   
   def load_builds_for_sparkline(project)
-    @builds = project.builds(nil, nil, SPARKLINE_COUNT)
+    @builds = project.builds(:count => SPARKLINE_COUNT)
   end
 
   def random_tip

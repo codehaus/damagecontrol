@@ -22,7 +22,7 @@ class RevisionController < ApplicationController
     load_builds_for_sparkline(@project)
   end
 
-  # Requests a build. Nothing is rendered.
+  # Requests a build. Should be called via an AJAX POST.
   def build
     @revision = Revision.find(@params[:id])
     @revision.request_build(Build::MANUALLY_TRIGGERED)
