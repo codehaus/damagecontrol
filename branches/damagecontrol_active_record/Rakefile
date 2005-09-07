@@ -246,4 +246,4 @@ task :remote_exec do
 end
 
 # Added for DamageControl (pay attention when upgrading rails) --------------------------------
-load 'script/build-tasks.rb'
+load 'script/build_tasks.rb'
