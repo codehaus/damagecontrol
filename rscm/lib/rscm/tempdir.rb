@@ -1,10 +1,10 @@
 require 'fileutils'
 
 module RSCM
-  def new_temp_dir(suffix="")
+  def new_temp_dir(suffix="", basedir=File.dirname(__FILE__) + "/../../target")
     identifier = identifier.to_s
     identifier.gsub!(/\(|:|\)/, '_')
-    dir = File.dirname(__FILE__) + "/../../target/temp_#{identifier}_#{Time.new.to_i}#{suffix}"
+    dir = "#{basedir}/temp_#{identifier}_#{Time.new.to_i}#{suffix}"
     FileUtils.mkdir_p(dir)
     dir
   end

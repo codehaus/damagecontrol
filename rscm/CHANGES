@@ -1,5 +1,11 @@
 = RSCM Changelog
 
+== Version 0.3.3
+
+This release makes some test utilities more reusable.
+
+* Added optional basedir parameter to assert_equal_with_diff
+
 == Version 0.3.2
 
 This is a bugfix release.
