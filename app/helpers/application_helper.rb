@@ -1,5 +1,3 @@
-#require_dependency 'damagecontrol'
-#require_dependency 'build'
 require 'damagecontrol'
 
 module ApplicationHelper

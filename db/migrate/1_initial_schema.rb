@@ -30,7 +30,6 @@ class InitialSchema < ActiveRecord::Migration
       t.column :relative_build_path, :text
       t.column :lock_time,           :timestamp
       t.column :quiet_period,        :integer
-      t.column :uses_polling,        :boolean
       t.column :build_command,       :text
       t.column :scm,                 :text
       t.column :publishers,          :text

@@ -1,15 +1,19 @@
 require 'test/unit'
 require 'fileutils'
-require 'rscm/difftool_test'
+require 'rubygems'
+require 'rscm'
 require 'damagecontrol/diff/diff_parser'
 require 'damagecontrol/diff/diff_htmlizer'
 
 module DamageControl
   class DiffHtmlizerTest < Test::Unit::TestCase
+    include RSCM::Difftool
+    
     def test_should_parse_diff_to_object_model
       p = DiffParser.new
-
-      html_file = File.dirname(__FILE__) + "/../../../../target/diff.html"
+      target_dir = File.expand_path(File.expand_path(File.dirname(__FILE__)) + "/../../../../target")
+      FileUtils.mkdir_p target_dir unless File.exist?(target_dir)
+      html_file = "#{target_dir}/diff.html"
       File.delete(html_file) if File.exist?(html_file)
       FileUtils.mkdir(File.dirname(html_file)) unless File.exist?(File.dirname(html_file))
 
@@ -28,7 +32,7 @@ module DamageControl
         end
       end
       expected = File.open(File.dirname(__FILE__) + "/test.html")
-      assert_equal_with_diff(expected.read_fix_nl, File.open(html_file).read_fix_nl)
+      assert_equal_with_diff(expected.read_fix_nl, File.open(html_file).read_fix_nl, "#{target_dir}/target")
     end
   end
 end

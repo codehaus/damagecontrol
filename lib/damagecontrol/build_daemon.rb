@@ -18,7 +18,13 @@ module DamageControl
     end
 
     def handle_all_projects_once
-      Project.find(:all).each do |project|
+      projects = Project.find(:all)
+      if(projects.size == 0)
+        logger.info "No projects in the database" if logger
+        return
+      end
+        
+      projects.each do |project|
         # assumptions:
         # 1) builds cannot be created for revisions that already have a pending (not started) build.
         #    anyone who tries to create one should either get an exception or just
@@ -35,26 +41,40 @@ module DamageControl
         
         # We're reloading the project here, since its locked state may have changed
         project.reload
-        unless(project.lock_time)
-          project.lock_time = Time.now.utc
-          project.save
-          handle_project(project) 
-          project.lock_time = false
-          project.save
-        end
+        
+        # TODO: We should set the lock_time flag and save the project to avoid other parallel
+        # daemon processes from handling the project. -But how do we ensure that locked projects
+        # don't remain locked if the locking daemon goes down before a project is unlocked?
+        # Maybe we need some inter-process communication - Drb or something. That opens up a new
+        # question: How do the processes get to know each other? Is there a simpler way around 
+        # this problem?
+        handle_project(project) 
       end
     end
     
     def handle_project(project)
-      pending_build = project.next_pending_build
-      if(pending_build)
-        pending_build.execute!
-      elsif(project.uses_polling)
-        latest_revision = @scm_poller.poll_and_persist_new_revisions(project)
-        if(latest_revision)
-          build = latest_revision.request_build(Build::SCM_POLLED)
-          build.execute!
+      begin
+        logger.info "Checking project #{project.name}" if logger
+        pending_build = project.next_pending_build
+        if(pending_build)
+          logger.info "Pending build found for project #{project.name}" if logger
+          pending_build.execute!
+        elsif(project.scm.uses_polling?)
+          logger.info "No pending builds found for project #{project.name}, polling SCM for new revisions" if logger
+          latest_new_revision = @scm_poller.poll_and_persist_new_revisions(project)
+          if(latest_new_revision)
+            logger.info "Requesting/executing build for new revision in project #{project.name}" if logger
+            build = latest_new_revision.request_build(Build::SCM_POLLED)
+            build.execute!
+          else
+            logger.info "No new revision in project #{project.name}" if logger
+          end
+        else
+          logger.info "No pending builds for project #{project.name} and not polling its SCM since the project has polling disabled" if logger
         end
+      rescue Exception => e
+        logger.error e.message if logger
+        logger.error e.backtrace.join("\n") if logger
       end
     end
   end

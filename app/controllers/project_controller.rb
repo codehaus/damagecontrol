@@ -29,6 +29,7 @@ class ProjectController < ApplicationController
   end
 
   def show_import
+    find
   end
   
   def import
@@ -94,7 +95,7 @@ protected
 private
 
   def find
-    @project = Project.find(@params[:id])
+    @project = Project.find(@params[:id]) if @params[:id]
   end
   
   def update_or_save(project)

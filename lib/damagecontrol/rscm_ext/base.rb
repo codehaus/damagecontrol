@@ -3,15 +3,17 @@ module RSCM
   class Base
     include ::DamageControl::Dom
 
-    # Available change detection types
-    POLLING = "POLLING" unless defined? POLLING
-    TRIGGER = "TRIGGER" unless defined? TRIGGER
-
     attr_accessor :enabled
-    attr_accessor :change_detection
+    attr_accessor :uses_polling # String, posted from web form.
 
     def category
       "scm"
+    end
+    
+    def uses_polling?
+      # If not set at all, default to true
+      return true if @uses_polling.nil?
+      @uses_polling.to_i != 0
     end
 
     def exclusive?

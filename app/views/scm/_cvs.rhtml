@@ -105,9 +105,7 @@ function enableOrDisableCvsFields() {
 	}
 }
 
-var cvs_protocol_tip = "<div class='tp1'>If you specify :local: DamageControl can create the repository for you after you save (unless the repository already exists).</div>";
-// not displayed yet - not appropriate for rscm...
-var cvs_mod_tip  = "<div class='tp1'>Note that you can't use trigged build if you are using DC to build multiple branches for the same project, use polling instead.</div>";
+Body.addLoadEvent(cvs_init);
 -->
 </script>
 

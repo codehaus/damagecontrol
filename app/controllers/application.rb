@@ -1,5 +1,5 @@
-require_dependency 'sparklines'
-require 'damagecontrol'
+#require_dependency 'sparklines'
+require_dependency 'damagecontrol'
 
 class ApplicationController < ActionController::Base
   SPARKLINE_COUNT = 20
