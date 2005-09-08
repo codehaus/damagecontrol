@@ -94,6 +94,7 @@ spec = Gem::Specification.new do |s|
   s.add_dependency('jabber4r', '0.8.0')
   s.add_dependency('RedCloth', '3.0.3')
   s.add_dependency('ruby-growl', '1.0.0')
+  s.add_dependency('meta_project', '0.4.10')
 #  s.add_dependency('rmagick', '1.9.0')
 #  s.add_dependency('sparklines', '0.2.4')
 
