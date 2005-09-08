@@ -1,5 +1,6 @@
 require 'rscm/annotations'
 require 'rscm/path_converter'
+require 'rscm/difftool'
 require 'rscm/logging'
 require 'rscm/better'
 require 'rscm/base'
