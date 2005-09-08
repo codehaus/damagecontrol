@@ -2,7 +2,8 @@ class ProjectController < ApplicationController
   include MetaProject::ProjectAnalyzer
 
   layout "application", :except => :list
-  
+  before_filter :define_feeds
+    
   def index
   end
 
@@ -41,6 +42,13 @@ class ProjectController < ApplicationController
       import_settings[:scm_web_url],
       import_settings
     )
+
+    # Set up some default publishers
+    if(RUBY_PLATFORM =~ /powerpc-darwin/)
+      # These only work on OS X
+      project.add_sound
+      project.add_growl
+    end
 
     project.save
     flash["notice"] = "Successfully imported settings for #{project.name}."
@@ -88,6 +96,17 @@ class ProjectController < ApplicationController
 
 protected
 
+  def define_feeds
+    if(find)
+      feeds << Struct::Feed.new(:rss, {:controller => "project", :action => "rss", :id => @project.id}, "#{@project.name} revisions and builds")
+    end
+  end
+  
+  def page_title
+    find
+    @page_title = @project ? "DamageControl: #{@project.name}" : "DamageControl"
+  end
+
   def tip_category
     :project_settings
   end
@@ -95,7 +114,7 @@ protected
 private
 
   def find
-    @project = Project.find(@params[:id]) if @params[:id]
+    @project ||= Project.find(@params[:id]) if @params[:id]
   end
   
   def update_or_save(project)

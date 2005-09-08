@@ -1,4 +1,5 @@
 require File.dirname(__FILE__) + '/../../test_helper'
+require 'stringio'
 
 module DamageControl  
   class BuildDaemonTest < Test::Unit::TestCase
@@ -33,7 +34,12 @@ module DamageControl
       end
     end
 
-    def test_should_execute_build_when_change_committed      
+    def test_should_execute_build_when_change_committed
+      log = StringIO.new
+      
+      BuildDaemon.logger = Logger.new(log)
+      ScmPoller.logger = Logger.new(log)
+
       daemon = BuildDaemon.new(ScmPoller.new)
       
       # create new project
@@ -49,6 +55,8 @@ module DamageControl
         :publishers => [archiver], 
         :build_command => 'cp input.txt result.txt'
       )
+      project.reload
+      assert_equal(::DamageControl::Publisher::ArtifactArchiver, project.publishers[0].class)
       
       # create svn repository
       scm.create_central
@@ -66,6 +74,9 @@ module DamageControl
       
       # this should execute a build
       daemon.handle_all_projects_once
+
+      log.rewind
+      #puts log.read
 
       # check build executed
       project.reload
