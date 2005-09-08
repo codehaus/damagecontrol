@@ -10,6 +10,7 @@ Settings = function(initial) {
    * Fade currently showing element and make a new one (element) appear.
    */
   this.show = function(element, category, pluginId, exclusive) {
+    if(this.current == element) return;
     var pluginIds = categories[category];
     if(exclusive) {
       for(i=0; i<pluginIds.length; i++) {
@@ -24,6 +25,26 @@ Settings = function(initial) {
     this.current = element;
   }
 }
+
+var Body = {
+  /**
+   * Adds a function to be called when the page has loaded.
+   * Can be called several times.
+   */
+	addLoadEvent : function(func){
+		var oldonload = window.onload;
+
+		if (typeof window.onload != 'function') {
+			window.onload = func;
+		} else {
+			window.onload = function() {
+				oldonload();
+				func();
+			}
+		}
+	}
+}
+
 
 /**
  * Called when one of the enable checkboxes for a publisher is changed.

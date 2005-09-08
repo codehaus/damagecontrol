@@ -1,6 +1,6 @@
 raise 'load environment.rb instead of dc_environment.rb' unless defined?(RAILS_ENV)
 
-LIBS = ["lib", "../../trunk/rscm/lib", "../../trunk/rscm/test", "vendor/rscm/lib"]
+LIBS = []#["lib", "../../trunk/rscm/lib", "../../trunk/rscm/test", "vendor/rscm/lib"]
 $:.unshift(LIBS.collect{|p| RAILS_ROOT+"/"+p}.join(':'))
 require 'rscm'
 

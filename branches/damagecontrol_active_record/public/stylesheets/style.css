@@ -16,9 +16,9 @@ body {
 
 /* Styles for project settings panel */
 .settings-container {
-  position: absolute;
-  top: 160px;
-  left: 250px;
+  position: relative;
+  top: 0px;
+  left: 0px;
   height: 500px;
 }
 

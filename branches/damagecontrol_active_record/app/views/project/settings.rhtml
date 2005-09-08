@@ -34,13 +34,17 @@ var settings = new Settings("setting-icons");
       </div>
     <% end %>
     <div class="setting-icon-column">
+      <% show_import_url = @project ? 
+        url_for(:controller => "project", :action => "show_import", :id => @project.id) :
+        url_for(:controller => "project", :action => "show_import")
+      %>
       <%= 
         link_to(
           image_tag(
             "/images/project/import.png", 
             :size=>"48x48", :border => 0
           ), 
-          url_for(:controller => "project", :action => "show_import")
+          show_import_url
         ) 
       %>
     </div>

@@ -88,14 +88,14 @@ spec = Gem::Specification.new do |s|
 
   #### Dependencies and requirements.
 
-  s.add_dependency('rscm', '>= 0.3.2')
-  s.add_dependency('rails', '>= 0.13.1.1962')
+  s.add_dependency('rscm', '>= 0.3.3')
+  s.add_dependency('rails', '>= 0.13.1.1962') # gem install rails --source http://gems.rubyonrails.com
 #  s.add_dependency('log4r', '1.0.5')
   s.add_dependency('jabber4r', '0.8.0')
   s.add_dependency('RedCloth', '3.0.3')
   s.add_dependency('ruby-growl', '1.0.0')
-  s.add_dependency('rmagick', '1.9.0')
-  s.add_dependency('sparklines', '0.2.4')
+#  s.add_dependency('rmagick', '1.9.0')
+#  s.add_dependency('sparklines', '0.2.4')
 
   s.files = PKG_FILES.to_a
 

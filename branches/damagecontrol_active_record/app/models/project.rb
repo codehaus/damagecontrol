@@ -57,7 +57,6 @@ class Project < ActiveRecord::Base
     ) if self.scm_web.nil?
     
     self.tracker = MetaProject::Tracker::NullTracker.new if self.tracker.nil?
-    self.uses_polling = true # trigger not implemented yet
   end
 
   # Same as revisions[0], but faster since it only loads one record

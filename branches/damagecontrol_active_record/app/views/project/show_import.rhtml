@@ -1,4 +1,10 @@
-<h1>Import settings</h1>
+<% if(@project) %>
+<h1>Import settings for existing project <%= @project.name %></h1>
+<b>Warning: This will overwrite the previous settings (except the project name)</b>
+<% else %>
+<h1>Import settings for new project</h1>
+<% end %>
+
 <%= form_tag(:action => "import") %>
   <table>
     <tr>
@@ -20,6 +26,9 @@
       </td>
     </tr>
   </table>
+  <% if(@project) %>
+    <%= hidden_field_tag("id", @project.id) %>
+  <% end %>
   <%= submit_tag "Import!" %>
 </form>
 <p>

@@ -37,7 +37,7 @@ module DamageControl
     end
 
     def default_render_excludes
-      [:enabled, :fileutils_label, :fileutils_output, :content_type]
+      [:enabled, :fileutils_label, :fileutils_output, :content_type, :uses_polling]
     end
 
     def <=> (other)
