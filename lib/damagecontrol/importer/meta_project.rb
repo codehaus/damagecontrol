@@ -15,7 +15,7 @@ module MetaProject
         artifact_archiver = DamageControl::Publisher::ArtifactArchiver.new
         artifact_archiver.files = build_tool.artifacts
         artifact_archiver.enabling_states = [Build::Successful.new, Build::Fixed.new]
-        project.publishers    = [artifact_archiver] # TODO: add mailing lists here
+        project.publishers << artifact_archiver # TODO: add mailing lists here
       end
     end
   end

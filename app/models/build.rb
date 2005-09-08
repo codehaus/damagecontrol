@@ -249,5 +249,6 @@ class Build < ActiveRecord::Base
   end 
   
   STATES = [Executing.new, Successful.new, Fixed.new, Broken.new, RepeatedlyBroken.new]
+  COMPLETE_STATES = [Successful.new, Fixed.new, Broken.new, RepeatedlyBroken.new]
 
 end
