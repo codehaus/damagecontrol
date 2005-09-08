@@ -57,6 +57,14 @@ class Project < ActiveRecord::Base
     ) if self.scm_web.nil?
     
     self.tracker = MetaProject::Tracker::NullTracker.new if self.tracker.nil?
+    self.publishers = []
+
+    # Set up some default publishers
+    if(RUBY_PLATFORM =~ /powerpc-darwin/)
+      # These only work on OS X
+      add_sound
+      add_growl
+    end
   end
 
   # Same as revisions[0], but faster since it only loads one record
@@ -295,6 +303,18 @@ private
   def mkdir(dir)
     FileUtils.mkdir_p(dir) unless File.exist?(dir)
     dir
+  end
+  
+  def add_sound
+    sound = DamageControl::Publisher::Sound.new
+    sound.enabling_states = Build::COMPLETE_STATES
+    self.publishers << sound
+  end
+
+  def add_growl
+    growl = DamageControl::Publisher::Growl.new
+    growl.enabling_states = Build::STATES
+    self.publishers << growl
   end
 
 end

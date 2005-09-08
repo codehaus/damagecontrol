@@ -1,3 +1,6 @@
 require 'damagecontrol/meta_project/build_tool/ant'
+require 'damagecontrol/meta_project/build_tool/make'
+require 'damagecontrol/meta_project/build_tool/maven'
+require 'damagecontrol/meta_project/build_tool/nant'
 require 'damagecontrol/meta_project/build_tool/rake'
 require 'damagecontrol/meta_project/build_tool/unknown'
