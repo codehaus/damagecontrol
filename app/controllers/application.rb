@@ -1,6 +1,8 @@
 #require_dependency 'sparklines'
 require_dependency 'damagecontrol'
 
+Struct.new("Feed", :type, :url_options, :title)
+
 class ApplicationController < ActionController::Base
   SPARKLINE_COUNT = 20
   
@@ -20,8 +22,10 @@ class ApplicationController < ActionController::Base
     :any => COMMIT_MSG_TIPS + PROJECT_SETTING_TIPS
   }
 
-  before_filter :load_projects, :random_tip
-  helper :sparklines
+  prepend_before_filter :load_projects, :random_tip, :feeds
+  append_before_filter :page_title
+
+  #helper :sparklines
   
   def deserialize_to_array(hash)
     result = []
@@ -73,6 +77,10 @@ protected
     @builds = project.builds(:count => SPARKLINE_COUNT)
   end
 
+  def feeds
+    @feeds ||= []
+  end
+  
   def random_tip
     # TODO: perhaps keep a counter in the session and show sequentially?
     tips = TIPS[tip_category]
@@ -87,6 +95,10 @@ protected
   # call this method from an action to display a specific tip
   def tip(template_name)
     @template_for_tip = "tips/#{template_name}"
+  end
+  
+  def page_title
+    @page_title = "DamageControl"
   end
 
 private

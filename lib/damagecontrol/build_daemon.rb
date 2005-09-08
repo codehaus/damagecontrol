@@ -66,6 +66,7 @@ module DamageControl
             logger.info "Requesting/executing build for new revision in project #{project.name}" if logger
             build = latest_new_revision.request_build(Build::SCM_POLLED)
             build.execute!
+            logger.info "Build of #{project.name}'s revision #{latest_new_revision.identifier} complete. Exitstatus: #{build.exitstatus}" if logger
           else
             logger.info "No new revision in project #{project.name}" if logger
           end

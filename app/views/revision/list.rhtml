@@ -1,17 +1,5 @@
 <div id="revisions">
   <table>
-    <tr>
-      <td>
-        <%= sparkline_tag @builds.reverse.collect{|b| b.duration.to_i*10}, 
-          :type => 'smooth',
-          :has_last => true
-        %>
-      </td>
-      <td>
-        build duration
-      </td>
-    </tr>
-
   <% @revisions.each do |revision| %>
     <tr>
       <td nowrap="nowrap">
