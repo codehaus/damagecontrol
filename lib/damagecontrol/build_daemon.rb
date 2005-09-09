@@ -23,7 +23,7 @@ module DamageControl
         logger.info "No projects in the database" if logger
         return
       end
-        
+      
       projects.each do |project|
         # assumptions:
         # 1) builds cannot be created for revisions that already have a pending (not started) build.
@@ -40,15 +40,24 @@ module DamageControl
         #
         
         # We're reloading the project here, since its locked state may have changed
-        project.reload
+        begin
+          project.reload
         
-        # TODO: We should set the lock_time flag and save the project to avoid other parallel
-        # daemon processes from handling the project. -But how do we ensure that locked projects
-        # don't remain locked if the locking daemon goes down before a project is unlocked?
-        # Maybe we need some inter-process communication - Drb or something. That opens up a new
-        # question: How do the processes get to know each other? Is there a simpler way around 
-        # this problem?
-        handle_project(project) 
+          # TODO: We should set the lock_time flag and save the project to avoid other parallel
+          # daemon processes from handling the project. -But how do we ensure that locked projects
+          # don't remain locked if the locking daemon goes down before a project is unlocked?
+          # Maybe we need some inter-process communication - Drb or something. That opens up a new
+          # question: How do the processes get to know each other? Is there a simpler way around 
+          # this problem?
+          handle_project(project) 
+        rescue ActiveRecord::RecordNotFound => e
+          logger.error "Couldn't handle project #{project.name}. It looks like it was recently deleted" if logger
+        rescue Exception => e
+          if(logger)
+            logger.error "Couldn't handle project #{project.name}. Unexpected error: #{e.message}"
+            logger.error e.backtrace.join("\n")
+          end
+        end
       end
     end
     
