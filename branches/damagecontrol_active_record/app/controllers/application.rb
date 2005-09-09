@@ -1,7 +1,7 @@
 #require_dependency 'sparklines'
 require_dependency 'damagecontrol'
 
-Struct.new("Feed", :type, :url_options, :title)
+Struct.new("Feed", :type, :url_options, :title) unless defined? Struct::Feed
 
 class ApplicationController < ActionController::Base
   SPARKLINE_COUNT = 20
