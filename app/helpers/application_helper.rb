@@ -19,10 +19,15 @@ module ApplicationHelper
   end
   
   def build_link(build)
-    link_to(
-      image_tag(build.icon, :border => 0, :size => "16x16"), 
-      :controller => "build", :action => "show", :id => build.id
-    )
+    if(build.nil?)
+      # Can't create a link to a nonexistant build! Just show a transparent image with same size as image links.
+      image_tag("transparentpixel.gif", :border => 0, :size => "16x16")
+    else
+      link_to(
+        image_tag(build.icon, :border => 0, :size => "16x16"), 
+        :controller => "build", :action => "show", :id => build.id
+      )
+    end
   end
   
   def enabled_field(object)

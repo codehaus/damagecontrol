@@ -287,16 +287,16 @@ LIMIT #{options[:count]}
   def add_sound
     sound = DamageControl::Publisher::Sound.new
     sound.enabling_states = Build::COMPLETE_STATES
-    self.publishers ||= []
-    self.publishers << sound
+    publishers ||= []
+    publishers << sound
   end
 
   # Helper method for adding Growl publisher
   def add_growl
     growl = DamageControl::Publisher::Growl.new
     growl.enabling_states = Build::STATES
-    self.publishers ||= []
-    self.publishers << growl
+    publishers ||= []
+    publishers << growl
   end
 
   include ::DamageControl::Dom
