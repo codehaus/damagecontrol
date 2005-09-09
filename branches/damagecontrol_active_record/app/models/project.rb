@@ -299,8 +299,6 @@ LIMIT #{options[:count]}
     publishers << growl
   end
 
-  include ::DamageControl::Dom
-
   def enabled
     true
   end
