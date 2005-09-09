@@ -84,7 +84,7 @@ class Project < ActiveRecord::Base
     options = default_options.merge(options)
 
     exitstatus_criterion = options[:exitstatus] ? "AND b.exitstatus=0" : ""
-    before_criterion = options[:before] ? "AND b.begin_time<#{quote(options[:before])}" : ""
+    before_criterion = options[:before] ? "AND b.create_time<#{quote(options[:before])}" : ""
     pending_criterion = options[:pending] ? "AND b.state IS NULL" : ""
     
     sql = <<-EOS
@@ -95,14 +95,22 @@ AND b.revision_id = r.id
 #{exitstatus_criterion}
 #{before_criterion}
 #{pending_criterion}
-ORDER BY b.begin_time DESC
+ORDER BY b.create_time DESC
 LIMIT #{options[:count]}
     EOS
 
     Build.find_by_sql([sql, self.id])
   end
   
-  def next_pending_build
+  def latest_build
+    builds[0]
+  end
+  
+  def latest_successful_build
+    builds(:exitstatus => 0)[0]
+  end
+  
+  def latest_pending_build
     builds(:pending => true)[0]
   end
 

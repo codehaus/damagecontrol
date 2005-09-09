@@ -6,15 +6,83 @@ body {
   background-repeat: repeat-x;
   background-position: 0 -25px;
 
-  font-size: 80%;  
+  font-size: 80%;
   font-family: verdana, helvetica, arial, sans-serif;
   line-height: 1.7em;
+
+  margin:10px 10px 0px 10px;
+  padding:0px;
 
   /* Center in IE5.5 */
   /* text-align:  center; */
 }
 
+h1 {
+  font-size: 2em;
+  font-weight: normal;
+  letter-spacing: -0.04em;
+}
+
+h2 {
+  font-size: 1.5em;
+  font-weight: normal;
+  letter-spacing: -0.04em;
+}
+
+/* http://glish.com/css/7.asp */
+#leftcontent {
+  position: absolute;
+  left:10px;
+  top:50px;
+  width:300px;
+  background:#fff;
+  border:1px solid #000;
+}
+
+#centercontent {
+  background:#fff;
+  margin-left: 299px;
+  margin-right:299px;
+  border:1px solid #000;
+  voice-family: "\"}\"";
+  voice-family: inherit;
+  margin-left: 301px;
+  margin-right:301px;
+}
+
+html>body #centercontent {
+  margin-left: 301px;
+  margin-right:301px;
+}
+
+#rightcontent {
+  position: absolute;
+  right:10px;
+  top:50px;
+  width:300px;
+  background:#fff;
+  border:1px solid #000;
+}
+
+#banner {
+  background:#fff;
+  height:40px;
+  border-top:1px solid #000;
+  border-right:1px solid #000;
+  border-left:1px solid #000;
+  voice-family: "\"}\"";
+  voice-family: inherit;
+  height:39px;
+}
+
+html>body #banner {
+  height:39px;
+}
+
 /* Styles for project settings panel */
+#settings-group {
+}
+
 .settings-container {
   position: relative;
   top: 0px;
@@ -36,6 +104,7 @@ body {
 .setting-names-row {
   position: relative;
   height: 20px;
+  text-align:center;margin:0 auto;
 }
 
 .setting-name-column {
@@ -48,6 +117,10 @@ body {
 .setting-category-row {
   position: relative;
   height: 20px;
+}
+
+.project-summary {
+  
 }
 
 /* arrows on textiled lists in revision summary */
@@ -65,18 +138,6 @@ body {
   background-position: 0px;
 }
 
-h1 {
-  font-size: 2em;
-  font-weight: normal;
-  letter-spacing: -0.04em;
-}
-
-h2 {
-  font-size: 1.5em;
-  font-weight: normal;
-  letter-spacing: -0.04em;
-}
-
 .notice {
   padding: 4px;
   background-color: #EEEEEE;
@@ -90,8 +151,9 @@ h2 {
 }
 
 .tip-box {
+  font-size: 80%;
   padding: 4px;
-  background: #EEEEEE;
+  background: #AAAAAA;
   border: 1px solid #CCCCCC;
 }
 

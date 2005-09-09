@@ -55,7 +55,7 @@ module DamageControl
     def handle_project(project)
       begin
         logger.info "Checking project #{project.name}" if logger
-        pending_build = project.next_pending_build
+        pending_build = project.latest_pending_build
         if(pending_build)
           logger.info "Pending build found for project #{project.name}" if logger
           pending_build.execute!

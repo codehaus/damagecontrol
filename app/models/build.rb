@@ -29,8 +29,8 @@ class Build < ActiveRecord::Base
 
   validates_inclusion_of :reason, :in => [SCM_POLLED, SCM_TRIGGERED, MANUALLY_TRIGGERED, SUCCESSFUL_DEPENDENCY]
 
-  def before_create
-    self.create_time = Time.now.utc
+  def before_save
+    self.create_time = Time.now.utc unless self.create_time
   end
   
   def before_destroy
@@ -183,7 +183,7 @@ class Build < ActiveRecord::Base
 
   # The previous build for the associated project. May be within the same revision or not.
   def previous
-    project.builds(:before => begin_time)[0]
+    project.builds(:before => create_time)[0]
   end
 
   # :nodoc:

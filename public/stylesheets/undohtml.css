@@ -23,8 +23,11 @@ h1,h2,h3,h4,h5,h6,pre,code { font-size:1em; }
 /* zero out the spacing around pre, form, body, html, p, blockquote as well */
 /* form elements are oddly inconsistent, and not quite CSS emulatable. */
 /*  nonetheless strip their margin and padding as well */
+
+/* NONONO (ASLAK)
 ul,ol,li,h1,h2,h3,h4,h5,h6,pre,form,body,html,blockquote,fieldset,input
 { margin:0; padding:0 }
+*/
 
 /* whoever thought blue linked image borders were a good idea? */
 a img,:link img,:visited img { border:none }
