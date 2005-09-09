@@ -79,34 +79,34 @@ class BuildTest < Test::Unit::TestCase
     p = Project.create
     r = p.revisions.create
     
-    now = Time.now.utc
+    now = Time.utc(2000, 1, 1, 1, 1, 1)
     
-    b1 = r.builds.create(:exitstatus => 0, :reason => Build::SCM_POLLED, :begin_time => now)
+    b1 = r.builds.create(:exitstatus => 0, :reason => Build::SCM_POLLED, :create_time => now)
     b1.determine_state
     b1.save
     assert_equal(Build::Successful, b1.state.class)
 
-    b2 = r.builds.create(:exitstatus => 0, :reason => Build::SCM_POLLED, :begin_time => now+1)
+    b2 = r.builds.create(:exitstatus => 0, :reason => Build::SCM_POLLED, :create_time => now+1)
     b2.determine_state
     b2.save
     assert_equal(Build::Successful, b2.state.class)
 
-    b3 = r.builds.create(:exitstatus => 1, :reason => Build::SCM_POLLED, :begin_time => now+2)
+    b3 = r.builds.create(:exitstatus => 1, :reason => Build::SCM_POLLED, :create_time => now+2)
     b3.determine_state
     b3.save
     assert_equal(Build::Broken, b3.state.class)
 
-    b4 = r.builds.create(:exitstatus => 1, :reason => Build::SCM_POLLED, :begin_time => now+3)
+    b4 = r.builds.create(:exitstatus => 1, :reason => Build::SCM_POLLED, :create_time => now+3)
     b4.determine_state
     b4.save
     assert_equal(Build::RepeatedlyBroken, b4.state.class)
 
-    b5 = r.builds.create(:exitstatus => 0, :reason => Build::SCM_POLLED, :begin_time => now+4)
+    b5 = r.builds.create(:exitstatus => 0, :reason => Build::SCM_POLLED, :create_time => now+4)
     b5.determine_state
     b5.save
     assert_equal(Build::Fixed, b5.state.class)
     
-    b6 = r.builds.create(:exitstatus => 0, :reason => Build::SCM_POLLED, :begin_time => now+5)
+    b6 = r.builds.create(:exitstatus => 0, :reason => Build::SCM_POLLED, :create_time => now+5)
     b6.determine_state
     b6.save
     assert_equal(Build::Successful, b6.state.class)

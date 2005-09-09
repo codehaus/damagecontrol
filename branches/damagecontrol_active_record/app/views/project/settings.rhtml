@@ -10,7 +10,7 @@ var settings = new Settings("setting-icons");
 
 <%= form_tag(:controller => "project", :action => @submit_action, :id => @project.id) %>
 <%= submit_tag(@submit_text) %>
-<div>
+<div id="settings-group">
   <!-- The top 'fixed' settings row -->
   <div class="setting-category-row">
     General settings

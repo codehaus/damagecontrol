@@ -8,8 +8,7 @@
       </td>
       <td>
         <% revision.builds.each do |build| %>
-          <%= link_to(image_tag(build.icon, :border => 0, :size => "16x16"), 
-                :controller => "build", :action => "show", :id => build.id) %>
+          <%= build_link(build) %>
         <% end %>
       </td>
     </tr>

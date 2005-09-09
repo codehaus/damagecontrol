@@ -10,17 +10,18 @@ class ProjectTest < Test::Unit::TestCase
   def test_should_find_latest_revision
     assert_equal(@revision_3, @project_1.latest_revision)
   end
-  
-  def test_should_find_latest_build
-    assert_equal(@build_2, @project_1.builds[0])
+
+  def test_should_find_latest_build_based_on_create_time
+    assert_equal(@build_2, @project_1.latest_build)
   end
 
   def test_should_find_latest_build_before
-    assert_equal(@build_1, @project_1.builds(:before => Time.utc(1971,02,28,23,45,01))[0])
+    assert_equal(@build_2, @project_1.builds(:before => Time.utc(1971,02,28,23,41,02))[0])
+    assert_equal(@build_1, @project_1.builds(:before => Time.utc(1971,02,28,23,41,01))[0])
   end
 
   def test_should_find_latest_successful_build
-    assert_equal(@build_1, @project_1.builds(:exitstatus => 0)[0])
+    assert_equal(@build_1, @project_1.latest_successful_build)
   end
 
   def test_should_persist_scm
@@ -157,10 +158,10 @@ class ProjectTest < Test::Unit::TestCase
     assert p.lock_time
   end
   
-  def test_should_have_next_pending_build
-    assert_nil @project_1.next_pending_build
+  def test_should_have_latest_pending_build
+    assert_nil @project_1.latest_pending_build
     pending = @revision_3.request_build(Build::SCM_POLLED)
-    assert_equal(pending, @project_1.next_pending_build)
+    assert_equal(pending, @project_1.latest_pending_build)
   end
   
 end

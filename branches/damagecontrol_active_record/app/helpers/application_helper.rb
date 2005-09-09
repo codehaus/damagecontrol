@@ -18,6 +18,13 @@ module ApplicationHelper
     )
   end
   
+  def build_link(build)
+    link_to(
+      image_tag(build.icon, :border => 0, :size => "16x16"), 
+      :controller => "build", :action => "show", :id => build.id
+    )
+  end
+  
   def enabled_field(object)
     field(object, "#{object.category}[#{object.class.name}]", "@enabled", "hidden", object.enabled_id)
     # <input id="<%= object.enabled_id %>" name="scm[<%= object.class.name %>][enabled]" value="<%= object.enabled %>">

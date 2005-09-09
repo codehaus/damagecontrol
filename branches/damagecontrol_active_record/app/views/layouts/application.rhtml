@@ -18,35 +18,36 @@
 	) %>
 </head>
 <body>
-  <p>
-  <%= link_to "New Project", :controller => "project", :action => "new" %>
-| <%= link_to "Artifacts", :controller => "file_system", :action => "artifacts" %>
-  <% if(@project) %>
-    | <%= link_to "RSS", :controller => "project", :action => "rss", :id => @project.id %>
-  <% end %>
-  </p>
+  <div id="banner">
+    <p>
+    <%= link_to "New Project", :controller => "project", :action => "new" %>
+  | <%= link_to "Artifacts", :controller => "file_system", :action => "artifacts" %>
+    <% if(@project) %>
+      | <%= link_to "RSS", :controller => "project", :action => "rss", :id => @project.id %>
+    <% end %>
+    </p>
+  </div>
 
-  <table width="100%">
-    <tr>
-      <td width="20%">
-        <% if(@template_for_left_column) %>
-          <%= render(@template_for_left_column) %>
-        <% else %>
-        TODO: assign @template_for_left_column to have it rendered here!
-        <% end %>
-      </td>
-      <td width="60%">
-        <div id="content_for_layout">
-          <% if @flash["notice"] %><div class="notice"><%= @flash["notice"] %></div><% end %>
-          <%= @content_for_layout %>
-        </div>
-      </td>
-      <td width="20%">
-        <%= render(@template_for_tip) %>
-        <% @project_list_refresh = true %>
-        render("project/list")
-      </td>
-    </tr>
-  </table>
+  <div id="leftcontent">
+    <% if(@template_for_left_column) %>
+      <%= render(@template_for_left_column) %>
+    <% else %>
+    TODO: assign @template_for_left_column to have it rendered here!
+    <% end %>
+  </div>
+
+  <div id="centercontent">
+    <div id="content_for_layout">
+      <% if @flash["notice"] %><div class="notice"><%= @flash["notice"] %></div><% end %>
+      <%= @content_for_layout %>
+    </div>
+  </div>
+
+  <div id="rightcontent">
+    <%= render(@template_for_tip) %>
+    <% @project_list_refresh = true %>
+    <%= render("project/list") %>
+  </div>
+
 </body>
 </html>
