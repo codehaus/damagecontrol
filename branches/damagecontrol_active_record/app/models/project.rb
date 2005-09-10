@@ -255,11 +255,9 @@ LIMIT #{options[:count]}
   end
   
   # Accumulates all dependencies into +set+
-  # Warning: will result in infinite cycle if there are cycles in the dependencies!
-  # No check is implemented for this here.
   def accumulate_transitive_dependencies(set)
     set.merge(dependencies)
-    dependencies.each{|dep| dep.accumulate_transitive_dependencies(set)}
+    dependencies.each{|dep| dep.accumulate_transitive_dependencies(set)} unless set.include?(self)
   end
 
   # RSS for this project. Contains a mix of revision and build items

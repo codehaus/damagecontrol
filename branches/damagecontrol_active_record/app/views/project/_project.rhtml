@@ -15,4 +15,18 @@
     <td>Home page</td>
     <td><%= text_field("project", "home_page") %></td>
   </tr>
+  <tr>
+    <td>Dependencies</td>
+    <td>
+      <%
+        dependencies = @project.dependencies
+        @projects.each do |project| 
+          depends_on = dependencies.index(project)
+      %>
+        <% if @project.could_depend_on?(project) %>
+          <%= check_box_tag("project_dependencies[]", project.id, depends_on ? true : false) %><%= project.name %><br/>
+        <% end %>  
+      <% end %>  
+    </td>
+  </tr>
 </table>

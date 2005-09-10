@@ -1,5 +1,5 @@
 <%
-link = {:controller => "project", :action => "show", :id => project.id}
+link = {:controller => "project", :action => "edit", :id => project.id}
 if(project.latest_revision)
   link = {:controller => "revision", :action => "show", :id => project.latest_revision.id}
 end

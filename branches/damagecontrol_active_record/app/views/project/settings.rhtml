@@ -3,13 +3,14 @@ var settings = new Settings("setting-icons");
 </script>
 
 <% if(@submit_action != "create")  %>
+  <h1><%= @project.name %> settings</h1>
   <%= form_tag(:controller => "project", :action => "destroy", :id => @project.id) %>
-    <%= submit_tag("Delete") %>
+    <%= submit_tag("Delete #{@project.name}") %>
   </form>
 <% end %>
-
 <%= form_tag(:controller => "project", :action => @submit_action, :id => @project.id) %>
 <%= submit_tag(@submit_text) %>
+
 <div id="settings-group">
   <!-- The top 'fixed' settings row -->
   <div class="setting-category-row">

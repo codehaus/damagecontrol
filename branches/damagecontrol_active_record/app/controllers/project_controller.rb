@@ -8,7 +8,7 @@ class ProjectController < ApplicationController
   end
 
   def new
-    @project = Project.new
+    @project = Project.new(:name => "Project #{@projects.length}")
     @project.publishers = []
 
     define_plugin_rows
@@ -25,7 +25,7 @@ class ProjectController < ApplicationController
     define_plugin_rows
 
     @submit_action = "update"
-    @submit_text = "Update project"
+    @submit_text = "Update #{@project.name}"
     render :action => "settings"
   end
 
@@ -121,16 +121,28 @@ private
     project.scm        = deserialize_to_array(@params[:scm]).find{|scm| scm.enabled}
     project.tracker    = deserialize_to_array(@params[:tracker]).find{|tracker| tracker.enabled}
     project.publishers = deserialize_to_array(@params[:publisher])
-    project.scm_web    = MetaProject::ScmWeb::Browser.new
 
+    project.scm_web = MetaProject::ScmWeb::Browser.new
     project.scm_web.dir_spec      = @params[:scm_web][:dir_spec]
     project.scm_web.history_spec  = @params[:scm_web][:history_spec]
     project.scm_web.raw_spec      = @params[:scm_web][:raw_spec]
     project.scm_web.html_spec     = @params[:scm_web][:html_spec]
     project.scm_web.diff_spec     = @params[:scm_web][:diff_spec]
 
-    project.update_attributes(@params[:project])
+    if(@params[:project_dependencies])
+      project.dependencies.clear
+      @params[:project_dependencies].each do |project_id|
+        p = Project.find(project_id)
+        if(project.could_depend_on?(p))
+          project.dependencies << p
+        else
+          flash["notice"] ||= ""
+          flash["notice"] << "Can't depend on #{p.name}, it would create a cycle.<br/>"
+        end
+      end
+    end
 
+    project.update_attributes(@params[:project])
     redirect_to :action => "edit", :id => project.id
   end
 
