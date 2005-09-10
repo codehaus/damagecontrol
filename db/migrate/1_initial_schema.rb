@@ -36,9 +36,9 @@ class InitialSchema < ActiveRecord::Migration
       t.column :scm_web,             :text
       t.column :tracker,             :text
     end
-    create_table :projects_projects do |t|
-      t.column :depending_id,        :integer
-      t.column :dependant_id,        :integer
+    create_table :project_dependencies, :id => false do |t|
+      t.column :from_id,             :integer
+      t.column :to_id,               :integer
     end
     create_table :revision_files do |t|
       t.column :status,              :text

@@ -1,5 +1,6 @@
 #require 'rgl/adjacency'
 #require 'rgl/connected_components'
+require 'set'
 require 'rss/maker'
 require 'rss/parser'
 require 'damagecontrol'
@@ -14,13 +15,15 @@ class Project < ActiveRecord::Base
   has_many :revisions, :order => "timepoint DESC", :dependent => true
   has_and_belongs_to_many :dependencies, 
     :class_name => "Project", 
-    :foreign_key => "depending_id", 
-    :association_foreign_key => "dependant_id",
+    :join_table => "project_dependencies",
+    :foreign_key => "from_id", 
+    :association_foreign_key => "to_id",
     :order => "name"
   has_and_belongs_to_many :dependants, 
     :class_name => "Project", 
-    :foreign_key => "dependant_id", 
-    :association_foreign_key => "depending_id",
+    :join_table => "project_dependencies",
+    :foreign_key => "to_id", 
+    :association_foreign_key => "from_id",
     :order => "name"
   
   serialize :scm
@@ -29,23 +32,17 @@ class Project < ActiveRecord::Base
   serialize :publishers
 
   def before_destroy
-    connection.delete("DELETE FROM projects_projects WHERE depending_id=?", self.id)
-    connection.delete("DELETE FROM projects_projects WHERE dependant_id=?", self.id)
     FileUtils.rm_rf(@basedir) if File.exist?(@basedir)
   end
 
-  # Returns an RGL::DirectedAdjacencyGraph representing all projects
-  # and their dependencies
-  def self.dependency_graph
-    g = RGL::DirectedAdjacencyGraph.new
-    self.find(:all).each do |from|
-      from.dependencies.each do |to|
-        g.add_edge(from, to)
-      end
-    end
-    g
+  def after_find
+    set_defaults
   end
 
+  def before_save
+    set_defaults
+  end
+  
   def initialize(*args)
     super(*args)
     self.scm_web = MetaProject::ScmWeb::Browser.new(
@@ -169,15 +166,6 @@ LIMIT #{options[:count]}
     mkdir "#{working_copy_dir}/#{relative_build_path}"
   end
 
-  def after_find
-    @basedir = "#{DAMAGECONTROL_HOME}/projects/#{id}"
-    mkdir @basedir
-    self.scm.checkout_dir = working_copy_dir unless self.scm.nil?
-
-    self.scm.enabled = true unless self.scm.nil?
-    self.tracker.enabled = true unless self.tracker.nil?
-  end
-  
   # Where temporary stdout log is written
   def stdout_file
     "#{@basedir}/stdout.log"
@@ -258,6 +246,22 @@ LIMIT #{options[:count]}
     rss.to_s
   end
   
+  # Whether we could depend on +project+ without creating a cycle.
+  def could_depend_on?(project)
+    return false if project == self
+    transitive_dependencies = Set.new
+    project.accumulate_transitive_dependencies(transitive_dependencies)
+    !transitive_dependencies.include?(self)
+  end
+  
+  # Accumulates all dependencies into +set+
+  # Warning: will result in infinite cycle if there are cycles in the dependencies!
+  # No check is implemented for this here.
+  def accumulate_transitive_dependencies(set)
+    set.merge(dependencies)
+    dependencies.each{|dep| dep.accumulate_transitive_dependencies(set)}
+  end
+
   # RSS for this project. Contains a mix of revision and build items
   def rss(controller, rss_version="2.0")
     # http://www.cozmixng.org/~rwiki/?cmd=view;name=RSS+Parser%3A%3ATutorial.en
@@ -299,6 +303,8 @@ LIMIT #{options[:count]}
     publishers << growl
   end
 
+  # DOM abstract methods
+
   def enabled
     true
   end
@@ -312,6 +318,14 @@ LIMIT #{options[:count]}
   end
 
 private
+
+  def set_defaults
+    @basedir = "#{DAMAGECONTROL_HOME}/projects/#{id}"
+    FileUtils.mkdir_p @basedir unless File.exist?(@basedir)
+    self.scm.checkout_dir = working_copy_dir if self.scm
+    self.scm.enabled = true if self.scm
+    self.tracker.enabled = true if self.tracker
+  end
 
   # creates dir if it doesn't exist and returns path to it
   def mkdir(dir)
