@@ -111,6 +111,6 @@ private
 
   # Loads all projects so that the right column can be populated properly
   def load_projects
-    @projects = Project.find(:all)
+    @projects = Project.find(:all, :order => "name")
   end
 end
