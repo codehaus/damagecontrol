@@ -2,8 +2,8 @@ These are important TODOs that must be fixed before release and RubyConf.
 
 == General stuff ==
 * Fix SQLite concurrency problems
-* Make daemon do more than just SCM polling. Also has to build manually requested builds/dependency triggered builds!
-* Make daemon sleep before it starts thr project loop again
+* DONE Make daemon do more than just SCM polling. Also has to build manually requested builds/dependency triggered builds!
+* DONE Make daemon sleep before it starts the project loop again
 * Get DC to work with lighttpd (too damn slow with WEBRick). script/lighttpd
   Problems:
     * lighttpd often dies on http://localhost:8000/project/list
@@ -23,13 +23,15 @@ These are important TODOs that must be fixed before release and RubyConf.
 * Grok how to use switchtower to deploy dc to codehaus
 * Make DC self hosting
 * DONE Implement project deletion
+* Package DC as a Gem and make sure it can run. Challenges:
+  * Gem install dir is readonly. How to make the app read the db from elsewhere? Must be configurable w/o changing Gem.
 
 == UI stuff ==
-* Fix settings. Try to avoid absolute layout
+* DONE Fix settings. Try to avoid absolute layout
 * Fix diff logic so diffs can be shown in web (LOW PRI, OTHER SCM WEB IS WORKING)
 * DONE Integrate scm_web and tracker with XForge (lots of stuff moved here)
-* Fix the project overview to the right
+* DONE Fix the project overview to the right
 * Fix settings bug that unsets SCM if saved w/o clicking SCM (use hidden radios perhaps? see damagecontrol.js and enabled_field macro)
 * Align build/revision content to the top
-* Use a proper 3-col layout
+* DONE Use a proper 3-col layout
 * General ui CSS niceness (logo and professional looking layout can wait)
