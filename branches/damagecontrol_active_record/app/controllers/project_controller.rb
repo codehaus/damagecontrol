@@ -129,8 +129,8 @@ private
     project.scm_web.html_spec     = @params[:scm_web][:html_spec]
     project.scm_web.diff_spec     = @params[:scm_web][:diff_spec]
 
+    project.dependencies.clear
     if(@params[:project_dependencies])
-      project.dependencies.clear
       @params[:project_dependencies].each do |project_id|
         p = Project.find(project_id)
         if(project.could_depend_on?(p))

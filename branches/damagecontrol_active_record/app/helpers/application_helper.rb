@@ -5,12 +5,22 @@ module ApplicationHelper
   def field(object, name, attr_name, type="text", id=nil)
     tag("input", 
       :name => "#{name}[#{attr_name[1..-1]}]", 
-      :value => object.instance_variable_get(attr_name),
+      :value => object.instance_variable_get(attr_name).to_s,
       :type => type,
       :id => id
     )
   end
 
+  def enabled_field(object)
+    # We can't use field, since we want nil to be "false"
+    tag("input", 
+      :name => "#{object.category}[#{object.class.name}][enabled]", 
+      :value => object.enabled ? "true" : "false",
+      :type => "hidden",
+      :id => object.enabled_id
+    )
+  end
+  
   def artifact_link(artifact)
     link_to(
       File.basename(artifact.relative_path), 
@@ -28,11 +38,6 @@ module ApplicationHelper
         :controller => "build", :action => "show", :id => build.id
       )
     end
-  end
-  
-  def enabled_field(object)
-    field(object, "#{object.category}[#{object.class.name}]", "@enabled", "hidden", object.enabled_id)
-    # <input id="<%= object.enabled_id %>" name="scm[<%= object.class.name %>][enabled]" value="<%= object.enabled %>">
   end
   
   def description(clazz, attr_name)

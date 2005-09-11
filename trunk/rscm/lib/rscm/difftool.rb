@@ -1,4 +1,3 @@
-require 'test/unit'
 require 'rscm/tempdir'
 require 'rscm/path_converter'
 require 'rscm/difftool'

@@ -1,12 +1,34 @@
 *SVN*
 
+* Added -m/--mime-types option to the WEBrick server, so you can specify a Apache-style mime.types file to load #2059 [ask@develooper.com]
+
+* Added -c/--svn option to the generator that'll add new files and remove destroyed files using svn add/revert/remove as appropriate #2064 [kevin.clark@gmail.com]
+
+* Added -c/--charset option to WEBrick server, so you can specify a default charset (which without changes is UTF-8) #2084 [wejn@box.cz]
+
+* Make the default stats task extendable by modifying the STATS_DIRECTORIES constant
+
+* Allow the selected environment to define RAILS_DEFAULT_LOGGER, and have Rails::Initializer use it if it exists.
+
+* Moved all the shared tasks from Rakefile into Rails, so that the Rakefile is empty and doesn't require updating.
+
+* Added Rails::Initializer and Rails::Configuration to abstract all of the common setup out of config/environment.rb (uses config/boot.rb to bootstrap the initializer and paths)
+
+* Fixed the scaffold generator to fail right away if the database isn't accessible instead of in mid-air #1169 [Chad Fowler]
+
+* Corrected project-local generator location in scripts.rb #2010 [Michael Schuerig]
+
+* Don't require the environment just to clear the logs #2093 [Scott Barron]
+
+* Make the default rakefile read *.rake files from config/tasks (for easy extension of the rakefile by e.g. generators)
+
+* Only load breakpoint in development mode and when BREAKPOINT_SERVER_PORT is defined.
+
+* Allow the --toggle-spin switch on process/reaper to be negated
+
 * Replace render_partial with render :partial in scaffold generator [Nicholas Seckar]
 
-* Make the rake tasks (like fresh_rails_without_docs_using_links) aware of switchtower
-
 * Added -w flag to ps in process/reaper #1934 [Scott Barron]
-
-* Add integration with SwitchTower (rake tasks, default deploy.rb recipe)
 
 * Allow ERb in the database.yml file (just like with fixtures), so you can pull out the database configuration in environment variables #1822 [Duane Johnson]
 

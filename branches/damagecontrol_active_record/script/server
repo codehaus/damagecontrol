@@ -4,11 +4,13 @@ require 'webrick'
 require 'optparse'
 
 OPTIONS = {
-  :port        => 3000,
-  :ip          => "0.0.0.0",
-  :environment => "development",
-  :server_root => File.expand_path(File.dirname(__FILE__) + "/../public/"),
-  :server_type => WEBrick::SimpleServer
+  :port            => 3000,
+  :ip              => "0.0.0.0",
+  :environment     => "development",
+  :server_root     => File.expand_path(File.dirname(__FILE__) + "/../public/"),
+  :server_type     => WEBrick::SimpleServer,
+  :charset         => "UTF-8",
+  :mime_types      => WEBrick::HTTPUtils::DefaultMimeTypes
 }
 
 ARGV.options do |opts|
@@ -26,9 +28,17 @@ ARGV.options do |opts|
   opts.on("-e", "--environment=name", String,
           "Specifies the environment to run this server under (test/development/production).",
           "Default: development") { |OPTIONS[:environment]| }
+  opts.on("-m", "--mime-types=filename", String,
+                  "Specifies an Apache style mime.types configuration file to be used for mime types",
+                  "Default: none") { |mime_types_file| OPTIONS[:mime_types] = WEBrick::HTTPUtils::load_mime_types(mime_types_file) }
+
   opts.on("-d", "--daemon",
           "Make Rails run as a Daemon (only works if fork is available -- meaning on *nix)."
           ) { OPTIONS[:server_type] = WEBrick::Daemon }
+
+  opts.on("-c", "--charset=charset", String,
+          "Set default charset for output.",
+          "Default: UTF-8") { |OPTIONS[:charset]| }
 
   opts.separator ""
 
