@@ -1,4 +1,41 @@
 #!/usr/local/bin/ruby
+require 'optparse'
+
+# default options
+DAEMON_OPTIONS = {
+  :webrick => false,
+}
+
+# http://www.bigbold.com/snippets/posts/show/605
+ARGV.options do |o|
+  script_name = File.basename($0)
+  
+  o.set_summary_indent('  ')
+  o.banner =    "Usage: #{script_name} [OPTIONS]"
+  o.define_head "Starts DamageControl"
+  o.separator   ""
+  o.on("-w", "--webrick",
+       "Starts the webapp") { |DAEMON_OPTIONS[:webrick]| }
+
+  o.separator ""
+  o.on_tail("-h", "--help", "Show this help message.") { puts o; exit }
+  
+  o.parse!
+end
+
+if(DAEMON_OPTIONS[:webrick])
+  Thread.new do
+    server_pid = fork do
+      load(File.dirname(__FILE__) + '/server')
+    end
+    at_exit do 
+      puts "Killing WEBrick [#{server_pid}]"
+      Process.kill("HUP", server_pid)
+    end
+    puts "WEBrick running [#{server_pid}]"
+    Process.wait(server_pid)
+  end
+end
 
 load File.dirname(__FILE__) + '/../config/environment.rb'
 
