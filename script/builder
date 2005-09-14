@@ -1,0 +1,15 @@
+#!/usr/local/bin/ruby
+
+load File.dirname(__FILE__) + '/../config/environment.rb'
+
+# set up logging
+[
+  DamageControl::ScmPoller, # TODO: This class is deprecated
+  DamageControl::BuildDaemon, 
+  DamageControl::Publisher::Base, 
+  Build, 
+  Project, 
+  Revision
+].each { |cls| cls.logger = Logger.new(STDOUT) }
+ 
+DamageControl::BuildDaemon.new(DamageControl::ScmPoller.new).run

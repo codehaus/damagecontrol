@@ -55,12 +55,8 @@ end
 
 desc "Create a self-contained executable"
 task :rubyscript2exe => [:tar2rubyscript] do
-  puts
-  puts "When the server comes up, kill it with CTRL-C"
-  puts
-  # TODO: kill it automatically so it can be built by dc itself
   Dir.chdir "dist" do
-    ruby "rubyscript2exe.rb #{PKG_FILE_NAME}.rb"
+    ruby "rubyscript2exe.rb #{PKG_FILE_NAME}.rb --dry-run"
   end
 end
 

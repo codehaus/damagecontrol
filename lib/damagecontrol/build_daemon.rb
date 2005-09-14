@@ -10,7 +10,7 @@ module DamageControl
     end
     
     def run
-      puts "==> DamageControl daemon started"
+      puts "=> DamageControl builder started"
       loop do
         handle_all_projects_once
         sleep CYCLE_PAUSE

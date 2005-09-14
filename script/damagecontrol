@@ -1,0 +1,79 @@
+#!/usr/local/bin/ruby
+require 'optparse'
+
+# default options
+MAIN_OPTIONS = {
+  :webrick => false,
+  :builders => 1
+}
+
+# http://www.bigbold.com/snippets/posts/show/605
+ARGV.options do |o|
+  script_name = File.basename($0)
+  
+  o.set_summary_indent('  ')
+  o.banner =    "Usage: #{script_name} [OPTIONS]"
+  o.define_head "Starts DamageControl"
+  o.separator   ""
+
+  o.on("-w", "--webrick",
+       "Starts the webapp") { |MAIN_OPTIONS[:webrick]| }
+  o.on("-u", "--build-daemons n", Integer,
+      "Number of build daemons to start",
+      "Default: #{MAIN_OPTIONS[:builders]}") { |MAIN_OPTIONS[:builders]| }
+  o.on("-r", "--dry-run", "Dry run. Loads the environment and exits.") do
+    puts "I'm running dry..."
+    ENV["RAILS_ENV"] = "production"
+    require File.dirname(__FILE__) + "/../config/environment"
+    puts "Done!"
+    exit
+  end
+
+  o.separator ""
+  o.on_tail("-h", "--help", "Show this help message.") { puts o; exit }
+  
+  o.parse!
+end
+
+def start_webrick
+  server_pid = fork do
+    load(File.dirname(__FILE__) + '/server')
+  end
+  at_exit do 
+    puts "Killing WEBrick [#{server_pid}]"
+    Process.kill("HUP", server_pid)
+  end
+  Process.wait(server_pid)
+end
+
+def start_builder
+  builder_pid = fork do
+    begin
+      load(File.dirname(__FILE__) + '/builder')
+    rescue
+      exit
+    end
+  end
+  at_exit do 
+    puts "Killing Builder [#{builder_pid}]"
+    Process.kill("HUP", builder_pid)
+  end
+  Process.wait(builder_pid)
+end
+
+threads = []
+
+if(MAIN_OPTIONS[:webrick])
+  threads << Thread.new do
+    start_webrick
+  end
+end
+
+(1..MAIN_OPTIONS[:builders]).each do |i|
+  threads << Thread.new do
+    start_builder
+  end
+end
+
+puts "=> DamageControl parent process running [#{Process.pid}]"
+threads.each{|t| t.join}
