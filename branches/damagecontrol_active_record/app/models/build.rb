@@ -210,6 +210,12 @@ class Build < ActiveRecord::Base
     def description
       "Executing"
     end
+    def fail
+      Broken.new
+    end
+    def succeed
+      Successful.new
+    end
   end
 
   class Successful
