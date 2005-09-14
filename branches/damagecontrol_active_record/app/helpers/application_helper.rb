@@ -25,7 +25,7 @@ module ApplicationHelper
     link_to(
       File.basename(artifact.relative_path), 
       :controller => "file_system", :action => "artifacts", :params => {:path => artifact.relative_path.split('/')}
-    )
+    ) + " (#{File.size(artifact.file) / 1024} Kb)"
   end
   
   def build_link(build)
