@@ -1,17 +1,12 @@
 == Welcome to DamageControl
 
-Create the database schema:
+Before you go on, please read instructions at http://hieraki.lavalamp.ca/
+(expecially the section about the ruby gems that need to be installed)
 
-  rake -f Rakefile.dc recreate_schema
+=== Create the initial database schema:
 
-Create some default projects:
+  rake migrate
 
-  rake -f Rakefile.dc create_sample_projects
+=== Start DamageControl with built-in web server:
 
-Start the webapp:
-
-  rake -f Rakefile.dc webrick
-  
-Start the daemon:
-
-  rake -f Rakefile.dc daemon
+  ruby script/builder --webrick

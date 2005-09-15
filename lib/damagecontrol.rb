@@ -15,3 +15,5 @@ require 'damagecontrol/core_ext/pathname'
 require 'damagecontrol/core_ext/class'
 require 'damagecontrol/sqlite/retry'
 
+exit if defined?(REQUIRE2LIB) # rubyscript2exe pqackaging mode
+
