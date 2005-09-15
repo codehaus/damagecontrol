@@ -1,6 +1,8 @@
 #!/usr/local/bin/ruby
 
-load File.dirname(__FILE__) + '/../config/environment.rb'
+# BIG TODO: set env in one place only. init.rb or script/damagecontrol. also think about easy ror upgrade!
+ENV["RAILS_ENV"] = "development"
+require File.dirname(__FILE__) + "/../config/environment"
 
 # set up logging
 [

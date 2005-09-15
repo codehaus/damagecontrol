@@ -1,5 +1,11 @@
 #!/usr/local/bin/ruby
+
+# Require the files from ruby's stdlib that will be needed by damagecontrol,
+# then exit if we're in rubyscript2exe packaging mode
+# (gems need not be required here, they're packaged separately by lib/dist.rake)
 require 'optparse'
+require 'webrick'
+require 'logger'
 
 # default options
 MAIN_OPTIONS = {
@@ -41,7 +47,7 @@ def start_webrick
   end
   at_exit do 
     puts "Killing WEBrick [#{server_pid}]"
-    Process.kill("HUP", server_pid)
+    #Process.kill("HUP", server_pid)
   end
   Process.wait(server_pid)
 end
@@ -56,7 +62,7 @@ def start_builder
   end
   at_exit do 
     puts "Killing Builder [#{builder_pid}]"
-    Process.kill("HUP", builder_pid)
+    #Process.kill("HUP", builder_pid)
   end
   Process.wait(builder_pid)
 end

@@ -76,8 +76,6 @@ module DamageControl
             build = latest_new_revision.request_build(Build::SCM_POLLED)
             build.execute!
             logger.info "Build of #{project.name}'s revision #{latest_new_revision.identifier} complete. Exitstatus: #{build.exitstatus}" if logger
-          else
-            logger.info "No new revision in project #{project.name}" if logger
           end
         else
           logger.info "No pending builds for project #{project.name} and not polling its SCM since the project has polling disabled" if logger

@@ -1,3 +1,24 @@
+# This rake script packages DamageControl to a standalone executable.
+# Executables can be made on any platform (TODO: verify this) that is supported by rubyscript2exe.
+# The final executable embeds:
+#
+# * Ruby runtime (taken from your box)
+# * All Ruby standard libraries that are needed by DamageControl (but not more)
+# * All rubygems required by DamageControl (we use our own packaging scheme - see below)
+# * The DamageControl appliaction itself
+# * Ruby on Rails (from its SVN HEAD, currently under vendor/rails)
+# * SQlite and other binaries used by DamageControl
+# * A preconfigured SQLite database schema (TODO: make sure it's production and clean and support migrate)
+#
+# The standalone executable can run both builder daemons and optionally serve the web
+# interface via its embedded webserver (WEBrick).
+#
+# The executable should be good enough to be deployed under Apache or Lighttpd (with some tweaks),
+# but this has not been thoroughly explored yet and is therefore undocumented. Until then it is
+# probably easier to get DamageControl running under one of these web servers by running from 
+# source (available via Subversion) and configure the webapp as any other RoR app. There is ample
+# socumentation about this available from http://rubyonrails.com/
+#
 require 'meta_project'
 require 'rake/contrib/sshpublisher'
 require 'rake/contrib/rubyforgepublisher'
@@ -31,23 +52,69 @@ PKG_FILES = FileList[
   'vendor/rails/railties/lib/**/*'
 ]
 
+DIST_DIR = "dist/#{PKG_FILE_NAME}"
+
 task :copy_dist do
-  dist_dir = "dist/#{PKG_FILE_NAME}"
-  FileUtils.rm_rf(dist_dir) if File.exist?(dist_dir)
-  FileUtils.mkdir_p(dist_dir)
+  FileUtils.rm_rf("dist") if File.exist?("dist")
+  FileUtils.mkdir_p(DIST_DIR)
 
   PKG_FILES.each do |file|
-    dest = File.join(dist_dir, file)
+    dest = File.join(DIST_DIR, file)
     FileUtils.mkdir_p(File.dirname(dest)) unless File.exist?(File.dirname(dest))
-    cp_r(file, dest) unless File.directory?(file) # don't copy dirs, as they will bring along .svn files
+    FileUtils.cp_r(file, dest) unless File.directory?(file) # don't copy dirs, as they will bring along .svn files
   end
 
-  FileUtils.mv "#{dist_dir}/bin/eee_darwin", "dist"
-  FileUtils.mv "#{dist_dir}/bin/rubyscript2exe.rb", "dist"
-  FileUtils.mv "#{dist_dir}/bin/tar2rubyscript.rb", "dist"
+  FileUtils.mv "#{DIST_DIR}/bin/eee_darwin", "dist"
+  FileUtils.mv "#{DIST_DIR}/bin/rubyscript2exe.rb", "dist"
+  FileUtils.mv "#{DIST_DIR}/bin/tar2rubyscript.rb", "dist"
 end
 
-task :tar2rubyscript => [:copy_dist] do
+GEMS = [
+  "jabber4r",
+  "rake",
+  "RedCloth",
+  "rscm",
+  "ruby-growl",
+  "meta_project"
+]
+
+# Although rubyscript2exe can automatically package gems, we prefer to do it
+# our own way to limit the size of the final package. rubyscript2exe packages
+# the entire gem in its entirety. we disable it and package only the lib part
+# of each gem.
+
+desc "Copy exploded gems to vendor"
+task :copy_exploded_gems => [:copy_dist] do
+  gems_dir = "dist/gems"
+  FileUtils.rm_rf(gems_dir) if File.exist?(gems_dir)
+  FileUtils.mkdir_p(gems_dir)
+
+  Dir.chdir gems_dir do
+    GEMS.each do |gem|
+      sh "gem unpack #{gem}"
+    end
+  end
+
+  FileUtils.mkdir_p(DIST_DIR) unless File.exist?(DIST_DIR)
+  gemnames = Dir["#{gems_dir}/*"].collect{|f| File.basename(f)}
+  gemnames.each do |gemname|
+    gemdest = "#{DIST_DIR}/vendor/#{gemname}"
+    FileUtils.mkdir_p gemdest
+    FileUtils.cp_r("#{gems_dir}/#{gemname}/lib", gemdest)
+  end
+  
+  # Write a file that will be loaded by dc_environment.rb
+  gemlibs = "['" + gemnames.collect{|g| "vendor/#{g}/lib"}.join("','") + "']"
+  gems_environment_script = <<-EOS
+# This file was generated during DamageControl's build process
+puts "Adding gems to loadpath"
+GEMLIBS = #{gemlibs}
+$:.unshift(GEMLIBS.collect{|p| RAILS_ROOT+"/"+p}.join(':'))
+EOS
+  File.open("#{DIST_DIR}/config/gems_environment.rb", "w") {|io| io.write gems_environment_script}
+end
+
+task :tar2rubyscript => [:copy_exploded_gems] do
   Dir.chdir "dist" do
     ruby "tar2rubyscript.rb #{PKG_FILE_NAME}"
   end
@@ -56,6 +123,7 @@ end
 desc "Create a self-contained executable"
 task :rubyscript2exe => [:tar2rubyscript] do
   Dir.chdir "dist" do
+    # Disable gem bundling. We do it our own way (see :copy_exploded_gems)
     ruby "rubyscript2exe.rb #{PKG_FILE_NAME}.rb --dry-run"
   end
 end

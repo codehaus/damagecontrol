@@ -81,7 +81,7 @@ module DamageControl
       
       revisions = scm.revisions(from)
       if(revisions.empty?)
-        logger.info "No revisions for #{project.name}'s #{scm.visual_name} after " +
+        logger.info "No new revisions for #{project.name}'s #{scm.visual_name} after " +
           "#{from}" if logger
         unless(latest_revision)
           double_seconds_before_now = 2*seconds_before_now
