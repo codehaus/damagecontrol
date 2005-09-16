@@ -318,7 +318,7 @@ LIMIT #{options[:count]}
 private
 
   def set_defaults
-    @basedir = "#{DAMAGECONTROL_HOME}/projects/#{id}"
+    @basedir = "#{DC_ENV[:data_dir]}/projects/#{id}"
     FileUtils.mkdir_p @basedir unless File.exist?(@basedir)
     self.scm.checkout_dir = working_copy_dir if self.scm
     self.scm.enabled = true if self.scm

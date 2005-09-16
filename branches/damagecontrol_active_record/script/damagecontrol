@@ -13,21 +13,21 @@ MAIN_OPTIONS = {
   :builders => 1
 }
 
-# http://www.bigbold.com/snippets/posts/show/605
-ARGV.options do |o|
+# TODO: replicate all the options from server and builder here!
+ARGV.options do |opts|
   script_name = File.basename($0)
   
-  o.set_summary_indent('  ')
-  o.banner =    "Usage: #{script_name} [OPTIONS]"
-  o.define_head "Starts DamageControl"
-  o.separator   ""
+  opts.set_summary_indent('  ')
+  opts.banner =    "Usage: ruby #{script_name} [OPTIONS]"
+  opts.define_head "Starts DamageControl"
+  opts.separator   ""
 
-  o.on("-w", "--webrick",
+  opts.on("-w", "--webrick",
        "Starts the webapp") { |MAIN_OPTIONS[:webrick]| }
-  o.on("-u", "--build-daemons n", Integer,
+  opts.on("-u", "--build-daemons=n", Integer,
       "Number of build daemons to start",
       "Default: #{MAIN_OPTIONS[:builders]}") { |MAIN_OPTIONS[:builders]| }
-  o.on("-r", "--dry-run", "Dry run. Loads the environment and exits.") do
+  opts.on("-r", "--dry-run", "Dry run. Loads the environment and exits.") do
     puts "I'm running dry..."
     ENV["RAILS_ENV"] = "production"
     require File.dirname(__FILE__) + "/../config/environment"
@@ -35,10 +35,10 @@ ARGV.options do |o|
     exit
   end
 
-  o.separator ""
-  o.on_tail("-h", "--help", "Show this help message.") { puts o; exit }
+  opts.separator ""
+  opts.on_tail("-h", "--help", "Show this help message.") { puts o; exit }
   
-  o.parse!
+  opts.parse!
 end
 
 def start_webrick

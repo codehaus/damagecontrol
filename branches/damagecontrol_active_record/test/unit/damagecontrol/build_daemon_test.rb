@@ -8,7 +8,6 @@ module DamageControl
       Project.delete_all
       Revision.delete_all
       Build.delete_all
-      FileUtils.rm_rf(DAMAGECONTROL_HOME)
     end
     
     def new_dir(dir)

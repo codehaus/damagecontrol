@@ -5,7 +5,7 @@ class ArtifactTest < Test::Unit::TestCase
 
   def test_should_store_and_retrieve_real_file
     # this would normally be done by the archiver
-    real_file_name = Artifact::ROOT_DIR + "/artifact.txt"
+    real_file_name = Artifact::ARTIFACT_DIR + "/artifact.txt"
     File.open(real_file_name, "w") do |io|
       io.puts("yo")
     end

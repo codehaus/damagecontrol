@@ -1,12 +1,22 @@
 #!/usr/local/bin/ruby
 
-# BIG TODO: set env in one place only. init.rb or script/damagecontrol. also think about easy ror upgrade!
-ENV["RAILS_ENV"] = "development"
+require 'optparse'
+BUILDER_OPTIONS = {
+  :environment     => "development"
+}
+
+ARGV.options do |opts|
+  opts.on("-e", "--environment=name", String,
+          "Specifies the environment to run this server under (test/development/production).",
+          "Default: development") { |BUILDER_OPTIONS[:environment]| }
+end
+
+ENV["RAILS_ENV"] = BUILDER_OPTIONS[:environment]
 require File.dirname(__FILE__) + "/../config/environment"
 
 # set up logging
 [
-  DamageControl::ScmPoller, # TODO: This class is deprecated
+  DamageControl::ScmPoller,
   DamageControl::BuildDaemon, 
   DamageControl::Publisher::Base, 
   Build, 
