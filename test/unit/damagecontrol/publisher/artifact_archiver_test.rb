@@ -13,7 +13,7 @@ module DamageControl
           io.puts("blah")
         end
 
-        expected_archived_file = DAMAGECONTROL_HOME + '/artifacts/gems/dummy.gem'
+        expected_archived_file = DC_ENV[:data_dir] + '/artifacts/gems/dummy.gem'
         File.rm(expected_archived_file) if File.exist?(expected_archived_file)
 
         aa = ArtifactArchiver.new

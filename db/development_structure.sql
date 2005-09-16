@@ -6,3 +6,4 @@ CREATE TABLE projects (id INTEGER PRIMARY KEY NOT NULL, name text, home_page tex
 CREATE TABLE revision_files (id INTEGER PRIMARY KEY NOT NULL, status text, path text, previous_native_revision_identifier text, native_revision_identifier text, timepoint datetime, revision_id integer);
 CREATE TABLE revisions (id INTEGER PRIMARY KEY NOT NULL, identifier text, developer text, message text, timepoint datetime, project_id integer);
 CREATE TABLE schema_info (version integer);
+INSERT INTO schema_info (version) VALUES (1);
