@@ -4,7 +4,7 @@ require 'pathname'
 # so they can be retrieved later, typically downloaded over HTTP.
 class Artifact < ActiveRecord::Base
   
-  ARTIFACT_DIR = "#{DC_ENV[:data_dir]}/artifacts"
+  ARTIFACT_DIR = "#{DC_DATA_DIR}/artifacts"
   FileUtils.mkdir_p(ARTIFACT_DIR) unless File.exist?(ARTIFACT_DIR)
 
   # The file represented by this Artifact, as a Pathname object.

@@ -16,11 +16,19 @@ DC_ENV = {
   :environment     => defined?(RUBYSCRIPT2EXE_APPEXE) ? "production" : "development",
   :data_dir        => SHELL_DIR,
   :database_yml    => "#{SHELL_DIR}/config/database.yml",
+  :builders        => 1,
   :webrick         => false,
-  :builders        => 1
+  ######### START: This is copied from script/server
+  :port            => 3000,
+  :ip              => "0.0.0.0",
+  :server_root     => File.expand_path(File.dirname(__FILE__) + "/../public/"),
+  :server_type     => WEBrick::SimpleServer,
+  :charset         => "UTF-8",
+  :mime_types      => WEBrick::HTTPUtils::DefaultMimeTypes
+  ######### END: This is copied from script/server
 }
 
-# TODO: replicate all the options from server and builder here!
+environment_specified = false
 ARGV.options do |opts|
   script_name = File.basename($0)
   
@@ -35,7 +43,7 @@ ARGV.options do |opts|
             "Extract #{File.basename(RUBYSCRIPT2EXE_APPEXE)} to a single ruby script (without executing anything)") {}
   elsif(File.basename(__FILE__) != "damagecontrol")
     opts.on("--tar2rubyscript-justextract",
-            "Extract #{File.basename(__FILE__)} to the current directory (without executing anything)" {}
+            "Extract #{File.basename(__FILE__)} to the current directory (without executing anything)") {}
   end
 
   opts.on("--data-dir=dir", String,
@@ -59,39 +67,41 @@ ARGV.options do |opts|
   opts.on("-w", "--webrick",
           "Starts the webapp") { |DC_ENV[:webrick]| }
 
-######### START: This is copied from script/webrick
+######### START: This is copied from script/server
   opts.on("-p", "--port=port", Integer,
           "Runs Rails on the specified port.",
-          "Default: 3000") { |OPTIONS[:port]| }
+          "Default: 3000") { |DC_ENV[:port]| }
 
   opts.on("-b", "--binding=ip", String,
           "Binds Rails to the specified ip.",
-          "Default: 0.0.0.0") { |OPTIONS[:ip]| }
+          "Default: 0.0.0.0") { |DC_ENV[:ip]| }
 
   opts.on("-e", "--environment=name", String,
           "Specifies the environment to run this server under (test/development/production).",
-          "Default: development") { |OPTIONS[:environment]| }
+          "Default: development") { |DC_ENV[:environment]| environment_specified = true}
 
   opts.on("-m", "--mime-types=filename", String,
           "Specifies an Apache style mime.types configuration file to be used for mime types",
-          "Default: none") { |mime_types_file| OPTIONS[:mime_types] = WEBrick::HTTPUtils::load_mime_types(mime_types_file) }
+          "Default: none") { |mime_types_file| DC_ENV[:mime_types] = WEBrick::HTTPUtils::load_mime_types(mime_types_file) }
 
   opts.on("-d", "--daemon",
           "Make Rails run as a Daemon (only works if fork is available -- meaning on *nix)."
-          ) { OPTIONS[:server_type] = WEBrick::Daemon }
+          ) { DC_ENV[:server_type] = WEBrick::Daemon }
 
   opts.on("-c", "--charset=charset", String,
           "Set default charset for output.",
-          "Default: UTF-8") { |OPTIONS[:charset]| }
+          "Default: UTF-8") { |DC_ENV[:charset]| }
 
   opts.separator ""
 
   opts.on("-h", "--help",
           "Show this help message.") { puts opts; exit }
-######### END: This is copied from script/webrick
+######### END: This is copied from script/server
 
   opts.parse!
 end
+
+ARGV << "--environment=#{DC_ENV[:environment]}"
 
 puts "=> DamageControl parent process running [#{Process.pid}]"
 puts "=> DamageControl data directory: #{DC_ENV[:data_dir]}"

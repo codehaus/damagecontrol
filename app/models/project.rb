@@ -3,7 +3,6 @@
 require 'set'
 require 'rss/maker'
 require 'rss/parser'
-require 'damagecontrol'
 
 # A Project record contains information about a project to be continuously
 # built by DamageControl.
@@ -318,7 +317,7 @@ LIMIT #{options[:count]}
 private
 
   def set_defaults
-    @basedir = "#{DC_ENV[:data_dir]}/projects/#{id}"
+    @basedir = "#{DC_DATA_DIR}/projects/#{id}"
     FileUtils.mkdir_p @basedir unless File.exist?(@basedir)
     self.scm.checkout_dir = working_copy_dir if self.scm
     self.scm.enabled = true if self.scm

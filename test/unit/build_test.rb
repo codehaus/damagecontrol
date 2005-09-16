@@ -15,7 +15,7 @@ class BuildTest < Test::Unit::TestCase
   end
   
   def test_should_execute_in_project_build_dir
-    build_proof = "#{DC_ENV[:data_dir]}/projects/#{@project_1.id}/working_copy/build_here/built"
+    build_proof = "#{DC_DATA_DIR}/projects/#{@project_1.id}/working_copy/build_here/built"
     File.delete build_proof if File.exist?(build_proof)
     
     build = @revision_1.builds.create(:reason => Build::SCM_POLLED)
