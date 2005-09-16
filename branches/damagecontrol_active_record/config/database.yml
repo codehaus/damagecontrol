@@ -1,3 +1,7 @@
+<% 
+STDERR.puts "SHELL_DIR=#{SHELL_DIR}" 
+STDERR.puts "RAILS_ENV=#{RAILS_ENV}" 
+%>
 development:
   adapter: sqlite
   dbfile: <%= SHELL_DIR %>/db/development.db

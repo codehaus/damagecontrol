@@ -1,5 +1,6 @@
 require 'rscm'
 require 'meta_project'
+require 'damagecontrol/platform'
 require 'damagecontrol/dom'
 require 'damagecontrol/rscm_ext/base'
 require 'damagecontrol/publisher/base'
