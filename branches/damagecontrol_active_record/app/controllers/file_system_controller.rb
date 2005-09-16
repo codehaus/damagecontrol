@@ -4,7 +4,7 @@ class FileSystemController < ApplicationController
 
   def artifacts
     @path_array = @params[:path] || []
-    file = Pathname.new(Artifact::ROOT_DIR + '/' + @path_array.join('/'))
+    file = Pathname.new(Artifact::ARTIFACT_DIR + '/' + @path_array.join('/'))
     if(file.directory?)
       @dir = file
       render :action => "dir"

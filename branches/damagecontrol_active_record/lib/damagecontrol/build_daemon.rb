@@ -69,7 +69,7 @@ module DamageControl
           logger.info "Pending build found for project #{project.name}" if logger
           pending_build.execute!
         elsif(project.scm.uses_polling?)
-          logger.info "No pending builds found for project #{project.name}, polling SCM for new revisions" if logger
+          logger.info "No pending builds found for project #{project.name}, polling #{project.scm.visual_name} for new revisions" if logger
           latest_new_revision = @scm_poller.poll_and_persist_new_revisions(project)
           if(latest_new_revision)
             logger.info "Requesting/executing build for new revision in project #{project.name}" if logger
