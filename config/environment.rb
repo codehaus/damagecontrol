@@ -4,7 +4,7 @@ require File.join(File.dirname(__FILE__), 'boot')
 
 require 'optparse'
 DC_ENV = {
-  :data_dir => "#{Dir.pwd}/target/testing"
+  :data_dir => Dir.pwd
 }
 ARGV.options do |opts|
   opts.on("-a", "--data-dir=path", String,
