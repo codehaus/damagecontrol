@@ -21,7 +21,7 @@ module DamageControl
         # and will be made available as an <enclosure> in the RSS feed (Appcast).
         is_primary = true
         @files.each do |src_glob, dest_dir|
-          full_dest_dir = Artifact::ROOT_DIR + '/' + dest_dir
+          full_dest_dir = Artifact::ARTIFACT_DIR + '/' + dest_dir
           FileUtils.mkdir_p(full_dest_dir)
 
           full_src = build.revision.project.working_copy_dir + '/' + src_glob

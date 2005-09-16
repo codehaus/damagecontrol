@@ -5,6 +5,7 @@ class ArtifactTest < Test::Unit::TestCase
 
   def setup
     FileUtils.rm_rf(Artifact::ARTIFACT_DIR) if File.exist?(Artifact::ARTIFACT_DIR)
+    FileUtils.mkdir_p(Artifact::ARTIFACT_DIR)
   end
 
   def test_should_store_and_retrieve_real_file

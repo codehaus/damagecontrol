@@ -11,14 +11,14 @@ class FileSystemControllerTest < Test::Unit::TestCase
     @request    = ActionController::TestRequest.new
     @response   = ActionController::TestResponse.new
 
-    FileUtils.rm_rf(Artifact::ROOT_DIR) if File.exist?(Artifact::ROOT_DIR)
+    FileUtils.rm_rf(Artifact::ARTIFACT_DIR) if File.exist?(Artifact::ARTIFACT_DIR)
   end
 
   def test_should_drill_down_in_directories
-    FileUtils.mkdir_p(Artifact::ROOT_DIR + "/gems")
-    FileUtils.mkdir_p(Artifact::ROOT_DIR + "/java/picocontainer/jars")
-    FileUtils.mkdir_p(Artifact::ROOT_DIR + "/java/nanocontainer/jars")
-    File.open(Artifact::ROOT_DIR + "/java/nanocontainer/jars/Hey.java", "w") do |io|
+    FileUtils.mkdir_p(Artifact::ARTIFACT_DIR + "/gems")
+    FileUtils.mkdir_p(Artifact::ARTIFACT_DIR + "/java/picocontainer/jars")
+    FileUtils.mkdir_p(Artifact::ARTIFACT_DIR + "/java/nanocontainer/jars")
+    File.open(Artifact::ARTIFACT_DIR + "/java/nanocontainer/jars/Hey.java", "w") do |io|
       io.puts "public class Hey {}"
     end
     
