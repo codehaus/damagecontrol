@@ -1,17 +1,7 @@
 #!/usr/local/bin/ruby
 
-require 'optparse'
-BUILDER_OPTIONS = {
-  :environment     => "development"
-}
-
-ARGV.options do |opts|
-  opts.on("-e", "--environment=name", String,
-          "Specifies the environment to run this server under (test/development/production).",
-          "Default: development") { |BUILDER_OPTIONS[:environment]| }
-end
-
-ENV["RAILS_ENV"] = BUILDER_OPTIONS[:environment]
+raise "This script must be run via script/damagecontrol" unless defined? DC_ENV
+ENV["RAILS_ENV"] = DC_ENV[:environment]
 require File.dirname(__FILE__) + "/../config/environment"
 
 # set up logging
