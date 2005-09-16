@@ -10,6 +10,9 @@
 # * SQlite and other binaries used by DamageControl
 # * A preconfigured SQLite database schema (TODO: make sure it's production and clean and support migrate)
 #
+# A SHELL_DIR variable is defined in script/damagecontrol. This is necessary in order for the packaged
+# executable to figure out in what directory the app was started from. It is used to compute the data directory.
+#
 # The standalone executable can run both builder daemons and optionally serve the web
 # interface via its embedded webserver (WEBrick).
 #
@@ -38,7 +41,8 @@ PKG_FILES = FileList[
   'bin/**/*',
   'components/**/*',
   'config/**/*',
-  'db/**/*',
+  'db/production.db',
+  'db/migrate/*',
   'doc/**/*',
   'lib/**/*',
   'log/**/*',
@@ -54,7 +58,11 @@ PKG_FILES = FileList[
 
 DIST_DIR = "dist/#{PKG_FILE_NAME}"
 
-task :copy_dist do
+task :verify_production_environment do
+  raise "Build with RAILS_ENV=production to ensure procuction.db is migrated first!" unless RAILS_ENV == "production"
+end
+
+task :copy_dist => [:verify_production_environment, :migrate] do
   FileUtils.rm_rf("dist") if File.exist?("dist")
   FileUtils.mkdir_p(DIST_DIR)
 

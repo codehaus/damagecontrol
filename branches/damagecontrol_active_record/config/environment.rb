@@ -2,19 +2,15 @@
 # Bootstrap the Rails environment, frameworks, and default configuration
 require File.join(File.dirname(__FILE__), 'boot')
 
-require 'optparse'
-DC_ENV = {
-  :data_dir => Dir.pwd
-}
-ARGV.options do |opts|
-  opts.on("-a", "--data-dir=path", String,
-      "Number of build daemons to start",
-      "Default: #{DC_ENV[:data_dir]}") { |DC_ENV[:data_dir]| }
-end
-
 Rails::Initializer.run do |config|
   # See Rails::Configuration for options
-  config.database_configuration_file = "#{DC_ENV[:data_dir]}/config/database.yml"
+  
+  # SHELL_DIR is used in config/database.yml
+  SHELL_DIR = File.expand_path(Dir.pwd) unless defined? SHELL_DIR
+  if defined? DC_ENV
+    raise "DC_ENV was defined, but had no :database_yml key" unless DC_ENV[:database_yml]
+    config.database_configuration_file = DC_ENV[:database_yml] 
+  end
 end
 
 # Include your application configuration below

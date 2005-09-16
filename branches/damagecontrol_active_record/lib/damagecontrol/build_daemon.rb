@@ -10,10 +10,15 @@ module DamageControl
     end
     
     def run
-      puts "=> DamageControl builder started"
-      loop do
-        handle_all_projects_once
-        sleep CYCLE_PAUSE
+      begin
+        puts "=> DamageControl builder started"
+        loop do
+          handle_all_projects_once
+          sleep CYCLE_PAUSE
+        end
+      rescue SignalException => e
+        puts "=> DamageControl builder shutting down"
+        exit!(1)
       end
     end
 
@@ -52,6 +57,8 @@ module DamageControl
           handle_project(project) 
         rescue ActiveRecord::RecordNotFound => e
           logger.error "Couldn't handle project #{project.name}. It looks like it was recently deleted" if logger
+        rescue SignalException => e
+          raise e
         rescue Exception => e
           if(logger)
             logger.error "Couldn't handle project #{project.name}. Unexpected error: #{e.message}"

@@ -1,16 +1,23 @@
 #!/usr/local/bin/ruby
 
+# This is the main bootstrapping script for DamageControl.
+
 # Require the files from ruby's stdlib that will be needed by damagecontrol,
 # then exit if we're in rubyscript2exe packaging mode
 # (gems need not be required here, they're packaged separately by lib/dist.rake)
 require 'optparse'
 require 'webrick'
 require 'logger'
+require 'fileutils'
 
-# default options
-MAIN_OPTIONS = {
-  :webrick => false,
-  :builders => 1
+# default environment
+SHELL_DIR = defined?(RUBYSCRIPT2EXE_APPEXE) ? File.expand_path(File.dirname(RUBYSCRIPT2EXE_APPEXE)) : File.expand_path(Dir.pwd)
+DC_ENV = {
+  :environment     => defined?(RUBYSCRIPT2EXE_APPEXE) ? "production" : "development",
+  :data_dir        => SHELL_DIR,
+  :database_yml    => "#{SHELL_DIR}/config/database.yml",
+  :webrick         => false,
+  :builders        => 1
 }
 
 # TODO: replicate all the options from server and builder here!
@@ -18,16 +25,28 @@ ARGV.options do |opts|
   script_name = File.basename($0)
   
   opts.set_summary_indent('  ')
-  opts.banner =    "Usage: ruby #{script_name} [OPTIONS]"
+  cmd = defined?(RUBYSCRIPT2EXE_APPEXE) ? File.basename(RUBYSCRIPT2EXE_APPEXE) : "ruby #{File.basename(__FILE__)}"
+  opts.banner =    "Usage: #{cmd} [options]"
   opts.define_head "Starts DamageControl"
   opts.separator   ""
 
-  opts.on("-w", "--webrick",
-       "Starts the webapp") { |MAIN_OPTIONS[:webrick]| }
-  opts.on("-u", "--build-daemons=n", Integer,
-      "Number of build daemons to start",
-      "Default: #{MAIN_OPTIONS[:builders]}") { |MAIN_OPTIONS[:builders]| }
-  opts.on("-r", "--dry-run", "Dry run. Loads the environment and exits.") do
+  if(defined?(RUBYSCRIPT2EXE_APPEXE))
+    opts.on("--eee-justextract",
+            "Extract #{File.basename(RUBYSCRIPT2EXE_APPEXE)} to a single ruby script (without executing anything)") {}
+  elsif(File.basename(__FILE__) != "damagecontrol")
+    opts.on("--tar2rubyscript-justextract",
+            "Extract #{File.basename(__FILE__)} to the current directory (without executing anything)" {}
+  end
+
+  opts.on("--data-dir=dir", String,
+          "Number of build daemons to start",
+          "Default: current dir = #{DC_ENV[:data_dir]}") { |dir| DC_ENV[:data_dir] = "#{SHELL_DIR}/#{dir}" }
+
+  opts.on("--build-daemons=n", Integer,
+          "Number of build daemons to start",
+          "Default: #{DC_ENV[:builders]}") { |DC_ENV[:builders]| }
+
+  opts.on("--dry-run", "Dry run. Loads the environment and exits.") do
     puts "I'm running dry..."
     ENV["RAILS_ENV"] = "production"
     require File.dirname(__FILE__) + "/../config/environment"
@@ -36,9 +55,61 @@ ARGV.options do |opts|
   end
 
   opts.separator ""
-  opts.on_tail("-h", "--help", "Show this help message.") { puts o; exit }
-  
+
+  opts.on("-w", "--webrick",
+          "Starts the webapp") { |DC_ENV[:webrick]| }
+
+######### START: This is copied from script/webrick
+  opts.on("-p", "--port=port", Integer,
+          "Runs Rails on the specified port.",
+          "Default: 3000") { |OPTIONS[:port]| }
+
+  opts.on("-b", "--binding=ip", String,
+          "Binds Rails to the specified ip.",
+          "Default: 0.0.0.0") { |OPTIONS[:ip]| }
+
+  opts.on("-e", "--environment=name", String,
+          "Specifies the environment to run this server under (test/development/production).",
+          "Default: development") { |OPTIONS[:environment]| }
+
+  opts.on("-m", "--mime-types=filename", String,
+          "Specifies an Apache style mime.types configuration file to be used for mime types",
+          "Default: none") { |mime_types_file| OPTIONS[:mime_types] = WEBrick::HTTPUtils::load_mime_types(mime_types_file) }
+
+  opts.on("-d", "--daemon",
+          "Make Rails run as a Daemon (only works if fork is available -- meaning on *nix)."
+          ) { OPTIONS[:server_type] = WEBrick::Daemon }
+
+  opts.on("-c", "--charset=charset", String,
+          "Set default charset for output.",
+          "Default: UTF-8") { |OPTIONS[:charset]| }
+
+  opts.separator ""
+
+  opts.on("-h", "--help",
+          "Show this help message.") { puts opts; exit }
+######### END: This is copied from script/webrick
+
   opts.parse!
+end
+
+puts "=> DamageControl parent process running [#{Process.pid}]"
+puts "=> DamageControl data directory: #{DC_ENV[:data_dir]}"
+DC_ENV[:database_yml] = "#{DC_ENV[:data_dir]}/config/database.yml"
+unless(File.exist?(DC_ENV[:database_yml]))
+  puts "=> DamageControl database settings not found in #{DC_ENV[:database_yml]}"
+  puts "=> DamageControl is creating default database settings for SQLite"
+  FileUtils.mkdir_p(File.dirname(DC_ENV[:database_yml])) unless File.exist?(File.dirname(DC_ENV[:database_yml]))
+
+  original_db_yaml = File.dirname(__FILE__) + '/../config/database.yml'
+  FileUtils.cp(original_db_yaml, DC_ENV[:database_yml])
+  
+  dest_sqlite_db = "#{DC_ENV[:data_dir]}/db/production.db"
+  unless(File.exist?(dest_sqlite_db))
+    FileUtils.mkdir_p(File.dirname(dest_sqlite_db)) unless File.exist?(File.dirname(dest_sqlite_db))    
+    original_sqlite_db  = File.dirname(__FILE__) + '/../db/production.db'
+    FileUtils.cp(original_sqlite_db, dest_sqlite_db)
+  end
 end
 
 def start_webrick
@@ -47,39 +118,34 @@ def start_webrick
   end
   at_exit do 
     puts "Killing WEBrick [#{server_pid}]"
-    #Process.kill("HUP", server_pid)
+    Process.kill("HUP", server_pid)
   end
   Process.wait(server_pid)
 end
 
 def start_builder
   builder_pid = fork do
-    begin
-      load(File.dirname(__FILE__) + '/builder')
-    rescue
-      exit
-    end
+    load(File.dirname(__FILE__) + '/builder')
   end
   at_exit do 
     puts "Killing Builder [#{builder_pid}]"
-    #Process.kill("HUP", builder_pid)
+    Process.kill("HUP", builder_pid)
   end
   Process.wait(builder_pid)
 end
 
 threads = []
 
-if(MAIN_OPTIONS[:webrick])
+if(DC_ENV[:webrick])
   threads << Thread.new do
     start_webrick
   end
 end
 
-(1..MAIN_OPTIONS[:builders]).each do |i|
+(1..DC_ENV[:builders]).each do |i|
   threads << Thread.new do
     start_builder
   end
 end
 
-puts "=> DamageControl parent process running [#{Process.pid}]"
 threads.each{|t| t.join}

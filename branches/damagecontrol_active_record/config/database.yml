@@ -1,12 +1,11 @@
 development:
   adapter: sqlite
-  dbfile: db/rails-development.db
-  schema: db/schema.sql
+  dbfile: <%= SHELL_DIR %>/db/development.db
 
 test:
   adapter: sqlite
-  dbfile: db/rails-test.db
+  dbfile: <%= SHELL_DIR %>/db/test.db
 
 production:
   adapter: sqlite
-  dbfile: db/rails-production.db
+  dbfile: <%= SHELL_DIR %>/db/production.db
