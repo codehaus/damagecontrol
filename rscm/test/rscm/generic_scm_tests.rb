@@ -9,7 +9,9 @@ module RSCM
     include FileUtils
 
     def teardown
-      @scm.destroy_central if @scm
+      if @scm
+#        @scm.destroy_central
+      end
     end
 
     #  Acceptance test for scm implementations 
@@ -169,7 +171,7 @@ module RSCM
       @scm = scm
       
       # Verify that install/uninstall works
-      touch = WINDOWS ? PathConverter.filepath_to_nativepath(File.dirname(__FILE__) + "../../bin/touch.exe", false) : "touch"
+      touch = WINDOWS ? PathConverter.filepath_to_nativepath(File.dirname(__FILE__) + "../../../bin/touch.exe", false) : "touch"
       trigger_command = "#{touch} " + PathConverter.filepath_to_nativepath(trigger_proof, false)
       trigger_files_checkout_dir = File.expand_path("#{checkout_dir}/../trigger")
       (1..3).each do |i|

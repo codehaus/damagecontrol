@@ -1,5 +1,12 @@
 = RSCM Changelog
 
+== Version 0.3.4
+
+This release fixes some bugs on windows.
+
+* Removed redirection to dev/null for CVS commands. 2>nul didn't seem to work on windows.
+* Fixed a the path to touch.exe
+
 == Version 0.3.3
 
 This release makes some test utilities more reusable.
