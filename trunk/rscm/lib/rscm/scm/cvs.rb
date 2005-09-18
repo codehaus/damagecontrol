@@ -299,8 +299,8 @@ module RSCM
   
     def command_line(cmd, password=nil, simulate=false)
       cvs_options = simulate ? "-n" : ""
-      dev_null = WIN32 ? "nul" : "/dev/null"
-      "cvs -f \"-d#{root_with_password(password)}\" #{cvs_options} -q #{cmd} 2> #{dev_null}"
+      dev_null_redirection = WIN32 ? "" : "2> /dev/null"
+      "cvs -f \"-d#{root_with_password(password)}\" #{cvs_options} -q #{cmd} #{dev_null_redirection}"
     end
 
     def create_root_cvs(checkout_dir)
