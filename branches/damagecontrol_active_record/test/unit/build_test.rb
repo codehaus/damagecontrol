@@ -50,10 +50,10 @@ class BuildTest < Test::Unit::TestCase
     @project_1.build_command = "w_t_f"
     @project_1.save
     build = @revision_1.builds.create(:reason => Build::SCM_POLLED)
-    assert_equal(127, build.execute!)
+    assert_not_equal(0, build.execute!)
     assert_equal(Build::RepeatedlyBroken, build.state.class)
     assert_equal("", build.stdout)
-    assert_equal("sh: line 1: w_t_f: command not found\n", build.stderr)
+    assert_match(/w_t_f/, build.stderr)
   end
 
   def test_should_return_one_when_executing_nonexistant_svn_command
