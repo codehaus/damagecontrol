@@ -1,6 +1,8 @@
 module DamageControl
   module Publisher
     class Sound < Base
+      include Platform
+
       register self
       
       attr_accessor :executing_sound, :successful_sound, :fixed_sound, :broken_sound, :repeatedly_broken_sound
@@ -16,7 +18,7 @@ module DamageControl
       def publish(build)
         track = sound_track(build)
         # Load platform-specific mediaplayer
-        require File.expand_path(File.dirname(__FILE__) + "/sound/" + RUBY_PLATFORM + "/media_player")
+        require File.expand_path(File.dirname(__FILE__) + "/sound/" + family + "/media_player")
         MediaPlayer.new.play(track)
       end
       

@@ -83,7 +83,8 @@ GEMS = [
   "RedCloth",
   "rscm",
   "ruby-growl",
-  "meta_project"
+  "meta_project",
+  "sqlite-ruby"
 ]
 
 # Although rubyscript2exe can automatically package gems, we prefer to do it
