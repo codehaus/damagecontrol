@@ -1,6 +1,8 @@
 require File.dirname(__FILE__) + '/../test_helper'
 
 class BuildTest < Test::Unit::TestCase
+  include DamageControl::Platform
+
   fixtures :builds, :revisions, :projects, :artifacts
 
   def test_should_create
@@ -26,20 +28,18 @@ class BuildTest < Test::Unit::TestCase
   end
 
   def test_should_persist_build_info
-    @project_1.build_command = "echo hello $DAMAGECONTROL_BUILD_LABEL"
+    @project_1.build_command = "echo hello #{env_var('DAMAGECONTROL_BUILD_LABEL')}"
     @project_1.save
     build = @revision_1.builds.create(:reason => Build::SCM_POLLED)
     t = Time.now.utc
     assert_equal(0, build.execute!(t))
     build.reload
     
-    assert_equal("echo hello $DAMAGECONTROL_BUILD_LABEL", build.command)
-    assert_equal("hello xyz\n", build.stdout)
+    assert_equal("echo hello #{env_var('DAMAGECONTROL_BUILD_LABEL')}", build.command)
+    assert_match(/hello xyz/, build.stdout)
     assert_equal("", build.stderr)
     assert_equal(0, build.exitstatus)
     assert_equal(Build::Fixed, build.state.class)
-    assert(build.pid)
-    assert(0 < build.pid)
     assert_equal(Time, build.begin_time.class)
     assert(build.begin_time.utc?)
     assert_equal(t.to_s, build.begin_time.to_s)
@@ -63,7 +63,7 @@ class BuildTest < Test::Unit::TestCase
     assert_equal(1, build.execute!)
     assert_equal(Build::RepeatedlyBroken, build.state.class)
     assert_equal("", build.stdout)
-    assert_equal("Unknown command: 'wtf'\nType 'svn help' for usage.\n", build.stderr)
+    assert_match(/[Uu]nknown command: 'wtf'\nType 'svn help' for usage.\n/, build.stderr)
   end
   
   def test_should_not_have_status_after_create
@@ -152,5 +152,11 @@ class BuildTest < Test::Unit::TestCase
   def test_should_estimate_duration
     b = @revision_3.builds.create
     assert_equal(120, b.estimated_duration)
+  end
+
+private
+  
+  def env_var(var)
+    family == "win32" ? "%#{var}%" : "$#{var}"
   end
 end

@@ -134,27 +134,23 @@ class Build < ActiveRecord::Base
     save
     project.build_executing(self)
     
-    # Do all the hard work in a sub process. Dir.chdir is global in ruby.
-    pid = fork do
-      # Make sure the working copy is in sync
-      revision.sync_working_copy
-      
-      env.each{|k,v| ENV[k]=v}
-      Dir.chdir(revision.project.build_dir) do
-        begin
-          redirected_cmd = "#{command} > #{revision.project.stdout_file} 2> #{revision.project.stderr_file}"
-          logger.info "Executing build for #{revision.project.name}'s revision #{revision.identifier}" if logger
-          exec redirected_cmd
-        rescue Errno::ENOENT => e
-          File.open(stderr_file.path) {|io| self.stderr = e.message}
-          exit! 1
-        end
+    # Make sure the working copy is in sync
+    revision.sync_working_copy
+
+    env.each{|k,v| ENV[k]=v}
+    Dir.chdir(revision.project.build_dir) do
+      begin
+        redirected_cmd = "#{command} > #{revision.project.stdout_file} 2> #{revision.project.stderr_file}"
+        logger.info "Executing build for #{revision.project.name}'s revision #{revision.identifier}" if logger
+        `#{redirected_cmd}`
+      rescue Errno::ENOENT => e
+        File.open(stderr_file.path) {|io| self.stderr = e.message}
+        exit! 1
       end
     end
     
     # Wait for the subprocess to complete and publish the result
-    self.pid, status = Process.waitpid2(pid)
-    self.exitstatus = status.exitstatus
+    self.exitstatus = $?.exitstatus
     self.end_time = Time.now.utc
     determine_state
     File.open(revision.project.stdout_file) do |io| 
