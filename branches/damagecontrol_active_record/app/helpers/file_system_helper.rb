@@ -3,10 +3,11 @@ module FileSystemHelper
 
   def file_icon(file_name)
     icon_path = nil
+STDERR.puts(file_name)
     if(File.directory?(file_name))
-      icon_path = '/images/filetypes/dir.gif'
+      icon_path = "/images/filetypes/dir.gif"
     else
-      icon_path = '/images/filetypes/#{File.extname(file_name)}.gif'
+      icon_path = "/images/filetypes/#{File.extname(file_name)}.gif"
     end
     File.exist?(RAILS_ROOT + '/public' + icon_path) ? icon_path : DEFAULT_ICON_PATH
   end
