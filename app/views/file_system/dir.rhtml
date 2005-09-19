@@ -1,11 +1,11 @@
 <div class="file_system">
-<% @dir.children.each do |child| %>
+<% Dir.foreach(@dir) do |child| next if child == '.' || child == '..' %>
   <div>
     <%= link_to(
-      image_tag(child.icon, :size => "16x16", :border => 0) + child.basename, 
+      image_tag(file_icon(child), :size => "16x16", :border => 0) + File.basename(child), 
       :controller => "file_system", 
       :action => "artifacts", 
-      :params => {:path => @path_array.dup << child.basename}
+      :params => {:path => @path_array.dup << File.basename(child)}
     ) %>
   </div>
 <% end %>

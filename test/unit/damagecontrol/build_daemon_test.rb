@@ -3,6 +3,7 @@ require 'stringio'
 
 module DamageControl  
   class BuildDaemonTest < Test::Unit::TestCase
+    include Platform
 
     def setup
       Project.delete_all
@@ -47,12 +48,13 @@ module DamageControl
       archiver.enabling_states = [Build::Successful.new]
       
       scm = RSCM::Subversion.new
-      scm.url = "file://#{central_repo}"
+      scm.url = RSCM::PathConverter.filepath_to_nativeurl(central_repo)
+      copy_command = family == "win32" ? "copy" : "cp"
       project = Project.create(
         :name => "Test", 
         :scm => scm, 
         :publishers => [archiver], 
-        :build_command => 'cp input.txt result.txt'
+        :build_command => "#{copy_command} input.txt result.txt"
       )
       project.reload
       assert_equal(::DamageControl::Publisher::ArtifactArchiver, project.publishers[0].class)
