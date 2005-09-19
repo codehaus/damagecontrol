@@ -77,8 +77,14 @@ module RSCM
 
   public
   
-    attr_accessor :checkout_dir
+    def checkout_dir=(dir)
+      @checkout_dir = PathConverter.filepath_to_nativepath(dir, false)
+    end
   
+    def checkout_dir
+      @checkout_dir
+    end
+
     def to_yaml_properties
       props = instance_variables
       props.delete("@checkout_dir")

@@ -83,14 +83,6 @@ module RSCM
       checked_out_files
     end
 
-    def checkout_commandline
-      "svn checkout #{revision_option(nil)}"
-    end
-
-    def update_commandline
-      "svn update #{url} #{checkout_dir}"
-    end
-
     def uptodate?(identifier)
       if(!checked_out?)
         false
@@ -300,8 +292,9 @@ module RSCM
     end
     
     def checkout_command(to_identifier)
-      checkout_dir = "\"#{checkout_dir}\""
-      "checkout #{login_options} #{url} #{checkout_dir} #{revision_option(nil,to_identifier)}"
+      cd = "\"#{checkout_dir}\""
+      raise "checkout_dir not set" if cd == ""
+      "checkout #{login_options} #{url} #{cd} #{revision_option(nil,to_identifier)}"
     end
 
     def update_command(to_identifier)

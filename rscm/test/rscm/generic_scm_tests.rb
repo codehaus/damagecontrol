@@ -10,7 +10,8 @@ module RSCM
 
     def teardown
       if @scm
-#        @scm.destroy_central
+        # Fails on windows with TortoiseCVS' cvs because of resident cvslock.exe
+        @scm.destroy_central
       end
     end
 
