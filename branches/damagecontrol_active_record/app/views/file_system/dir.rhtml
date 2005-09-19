@@ -4,7 +4,7 @@
     <%= link_to(
       image_tag(file_icon(child), :size => "16x16", :border => 0) + File.basename(child), 
       :controller => "file_system", 
-      :action => "artifacts", 
+      :action => "browse", 
       :params => {:path => @path_array.dup << File.basename(child)}
     ) %>
   </div>
