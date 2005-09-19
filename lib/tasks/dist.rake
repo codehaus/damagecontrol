@@ -84,6 +84,7 @@ GEMS = [
   "rscm",
   "ruby-growl",
   "meta_project",
+  "mime-types",
   "sqlite-ruby"
 ]
 

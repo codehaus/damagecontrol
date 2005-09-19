@@ -22,26 +22,26 @@ class FileSystemControllerTest < Test::Unit::TestCase
       io.puts "public class Hey {}"
     end
     
-    get :artifacts, :path => nil
+    get :browse, :path => nil
     assert_tag :tag => "a", :attributes => {:href => "/artifacts/gems"}
     assert_tag :tag => "a", :attributes => {:href => "/artifacts/java"}
 
-    get :artifacts, :path => ["java"]
+    get :browse, :path => ["java"]
     assert_tag :tag => "a", :attributes => {:href => "/artifacts/java/picocontainer"}
     assert_tag :tag => "a", :attributes => {:href => "/artifacts/java/nanocontainer"}
 
-    get :artifacts, :path => ["java", "nanocontainer", "jars"]
+    get :browse, :path => ["java", "nanocontainer", "jars"]
     assert_tag :tag => "a", :attributes => {:href => "/artifacts/java/nanocontainer/jars/Hey.java"}
     
-    get :artifacts, :path => ["java", "nanocontainer", "jars", "Hey.java"]
+    get :browse, :path => ["java", "nanocontainer", "jars", "Hey.java"]
     #assert_equal "public class Hey {}", @response.body
   end
 
   def test_should_map_paths
     assert_routing("artifacts", 
-      {:controller => "file_system", :action => "artifacts", :path => []})
+      {:controller => "file_system", :action => "browse", :path => []})
 
     assert_routing("artifacts/check/your/head", 
-      {:controller => "file_system", :action => "artifacts", :path => ["check", "your", "head"]})
+      {:controller => "file_system", :action => "browse", :path => ["check", "your", "head"]})
   end
 end
