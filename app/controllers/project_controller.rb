@@ -1,5 +1,6 @@
 class ProjectController < ApplicationController
   include MetaProject::ProjectAnalyzer
+  include DamageControl::Platform
 
   layout "application", :except => :list
   before_filter :define_feeds
@@ -44,14 +45,16 @@ class ProjectController < ApplicationController
     )
 
     # Set up some default publishers
-    if(RUBY_PLATFORM =~ /powerpc-darwin/)
-      # These only work on OS X
-      project.add_sound
+    if(family == 'powerpc-darwin')
       project.add_growl
+    end
+    if(family == 'powerpc-darwin' || family == 'win32')
+      project.add_sound
     end
 
     project.save
     flash["notice"] = "Successfully imported settings for #{project.name}."
+    flash["notice"] << "<br/>I guessed that the build command is '#{project.build_command}'. Correct me if I'm wrong." if project.build_command
     redirect_to :action => "edit", :id => project.id
   end
 

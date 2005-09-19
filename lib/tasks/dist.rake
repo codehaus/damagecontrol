@@ -99,9 +99,10 @@ task :copy_exploded_gems => [:copy_dist] do
   FileUtils.rm_rf(gems_dir) if File.exist?(gems_dir)
   FileUtils.mkdir_p(gems_dir)
 
+  gem_exe = (RUBY_PLATFORM =~ /mswin32/) ? "gem.cmd" : "gem"
   Dir.chdir gems_dir do
     GEMS.each do |gem|
-      sh "gem unpack #{gem}"
+      `#{gem_exe} unpack #{gem}`
     end
   end
 

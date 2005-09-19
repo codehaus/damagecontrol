@@ -1,7 +1,13 @@
 #!/usr/local/bin/ruby
 
-raise "This script must be run via script/damagecontrol" unless defined? DC_ENV
-ENV["RAILS_ENV"] = DC_ENV[:environment]
+require 'optparse'
+
+ENV["RAILS_ENV"] = "development"
+ARGV.options do |opts|
+  opts.on("-e", "--environment=name", String,
+          "Specifies the environment to run this server under (test/development/production).",
+          "Default: development") { |e| ENV["RAILS_ENV"]=e}
+end
 require File.dirname(__FILE__) + "/../config/environment"
 
 # set up logging

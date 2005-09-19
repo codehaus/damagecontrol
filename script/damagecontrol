@@ -13,22 +13,12 @@ require 'fileutils'
 # default environment
 SHELL_DIR = defined?(RUBYSCRIPT2EXE_APPEXE) ? File.expand_path(File.dirname(RUBYSCRIPT2EXE_APPEXE)) : File.expand_path(Dir.pwd)
 DC_ENV = {
-  :environment     => defined?(RUBYSCRIPT2EXE_APPEXE) ? "production" : "development",
   :data_dir        => SHELL_DIR,
   :database_yml    => "#{SHELL_DIR}/config/database.yml",
   :builders        => 1,
-  :webrick         => false,
-  ######### START: This is copied from script/server
-  :port            => 3000,
-  :ip              => "0.0.0.0",
-  :server_root     => File.expand_path(File.dirname(__FILE__) + "/../public/"),
-  :server_type     => WEBrick::SimpleServer,
-  :charset         => "UTF-8",
-  :mime_types      => WEBrick::HTTPUtils::DefaultMimeTypes
-  ######### END: This is copied from script/server
+  :webrick         => false
 }
 
-environment_specified = false
 ARGV.options do |opts|
   script_name = File.basename($0)
   
@@ -41,7 +31,7 @@ ARGV.options do |opts|
   if(defined?(RUBYSCRIPT2EXE_APPEXE))
     opts.on("--eee-justextract",
             "Extract #{File.basename(RUBYSCRIPT2EXE_APPEXE)} to a single ruby script (without executing anything)") {}
-  elsif(File.basename(__FILE__) != "damagecontrol")
+  else
     opts.on("--tar2rubyscript-justextract",
             "Extract #{File.basename(__FILE__)} to the current directory (without executing anything)") {}
   end
@@ -65,43 +55,12 @@ ARGV.options do |opts|
   opts.separator ""
 
   opts.on("-w", "--webrick",
-          "Starts the webapp") { |DC_ENV[:webrick]| }
-
-######### START: This is copied from script/server
-  opts.on("-p", "--port=port", Integer,
-          "Runs Rails on the specified port.",
-          "Default: 3000") { |DC_ENV[:port]| }
-
-  opts.on("-b", "--binding=ip", String,
-          "Binds Rails to the specified ip.",
-          "Default: 0.0.0.0") { |DC_ENV[:ip]| }
-
-  opts.on("-e", "--environment=name", String,
-          "Specifies the environment to run this server under (test/development/production).",
-          "Default: development") { |DC_ENV[:environment]| environment_specified = true}
-
-  opts.on("-m", "--mime-types=filename", String,
-          "Specifies an Apache style mime.types configuration file to be used for mime types",
-          "Default: none") { |mime_types_file| DC_ENV[:mime_types] = WEBrick::HTTPUtils::load_mime_types(mime_types_file) }
-
-  opts.on("-d", "--daemon",
-          "Make Rails run as a Daemon (only works if fork is available -- meaning on *nix)."
-          ) { DC_ENV[:server_type] = WEBrick::Daemon }
-
-  opts.on("-c", "--charset=charset", String,
-          "Set default charset for output.",
-          "Default: UTF-8") { |DC_ENV[:charset]| }
-
-  opts.separator ""
-
-  opts.on("-h", "--help",
-          "Show this help message.") { puts opts; exit }
-######### END: This is copied from script/server
+          "Starts the webapp")
 
   opts.parse!
 end
 
-ARGV << "--environment=#{DC_ENV[:environment]}"
+ARGV << "--environment=#{defined?(RUBYSCRIPT2EXE_APPEXE) ? 'production' : 'development'}"
 
 puts "=> DamageControl parent process running [#{Process.pid}]"
 puts "=> DamageControl data directory: #{DC_ENV[:data_dir]}"
@@ -122,26 +81,38 @@ unless(File.exist?(DC_ENV[:database_yml]))
   end
 end
 
-def start_webrick
-  server_pid = fork do
-    load(File.dirname(__FILE__) + '/server')
+if(RUBY_PLATFORM =~ /mswin32/)
+  def start_webrick
+    program = File.dirname(__FILE__) + '/server'
+    `ruby #{program} #{ARGV.join(" ")}`
   end
-  at_exit do 
-    puts "Killing WEBrick [#{server_pid}]"
-    Process.kill("HUP", server_pid)
-  end
-  Process.wait(server_pid)
-end
 
-def start_builder
-  builder_pid = fork do
-    load(File.dirname(__FILE__) + '/builder')
+  def start_builder
+    program = File.dirname(__FILE__) + '/builder'
+    `ruby #{program} #{ARGV.join(" ")}`
   end
-  at_exit do 
-    puts "Killing Builder [#{builder_pid}]"
-    Process.kill("HUP", builder_pid)
+else
+  def start_webrick
+    server_pid = fork do
+      load(File.dirname(__FILE__) + '/server')
+    end
+    at_exit do 
+      puts "Killing WEBrick [#{server_pid}]"
+      Process.kill("HUP", server_pid)
+    end
+    Process.wait(server_pid)
   end
-  Process.wait(builder_pid)
+
+  def start_builder
+    builder_pid = fork do
+      load(File.dirname(__FILE__) + '/builder')
+    end
+    at_exit do 
+      puts "Killing Builder [#{builder_pid}]"
+      Process.kill("HUP", builder_pid)
+    end
+    Process.wait(builder_pid)
+  end
 end
 
 threads = []
