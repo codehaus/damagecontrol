@@ -41,7 +41,7 @@
   </tr>
   <tr>
     <td>Artifacts:</td>
-    <td><%= @build.artifacts.collect{ |artifact| artifact_link(artifact) }.join("<br>\n") %></td>
+    <td><%= @build.artifacts.collect{ |artifact| file_system_link(artifact) }.join("<br>\n") %></td>
   </tr>
 </table>
 
