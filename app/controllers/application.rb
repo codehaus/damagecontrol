@@ -14,7 +14,8 @@ class ApplicationController < ActionController::Base
   ]
   PROJECT_SETTING_TIPS = [
 #    "triggering",
-    "importing"
+    "importing",
+    "build_env_vars"
   ]
   TIPS = {
     :project_settings => PROJECT_SETTING_TIPS,
