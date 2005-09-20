@@ -61,8 +61,8 @@ ARGV.options do |opts|
   opts.parse!
 end
 
-# ARGV << "--environment=#{defined?(RUBYSCRIPT2EXE_APPEXE) ? 'production' : 'development'}"
-ARGV << "--environment=production"
+ARGV << "--environment=#{defined?(RUBYSCRIPT2EXE_APPEXE) ? 'production' : 'development'}"
+#ARGV << "--environment=production"
 
 puts "=> DamageControl parent process running [#{Process.pid}]"
 puts "=> DamageControl data directory: #{DC_ENV[:data_dir]}"
