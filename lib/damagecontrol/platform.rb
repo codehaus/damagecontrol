@@ -16,8 +16,3 @@ end
 
 # Add binaries to path
 ENV['PATH'] = File.expand_path(File.dirname(__FILE__) + "/../../bin/#{DamageControl::Platform.family}") + File::PATH_SEPARATOR + ENV['PATH']
-
-# Make sure forl works
-if(DamageControl::Platform.family == "win32")
-  require 'win32/process'
-end
