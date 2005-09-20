@@ -16,7 +16,7 @@ DC_ENV = {
   :data_dir        => SHELL_DIR,
   :database_yml    => "#{SHELL_DIR}/config/database.yml",
   :builders        => 1,
-  :webrick         => false
+  :nowebrick       => false
 }
 
 ARGV.options do |opts|
@@ -54,13 +54,15 @@ ARGV.options do |opts|
 
   opts.separator ""
 
-  opts.on("-w", "--webrick",
-          "Starts the webapp")
+  opts.on("-w", "--nowebrick",
+          "Don't start the webapp",
+          "Default: #{DC_ENV[:nowebrick]}") { |DC_ENV[:nowebrick]| }
 
   opts.parse!
 end
 
-ARGV << "--environment=#{defined?(RUBYSCRIPT2EXE_APPEXE) ? 'production' : 'development'}"
+# ARGV << "--environment=#{defined?(RUBYSCRIPT2EXE_APPEXE) ? 'production' : 'development'}"
+ARGV << "--environment=production"
 
 puts "=> DamageControl parent process running [#{Process.pid}]"
 puts "=> DamageControl data directory: #{DC_ENV[:data_dir]}"
@@ -84,12 +86,14 @@ end
 if(RUBY_PLATFORM =~ /mswin32/)
   def start_webrick
     program = File.dirname(__FILE__) + '/server'
-    `ruby #{program} #{ARGV.join(" ")}`
+    `ruby #{program} #{ARGV.join(' ')}`
   end
 
   def start_builder
     program = File.dirname(__FILE__) + '/builder'
-    `ruby #{program} #{ARGV.join(" ")}`
+    IO.popen("ruby #{program} #{ARGV.join(' ')}") do |io|
+      io.each_line{|l| puts l}
+    end
   end
 else
   def start_webrick
@@ -117,7 +121,7 @@ end
 
 threads = []
 
-if(DC_ENV[:webrick])
+unless(DC_ENV[:nowebrick])
   threads << Thread.new do
     start_webrick
   end

@@ -6,7 +6,9 @@ ENV["RAILS_ENV"] = "development"
 ARGV.options do |opts|
   opts.on("-e", "--environment=name", String,
           "Specifies the environment to run this server under (test/development/production).",
-          "Default: development") { |e| ENV["RAILS_ENV"]=e}
+          "Default: development") { |ENV["RAILS_ENV"]|}
+
+  opts.parse!
 end
 require File.dirname(__FILE__) + "/../config/environment"
 
