@@ -25,6 +25,7 @@
 require 'meta_project'
 require 'rake/contrib/sshpublisher'
 require 'rake/contrib/rubyforgepublisher'
+require 'damagecontrol/platform'
 
 PKG_BUILD     = ENV['PKG_BUILD'] ? '.' + ENV['PKG_BUILD'] : ''
 PKG_NAME      = 'damagecontrol'
@@ -38,7 +39,8 @@ PKG_FILES = FileList[
   'Rakefile',
   'README.license',
   'app/**/*',
-  'bin/**/*',
+  "bin/#{DamageControl::Platform.family}/sqlite*",
+  "bin/*",
   'components/**/*',
   'config/**/*',
   'db/production.db',
@@ -72,7 +74,9 @@ task :copy_dist => [:verify_production_environment, :migrate] do
     FileUtils.cp_r(file, dest) unless File.directory?(file) # don't copy dirs, as they will bring along .svn files
   end
 
+  FileUtils.mv "#{DIST_DIR}/bin/eee_linux", "dist"
   FileUtils.mv "#{DIST_DIR}/bin/eee_darwin", "dist"
+  FileUtils.mv "#{DIST_DIR}/bin/eeew.exe", "dist"
   FileUtils.mv "#{DIST_DIR}/bin/rubyscript2exe.rb", "dist"
   FileUtils.mv "#{DIST_DIR}/bin/tar2rubyscript.rb", "dist"
 end
@@ -118,7 +122,6 @@ task :copy_exploded_gems => [:copy_dist] do
   gemlibs = "['" + gemnames.collect{|g| "vendor/#{g}/lib"}.join("','") + "']"
   gems_environment_script = <<-EOS
 # This file was generated during DamageControl's build process
-puts "Adding gems to loadpath"
 GEMLIBS = #{gemlibs}
 $:.unshift(GEMLIBS.collect{|p| RAILS_ROOT+"/"+p}.join(':'))
 EOS
