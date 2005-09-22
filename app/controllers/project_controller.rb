@@ -60,13 +60,37 @@ class ProjectController < ApplicationController
 
   def create
     project = Project.create(@params[:project])
-    update_or_save(project)
+    populate_from_params(project)
+
+    project.update_attributes(@params[:project])
+    redirect_to :action => "edit", :id => project.id
   end
 
   def update
-    update_or_save(find)
+    project = find
+    populate_from_params(project)
+
+    project.update_attributes(@params[:project])
+    redirect_to :action => "edit", :id => project.id
   end
   
+  def test_publisher
+    project = Project.new(@params[:project])
+    populate_from_params(project)
+    publisher_class_name = @params[:publisher_class_name]
+    publisher = project.publishers.find{|p| p.class.name == publisher_class_name}
+    
+    build = Build.new(:state => Build::Successful.new)
+    
+    # TODO: render nothing and figure text with javascript on client (yellow appear effect)
+    begin
+      publisher.publish_maybe(build)
+      render :text => "Tested #{publisher.visual_name}"
+    rescue
+      render :text => "Failed to test"
+    end
+  end
+
   def destroy
     project = find
     project.destroy
@@ -96,7 +120,7 @@ class ProjectController < ApplicationController
     find
     render :text => @project.builds_rss(self)
   end
-
+  
 protected
 
   def define_feeds
@@ -120,7 +144,7 @@ private
     @project ||= Project.find(@params[:id]) if @params[:id]
   end
   
-  def update_or_save(project)
+  def populate_from_params(project)
     project.scm        = deserialize_to_array(@params[:scm]).find{|scm| scm.enabled}
     project.tracker    = deserialize_to_array(@params[:tracker]).find{|tracker| tracker.enabled}
     project.publishers = deserialize_to_array(@params[:publisher])
@@ -144,9 +168,6 @@ private
         end
       end
     end
-
-    project.update_attributes(@params[:project])
-    redirect_to :action => "edit", :id => project.id
   end
 
   def define_plugin_rows
