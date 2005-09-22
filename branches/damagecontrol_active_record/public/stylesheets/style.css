@@ -2,9 +2,6 @@ body {
   color: #333333;
 
   background-color: #FFFFFF;
-  background-image: url(/images/header_backdrop.png);
-  background-repeat: repeat-x;
-  background-position: 0 -25px;
 
   font-size: 80%;
   font-family: verdana, helvetica, arial, sans-serif;

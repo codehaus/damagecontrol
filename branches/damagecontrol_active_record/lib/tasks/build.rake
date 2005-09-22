@@ -34,15 +34,27 @@ task :greyscale do
 
   colour_pngs = FileList.new('public/images/**/*.png')
   colour_pngs.exclude('public/images/**/*_grey.png')
-  colour_pngs.exclude('public/images/raw/**/*')
   colour_pngs.to_a.each do |png|
     img = Magick::ImageList.new(png)
     # img = img.sepiatone
     img = img.quantize(256, Magick::GRAYColorspace)
     img = img.colorize(0.30, 0.30, 0.30, '#cc9933')
 
-    grey_png = png.gsub(/\.png/, "_grey.png")
+    grey_png = png.gsub(/\.png$/, "_grey.png")
     puts "writing greyscale image #{grey_png}"
     img.write(grey_png)
+  end
+end
+
+desc "Turn png into gif (IE doesn't handle alpha channel pngs)"
+task :png2gif do
+  require 'RMagick'
+
+  pngs = FileList.new('public/images/**/*.png')
+  pngs.to_a.each do |png|
+    img = Magick::ImageList.new(png)
+    gif = png.gsub(/\.png$/, ".gif")
+    puts "writing gif image #{gif}"
+    img.write(gif)
   end
 end
