@@ -37,7 +37,6 @@ module DamageControl
       # To let the device cope with all the signals.
       def exclusively_on(device_on_attr, x10)
         device_on_id = self.send(device_on_attr)
-        puts "ON:#{device_on_id}"
         x10.device(device_on_id).on
         sleep(1)
 
@@ -46,7 +45,6 @@ module DamageControl
           device_id = self.send(device_attr)
           unless(device_id == device_on_id || off.include?(device_id))
             off << device_id
-            puts "OFF:#{device_id}"
             x10.device(device_id).off
             sleep(1)
           end

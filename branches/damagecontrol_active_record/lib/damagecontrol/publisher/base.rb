@@ -1,5 +1,10 @@
 module DamageControl
   module Publisher
+    # Base class for publishers.
+    # Subclasses should refrain from accessing the build's parent
+    # revision so it can be tested from the web ui (the test build)
+    # doesn't have a revision. Or better: create a temp revision
+    # and build and delete them after the test.
     class Base
       include Dom
 

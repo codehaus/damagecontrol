@@ -1,3 +1,15 @@
+<%= 
+  link_to_remote(
+    "Test #{object.visual_name}",
+    {
+      :submit => "project_settings",
+      :update => "#{object.dom_id}_publisher_test_result",
+      :url => {:controller => "project", :action => "test_publisher", :params => {:publisher_class_name => object.class.name}}
+    }
+  ) 
+%>
+<div id="<%= object.dom_id %>_publisher_test_result"></div>
+
 <div id="<%= object.dom_id %>">
   <table>
     <tr>
