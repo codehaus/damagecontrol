@@ -67,7 +67,7 @@ module ApplicationHelper
   # Checkbox tag for publishers' enabling states
   def enabling_state_tag(object, state_class_name)
     enabled = object.enabling_states && !object.enabling_states.find{|state| state.class.name == state_class_name}.nil?
-    check_box_tag("#{object.category}[#{object.class.name}][enabling_states][]", state_class_name, enabled, {:onchange => "publisherChanged('#{object.dom_id}');return false;", :id => nil})
+    check_box_tag("#{object.category}[#{object.class.name}][enabling_states][]", state_class_name, enabled, {:onclick => "publisherChanged('#{object.dom_id}');return true;", :id => nil})
   end
   
   # Tag that shows a tip icon. Must be closed with a </div> !
