@@ -47,7 +47,7 @@ task :greyscale do
 end
 
 desc "Turn png into gif (IE doesn't handle alpha channel pngs)"
-task :png2gif do
+task :png2gif => :greyscale do
   require 'RMagick'
 
   pngs = FileList.new('public/images/**/*.png')
