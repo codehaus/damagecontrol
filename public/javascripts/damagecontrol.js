@@ -31,18 +31,18 @@ var Body = {
    * Adds a function to be called when the page has loaded.
    * Can be called several times.
    */
-	addLoadEvent : function(func){
-		var oldonload = window.onload;
+  addLoadEvent: function(func){
+    var oldonload = window.onload;
 
-		if (typeof window.onload != 'function') {
-			window.onload = func;
-		} else {
-			window.onload = function() {
-				oldonload();
-				func();
-			}
-		}
-	}
+    if (typeof window.onload != 'function') {
+      window.onload = func;
+    } else {
+      window.onload = function() {
+        oldonload();
+        func();
+      }
+    }
+  }
 }
 
 
