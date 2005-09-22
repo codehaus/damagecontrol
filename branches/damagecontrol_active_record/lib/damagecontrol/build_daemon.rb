@@ -10,6 +10,9 @@ module DamageControl
     end
     
     def run
+      at_exit do
+        puts "=> DamageControl builder exiting"
+      end
       begin
         puts "=> DamageControl builder started"
         loop do
@@ -17,7 +20,7 @@ module DamageControl
           sleep CYCLE_PAUSE
         end
       rescue SignalException => e
-        puts "=> DamageControl builder shutting down"
+        puts "=> DamageControl builder received signal to shut down"
         exit!(1)
       end
     end
@@ -34,12 +37,11 @@ module DamageControl
         # 1) builds cannot be created for revisions that already have a pending (not started) build.
         #    anyone who tries to create one should either get an exception or just
         #    get the existing build. as much as possible of these constraints should be enforced in
-        #    Build.before_save and Revision.builds.
+        #    Build.before_save and Revision.builds. TODO!
         #
         # 2) polling for a project's scm revisions or executing its builds should not occur if the 
         #    project is marked as 'busy' (typically by another daemon process)
         #
-        # 3) a project should always be marked as busy right before it's being polled
         # 3) polling and detecting revision should go straight to build
         # 4) polling or building project should mark it as busy in the db.
         #
@@ -69,27 +71,22 @@ module DamageControl
     end
     
     def handle_project(project)
-      begin
-        logger.info "Checking project #{project.name}" if logger
-        pending_build = project.latest_pending_build
-        if(pending_build)
-          logger.info "Pending build found for project #{project.name}" if logger
-          pending_build.execute!
-        elsif(project.scm.uses_polling?)
-          logger.info "No pending builds found for project #{project.name}, polling #{project.scm.visual_name} for new revisions" if logger
-          latest_new_revision = @scm_poller.poll_and_persist_new_revisions(project)
-          if(latest_new_revision)
-            logger.info "Requesting/executing build for new revision in project #{project.name}" if logger
-            build = latest_new_revision.request_build(Build::SCM_POLLED)
-            build.execute!
-            logger.info "Build of #{project.name}'s revision #{latest_new_revision.identifier} complete. Exitstatus: #{build.exitstatus}" if logger
-          end
-        else
-          logger.info "No pending builds for project #{project.name} and not polling its SCM since the project has polling disabled" if logger
+      logger.info "Checking project #{project.name}" if logger
+      pending_build = project.latest_pending_build
+      if(pending_build)
+        logger.info "Pending build found for project #{project.name}" if logger
+        pending_build.execute!
+      elsif(project.scm.uses_polling?)
+        logger.info "No pending builds found for project #{project.name}, polling #{project.scm.visual_name} for new revisions" if logger
+        latest_new_revision = @scm_poller.poll_and_persist_new_revisions(project)
+        if(latest_new_revision)
+          logger.info "Requesting/executing build for new revision in project #{project.name}" if logger
+          build = latest_new_revision.request_build(Build::SCM_POLLED)
+          build.execute!
+          logger.info "Build of #{project.name}'s revision #{latest_new_revision.identifier} complete. Exitstatus: #{build.exitstatus}" if logger
         end
-      rescue Exception => e
-        logger.error e.message if logger
-        logger.error e.backtrace.join("\n") if logger
+      else
+        logger.info "No pending builds for project #{project.name} and not polling its SCM since the project has polling disabled" if logger
       end
     end
   end

@@ -94,7 +94,7 @@ GEMS = [
 
 # Although rubyscript2exe can automatically package gems, we prefer to do it
 # our own way to limit the size of the final package. rubyscript2exe packages
-# the entire gem in its entirety. we disable it and package only the lib part
+# each gem in its entirety. we disable it and package only the lib part
 # of each gem.
 
 desc "Copy exploded gems to vendor"
@@ -128,7 +128,7 @@ EOS
   File.open("#{DIST_DIR}/config/gems_environment.rb", "w") {|io| io.write gems_environment_script}
 end
 
-task :tar2rubyscript => [:copy_exploded_gems] do
+task :tar2rubyscript => [:copy_dist] do
   Dir.chdir "dist" do
     ruby "tar2rubyscript.rb #{PKG_FILE_NAME}"
   end

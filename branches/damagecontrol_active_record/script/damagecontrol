@@ -31,7 +31,7 @@ ARGV.options do |opts|
   if(defined?(RUBYSCRIPT2EXE_APPEXE))
     opts.on("--eee-justextract",
             "Extract #{File.basename(RUBYSCRIPT2EXE_APPEXE)} to a single ruby script (without executing anything)") {}
-  else
+  else #TAR2RUBYSCRIPT
     opts.on("--tar2rubyscript-justextract",
             "Extract #{File.basename(__FILE__)} to the current directory (without executing anything)") {}
   end
@@ -77,6 +77,7 @@ unless(File.exist?(DC_ENV[:database_yml]))
   
   dest_sqlite_db = "#{DC_ENV[:data_dir]}/db/production.db"
   unless(File.exist?(dest_sqlite_db))
+    puts "=> DamageControl is copying an emtpy SQLite database to #{dest_sqlite_db}"
     FileUtils.mkdir_p(File.dirname(dest_sqlite_db)) unless File.exist?(File.dirname(dest_sqlite_db))    
     original_sqlite_db  = File.dirname(__FILE__) + '/../db/production.db'
     FileUtils.cp(original_sqlite_db, dest_sqlite_db)
