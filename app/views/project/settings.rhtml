@@ -19,7 +19,7 @@ var settings = new Settings("setting-icons");
 
   <div class="setting-icon-row">
     <div class="setting-icon-column">
-      <%= link_to_function(image_tag("wrench", :size=>"48x48", :border=>0), "settings.show('setting-icons')") %>
+      <%= link_to_function(image_tag("wrench.gif", :size=>"48x48", :border=>0), "settings.show('setting-icons')") %>
     </div>
     <% @rows[0].each do |object| %>
       <div class="setting-icon-column">
@@ -42,7 +42,7 @@ var settings = new Settings("setting-icons");
       <%= 
         link_to(
           image_tag(
-            "/images/project/import.png", 
+            "/images/project/import.gif", 
             :size=>"48x48", :border => 0
           ), 
           show_import_url
