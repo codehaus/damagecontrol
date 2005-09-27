@@ -85,16 +85,18 @@ unless(File.exist?(DC_ENV[:database_yml]))
 end
 
 if(RUBY_PLATFORM =~ /mswin32/)
+  def ruby_script(script)
+    program = File.dirname(__FILE__) + '/' + script
+    loadpath = $:.join(";")
+    `ruby -I#{loadpath} #{program} #{ARGV.join(' ')}`
+  end
+
   def start_webrick
-    program = File.dirname(__FILE__) + '/server'
-    `ruby #{program} #{ARGV.join(' ')}`
+    ruby_script('server')
   end
 
   def start_builder
-    program = File.dirname(__FILE__) + '/builder'
-    IO.popen("ruby #{program} #{ARGV.join(' ')}") do |io|
-      io.each_line{|l| puts l}
-    end
+    ruby_script('builder')
   end
 else
   def start_webrick
