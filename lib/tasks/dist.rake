@@ -81,53 +81,6 @@ task :copy_dist => [:verify_production_environment, :migrate] do
   FileUtils.mv "#{DIST_DIR}/bin/tar2rubyscript.rb", "dist"
 end
 
-GEMS = [
-  "jabber4r",
-  "rake",
-  "RedCloth",
-  "rscm",
-  "ruby-growl",
-  "meta_project",
-  "mime-types",
-  "sqlite-ruby"
-]
-
-# Although rubyscript2exe can automatically package gems, we prefer to do it
-# our own way to limit the size of the final package. rubyscript2exe packages
-# each gem in its entirety. we disable it and package only the lib part
-# of each gem.
-
-desc "Copy exploded gems to vendor"
-task :copy_exploded_gems => [:copy_dist] do
-  gems_dir = "dist/gems"
-  FileUtils.rm_rf(gems_dir) if File.exist?(gems_dir)
-  FileUtils.mkdir_p(gems_dir)
-
-  gem_exe = (RUBY_PLATFORM =~ /mswin32/) ? "gem.cmd" : "gem"
-  Dir.chdir gems_dir do
-    GEMS.each do |gem|
-      `#{gem_exe} unpack #{gem}`
-    end
-  end
-
-  FileUtils.mkdir_p(DIST_DIR) unless File.exist?(DIST_DIR)
-  gemnames = Dir["#{gems_dir}/*"].collect{|f| File.basename(f)}
-  gemnames.each do |gemname|
-    gemdest = "#{DIST_DIR}/vendor/#{gemname}"
-    FileUtils.mkdir_p gemdest
-    FileUtils.cp_r("#{gems_dir}/#{gemname}/lib", gemdest)
-  end
-  
-  # Write a file that will be loaded by dc_environment.rb
-  gemlibs = "['" + gemnames.collect{|g| "vendor/#{g}/lib"}.join("','") + "']"
-  gems_environment_script = <<-EOS
-# This file was generated during DamageControl's build process
-GEMLIBS = #{gemlibs}
-$:.unshift(GEMLIBS.collect{|p| RAILS_ROOT+"/"+p}.join(':'))
-EOS
-  File.open("#{DIST_DIR}/config/gems_environment.rb", "w") {|io| io.write gems_environment_script}
-end
-
 task :tar2rubyscript => [:copy_dist] do
   Dir.chdir "dist" do
     ruby "tar2rubyscript.rb #{PKG_FILE_NAME}"
