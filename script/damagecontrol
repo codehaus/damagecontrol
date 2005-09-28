@@ -31,13 +31,14 @@ ARGV.options do |opts|
   if(defined?(RUBYSCRIPT2EXE_APPEXE))
     opts.on("--eee-justextract",
             "Extract #{File.basename(RUBYSCRIPT2EXE_APPEXE)} to a single ruby script (without executing anything)") {}
-  else #TAR2RUBYSCRIPT
+  end
+  if(defined?(TAR2RUBYSCRIPT))
     opts.on("--tar2rubyscript-justextract",
             "Extract #{File.basename(__FILE__)} to the current directory (without executing anything)") {}
   end
 
   opts.on("--data-dir=dir", String,
-          "Number of build daemons to start",
+          "DamageControl data directory",
           "Default: current dir = #{DC_ENV[:data_dir]}") { |dir| DC_ENV[:data_dir] = "#{SHELL_DIR}/#{dir}" }
 
   opts.on("--build-daemons=n", Integer,
