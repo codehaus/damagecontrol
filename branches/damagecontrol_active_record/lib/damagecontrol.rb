@@ -35,5 +35,13 @@ require 'damagecontrol/core_ext/pathname'
 require 'damagecontrol/core_ext/class'
 require 'damagecontrol/sqlite/retry'
 
+# This is normally not needed, but we do it to avoid strange problems with const_missing
+require 'artifact'
+require 'build'
+require 'build_result_mailer'
+require 'project'
+require 'revision'
+require 'revision_file'
+
 exit if defined?(REQUIRE2LIB) # rubyscript2exe packaging mode
 
