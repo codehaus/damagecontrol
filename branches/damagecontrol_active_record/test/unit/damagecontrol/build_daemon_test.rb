@@ -83,7 +83,8 @@ module DamageControl
       project.reload
       assert_equal(1, project.revisions.length)
       assert_equal(1, project.latest_revision.builds.length)
-      assert(project.latest_revision.builds[0].successful?)
+      build = project.latest_revision.builds[0]
+      assert(build.successful?, "STDERR:#{build.stderr}\nSTDOUT:#{build.stdout}")
       assert_equal("This is a test", File.open(Artifact::ARTIFACT_DIR + "/results/result.txt").read)
     end
 

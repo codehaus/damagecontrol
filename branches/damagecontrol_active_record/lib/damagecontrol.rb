@@ -18,9 +18,13 @@ end
 
 require 'optparse'
 require 'webrick'
-
+require 'logger'
+require 'fileutils'
 require 'rscm'
 require 'meta_project'
+# http://wiki.rubyonrails.com/rails/pages/iconv
+require 'iconv'
+
 require 'damagecontrol/dom'
 require 'damagecontrol/rscm_ext/base'
 require 'damagecontrol/publisher/base'
@@ -36,6 +40,7 @@ require 'damagecontrol/core_ext/class'
 require 'damagecontrol/sqlite/retry'
 
 # This is normally not needed, but we do it to avoid strange problems with const_missing
+# that occur in the rubyscript2exe executables. Doesn't do any harm for conventional use.
 require 'artifact'
 require 'build'
 require 'build_result_mailer'

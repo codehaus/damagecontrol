@@ -2,9 +2,6 @@
 
 # This is the main bootstrapping script for DamageControl.
 
-# Require the files from ruby's stdlib that will be needed by damagecontrol,
-# then exit if we're in rubyscript2exe packaging mode
-# (gems need not be required here, they're packaged separately by lib/dist.rake)
 require 'optparse'
 require 'webrick'
 require 'logger'
@@ -89,7 +86,9 @@ if(RUBY_PLATFORM =~ /mswin32/)
   def ruby_script(script)
     program = File.dirname(__FILE__) + '/' + script
     loadpath = $:.join(";")
-    `ruby -I#{loadpath} #{program} #{ARGV.join(' ')}`
+    IO.popen("ruby -I#{loadpath} #{program} #{ARGV.join(' ')}") do |io|
+      io.each_line{|line| puts line}
+    end
   end
 
   def start_webrick

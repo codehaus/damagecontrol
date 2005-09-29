@@ -16,10 +16,11 @@
 # In order to reexecute a build, create a new instance (via Revision.builds.create)
 #
 class Build < ActiveRecord::Base
-  SCM_POLLED = "SCM_POLLED"
-  SCM_TRIGGERED = "SCM_TRIGGERED"
-  MANUALLY_TRIGGERED = "MANUALLY_TRIGGERED"
-  SUCCESSFUL_DEPENDENCY = "SUCCESSFUL_DEPENDENCY"
+  SCM_POLLED = "SCM_POLLED" unless defined? SCM_POLLED
+  SCM_TRIGGERED = "SCM_TRIGGERED" unless defined? SCM_TRIGGERED
+  MANUALLY_TRIGGERED = "MANUALLY_TRIGGERED" unless defined? MANUALLY_TRIGGERED
+  SUCCESSFUL_DEPENDENCY = "SUCCESSFUL_DEPENDENCY" unless defined? SUCCESSFUL_DEPENDENCY
+  NOT_STARTED_LOG = "The build has not started yet. It's probably waiting for a daemon to execute it" unless defined? NOT_STARTED_LOG
 
   belongs_to :revision
   belongs_to :triggering_build, :class_name => "Build"
@@ -37,8 +38,6 @@ class Build < ActiveRecord::Base
     connection.delete("DELETE FROM build_logs WHERE id=?", self.stdout_id)
     connection.delete("DELETE FROM build_logs WHERE id=?", self.stderr_id)
   end
-
-  NOT_STARTED_LOG = "The build has not started yet. It's probably waiting for a daemon to execute it"
 
   # TODO: use has_one here?
   def stdout
@@ -250,7 +249,7 @@ class Build < ActiveRecord::Base
     end
   end 
   
-  STATES = [Executing.new, Successful.new, Fixed.new, Broken.new, RepeatedlyBroken.new]
-  COMPLETE_STATES = [Successful.new, Fixed.new, Broken.new, RepeatedlyBroken.new]
+  STATES = [Executing.new, Successful.new, Fixed.new, Broken.new, RepeatedlyBroken.new] unless defined? STATES
+  COMPLETE_STATES = [Successful.new, Fixed.new, Broken.new, RepeatedlyBroken.new] unless defined? COMPLETE_STATES
 
 end
