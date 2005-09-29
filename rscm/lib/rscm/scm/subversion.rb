@@ -70,10 +70,13 @@ module RSCM
             absolute_path = PathConverter.nativepath_to_filepath(native_absolute_path)
             if(File.exist?(absolute_path) && !File.directory?(absolute_path))
               native_checkout_dir = PathConverter.filepath_to_nativepath(@checkout_dir, false)
-#              relative_path = native_absolute_path[native_checkout_dir.length+1..-1].chomp
-# not sure about this old code - this seems to work. keep it here till it's verified on win32
-              relative_path = absolute_path
-              relative_path = relative_path.gsub(/\\/, "/") if WINDOWS
+              relative_path = nil
+              if WINDOWS
+                relative_path = native_absolute_path[native_checkout_dir.length+1..-1].chomp
+                relative_path = relative_path.gsub(/\\/, "/")
+              else
+                relative_path = absolute_path
+              end
               checked_out_files << relative_path
               yield relative_path if block_given?
             end
@@ -182,13 +185,13 @@ module RSCM
       svn(dir, import_cmd)
     end
 
-    def revisions(from_identifier, to_identifier=Time.infinity)
+    def revisions(from_identifier, to_identifier=Time.infinity, relative_path="")
       # Return empty revision if the requested revision doesn't exist yet.
       return Revisions.new if(from_identifier.is_a?(Integer) && head_revision_identifier <= from_identifier)
 
       checkout_dir = PathConverter.filepath_to_nativepath(@checkout_dir, false)
       revisions = nil
-      command = "svn #{changes_command(from_identifier, to_identifier)}"
+      command = "svn #{changes_command(from_identifier, to_identifier, relative_path)}"
 
       with_working_dir(@checkout_dir) do
         Better.popen(command) do |stdout|
@@ -301,11 +304,11 @@ module RSCM
       "update #{login_options} #{revision_option(nil,to_identifier)}"
     end
     
-    def changes_command(from_identifier, to_identifier)
+    def changes_command(from_identifier, to_identifier, relative_path)
       # http://svnbook.red-bean.com/svnbook-1.1/svn-book.html#svn-ch-3-sect-3.3
       # file_list = files.join('\n')
-# WEIRD cygwin bug garbles this!?!?!?!
-      cmd = "log --verbose #{login_options} #{revision_option(from_identifier, to_identifier)} #{url}"
+      full_url = relative_path ? "#{url}/#{relative_path}" : ""
+      cmd = "log --verbose #{login_options} #{revision_option(from_identifier, to_identifier)} #{full_url}"
       cmd
     end
 

@@ -20,6 +20,7 @@ module RSCM
   # * move
   # * revisions
   # * uptodate?
+  # * file
   #
   # In addition to operations related to working copies, the same instance should provide
   # methods to administer the working copy's associated 'central' repository. These are:
@@ -150,7 +151,7 @@ module RSCM
     # Commit (check in) modified files.
     def commit(message)
     end
-
+    
     # Checks out or updates contents from a central SCM to +checkout_dir+ - a local working copy.
     # If this is a distributed SCM, this method should create a 'working copy' repository
     # if one doesn't already exist. Then the contents of the central SCM should be pulled into
@@ -192,9 +193,10 @@ module RSCM
     end
   
     # Returns a Revisions object for the period specified by +from_identifier+ (exclusive, i.e. after)
-    # and +to_identifier+ (inclusive).
+    # and +to_identifier+ (inclusive). If +relative_path+ is specified, the result will only contain
+    # revisions pertaining to that path.
     #
-    def revisions(from_identifier, to_identifier=Time.infinity)
+    def revisions(from_identifier, to_identifier=Time.infinity, relative_path=nil)
       # Should be overridden by subclasses
       revisions = Revisions.new
       revisions.add(
@@ -211,6 +213,11 @@ module RSCM
         )
       )
       revisions
+    end
+    
+    # Returns a HistoricFile for +relative_path+
+    def file(relative_path)
+      HistoricFile.new(relative_path, self)
     end
 
     # Whether the working copy is in synch with the central

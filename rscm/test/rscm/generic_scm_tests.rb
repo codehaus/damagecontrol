@@ -10,8 +10,12 @@ module RSCM
 
     def teardown
       if @scm
-        # Fails on windows with TortoiseCVS' cvs because of resident cvslock.exe
-        @scm.destroy_central
+        begin
+          @scm.destroy_centra
+        rescue => e
+          # Fails on windows with TortoiseCVS' cvs because of resident cvslock.exe
+          STDERR.puts "Couldn't destroy central #{@scm.class.name}"
+        end
       end
     end
 
@@ -253,7 +257,7 @@ module RSCM
 +five six
 EOF
     
-    def test_diffs
+    def test_diffs_and_historic_file
       work_dir = RSCM.new_temp_dir("diff")
       checkout_dir = "#{work_dir}/checkout"
       repository_dir = "#{work_dir}/repository"
@@ -303,6 +307,13 @@ EOF
         assert_match(/^\+five six/, diff_string)
       end
       assert(got_diff)
+      
+      # TODO: make separate test. Make helper method for the cumbersome setup!
+      historic_afile = scm.file("afile.txt")
+      revision_files = historic_afile.revision_files
+      assert_equal(Array, revision_files.class)
+      assert(revision_files.length >= 2)
+      assert(revision_files.length <= 3)
     end
 
   private
