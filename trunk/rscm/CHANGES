@@ -1,5 +1,12 @@
 = RSCM Changelog
 
+== Version 0.3.5
+
+This release adds new API methods for accessing files and their revisions.
+
+* Added new scm.history_file method (returning RSCM::HistoryFile).
+* Added RSCM::HistoryFile.revision_files methods to get all revisions of a file.
+
 == Version 0.3.4
 
 This release fixes some bugs on windows.

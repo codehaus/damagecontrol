@@ -91,9 +91,9 @@ module RSCM
       files.empty?
     end
 
-    def revisions(from_identifier, to_identifier=Time.infinity)
+    def revisions(from_identifier, to_identifier=Time.infinity, relative_path=nil)
       checkout(to_identifier) unless uptodate?(to_identifier) # must checkout to get revisions
-      parse_log(changes_command(from_identifier, to_identifier))
+      parse_log(changes_command(from_identifier, to_identifier, relative_path))
     end
     
     def diff(change)
@@ -241,10 +241,10 @@ module RSCM
       revisions
     end
 
-    def changes_command(from_identifier, to_identifier)
+    def changes_command(from_identifier, to_identifier, relative_path)
       # https://www.cvshome.org/docs/manual/cvs-1.11.17/cvs_16.html#SEC144
       # -N => Suppress the header if no RevisionFiles are selected.
-      "log #{branch_option} -N #{period_option(from_identifier, to_identifier)}"
+      "log #{branch_option} -N #{period_option(from_identifier, to_identifier)} #{relative_path}"
     end
 
     def branch_specified?
