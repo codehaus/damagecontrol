@@ -1,3 +1,4 @@
+require 'stringio'
 require 'rscm/base'
 require 'rscm/path_converter'
 require 'rscm/line_editor'
@@ -112,6 +113,15 @@ module RSCM
       end
     end
     
+    def open(revision_file, &block)
+      with_working_dir(@checkout_dir) do
+        diff_cmd = "cvs -Q update -p -r #{revision_file.native_revision_identifier} #{revision_file.path}"
+        Better.popen(diff_cmd) do |io|
+          block.call io
+        end
+      end
+    end
+
     def apply_label(label)
       cvs(@checkout_dir, "tag -c #{label}")
     end

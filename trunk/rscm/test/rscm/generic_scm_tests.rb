@@ -314,6 +314,7 @@ EOF
       assert_equal(Array, revision_files.class)
       assert(revision_files.length >= 2)
       assert(revision_files.length <= 3)
+      assert_equal("one two three four\nfive six\n", revision_files[-1].open(scm){|io| io.read})
     end
 
   private

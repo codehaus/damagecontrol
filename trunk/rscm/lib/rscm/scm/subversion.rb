@@ -107,10 +107,16 @@ module RSCM
 
     def diff(file, &block)
       with_working_dir(@checkout_dir) do
-        cmd = "svn diff -r #{file.previous_native_revision_identifier}:#{file.native_revision_identifier} \"#{url}/#{file.path}\""
+        cmd = "svn diff --revision #{file.previous_native_revision_identifier}:#{file.native_revision_identifier} \"#{url}/#{file.path}\""
         Better.popen(cmd) do |io|
           return(yield(io))
         end
+      end
+    end
+    
+    def open(revision_file, &block)
+      Better.popen("svn cat --revision #{revision_file.native_revision_identifier} #{url}/#{revision_file.path}") do |io|
+        return(yield(io))
       end
     end
 
