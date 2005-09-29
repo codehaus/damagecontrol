@@ -20,9 +20,16 @@ module RSCM
     attr_accessor :message
     # This is a UTC ruby time
     attr_accessor :time
+    attr_accessor :scm
     
     def initialize(path=nil, status=nil, developer=nil, message=nil, native_revision_identifier=nil, time=nil)
       @path, @developer, @message, @native_revision_identifier, @time, @status = path, developer, message, native_revision_identifier, time, status
+    end
+    
+    # Returns/yields an IO containing the contents of this file, using +scm+ this
+    # file lives in.
+    def open(scm, &block)
+      scm.open(self, &block)
     end
   
     def accept(visitor)
