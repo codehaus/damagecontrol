@@ -14,6 +14,8 @@ require_gem 'sqlite-ruby'
 require_gem 'x10-cm17a'
 if(DamageControl::Platform.family == "win32")
   require 'win32/sound'
+  # http://wiki.rubyonrails.com/rails/pages/iconv
+  require 'i386-mswin32/iconv'
 end
 
 require 'optparse'
@@ -22,8 +24,6 @@ require 'logger'
 require 'fileutils'
 require 'rscm'
 require 'meta_project'
-# http://wiki.rubyonrails.com/rails/pages/iconv
-require 'iconv'
 
 require 'damagecontrol/dom'
 require 'damagecontrol/rscm_ext/base'

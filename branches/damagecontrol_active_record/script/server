@@ -60,15 +60,25 @@ require 'webrick_server'
 
 OPTIONS['working_directory'] = File.expand_path(RAILS_ROOT)
 
-# shut up, webrick :-)
+FileUtils.mkdir_p("#{DC_DATA_DIR}/log") unless File.exist?("#{DC_DATA_DIR}/log")
 class ::WEBrick::HTTPServer
+  access_log_file= "#{DC_DATA_DIR}/log/access.log"
+  @@access_log = Logger.new(access_log_file, 10, 1.megabyte)
+  @@access_log.datetime_format = "%Y-%m-%d %H:%M:%S"
+  @@access_log.level = Logger::INFO
+
   def access_log(config, req, res)
-    # nop
+    @@access_log.info(req.to_s)
   end
 end
 class ::WEBrick::BasicLog
+  webrick_log_file = "#{DC_DATA_DIR}/log/webrick.log"
+  @@webrick_log = Logger.new(webrick_log_file, 10, 1.megabyte)
+  @@webrick_log.datetime_format = "%Y-%m-%d %H:%M:%S"
+  @@webrick_log.level = Logger::INFO
+
   def log(level, data)
-    # nop
+    @@webrick_log.info(data)
   end
 end
 
