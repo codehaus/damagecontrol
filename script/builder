@@ -8,8 +8,13 @@ ARGV.options do |opts|
           "Specifies the environment to run this server under (test/development/production).",
           "Default: development") { |ENV["RAILS_ENV"]|}
 
+  opts.on("--data-dir=dir", String, 
+          "DamageControl data directory", 
+          "Default: current dir = #{File.expand_path(Dir.pwd)}") {|dir| DC_DATA_DIR = File.expand_path(dir)}
+
   opts.parse!
 end
+DC_DATA_DIR = File.expand_path(File.dirname(__FILE__) + "/..") unless defined? DC_DATA_DIR
 require File.dirname(__FILE__) + "/../config/environment"
 
 # set up logging

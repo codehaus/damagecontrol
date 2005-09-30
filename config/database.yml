@@ -1,15 +1,11 @@
-<% 
-STDERR.puts "SHELL_DIR=#{SHELL_DIR}" 
-STDERR.puts "RAILS_ENV=#{RAILS_ENV}" 
-%>
 development:
   adapter: sqlite
-  dbfile: <%= SHELL_DIR %>/db/development.db
+  dbfile: <%= DC_DATA_DIR %>/db/development.db
 
 test:
   adapter: sqlite
-  dbfile: <%= SHELL_DIR %>/db/test.db
+  dbfile: <%= DC_DATA_DIR %>/db/test.db
 
 production:
   adapter: sqlite
-  dbfile: <%= SHELL_DIR %>/db/production.db
+  dbfile: <%= DC_DATA_DIR %>/db/production.db

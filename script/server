@@ -45,8 +45,14 @@ ARGV.options do |opts|
   opts.on("-h", "--help",
           "Show this help message.") { puts opts; exit }
 
+  opts.on("--data-dir=dir", String, 
+          "DamageControl data directory", 
+          "Default: current dir = #{File.expand_path(Dir.pwd)}") {|dir| DC_DATA_DIR = File.expand_path(dir)}
+
   opts.parse!
 end
+DC_DATA_DIR = File.expand_path(File.dirname(__FILE__) + "/..") unless defined? DC_DATA_DIR
+puts "DC_DATA_DIR:#{DC_DATA_DIR}"
 
 ENV["RAILS_ENV"] = OPTIONS[:environment]
 require File.dirname(__FILE__) + "/../config/environment"
@@ -67,6 +73,6 @@ class ::WEBrick::BasicLog
 end
 
 
-puts "=> Rails application started on http://#{OPTIONS[:ip]}:#{OPTIONS[:port]}"
+puts "=> DamageControl WEBrick server started on http://#{OPTIONS[:ip]}:#{OPTIONS[:port]}"
 puts "=> Ctrl-C to shutdown server; call with --help for options" if OPTIONS[:server_type] == WEBrick::SimpleServer
 DispatchServlet.dispatch(OPTIONS)
