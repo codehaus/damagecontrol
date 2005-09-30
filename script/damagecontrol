@@ -136,8 +136,8 @@ if(RUBY_PLATFORM =~ /mswin32/)
     ruby_script("server", WEBRICK_OPTIONS)
   end
 
-  def start_builder
-    ruby_script("builder", BUILDER_OPTIONS)
+  def start_builder(id)
+    ruby_script("builder", BUILDER_OPTIONS + "--id=#{id}")
   end
 else
   def start_webrick
@@ -152,9 +152,10 @@ else
     Process.wait(server_pid)
   end
 
-  def start_builder
+  def start_builder(id)
     builder_pid = fork do
       BUILDER_OPTIONS.split(" ").each{|opt| ARGV << opt}
+      ARGV << "--id=#{id}"
       load(File.dirname(__FILE__) + '/builder')
     end
     at_exit do 
@@ -175,7 +176,7 @@ end
 
 (1..DC_OPTIONS[:builders]).each do |i|
   threads << Thread.new do
-    start_builder
+    start_builder(i)
   end
 end
 

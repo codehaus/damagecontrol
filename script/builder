@@ -12,12 +12,27 @@ ARGV.options do |opts|
           "DamageControl data directory", 
           "Default: current dir = #{File.expand_path(Dir.pwd)}") {|dir| DC_DATA_DIR = File.expand_path(dir)}
 
+  opts.on("--id=id", Integer, 
+          "Builder id") {|id| BUILDER_ID = id}
+
   opts.parse!
+  
+  unless defined? BUILDER_ID
+    STDERR.puts "id must be specified"
+    puts
+    puts opts
+    exit 20
+  end
 end
 DC_DATA_DIR = File.expand_path(File.dirname(__FILE__) + "/..") unless defined? DC_DATA_DIR
 require File.dirname(__FILE__) + "/../config/environment"
 
 # set up logging
+FileUtils.mkdir_p("#{DC_DATA_DIR}/log") unless File.exist?("#{DC_DATA_DIR}/log")
+logfile = "#{DC_DATA_DIR}/log/builder_#{BUILDER_ID}.log"
+logger = Logger.new(logfile, 10, 1.megabyte)
+logger.datetime_format = "%Y-%m-%d %H:%M:%S"
+logger.level = Logger::DEBUG
 [
   DamageControl::ScmPoller,
   DamageControl::BuildDaemon, 
@@ -25,6 +40,6 @@ require File.dirname(__FILE__) + "/../config/environment"
   Build, 
   Project, 
   Revision
-].each { |cls| cls.logger = Logger.new(STDOUT) }
- 
+].each { |cls| cls.logger = logger }
+puts "DamageControl builder log: #{logfile}"
 DamageControl::BuildDaemon.new(DamageControl::ScmPoller.new).run
