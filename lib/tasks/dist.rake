@@ -95,8 +95,13 @@ task :rubyscript2exe => [:tar2rubyscript] do
   end
 end
 
-desc "Publish the release files in Subversion repository."
+desc "Tag the release."
 task :tag_svn do
   # TODO: remove user name from SVN URL
   system("svn cp svn+ssh://rinkrank@beaver.codehaus.org/home/projects/damagecontrol/scm/trunk svn+ssh://rinkrank@beaver.codehaus.org/home/projects/damagecontrol/scm/tags/rel_#{PKG_VERSION.gsub(/\./,'-')} -m 'tagged release #{PKG_VERSION}'")
+end
+
+desc "Upload to aslakhellesoy.com"
+task :upload do
+  `pscp dist\\#{PKG_FILE_NAME}.exe aslak.hellesoy@chilco.textdrive.com:/users/home/aslak.hellesoy/web/public/damagecontrol/downloads`
 end
