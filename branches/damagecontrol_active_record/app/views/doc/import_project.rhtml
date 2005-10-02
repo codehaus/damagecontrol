@@ -1,13 +1,40 @@
 <h1>Importing projects</h1>
 <p>
-In order to make the transition to DamageControl as simple as possible, DamageControl ships
-with several importers for other systems. These can be used either via the web user interface
-or from the command line. Just run:
+  DamageControl projects can be configured either through the web interface or through
+  a console interface. (There is currently no web service interface for project configuration).
 </p>
-<pre>script/import</pre>
+
+<h2>Web interface</h2>
 <p>
-to see all the options. All the importers do is to fill in as much as possible of the project settings. Depending on the importer you use and the information you supply to it, you may want to return to the project settings screen and manually tune some of the settings.
+  This option is recommended for people who are new to DamageControl and want to stay away from
+  configuration files.
 </p>
 <p>
-You can also write your own importer by using DamageControl's API. This can be useful in e.g. corporate environments if you want to do a mass-import of projects into DamageControl.
+  TODO: screenshot
 </p>
+<p>
+  You can use the web interface to either configure projects from scratch, or you can import
+  all project settings if your project is currently stored in a format that DamageControl understands.
+  Please see the Project import page in the DamageControl web interface for more details.
+</p>
+
+<h2>Console interface</h2>
+<p>
+  This option is recommended for people who want a more automated way to configure projects.
+  DamageControl ships with a script that will read a YAML file and update the database with
+  settings from that YAML file. Example usage:
+</p>
+
+<pre>ruby script/import < path/to/project_file.yml</pre>
+
+<p>
+  Here is an example of a project YAML file:
+</p>
+
+<pre>
+<%= File.open(File.expand_path(__FILE__ + '/../../../../script/sample_project.yml')).read %>
+</pre>
+
+Please check out the RubyDoc APIs of DamageControl, <a href="http://rscm.rubyforge.org/">RSCM</a> 
+and <a href="http://xforge.rubyforge.org/">MetaProject</a> to see what attributes you can specify
+for each class.

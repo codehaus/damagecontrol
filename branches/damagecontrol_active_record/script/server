@@ -51,8 +51,7 @@ ARGV.options do |opts|
 
   opts.parse!
 end
-DC_DATA_DIR = File.expand_path(File.dirname(__FILE__) + "/..") unless defined? DC_DATA_DIR
-puts "DC_DATA_DIR:#{DC_DATA_DIR}"
+#DC_DATA_DIR = File.expand_path(File.dirname(__FILE__) + "/..") unless defined? DC_DATA_DIR
 
 ENV["RAILS_ENV"] = OPTIONS[:environment]
 require File.dirname(__FILE__) + "/../config/environment"
