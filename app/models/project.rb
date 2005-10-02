@@ -314,6 +314,36 @@ LIMIT #{options[:count]}
   def exclusive?
     false
   end
+  
+  # Populates from fields in a hash. The hash typically
+  # comes from a HTTP request or a YAML file.
+  def populate_from_hash(hash)
+    self.update_attributes(hash[:project])
+
+    self.scm        = hash[:scm].deserialize_to_array.find{|scm| scm.enabled}
+    self.tracker    = hash[:tracker].deserialize_to_array.find{|tracker| tracker.enabled}
+    self.publishers = hash[:publisher].deserialize_to_array
+
+    self.scm_web = MetaProject::ScmWeb::Browser.new
+    self.scm_web.dir_spec      = hash[:scm_web][:dir_spec]
+    self.scm_web.history_spec  = hash[:scm_web][:history_spec]
+    self.scm_web.raw_spec      = hash[:scm_web][:raw_spec]
+    self.scm_web.html_spec     = hash[:scm_web][:html_spec]
+    self.scm_web.diff_spec     = hash[:scm_web][:diff_spec]
+
+    self.dependencies.clear
+    if(hash[:project_dependencies])
+      hash[:project_dependencies].each do |project_id|
+        p = Project.find(project_id)
+        if(project.could_depend_on?(p))
+          project.dependencies << p
+        else
+          flash["notice"] ||= ""
+          flash["notice"] << "Can't depend on #{p.name}, it would create a cycle.<br/>"
+        end
+      end
+    end
+  end
 
 private
 

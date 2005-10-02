@@ -35,8 +35,9 @@ require 'damagecontrol/meta_project/build_tool'
 require 'damagecontrol/importer/meta_project'
 require 'damagecontrol/scm_poller'
 require 'damagecontrol/build_daemon'
-require 'damagecontrol/core_ext/pathname'
 require 'damagecontrol/core_ext/class'
+require 'damagecontrol/core_ext/hash'
+require 'damagecontrol/core_ext/pathname'
 require 'damagecontrol/sqlite/retry'
 
 # This is normally not needed, but we do it to avoid strange problems with const_missing

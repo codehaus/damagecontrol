@@ -1,0 +1,15 @@
+#!/usr/local/bin/ruby
+
+require File.dirname(__FILE__) + "/../config/environment"
+project_hash = HashWithIndifferentAccess.new(YAML.load(STDIN))
+
+project = nil
+if(project_hash[:project][:id])
+  puts "Updating existing project with id=#{project_hash[:project][:id]}"
+  project = Project.find(project_hash[:project][:id])
+else
+  puts "Creating new project"
+  project = Project.create(project_hash[:project][:id])
+end
+project.populate_from_hash(project_hash)
+project.save
