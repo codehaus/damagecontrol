@@ -32,9 +32,17 @@
 </p>
 
 <pre>
-<%= File.open(File.expand_path(__FILE__ + '/../../../../script/sample_project.yml')).read %>
+<%= File.open(File.expand_path(__FILE__ + '/../../../../damagecontrol.yml')).read %>
 </pre>
 
 Please check out the RubyDoc APIs of DamageControl, <a href="http://rscm.rubyforge.org/">RSCM</a> 
 and <a href="http://xforge.rubyforge.org/">MetaProject</a> to see what attributes you can specify
 for each class.
+
+<h2>Importing settings from SCM</h2>
+If your project has a file called damagecontrol.yml in the root directory, DamageControl will
+update the settings autmatically whenever that file is updated.
+
+<h2>Exporting settings</h2>
+By selecting the Export link, DamageControl will export your project's current settings into a YAML file
+for you.
