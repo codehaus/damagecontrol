@@ -11,6 +11,7 @@ module RSCM
     end
     
     def uses_polling?
+      return @uses_polling if (@uses_polling == true || @uses_polling == false)
       # If not set at all, default to true
       return true if @uses_polling.nil?
       @uses_polling.to_i != 0
