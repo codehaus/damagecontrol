@@ -1,4 +1,3 @@
-
 module DamageControl
   
   class ScmPoller
@@ -14,8 +13,6 @@ module DamageControl
       persist_revisions(project, rscm_revisions) unless rscm_revisions.length == 0
     end
     
-  private
-
     # Stores revisions in the database and returns the latest persisted revision.
     def persist_revisions(project, rscm_revisions)
       rev = nil

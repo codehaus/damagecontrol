@@ -1,22 +1,38 @@
 <h1>Build Tool</h1>
 <p>
-A common misconception about DamageControl and other continuous integration tools is that they are build tools. DamageControl is not (strictly speaking) a build tool.
+A common misconception about DamageControl and other continuous integration tools is that 
+they are build tools. DamageControl is not (strictly speaking) a build tool.
 </p>
 <p>
-DamageControl is (foremost, but not only) a <em>build scheduler</em>. DamageControl can <em>invoke</em> a build tool to perform a build, and will perform various tasks <em>after</em> the build tool has done its job (such as publishing results, triggering other builds, archive artifacts and so on).
+DamageControl is (foremost, but not only) a <em>build scheduler</em>. DamageControl can 
+<em>invoke</em> a build tool to perform a build, and will perform various tasks <em>after</em> 
+the build tool has done its job (such as publishing results, triggering other builds, 
+archive artifacts and so on).
 </p>
 <p>
-This means that you still have to use a traditional build tool in conjunction with DamageControl. This can be any kind of command line tool (meaning it has no graphical user interface, but can be invoked from a dos prompt or shell program). Some common build tools are <a href="http://www.gnu.org/software/make/">Make</a>, <a href="http://ant.apache.org/">Ant</a>, <a href="http://rake.rubyforge.org/">Rake</a>, <a href="http://maven.apache.org/">Maven</a> and <a href="http://nant.sourceforge.net/">NAnt</a>.
+This means that you still have to use a traditional build tool in conjunction with DamageControl. 
+This can be any kind of command line tool (meaning it has no graphical user interface, but can 
+be invoked from a dos prompt or shell program). Some common build tools are <a href="http://www.gnu.org/software/make/">Make</a>, 
+<a href="http://ant.apache.org/">Ant</a>, <a href="http://rake.rubyforge.org/">Rake</a>, 
+<a href="http://maven.apache.org/">Maven</a> and <a href="http://nant.sourceforge.net/">NAnt</a>.
 </p>
 <p>
-This means that in order to use DamageControl, you also have to use a build tool. This in turn means that you have to write a build script for whatever build tool you are using. A build script is usually a text file that is read by your build tool of choice, and that contains instructions about what steps the build tool should execute in order to build your software.
+This in turn means that you have to write a build script for whatever build tool you are using. 
+A build script is usually a text file that is read by your build tool of choice, and that contains instructions 
+about what steps the build tool should execute in order to build your software.
 </p>
 <p>
-If you are new to build tools and continuous integration you might wonder what DamageControl can accomplish beyond what a build tool and a build script can accomplish. Many (if not all!) of the functionality offered by DamageControl can theoretically be performed by a well-crafted build script. 
+If you are new to build tools and continuous integration you might wonder what DamageControl can accomplish beyond what 
+a build tool and a build script can accomplish. Many (if not all!) of the functionality offered by DamageControl can 
+theoretically be performed by a well-crafted build script. 
 </p>
 <p>
-DamageControl takes care of a lot of the tasks that are secondary to building the software itself. DamageControl will automate the execution of the build tool/build script, publish results of the builds, integrate your SCM with your issue tracker and simplify of a lot of the release management grunt work that often is neglected because they are often too hard to accomplish with traditional build scripts or manual processes.
+DamageControl takes care of a lot of the tasks that are secondary to building the software itself. 
+DamageControl will automate the execution of the build tool/build script, publish results of the builds, 
+integrate your SCM with your issue tracker and simplify of a lot of the release management grunt work that often is 
+neglected because they are often too hard to accomplish with traditional build scripts or manual processes.
 </p>
 <p>
-The rest of this manual will give you a better insight into what extra benefits DamageControl offers beyond plain old build scripts.
+The rest of this manual will give you a better insight into what extra benefits DamageControl offers beyond plain 
+old build scripts.
 </p>

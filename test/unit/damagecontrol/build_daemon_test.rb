@@ -49,7 +49,7 @@ module DamageControl
       
       scm = RSCM::Subversion.new
       scm.url = RSCM::PathConverter.filepath_to_nativeurl(central_repo)
-      copy_command = family == "win32" ? "copy" : "cp"
+      copy_command = family == "mswin32" ? "copy" : "cp"
       project = Project.create(
         :name => "Test", 
         :scm => scm, 
