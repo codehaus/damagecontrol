@@ -28,6 +28,19 @@ class Revision < ActiveRecord::Base
     logger.info "Syncing working copy for #{project.name} with revision #{identifier} ..." if logger
     project.scm.checkout(identifier) if project.scm
     logger.info "Done Syncing working copy for #{project.name} with revision #{identifier}" if logger
+    
+    # Now update the project settings if this revision has a damagecontrol.yml file
+    damagecontrol_yml = revision_files.detect {|file| file.path == "damagecontrol.yml"}
+    if(damagecontrol_yml)
+      damagecontrol_yml_file = File.join(project.scm.checkout_dir, "damagecontrol.yml")
+      if(File.exist?(damagecontrol_yml_file))
+        logger.info "Importing project settings from #{damagecontrol_yml_file}" if logger
+        project.populate_from_hash(YAML.load(damagecontrol_yml_file))
+        project.save
+      else
+        logger.info "Where is #{damagecontrol_yml_file} ??? Should be here by now" if logger
+      end
+    end
   end
 
   # Creates a new (pending) build for this revision

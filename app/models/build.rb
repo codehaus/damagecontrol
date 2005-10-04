@@ -162,7 +162,8 @@ class Build < ActiveRecord::Base
     save
     
     project.build_complete(self)
-    
+    logger.info "Build of #{project.name}'s revision #{revision.identifier} complete. Exitstatus: #{self.exitstatus}" if logger
+
     self.exitstatus
   end
   
