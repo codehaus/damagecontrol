@@ -6,16 +6,18 @@ class InitialSchema < ActiveRecord::Migration
       t.column :build_id,            :integer
       t.column :position,            :integer
     end
+
     create_table :build_logs do |t|
       t.column :data,                :text
     end
+
     create_table :builds do |t|
-      t.column :state,               :text
+      t.column :state,               :string
       t.column :pid,                 :integer
       t.column :exitstatus,          :integer
       t.column :reason,              :text
       t.column :env,                 :text
-      t.column :command,             :text
+      t.column :command,             :string
       t.column :create_time,         :timestamp
       t.column :begin_time,          :timestamp
       t.column :end_time,            :timestamp
@@ -24,33 +26,37 @@ class InitialSchema < ActiveRecord::Migration
       t.column :revision_id,         :integer
       t.column :triggering_build_id, :integer
     end
+
     create_table :projects do |t|
-      t.column :name,                :text
-      t.column :home_page,           :text
-      t.column :relative_build_path, :text
+      t.column :name,                :string
+      t.column :home_page,           :string
+      t.column :relative_build_path, :string
       t.column :lock_time,           :timestamp
       t.column :quiet_period,        :integer
-      t.column :build_command,       :text
+      t.column :build_command,       :string
       t.column :scm,                 :text
       t.column :publishers,          :text
       t.column :scm_web,             :text
       t.column :tracker,             :text
     end
+
     create_table :project_dependencies, :id => false do |t|
       t.column :from_id,             :integer
       t.column :to_id,               :integer
     end
+
     create_table :revision_files do |t|
-      t.column :status,              :text
-      t.column :path,                :text
-      t.column :previous_native_revision_identifier,    :text
-      t.column :native_revision_identifier,             :text
+      t.column :status,              :string
+      t.column :path,                :string
+      t.column :previous_native_revision_identifier,    :string
+      t.column :native_revision_identifier,             :string
       t.column :timepoint,           :timestamp
       t.column :revision_id,         :integer
     end
+
     create_table :revisions do |t|
-      t.column :identifier,          :text
-      t.column :developer,           :text
+      t.column :identifier,          :string
+      t.column :developer,           :string
       t.column :message,             :text
       t.column :timepoint,           :timestamp
       t.column :project_id,          :integer

@@ -1,13 +1,26 @@
 <h1>Appcasting</h1>
 <p>
-Appcasting is a mechanism for software delivery. Appcasting is based on the same concept as <a href="http://en.wikipedia.org/wiki/Podcast">podcasting</a> and was first described (to our knowledge) by <a href="http://www.speirs.org/appcasting/">Frasier Speirs</a>.
+Appcasting is a mechanism for software delivery. Appcasting is based on the same concept as 
+<a href="http://en.wikipedia.org/wiki/Podcast">podcasting</a> and was first described (to our knowledge) 
+by <a href="http://www.speirs.org/appcasting/">Frasier Speirs</a>.
 </p>
 <p>
-DamageControl supports Appcasting through built-in RSS feeds. In order to use Appcasting you need an &lt;enclosure&gt; aware RSS reader such as <a href="http://ranchero.com/netnewswire/">NetNewsWire</a> (OS X), <a href="http://www.bradsoft.com/feeddemon/">FeedDemon</a> (Windows) or <a href="http://rasterweb.net/raster/code/renko.html">Renko</a> (Linux).
+Each DamageControlled project's RSS feed can embed an appcast if the project's artifact archiver 
+is enabled. The first declared artifact in the artifact publisher will automatically be included 
+in an &lt;enclosure&gt; tag in the project's RSS feed. 
 </p>
 <p>
-By subscribing to the RSS feed of a project your &lt;enclosure&gt; aware RSS reader will ask you if you want to download build artifacts as they become available.
+You can declare several artifacts for each project, but only the first (in alphabetical order of its path) 
+will be published as an appcast. (Later DamageControl versions will probably allow 
+you to specify exactly what artifact(s) you want to publish via appcasting).
 </p>
 <p>
-You can define Appcasts for your project by enabling the ArtifactArchiver publisher. The first artifact defined for the artifact publisher will automatically included as an appcast in the project's RSS feed. You can specify several artifacts for each build, but only the first one will serve as an appcast. (Currently the order is defined by alphabetical order. Later DamageControl versions will probably allow you to specify exactly what artifact(s) you want to publish via appcasting).
+Anyone with an &lt;enclosure&gt; aware RSS reader such as <a href="http://ranchero.com/netnewswire/">NetNewsWire</a> 
+(OS X), <a href="http://www.bradsoft.com/feeddemon/">FeedDemon</a> (Windows) or 
+<a href="http://rasterweb.net/raster/code/renko.html">Renko</a> (Linux) will then be asked if they want to download
+the latest binaries on each successful build.
+</p>
+<p>
+(We realise that very active teams will offer new binaries several times per day, which might be a bit much. Later versions
+of DamageControl may allow you to control when an appcast occurs in the RSS and when not %>
 </p>

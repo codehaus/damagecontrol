@@ -1,7 +1,7 @@
 These are important TODOs that must be fixed before release and RubyConf.
 
 == General stuff ==
-* Fix SQLite concurrency problems
+* DONE (sqlite3 fixed it) Fix SQLite concurrency problems
 * DONE Make daemon do more than just SCM polling. Also has to build manually requested builds/dependency triggered builds!
 * DONE Make daemon sleep before it starts the project loop again
 * Get DC to work with lighttpd (too damn slow with WEBRick). script/lighttpd
@@ -13,17 +13,19 @@ These are important TODOs that must be fixed before release and RubyConf.
       /app/controllers/application.rb:70:in `load_projects' 
     * see application.rb. I tried some require_dependency, but it doesn't help
     * this NameError also occurs sometimes with WEBrick
-* Move doco under public/doc so that a stable web server can serve it even when DC is down
-* Avoid NameError with WEBrick that occur randomly (see above)
-* Make sure DC runs on Windows/Linux (people are going to be disappointed if the release only works on os x)
-* Make DC run against PostgreSQL (MySQL is not popular at Codehaus)
-* Use XForge for release in DC and RSCM
-* Merge branch back to trunk
+* WONT_FIX Move doco under public/doc so that a stable web server can serve it even when DC is down
+* DONE Avoid NameError with WEBrick that occur randomly (see above)
+* DONE (Windows/Mac) Make sure DC runs on Windows/Linux (people are going to be disappointed if the release only works on os x)
+* WONT_FIX_NOW Make DC run against PostgreSQL (MySQL is not popular at Codehaus)
+* DONE (RSCM) Use XForge for release in DC and RSCM
+* WONT_FIX Merge branch back to trunk
+* Copy Svn to textdrive
+* Migrate to Collaboa on Textdrive
 * DONE Use migrations (i.e. get them to work on sqlite!)
-* Grok how to use switchtower to deploy dc to codehaus
+* Grok how to use switchtower to deploy dc to textdrive
 * Make DC self hosting
 * DONE Implement project deletion
-* Package DC as a Gem and make sure it can run. Challenges:
+* WONT_FIX Package DC as a Gem and make sure it can run. Challenges:
   * Gem install dir is readonly. How to make the app read the db from elsewhere? Must be configurable w/o changing Gem.
 
 == UI stuff ==
@@ -31,7 +33,7 @@ These are important TODOs that must be fixed before release and RubyConf.
 * Fix diff logic so diffs can be shown in web (LOW PRI, OTHER SCM WEB IS WORKING)
 * DONE Integrate scm_web and tracker with XForge (lots of stuff moved here)
 * DONE Fix the project overview to the right
-* Fix settings bug that unsets SCM if saved w/o clicking SCM (use hidden radios perhaps? see damagecontrol.js and enabled_field macro)
+* DONE Fix settings bug that unsets SCM if saved w/o clicking SCM (use hidden radios perhaps? see damagecontrol.js and enabled_field macro)
 * Align build/revision content to the top
 * DONE Use a proper 3-col layout
 * General ui CSS niceness (logo and professional looking layout can wait)

@@ -10,12 +10,10 @@ require_gem 'RedCloth'
 require_gem 'ruby-growl'
 require_gem 'meta_project'
 require_gem 'mime-types'
-require_gem 'sqlite-ruby'
+require_gem 'sqlite3-ruby'
 require_gem 'x10-cm17a'
-if(DamageControl::Platform.family == "win32")
+if(DamageControl::Platform.family == "mswin32")
   require 'win32/sound'
-  # http://wiki.rubyonrails.com/rails/pages/iconv
-  require 'i386-mswin32/iconv'
 end
 
 require 'optparse'
@@ -38,7 +36,6 @@ require 'damagecontrol/build_daemon'
 require 'damagecontrol/core_ext/class'
 require 'damagecontrol/core_ext/hash'
 require 'damagecontrol/core_ext/pathname'
-require 'damagecontrol/sqlite/retry'
 
 # This is normally not needed, but we do it to avoid strange problems with const_missing
 # that occur in the rubyscript2exe executables. Doesn't do any harm for conventional use.

@@ -5,7 +5,7 @@ module DamageControl
     def family
       target_os = Config::CONFIG["target_os"] or ""
       return "popwerpc-darwin" if target_os.downcase =~ /darwin/
-      return "win32"  if target_os.downcase =~ /32/
+      return "mswin32"  if target_os.downcase =~ /32/
       return "cygwin" if target_os.downcase =~ /cyg/
       # TODO: distinguish between ELF and, err, what's the other one?
       return "linux"

@@ -1,11 +1,11 @@
 development:
-  adapter: sqlite
+  adapter: sqlite3
   dbfile: <%= DC_DATA_DIR %>/db/development.db
 
 test:
-  adapter: sqlite
+  adapter: sqlite3
   dbfile: <%= DC_DATA_DIR %>/db/test.db
 
 production:
-  adapter: sqlite
+  adapter: sqlite3
   dbfile: <%= DC_DATA_DIR %>/db/production.db

@@ -25,6 +25,7 @@
     <% if(@project) %>
       | <%= link_to "RSS", :controller => "project", :action => "rss", :id => @project.id %>
     <% end %>
+  | <%= link_to "Documentation", :controller => "doc", :action => "index" %>
     </p>
   </div>
 

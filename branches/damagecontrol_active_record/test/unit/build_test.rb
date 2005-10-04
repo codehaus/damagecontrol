@@ -157,6 +157,6 @@ class BuildTest < Test::Unit::TestCase
 private
   
   def env_var(var)
-    family == "win32" ? "%#{var}%" : "$#{var}"
+    family == "mswin32" ? "%#{var}%" : "$#{var}"
   end
 end

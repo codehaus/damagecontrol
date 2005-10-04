@@ -6,20 +6,32 @@ TODO: this is a bit theorethical. Make it more speakeasy.
 DamageControl tasks are, well <em>tasks</em> that can be executed before or after the execution of a build.
 </p>
 <p>
-If you are familiar with a scripted build tool such as Ant or Rake you are probably familiar with their concept of tasks. DamageControl tasks are similar, except that they are configured via the web interface rather than via a script.
+If you are familiar with a scripted build tool such as Ant or Rake you are probably familiar with their 
+concept of tasks. DamageControl tasks are similar, except that they are configured via the web interface 
+rather than via a script.
 </p>
 <p>
-Tasks (in the broader sense of build management) can be very generic or completely bespoke for the project. An example of a bespoke task is the configuration of a test coverage tool. An example of a more generic task is the running of a tool like Simian to determine the amount of duplicate code in a project's codebase.
+Tasks (in the broader sense of build management) can be very generic or completely bespoke for the project. 
+An example of a bespoke task is the configuration of a test coverage tool. An example of a more generic task 
+is the running of a tool like Simian to determine the amount of duplicate code in a project's codebase.
 </p>
 <p>
-The less complex configuration of a task, the more generic it is. The DamageControl tasks are placed towards the 'generic' end of the task spectrum.
+The less complex configuration of a task, the more generic it is. The DamageControl tasks are placed towards 
+the 'generic' end of the task spectrum.
 </p>
 <p>
-If you are a build script guru, chances are that you prefer to write these tasks by hand in your build tool's scripting language. 
+If you are a build script guru, chances are that you prefer to write these tasks by hand in your build tool's 
+scripting language. 
 </p>
 <p>
-There is a lot of smart things to do that never gets done. -Like failing a build if there is too much duplication of code. -Or tracking the evolution of a certain metric like test coverage. The main reason why smart things don't get done is that people either don't know about these smart things, or they know about them but don't have time to do them. -Or they might know about them and have oodles of time, but lack the skills to configure them properly. Writing good build scripts is an art similar to (but different from) conventional programming.
+There is a lot of smart things to do that never gets done. -Like failing a build if there is too much 
+duplication of code. -Or tracking the evolution of a certain metric like test coverage. The main reason why 
+smart things don't get done is that people either don't know about these smart things, or they know about 
+them but don't have time to do them. -Or they might know about them and have oodles of time, but lack the 
+skills to configure them properly. Writing good build scripts is an art similar to (but different from) 
+traditional programming.
 </p>
 <p>
-This is why DamageControl ships with support for a number of build-related tasks that we believe are vital to a sound software project. We hope that these tasks will make your project more agile.
+This is why DamageControl ships with support for a number of build-related tasks that we believe are vital to 
+a sound software project. We hope that these tasks will make your project more agile.
 </p>
