@@ -1,5 +1,14 @@
 #!/usr/local/bin/ruby
 
+# This script slurps a YAML file from stdin and sets up a new (or, modifies an existing) 
+# DamageControl project. Useful for setting up projects in an automated fashion.
+#
+# Usage:
+#
+# ruby script/importer < path/to/project/yaml/file
+#
+# See the example YAML file in this directory for an example.
+
 require File.dirname(__FILE__) + "/../config/environment"
 project_hash = HashWithIndifferentAccess.new(YAML.load(STDIN))
 

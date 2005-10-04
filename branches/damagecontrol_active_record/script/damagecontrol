@@ -1,6 +1,8 @@
 #!/usr/local/bin/ruby
 
-# This is the main bootstrapping script for DamageControl.
+# This is the main bootstrapping script for DamageControl. It forks off zero or more builders
+# (builders are headless daemons that get code from scm and build code) and zero or one server
+# (server is the standard Rails script to start the webapp in WEBrick)
 
 require 'optparse'
 require 'webrick'
