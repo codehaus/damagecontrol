@@ -8,6 +8,7 @@ This release adds new API methods for accessing files and their revisions and co
 * Added RSCM::HistoryFile.revision_files methods to get all revisions of a file.
 * Added RSCM::RevisionFile.open to get the contents of a specific revision of a file.
 * Set defaults for Subversion username/password
+* Removed logging code (may reintroduce later if I come up with a better way to configure it)
 
 == Version 0.3.4
 

@@ -134,7 +134,8 @@ task :release_files => [:gem] do
   end
 end
 
-task :publish_doc => [:rdoc] do
+desc "Publish docs/website"
+task :publish_doc  do
   publisher = Rake::RubyForgePublisher.new(PKG_NAME, ENV['RUBYFORGE_USER'])
   publisher.upload
 end
