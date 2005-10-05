@@ -20,6 +20,10 @@ module RSCM
     ann :tip => "If you use ssh, specify the URL as svn+ssh://username@server/path/to/repo"
     attr_accessor :url
 
+    ann :description => "Path"
+    ann :tip => "You only need to specify this if you want to be able to automatically create the repository. This should be the relative path from the start of the repository <br>to the end of the URL. For example, if your URL is <br>svn://your.server/path/to/repository/path/within/repository <br>then this value should be path/within/repository."
+    attr_accessor :path
+
     ann :description => "Username"
     ann :tip => "This only applies to svn:// URLs."
     attr_accessor :username
@@ -28,12 +32,14 @@ module RSCM
     ann :tip => "This only applies to svn:// URLs."
     attr_accessor :password
 
-    ann :description => "Path"
-    ann :tip => "You only need to specify this if you want to be able to automatically create the repository. This should be the relative path from the start of the repository <br>to the end of the URL. For example, if your URL is <br>svn://your.server/path/to/repository/path/within/repository <br>then this value should be path/within/repository."
-    attr_accessor :path
-
     def initialize(url="", path="")
       @url, @path = url, path
+      @username = ""
+      @password = ""
+    end
+    
+    def to_yaml_properties
+      ["@url", "@password", "@username", "@password"]
     end
 
     def add(relative_filename)
@@ -320,10 +326,10 @@ module RSCM
 
     def login_options
       result = ""
-      u = @username ? @username.strip : nil
-      p = @password ? @password.strip : nil
-      result << "--username #{u} " if u
-      result << "--password #{p} " if p
+      u = @username ? @username.strip : ""
+      p = @password ? @password.strip : "
+      result << "--username #{u} " unless u == ""
+      result << "--password #{p} " unless p == ""
       result
     end
 

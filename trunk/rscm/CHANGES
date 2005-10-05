@@ -7,13 +7,14 @@ This release adds new API methods for accessing files and their revisions and co
 * Added new scm.history_file method (returning RSCM::HistoryFile).
 * Added RSCM::HistoryFile.revision_files methods to get all revisions of a file.
 * Added RSCM::RevisionFile.open to get the contents of a specific revision of a file.
+* Set defaults for Subversion username/password
 
 == Version 0.3.4
 
 This release fixes some bugs on windows.
 
 * Removed redirection to dev/null for CVS commands. 2>nul didn't seem to work on windows.
-* Fixed a the path to touch.exe
+* Fixed the path to touch.exe (needed in tests)
 
 == Version 0.3.3
 
