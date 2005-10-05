@@ -50,7 +50,7 @@ var settings = new Settings("setting-icons");
       %>
     </div>
     <div class="setting-icon-column">
-      <% if(@project) %>
+      <% if(@project.id) %>
         <%=
           link_to(
             image_tag(
@@ -69,7 +69,7 @@ var settings = new Settings("setting-icons");
       <div class="setting-name-column"><%= object.visual_name %></div>
     <% end %>
     <div class="setting-name-column">Import</div>
-    <% if(@project) %>
+    <% if(@project.id) %>
       <div class="setting-name-column">Export</div>
     <% end %>
   </div>

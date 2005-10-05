@@ -1,9 +1,8 @@
 module FileSystemHelper
-  DEFAULT_ICON_PATH = '/images/filetypes/txt.gif'
+  DEFAULT_ICON_PATH = '/images/filetypes/txt.gif' unless defined? DEFAULT_ICON_PATH
 
   def file_icon(file_name)
     icon_path = nil
-STDERR.puts(file_name)
     if(File.directory?(file_name))
       icon_path = "/images/filetypes/dir.gif"
     else

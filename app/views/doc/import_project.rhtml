@@ -1,34 +1,51 @@
 <h1>Importing projects</h1>
+
 <p>
-  DamageControl projects can be configured either through the web interface or through
-  a console interface. (There is currently no web service interface for project configuration).
+Also see <%= link_to "exporting projects", :action => "export_project" %>.
 </p>
 
-<h2>Web interface</h2>
 <p>
-  This option is recommended for people who are new to DamageControl and want to stay away from
-  configuration files.
-</p>
-<p>
-  TODO: screenshot
-</p>
-<p>
-  You can use the web interface to either configure projects from scratch, or you can import
-  all project settings if your project is currently stored in a format that DamageControl understands.
-  Please see the Project import page in the DamageControl web interface for more details.
+  Projects can be created and configured in other ways than manually entering
+  information via the <%= link_to "web interface", :action => "project_settings_web" %>.
+  The following import options are available:
 </p>
 
-<h2>Console interface</h2>
+<h2>Import via web interface</h2>
 <p>
-  This option is recommended for people who want a more automated way to configure projects.
-  DamageControl ships with a script that will read a YAML file and update the database with
-  settings from that YAML file. Example usage:
+  If you select <em>Import</em> from the project configuration screen you will be presented
+  with a new screen where you can import project settings from several sources:  
+</p>
+
+<h3>SCM browser</h3>
+<p>
+  You can enter an SCM browser 'directory' URL such as
+  <a href="http://svn.xstream.codehaus.org/trunk/xstream/">http://svn.xstream.codehaus.org/trunk/xstream/</a>.
+  This should work if the URL is pointing to one of the following SCM browsers:
+  <ul>
+    <li>RubyForge</li>
+    <li>SourceForge</li>
+    <li>Codehaus</li>
+    <li>Trac installation</li>
+  </ul>
+  DamageControl will set up 
+  <%= link_to "issue tracker integration", :action => "issue_tracker_integration" %> 
+  <%= link_to "scm browser integration", :action => "scm_web" %>
+  and a default set of
+  <%= link_to "publishers", :action => "publisher" %> 
+  for your project.
+  DamageControl will also guess your build command (based on what it can find in the 'directory' URL.
+</p>
+
+<h2>Import via console</h2>
+<p>
+  DamageControl ships with a script that can read a Project YAML file and update the database with
+  settings from that file. Example usage:
 </p>
 
 <pre>ruby script/import < path/to/project_file.yml</pre>
 
 <p>
-  Here is an example of a project YAML file:
+  Here is an example of a Project YAML file:
 </p>
 
 <pre>
@@ -36,13 +53,8 @@
 </pre>
 
 Please check out the RubyDoc APIs of DamageControl, <a href="http://rscm.rubyforge.org/">RSCM</a> 
-and <a href="http://xforge.rubyforge.org/">MetaProject</a> to see what attributes you can specify
-for each class.
+and <a href="http://xforge.rubyforge.org/">MetaProject</a> to see what attributes you can specify.
 
-<h2>Importing settings from SCM</h2>
+<h2>Import settings from a YAML file under SCM</h2>
 If your project has a file called damagecontrol.yml in the root directory, DamageControl will
-update the settings autmatically whenever that file is updated.
-
-<h2>Exporting settings</h2>
-By selecting the Export link, DamageControl will export your project's current settings into a YAML file
-for you.
+update the settings autmatically whenever that file is changed.

@@ -2,11 +2,14 @@
 
 require 'optparse'
 
-ENV["RAILS_ENV"] = "development"
+ENV['RAILS_ENV'] = "development"
 ARGV.options do |opts|
+  script_name = File.basename($0)
+  opts.banner = "Usage: ruby #{script_name} [options]"
+
   opts.on("-e", "--environment=name", String,
-          "Specifies the environment to run this server under (test/development/production).",
-          "Default: development") { |ENV["RAILS_ENV"]|}
+          "Specifies the environment (test/development/production).",
+          "Default: #{ENV['RAILS_ENV']}") { |ENV['RAILS_ENV']|}
 
   opts.on("--data-dir=dir", String, 
           "DamageControl data directory", 
@@ -14,6 +17,10 @@ ARGV.options do |opts|
 
   opts.on("--id=id", Integer, 
           "Builder id") {|id| BUILDER_ID = id}
+
+  opts.separator ""
+  opts.on("-h", "--help",
+          "Show this help message.") { puts opts; exit }
 
   opts.parse!
   

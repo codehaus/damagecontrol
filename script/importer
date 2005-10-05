@@ -10,7 +10,7 @@
 # See the example YAML file in this directory for an example.
 
 require File.dirname(__FILE__) + "/../config/environment"
-project_hash = HashWithIndifferentAccess.new(YAML.load(STDIN))
+project_hash = YAML.load(STDIN)
 
 project = nil
 if(project_hash[:project][:id])
