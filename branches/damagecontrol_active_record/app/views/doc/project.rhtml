@@ -1,21 +1,32 @@
 <h1>Project</h1>
 <p>
-A DamageControl project consists of settings that define an <%= link_to "SCM", :action=>"scm" %>, a <%= link_to "build command", :action=>"build_command" %>, a set of <%= link_to "publishers", :action=>"publisher" %> and optionally an <%= link_to "issue tracker", :action=>"tracker" %> and an <%= link_to "SCM Web", :action=>"scm_web" %>.
+A DamageControl project consists of settings that define an <%= link_to "SCM", :action=>"scm" %>, 
+a <%= link_to "build command", :action=>"build_command" %>, 
+a set of <%= link_to "publishers", :action=>"publisher" %> 
+and optionally an <%= link_to "issue tracker", :action=>"tracker" %> and an <%= link_to "SCM Web", :action=>"scm_web" %>.
 </p>
 
 <p>
-Projects are defined via DamageControl's integrated web interface and stored in DamageControl's internal database. Fututre versions of DamageControl may provide a web service API for configuration of projects.
+Projects are defined via DamageControl's integrated web interface or console scriptd and stored in DamageControl's internal 
+database. See <%= link_to "importing projects", :action=>"import_project" %>
 </p>
 
 <p>
-Once a project is set up, DamageControl will detect whenever new code is committed (checked in) to the SCM, check out the source code, run the build command (typically Ant, Make, Rake, Nant or some other build tool), and finally publish the results of the build via one or more of the many available <%= link_to "publishers", :action=>"publisher" %>. See the chapter on <%= link_to "build states", :action=>"build_states" %> for more detailed information on the build process.
+Once a project is set up, DamageControl will detect whenever new code is committed (checked in) to the SCM, 
+check out the source code, run the build command (typically Ant, Make, Rake, Nant or some other build tool), 
+and finally publish the results of the build via one or more of the many available 
+<%= link_to "publishers", :action=>"publisher" %>. See the chapter on <%= link_to "build states", :action=>"build_states" %> 
+for more detailed information on the build process.
 </p>
 
 <p>
-Most <%= link_to "build processes", :action=>"build_process" %> will produce one or many artifacts. Examples are Java jar files, Ruby gems, binary executables or libraries, zip or tar.gz bundles, documentation and so forth.
-For each project you can specify what these artifacts are. DamageControl will automatically archive artifacts and make them available for download via the integrated web server.
+Most <%= link_to "build processes", :action=>"build_process" %> will produce one or many artifacts. 
+Examples are Java jar files, Ruby gems, binary executables or libraries, zip or tar.gz bundles, documentation and so forth.
+For each project you can specify what these artifacts are. DamageControl will automatically archive artifacts and 
+make them available for download via the integrated web server.
 </p>
 
 <p>
-Projects can also declare dependencies on other projects. See <%= link_to "project dependencies", :action=>"project_dependencies" %> for more information.
+Projects can also declare dependencies on other projects. See <%= link_to "project dependencies", :action=>"project_dependencies" %> 
+for more information.
 </p>

@@ -319,7 +319,7 @@ LIMIT #{options[:count]}
   # comes from a HTTP request or a YAML file.
   def populate_from_hash(hash)
     hash = HashWithIndifferentAccess.new(hash)
-    self.update_attributes(hash[:project])
+    self.update_attributes(hash)
 
     self.scm        = hash[:scm].deserialize_to_array.find{|scm| scm.enabled}
     self.tracker    = hash[:tracker].deserialize_to_array.find{|tracker| tracker.enabled}
@@ -344,15 +344,7 @@ LIMIT #{options[:count]}
   end
   
   def export_to_hash
-    # TODO: change structure so scm, tracker etc are *under* project. must change rhtml/controllers too.
-    result = {}
-    result["project"] = attributes.delete_if{|k,v| k=="scm" || k=="tracker" || k=="publishers" || k == "scm_web"}
-    result["scm"] = scm
-    result["tracker"] = tracker
-    result["publishers"] = publishers
-    result["scm_web"] = scm_web
-    
-    result
+    attributes
   end
 
 private

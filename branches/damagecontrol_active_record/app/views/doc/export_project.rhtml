@@ -1,0 +1,24 @@
+<h1>Exporting projects</h1>
+
+<p>
+Also see <%= link_to "importing projects", :action => "import_project" %>.
+</p>
+
+<p>
+  Projects can be exported as YAML. There are two ways to do this.
+</p>
+
+<h2>Export via web interface</h2>
+<p>
+  If you select <em>Export</em> from the project configuration screen you will see
+  the project's settings as YAML.  
+</p>
+
+<h2>Export via console and</h2>
+<p>
+  DamageControl ships with a script that can export a project's settings as a Project YAML file. 
+  Example usage:
+</p>
+
+<pre>ruby script/export --project-id=id</pre>
+
