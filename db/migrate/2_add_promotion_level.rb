@@ -3,8 +3,8 @@ class AddPromotionLevel < ActiveRecord::Migration
     create_table :promotion_levels do |t|
       t.column :name, :string
     end
-    PromotionLevel.create :name => "Ready for UAT"
-    PromotionLevel.create :name => "Release"
+    ::PromotionLevel.create :name => "Ready for UAT"
+    ::PromotionLevel.create :name => "Release"
     
     add_column :builds, :promotion_level_id, :integer
   end
