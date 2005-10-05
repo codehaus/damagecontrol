@@ -183,4 +183,13 @@ class ProjectTest < Test::Unit::TestCase
     assert_equal(pending, @project_1.latest_pending_build)
   end
   
+  def FIXMEtest_should_import_and_export_as_yaml
+    import = YAML.load_file(File.dirname(__FILE__) + '/../../damagecontrol.yml')
+    p = Project.new
+    p.populate_from_hash(import)
+    assert_equal("http://damagecontrol.codehaus.org/", p.home_page)
+    export = p.export_to_hash
+    assert_equal(import, export)
+  end
+  
 end
