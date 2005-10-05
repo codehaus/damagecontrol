@@ -122,6 +122,11 @@ class Build < ActiveRecord::Base
   #
   def execute!(begin_time=Time.now.utc)
     raise "Already executed" if exitstatus
+
+    # Make sure the working copy is in sync, and possibly reload settings from
+    # a checked-in damagecotrol.yml
+    revision.sync_working_copy
+
     self.state = Executing.new
     self.begin_time = begin_time
     self.command = self.revision.project.build_command
@@ -132,9 +137,6 @@ class Build < ActiveRecord::Base
     }
     save
     project.build_executing(self)
-    
-    # Make sure the working copy is in sync
-    revision.sync_working_copy
 
     env.each{|k,v| ENV[k]=v}
     Dir.chdir(revision.project.build_dir) do
