@@ -318,6 +318,7 @@ LIMIT #{options[:count]}
   # Populates from fields in a hash. The hash typically
   # comes from a HTTP request or a YAML file.
   def populate_from_hash(hash)
+    hash = HashWithIndifferentAccess.new(hash)
     self.update_attributes(hash[:project])
 
     self.scm        = hash[:scm].deserialize_to_array.find{|scm| scm.enabled}

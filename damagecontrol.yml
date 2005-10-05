@@ -1,7 +1,7 @@
 project: 
   name: DamageControl
   home_page: 'http://damagecontrol.codehaus.org/'
-  build_command: 'rake stats'
+  build_command: 'rake clear-logs'
   relative_build_path: ''
 scm: 
   RSCM::Subversion: 
