@@ -125,6 +125,8 @@ class Build < ActiveRecord::Base
 
     # Make sure the working copy is in sync, and possibly reload settings from
     # a checked-in damagecotrol.yml
+    self.state = SynchingWorkingCopy.new
+    save
     revision.sync_working_copy
 
     self.state = Executing.new
@@ -194,13 +196,26 @@ class Build < ActiveRecord::Base
   def icon
     # Don't ask me why we have to case on the class name and not the class itself
     case state.class.name
-      when Successful.name       then "green-32.gif"
-      when Fixed.name            then "green-32.gif"
-      when Broken.name           then "red-32.gif"
-      when RepeatedlyBroken.name then "red-32.gif"
-      when Executing.name        then "spinner.gif"
-      when NilClass.name         then "grey-32.gif"
+      when Successful.name          then "green-32.gif"
+      when Fixed.name               then "green-32.gif"
+      when Broken.name              then "red-32.gif"
+      when RepeatedlyBroken.name    then "red-32.gif"
+      when Executing.name           then "spinner.gif"
+      when SynchingWorkingCopy.name then "blue-32.gif"
+      when NilClass.name            then "grey-32.gif"
       else "red-pulse-32.gif"
+    end
+  end
+
+  class SynchingWorkingCopy
+    def description
+      "Synching working copy"
+    end
+    def fail
+      Broken.new
+    end
+    def succeed
+      Successful.new
     end
   end
 
@@ -252,7 +267,7 @@ class Build < ActiveRecord::Base
     end
   end 
   
-  STATES = [Executing.new, Successful.new, Fixed.new, Broken.new, RepeatedlyBroken.new] unless defined? STATES
+  STATES = [SynchingWorkingCopy.new, Executing.new, Successful.new, Fixed.new, Broken.new, RepeatedlyBroken.new] unless defined? STATES
   COMPLETE_STATES = [Successful.new, Fixed.new, Broken.new, RepeatedlyBroken.new] unless defined? COMPLETE_STATES
 
 end
