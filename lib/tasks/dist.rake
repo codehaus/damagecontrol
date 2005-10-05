@@ -63,7 +63,7 @@ task :verify_production_environment do
   raise "Build with RAILS_ENV=production to ensure procuction.db is migrated first!" unless RAILS_ENV == "production"
 end
 
-task :copy_dist => [:verify_production_environment, :migrate] do
+task :copy_dist => [:verify_production_environment, :migrate, :clear_logs] do
   FileUtils.rm_rf("dist") if File.exist?("dist")
   FileUtils.mkdir_p(DIST_DIR)
 
@@ -89,7 +89,6 @@ end
 desc "Create a self-contained executable"
 task :rubyscript2exe => [:tar2rubyscript] do
   Dir.chdir "dist" do
-    # Disable gem bundling. We do it our own way (see :copy_exploded_gems)
     ruby "rubyscript2exe.rb #{PKG_FILE_NAME}.rb --dry-run"
   end
 end

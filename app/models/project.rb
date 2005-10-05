@@ -115,6 +115,13 @@ LIMIT #{options[:count]}
     latest_revision.builds.empty?
   end
   
+  # Indicates that a build has started
+  def build_executing(build)
+    publishers.each do |publisher| 
+      publisher.publish_maybe(build)
+    end
+  end
+  
   # Indicates that a build is complete (regardless of its successfulness)
   # Tells each enabled publisher to publish the build
   # and creates a build request for each dependant project
@@ -140,13 +147,6 @@ LIMIT #{options[:count]}
     end
   end
 
-  # Indicates that a build has started
-  def build_executing(build)
-    publishers.each do |publisher| 
-      publisher.publish_maybe(build)
-    end
-  end
-  
   # Creates a new (pending) build for the latest revision
   # of this project. Returns the created Build object.
   def request_build(reason, triggering_build=nil)
