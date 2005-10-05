@@ -34,6 +34,10 @@ class ProjectController < ApplicationController
     find
   end
   
+  def export
+    render :text => "<pre>#{find.export_to_hash.to_yaml}</pre>"
+  end
+  
   def import
     project = @params[:id] ? find : Project.new
     import_settings = @params[:import]

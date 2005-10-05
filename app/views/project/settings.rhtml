@@ -49,6 +49,19 @@ var settings = new Settings("setting-icons");
         ) 
       %>
     </div>
+    <div class="setting-icon-column">
+      <% if(@project) %>
+        <%=
+          link_to(
+            image_tag(
+              "/images/project/export.gif", 
+              :size=>"48x48", :border => 0
+            ), 
+            url_for(:controller => "project", :action => "export", :id => @project.id)
+          ) 
+        %>
+      <% end %>
+    </div>
   </div>
   <div class="setting-names-row">
     <div class="setting-name-column">Show All</div>
@@ -56,6 +69,9 @@ var settings = new Settings("setting-icons");
       <div class="setting-name-column"><%= object.visual_name %></div>
     <% end %>
     <div class="setting-name-column">Import</div>
+    <% if(@project) %>
+      <div class="setting-name-column">Export</div>
+    <% end %>
   </div>
 
   <div id="setting-icons" style="display:block">

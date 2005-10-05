@@ -338,12 +338,21 @@ LIMIT #{options[:count]}
         p = Project.find(project_id)
         if(project.could_depend_on?(p))
           project.dependencies << p
-        else
-          flash["notice"] ||= ""
-          flash["notice"] << "Can't depend on #{p.name}, it would create a cycle.<br/>"
         end
       end
     end
+  end
+  
+  def export_to_hash
+    # TODO: change structure so scm, tracker etc are *under* project. must change rhtml/controllers too.
+    result = {}
+    result["project"] = attributes.delete_if{|k,v| k=="scm" || k=="tracker" || k=="publishers" || k == "scm_web"}
+    result["scm"] = scm
+    result["tracker"] = tracker
+    result["publishers"] = publishers
+    result["scm_web"] = scm_web
+    
+    result
   end
 
 private
