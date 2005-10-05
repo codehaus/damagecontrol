@@ -1,10 +1,6 @@
 module RSCM
   class Better
-    @@logger = nil
-    @@logger = RSCM_DEFAULT_LOGGER
-    
     def self.popen(cmd, mode="r", expected_exit=0, &proc)
-      @@logger.info "Executing command: '#{cmd}'" if @@logger
       ret = IO.popen(cmd, mode) do |io|
         proc.call(io)
       end
