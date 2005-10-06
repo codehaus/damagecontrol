@@ -1,0 +1,43 @@
+<h1>Distributed builds</h1>
+
+<p>
+DamageControl can distribute builds to other machines that have registered as build slaves.
+This can be useful in several scenarios:
+</p>
+
+<h2>Build on several platforms</h2>
+<p>
+Some software is designed to run on different platforms. By using distributed builds, a project
+can be built on other platforms than the machine running the master DamageControl server.
+</p>
+
+<h2>Offloading the master server</h2>
+<p>
+If a DamageControl server is hosting many projects, build queues can quickly clog up and increase
+the time it takes to get feedback from a complete build.
+</p>
+
+<h1>How it works</h1>
+
+<p>
+Registering a machine as a build slave can be done by downloading and running a build slave
+program from the DamageControl server.
+</p>
+
+<p>
+The build slave application is a <a href="http://java.sun.com/products/javawebstart/">Java Web Start</a> application
+that will poll the master server for new builds to execute. When there is, the slave will download a zip file
+from the main server, containing a snapshot of the working copy for a particular revision, plus an XML file containing
+information about how to execute the build.
+</p>
+
+<p>
+The slave will then unzip the zip file to its local file system, execute the build, and zip up the working copy
+(which will now contain build artifacts, logs etc). It will also add a new XML file to the resulting zip, which
+will contain information about the build. It will then upload the zipfile to the master server with a HTTP POST.
+</p>
+
+<p>
+The master server will then unzip the file and do all necessary post processing (such as publishing results) as
+if the build had occurred on the master machine.
+</p>

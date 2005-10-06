@@ -4,36 +4,43 @@ require 'optparse'
 
 ENV['RAILS_ENV'] = "development"
 project_id = nil
-ARGV.options do |opts|
-  script_name = File.basename($0)
-  opts.banner = "Usage: ruby #{script_name} [options]"
 
-  opts.on("-e", "--environment=name", String,
-          "Specifies the environment (test/development/production).",
-          "Default: #{ENV['RAILS_ENV']}") { |ENV['RAILS_ENV']|}
-
-  opts.on("--data-dir=dir", String, 
-          "DamageControl data directory", 
-          "Default: current dir = #{File.expand_path(Dir.pwd)}") {|dir| DC_DATA_DIR = File.expand_path(dir)}
-
-  opts.on("--project-id=id", Integer, 
-          "Project id") {|project_id|}
-
-  opts.separator ""
-  opts.on("-h", "--help",
-          "Show this help message.") { puts opts; exit }
-
-  opts.parse!
+begin
+  ARGV.options do |opts|
+    script_name = File.basename($0)
+    opts.banner = "Usage: ruby #{script_name} [options]"
   
-  unless project_id
-    STDERR.puts "--project-id must be specified"
-    puts
-    puts opts
-    exit 20
+    opts.on("-e", "--environment=name", String,
+            "Specifies the environment (test/development/production).",
+            "Default: #{ENV['RAILS_ENV']}") { |ENV['RAILS_ENV']|}
+
+    opts.on("--data-dir=dir", String, 
+            "DamageControl data directory", 
+            "Default: current dir = #{File.expand_path(Dir.pwd)}") {|dir| DC_DATA_DIR = File.expand_path(dir)}
+
+    opts.on("--project-id=id", Integer, 
+            "Project id") {|project_id|}
+  
+    opts.separator ""
+    opts.on("-h", "--help",
+            "Show this help message.") { puts opts; exit }
+  
+    opts.parse!
+  
+    unless project_id
+      STDERR.puts "--project-id must be specified"
+      puts
+      puts opts
+      exit 20
+    end
   end
+  
+  require File.dirname(__FILE__) + "/../config/environment"
+
+  project = Project.find(project_id)
+  puts project.attributes.to_yaml
+rescue => e
+  STDERR.puts e.message
+  STDERR.puts e.backtrace.join("\n")
+  exit 1
 end
-
-require File.dirname(__FILE__) + "/../config/environment"
-
-project = Project.find(project_id)
-puts project.attributes.to_yaml

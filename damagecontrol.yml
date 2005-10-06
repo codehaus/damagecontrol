@@ -2,6 +2,10 @@ name: DamageControl
 home_page: 'http://damagecontrol.codehaus.org/'
 build_command: 'rake'
 relative_build_path: ''
+generated_files:
+  - target/*
+  - projects/*
+  - artifacts/*
 scm: 
   RSCM::Subversion: 
     url: svn://beaver.codehaus.org/damagecontrol/scm/branches/damagecontrol_active_record

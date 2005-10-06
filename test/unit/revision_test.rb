@@ -50,15 +50,28 @@ class RevisionTest < Test::Unit::TestCase
     assert_equal("here/i/go", ar_revision.revision_files[1].path)
   end
 
-  def test_should_sync_projects_working_copy
+  def test_should_sync_projects_working_copy_and_zip_it
     scm = MockIt::Mock.new
     scm.__expect(:checkout) do |identifier|
       assert_equal("xyz", identifier)
     end
+    scm.__setup(:checkout_dir) do
+      "checkout_dir"
+    end
     @revision_1.project.scm = scm
-    @revision_1.sync_working_copy
+
+    zipper = MockIt::Mock.new
+    zipper.__expect :zip do |dirname, zipfile_name, exclude_patterns|
+      assert_equal "checkout_dir", dirname
+      assert_equal File.expand_path(@revision_1.project.zip_dir + "/xyz.zip"), File.expand_path(zipfile_name)
+      # TODO assert_equal ["build/*", "*.log"], exclude_patterns
+      assert_equal [], exclude_patterns
+    end
+    
+    @revision_1.sync_working_copy(zipper)
     
     scm.__verify
+    zipper.__verify
   end
   
   def test_should_persist_identifier_as_time
