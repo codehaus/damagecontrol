@@ -1,0 +1,12 @@
+require 'fileutils'
+
+task :default => [:hello]
+
+task :hello do
+  STDOUT.puts "Hello"
+  STDERR.puts "World"
+  FileUtils.mkdir_p("sub/directory")
+  File.open("sub/directory/file.txt", "w") do |io|
+    io.puts("This file was generated")
+  end
+end

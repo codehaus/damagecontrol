@@ -1,0 +1,14 @@
+<build-info>
+    <revision>
+        <id>123</id>
+        <identifier>456</identifier>
+        <label>456</label>
+    </revision>
+    <buildcommand>rake.cmd</buildcommand>
+    <environment>
+        <entry>
+            <string>DAMAGECONTROL_BUILD_LABEL</string>
+            <string>456</string>
+        </entry>
+    </environment>
+</build-info>

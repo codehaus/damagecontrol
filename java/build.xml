@@ -1,0 +1,9 @@
+<project name="damagecontrol" default="webstart">
+    <target name="zip-test">
+        <mkdir dir="target"/>
+        <delete file="target/test-project.zip"/>
+        <zip basedir="src/test-project" zipfile="target/test-project.zip"/>
+    </target>
+
+    <target name="webstart"/>
+</project>
