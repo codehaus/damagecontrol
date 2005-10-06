@@ -132,11 +132,7 @@ class Build < ActiveRecord::Base
     self.state = Executing.new
     self.begin_time = begin_time
     self.command = self.revision.project.build_command
-    self.env = {
-      "DAMAGECONTROL_BUILD_LABEL" => revision.identifier.to_s,
-      "PKG_BUILD" => revision.identifier.to_s,
-      "DAMAGECONTROL_CHANGED_FILES" => revision.revision_files.collect{|f| f.path}.join(',')
-    }
+    self.env = revision.build_environment
     save
     project.build_executing(self)
 

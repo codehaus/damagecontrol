@@ -4,6 +4,7 @@ project_1:
   build_command: touch built
   relative_build_path: build_here
   publishers: []
+  generated_files: ["build/*", "*.log"]
 project_2:
   id: 2
   name: project_2

@@ -64,21 +64,21 @@ class ProjectController < ApplicationController
 
   def create
     project = Project.create(@params[:project])
-    project.populate_from_hash(@params)
+    populate_from_hash(project, @params)
     project.save
     redirect_to :action => "edit", :id => project.id
   end
 
   def update
     project = find
-    project.populate_from_hash(@params)
+    populate_from_hash(project, @params)
     project.save
     redirect_to :action => "edit", :id => project.id
   end
   
   def test_publisher
     project = Project.new(@params[:project])
-    project.populate_from_hash(@params)
+    populate_from_hash(project, @params)
 
     publisher_class_name = @params[:publisher_class_name]
     publisher = project.publishers.find{|p| p.class.name == publisher_class_name}
@@ -145,6 +145,14 @@ private
 
   def find
     @project ||= Project.find(@params[:id]) if @params[:id]
+  end
+  
+  def populate_from_hash(project, params)
+    # move 'up' the entries that are under :project.
+    # the POSTed hash (@params) aren't exactly how we want things
+    hash = params.dup
+    hash.merge!(params[:project])
+    project.populate_from_hash(hash)
   end
   
   def define_plugin_rows

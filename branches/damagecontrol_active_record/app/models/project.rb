@@ -30,6 +30,7 @@ class Project < ActiveRecord::Base
   serialize :scm_web
   serialize :tracker
   serialize :publishers
+  serialize :generated_files
 
   def before_destroy
     FileUtils.rm_rf(@basedir) if File.exist?(@basedir)
@@ -160,6 +161,10 @@ LIMIT #{options[:count]}
   
   def working_copy_dir
      mkdir "#{@basedir}/working_copy"
+  end
+
+  def zip_dir
+     mkdir "#{@basedir}/zips"
   end
 
   def build_dir
@@ -319,7 +324,16 @@ LIMIT #{options[:count]}
   # comes from a HTTP request or a YAML file.
   def populate_from_hash(hash)
     hash = HashWithIndifferentAccess.new(hash)
-    self.update_attributes(hash)
+    
+    attrs = hash.dup.delete_if do |k,v|
+      !attribute_names.index(k.to_s) ||
+      k.to_s == "scm" ||
+      k.to_s == "tracker" ||
+      k.to_s == "publishers" ||
+      k.to_s == "scm_web"
+    end
+
+    self.update_attributes(attrs)
 
     self.scm        = hash[:scm].deserialize_to_array.find{|scm| scm.enabled}
     self.tracker    = hash[:tracker].deserialize_to_array.find{|tracker| tracker.enabled}

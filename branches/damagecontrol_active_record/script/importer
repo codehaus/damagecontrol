@@ -9,16 +9,22 @@
 #
 # See the example YAML file in this directory for an example.
 
-require File.dirname(__FILE__) + "/../config/environment"
-project_hash = YAML.load(STDIN)
+begin
+  require File.dirname(__FILE__) + "/../config/environment"
+  project_hash = YAML.load(STDIN)
 
-project = nil
-if(project_hash[:project][:id])
-  puts "Updating existing project with id=#{project_hash[:project][:id]}"
-  project = Project.find(project_hash[:project][:id])
-else
-  puts "Creating new project"
-  project = Project.create(project_hash[:project][:id])
+  project = nil
+  if(project_hash[:id])
+    project = Project.find(project_hash[:id])
+    puts "Updating existing project '#{project.name}'"
+  else
+    puts "Creating new project"
+    project = Project.create(project_hash[:id])
+  end
+  project.populate_from_hash(project_hash)
+  project.save
+rescue => e
+  STDERR.puts e.message
+  STDERR.puts e.backtrace.join("\n")
+  exit 1
 end
-project.populate_from_hash(project_hash)
-project.save
