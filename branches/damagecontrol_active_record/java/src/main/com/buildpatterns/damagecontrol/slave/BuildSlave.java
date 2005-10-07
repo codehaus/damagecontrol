@@ -29,7 +29,7 @@ public class BuildSlave {
     }
 
     BuildInfo getBuildInfo(File buildInfo) throws FileNotFoundException {
-        XStream xstream = new XStream(new DomDriver());
+        XStream xstream = new XStream();
         xstream.alias("build-info", BuildInfo.class);
         xstream.alias("revision", Revision.class);
         return (BuildInfo) xstream.fromXML(new FileReader(buildInfo));
@@ -74,7 +74,7 @@ public class BuildSlave {
     }
 
     private void writeBuildResult(File dir, BuildResult buildResult) throws IOException {
-        XStream xstream = new XStream(new DomDriver());
+        XStream xstream = new XStream();
         xstream.alias("buildresult", BuildResult.class);
         Writer out = new BufferedWriter(new FileWriter(new File(dir, "damagecontrol_build_result.xml")));
         out.write(xstream.toXML(buildResult));
