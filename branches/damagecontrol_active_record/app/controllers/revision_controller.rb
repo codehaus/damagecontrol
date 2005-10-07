@@ -43,7 +43,7 @@ class RevisionController < ApplicationController
   end
   
   def result_zip
-    if(request.post?)    
+    if(request.post?)
       revision = Revision.find(@params[:id])
       zipfile = revision.project.zip_dir + "/#{revision.id}_result.zip"
       File.open(zipfile, "wb") do |io|
