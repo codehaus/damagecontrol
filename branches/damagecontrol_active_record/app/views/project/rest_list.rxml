@@ -1,0 +1,13 @@
+xml.instruct!
+
+xml.projects do
+  @projects.each do |p|
+    xml.project do
+      p.attributes.each do |k,v|
+        if(v.is_a?(Numeric) || v.is_a?(String))
+          xml.tag! k, v
+        end
+      end
+    end
+  end
+end
