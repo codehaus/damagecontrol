@@ -1,4 +1,10 @@
-<project name="damagecontrol-slave" default="jar">
+<project name="damagecontrol-slave" default="sign-jars">
+    <path id="classpath">
+        <fileset dir="lib"/>
+        <pathelement path="target/classes"/>
+        <pathelement path="target/test-classes"/>
+    </path>
+
     <target name="zip-test">
         <mkdir dir="target"/>
         <delete file="target/test-project.zip"/>
@@ -10,20 +16,15 @@
     </target>
 
     <target name="jar" depends="clean,test">
-        <jar basedir="target/classes" jarfile="../public/${ant.project.name}.jar"/>  
+        <jar basedir="target/classes" jarfile="../public/slave/${ant.project.name}.jar"/>
     </target>
 
     <target name="test" depends="compile-test,zip-test">
         <mkdir dir="target/test-reports"/>
         <junit printsummary="yes" haltonfailure="yes">
-            <classpath>
-                <pathelement path="lib/jmock-1.0.1.jar"/>
-                <pathelement path="lib/xstream-1.1.2.jar"/>
-                <pathelement path="target/classes"/>
-                <pathelement path="target/test-classes"/>
-            </classpath>
+            <classpath refid="classpath"/>
 
-           <batchtest fork="no" todir="target/test-reports">
+            <batchtest fork="no" todir="target/test-reports">
                 <fileset dir="src/test">
                     <include name="**/*Test.java"/>
                 </fileset>
@@ -33,11 +34,32 @@
 
     <target name="compile-test" depends="compile-main">
         <mkdir dir="target/test-classes"/>
-        <javac srcdir="src/test" destdir="target/test-classes" classpath="lib/xstream-1.1.2.jar;lib/jmock-1.0.1.jar;target/classes"/>
+        <javac srcdir="src/test" destdir="target/test-classes" classpathref="classpath"/>
     </target>
 
     <target name="compile-main">
         <mkdir dir="target/classes"/>
-        <javac srcdir="src/main" destdir="target/classes" classpath="lib/xstream-1.1.2.jar"/>
+        <javac srcdir="src/main" destdir="target/classes" classpathref="classpath"/>
+    </target>
+
+    <!--
+    http://weblogs.java.net/blog/kirillcool/archive/2005/05/signing_jars_fo.html
+    %JAVA_HOME%\bin\keytool -genkey -keystore damagecontrol.keys -alias http://damagecontrol.buildpatterns.com/ -validity 365
+    -->
+    <target name="sign-jars" depends="jar, copy-jars">
+        <!--genkey alias="damagecontrol-team" storepass="secret"
+            dname="CN=BuildPatterns Team, OU=DamageControl Team, O=buildpatterns.com, C=US"/-->
+
+        <signjar alias="damagecontrol-team" storepass="secret">
+            <fileset dir="../public/slave"/>
+        </signjar>
+    </target>
+
+    <target name="copy-jars">
+        <copy todir="../public/slave">
+            <fileset dir="lib">
+                <exclude name="jmock*.jar"/>
+            </fileset>
+        </copy>
     </target>
 </project>

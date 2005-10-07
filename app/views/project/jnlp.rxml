@@ -7,12 +7,19 @@ xml.jnlp "codebase" => "http://localhost:3000/", "href" => "project/jnlp" do
     xml.description "DamageControl build slave"
     xml.tag! "offline-allowed"
   end
-#  xml.security do
-#    xml.tag! "all-permissions"
-#  end
+
+  xml.security do
+    xml.tag! "all-permissions"
+  end
+
   xml.resources do
-    xml.j2se "version" => "1.3"
-    xml.jar "href" => "/damagecontrol-slave.jar"
+    xml.j2se "version" => "1.4"
+    xml.jar "href" => "/slave/damagecontrol-slave.jar"
+    xml.jar "href" => "/slave/commons-codec-1.2.jar"
+    xml.jar "href" => "/slave/commons-httpclient-3.0-rc3.jar"
+    xml.jar "href" => "/slave/commons-logging-1.0.3.jar"
+    xml.jar "href" => "/slave/xstream-1.1.2.jar"
+    xml.jar "href" => "/slave/xpp3_min-1.1.3.4.I.jar"
   end
   xml.tag! "application-desc", "main-class" => "com.buildpatterns.damagecontrol.slave.Main" 
 end
