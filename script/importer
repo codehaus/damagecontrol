@@ -5,24 +5,31 @@
 #
 # Usage:
 #
-# ruby script/importer < path/to/project/yaml/file
+# ruby script/importer path/to/project/yaml/file
+# ruby script/importer http://some.host/path/to/project/yaml/file
 #
 # See the example YAML file in this directory for an example.
 
+require 'open-uri'
 begin
   require File.dirname(__FILE__) + "/../config/environment"
-  project_hash = YAML.load(STDIN)
+  
+  opener = ARGV[0] =~ /^http/ ? Kernel : File
+  opener.open(ARGV[0]) do |io|
+    project_hash = YAML.load(io)
 
-  project = nil
-  if(project_hash[:id])
-    project = Project.find(project_hash[:id])
-    puts "Updating existing project '#{project.name}'"
-  else
-    puts "Creating new project"
-    project = Project.create(project_hash[:id])
+    project = nil
+    if(project_hash[:id])
+      project = Project.find(project_hash[:id])
+      STDOUT.write "Updating existing project "
+    else
+      STDOUT.write "Creating new project "
+      project = Project.create(project_hash[:id])
+    end
+    project.populate_from_hash(project_hash)
+    puts "'#{project.name}'"
+    project.save
   end
-  project.populate_from_hash(project_hash)
-  project.save
 rescue => e
   STDERR.puts e.message
   STDERR.puts e.backtrace.join("\n")

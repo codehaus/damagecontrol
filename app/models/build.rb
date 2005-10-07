@@ -48,8 +48,10 @@ class Build < ActiveRecord::Base
       else
         NOT_STARTED_LOG
       end
-    else
+    elsif(stdout_id)
       connection.select_one("SELECT data FROM build_logs WHERE id=#{stdout_id}")["data"]
+    else
+      ""
     end
   end
 
@@ -61,8 +63,10 @@ class Build < ActiveRecord::Base
       else
         NOT_STARTED_LOG
       end
-    else
+    elsif(stdout_id)
       connection.select_one("SELECT data FROM build_logs WHERE id=#{stderr_id}")["data"]
+    else
+      ""
     end
   end
 
@@ -152,11 +156,17 @@ class Build < ActiveRecord::Base
     self.exitstatus = $?.exitstatus
     self.end_time = Time.now.utc
     determine_state
-    File.open(revision.project.stdout_file) do |io| 
-      self.stdout_id = connection.insert("INSERT INTO build_logs (data) VALUES('#{connection.quote_string(io.read)}')")
+
+    if(File.exist?(revision.project.stdout_file))
+      File.open(revision.project.stdout_file) do |io| 
+        self.stdout_id = connection.insert("INSERT INTO build_logs (data) VALUES('#{connection.quote_string(io.read)}')")
+      end
     end
-    File.open(revision.project.stderr_file) do |io| 
-      self.stderr_id = connection.insert("INSERT INTO build_logs (data) VALUES('#{connection.quote_string(io.read)}')")
+
+    if(File.exist?(revision.project.stderr_file))
+      File.open(revision.project.stderr_file) do |io| 
+        self.stderr_id = connection.insert("INSERT INTO build_logs (data) VALUES('#{connection.quote_string(io.read)}')")
+      end
     end
 
     save

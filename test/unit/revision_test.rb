@@ -13,7 +13,7 @@ class RevisionTest < Test::Unit::TestCase
   end
 
   def test_should_have_properties
-    assert_equal("xyz", @revision_1.identifier)
+    assert_equal(789, @revision_1.identifier)
     assert_equal("aslak", @revision_1.developer)
     assert_equal("fixed a bug", @revision_1.message)
     assert_equal(Time.utc(1971, 2, 28, 23, 45, 0), @revision_1.timepoint)
@@ -53,7 +53,7 @@ class RevisionTest < Test::Unit::TestCase
   def test_should_sync_projects_working_copy_and_zip_it
     scm = MockIt::Mock.new
     scm.__expect(:checkout) do |identifier|
-      assert_equal("xyz", identifier)
+      assert_equal(789, identifier)
     end
     scm.__setup(:checkout_dir) do
       "checkout_dir"
@@ -63,7 +63,7 @@ class RevisionTest < Test::Unit::TestCase
     zipper = MockIt::Mock.new
     zipper.__expect :zip do |dirname, zipfile_name, exclude_patterns|
       assert_equal "checkout_dir", dirname
-      assert_equal File.expand_path(@revision_1.project.zip_dir + "/xyz.zip"), File.expand_path(zipfile_name)
+      assert_equal File.expand_path(@revision_1.project.zip_dir + "/789.zip"), File.expand_path(zipfile_name)
       # TODO assert_equal ["build/*", "*.log"], exclude_patterns
       assert_equal [], exclude_patterns
     end
@@ -76,27 +76,27 @@ class RevisionTest < Test::Unit::TestCase
   
   def test_should_persist_identifier_as_time
     now = Time.now.utc
-    time_rscm_revision = RSCM::Revision.new
-    time_rscm_revision.identifier = now
-    time_revision = Revision.create(time_rscm_revision)
-    time_revision.reload
-    assert_equal(now, time_revision.identifier)
+    rscm_revision = RSCM::Revision.new
+    rscm_revision.identifier = now
+    revision = Revision.create(rscm_revision)
+    revision.reload
+    assert_equal(now, revision.identifier)
   end
 
   def test_should_persist_identifier_as_string
-    time_rscm_revision = RSCM::Revision.new
-    time_rscm_revision.identifier = "koko"
-    time_revision = Revision.create(time_rscm_revision)
-    time_revision.reload
-    assert_equal("koko", time_revision.identifier)
+    rscm_revision = RSCM::Revision.new
+    rscm_revision.identifier = "koko"
+    revision = Revision.create(rscm_revision)
+    revision.reload
+    assert_equal("koko", revision.identifier)
   end
 
   def test_should_persist_identifier_as_int
-    time_rscm_revision = RSCM::Revision.new
-    time_rscm_revision.identifier = 999
-    time_revision = Revision.create(time_rscm_revision)
-    time_revision.reload
-    assert_equal(999, time_revision.identifier)
+    rscm_revision = RSCM::Revision.new
+    rscm_revision.identifier = 999
+    revision = Revision.create(rscm_revision)
+    revision.reload
+    assert_equal(999, revision.identifier)
   end
 
 end

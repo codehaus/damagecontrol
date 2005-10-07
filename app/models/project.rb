@@ -364,7 +364,7 @@ LIMIT #{options[:count]}
 private
 
   def set_defaults
-    @basedir = "#{DC_DATA_DIR}/projects/#{id}"
+    @basedir = File.expand_path("#{DC_DATA_DIR}/projects/#{id}")
     FileUtils.mkdir_p @basedir unless File.exist?(@basedir)
     self.scm.checkout_dir = working_copy_dir if self.scm
     self.scm.enabled = true if self.scm

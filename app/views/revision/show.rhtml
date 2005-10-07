@@ -1,4 +1,7 @@
-<h1><%= link_to(@project.name, :controller => "project", :action => "edit", :id => @project.id) %> revision <%= @revision.identifier %></h1>
+<h1>
+  <%= link_to(@project.name, :controller => "project", :action => "edit", :id => @project.id) %> 
+  revision <%= @revision.label %>
+</h1>
 <p>
 <% unless @revision.builds.empty? %>
   Builds:

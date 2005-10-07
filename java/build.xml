@@ -1,9 +1,43 @@
-<project name="damagecontrol" default="webstart">
+<project name="damagecontrol-slave" default="jar">
     <target name="zip-test">
         <mkdir dir="target"/>
         <delete file="target/test-project.zip"/>
         <zip basedir="src/test-project" zipfile="target/test-project.zip"/>
     </target>
 
-    <target name="webstart"/>
+    <target name="clean">
+        <delete dir="target"/>
+    </target>
+
+    <target name="jar" depends="clean,test">
+        <jar basedir="target/classes" jarfile="../public/${ant.project.name}.jar"/>  
+    </target>
+
+    <target name="test" depends="compile-test,zip-test">
+        <mkdir dir="target/test-reports"/>
+        <junit printsummary="yes" haltonfailure="yes">
+            <classpath>
+                <pathelement path="lib/jmock-1.0.1.jar"/>
+                <pathelement path="lib/xstream-1.1.2.jar"/>
+                <pathelement path="target/classes"/>
+                <pathelement path="target/test-classes"/>
+            </classpath>
+
+           <batchtest fork="no" todir="target/test-reports">
+                <fileset dir="src/test">
+                    <include name="**/*Test.java"/>
+                </fileset>
+            </batchtest>
+        </junit>
+    </target>
+
+    <target name="compile-test" depends="compile-main">
+        <mkdir dir="target/test-classes"/>
+        <javac srcdir="src/test" destdir="target/test-classes" classpath="lib/xstream-1.1.2.jar;lib/jmock-1.0.1.jar;target/classes"/>
+    </target>
+
+    <target name="compile-main">
+        <mkdir dir="target/classes"/>
+        <javac srcdir="src/main" destdir="target/classes" classpath="lib/xstream-1.1.2.jar"/>
+    </target>
 </project>

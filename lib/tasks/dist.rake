@@ -34,27 +34,29 @@ PKG_FILE_NAME = "#{PKG_NAME}-#{PKG_VERSION}"
 
 # FileList excludes .svn files by default
 PKG_FILES = FileList[
-  'init.rb', # RubyScript2Exe bootstrapper
-  '[A-Z]*',
-  'Rakefile',
-  'README.license',
-  'app/**/*',
+  "init.rb", # RubyScript2Exe bootstrapper
+  "[A-Z]*",
+  "Rakefile",
+  "README.license",
+  "app/**/*",
   "bin/#{DamageControl::Platform.family}/sqlite3*",
-  'components/**/*',
-  'config/**/*',
-  'db/production.db',
-  'db/migrate/*',
-  'doc/**/*',
-  'lib/**/*',
-  'log/**/*',
-  'public/**/*',
-  'script/**/*',
-  'vendor/rails/actionmailer/lib/**/*',
-  'vendor/rails/actionpack/lib/**/*',
-  'vendor/rails/actionwebservice/lib/**/*',
-  'vendor/rails/activerecord/lib/**/*',
-  'vendor/rails/activesupport/lib/**/*',
-  'vendor/rails/railties/lib/**/*'
+  "bin/eee*",
+  "bin/*rubyscript*",
+  "components/**/*",
+  "config/**/*",
+  "db/production.db",
+  "db/migrate/*",
+  "doc/**/*",
+  "lib/**/*",
+  "log/**/*",
+  "public/**/*",
+  "script/**/*",
+  "vendor/rails/actionmailer/lib/**/*",
+  "vendor/rails/actionpack/lib/**/*",
+  "vendor/rails/actionwebservice/lib/**/*",
+  "vendor/rails/activerecord/lib/**/*",
+  "vendor/rails/activesupport/lib/**/*",
+  "vendor/rails/railties/lib/**/*"
 ]
 
 DIST_DIR = "dist/#{PKG_FILE_NAME}"

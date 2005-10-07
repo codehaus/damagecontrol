@@ -2,7 +2,7 @@ class ProjectController < ApplicationController
   include MetaProject::ProjectAnalyzer
   include DamageControl::Platform
 
-  layout "application", :except => :list
+  layout "application", :except => [:list, :jnlp]
   before_filter :define_feeds
     
   def index
@@ -122,6 +122,11 @@ class ProjectController < ApplicationController
   def builds_rss
     find
     render :text => @project.builds_rss(self)
+  end
+  
+  # Java WebStart
+  def jnlp
+    response.headers["Content-Type"] = "application/x-java-jnlp-file"
   end
   
 protected
