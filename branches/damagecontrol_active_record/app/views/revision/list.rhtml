@@ -3,7 +3,7 @@
   <% @revisions.each do |revision| %>
     <tr>
       <td nowrap="nowrap">
-        <%= link_to(revision.identifier, :controller => "revision", :action => "show", :id => revision.id) %>
+        <%= link_to(revision.label, :controller => "revision", :action => "show", :id => revision.id) %>
         (<%= revision.developer %>)
       </td>
       <td>

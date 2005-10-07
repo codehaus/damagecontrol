@@ -36,7 +36,7 @@ class BuildTest < Test::Unit::TestCase
     build.reload
     
     assert_equal("echo hello #{env_var('DAMAGECONTROL_BUILD_LABEL')}", build.command)
-    assert_match(/hello xyz/, build.stdout)
+    assert_match(/hello 789/, build.stdout)
     assert_equal("", build.stderr)
     assert_equal(0, build.exitstatus)
     assert_equal(Build::Fixed, build.state.class)
@@ -153,7 +153,7 @@ class BuildTest < Test::Unit::TestCase
     b = @revision_3.builds.create
     assert_equal(120, b.estimated_duration)
   end
-
+  
 private
   
   def env_var(var)

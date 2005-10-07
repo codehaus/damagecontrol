@@ -3,6 +3,8 @@
 # discover what it needs to bundle up!
 require 'damagecontrol/platform'
 
+
+##### START: ALL OF THIS MUST BE INSTALLED MANUALLY
 require_gem 'rscm'
 require_gem 'jabber4r'
 require_gem 'rake'
@@ -16,6 +18,7 @@ require_gem 'x10-cm17a'
 if(DamageControl::Platform.family == "mswin32")
   require 'win32/sound'
 end
+##### END: ALL OF THIS MUST BE INSTALLED MANUALLY
 
 require 'optparse'
 require 'webrick'

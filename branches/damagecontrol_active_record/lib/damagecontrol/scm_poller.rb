@@ -17,21 +17,26 @@ module DamageControl
     def persist_revisions(project, rscm_revisions)
       rev = nil
       logger.info "Persisting #{rscm_revisions.length} new revisions for #{project.name}" if logger
-      rscm_revisions.each do |rscm_revision|
-        # We're not doing:
-        #   project.revisions.create(revision)
-        # because of the way Revision.create is implemented (overridden).
-        # TODO: chop up in smaller txns! This will reduce the likelihood of collision with web ui
-        rscm_revision.project_id = project.id
-        
-        # This will go on the web and scrape issue summaries. Might take a little while....
-        begin
-          # TODO: parse patois messages here too.
-          rscm_revision.message = project.tracker.markup(rscm_revision.message) if project.tracker
-        rescue => e
-          logger.warn "Error marking up issue summaries for #{project.name}: #{e.message}" if logger
+      position = project.revisions.length
+      Revision.transaction do
+        rscm_revisions.each do |rscm_revision|
+          # TODO: chop up in bigger txns! This will reduce the likelihood of collision with web ui
+          rscm_revision.project_id = project.id
+          rscm_revision.position = position
+          position += 1
+
+          # This will go on the web and scrape issue summaries. Might take a little while....
+          begin
+            # TODO: parse patois messages here too.
+            rscm_revision.message = project.tracker.markup(rscm_revision.message) if project.tracker
+          rescue => e
+            logger.warn "Error marking up issue summaries for #{project.name}: #{e.message}" if logger
+          end
+          # We're not doing:
+          #   project.revisions.create(revision)
+          # because of the way Revision.create is implemented (overridden).
+          rev = Revision.create(rscm_revision)
         end
-        rev = Revision.create(rscm_revision)
       end
       rev
     end

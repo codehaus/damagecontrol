@@ -1,7 +1,7 @@
 revision_1:
   id: 1
   project_id: 1
-  identifier: [xyz]
+  identifier: [789]
   developer: aslak
   message: fixed a bug
   timepoint: 1971-02-28 23:45:00 Z

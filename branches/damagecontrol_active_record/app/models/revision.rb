@@ -12,6 +12,21 @@ class Revision < ActiveRecord::Base
   def identifier
      (YAML::load(self[:identifier]))[0]
   end
+
+  # An integer that serves as a label. If the identifier is a number,
+  # same as that - otherwise a custom counter.
+  # The purpose of the label is simply to display a nicer label than the
+  # revision identifier in the case where the identifier is not a number
+  # (but e.g. a Time, as it is with CVS).
+  def label
+    if(identifier.is_a?(Numeric))
+      identifier
+    elsif(position && project && project.initial_revision_label)
+      position + project.initial_revision_label
+    else
+      nil
+    end
+  end
   
   def self.create(rscm_revision)
     revision = super(rscm_revision)
@@ -46,8 +61,8 @@ class Revision < ActiveRecord::Base
   # Environment variables to set when building this revision.
   def build_environment
     {
-      "DAMAGECONTROL_BUILD_LABEL" => identifier.to_s,
-      "PKG_BUILD" => identifier.to_s,
+      "DAMAGECONTROL_BUILD_LABEL" => label.to_s,
+      "PKG_BUILD" => label.to_s,
       "DAMAGECONTROL_CHANGED_FILES" => revision_files.collect{|f| f.path}.join(',')
     }
   end
@@ -78,30 +93,33 @@ private
   def zip(zipper)
     return unless project.scm && project.scm.checkout_dir 
     zipdir = project.scm.checkout_dir
-    zipfile_name = project.zip_dir + "/#{identifier}.zip"
+    zipfile_name = project.zip_dir + "/#{label}.zip"
+    File.delete(zipfile_name) if File.exist?(zipfile_name)
     
     # TODO use this when we have implemented 'array' editing in the web interface
     # excludes = project.generated_files
 
     excludes = []
     zipper.zip(zipdir, zipfile_name, excludes) do |zipfile|
-      zipfile.file.open("damagecontrol_build_info.yml", "w") do |f| 
-        f.puts("<build_info>")
-        f.puts("  <revision>#{identifier}</revision>")
-        f.puts("  <build_command>#{project.build_command}</build_command>")
-        f.puts("  <env-vars>")
-        f.puts("    <map>")
+      zipfile.file.open("damagecontrol_build_info.xml", "w") do |f| 
+        f.puts("<build-info>")
+        f.puts("  <revision>")
+        f.puts("    <id>#{id}</id>")
+        f.puts("    <identifier>#{identifier}</identifier>")
+        f.puts("    <label>#{label}</label>")
+        f.puts("  </revision>")
+        f.puts("  <buildcommand>#{project.build_command}</buildcommand>")
+        f.puts("  <environment>")
 
         build_environment.each do |k, v|
-        f.puts("      <entry>")
-        f.puts("        <string>#{k}</string>")
-        f.puts("        <string>#{v}</string>")
-        f.puts("      </entry>")
+        f.puts("    <entry>")
+        f.puts("      <string>#{k}</string>")
+        f.puts("      <string>#{v}</string>")
+        f.puts("    </entry>")
         end
 
-        f.puts("    </map>")
-        f.puts("  </env-vars>")
-        f.puts("</build_info>")
+        f.puts("  </environment>")
+        f.puts("</build-info>")
       end
     end    
   end
@@ -112,6 +130,7 @@ end
 # from an RSCM one
 class RSCM::Revision
   attr_accessor :project_id
+  attr_accessor :position
   
   def stringify_keys!
   end
@@ -119,6 +138,7 @@ class RSCM::Revision
   def reject
     {
       "project_id" => project_id,
+      "position" => position,
       "identifier" => identifier,
       "developer" => developer,
       "message" => message,
