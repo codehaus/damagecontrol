@@ -2,7 +2,7 @@ class ProjectController < ApplicationController
   include MetaProject::ProjectAnalyzer
   include DamageControl::Platform
 
-  layout "application", :except => [:list, :jnlp]
+  layout "application", :except => [:list, :jnlp, :rest_list]
   before_filter :define_feeds
     
   def index
@@ -127,6 +127,11 @@ class ProjectController < ApplicationController
   # Java WebStart
   def jnlp
     response.headers["Content-Type"] = "application/x-java-jnlp-file"
+  end
+  
+  #### REST API ####
+  
+  def rest_list
   end
   
 protected

@@ -17,18 +17,23 @@ If a DamageControl server is hosting many projects, build queues can quickly clo
 the time it takes to get feedback from a complete build.
 </p>
 
-<h1>How it works</h1>
+<h1>How to set up a slave</h1>
 
 <p>
 Registering a machine as a build slave can be done by downloading and running a build slave
-program from the DamageControl server.
+program via the DamageControl webapp. This should fire up a new window where you can configure
+the slave.
 </p>
+
+
+<h1>How it works</h1>
 
 <p>
 The build slave application is a <a href="http://java.sun.com/products/javawebstart/">Java Web Start</a> application
-that will poll the master server for new builds to execute. When there is, the slave will download a zip file
-from the main server, containing a snapshot of the working copy for a particular revision, plus an XML file containing
-information about how to execute the build.
+that will poll the master server for new builds to execute. When a build becomes available for remote execution, the 
+slave will download a zip file from the main server, containing a snapshot of the working copy for a particular revision.
+The zip file contains and additional XML file (damagecontrol_build_info.xml) containing information about how to execute 
+the build.
 </p>
 
 <p>

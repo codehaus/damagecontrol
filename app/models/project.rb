@@ -350,8 +350,8 @@ LIMIT #{options[:count]}
     if(hash[:project_dependencies])
       hash[:project_dependencies].each do |project_id|
         p = Project.find(project_id)
-        if(project.could_depend_on?(p))
-          project.dependencies << p
+        if(self.could_depend_on?(p))
+          self.dependencies << p
         end
       end
     end
