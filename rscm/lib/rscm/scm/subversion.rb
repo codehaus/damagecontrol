@@ -39,7 +39,7 @@ module RSCM
     end
     
     def to_yaml_properties
-      ["@url", "@password", "@username", "@password"]
+      ["@url", "@path", "@username", "@password"]
     end
 
     def add(relative_filename)

@@ -1,5 +1,17 @@
 = RSCM Changelog
 
+== Version 0.3.7
+
+This release improves polling of revisions (changesets)
+
+* Added RSCM.Base.poll_new_revisions (moved from DamageControl)
+
+== Version 0.3.6
+
+Bugfix release
+
+* Subversion password was defined twice - fixed.
+
 == Version 0.3.5
 
 This release adds new API methods for accessing files and their revisions and contents.
