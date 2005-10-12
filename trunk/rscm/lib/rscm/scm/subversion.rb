@@ -76,13 +76,8 @@ module RSCM
             absolute_path = PathConverter.nativepath_to_filepath(native_absolute_path)
             if(File.exist?(absolute_path) && !File.directory?(absolute_path))
               native_checkout_dir = PathConverter.filepath_to_nativepath(@checkout_dir, false)
-              relative_path = nil
-              if WINDOWS
-                relative_path = native_absolute_path[native_checkout_dir.length+1..-1].chomp
-                relative_path = relative_path.gsub(/\\/, "/")
-              else
-                relative_path = absolute_path
-              end
+              relative_path = native_absolute_path[native_checkout_dir.length+1..-1].chomp
+              relative_path = relative_path.gsub(/\\/, "/")
               checked_out_files << relative_path
               yield relative_path if block_given?
             end
