@@ -2,11 +2,11 @@ module DamageControl
   # This module adds HTML DOM methods to objects
   module Dom
     def enabled_icon
-      "#{icon_base}.gif"
+      "#{icon_base}.png"
     end
 
     def disabled_icon
-      "#{icon_base}_grey.gif"
+      "#{icon_base}_grey.png"
     end
 
     # Returns +enabled_icon+ if the instance is +enabled+, or

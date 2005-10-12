@@ -74,7 +74,7 @@ module ApplicationHelper
   def tip_box
     <<-EOT
     <div class="tip-box">
-      #{image_tag("atom", :size => "24x24")} Tip!<br/>
+      #{image_tag("tip", :size => "48x48")}<br/>
     EOT
   end
 end
