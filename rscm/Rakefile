@@ -10,7 +10,7 @@ require 'meta_project'
 
 PKG_BUILD     = ENV['PKG_BUILD'] ? '.' + ENV['PKG_BUILD'] : ''
 PKG_NAME      = 'rscm'
-PKG_VERSION   = '0.3.7' + PKG_BUILD
+PKG_VERSION   = '0.3.8' + PKG_BUILD
 PKG_FILE_NAME = "#{PKG_NAME}-#{PKG_VERSION}"
 
 desc "Default Task"
@@ -135,7 +135,7 @@ task :release_files => [:gem] do
 end
 
 desc "Publish docs/website"
-task :publish_doc  do
+task :publish_doc => [:rdoc] do
   publisher = Rake::RubyForgePublisher.new(PKG_NAME, ENV['RUBYFORGE_USER'])
   publisher.upload
 end

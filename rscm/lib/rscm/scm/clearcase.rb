@@ -18,7 +18,7 @@ module RSCM
 
    attr_accessor :stream, :stgloc, :tag, :config_spec
 
-   def initialize(stream, stgloc, tag, config_spec)
+   def initialize(stream=nil, stgloc=nil, tag=nil, config_spec=nil)
      @stream, @stgloc, @tag, @config_spec = stream, stgloc, tag, config_spec
    end
 
