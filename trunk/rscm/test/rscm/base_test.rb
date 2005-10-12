@@ -5,7 +5,7 @@ module RSCM
   class BaseTest < Test::Unit::TestCase
     def test_should_load_all_scm_classes
       expected_scms_classes = [
-        ClearCase
+        ClearCase,
         Cvs,
 #        Darcs,
 #        Monotone,
