@@ -2,9 +2,10 @@
 
 == Version 0.3.7
 
-This release improves polling of revisions (changesets)
+This release improves polling of revisions (changesets) and improves ClearCase support
 
 * Added RSCM.Base.poll_new_revisions (moved from DamageControl)
+* Rewrote the ClearCase adapter. There are no tests for ClearCase yet - tested manually.
 
 == Version 0.3.6
 
