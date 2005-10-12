@@ -4,7 +4,7 @@ require 'rscm'
 
 module RSCM
   class Monotone < Base
-    register self
+    # register self
 
     ann :description => "Database file"
     attr_accessor :db_file
