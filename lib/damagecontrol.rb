@@ -6,6 +6,7 @@ require 'damagecontrol/platform'
 
 ##### START: ALL OF THIS MUST BE INSTALLED MANUALLY
 require_gem 'rscm'
+require_gem 'cmdparse'
 require_gem 'jabber4r'
 require_gem 'rake'
 require_gem 'RedCloth'
