@@ -1,5 +1,12 @@
 = RSCM Changelog
 
+== Version 0.3.8
+
+Bugfix release
+
+* Reshuffled supported SCMs
+* Made ClearCase ctor params optional
+
 == Version 0.3.7
 
 This release improves polling of revisions (changesets) and improves ClearCase support

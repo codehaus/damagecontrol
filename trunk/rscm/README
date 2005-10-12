@@ -1,4 +1,4 @@
-= RSCM - Ruby Source Control Management (0.3.7)
+= RSCM - Ruby Source Control Management (0.3.8)
 
 RSCM is to SCM what DBI/JDBC/ODBC are to databases - an SCM-independent API for accessing different SCMs. The features are roughly:
 
@@ -32,15 +32,15 @@ If you want the latest and greatest, you can get the sources, which live alongsi
 == Supported SCMs
 
 * CVS - http://www.cvshome.org (stable)
-* Perforce - http://www.perforce.com (not thoroughly tested)
-* StarTeam - http://www.borland.com/starteam (not thoroughly tested)
 * Subversion - http://subversion.tigris.org (stable)
 
 In progress:
 
-* ClearCase -http://www-306.ibm.com/software/awdtools/clearcase (half way there)
+* ClearCase -http://www-306.ibm.com/software/awdtools/clearcase (half complete)
 * Darcs - http://www.abridgegame.org/darcs (very incomplete)
-* Monotone - http://www.venge.net/monotone (half way there)
+* Monotone - http://www.venge.net/monotone (half complete)
+* Perforce - http://www.perforce.com (nearly complete - a little out of date with recent API)
+* StarTeam - http://www.borland.com/starteam (nearly complete - a little out of date with recent API)
 
 Planned:
 
