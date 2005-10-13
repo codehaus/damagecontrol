@@ -7,6 +7,12 @@
     <td>Reason:</td>
     <td><%= @build.reason %></td>
   </tr>
+  <% if(@build.triggering_build) %>
+  <tr>
+    <td>Triggered by:</td>
+    <td><%= link_to(@build.triggering_build.project.name, :id => @build.triggering_build.id) %></td>
+  </tr>
+  <% end %>
   <tr>
     <td>Command:</td>
     <td><%= @build.command %></td>

@@ -3,9 +3,6 @@ module DamageControl
   class ScmPoller
     cattr_accessor :logger
     
-    # Default time to wait for scm to be quiet (applies to non-transactional scms only)
-    DEFAULT_QUIET_PERIOD = 15 unless defined? DEFAULT_QUIET_PERIOD
-    
     # Polls for new revisions in the SCM and persists them.
     # The latest revision is returned.
     def poll_and_persist_new_revisions(project)

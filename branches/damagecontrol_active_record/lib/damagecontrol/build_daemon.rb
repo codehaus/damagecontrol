@@ -86,9 +86,11 @@ module DamageControl
       has_built_master = false
       
       builds.each do |build|
-        should_build_now = ((build.build_executor.is_master && !has_built_master) || !build.build_executor.is_master)
+        # workaround for odd cases where build doesn't have an executor?!?
+        is_master = (build.build_executor && build.build_executor.is_master) || (build.build_executor.nil?)
+        should_build_now = ((is_master && !has_built_master) || !is_master)
         build.execute! if should_build_now
-        has_built_master = true if build.build_executor.is_master
+        has_built_master = true if is_master
       end
     end
   end
