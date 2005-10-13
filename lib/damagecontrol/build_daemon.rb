@@ -72,19 +72,23 @@ module DamageControl
     
     def handle_project(project)
       logger.info "Checking project #{project.name}" if logger
-      pending_build = project.latest_pending_build
-      if(pending_build)
-        logger.info "Pending build found for project #{project.name}" if logger
-        pending_build.execute!
-      elsif(project.scm.uses_polling?)
+      builds = []
+      builds.concat(project.pending_builds)
+      if(project.scm.uses_polling?)
         logger.info "No pending builds found for project #{project.name}, polling #{project.scm.visual_name} for new revisions" if logger
         latest_new_revision = @scm_poller.poll_and_persist_new_revisions(project)
         if(latest_new_revision)
-          logger.info "Requesting/executing build for new revision in project #{project.name}" if logger
-          project.request_build(Build::SCM_POLLED).execute!
+          builds.concat(latest_new_revision.request_builds(Build::SCM_POLLED))
         end
-      else
-        logger.info "No pending builds for project #{project.name} and not polling its SCM since the project has polling disabled" if logger
+      end
+
+      # If there are more than one pending build, only build one of the master/local ones
+      has_built_master = false
+      
+      builds.each do |build|
+        should_build_now = ((build.build_executor.is_master && !has_built_master) || !build.build_executor.is_master)
+        build.execute! if should_build_now
+        has_built_master = true if build.build_executor.is_master
       end
     end
   end

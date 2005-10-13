@@ -41,6 +41,10 @@ Also see <%= link_to "exporting projects", :action => "export_project" %>.
   DamageControl ships with a script that can read a Project YAML file and update the database with
   settings from that file. Example usage:
 </p>
+<p>
+  YAML is a text format specifically designed to mark up objects in text. It's similar to XML (but
+  much easier to type). YAML is picky about indentation. Use 2 spaces for indentation and no tabs.
+</p>
 
 <pre>ruby script/import < path/to/project_file.yml</pre>
 

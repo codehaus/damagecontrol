@@ -11,6 +11,10 @@ var settings = new Settings("setting-icons");
 <%= form_tag({:controller => "project", :action => @submit_action, :id => @project.id}, {:id => "project_settings"}) %>
 <%= submit_tag(@submit_text) %>
 
+<div id="build-executors">
+Build executors: <%= @project.build_executors.collect{|be| be.description}.join(",") %>
+</div>
+
 <div id="settings-group">
   <!-- The top 'fixed' settings row -->
   <div class="setting-category-row">

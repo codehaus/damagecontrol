@@ -25,3 +25,7 @@ revision_4:
 rails_1735:
   id: 1735
   identifier: [1735]
+slave_revision:
+  id: 5
+  project_id: 4
+  identifier: [5]

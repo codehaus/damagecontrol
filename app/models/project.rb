@@ -26,6 +26,8 @@ class Project < ActiveRecord::Base
     :association_foreign_key => "from_id",
     :order => "name"
   
+  has_and_belongs_to_many :build_executors, :order => "build_executor_id"
+
   serialize :scm
   serialize :scm_web
   serialize :tracker
@@ -33,6 +35,10 @@ class Project < ActiveRecord::Base
   serialize :generated_files
 
   def before_destroy
+    begin
+      scm.destroy_working_copy if scm
+    rescue
+    end
     FileUtils.rm_rf(@basedir) if File.exist?(@basedir)
   end
 
@@ -41,7 +47,16 @@ class Project < ActiveRecord::Base
   end
 
   def before_save
-    set_defaults
+    set_defaults    
+  end
+  
+  def after_save
+    master = BuildExecutor.master_instance
+    if(local_build)
+      build_executors << master unless build_executors.index(master)
+    else
+      build_executors.delete(master)
+    end
   end
   
   def initialize(*args)
@@ -108,8 +123,8 @@ LIMIT #{options[:count]}
     builds(:exitstatus => 0)[0]
   end
   
-  def latest_pending_build
-    builds(:pending => true)[0]
+  def pending_builds
+    builds(:pending => true)
   end
 
   def latest_revision_has_builds?
@@ -143,24 +158,21 @@ LIMIT #{options[:count]}
     if(build.successful?)
       logger.info "Requesting build of dependant projects of #{name}: #{dependants.collect{|p| p.name}.join(',')}" if logger
       dependants.each do |project|
-        project.request_build(Build::SUCCESSFUL_DEPENDENCY, build)
+        project.request_builds_for_latest_revision(Build::SUCCESSFUL_DEPENDENCY, build)
       end
     end
   end
-
-  # Creates a new (pending) build for the latest revision
-  # of this project. Returns the created Build object.
-  def request_build(reason, triggering_build=nil)
+  
+  # Requests builds for the latest revision and returns those builds
+  def request_builds_for_latest_revision(reason, triggering_build)
     lr = latest_revision
     if(lr)
-      lr.request_build(reason, triggering_build)
-    else
-      nil
+      lr.request_builds(reason, triggering_build)
     end
   end
-  
+
   def working_copy_dir
-     mkdir "#{@basedir}/working_copy"
+     File.expand_path("#{@basedir}/working_copy")
   end
 
   def zip_dir

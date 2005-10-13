@@ -49,14 +49,20 @@ class Revision < ActiveRecord::Base
     update_project_settings
     
     # Make a zip of the working copy so it can be downloaded by a distributed builder.
+    # TODO: move to SlaveBuilder
     zip(zipper)
   end
 
-  # Creates a new (pending) build for this revision
-  # Returns the created Build object.
-  def request_build(reason, triggering_build=nil)
-    builds.create(:reason => reason, :triggering_build => triggering_build)
+  # Requests build(s) for this revision. How many builds are requested depends on
+  # how many BuildExecutors (slave and/or local) are registered for the associated project.
+  # A +triggering_build+ can be specified if the build is requested as a result of another
+  # successful build (this is only used for reporting).
+  def request_builds(reason, triggering_build=nil)
+    project.build_executors.collect do |build_executor|
+      build_executor.request_build_for(self, reason, triggering_build)
+    end
   end
+  
   
   # Environment variables to set when building this revision.
   def build_environment
@@ -98,8 +104,9 @@ private
     
     # TODO use this when we have implemented 'array' editing in the web interface
     # excludes = project.generated_files
-
     excludes = []
+
+    # TODO: use builder.
     zipper.zip(zipdir, zipfile_name, excludes) do |zipfile|
       zipfile.file.open("damagecontrol_build_info.xml", "w") do |f| 
         f.puts("<build-info>")

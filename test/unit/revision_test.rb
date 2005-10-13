@@ -2,7 +2,7 @@ require File.dirname(__FILE__) + '/../test_helper'
 require 'rscm/mockit'
 
 class RevisionTest < Test::Unit::TestCase
-  fixtures :projects, :revisions, :revision_files, :builds
+  fixtures :projects, :revisions, :revision_files, :builds, :build_executors, :build_executors_projects
 
   def test_should_have_builds
     assert_equal([@build_1], @revision_1.builds)
@@ -50,6 +50,13 @@ class RevisionTest < Test::Unit::TestCase
     assert_equal("here/i/go", ar_revision.revision_files[1].path)
   end
 
+  def test_should_request_build_for_each_build_executor
+    assert_equal(0, @slave_revision.builds.size)
+    @slave_revision.request_builds(Build::SCM_POLLED)
+    assert_equal(2, @slave_revision.builds(true).size)
+    assert_equal(Build::SCM_POLLED, @slave_revision.builds[0].reason)
+  end
+  
   def test_should_sync_projects_working_copy_and_zip_it
     scm = MockIt::Mock.new
     scm.__expect(:checkout) do |identifier|
@@ -98,5 +105,5 @@ class RevisionTest < Test::Unit::TestCase
     revision.reload
     assert_equal(999, revision.identifier)
   end
-
+  
 end

@@ -1,7 +1,7 @@
 require File.dirname(__FILE__) + '/../test_helper'
 
 class ProjectTest < Test::Unit::TestCase
-  fixtures :projects, :revisions, :builds
+  fixtures :projects, :revisions, :builds, :build_executors, :build_executors_projects
 
   def test_should_have_revisions
     assert_equal(3, @project_1.revisions.length)
@@ -22,6 +22,10 @@ class ProjectTest < Test::Unit::TestCase
 
   def test_should_find_latest_successful_build
     assert_equal(@build_1, @project_1.latest_successful_build)
+  end
+  
+  def test_should_have_build_executors
+    assert_equal([@slave_1, @slave_2], @slave_project.build_executors)
   end
 
   def test_should_persist_scm
@@ -86,16 +90,6 @@ class ProjectTest < Test::Unit::TestCase
     assert(File.exist?(expected_base_dir), "Should exist: #{expected_base_dir}")
   end
 
-  def test_should_initialise_scm_checkout_dir_on_find
-    @project_1.scm = RSCM::Cvs.new("a_root", "a_mod", "a_branch", "a_password")
-    @project_1.save
-    @project_1.reload
-
-    expected_wc_dir = "#{DC_DATA_DIR}/projects/#{@project_1.id}/working_copy"
-    assert(File.exist?(expected_wc_dir), "Should exist: #{expected_wc_dir}")
-    assert_equal(File.expand_path(@project_1.working_copy_dir), File.expand_path(@project_1.scm.checkout_dir))
-  end
-  
   # fred   ->    wilma -> dino
   #  +-> barney <-+
   def test_should_find_dependencies_and_dependants
@@ -163,13 +157,6 @@ class ProjectTest < Test::Unit::TestCase
     # TODO: how the heck do we get the 2 sub graphs?
   end
   
-  def test_should_create_pending_build_for_latest_revision
-    assert_equal(0, @revision_3.builds.size)
-    @project_1.request_build(Build::SUCCESSFUL_DEPENDENCY)
-    assert_equal(1, @revision_3.builds(true).size)
-    assert_equal(Build::SUCCESSFUL_DEPENDENCY, @revision_3.builds[0].reason)
-  end
-  
   def test_should_lock_project
     p = Project.create(:name => "lock me")
     assert !p.lock_time
@@ -177,10 +164,10 @@ class ProjectTest < Test::Unit::TestCase
     assert p.lock_time
   end
   
-  def test_should_have_latest_pending_build
-    assert_nil @project_1.latest_pending_build
-    pending = @revision_3.request_build(Build::SCM_POLLED)
-    assert_equal(pending, @project_1.latest_pending_build)
+  def test_should_have_latest_pending_builds
+    assert_equal([], @project_1.pending_builds)
+    pending = @revision_3.request_builds(Build::SCM_POLLED)
+    assert_equal(pending, @project_1.pending_builds)
   end
   
   def FIXMEtest_should_import_and_export_as_yaml
