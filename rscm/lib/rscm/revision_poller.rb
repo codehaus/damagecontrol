@@ -4,6 +4,9 @@ module RSCM
   
     TWO_WEEKS_AGO = 2*7*24*60*60
     THIRTY_TWO_WEEKS_AGO = TWO_WEEKS_AGO * 16
+    # Default time to wait for scm to be quiet (applies to non-transactional scms only)
+    DEFAULT_QUIET_PERIOD = 15
+    
 
     # Polls new revisions for since +last_revision+,
     # or if +last_revision+ is nil, polls since 'now' - +seconds_before_now+.
@@ -13,7 +16,7 @@ module RSCM
     # This happens until revisions are found, ot until the +seconds_before_now+
     # Exceeds 32 weeks, which means it's probably not worth looking further in
     # the past, the scm is either completely idle or not yet active.
-    def poll_new_revisions(latest_revision=nil, seconds_before_now=TWO_WEEKS_AGO, max_time_before_now=THIRTY_TWO_WEEKS_AGO)
+    def poll_new_revisions(latest_revision=nil, quiet_period=DEFAULT_QUIET_PERIOD, seconds_before_now=TWO_WEEKS_AGO, max_time_before_now=THIRTY_TWO_WEEKS_AGO)
       max_past = Time.new.utc - max_time_before_now
   
       if(!central_exists?)
@@ -57,7 +60,6 @@ module RSCM
         # the revisions for really slow commits, but they will be part of the next 
         # revision (on next poll).
         commit_in_progress = true
-        quiet_period = project.quiet_period || DEFAULT_QUIET_PERIOD
         while(commit_in_progress)
           logger.info "Sleeping for #{quiet_period} seconds because #{visual_name} is not transactional." if logger
           
