@@ -31,12 +31,12 @@ If you want the latest and greatest, you can get the sources, which live alongsi
 
 == Supported SCMs
 
-* CVS - http://www.cvshome.org (stable)
+* CVS - http://www.nongnu.org/cvs (stable)
 * Subversion - http://subversion.tigris.org (stable)
+* ClearCase - http://www-306.ibm.com/software/awdtools/clearcase (not thoroughly tested)
 
 In progress:
 
-* ClearCase -http://www-306.ibm.com/software/awdtools/clearcase (half complete)
 * Darcs - http://www.abridgegame.org/darcs (very incomplete)
 * Monotone - http://www.venge.net/monotone (half complete)
 * Perforce - http://www.perforce.com (nearly complete - a little out of date with recent API)
