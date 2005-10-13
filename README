@@ -9,4 +9,4 @@ Before you go on, please read instructions at http://hieraki.lavalamp.ca/
 
 === Start DamageControl with built-in web server:
 
-  ruby script/builder --webrick
+  ruby script/damagecontrol
