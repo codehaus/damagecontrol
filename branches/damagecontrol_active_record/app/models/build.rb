@@ -23,6 +23,7 @@ class Build < ActiveRecord::Base
   NOT_STARTED_LOG = "The build has not started yet. It's probably waiting for a daemon to execute it" unless defined? NOT_STARTED_LOG
 
   belongs_to :revision
+  belongs_to :build_executor
   belongs_to :triggering_build, :class_name => "Build"
   has_many :artifacts, :dependent => true
   serialize :env

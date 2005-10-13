@@ -1,2 +1,15 @@
-<h1>Doc#scm</h1>
-<p>Find me in app/views/doc/scm.rhtml</p>
+<h1>Source Control Management</h1>
+<p>
+DamageControl connects to your Source Control Management (SCM) system to find new <%= link_to "revisions", :action=>"revision" %>
+and pull sources so it can execute <%= link_to "builds", :action=>"build" %>.
+</p>
+<p>
+The following SCMs work with DamageControl:
+<ul>
+  <li><a href="http://www-306.ibm.com/software/awdtools/clearcase">ClearCase</a></li>
+  <li><a href="http://www.nongnu.org/cvs">CVS</a></li>
+  <li><a href="http://subversion.tigris.org">Subversion</a></li>
+</ul>
+DamageControl uses <a href="http://rscm.rubyforge.org/">RSCM</a> to interact with an SCM.
+Please refer to the RSCM homepage for information about how you can add support for additional SCMs.
+</p>

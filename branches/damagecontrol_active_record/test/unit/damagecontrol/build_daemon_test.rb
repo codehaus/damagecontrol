@@ -54,9 +54,14 @@ module DamageControl
         :name => "Test", 
         :scm => scm, 
         :publishers => [archiver], 
-        :build_command => "#{copy_command} input.txt result.txt"
+        :build_command => "#{copy_command} input.txt result.txt",
+        :local_build => true
       )
       project.reload
+      #project.build_executors << BuildExecutor.create(:is_master => true)
+      assert_equal(1, project.build_executors.length)
+      assert(project.build_executors[0].is_master)
+
       assert_equal(::DamageControl::Publisher::ArtifactArchiver, project.publishers[0].class)
       
       # create svn repository

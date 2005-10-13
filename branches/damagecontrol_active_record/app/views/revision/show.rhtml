@@ -14,7 +14,7 @@
 </p>
 <div id="request-build">
   <%= link_to_remote(
-  	"Request new build for this revision",
+  	"Request build(s) for this revision",
   	:url => {:controller => "revision", :action => "build", :id => @revision.id},
   	:update => "request-build"
   ) %>

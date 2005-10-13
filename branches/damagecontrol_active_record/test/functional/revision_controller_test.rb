@@ -5,7 +5,7 @@ require 'revision_controller'
 class RevisionController; def rescue_action(e) raise e end; end
 
 class RevisionControllerTest < Test::Unit::TestCase
-  fixtures :revisions, :builds
+  fixtures :revisions, :builds, :projects, :build_executors_projects
   
   def setup
     @controller = RevisionController.new

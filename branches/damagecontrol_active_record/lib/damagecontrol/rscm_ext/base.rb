@@ -25,10 +25,9 @@ module RSCM
       ""
     end
 
-    def damage_control_full_path(revision_file)
+    def scm_web_path(revision_file)
       revision_file.path
     end
-
   end
   
   class Cvs < Base
@@ -38,12 +37,6 @@ module RSCM
       dir = path_elements[0..-2].join("/") + "/"
       file = path_elements[-1]
       "#{dir}#{deleted_prefix}#{file}"
-    end
-  end
-
-  class Subversion < Base
-    def scm_web_path(revision_file)
-      revision_file.path
     end
   end
 

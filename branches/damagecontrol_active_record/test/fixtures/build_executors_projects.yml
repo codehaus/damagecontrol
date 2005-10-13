@@ -1,0 +1,9 @@
+master_project_1:
+  build_executor_id: 1
+  project_id: 1
+slave_1_slave_project:
+  build_executor_id: 2
+  project_id: 4
+slave_2:
+  build_executor_id: 3
+  project_id: 4

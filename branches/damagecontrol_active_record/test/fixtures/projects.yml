@@ -13,3 +13,5 @@ project_3:
   id: 3
   name: project_3
   publishers: []
+slave_project:
+  id: 4

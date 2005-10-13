@@ -1,0 +1,9 @@
+master:
+  id: 1
+  is_master: true
+slave_1:
+  id: 2
+  is_master: false
+slave_2:
+  id: 3
+  is_master: false
