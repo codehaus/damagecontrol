@@ -1,5 +1,11 @@
 = RSCM Changelog
 
+== Version 0.3.10
+
+Bugfix release
+
+* Removed DamageControl leftovers in revision_poller 
+
 == Version 0.3.9
 
 This release improves Subversion and ClearCase support
