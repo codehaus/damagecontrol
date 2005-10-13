@@ -107,11 +107,9 @@ module RSCM
     end
 
     def diff(file, &block)
-      with_working_dir(@checkout_dir) do
-        cmd = "svn diff --revision #{file.previous_native_revision_identifier}:#{file.native_revision_identifier} \"#{url}/#{file.path}\""
-        Better.popen(cmd) do |io|
-          return(yield(io))
-        end
+      cmd = "svn diff --revision #{file.previous_native_revision_identifier}:#{file.native_revision_identifier} \"#{url}/#{file.path}\""
+      Better.popen(cmd) do |io|
+        return(yield(io))
       end
     end
     
@@ -126,7 +124,11 @@ module RSCM
     end
 
     def destroy_central
-      FileUtils.rm_rf(svnrootdir)
+      if(File.exist?(svnrootdir) && local?)
+        FileUtils.rm_rf(svnrootdir)
+      else
+        raise "Cannot destroy central repository. '#{svnrootdir}' doesn't exist or central repo isn't local to this machine"
+      end
     end
 
     def central_exists?
@@ -200,11 +202,9 @@ module RSCM
       revisions = nil
       command = "svn #{changes_command(from_identifier, to_identifier, relative_path)}"
 
-      with_working_dir(@checkout_dir) do
-        Better.popen(command) do |stdout|
-          parser = SubversionLogParser.new(stdout, @url)
-          revisions = parser.parse_revisions
-        end
+      Better.popen(command) do |stdout|
+        parser = SubversionLogParser.new(stdout, @url)
+        revisions = parser.parse_revisions
       end
       revisions
     end
@@ -238,12 +238,10 @@ module RSCM
       # We therefore don't specify it and get the latest revision from the full url instead.
       # cmd = "svn log #{login_options} #{repourl} -r HEAD"
       cmd = "svn log #{login_options} #{url}"
-      with_working_dir(@checkout_dir) do
-        Better.popen(cmd) do |stdout|
-          parser = SubversionLogParser.new(stdout, @url)
-          revisions = parser.parse_revisions
-          revisions[0].identifier.to_i
-        end
+      Better.popen(cmd) do |stdout|
+        parser = SubversionLogParser.new(stdout, @url)
+        revisions = parser.parse_revisions
+        revisions[0].identifier.to_i
       end
     end
 

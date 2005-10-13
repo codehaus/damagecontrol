@@ -190,7 +190,11 @@ module RSCM
     end
 
     def destroy_central
-      FileUtils.rm_rf(path)
+      if(File.exist?(path) && local?)
+        FileUtils.rm_rf(path)
+      else
+        raise "Cannot destroy central repository. '#{path}' doesn't exist or central repo isn't local to this machine"
+      end
     end
     
     def central_exists?

@@ -21,6 +21,7 @@ module RSCM
   # * revisions
   # * uptodate?
   # * file
+  # * destroy_working_copy
   #
   # In addition to operations related to working copies, the same instance should provide
   # methods to administer the working copy's associated 'central' repository. These are:
@@ -90,6 +91,11 @@ module RSCM
       props = instance_variables
       props.delete("@checkout_dir")
       props.sort!
+    end
+
+    # Destroys the working copy
+    def destroy_working_copy
+      FileUtils.rm_rf(checkout_dir) unless checkout_dir.nil?
     end
 
     # Whether the physical SCM represented by this instance exists.

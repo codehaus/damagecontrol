@@ -1,5 +1,13 @@
 = RSCM Changelog
 
+== Version 0.3.9
+
+This release improves Subversion and ClearCase support
+
+* Subversion no longer needs a working copy to get revisions and diffs
+* Misc. ClearCase improvements
+* Added RSCM::Base.destroy_working_copy
+
 == Version 0.3.8
 
 Bugfix release
