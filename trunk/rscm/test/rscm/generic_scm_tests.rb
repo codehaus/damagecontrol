@@ -11,10 +11,11 @@ module RSCM
     def teardown
       if @scm
         begin
-          @scm.destroy_centra
+          @scm.destroy_working_copy
+          @scm.destroy_central
         rescue => e
           # Fails on windows with TortoiseCVS' cvs because of resident cvslock.exe
-          STDERR.puts "Couldn't destroy central #{@scm.class.name}"
+          STDERR.puts "Couldn't destroy central #{@scm.class.name}: #{e.message}"
         end
       end
     end
