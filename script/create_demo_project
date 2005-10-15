@@ -1,0 +1,37 @@
+#!/usr/local/bin/ruby
+
+require 'rubygems'
+require 'rscm'
+require 'optparse'
+
+OPTIONS = {
+  :environment     => "production"
+}
+ARGV.options do |opts|
+  opts.on("-e", "--environment=environment", String) {|OPTIONS[:environment]|}
+  opts.parse!
+end
+
+#scm = RSCM::Subversion.new
+#scm.url = RSCM::PathConverter.filepath_to_nativeurl(OPTIONS[:root])
+
+path = RSCM::PathConverter.filepath_to_nativepath("cvsroot", true)
+scm = RSCM::Cvs.new(":local:#{path}", "demo")
+if(scm.central_exists?)
+  scm.destroy_central
+end
+scm.create_central
+scm.import_central(File.dirname(__FILE__) + '/../demo', "import first")
+
+ENV["RAILS_ENV"] = OPTIONS[:environment]
+require File.dirname(__FILE__) + "/../config/environment"
+
+p = Project.find_by_name("demo")
+p.destroy if p
+Project.create(
+  :name => "demo",
+  :build_command => "spec specs/stock_broker_spec.rb",
+  :scm => scm,
+  :publishers => [],
+  :tracker => nil
+)

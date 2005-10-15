@@ -1,4 +1,0 @@
-#!/usr/local/bin/ruby
-
-load File.dirname(__FILE__) + '/../config/dc_environment.rb'
-load File.dirname(__FILE__) + '/server'
