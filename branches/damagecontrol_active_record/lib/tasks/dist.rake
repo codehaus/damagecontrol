@@ -1,5 +1,5 @@
-# This rake script packages DamageControl to a standalone executable.
-# Executables can be made on any platform (TODO: verify this) that is supported by rubyscript2exe.
+# This rake script packages DamageControl to standard zip/tgz archives and also a standalone executable.
+# Executables can be made on any platform that is supported by rubyscript2exe.
 # The final executable embeds:
 #
 # * Ruby runtime (taken from your box)
@@ -8,7 +8,7 @@
 # * The DamageControl appliaction itself
 # * Ruby on Rails (from its SVN HEAD, currently under vendor/rails)
 # * SQlite and other binaries used by DamageControl
-# * A preconfigured SQLite database schema (TODO: make sure it's production and clean and support migrate)
+# * A preconfigured SQLite database schema
 #
 # A SHELL_DIR variable is defined in script/damagecontrol. This is necessary in order for the packaged
 # executable to figure out in what directory the app was started from. It is used to compute the data directory.
@@ -23,6 +23,7 @@
 # socumentation about this available from http://rubyonrails.com/
 #
 require 'meta_project'
+require 'rake/packagetask'
 require 'rake/contrib/sshpublisher'
 require 'rake/contrib/rubyforgepublisher'
 require 'damagecontrol/platform'
@@ -32,21 +33,18 @@ PKG_NAME      = 'damagecontrol'
 PKG_VERSION   = '0.6.0' + PKG_BUILD
 PKG_FILE_NAME = "#{PKG_NAME}-#{PKG_VERSION}"
 
-# FileList excludes .svn files by default
+# Files to package. See :rubyscript2exe and PackageTask for modifications
 PKG_FILES = FileList[
   "init.rb", # RubyScript2Exe bootstrapper
   "[A-Z]*",
   "Rakefile",
   "README.license",
   "app/**/*",
-  "bin/#{DamageControl::Platform.family}/sqlite3*",
-  "bin/eee*",
-  "bin/*rubyscript*",
   "components/**/*",
   "config/**/*",
   "db/production.db",
   "db/migrate/*",
-  "doc/**/*",
+#  "doc/**/*",
   "lib/**/*",
   "log/**/*",
   "public/**/*",
@@ -59,17 +57,32 @@ PKG_FILES = FileList[
   "vendor/rails/railties/lib/**/*"
 ]
 
+# Extra stuff needed for 'classic' packaging
+PACKAGE_INCLUDES = [
+  "bin/**/*"
+]
+
 DIST_DIR = "dist/#{PKG_FILE_NAME}"
 
 task :verify_production_environment do
   raise "Build with RAILS_ENV=production to ensure procuction.db is migrated first!" unless RAILS_ENV == "production"
 end
 
-task :copy_dist => [:verify_production_environment, :migrate, :clear_logs] do
+task :prepare_dist => [:verify_production_environment, :migrate, :clear_logs]
+task :package => [:prepare_dist]
+
+task :copy_dist => [:prepare_dist] do
   FileUtils.rm_rf("dist") if File.exist?("dist")
   FileUtils.mkdir_p(DIST_DIR)
 
-  PKG_FILES.each do |file|
+  files = PKG_FILES.dup
+  files.include(
+    "bin/#{DamageControl::Platform.family}/sqlite3*",
+    "bin/eee*",
+    "bin/*rubyscript*"
+  )
+
+  files.each do |file|
     dest = File.join(DIST_DIR, file)
     FileUtils.mkdir_p(File.dirname(dest)) unless File.exist?(File.dirname(dest))
     FileUtils.cp_r(file, dest) unless File.directory?(file) # don't copy dirs, as they will bring along .svn files
@@ -93,6 +106,19 @@ task :rubyscript2exe => [:tar2rubyscript] do
   Dir.chdir "dist" do
     ruby "rubyscript2exe.rb #{PKG_FILE_NAME}.rb --dry-run"
   end
+end
+
+desc "Create a distro"
+Rake::PackageTask.new(PKG_NAME, PKG_VERSION) do |p|
+  files = PKG_FILES.dup
+  files.include("bin/**/*")
+  files.exclude(
+    "bin/eee*",
+    "bin/*rubyscript*"
+  )
+
+  p.need_tar = true
+  p.package_files = files
 end
 
 desc "Tag the release."
