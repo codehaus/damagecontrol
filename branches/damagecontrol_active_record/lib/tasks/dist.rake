@@ -4,7 +4,7 @@
 #
 # * Ruby runtime (taken from your box)
 # * All Ruby standard libraries that are needed by DamageControl (but not more)
-# * All rubygems required by DamageControl (we use our own packaging scheme - see below)
+# * All rubygems required by DamageControl
 # * The DamageControl appliaction itself
 # * Ruby on Rails (from its SVN HEAD, currently under vendor/rails)
 # * SQlite and other binaries used by DamageControl
@@ -16,12 +16,10 @@
 # The standalone executable can run both builder daemons and optionally serve the web
 # interface via its embedded webserver (WEBrick).
 #
-# The executable should be good enough to be deployed under Apache or Lighttpd (with some tweaks),
-# but this has not been thoroughly explored yet and is therefore undocumented. Until then it is
-# probably easier to get DamageControl running under one of these web servers by running from 
-# source (available via Subversion) and configure the webapp as any other RoR app. There is ample
-# socumentation about this available from http://rubyonrails.com/
-#
+# The exe is using webrick. In the future we may embed lighttpd/scgi (better performance). This may
+# require cygwin on windows since lighttpd doesn't run on win32 (AFAIK)
+# 
+# 
 require 'meta_project'
 require 'rake/packagetask'
 require 'rake/contrib/sshpublisher'
