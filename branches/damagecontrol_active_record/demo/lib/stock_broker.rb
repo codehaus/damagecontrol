@@ -3,8 +3,13 @@ class StockBroker
     @market = market
   end
   
-  def deal(sym)
-    price = @market.price_for(sym)
-    @market.bid(sym, price-1)
+  def trade(sym)
+    price = @market.quote(sym)
+    if(price <= 45)
+      @market.bid(sym, price)
+      true
+    else
+      false
+    end
   end
 end
