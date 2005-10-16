@@ -2,3 +2,7 @@ This is a demo project that can be registered in DamageControl with
 
   rake migrate RAILS_ENV=production
   ruby script/create_demo_project
+  
+DamageControl will 'build' the project with
+
+  spec specs/stock_broker_spec.rb

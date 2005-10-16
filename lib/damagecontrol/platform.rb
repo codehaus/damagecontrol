@@ -1,5 +1,6 @@
 require 'rbconfig'
 
+# TODO: move to RSCM
 module DamageControl
   module Platform
     def family

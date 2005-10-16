@@ -5,7 +5,7 @@ require 'rscm'
 require 'optparse'
 
 OPTIONS = {
-  :environment     => "production"
+  :environment     => "development"
 }
 ARGV.options do |opts|
   opts.on("-e", "--environment=environment", String) {|OPTIONS[:environment]|}

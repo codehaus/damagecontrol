@@ -1,11 +1,6 @@
-#require 'rubygems'
-#require_gem 'rspec'
-require 'spec'
 $:.unshift('lib')
+require 'spec'
 require 'stock_broker'
-
-
-
 
 class StockBrokerSpec < Spec::Context
   
@@ -14,15 +9,17 @@ class StockBrokerSpec < Spec::Context
     @broker = StockBroker.new(@market)
   end
   
-  def should_bid_one_cheaper_when_price_above_50000
-    @market.should_receive(:price_for).with("RUBY").and_return(50001)
-    @market.should_receive(:bid) do |sym, price|
-      sym.should_match /UR/
-      price.should_equal 50000
-    end
-    
-    result = @broker.deal("RUBY")
-    result.should_be_nil
+  def should_bid_when_price_below_45_and_return_true
+    @market.should_receive(:quote).with("RUBY").and_return(45)
+    @market.should_receive(:bid).with("RUBY", 45)    
+    result = @broker.trade("RUBY")
+    result.should_be_true
+  end
+
+  def should_not_bid_when_price_above_45_and_return_false
+    @market.should_receive(:quote).with("RUBY").and_return(46)
+    result = @broker.trade("RUBY")
+    result.should_be_false
   end
 end
 

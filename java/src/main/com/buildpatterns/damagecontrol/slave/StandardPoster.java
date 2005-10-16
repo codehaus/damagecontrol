@@ -27,7 +27,7 @@ public class StandardPoster implements Poster {
         }
     }
 
-    public int post(File file, String postUrl) throws IOException {
+    public int post(File file, URL postUrl) throws IOException {
         HttpURLConnection urlConn = createUrlConnection(postUrl);
         urlConn.connect();
 
@@ -39,9 +39,8 @@ public class StandardPoster implements Poster {
         return urlConn.getResponseCode();
     }
 
-    private HttpURLConnection createUrlConnection(String postUrl) throws IOException {
-        URL url = new URL(postUrl);
-        HttpURLConnection urlConn = (HttpURLConnection) url.openConnection();
+    private HttpURLConnection createUrlConnection(URL postUrl) throws IOException {
+        HttpURLConnection urlConn = (HttpURLConnection) postUrl.openConnection();
 
         urlConn.setDoOutput(true);
         urlConn.setUseCaches(false);

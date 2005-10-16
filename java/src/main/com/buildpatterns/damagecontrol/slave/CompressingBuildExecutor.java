@@ -1,11 +1,5 @@
 package com.buildpatterns.damagecontrol.slave;
 
-import com.buildpatterns.damagecontrol.slave.types.BuildInfo;
-import com.buildpatterns.damagecontrol.slave.types.BuildResult;
-import com.buildpatterns.damagecontrol.slave.types.Revision;
-import com.thoughtworks.xstream.XStream;
-import com.thoughtworks.xstream.io.xml.DomDriver;
-
 import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -18,21 +12,23 @@ import java.io.OutputStream;
 import java.io.Writer;
 import java.util.Date;
 
+import com.buildpatterns.damagecontrol.slave.types.BuildInfo;
+import com.buildpatterns.damagecontrol.slave.types.BuildResult;
+import com.buildpatterns.damagecontrol.slave.types.Revision;
+import com.thoughtworks.xstream.XStream;
+
 /**
  * @author Aslak Helles&oslash;y
  */
-public class BuildSlave {
+public class CompressingBuildExecutor implements BuildExecutor {
     private final Compresser compresser;
 
-    public BuildSlave(Compresser compresser) {
+    public CompressingBuildExecutor(Compresser compresser) {
         this.compresser = compresser;
     }
 
     BuildInfo getBuildInfo(File buildInfo) throws FileNotFoundException {
-        XStream xstream = new XStream();
-        xstream.alias("build-info", BuildInfo.class);
-        xstream.alias("revision", Revision.class);
-        return (BuildInfo) xstream.fromXML(new FileReader(buildInfo));
+        return (BuildInfo) X.stream.fromXML(new FileReader(buildInfo));
     }
 
     public File execute(InputStream zip, File dir) throws IOException {
@@ -74,10 +70,8 @@ public class BuildSlave {
     }
 
     private void writeBuildResult(File dir, BuildResult buildResult) throws IOException {
-        XStream xstream = new XStream();
-        xstream.alias("buildresult", BuildResult.class);
         Writer out = new BufferedWriter(new FileWriter(new File(dir, "damagecontrol_build_result.xml")));
-        out.write(xstream.toXML(buildResult));
+        out.write(X.stream.toXML(buildResult));
         out.flush();
         out.close();
     }

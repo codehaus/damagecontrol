@@ -12,6 +12,7 @@
     </target>
 
     <target name="clean">
+        <echo>ANT HOME: ${ant.home}</echo>
         <delete dir="target"/>
     </target>
 
@@ -51,7 +52,9 @@
             dname="CN=BuildPatterns Team, OU=DamageControl Team, O=buildpatterns.com, C=US"/-->
 
         <signjar alias="damagecontrol-team" storepass="secret">
-            <fileset dir="../public/slave"/>
+            <fileset dir="../public/slave">
+                <include name="*.jar"/>
+            </fileset>
         </signjar>
     </target>
 
