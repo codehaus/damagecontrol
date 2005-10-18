@@ -12,6 +12,10 @@ class Revision < ActiveRecord::Base
   def identifier
      (YAML::load(self[:identifier]))[0]
   end
+  
+  def basedir
+    "#{project.basedir}/revision/#{id}"
+  end
 
   # An integer that serves as a label. If the identifier is a number,
   # same as that - otherwise a custom counter.

@@ -10,7 +10,7 @@ public class Main {
         Compresser compresser = new Zipper();
         CompressingBuildExecutor buildSlave = new CompressingBuildExecutor(compresser);
         Poster poster = new HttpClientPoster();
-        Agent agent = new Agent(buildSlave, poster, null);
+        Agent agent = new Agent(buildSlave, poster, null, null);
 
         agent.buildNext();
     }

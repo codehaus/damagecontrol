@@ -183,16 +183,6 @@ LIMIT #{options[:count]}
     mkdir "#{working_copy_dir}/#{relative_build_path}"
   end
 
-  # Where temporary stdout log is written
-  def stdout_file
-    "#{@basedir}/stdout.log"
-  end
-
-  # Where temporary stderr log is written
-  def stderr_file
-    "#{@basedir}/stderr.log"
-  end
-  
   def revisions_rss(controller, rss_version="2.0")
     rss = RSS::Maker.make(rss_version) do |maker|
       maker.channel.title = "#{name} revisions"

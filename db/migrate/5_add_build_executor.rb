@@ -16,8 +16,8 @@ class AddBuildExecutor < ActiveRecord::Migration
   end
 
   def self.down
-    drop_column :projects, :local_build
-    drop_column :builds,   :build_executor_id
+    remove_column :projects, :local_build
+    remove_column :builds,   :build_executor_id
     drop_table :build_executors_projects
     drop_table :build_executors
   end

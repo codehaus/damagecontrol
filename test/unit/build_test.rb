@@ -36,8 +36,8 @@ class BuildTest < Test::Unit::TestCase
     build.reload
     
     assert_equal("echo hello #{env_var('DAMAGECONTROL_BUILD_LABEL')}", build.command)
-    assert_match(/hello 789/, build.stdout)
-    assert_equal("", build.stderr)
+    assert_match(/hello 789/, File.open(build.stdout_file).read)
+    assert_equal("", File.open(build.stderr_file).read)
     assert_equal(0, build.exitstatus)
     assert_equal(Build::Fixed, build.state.class)
     assert_equal(Time, build.begin_time.class)
@@ -52,8 +52,8 @@ class BuildTest < Test::Unit::TestCase
     build = @revision_1.builds.create(:reason => Build::SCM_POLLED)
     assert_not_equal(0, build.execute!)
     assert_equal(Build::RepeatedlyBroken, build.state.class)
-    assert_equal("", build.stdout)
-    assert_match(/w_t_f/, build.stderr)
+    assert_equal("", File.open(build.stdout_file).read)
+    assert_match(/w_t_f/, File.open(build.stderr_file).read)
   end
 
   def test_should_return_one_when_executing_nonexistant_svn_command
@@ -62,8 +62,8 @@ class BuildTest < Test::Unit::TestCase
     build = @revision_1.builds.create(:reason => Build::SCM_POLLED)
     assert_equal(1, build.execute!)
     assert_equal(Build::RepeatedlyBroken, build.state.class)
-    assert_equal("", build.stdout)
-    assert_match(/[Uu]nknown command: 'wtf'\nType 'svn help' for usage.\n/, build.stderr)
+    assert_equal("", File.open(build.stdout_file).read)
+    assert_match(/[Uu]nknown command: 'wtf'\nType 'svn help' for usage.\n/, File.open(build.stderr_file).read)
   end
   
   def test_should_not_have_status_after_create

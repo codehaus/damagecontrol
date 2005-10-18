@@ -14,8 +14,6 @@ import java.util.Date;
 
 import com.buildpatterns.damagecontrol.slave.types.BuildInfo;
 import com.buildpatterns.damagecontrol.slave.types.BuildResult;
-import com.buildpatterns.damagecontrol.slave.types.Revision;
-import com.thoughtworks.xstream.XStream;
 
 /**
  * @author Aslak Helles&oslash;y
@@ -27,10 +25,6 @@ public class CompressingBuildExecutor implements BuildExecutor {
         this.compresser = compresser;
     }
 
-    BuildInfo getBuildInfo(File buildInfo) throws FileNotFoundException {
-        return (BuildInfo) X.stream.fromXML(new FileReader(buildInfo));
-    }
-
     public File execute(InputStream zip, File dir) throws IOException {
         compresser.unzip(zip, dir);
         BuildInfo buildInfo = getBuildInfo(new File(dir, "damagecontrol_build_info.xml"));
@@ -39,12 +33,16 @@ public class CompressingBuildExecutor implements BuildExecutor {
         return execute(buildInfo, dir, stdOut, stdErr);
     }
 
+    BuildInfo getBuildInfo(File buildInfo) throws FileNotFoundException {
+        return (BuildInfo) X.stream.fromXML(new FileReader(buildInfo));
+    }
+
     private File execute(BuildInfo buildInfo, File dir, OutputStream stdOut, OutputStream stdErr) throws IOException {
         BuildResult buildResult = new BuildResult();
         try {
             buildResult.begintime = new Date(System.currentTimeMillis());
             final String[] envp = null;
-            final String[] args = new String[]{"cmd.exe", "/C", buildInfo.buildcommand};
+            final String[] args = createArgs(buildInfo);
             Process process = Runtime.getRuntime().exec(args, envp, dir);
             InputStream stdOutIn = process.getInputStream();
             InputStream stdErrIn = process.getErrorStream();
@@ -58,8 +56,6 @@ public class CompressingBuildExecutor implements BuildExecutor {
             stdOutPumper.join();
             stdErrPumper.join();
             process.destroy();
-        } catch (IOException e) {
-            e.printStackTrace();
         } catch (InterruptedException e) {
             e.printStackTrace();
         } finally {
@@ -69,7 +65,17 @@ public class CompressingBuildExecutor implements BuildExecutor {
         return compresser.zip(dir);
     }
 
-    private void writeBuildResult(File dir, BuildResult buildResult) throws IOException {
+	private String[] createArgs(BuildInfo buildInfo) {
+		boolean isWindows = false;
+		if(isWindows) {
+			// TODO: retry with .cmd if it fails
+			return new String[]{"cmd.exe", "/C", buildInfo.buildcommand};
+		} else {
+			return new String[]{buildInfo.buildcommand};
+		}
+	}
+
+	private void writeBuildResult(File dir, BuildResult buildResult) throws IOException {
         Writer out = new BufferedWriter(new FileWriter(new File(dir, "damagecontrol_build_result.xml")));
         out.write(X.stream.toXML(buildResult));
         out.flush();

@@ -10,11 +10,11 @@ class BuildController < ApplicationController
   end
 
   def stdout
-    send_inline_text(find.stdout)
+    send_log(find.stdout_file)
   end
 
   def stderr
-    send_inline_text(find.stderr)
+    send_log(find.stderr_file)
   end
 
 private
@@ -23,8 +23,12 @@ private
     @build = Build.find(@params[:id])
   end
 
-  def send_inline_text(text)
-    send_data(text, :type => "text/plain".freeze, :disposition => "inline".freeze)
+  def send_log(file)
+    if(File.exist?(file))
+      send_file(file, :type => "text/plain", :disposition => "inline")
+    else
+      render :text => "Build not started"
+    end
   end
 
 end

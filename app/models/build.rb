@@ -36,41 +36,16 @@ class Build < ActiveRecord::Base
   end
   
   def before_destroy
-    connection.delete("DELETE FROM build_logs WHERE id=?", self.stdout_id)
-    connection.delete("DELETE FROM build_logs WHERE id=?", self.stderr_id)
   end
 
-  # TODO: use has_one here?
-  def stdout
-    # Read from file if the build is currently running (it won't be in the database yet)
-    if self.exitstatus.nil?
-      if(File.exist?(revision.project.stdout_file))
-        File.open(revision.project.stdout_file).read
-      else
-        NOT_STARTED_LOG
-      end
-    elsif(stdout_id)
-      connection.select_one("SELECT data FROM build_logs WHERE id=#{stdout_id}")["data"]
-    else
-      ""
-    end
+  def stdout_file
+    "#{revision.basedir}/builds/#{id}/stdout.log"
   end
 
-  def stderr
-    # Read from file if the build is currently running (it won't be in the database yet)
-    if self.exitstatus.nil?
-      if(File.exist?(revision.project.stderr_file))
-        File.open(revision.project.stderr_file).read
-      else
-        NOT_STARTED_LOG
-      end
-    elsif(stdout_id)
-      connection.select_one("SELECT data FROM build_logs WHERE id=#{stderr_id}")["data"]
-    else
-      ""
-    end
+  def stderr_file
+    "#{revision.basedir}/builds/#{id}/stderr.log"
   end
-
+  
   # The 'owner' of this build depends on the +reason+ for the build:
   #
   #   * SCM_POLLED => revision.developer
@@ -144,11 +119,12 @@ class Build < ActiveRecord::Base
     env.each{|k,v| ENV[k]=v}
     Dir.chdir(revision.project.build_dir) do
       begin
-        redirected_cmd = "#{command} > #{revision.project.stdout_file} 2> #{revision.project.stderr_file}"
+        FileUtils.mkdir_p(File.dirname(stdout_file)) unless File.exist?(File.dirname(stdout_file))
+        redirected_cmd = "#{command} > #{stdout_file} 2> #{stderr_file}"
         logger.info "Executing build for #{revision.project.name}'s revision #{revision.identifier}" if logger
         `#{redirected_cmd}`
       rescue Errno::ENOENT => e
-        File.open(stderr_file.path) {|io| self.stderr = e.message}
+        File.open(stderr_file) {|io| self.stderr = e.message}
         exit! 1
       end
     end
@@ -157,18 +133,6 @@ class Build < ActiveRecord::Base
     self.exitstatus = $?.exitstatus
     self.end_time = Time.now.utc
     determine_state
-
-    if(File.exist?(revision.project.stdout_file))
-      File.open(revision.project.stdout_file) do |io| 
-        self.stdout_id = connection.insert("INSERT INTO build_logs (data) VALUES('#{connection.quote_string(io.read)}')")
-      end
-    end
-
-    if(File.exist?(revision.project.stderr_file))
-      File.open(revision.project.stderr_file) do |io| 
-        self.stderr_id = connection.insert("INSERT INTO build_logs (data) VALUES('#{connection.quote_string(io.read)}')")
-      end
-    end
 
     save
     
@@ -213,7 +177,7 @@ class Build < ActiveRecord::Base
       else "red-pulse-32.gif"
     end
   end
-
+  
   class SynchingWorkingCopy
     def description
       "Synching working copy"
