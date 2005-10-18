@@ -4,7 +4,7 @@
         <identifier>456</identifier>
         <label>456</label>
     </revision>
-    <buildcommand>rake.cmd</buildcommand>
+    <buildcommand>rake</buildcommand>
     <environment>
         <entry>
             <string>DAMAGECONTROL_BUILD_LABEL</string>

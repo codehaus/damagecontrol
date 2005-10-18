@@ -51,11 +51,8 @@ module DamageControl
           project.reload
         
           # TODO: We should set the lock_time flag and save the project to avoid other parallel
-          # daemon processes from handling the project. -But how do we ensure that locked projects
-          # don't remain locked if the locking daemon goes down before a project is unlocked?
-          # Maybe we need some inter-process communication - Drb or something. That opens up a new
-          # question: How do the processes get to know each other? Is there a simpler way around 
-          # this problem?
+          # daemon processes from handling the project. TODO: use the --id value instead, and
+          # clear out all of them when starting up.
           handle_project(project) 
         rescue ActiveRecord::RecordNotFound => e
           logger.error "Couldn't handle project #{project.name}. It looks like it was recently deleted" if logger

@@ -5,42 +5,50 @@
         <pathelement path="target/test-classes"/>
     </path>
 
+    <target name="clean">
+        <delete dir="target"/>
+    </target>
+
+    <target name="compile-main">
+        <mkdir dir="target/classes"/>
+        <javac srcdir="src/main" destdir="target/classes" classpathref="classpath" debug="true"/>
+    </target>
+
+	<target name="copy-resources">
+		<copy todir="target/test-classes">
+			<fileset dir="src/test">
+				<include name="**/*.xml"/>
+			</fileset>
+		</copy>
+	</target>
+    
+	<target name="compile-test" depends="compile-main">
+        <mkdir dir="target/test-classes"/>
+        <javac srcdir="src/test" destdir="target/test-classes" classpathref="classpath" debug="true"/>
+    </target>
+
     <target name="zip-test">
         <mkdir dir="target"/>
         <delete file="target/test-project.zip"/>
         <zip basedir="src/test-project" zipfile="target/test-project.zip"/>
     </target>
 
-    <target name="clean">
-        <echo>ANT HOME: ${ant.home}</echo>
-        <delete dir="target"/>
-    </target>
-
-    <target name="jar" depends="clean,test">
-        <jar basedir="target/classes" jarfile="../public/slave/${ant.project.name}.jar"/>
-    </target>
-
-    <target name="test" depends="compile-test,zip-test">
+    <target name="test" depends="compile-test,zip-test,copy-resources">
         <mkdir dir="target/test-reports"/>
-        <junit printsummary="yes" haltonfailure="yes">
+        <junit printsummary="yes" haltonfailure="yes" showoutput="true" >
             <classpath refid="classpath"/>
 
             <batchtest fork="no" todir="target/test-reports">
                 <fileset dir="src/test">
                     <include name="**/*Test.java"/>
                 </fileset>
+                <formatter type="plain"/>
             </batchtest>
         </junit>
     </target>
 
-    <target name="compile-test" depends="compile-main">
-        <mkdir dir="target/test-classes"/>
-        <javac srcdir="src/test" destdir="target/test-classes" classpathref="classpath"/>
-    </target>
-
-    <target name="compile-main">
-        <mkdir dir="target/classes"/>
-        <javac srcdir="src/main" destdir="target/classes" classpathref="classpath"/>
+    <target name="jar" depends="clean,test">
+        <jar basedir="target/classes" jarfile="../public/slave/${ant.project.name}.jar"/>
     </target>
 
     <!--
@@ -62,6 +70,7 @@
         <copy todir="../public/slave">
             <fileset dir="lib">
                 <exclude name="jmock*.jar"/>
+                <exclude name="junit*.jar"/>
             </fileset>
         </copy>
     </target>

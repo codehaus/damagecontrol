@@ -18,10 +18,14 @@ public class AgentTest extends MockObjectTestCase {
         buildExecutor.expects(once()).method("execute").withAnyArguments().will(returnValue(resultFile));
         
         Mock poster = mock(Poster.class);
-        poster.expects(once()).method("post").with(same(resultFile), eq("what"));
+        poster
+			.expects(once())
+			.method("post")
+			.with(same(resultFile), eq(new URL("http://localhost:9876/what/ever")))
+			.will(returnValue(200));
         
-        URL pendingBuildInfoUrl = null;
-        Agent agent = new Agent((BuildExecutor)buildExecutor.proxy(), (Poster)poster.proxy(), pendingBuildInfoUrl);
+        URL pendingBuildInfoUrl = getClass().getResource("/com/buildpatterns/damagecontrol/slave/pending_build_info.xml");
+        Agent agent = new Agent((BuildExecutor)buildExecutor.proxy(), (Poster)poster.proxy(), pendingBuildInfoUrl, new File("target/testroot"));
         agent.buildNext();
     }
 }
