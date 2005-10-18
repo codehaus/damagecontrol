@@ -45,6 +45,7 @@ logger.level = Logger::DEBUG
   DamageControl::BuildDaemon, 
   DamageControl::Publisher::Base, 
   Build, 
+  BuildExecutor, 
   Project, 
   Revision
 ].each { |cls| cls.logger = logger }
