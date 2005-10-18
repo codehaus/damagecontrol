@@ -3,7 +3,7 @@ require File.dirname(__FILE__) + '/../test_helper'
 class BuildTest < Test::Unit::TestCase
   include DamageControl::Platform
 
-  fixtures :builds, :revisions, :projects, :artifacts
+  fixtures :builds, :revisions, :projects, :artifacts, :build_executors, :build_executors_projects
 
   def test_should_create
     br = @revision_1.builds.create(:reason => Build::SCM_POLLED)
@@ -20,9 +20,9 @@ class BuildTest < Test::Unit::TestCase
     build_proof = "#{DC_DATA_DIR}/projects/#{@project_1.id}/working_copy/build_here/built"
     File.delete build_proof if File.exist?(build_proof)
     
-    build = @revision_1.builds.create(:reason => Build::SCM_POLLED)
+    build = @revision_1.request_builds(:reason => Build::SCM_POLLED)[0]
     assert(!File.exist?(build_proof), "Should not exist: #{build_proof}")
-    assert_equal(0, build.execute!)
+    build.execute!
     assert_equal(Build::Fixed, build.state.class)
     assert(File.exist?(build_proof), "Should exist: #{build_proof}")
   end
@@ -30,10 +30,9 @@ class BuildTest < Test::Unit::TestCase
   def test_should_persist_build_info
     @project_1.build_command = "echo hello #{env_var('DAMAGECONTROL_BUILD_LABEL')}"
     @project_1.save
-    build = @revision_1.builds.create(:reason => Build::SCM_POLLED)
-    t = Time.now.utc
-    assert_equal(0, build.execute!(t))
-    build.reload
+    build = @revision_1.request_builds(:reason => Build::SCM_POLLED)[0]
+    now = Time.now.utc
+    build.execute!
     
     assert_equal("echo hello #{env_var('DAMAGECONTROL_BUILD_LABEL')}", build.command)
     assert_match(/hello 789/, File.open(build.stdout_file).read)
@@ -42,15 +41,16 @@ class BuildTest < Test::Unit::TestCase
     assert_equal(Build::Fixed, build.state.class)
     assert_equal(Time, build.begin_time.class)
     assert(build.begin_time.utc?)
-    assert_equal(t.to_s, build.begin_time.to_s)
+    assert(now <= build.begin_time)
     assert_equal(Build::Fixed, build.state.class)
   end
 
   def test_should_store_info_for_nonexistant_command
     @project_1.build_command = "w_t_f"
     @project_1.save
-    build = @revision_1.builds.create(:reason => Build::SCM_POLLED)
-    assert_not_equal(0, build.execute!)
+    build = @revision_1.request_builds(:reason => Build::SCM_POLLED)[0]
+    build.execute!
+    assert_not_equal(0, build.exitstatus)
     assert_equal(Build::RepeatedlyBroken, build.state.class)
     assert_equal("", File.open(build.stdout_file).read)
     assert_match(/w_t_f/, File.open(build.stderr_file).read)
@@ -59,15 +59,16 @@ class BuildTest < Test::Unit::TestCase
   def test_should_return_one_when_executing_nonexistant_svn_command
     @project_1.build_command = "svn wtf"
     @project_1.save
-    build = @revision_1.builds.create(:reason => Build::SCM_POLLED)
-    assert_equal(1, build.execute!)
+    build = @revision_1.request_builds(:reason => Build::SCM_POLLED)[0]
+    build.execute!
+    assert_equal(1, build.exitstatus)
     assert_equal(Build::RepeatedlyBroken, build.state.class)
     assert_equal("", File.open(build.stdout_file).read)
     assert_match(/[Uu]nknown command: 'wtf'\nType 'svn help' for usage.\n/, File.open(build.stderr_file).read)
   end
   
-  def test_should_not_have_status_after_create
-    build = @revision_1.builds.create(:reason => Build::SCM_POLLED)
+  def test_should_not_have_status_after_request
+    build = @revision_1.request_builds(:reason => Build::SCM_POLLED)[0]
     assert_nil(build.state)
   end
   

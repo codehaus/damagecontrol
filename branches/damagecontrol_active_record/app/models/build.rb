@@ -94,13 +94,12 @@ class Build < ActiveRecord::Base
   end
 
   # Executes this build and persists results. 
-  # The following steps occur (in a forked subprocess) when calling this method:
+  # The following steps occur when calling this method:
   #
-  # 1) The revision for this build is checked out
-  # 2) The project's build command is executed
-  # 3) The project is notified via Project.build_complete when the build is complete
+  # 1) The working copy is updated to this build's revision
+  # 2) The build's build_executor executes the build
   #
-  def execute!(begin_time=Time.now.utc)
+  def execute!
     raise "Already executed" if exitstatus
 
     # Make sure the working copy is in sync, and possibly reload settings from
@@ -109,37 +108,10 @@ class Build < ActiveRecord::Base
     save
     revision.sync_working_copy
 
-    self.state = Executing.new
-    self.begin_time = begin_time
-    self.command = self.revision.project.build_command
+    self.command = revision.project.build_command
     self.env = revision.build_environment
-    save
-    project.build_executing(self)
 
-    env.each{|k,v| ENV[k]=v}
-    Dir.chdir(revision.project.build_dir) do
-      begin
-        FileUtils.mkdir_p(File.dirname(stdout_file)) unless File.exist?(File.dirname(stdout_file))
-        redirected_cmd = "#{command} > #{stdout_file} 2> #{stderr_file}"
-        logger.info "Executing build for #{revision.project.name}'s revision #{revision.identifier}" if logger
-        `#{redirected_cmd}`
-      rescue Errno::ENOENT => e
-        File.open(stderr_file) {|io| self.stderr = e.message}
-        exit! 1
-      end
-    end
-    
-    # Wait for the subprocess to complete and publish the result
-    self.exitstatus = $?.exitstatus
-    self.end_time = Time.now.utc
-    determine_state
-
-    save
-    
-    project.build_complete(self)
-    logger.info "Build of #{project.name}'s revision #{revision.identifier} complete. Exitstatus: #{self.exitstatus}" if logger
-
-    self.exitstatus
+    build_executor.execute(self)
   end
   
   # The description of the state
