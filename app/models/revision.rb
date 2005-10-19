@@ -80,18 +80,14 @@ class Revision < ActiveRecord::Base
 private
 
   def update_project_settings
-    damagecontrol_yml = revision_files.detect do |file| 
-      file.path == "damagecontrol.yml"
-    end
-
-    if(damagecontrol_yml)
-      damagecontrol_yml_file = File.join(project.scm.checkout_dir, "damagecontrol.yml")
-      if(File.exist?(damagecontrol_yml_file))
-        logger.info "Importing project settings from #{damagecontrol_yml_file}" if logger
+    damagecontrol_yml_file = File.join(project.scm.checkout_dir, "damagecontrol.yml")
+    if(File.exist?(damagecontrol_yml_file))
+      logger.info "Importing project settings from #{damagecontrol_yml_file}" if logger
+      begin
         project.populate_from_hash(YAML.load_file(damagecontrol_yml_file))
         project.save
-      else
-        logger.info "Where is #{damagecontrol_yml_file} ??? Should be here by now" if logger
+      rescue => e
+        logger.error e.message if logger
       end
     end
   end

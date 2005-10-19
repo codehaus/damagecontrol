@@ -3,11 +3,3 @@
     <%= render :partial => "project/summary", :locals => {:project => project} %>
   <% end %>
 </div>
-
-<% if(@project_list_refresh) %>
-  <%= periodically_call_remote(
-    :update => "projects",
-    :url => {:controller => "project", :action => "list"},
-    :frequency => 59 # prime
-  ) %>
-<% end %>

@@ -15,17 +15,3 @@
   <% end %>
   </table>
 </div>
-
-<% unless(@params[:no_init_of_revision_list_refresh]) %>
-  <%= periodically_call_remote(
-    :update => "revisions",
-    :url => {
-      :controller => "revision", 
-      :action => "list", 
-      :id => @project.id, 
-      :params => {:no_init_of_revision_list_refresh => true}
-    },
-    :frequency => 29, # prime increases dispersion of other ajax calls
-    :failure => "alert('AJAX problem for revision/list/#{@project.id}')"
-  ) %>
-<% end %>
