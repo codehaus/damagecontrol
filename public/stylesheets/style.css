@@ -120,6 +120,10 @@ html>body #banner {
   
 }
 
+#revisions h2 {
+  background-color: #AAAAAA;
+}
+
 /* arrows on textiled lists in revision summary */
 .revision-summary {
   margin-left: 0;
