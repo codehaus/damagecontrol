@@ -80,6 +80,7 @@ class Revision < ActiveRecord::Base
 private
 
   def update_project_settings
+    return unless project && project.scm
     damagecontrol_yml_file = File.join(project.scm.checkout_dir, "damagecontrol.yml")
     if(File.exist?(damagecontrol_yml_file))
       logger.info "Importing project settings from #{damagecontrol_yml_file}" if logger

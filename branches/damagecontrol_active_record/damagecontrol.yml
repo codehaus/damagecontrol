@@ -13,7 +13,7 @@ scm:
     uses_polling: true
     enabled: true
 scm_web: 
-  diff_spec: http://svn.damagecontrol.codehaus.org/branches/damagecontrol_active_record/#{path}?r1=#{previous_revision}&r2=#{revision}&p1=#{path}&p2=#{path}
+  diff_spec: http://svn.damagecontrol.codehaus.org/branches/damagecontrol_active_record/#{path}?r1=#{previous_revision}&r2=#{revision}&p1=branches/damagecontrol_active_record/#{path}&p2=branches/damagecontrol_active_record/#{path}
   dir_spec: http://svn.damagecontrol.codehaus.org/branches/damagecontrol_active_record/#{path}
   raw_spec: http://svn.damagecontrol.codehaus.org/branches/damagecontrol_active_record/#{path}?rev=#{revision}
   html_spec: http://svn.damagecontrol.codehaus.org/branches/damagecontrol_active_record/#{path}?rev=#{revision}&view=auto
