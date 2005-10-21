@@ -34,7 +34,7 @@ module ApplicationHelper
       image_tag("transparentpixel.gif", :border => 0, :size => "16x16")
     else
       link_to(
-        image_tag(build.icon, :border => 0, :size => "16x16"), 
+        image_tag(build.icon, :border => 0, :size => "16x16") + " " + build.state.class.name, 
         :controller => "build", :action => "show", :id => build.id
       )
     end
