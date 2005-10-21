@@ -1,69 +1,55 @@
+require 'gmailer'
+
 module DamageControl
   module Publisher
+    # Uses sendmail, smtp or gmail to send email. Which one to use depends on attributes.
     class Email < Base
-      attr_accessor :enabled
-
-      ann :tip => "Specify as many email addresses as you like, separated with comma or whitespace."
-      ann :description => "To"
       attr_accessor :to
-
-      ann :tip => "Who the emails should appear to be from."
-      ann :description => "From"
-      attr_accessor :from
+      attr_accessor :from # will use gmailer if this is a gmail address
 
       # SMTP only settings
-
-      ann :tip => "SMTP server's IP address or name."
-      ann :description => "Server"
-      attr_accessor :server
-
-      ann :tip => "SMTP server's port."
-      ann :description => "Port"
+      attr_accessor :server # setting this will use smtp
       attr_accessor :port
-
-      ann :tip => "If you need to specify a HELO domain, you can do it here."
-      ann :description => "Domain"
       attr_accessor :domain
-
-      ann :tip => "If your SMTP server requires authentication, set the username."
-      ann :description => "User name"
       attr_accessor :user_name
-
-      ann :tip => "If your SMTP server requires authentication, set the password."
-      ann :description => "Password"
       attr_accessor :password
-
-      ann :tip => "If your SMTP server requires authentication, you need to specify " +
-                  "the authentication type here. This is one of 'plain', 'login', 'cram_md5'"
-      ann :description => "Authentication"
       attr_accessor :authentication
-
-      ann :description => "smtp or sendmail"
-      attr_accessor :delivery_method
 
       def initialize
         @content_type = "text/html"
         @to = ""
         @from = "\"DamageControl\" <dcontrol@codehaus.org>"
-        @delivery_method = "smtp"
 
         # SMTP only
-        @server = "localhost"
         @port = 25
         @domain = "localhost.localdomain"
       end
 
       def publish(build)
-        BuildResultMailer.server_settings = server_settings
-        BuildResultMailer.delivery_method = @delivery_method    
-
-        BuildResultMailer.deliver_build_result(to.split(%r{,\s*}), from, build)
+        if(@from =~ /(.*)@gmail.com/)
+          GMailer.connect($1, @password) do |g|
+            # 'From' default gmail.com account
+            g.send(
+              :to => to.split(%r{,\s*}).join(","),
+              :subject => "#{build.project.name}: #{build.state.class.name}",
+              :body => "Hello"
+            )
+          end
+        else
+          BuildResultMailer.delivery_method = delivery_method
+          BuildResultMailer.server_settings = server_settings
+          BuildResultMailer.deliver_build_result(to.split(%r{,\s*}), from, build)
+        end
       end
 
     private
+    
+      def delivery_method
+        (@server && @server.strip != "") ? "smtp" : "sendmail"
+      end
 
       def server_settings
-        if(@delivery_method == "smtp")
+        if(delivery_method == "smtp")
           {
             :server => @server,
             :port => @port.to_i,

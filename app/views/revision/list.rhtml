@@ -1,17 +1,24 @@
 <div id="revisions">
-  <table>
+  <% last_date = nil %>
   <% @revisions.each do |revision| %>
-    <tr>
-      <td nowrap="nowrap">
-        <%= link_to(revision.label, :controller => "revision", :action => "show", :id => revision.id) %>
-        (<%= revision.developer %>)
-      </td>
-      <td>
-        <% revision.builds.each do |build| %>
-          <%= build_link(build) %>
-        <% end %>
-      </td>
-    </tr>
+    <% date = revision.timepoint.strftime("%e %b"); if(date != last_date) %>
+      <h2><%= date %></h2>
+    <% end; last_date = date %>
+
+    <% revision.builds.each do |build| %>
+      <div>
+        <%= build_link(build) %>
+      </div>
+    <% end %>
+    <div>
+      <%= image_tag "document_edit", :size=>"16x16" %>
+      <%= link_to_remote(
+        revision.label, 
+        :update => "revision_#{revision.id}",
+        :url => {:controller => "revision", :action => "show", :id => revision.id}
+      ) %>
+      (<%= revision.developer %>)
+    </div>
+    <div id="revision_<%= revision.id %>"></div>
   <% end %>
-  </table>
 </div>
