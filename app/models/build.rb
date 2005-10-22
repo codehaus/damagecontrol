@@ -91,6 +91,11 @@ class Build < ActiveRecord::Base
   def successful?
     exitstatus == 0
   end
+  
+  # Whether this build has completed or not.
+  def completed?
+    !exitstatus.nil?
+  end
 
   # Executes this build and persists results. 
   # The following steps occur when calling this method:

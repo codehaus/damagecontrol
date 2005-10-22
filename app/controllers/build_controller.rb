@@ -1,12 +1,11 @@
 class BuildController < ApplicationController
   
+  layout "application", :except => [:show]
+
   def show
     find
     # TODO: optimize
     @project = @build.project
-    @revisions = @build.revision.project.revisions
-    load_builds_for_sparkline(@project)
-    @template_for_left_column = "revision/list"
   end
 
   def stdout
@@ -27,7 +26,7 @@ private
     if(File.exist?(file))
       send_file(file, :type => "text/plain", :disposition => "inline")
     else
-      render :text => "Build not started"
+      render :text => @build.completed? ? "File #{file} not found. It has probably been deleted" : "Build not started"
     end
   end
 

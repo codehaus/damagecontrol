@@ -2,6 +2,26 @@ require 'damagecontrol'
 
 module ApplicationHelper
   
+  # Works like link_to_remote, but makes the link toggle after first fetch.
+  # IMPORTANT: each use per page must use different +update+ parameters.
+  # TODO: we could generate random ids for anchors.. 
+  def toggle_link_to_remote(content, update, controller, action, id)
+    anchor_id = "#{update}_link"
+    link_to_remote(
+      content, {
+        :update => update,
+        :url => {
+          :controller => controller, 
+          :action => action, 
+          :id => id
+        },
+          :complete => "$('#{anchor_id}').onclick = function(){Element.toggle('#{update}')}"
+      }, {
+        :id => anchor_id
+      }
+    )
+  end
+  
   def field(object, name, attr_name, type="text", id=nil)
     tag("input", 
       :name => "#{name}[#{attr_name[1..-1]}]", 
@@ -26,18 +46,6 @@ module ApplicationHelper
       File.basename(artifact.relative_path), 
       :controller => "file_system", :action => "browse", :params => {:path => artifact.relative_path.split('/')}
     ) + " (#{File.size(artifact.file) / 1024} Kb)"
-  end
-  
-  def build_link(build)
-    if(build.nil?)
-      # Can't create a link to a nonexistant build! Just show a transparent image with same size as image links.
-      image_tag("transparentpixel.gif", :border => 0, :size => "16x16")
-    else
-      link_to(
-        image_tag(build.icon, :border => 0, :size => "16x16") + " " + build.state.class.name, 
-        :controller => "build", :action => "show", :id => build.id
-      )
-    end
   end
   
   def description(clazz, attr_name)

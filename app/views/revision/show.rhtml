@@ -3,6 +3,12 @@
 </div>
 
 <table>
+  <thead>
+    <tr>
+      <th>Revision</th><th>Diff</th><th>History</th>
+    </tr>
+  </thead>
+  <tbody>
   <%
   @revision.revision_files.each_with_index do |file, i|
     full_path = @project.scm.scm_web_path(file)
@@ -36,7 +42,30 @@
     diff_tip = "Show diff"
     history_tip = "Show history"
   %>
+
     <tr>
+      <% if(@project.scm_web.nil?) %>
+        <td><%= file.native_revision_identifier %></td>
+      <% else %>
+        <td>
+          <%= 
+            content_tag(
+              "a", 
+              file.native_revision_identifier, 
+              {
+                :href=> revision_url,
+                :title => case(file.status)
+                  when "ADDED" then added_rev_tip
+                  when "MODIFIED" then modified_rev_tip
+                  when "MOVED" then moved_rev_tip
+                  when "DELETED" then deleted_rev_tip
+                end
+              }
+            )
+          %>
+        </td>
+      <% end %>
+
       <% if(@project.scm_web.nil?) %>
         <td><%= image_tag(file.icon, :size => "16x16", :title => file.status_description) %></td>
       <% else %>
@@ -71,28 +100,6 @@
       <% end %>
 
       <% if(@project.scm_web.nil?) %>
-        <td><%= file.native_revision_identifier %></td>
-      <% else %>
-        <td>
-          <%= 
-            content_tag(
-              "a", 
-              file.native_revision_identifier, 
-              {
-                :href=> revision_url,
-                :title => case(file.status)
-                  when "ADDED" then added_rev_tip
-                  when "MODIFIED" then modified_rev_tip
-                  when "MOVED" then moved_rev_tip
-                  when "DELETED" then deleted_rev_tip
-                end
-              }
-            )
-          %>
-        </td>
-      <% end %>
-
-      <% if(@project.scm_web.nil?) %>
         <td><%= file.path %></td>
       <% else %>
         <td>
@@ -108,8 +115,10 @@
           %>
         </td>
       <% end %>
+
     </tr>
   <% end %>
+  <tbody>
 </table>
 <div id="request-build">
   <%= link_to_remote(

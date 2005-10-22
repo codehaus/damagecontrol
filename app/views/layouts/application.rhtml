@@ -29,23 +29,12 @@
     </p>
   </div>
 
-  <div id="leftcontent">
-    <% if(@template_for_left_column) %>
-      <%= render(@template_for_left_column) %>
+  <div>
+    <% if @flash["notice"] %>
+      <div class="notice"><%= @flash["notice"] %></div>
     <% end %>
-  </div>
-
-  <div id="centercontent">
-    <div id="content_for_layout">
-      <% if @flash["notice"] %><div class="notice"><%= @flash["notice"] %></div><% end %>
-      <%= @content_for_layout %>
-    </div>
-  </div>
-
-  <div id="rightcontent">
-    <%= render(@template_for_tip) %>
-    <% @project_list_refresh = true %>
-    <%= render("project/list") %>
+    <h1><%= @page_title %></h1>
+    <%= @content_for_layout %>
   </div>
 
 </body>

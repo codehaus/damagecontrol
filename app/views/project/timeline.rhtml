@@ -1,0 +1,23 @@
+<div id="timeline">
+  <% last_date = nil %>
+  <% @revisions.each do |revision| revision_detail_id = "revision_#{revision.id}_detail" %>
+    <% date = revision.timepoint.strftime("%e %b"); if(date != last_date) %>
+      <h2><%= date %></h2>
+    <% end; last_date = date %>
+
+    <% revision.builds.reverse.each do |build| build_detail_id = "build_#{build.id}_detail" %>
+      <div>
+        <%= toggle_link_to_remote(build.state.class.name, build_detail_id, "build", "show", build.id) %>
+      </div>
+      <div id="<%= build_detail_id %>"></div>
+    <% end %>
+
+    <div>
+      <%= revision.timepoint.strftime("%H:%M") %>
+      <%= image_tag "document_edit", :size=>"16x16" %>
+      <%= toggle_link_to_remote(revision.label, revision_detail_id, "revision", "show", revision.id) %>
+      (<%= revision.developer %>)
+    </div>
+    <div id="revision_<%= revision.id %>_detail"></div>
+  <% end %>
+</div>
