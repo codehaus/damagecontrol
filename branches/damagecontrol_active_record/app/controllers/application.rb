@@ -4,8 +4,6 @@ require_dependency 'damagecontrol'
 Struct.new("Feed", :type, :url_options, :title) unless defined? Struct::Feed
 
 class ApplicationController < ActionController::Base
-  SPARKLINE_COUNT = 20
-  
   COMMIT_MSG_TIPS = [
     "bug_ids_commit_msg",
     "textile_commit_msg"
@@ -25,15 +23,9 @@ class ApplicationController < ActionController::Base
 
   prepend_before_filter :load_projects, :random_tip, :feeds
   append_before_filter :page_title
-
-  #helper :sparklines
   
 protected
   
-  def load_builds_for_sparkline(project)
-    @builds = project.builds(:count => SPARKLINE_COUNT)
-  end
-
   def feeds
     @feeds ||= []
   end

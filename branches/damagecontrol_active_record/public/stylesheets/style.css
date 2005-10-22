@@ -27,40 +27,6 @@ h2 {
 }
 
 /* http://glish.com/css/7.asp */
-#leftcontent {
-  position: absolute;
-  left:10px;
-  top:50px;
-  width:300px;
-  background:#fff;
-  border:1px solid #fff;
-}
-
-#centercontent {
-  background:#fff;
-  margin-left: 299px;
-  margin-right:299px;
-  border:1px solid #fff;
-  voice-family: "\"}\"";
-  voice-family: inherit;
-  margin-left: 301px;
-  margin-right:301px;
-}
-
-html>body #centercontent {
-  margin-left: 301px;
-  margin-right:301px;
-}
-
-#rightcontent {
-  position: absolute;
-  right:10px;
-  top:50px;
-  width:300px;
-  background:#fff;
-  border:1px solid #fff;
-}
-
 #banner {
   background:#fff;
   height:40px;
@@ -120,7 +86,7 @@ html>body #banner {
   
 }
 
-#revisions h2 {
+#timeline h2 {
   background-color: #AAAAAA;
 }
 

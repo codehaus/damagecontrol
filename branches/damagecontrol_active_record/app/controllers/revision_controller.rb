@@ -2,15 +2,8 @@ require 'zip/zip'
 
 class RevisionController < ApplicationController
 
-  layout "application", :except => :list
+  layout "application", :except => [:show]
 
-  def list
-    @project = Project.find(@params[:id])
-    @revisions = @project.revisions
-    
-    load_builds_for_sparkline(@project)
-  end
-  
   def show
     @revision = Revision.find(@params[:id])
 
@@ -20,8 +13,6 @@ class RevisionController < ApplicationController
     @template_for_left_column = "revision/list"
     
     @revision_message = @revision.message
-
-    load_builds_for_sparkline(@project)
   end
 
   # Requests build(s). Should be called via an AJAX POST.

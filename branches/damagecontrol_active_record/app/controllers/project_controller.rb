@@ -105,10 +105,10 @@ class ProjectController < ApplicationController
     find
   end
   
-  # This should only be called via AJAX to display the right column.
-  def list
+  def timeline
+    @revisions = @project.revisions
   end
-  
+
   def rss
     find
     render :text => @project.rss(self)
@@ -152,6 +152,15 @@ protected
   end
 
 private
+
+  def page_title
+    if(@params[:id])
+      @project = Project.find(@params[:id])
+      @page_title = "#{@project.name}"
+    else
+      @page_title = "Projects"
+    end
+  end
 
   def find
     @project ||= Project.find(@params[:id]) if @params[:id]
