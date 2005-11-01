@@ -46,15 +46,11 @@ Also see <%= link_to "exporting projects", :action => "export_project" %>.
   much easier to type). YAML is picky about indentation. Use 2 spaces for indentation and no tabs.
 </p>
 
-<pre>ruby script/import < path/to/project_file.yml</pre>
+<pre>ruby script/import < path/to/damagecontrol.yml</pre>
 
 <p>
-  Here is an example of a Project YAML file:
+  Here is an example of a <%= link_to("damagecontrol.yml", :action => "damagecontrol_yml") %>
 </p>
-
-<pre>
-<%= File.open(File.expand_path(__FILE__ + '/../../../../damagecontrol.yml')).read %>
-</pre>
 
 Please check out the RubyDoc APIs of DamageControl, <a href="http://rscm.rubyforge.org/">RSCM</a> 
 and <a href="http://xforge.rubyforge.org/">MetaProject</a> to see what attributes you can specify.
