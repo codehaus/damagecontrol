@@ -1,0 +1,80 @@
+<table>
+  <thead>
+    <tr>
+      <th>Build State</th>
+      <th>Color</th>
+      <th>Animation</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>Successful</td>
+      <td>
+        <select name="publisher[DamageControl::Publisher::AmbientOrb][successful_color]">
+          <%= options_for_select(Ambient::Orb.colors, object.successful_color) %>
+        </select>
+      </td>
+      <td>
+        <select name="publisher[DamageControl::Publisher::AmbientOrb][successful_animation]">
+          <%= options_for_select(Ambient::Orb.animations, object.successful_animation) %>
+        </select>
+      </td>
+    </tr>
+
+    <tr>
+      <td>Fixed</td>
+      <td>
+        <select name="publisher[DamageControl::Publisher::AmbientOrb][fixed_color]">
+          <%= options_for_select(Ambient::Orb.colors, object.fixed_color) %>
+        </select>
+      </td>
+      <td>
+        <select name="publisher[DamageControl::Publisher::AmbientOrb][fixed_animation]">
+          <%= options_for_select(Ambient::Orb.animations, object.fixed_animation) %>
+        </select>
+      </td>
+    </tr>
+
+    <tr>
+      <td>Broken</td>
+      <td>
+        <select name="publisher[DamageControl::Publisher::AmbientOrb][broken_color]">
+          <%= options_for_select(Ambient::Orb.colors, object.broken_color) %>
+        </select>
+      </td>
+      <td>
+        <select name="publisher[DamageControl::Publisher::AmbientOrb][broken_animation]">
+          <%= options_for_select(Ambient::Orb.animations, object.broken_animation) %>
+        </select>
+      </td>
+    </tr>
+
+    <tr>
+      <td>Repeatedly Broken</td>
+      <td>
+        <select name="publisher[DamageControl::Publisher::AmbientOrb][repeatedly_broken_color]">
+          <%= options_for_select(Ambient::Orb.colors, object.repeatedly_broken_color) %>
+        </select>
+      </td>
+      <td>
+        <select name="publisher[DamageControl::Publisher::AmbientOrb][repeatedly_broken_animation]">
+          <%= options_for_select(Ambient::Orb.animations, object.repeatedly_broken_animation) %>
+        </select>
+      </td>
+    </tr>
+
+    <tr>
+      <td>Executing</td>
+      <td>
+        <select name="publisher[DamageControl::Publisher::AmbientOrb][executing_color]">
+          <%= options_for_select(Ambient::Orb.colors, object.executing_color) %>
+        </select>
+      </td>
+      <td>
+        <select name="publisher[DamageControl::Publisher::AmbientOrb][executing_animation]">
+          <%= options_for_select(Ambient::Orb.animations, object.executing_animation) %>
+        </select>
+      </td>
+    </tr>
+  </tbody>
+</table>

@@ -4,10 +4,6 @@ require 'damagecontrol/publisher/base'
 module DamageControl
   module Publisher
     class Growl < Base
-    
-      ann :description => "Hosts"
-      ann :tip => "Comma-separated list of (OS X) hosts that will receive Growl notifications. " + 
-                  "Growl 0.7 or later must be installed on these hosts."
       attr_accessor :hosts
 
       def initialize

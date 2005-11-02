@@ -5,7 +5,7 @@ module DamageControl
     class BaseTest < Test::Unit::TestCase
       def test_should_load_all_publisher_classes
         expected = [
-          #AmbientOrb,
+          AmbientOrb,
           ArtifactArchiver,
           #BuildDuration,
           Email,
