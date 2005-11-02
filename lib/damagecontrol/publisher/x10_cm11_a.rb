@@ -2,12 +2,6 @@
 module DamageControl
   module Publisher
     class X10Cm11A < Base
-      #register self
-    
-      def name
-        "X10-CM11A"
-      end    
-
       def publish(build)
       end
     end

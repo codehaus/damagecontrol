@@ -3,8 +3,6 @@ module DamageControl
     class Sound < Base
       include Platform
 
-      register self
-      
       attr_accessor :executing_sound, :successful_sound, :fixed_sound, :broken_sound, :repeatedly_broken_sound
 
       def initialize
@@ -16,28 +14,10 @@ module DamageControl
       end
 
       def publish(build)
-        track = sound_track(build)
+        sound = build_status_attr(build, "sound")
         # Load platform-specific mediaplayer
         require File.expand_path(File.dirname(__FILE__) + "/sound/" + family + "/media_player")
-        MediaPlayer.new.play(track)
-      end
-      
-    private
-    
-      def sound_track(build)
-        # TODO: something cleaner. Why doesn't the class comparison work??
-        case build.state.class.name
-          when Build::Executing.name
-            return executing_sound
-          when Build::Successful.name
-            return successful_sound
-          when Build::Fixed.name
-            return fixed_sound
-          when Build::Broken.name
-            return broken_sound
-          when Build::RepeatedlyBroken.name
-            return repeatedly_broken_sound
-        end
+        MediaPlayer.new.play(sound)
       end
       
     end

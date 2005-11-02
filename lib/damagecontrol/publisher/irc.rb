@@ -3,15 +3,8 @@ require 'damagecontrol/publisher/base'
 module DamageControl
   module Publisher
     class Irc < Base
-      #register self
-    
-      ann :description => "IRC server"
       attr_reader :server
-
-      ann :description => "IRC notification channel"
       attr_reader :channel
-
-      ann :description => "DamageControl's IRC nick"
       attr_reader :nick
     
       def initialize

@@ -4,15 +4,8 @@ require 'damagecontrol/publisher/base'
 module DamageControl
   module Publisher
     class Jabber < Base
-      register self
-
-      ann :description => "DamageControl Jabber Id/Resource"
       attr_accessor :id_resource
-
-      ann :description => "DamageControl Jabber Password"
       attr_accessor :password
-
-      ann :description => "DamageControl's Friends"
       attr_accessor :friends
       
       def initialize

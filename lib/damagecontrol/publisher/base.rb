@@ -10,7 +10,7 @@ module DamageControl
 
       def self.classes
         [
-          #AmbientOrb,
+          AmbientOrb,
           ArtifactArchiver,
           #BuildDuration,
           Email,
@@ -54,6 +54,12 @@ module DamageControl
         if(should_publish)
           publish(build)
         end
+      end
+      
+    protected
+    
+      def build_status_attr(build, kind)
+        __send__ "#{build.state.class.name.demodulize.underscore}_#{kind}".to_sym
       end
 
     end

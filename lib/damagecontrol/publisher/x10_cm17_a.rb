@@ -9,7 +9,6 @@ end
 module DamageControl
   module Publisher
     class X10Cm17A < Base
-      register self
     
       @@device_attrs = {
         "Build::Broken"           => :broken, 
