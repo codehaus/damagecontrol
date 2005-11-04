@@ -5,7 +5,6 @@ require 'tempfile'
 
 module RSCM
   class ClearCase < Base
-    register self
 
     LOG_FORMAT = "- !ruby/object:RSCM::RevisionFile\\n  developer: %u\\n  time: \\\"%Nd\\\"\\n  native_revision_identifier: %Vn\\n  previous_native_revision_identifier: %PVn\\n  path: %En\\n  status: %o\\n  message: \\\"%Nc\\\"\\n\\n"
     TIME_FORMAT = "%d-%b-%Y.%H:%M:%S"
