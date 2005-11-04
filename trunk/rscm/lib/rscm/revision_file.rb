@@ -26,10 +26,14 @@ module RSCM
       @path, @developer, @message, @native_revision_identifier, @time, @status = path, developer, message, native_revision_identifier, time, status
     end
     
-    # Returns/yields an IO containing the contents of this file, using +scm+ this
+    # Returns/yields an IO containing the contents of this file, using the +scm+ this
     # file lives in.
     def open(scm, &block)
       scm.open(self, &block)
+    end
+    
+    def diff(scm, &block)
+      scm.diff(self, &block)
     end
   
     def accept(visitor)

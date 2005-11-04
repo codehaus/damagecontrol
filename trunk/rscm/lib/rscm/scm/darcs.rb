@@ -4,9 +4,6 @@ require 'rscm'
 
 module RSCM
   class Darcs < Base
-    #register self
-
-    ann :description => "Directory"
     attr_accessor :dir
 
     def initialize(dir=".")

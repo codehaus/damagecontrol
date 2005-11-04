@@ -1,7 +1,6 @@
 require 'fileutils'
 require 'rscm/revision'
 require 'rscm/path_converter'
-require 'rscm/annotations'
 
 module RSCM
   # This class defines the RSCM API. The documentation of the various methods
@@ -57,20 +56,6 @@ module RSCM
   #
   class Base
 
-    @@classes = []
-    def self.register(cls) 
-      @@classes << cls unless @@classes.index(cls)
-    end      
-    def self.classes
-      @@classes
-    end
-
-    # Load all sources under scm, so SCM classes can register themselves
-    Dir[File.dirname(__FILE__) + "/scm/*.rb"].each do |src|
-      require src
-    end
-
-
 # TODO: Make revisions yield revisions as they are determined, to avoid
 # having to load them all into memory before the method exits. Careful not to
 # use yielded revisions to do another scm hit - like get diffs. Some SCMs
@@ -111,6 +96,7 @@ module RSCM
     def transactional?
       false
     end
+    alias :atomic? :transactional?
 
     # Creates a new 'central' repository. This is intended only for creation of 'central'
     # repositories (not for working copies). You shouldn't have to call this method if a central repository
@@ -288,6 +274,7 @@ module RSCM
     end
 
     # Returns/yields an IO containing the unified diff of the change.
+    # Also see RevisionFile#diff
     def diff(change, &block)
       return(yield("Not implemented"))
     end

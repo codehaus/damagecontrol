@@ -12,18 +12,9 @@ module RSCM
   #
   # NOTE: On Cygwin this has to be the win32 build of cvs and not the Cygwin one.
   class Cvs < Base
-    register self
-
-    ann :description => "CVSROOT"
     attr_accessor :root
-
-    ann :description => "Module"
     attr_accessor :mod
-
-    ann :description => "Branch"
     attr_accessor :branch
-
-    ann :description => "Password", :tip => "<b>Warning!</b> Password will be shown in cleartext in configuration files."
     attr_accessor :password
     
     def initialize(root=nil, mod=nil, branch=nil, password=nil)
@@ -97,16 +88,16 @@ module RSCM
       parse_log(changes_command(from_identifier, to_identifier, relative_path))
     end
     
-    def diff(change)
+    def diff(revision_file)
       with_working_dir(@checkout_dir) do
-        opts = case change.status
-          when /#{RevisionFile::MODIFIED}/; "#{revision_option(change.previous_native_revision_identifier)} #{revision_option(change.native_revision_identifier)}"
-          when /#{RevisionFile::DELETED}/; "#{revision_option(change.previous_native_revision_identifier)}"
-          when /#{RevisionFile::ADDED}/; "#{revision_option(Time.epoch)} #{revision_option(change.native_revision_identifier)}"
+        opts = case revision_file.status
+          when /#{RevisionFile::MODIFIED}/; "#{revision_option(revision_file.previous_native_revision_identifier)} #{revision_option(revision_file.native_revision_identifier)}"
+          when /#{RevisionFile::DELETED}/; "#{revision_option(revision_file.previous_native_revision_identifier)}"
+          when /#{RevisionFile::ADDED}/; "#{revision_option(Time.epoch)} #{revision_option(revision_file.native_revision_identifier)}"
         end
         # IMPORTANT! CVS NT has a bug in the -N diff option
         # http://www.cvsnt.org/pipermail/cvsnt-bugs/2004-November/000786.html
-        cmd = command_line("diff -Nu #{opts} #{change.path}")
+        cmd = command_line("diff -Nu #{opts} #{revision_file.path}")
         Better.popen(cmd, "r", 1) do |io|
           return(yield(io))
         end

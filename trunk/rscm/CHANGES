@@ -1,5 +1,16 @@
 = RSCM Changelog
 
+== Version 0.3.11
+
+* Added atomic? alias for transactional?
+* Removed annotations, too magic :-)
+* Removed Base.classes - not needed.
+* Removed logging
+
+== Version 0.3.11
+
+* Fixes in the README
+
 == Version 0.3.10
 
 Bugfix release

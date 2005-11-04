@@ -15,22 +15,12 @@ module RSCM
   # You need the p4/p4d executable on the PATH in order for it to work.
   #
   class Perforce < Base
-    register self
-
     @@counter = 0
 
-    ann :description => "P4CLIENT: workspace name"
     attr_accessor :client_name
-
-    ann :description => "P4PORT: [host:port]", :tip => "perforce server address e.g. 10.12.1.55:1666"
     attr_accessor :port
-
-    ann :description => "P4USER", :tip => "username"
     attr_accessor :user
-
-    ann :description => "P4PASSWD", :tip => "password"
     attr_accessor :pwd
-
     attr_accessor :repository_root_dir
 
     def initialize(port = "1666", user = ENV["LOGNAME"], pwd = "", client_name = Perforce.next_client_name)

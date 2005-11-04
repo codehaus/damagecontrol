@@ -11,25 +11,12 @@ module RSCM
   #
   # NOTE: On Cygwin these have to be the win32 builds of svn/svnadmin and not the Cygwin ones.
   class Subversion < Base
-    register self
-
     include FileUtils
     include PathConverter
     
-    ann :description => "Repository URL"
-    ann :tip => "If you use ssh, specify the URL as svn+ssh://username@server/path/to/repo"
     attr_accessor :url
-
-    ann :description => "Path"
-    ann :tip => "You only need to specify this if you want to be able to automatically create the repository. This should be the relative path from the start of the repository <br>to the end of the URL. For example, if your URL is <br>svn://your.server/path/to/repository/path/within/repository <br>then this value should be path/within/repository."
     attr_accessor :path
-
-    ann :description => "Username"
-    ann :tip => "This only applies to svn:// URLs."
     attr_accessor :username
-
-    ann :description => "Password"
-    ann :tip => "This only applies to svn:// URLs."
     attr_accessor :password
 
     def initialize(url="", path="")

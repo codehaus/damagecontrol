@@ -4,24 +4,11 @@ require 'rscm'
 
 module RSCM
   class Monotone < Base
-    # register self
-
-    ann :description => "Database file"
     attr_accessor :db_file
-
-    ann :description => "Branch"
     attr_accessor :branch
-
-    ann :description => "Key"
     attr_accessor :key
-
-    ann :description => "Passphrase"
     attr_accessor :passphrase
-
-    ann :description => "Keys file"
     attr_accessor :keys_file
-
-    ann :description => "Server"
     attr_accessor :server
 
     def initialize(branch=nil, key=nil, passphrase=nil, keys_file=nil, server=nil, central_checkout_dir=nil)

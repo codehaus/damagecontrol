@@ -18,27 +18,12 @@ module RSCM
   # * Apache Ant (http://ant.apache.org/)
   #
   class StarTeam < Base
-    #register self
-
-    ann :description => "User name"
     attr_accessor :user_name
-
-    ann :description => "Password"
     attr_accessor :password
-
-    ann :description => "Server name"
     attr_accessor :server_name
-
-    ann :description => "Server port"
     attr_accessor :server_port
-
-    ann :description => "Project name"
     attr_accessor :project_name
-
-    ann :description => "View name"
     attr_accessor :view_name
-
-    ann :description => "Folder name"
     attr_accessor :folder_name
 
     def initialize(user_name="", password="", server_name="", server_port="", project_name="", view_name="", folder_name="")

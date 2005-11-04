@@ -1,9 +1,9 @@
-= RSCM - Ruby Source Control Management (0.3.10)
+= RSCM - Ruby Source Control Management (0.3.11)
 
-RSCM is to SCM what DBI/JDBC/ODBC are to databases - an SCM-independent API for accessing different SCMs. The features are roughly:
+RSCM is to SCM what DBI/JDBC/ODBC are to databases - an SCM-independent API for accessing different SCMs. The high level features are roughly:
 
 * Check out a working copy (with possibility to specify branch/date/label)
-* Get changesets (changesets are emulated for non-transactional SCMs like CVS and StarTeam)
+* Get revisions (changesets) (Emulated for non-transactional SCMs like CVS, ClearCase and StarTeam)
 * Get diffs
 * Add and commit files
 * Manipluate triggers
@@ -22,7 +22,7 @@ If you want the latest and greatest, you can get the sources, which live alongsi
 
 * See the DamageControl Developer Guide at http://hieraki.lavalamp.ca/
 
-== Team
+== Contributors
 
 * Aslak Hellesoy - All
 * Steven Baker - Monotone
@@ -52,15 +52,13 @@ Loads! All of them! How to add support for a new one is described further down i
 
 == Sample usage
 
-Here is an example of how to use RSCM to get a list of changesets from a CVS repository:
+Here is an example of how to use RSCM to get a list of revisions (aka changesets) from a subversion repository:
 
   require 'rscm'
   
-  scm = RSCM::Subversion.new("svn://some.server/some/path/trunk", "trunk")
-  scm.checkout_dir = "/my/working/copy"
-
-  scm.checkout
-  revisions = scm.revisions(Time.utc(2004, 11, 10, 12, 34, 22))
+  scm = RSCM::Subversion.new("svn://some.server/some/path/trunk")
+  # What follows would look the same for any supported SCM
+  revisions = scm.revisions(Time.utc(2004, 11, 10, 12, 34, 22)) # For Subversion, you can also pass a revision number (int)
   revisions.each do |revision|
     puts revision # or do something more funky with it
   end
@@ -76,18 +74,12 @@ must respond to the following methods:
   def visit_revision(revision); end
   def visit_file(revision_file); end
 
-=== Getting diffs
-
-RSCM allows you to get diffs for changesets. See the DamageControl sources for more detailed 
-examples (DamageControl persists diffs to disk and presents them as colourised diffs in its 
-user interface).
-
 == Future plans
 
 === Cross-SCM synchronisation
 
 RSCM could be used as a tool to migrate files from one SCM to another (of a different type)
-while keeping the history. -Similar to cvs2svn.
+while keeping the history. -Similar to cvs2svn or http://nautilus.homeip.net/~lele/projects/tailor/
 
 RSCM could also be used as a continuous synchronisation service between SCMs. This can be very useful
 when you have to work with an SCM and you'd rather use a different one. RSCM could synchronise between
@@ -169,7 +161,7 @@ provides libraries (perhaps in C), then you should consider writing a Ruby C ext
 instead.
 
 If the SCM has a Java interface, you can take the same approach as for StarTeam. There are
-Java classes for ChangeSets that allow easy interaction between Ruby and Java over YAML. 
+Java classes for Revisions that allow easy interaction between Ruby and Java over YAML. 
 You can reuse these classes for other Java based SCMs (if there are any, I don't know).
 
 == Web interface (DamageControl only)
@@ -188,8 +180,8 @@ Now change to the RSCM root directory and type
 
   rake gem
 
-This will create a gem for RSCM. To install this gem, you have to change to the pgk directory and type
+This will create a gem for RSCM. To install this gem, you have to change to the pkg directory and type
 
-  sudo gem install pkg/rscm-0.3.0.gem
+  sudo gem install pkg/rscm-0.3.11.gem
   
 Now you can use RSCM in other Ruby apps with a simple require 'rscm'.
