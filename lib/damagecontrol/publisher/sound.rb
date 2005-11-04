@@ -17,7 +17,7 @@ module DamageControl
         sound = build_status_attr(build, "sound")
         # Load platform-specific sound player
         require File.expand_path(File.dirname(__FILE__) + "/sound/" + family + "/sound_player")
-        sound_path = "#{RAILS_ROOT}/sound/#{sound}"
+        sound_path = "#{DC_DATA_DIR}/sound/#{sound}"
         SoundPlayer.new.play(sound_path)
       end
       
