@@ -36,7 +36,7 @@ class Build < ActiveRecord::Base
   
   def before_destroy
   end
-
+  
   def stdout_file
     "#{revision.basedir}/builds/#{id}/stdout.log"
   end

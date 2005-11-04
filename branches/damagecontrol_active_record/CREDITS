@@ -1,0 +1,21 @@
+== Credits
+
+=== Contributors
+
+ * Jon Tirsen (early contributions to DamageControl)
+ 
+
+=== Software used by DamageControl
+
+==== Runtime
+
+ * Playsound - http://steike.com/PlaySound
+ * RSCM - http://rscm.rubyforge.org
+ * RubyScript2Exe
+ 
+==== Buildtime
+
+ * Rake
+ * RubyGems
+ * RMagick
+ * TODO: all the rest
