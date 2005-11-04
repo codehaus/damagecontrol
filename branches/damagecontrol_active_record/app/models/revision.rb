@@ -1,14 +1,14 @@
 class Revision < ActiveRecord::Base
-  ActiveRecord::Base.default_timezone = :utc
-  
   belongs_to :project
   has_many :revision_files, :dependent => true
   has_many :builds, :order => "create_time", :dependent => true
-  # identifier can be String, Numeric or Time, so we YAML it to the database to preserve type info.
-  # We have to fool AR to do this by wrapping it in an array - serialize doesn't work
+
+  # identifier can be String, Numeric or Time (depending on the SCM), so we YAML it to the database to preserve type info.
+  # We have to fool AR to do this by wrapping it in an array - serialize doesn't seem to work when the types differ.
   def identifier=(i)
     self[:identifier] = YAML::dump([i])
   end
+
   def identifier
      (YAML::load(self[:identifier]))[0]
   end
@@ -17,10 +17,10 @@ class Revision < ActiveRecord::Base
     "#{project.basedir}/revision/#{id}"
   end
 
-  # An integer that serves as a label. If the identifier is a number,
+  # An integer that serves as a label. If the identifier is a Numeric (integer),
   # same as that - otherwise a custom counter.
   # The purpose of the label is simply to display a nicer label than the
-  # revision identifier in the case where the identifier is not a number
+  # revision identifier in the case where the identifier is not a Numeric
   # (but e.g. a Time, as it is with CVS).
   def label
     if(identifier.is_a?(Numeric))
