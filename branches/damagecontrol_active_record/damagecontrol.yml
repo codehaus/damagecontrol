@@ -30,12 +30,20 @@ publisher:
     executing_sound: hal_moment.wav
     repeatedly_broken_sound: hal_error.wav
     fixed_sound: hal_better.wav
-  DamageControl::Publisher::Growl: 
-    hosts: localhost
     enabling_states:
+      - Build::Executing
+      - Build::Successful
       - Build::Fixed
       - Build::Broken
       - Build::RepeatedlyBroken
+  DamageControl::Publisher::Growl: 
+    hosts: localhost
+    enabling_states:
+    - Build::Executing
+    - Build::Successful
+    - Build::Fixed
+    - Build::Broken
+    - Build::RepeatedlyBroken
   DamageControl::Publisher::Jabber: 
     id_resource: dcontrol
     friends: ''
@@ -46,3 +54,9 @@ publisher:
     repeatedly_broken: a2
     broken: a2
     executing: a3
+    enabling_states:
+      - Build::Executing
+      - Build::Successful
+      - Build::Fixed
+      - Build::Broken
+      - Build::RepeatedlyBroken
