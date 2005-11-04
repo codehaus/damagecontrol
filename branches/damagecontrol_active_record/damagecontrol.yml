@@ -25,11 +25,11 @@ tracker:
     enabled: true
 publisher: 
   DamageControl::Publisher::Sound: 
-    successful_sound: C:/scm/damagecontrol/lib/damagecontrol/publisher/sound/well.wav
-    broken_sound: C:/scm/damagecontrol/lib/damagecontrol/publisher/sound/fault.wav
-    executing_sound: C:/scm/damagecontrol/lib/damagecontrol/publisher/sound/better.wav
-    repeatedly_broken_sound: C:/scm/damagecontrol/lib/damagecontrol/publisher/sound/error.wav
-    fixed_sound: C:/scm/damagecontrol/lib/damagecontrol/publisher/sound/better.wav
+    successful_sound: hal_well.wav
+    broken_sound: hal_fault.wav
+    executing_sound: hal_moment.wav
+    repeatedly_broken_sound: hal_error.wav
+    fixed_sound: hal_better.wav
   DamageControl::Publisher::Growl: 
     hosts: localhost
     enabling_states:
