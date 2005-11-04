@@ -12,7 +12,8 @@ class BuildExecutor < ActiveRecord::Base
   
   # Requests a build.
   def request_build_for(revision, reason, triggering_build)
-    build = revision.builds.create(:reason => reason, :triggering_build => triggering_build)
+    build_number = revision.project.build_count + 1
+    build = revision.builds.create(:number => build_number, :reason => reason, :triggering_build => triggering_build)
     self.builds << build
     build
   end

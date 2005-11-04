@@ -81,6 +81,11 @@ class Project < ActiveRecord::Base
   def latest_revisions(count)
     Revision.find_by_sql(["SELECT * FROM revisions WHERE project_id=? ORDER BY timepoint DESC LIMIT ?", self.id, count])
   end
+  
+  # The number of builds for this project
+  def build_count
+    connection.select_value("SELECT count(*) FROM builds b, revisions r WHERE b.revision_id = r.id AND r.project_id=#{id}").to_i
+  end
 
   # Finds builds ordered in descending order of their +begin_time+. Valid options:
   #  * :exitstatus (Integer)
@@ -102,7 +107,7 @@ class Project < ActiveRecord::Base
     
     sql = <<-EOS
 SELECT DISTINCT b.* 
-FROM builds b, revisions r, projects p 
+FROM builds b, revisions r
 WHERE r.project_id = ?
 AND b.revision_id = r.id 
 #{exitstatus_criterion}

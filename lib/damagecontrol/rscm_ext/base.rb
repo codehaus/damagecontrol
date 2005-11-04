@@ -6,6 +6,11 @@ module RSCM
     attr_accessor :enabled
     attr_accessor :uses_polling # String, posted from web form.
 
+    def self.classes
+      # Only Subversion and Cvs are known to be stable...
+      [RSCM::Subversion, RSCM::Cvs, RSCM::ClearCase, RSCM::Perforce, RSCM::Monotone]
+    end
+
     def category
       "scm"
     end

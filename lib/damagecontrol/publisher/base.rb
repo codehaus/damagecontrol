@@ -6,6 +6,7 @@ module DamageControl
     # doesn't have a revision. Or better: create a temp revision
     # and build and delete them after the test.
     class Base
+      cattr_accessor :logger
       include Dom
 
       def self.classes

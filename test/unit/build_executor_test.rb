@@ -11,8 +11,10 @@ class BuildExecutorTest < Test::Unit::TestCase
   end
   
   def test_should_request_builds
+    p = Project.create
     be = BuildExecutor.create
     r = Revision.create(RSCM::Revision.new)
+    p.revisions << r
     b = be.request_build_for(r, Build::SCM_POLLED, nil)
     
     be.reload

@@ -50,11 +50,14 @@ class RevisionTest < Test::Unit::TestCase
     assert_equal("here/i/go", ar_revision.revision_files[1].path)
   end
 
-  def test_should_request_build_for_each_build_executor
+  def test_should_request_build_for_each_build_executor_and_persist_build_number
     assert_equal(0, @slave_revision.builds.size)
-    @slave_revision.request_builds(Build::SCM_POLLED)
+    builds = @slave_revision.request_builds(Build::SCM_POLLED)
     assert_equal(2, @slave_revision.builds(true).size)
     assert_equal(Build::SCM_POLLED, @slave_revision.builds[0].reason)
+
+    assert_equal(1, builds[0].number)
+    assert_equal(2, builds[1].number)
   end
   
   def test_should_sync_projects_working_copy_and_zip_it
