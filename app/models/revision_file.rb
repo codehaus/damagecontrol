@@ -1,12 +1,11 @@
 class RevisionFile < ActiveRecord::Base
-  ActiveRecord::Base.default_timezone = :utc
-
   belongs_to :revision
   
   def timepoint
     self[:timepoint] || revision.timepoint
   end
 
+  # It's a bit hackish to embed view info in the model :-(
   ICONS = {
     RSCM::RevisionFile::ADDED => "document_new",
     RSCM::RevisionFile::DELETED => "document_delete",

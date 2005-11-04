@@ -6,10 +6,7 @@ module DamageControl
     # Copies build artifacts (files) over to a more permanent location
     # where they can be served via the web server.
     class ArtifactArchiver < Base
-      register self
 
-      ann :tip => "Files to archive and make available for download."
-      ann :description => "Files"
       attr_accessor :files
 
       def initialize
