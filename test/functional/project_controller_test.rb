@@ -105,7 +105,7 @@ class ProjectControllerTest < Test::Unit::TestCase
     assert @response.body.index("length=\"9\"") != 0
     assert @response.body.index("<pubDate>Sun, 28 Feb 1971 23:45:02 -0000</pubDate>")
   end
-
+  
 private
 
   def setup_project_for_rss

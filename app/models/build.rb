@@ -97,24 +97,8 @@ class Build < ActiveRecord::Base
     !exitstatus.nil?
   end
 
-  # Executes this build and persists results. 
-  # The following steps occur when calling this method:
-  #
-  # 1) The working copy is updated to this build's revision
-  # 2) The build's build_executor executes the build
-  #
+  # Executes this build
   def execute!
-    raise "Already executed" if exitstatus
-
-    # Make sure the working copy is in sync, and possibly reload settings from
-    # a checked-in damagecotrol.yml
-    self.state = SynchingWorkingCopy.new
-    save
-    revision.sync_working_copy
-
-    self.command = revision.project.build_command
-    self.env = revision.build_environment
-
     build_executor.execute(self)
   end
   

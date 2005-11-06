@@ -78,7 +78,7 @@ class RevisionTest < Test::Unit::TestCase
       assert_equal [], exclude_patterns
     end
     
-    @revision_1.sync_working_copy(zipper)
+    @revision_1.sync_working_copy(true, zipper)
     
     scm.__verify
     zipper.__verify

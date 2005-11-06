@@ -1,5 +1,6 @@
 module DamageControl
   
+  # This is the main class of the daemon process.
   class BuildDaemon
     CYCLE_PAUSE = 20
 
@@ -33,26 +34,11 @@ module DamageControl
       end
       
       projects.each do |project|
-        # assumptions:
-        # 1) builds cannot be created for revisions that already have a pending (not started) build.
-        #    anyone who tries to create one should either get an exception or just
-        #    get the existing build. as much as possible of these constraints should be enforced in
-        #    Build.before_save and Revision.builds. TODO!
-        #
-        # 2) polling for a project's scm revisions or executing its builds should not occur if the 
-        #    project is marked as 'busy' (typically by another daemon process)
-        #
-        # 3) polling and detecting revision should go straight to build
-        # 4) polling or building project should mark it as busy in the db.
-        #
-        
-        # We're reloading the project here, since its locked state may have changed
         begin
           project.reload
         
-          # TODO: We should set the lock_time flag and save the project to avoid other parallel
-          # daemon processes from handling the project. TODO: use the --id value instead, and
-          # clear out all of them when starting up.
+          # TODO: We must lock the project (persistent lock) to prevent other processes from handling the
+          # same project.
           handle_project(project) 
         rescue ActiveRecord::RecordNotFound => e
           logger.error "Couldn't handle project #{project.name}. It looks like it was recently deleted" if logger
@@ -69,27 +55,28 @@ module DamageControl
     
     def handle_project(project)
       logger.info "Checking project #{project.name}" if logger
+      
+      # We'll put all pending and new builds in here...
       builds = []
       builds.concat(project.pending_builds)
-      if(project.scm.uses_polling?)
-        logger.info "No pending builds found for project #{project.name}, polling #{project.scm.visual_name} for new revisions" if logger
+      if(project.scm && project.scm.uses_polling?)
+
         latest_new_revision = @scm_poller.poll_and_persist_new_revisions(project)
         if(latest_new_revision)
           builds.concat(latest_new_revision.request_builds(Build::SCM_POLLED))
         end
       end
-
-      # If there are more than one pending build, only build one of the master/local ones
-      has_built_master = false
       
-      builds.each do |build|
-        # workaround for odd cases where build doesn't have an executor?!?
-        is_master = (build.build_executor && build.build_executor.is_master) || (build.build_executor.nil?)
-        should_build_now = ((is_master && !has_built_master) || !is_master)
-        build.execute! if should_build_now
-        has_built_master = true if is_master
+      local_builds, slave_managed_builds = builds.partition {|build| build.build_executor.is_master}
+      
+      # The slave-managed builds are fast to build, since all that happens is to zip up the working copies.
+      slave_managed_builds.each do |build|
+        build.execute!
       end
+      
+      # We'll only build one of the pending local builds to avoid spending too much time in one project.
+      local_builds[0].execute! if local_builds[0]
     end
+    
   end
-
 end
