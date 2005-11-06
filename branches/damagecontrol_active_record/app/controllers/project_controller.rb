@@ -1,10 +1,9 @@
 class ProjectController < ApplicationController
   include MetaProject::ProjectAnalyzer
-  include DamageControl::Platform
 
   layout "application", :except => [:list, :jnlp, :rest_list]
   before_filter :define_feeds
-    
+  
   def index
   end
 
@@ -49,10 +48,10 @@ class ProjectController < ApplicationController
     )
 
     # Set up some default publishers
-    if(family == 'powerpc-darwin')
+    if(DamageControl::Platform.family == 'powerpc-darwin')
       project.add_growl
     end
-    if(family == 'powerpc-darwin' || family == 'win32')
+    if(DamageControl::Platform.family == 'powerpc-darwin' || family == 'win32')
       project.add_sound
     end
 

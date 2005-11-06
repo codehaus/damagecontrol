@@ -1,10 +1,9 @@
 class BuildController < ApplicationController
   
-  layout "application", :except => [:show]
+  layout nil
 
   def show
     find
-    # TODO: optimize
     @project = @build.project
   end
 

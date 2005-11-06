@@ -43,18 +43,15 @@ class Revision < ActiveRecord::Base
   end
 
   # Syncs the working copy of the project with this revision.
-  # If zip is true, also creates a zip file
-  def sync_working_copy(zipper=DamageControl::Zipper.new)
+  # If +needs_zip+ is true, also creates a zip file.
+  def sync_working_copy(needs_zip, zipper = DamageControl::Zipper.new)
     logger.info "Syncing working copy for #{project.name} with revision #{identifier} ..." if logger
     project.scm.checkout(identifier) if project.scm
     logger.info "Done Syncing working copy for #{project.name} with revision #{identifier}" if logger
+    zip(zipper) if needs_zip
 
     # Now update the project settings if this revision has a damagecontrol.yml file
-    update_project_settings
-    
-    # Make a zip of the working copy so it can be downloaded by a distributed builder.
-    # TODO: move to SlaveBuilder
-    zip(zipper)
+    update_project_settings    
   end
 
   # Requests build(s) for this revision. How many builds are requested depends on
@@ -66,8 +63,7 @@ class Revision < ActiveRecord::Base
       build_executor.request_build_for(self, reason, triggering_build)
     end
   end
-  
-  
+
   # Environment variables to set when building this revision.
   def build_environment
     {
@@ -76,29 +72,16 @@ class Revision < ActiveRecord::Base
       "DAMAGECONTROL_CHANGED_FILES" => revision_files.collect{|f| f.path}.join(',')
     }
   end
-  
-private
 
-  def update_project_settings
-    return unless project && project.scm
-    damagecontrol_yml_file = File.join(project.scm.checkout_dir, "damagecontrol.yml")
-    if(File.exist?(damagecontrol_yml_file))
-      logger.info "Importing project settings from #{damagecontrol_yml_file}" if logger
-      begin
-        project.populate_from_hash(YAML.load_file(damagecontrol_yml_file))
-        project.save
-      rescue => e
-        logger.error e.message if logger
-      end
-    end
-  end
+private
   
-  # Zips up the working copy and adds an XML file with metadata that can be read
+  # Makes a zip of the working copy and adds an XML file with metadata that can be read
   # by XStream (http://xstream.codehaus.org/). This will be read by build slaves
   # that are Java webstart (http://java.sun.com/products/javawebstart/) apps that 
   # can be downloaded from the DC server (not yet written).
   def zip(zipper)
     return unless project.scm && project.scm.checkout_dir 
+
     zipdir = project.scm.checkout_dir
     zipfile_name = project.zip_dir + "/#{label}.zip"
     File.delete(zipfile_name) if File.exist?(zipfile_name)
@@ -120,10 +103,10 @@ private
         f.puts("  <environment>")
 
         build_environment.each do |k, v|
-        f.puts("    <entry>")
-        f.puts("      <string>#{k}</string>")
-        f.puts("      <string>#{v}</string>")
-        f.puts("    </entry>")
+          f.puts("    <entry>")
+          f.puts("      <string>#{k}</string>")
+          f.puts("      <string>#{v}</string>")
+          f.puts("    </entry>")
         end
 
         f.puts("  </environment>")
@@ -131,7 +114,21 @@ private
       end
     end    
   end
-  
+
+  def update_project_settings
+    return unless project && project.scm
+    damagecontrol_yml_file = File.join(project.scm.checkout_dir, "damagecontrol.yml")
+    if(File.exist?(damagecontrol_yml_file))
+      logger.info "Importing project settings from #{damagecontrol_yml_file}" if logger
+      begin
+        project.populate_from_hash(YAML.load_file(damagecontrol_yml_file))
+        project.save
+      rescue => e
+        logger.error e.message if logger
+      end
+    end
+  end
+    
 end
 
 # Adaptation to make it possible to create an AR Revision

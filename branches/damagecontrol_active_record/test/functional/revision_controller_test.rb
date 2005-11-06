@@ -16,7 +16,7 @@ class RevisionControllerTest < Test::Unit::TestCase
   def test_should_create_new_build
     build_count = @revision_1.builds.size
     
-    post :build, :id => @revision_1.id, :reason => "test"
+    post :request_build, :id => @revision_1.id, :reason => "test"
     
     @revision_1.reload
     assert_equal(build_count + 1, @revision_1.builds(true).size)

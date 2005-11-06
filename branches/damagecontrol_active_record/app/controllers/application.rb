@@ -4,6 +4,8 @@ require_dependency 'damagecontrol'
 Struct.new("Feed", :type, :url_options, :title) unless defined? Struct::Feed
 
 class ApplicationController < ActionController::Base
+  include RestResource
+
   COMMIT_MSG_TIPS = [
     "bug_ids_commit_msg",
     "textile_commit_msg"

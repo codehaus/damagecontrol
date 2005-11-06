@@ -31,7 +31,7 @@ module DamageControl
 
     private
 
-      # Turin on +device_on_attr+ and turn off all the others
+      # Turn on +device_on_attr+ and turn off all the others
       # We're sleeping one sec between them all. It seems necessary
       # To let the device cope with all the signals.
       def exclusively_on(device_on_attr, x10)

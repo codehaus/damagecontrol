@@ -4,7 +4,7 @@ module DamageControl
   module Publisher
     # win32/sound (win32utils) based player for Windows
     class SoundPlayer
-      def play(track)
+      def self.play(track)
         Win32::Sound.play(track)
       end
     end
