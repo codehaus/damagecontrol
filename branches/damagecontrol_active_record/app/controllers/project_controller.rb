@@ -190,6 +190,7 @@ private
   end
 
   def publishers
+    @project.publishers ||= []
     DamageControl::Publisher::Base.classes.collect{|cls| cls.new}.collect do |publisher|
       already = @project.publishers.find do |p| 
         p.class.name == publisher.class.name

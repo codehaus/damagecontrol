@@ -10,9 +10,6 @@
 # * SQlite and other binaries used by DamageControl
 # * A preconfigured SQLite database schema
 #
-# A SHELL_DIR variable is defined in script/damagecontrol. This is necessary in order for the packaged
-# executable to figure out in what directory the app was started from. It is used to compute the data directory.
-#
 # The standalone executable can run both builder daemons and optionally serve the web
 # interface via its embedded webserver (WEBrick).
 #

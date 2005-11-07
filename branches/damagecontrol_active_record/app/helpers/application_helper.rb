@@ -85,4 +85,12 @@ module ApplicationHelper
       #{image_tag("tip", :size => "48x48")}<br/>
     EOT
   end
+  
+  def build_inline_link(build)
+    render :partial => "build/inline_link", :locals => {:build => build}
+  end
+
+  def revision_inline_link(revision)
+    render :partial => "revision/inline_link", :locals => {:revision => revision}
+  end
 end

@@ -1,0 +1,15 @@
+<div>
+  <% 
+    build_detail_id = "build_#{build.id}_detail"
+    build_state = build.state ? build.state.class.name.demodulize.underscore.gsub(/_/, ' ') : 'pending' 
+    time = (build.begin_time ? build.begin_time : build.create_time).strftime("%H:%M")
+  %>
+  <%= time %>
+  <%= toggle_link_to_remote(
+    "#{image_tag(build.icon, :size=>'16x16')} #{build.number} (#{build_state})", 
+    build_detail_id, 
+    "build", 
+    "show", 
+    build.id) %>
+</div>
+<div id="<%= build_detail_id %>"></div>
