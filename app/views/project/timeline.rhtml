@@ -1,33 +1,14 @@
 <div id="timeline">
   <% last_date = nil %>
-  <% @revisions.each do |revision| revision_detail_id = "revision_#{revision.id}_detail" %>
+  <% @revisions.each do |revision| %>
     <% date = revision.timepoint.strftime("%e %b"); if(date != last_date) %>
       <h2><%= date %></h2>
     <% end; last_date = date %>
 
-    <% revision.builds.reverse.each do |build| build_detail_id = "build_#{build.id}_detail" %>
-      <div>
-        <% 
-          build_state = build.state ? build.state.class.name.demodulize.underscore.gsub(/_/, ' ') : 'pending' 
-          time = (build.begin_time ? build.begin_time : build.create_time).strftime("%H:%M")
-        %>
-        <%= time %>
-        <%= toggle_link_to_remote(
-          "#{image_tag(build.icon, :size=>'16x16')} #{build.number} (#{build_state})", 
-          build_detail_id, 
-          "build", 
-          "show", 
-          build.id) %>
-      </div>
-      <div id="<%= build_detail_id %>"></div>
+    <% revision.builds.reverse.each do |build| %>
+      <%= build_inline_link(build) %>
     <% end %>
 
-    <div>
-      <%= revision.timepoint.strftime("%H:%M") %>
-      <%= image_tag "document_edit", :size=>"16x16" %>
-      <%= toggle_link_to_remote(revision.label, revision_detail_id, "revision", "show", revision.id) %>
-      (<%= revision.developer %>)
-    </div>
-    <div id="revision_<%= revision.id %>_detail"></div>
+    <%= revision_inline_link(revision) %>
   <% end %>
 </div>
