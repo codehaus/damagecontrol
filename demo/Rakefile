@@ -1,0 +1,4 @@
+task :default do
+  puts "Hello World"
+  #raise "Bang!"
+end

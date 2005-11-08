@@ -1,8 +1,9 @@
 require 'zip/zip'
 
 class RevisionController < ApplicationController
+  verify :method => :post, :only => %w( request_build result_zip )
 
-  layout "application", :except => [:show]
+  layout nil
 
   def show
     @revision = Revision.find(@params[:id])
@@ -34,16 +35,12 @@ class RevisionController < ApplicationController
   end
   
   def result_zip
-    if(request.post?)
-      revision = Revision.find(@params[:id])
-      zipfile = revision.project.zip_dir + "/#{revision.id}_result.zip"
-      File.open(zipfile, "wb") do |io|
-        io.write(@params[:zip].read)
-      end
-      render :text => "OK:#{request.raw_post.length}"
-    else
-      render :text => "KO"
+    revision = Revision.find(@params[:id])
+    zipfile = revision.project.zip_dir + "/#{revision.id}_result.zip"
+    File.open(zipfile, "wb") do |io|
+      io.write(@params[:zip].read)
     end
+    render :text => "OK:#{request.raw_post.length}"
   end
   
 protected
