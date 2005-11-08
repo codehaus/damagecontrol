@@ -1,12 +1,10 @@
 class ProjectController < ApplicationController
   include MetaProject::ProjectAnalyzer
+  verify :method => :post, :only => %w( import create update destroy test_publisher )
 
-  layout "application", :except => [:list, :jnlp, :rest_list]
+  layout "application", :except => [:jnlp]
   before_filter :define_feeds
   
-  def index
-  end
-
   def new
     @project = Project.new(:name => "Project #{@projects.length}")
     @project.publishers = []
@@ -34,7 +32,8 @@ class ProjectController < ApplicationController
   end
   
   def export
-    render :text => "<pre>#{find.export_to_hash.to_yaml}</pre>"
+    response.headers["Content-Type"] = "text/plain"
+    render :text => "#{find.export_to_hash.to_yaml}"
   end
   
   def import
@@ -126,11 +125,6 @@ class ProjectController < ApplicationController
   # Java WebStart
   def jnlp
     response.headers["Content-Type"] = "application/x-java-jnlp-file"
-  end
-  
-  #### REST API ####
-  
-  def rest_list
   end
   
 protected
