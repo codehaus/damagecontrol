@@ -4,6 +4,7 @@ require 'stringio'
 module DamageControl  
   class BuildDaemonTest < Test::Unit::TestCase
     include Platform
+    self.use_transactional_fixtures = false
 
     def setup
       Project.delete_all

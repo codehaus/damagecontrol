@@ -3,7 +3,7 @@
 require 'set'
 require 'rss/maker'
 require 'rss/parser'
-require 'damagecontrol/dom'
+#require 'damagecontrol'
 
 # A Project record contains information about a project to be continuously
 # built by DamageControl.

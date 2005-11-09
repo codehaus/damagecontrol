@@ -6,7 +6,7 @@ module DamageControl
       fixtures :builds, :projects, :revisions, :artifacts
 
       def test_should_archive_in_project_directory_and_create_artifact_record
-        artifact_dir = "#{@project_1.working_copy_dir}/pkg"
+        artifact_dir = "#{projects(:project_1).working_copy_dir}/pkg"
         FileUtils.rm_rf(artifact_dir) if File.exist?(artifact_dir)
         FileUtils.mkdir_p(artifact_dir)
         File.open("#{artifact_dir}/dummy.gem", "w") do |io|
@@ -20,12 +20,12 @@ module DamageControl
         aa.files = {
           "pkg/*.gem" => "gems"
         }
-        aa.publish(@build_1)
+        aa.publish(builds(:build_1))
         assert(File.exist?(expected_archived_file), "Should exist: #{expected_archived_file}")
         
         # we want a record too
-        assert_equal(1, @build_1.artifacts.length)
-        artifact = @build_1.artifacts[0]
+        assert_equal(1, builds(:build_1).artifacts.length)
+        artifact = builds(:build_1).artifacts[0]
         assert_equal("gems/dummy.gem", artifact.relative_path)
       end
     end

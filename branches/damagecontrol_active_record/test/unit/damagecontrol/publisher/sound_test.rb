@@ -6,7 +6,7 @@ module DamageControl
       fixtures :builds, :projects, :revisions
 
       def test_should_play_sound_on_local_machine_on_publish
-        Sound.new.publish(@build_1)
+        Sound.new.publish(builds(:build_1))
         # hard to assert success. verify audibly.
       end
     end

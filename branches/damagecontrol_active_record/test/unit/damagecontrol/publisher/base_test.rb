@@ -3,6 +3,8 @@ require File.dirname(__FILE__) + '/../../../test_helper'
 module DamageControl
   module Publisher
     class BaseTest < Test::Unit::TestCase
+      self.use_transactional_fixtures = false
+
       def test_should_load_all_publisher_classes
         expected = [
           AmbientOrb,

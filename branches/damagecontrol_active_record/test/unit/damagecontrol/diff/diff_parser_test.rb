@@ -1,4 +1,4 @@
-require 'test/unit'
+require File.dirname(__FILE__) + '/../../../test_helper'
 require 'rscm/path_converter'
 require 'rscm/tempdir'
 require 'damagecontrol/diff/diff_parser'
@@ -11,6 +11,8 @@ end
 
 module DamageControl
   class DiffParserTest < Test::Unit::TestCase
+    self.use_transactional_fixtures = false
+
     def test_should_parse_diff_to_object_model
       p = DiffParser.new
 

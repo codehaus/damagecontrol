@@ -4,10 +4,10 @@ class BuildExecutorTest < Test::Unit::TestCase
   fixtures :build_executors, :revisions, :builds, :build_executors
 
   def test_should_have_builds
-    assert_equal([@build_2], @slave_2.builds)
+    assert_equal([builds(:build_2)], build_executors(:slave_2).builds)
     
-    @slave_2.builds << @build_1
-    assert_equal([@build_1, @build_2], @slave_2.builds(true))
+    build_executors(:slave_2).builds << builds(:build_1)
+    assert_equal([builds(:build_1), builds(:build_2)], build_executors(:slave_2).builds(true))
   end
   
   def test_should_request_builds

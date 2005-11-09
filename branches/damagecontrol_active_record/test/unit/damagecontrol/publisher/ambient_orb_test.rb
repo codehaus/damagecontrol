@@ -16,24 +16,24 @@ module DamageControl
         puts "Using mocks in #{self.class.name} (#{__FILE__})"
         puts "If you have an Ambient Orb device and a primary account for it you can test against real Orb devices by defining"
         puts "DC_TEST_ORB_ENABLE=your_orb_id in your shell"
-        puts "You should see it switching to flashing yellow"
+        puts "You should see it switching to flashing green"
         puts "\n"
         
         def driver
-          driver = new_mock
+          driver = Mock.new
           driver.__expect(:id=) {|id| assert_equal("dummy", id)}
-          driver.__expect(:color=) {|color| assert_equal(:yellow, color)}
-          driver.__expect(:animation=) {|animation| assert_equal(:medium, animation)}
+          driver.__expect(:color=) {|color| assert_equal(:green, color)}
+          driver.__expect(:animation=) {|animation| assert_equal(:none, animation)}
           driver.__expect(:update)
           driver
         end
       end
-
+      
       def test_should_set_flashing_yellow
+        executing = builds(:build_1)
         orb_id = ENV['DC_TEST_ORB_ENABLE'] || "dummy"
         publisher = AmbientOrb.new
         publisher.orb_id = orb_id
-        executing = Build.create(:exitstatus => nil, :state => Build::Executing.new)
         publisher.publish(executing, driver)
         # can't assert success. verify manually.
       end

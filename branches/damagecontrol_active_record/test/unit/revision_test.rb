@@ -5,23 +5,23 @@ class RevisionTest < Test::Unit::TestCase
   fixtures :projects, :revisions, :revision_files, :builds, :build_executors, :build_executors_projects
 
   def test_should_have_builds
-    assert_equal([@build_1], @revision_1.builds)
+    assert_equal([builds(:build_1)], revisions(:revision_1).builds)
   end
 
   def test_should_have_files
-    assert_equal([@revision_file_1_1, @revision_file_1_2], @revision_1.revision_files)
+    assert_equal([revision_files(:revision_file_1_1), revision_files(:revision_file_1_2)], revisions(:revision_1).revision_files)
   end
 
   def test_should_have_properties
-    assert_equal(789, @revision_1.identifier)
-    assert_equal("aslak", @revision_1.developer)
-    assert_equal("fixed a bug", @revision_1.message)
-    assert_equal(Time.utc(1971, 2, 28, 23, 45, 0), @revision_1.timepoint)
-    assert_equal(@project_1, @revision_1.project)
+    assert_equal(789, revisions(:revision_1).identifier)
+    assert_equal("aslak", revisions(:revision_1).developer)
+    assert_equal("fixed a bug", revisions(:revision_1).message)
+    assert_equal(Time.utc(1971, 2, 28, 23, 45, 0), revisions(:revision_1).timepoint)
+    assert_equal(projects(:project_1), revisions(:revision_1).project)
   end
 
   def test_should_persist_rscm_revisions
-    assert_equal([@revision_4], @project_2.revisions)
+    assert_equal([revisions(:revision_4)], projects(:project_2).revisions)
 
     rscm_revision = RSCM::Revision.new
     rscm_revision.project_id = 2
@@ -39,8 +39,8 @@ class RevisionTest < Test::Unit::TestCase
 
     Revision.create(rscm_revision)
     
-    ar_revision = @project_2.revisions(true)[0]
-    assert_equal(@project_2, ar_revision.project)
+    ar_revision = projects(:project_2).revisions(true)[0]
+    assert_equal(projects(:project_2), ar_revision.project)
     assert_equal("qwerty", ar_revision.identifier)
     assert_equal("hellesoy", ar_revision.developer)
     assert_equal("yippee", ar_revision.message)
@@ -51,10 +51,10 @@ class RevisionTest < Test::Unit::TestCase
   end
 
   def test_should_request_build_for_each_build_executor_and_persist_build_number
-    assert_equal(0, @slave_revision.builds.size)
-    builds = @slave_revision.request_builds(Build::SCM_POLLED)
-    assert_equal(2, @slave_revision.builds(true).size)
-    assert_equal(Build::SCM_POLLED, @slave_revision.builds[0].reason)
+    assert_equal(0, revisions(:slave_revision).builds.size)
+    builds = revisions(:slave_revision).request_builds(Build::SCM_POLLED)
+    assert_equal(2, revisions(:slave_revision).builds(true).size)
+    assert_equal(Build::SCM_POLLED, revisions(:slave_revision).builds[0].reason)
 
     assert_equal(1, builds[0].number)
     assert_equal(2, builds[1].number)
@@ -68,17 +68,17 @@ class RevisionTest < Test::Unit::TestCase
     scm.__setup(:checkout_dir) do
       "checkout_dir"
     end
-    @revision_1.project.scm = scm
+    revisions(:revision_1).project.scm = scm
 
     zipper = MockIt::Mock.new
     zipper.__expect :zip do |dirname, zipfile_name, exclude_patterns|
       assert_equal "checkout_dir", dirname
-      assert_equal File.expand_path(@revision_1.project.zip_dir + "/789.zip"), File.expand_path(zipfile_name)
+      assert_equal File.expand_path(revisions(:revision_1).project.zip_dir + "/789.zip"), File.expand_path(zipfile_name)
       # TODO assert_equal ["build/*", "*.log"], exclude_patterns
       assert_equal [], exclude_patterns
     end
     
-    @revision_1.sync_working_copy(true, zipper)
+    revisions(:revision_1).sync_working_copy(true, zipper)
     
     scm.__verify
     zipper.__verify

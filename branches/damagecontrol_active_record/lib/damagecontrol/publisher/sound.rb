@@ -22,7 +22,9 @@ module DamageControl
 
       def publish(build)
         sound = build_status_attr(build, "sound")
-        sound_path = "#{DC_DATA_DIR}/sound/#{sound}"
+        # TODO: use DC_DATA_DIR (we must copy sounds out)
+        sound_path = File.expand_path("#{RAILS_ROOT}/sound/#{sound}")
+        raise "File not found: #{sound_path}" unless File.exist?(sound_path)
         SoundPlayer.play(sound_path)
       end
       

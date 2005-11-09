@@ -12,7 +12,7 @@ Rails::Initializer.run do |config|
   # config.frameworks -= [ :action_web_service, :action_mailer ]
 
   # Add additional load paths for your own custom dirs
-  # config.load_paths += %W( #{RAILS_ROOT}/app/services #{RAILS_ROOT}/app/services )
+  # config.load_paths += %W( #{RAILS_ROOT}/app/services )
 
   # Force all environments to use the same logger level 
   # (by default production uses :info, the others :debug)
@@ -29,13 +29,19 @@ Rails::Initializer.run do |config|
   # Activate observers that should always be running
   # config.active_record.observers = :cacher, :garbage_collector
 
+  raise "The environment variable DC_DATA_DIR must be defined and point to the directory where DamageControl will store data." unless ENV['DC_DATA_DIR']
+  DC_DATA_DIR = ENV['DC_DATA_DIR']
+  FileUtils.mkdir_p "#{DC_DATA_DIR}/db" unless File.exist?("#{DC_DATA_DIR}/db")
+#  config.database_configuration_file = File.join(DC_DATA_DIR, 'config', 'database.yml')
+
   # Make Active Record use UTC-base instead of local time
   config.active_record.default_timezone = :utc
+  
+  # Use Active Record's schema dumper instead of SQL when creating the test database
+  # (enables use of different database adapters for development and test environments)
+  config.active_record.schema_format = :ruby
 
   # See Rails::Configuration for more options
-
-  DC_DATA_DIR = RAILS_ROOT unless defined? DC_DATA_DIR
-  config.database_configuration_file = File.join(DC_DATA_DIR, 'config', 'database.yml')
 end
 
 # Add new inflection rules using the following format 

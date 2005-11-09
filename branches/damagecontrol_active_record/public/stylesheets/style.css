@@ -9,9 +9,6 @@ body {
 
   margin:10px 10px 0px 10px;
   padding:0px;
-
-  /* Center in IE5.5 */
-  /* text-align:  center; */
 }
 
 h1 {
@@ -24,22 +21,6 @@ h2 {
   font-size: 1.5em;
   font-weight: normal;
   letter-spacing: -0.04em;
-}
-
-/* http://glish.com/css/7.asp */
-#banner {
-  background:#fff;
-  height:40px;
-  border-top:1px solid #fff;
-  border-right:1px solid #fff;
-  border-left:1px solid #fff;
-  voice-family: "\"}\"";
-  voice-family: inherit;
-  height:39px;
-}
-
-html>body #banner {
-  height:39px;
 }
 
 /* Styles for project settings panel */
@@ -135,32 +116,4 @@ html>body #banner {
   padding: 4px;
   background: #FFFFFF;
   border: 1px solid #CCCCCC;
-}
-
-.progress-bg {
-  background-color: #FFFFFF;
-  border-color: #FF0000;
-  border-width: 1;
-  border-style: solid;
-  position: relative;
-  height: 14px;
-  width: 100%;
-}
-
-.progress {
-  background-color: #33FF33;
-  position: relative;
-  top: -15px;
-  left: 1px;
-  height: 14px;
-  width: 0%;
-}
-
-.progress-text {
-  position: relative;
-  top: -30px;
-  left: 1px;
-  height: 14px;
-  width: 30px;
-  white-space: nowrap;
 }

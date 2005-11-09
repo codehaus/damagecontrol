@@ -1,7 +1,3 @@
-require 'rubygems'
-require 'rgl/adjacency'
-require 'rgl/dot'
-
 module DamageControl
   # This class knows how to generate a GraphViz DOT image map for the project
   # dependencies

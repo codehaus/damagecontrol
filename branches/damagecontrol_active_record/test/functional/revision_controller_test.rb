@@ -5,7 +5,7 @@ require 'revision_controller'
 class RevisionController; def rescue_action(e) raise e end; end
 
 class RevisionControllerTest < Test::Unit::TestCase
-  fixtures :revisions, :builds, :projects, :build_executors_projects
+  fixtures :revisions, :builds, :projects, :build_executors_projects, :build_executors
   
   def setup
     @controller = RevisionController.new
@@ -14,11 +14,11 @@ class RevisionControllerTest < Test::Unit::TestCase
   end
 
   def test_should_create_new_build
-    build_count = @revision_1.builds.size
+    build_count = revisions(:revision_1).builds.size
     
-    post :request_build, :id => @revision_1.id, :reason => "test"
+    post :request_build, :id => revisions(:revision_1).id
     
-    @revision_1.reload
-    assert_equal(build_count + 1, @revision_1.builds(true).size)
+    revisions(:revision_1).reload
+    assert_equal(build_count + 1, revisions(:revision_1).builds(true).size)
   end
 end

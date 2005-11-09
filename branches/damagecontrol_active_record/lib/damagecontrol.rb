@@ -19,6 +19,9 @@ require_gem 'sqlite3-ruby'
 require_gem 'x10-cm17a'
 if(DamageControl::Platform.family == "mswin32")
   require 'win32/sound'
+else
+  require_gem 'fcgi'
+  require 'fcgi'
 end
 ##### END: ALL OF THIS MUST BE INSTALLED MANUALLY
 

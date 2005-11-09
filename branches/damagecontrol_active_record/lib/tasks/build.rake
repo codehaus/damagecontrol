@@ -1,6 +1,3 @@
-# This is the value used for testing
-ENV['DC_DATA_DIR'] = "target/data"
-
 desc "Delete files generated during test"
 task :clean_target_unless_production do
   FileUtils.rm_rf 'target' unless RAILS_ENV == 'production'

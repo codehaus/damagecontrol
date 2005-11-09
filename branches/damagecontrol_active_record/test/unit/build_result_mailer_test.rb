@@ -4,7 +4,9 @@ require 'build_result_mailer'
 class BuildResultMailerTest < Test::Unit::TestCase
   FIXTURES_PATH = File.dirname(__FILE__) + '/../fixtures'
   CHARSET = "utf-8"
+  self.use_transactional_fixtures = false
   fixtures :builds, :projects, :revisions, :revision_files
+  
 
   include ActionMailer::Quoting
 
@@ -20,7 +22,7 @@ class BuildResultMailerTest < Test::Unit::TestCase
   def test_should_render_email_with_changed_files
     @expected.subject = "project_1: Fixed build (commit by aslak)"
 
-    mail = BuildResultMailer.create_build_result("nah@not.real", "dcontrol@codehaus.org", @build_1)
+    mail = BuildResultMailer.create_build_result("nah@not.real", "dcontrol@codehaus.org", builds(:build_1))
     assert_equal(@expected.subject, mail.subject)
     assert_match(/three\/blind\/mice\.rb/, mail.body)
     #assert_equal @expected.encoded, mail.encoded
