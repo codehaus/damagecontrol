@@ -1,7 +1,7 @@
 == Welcome to DamageControl
 
 Before you go on, please read instructions at http://hieraki.lavalamp.ca/
-(expecially the section about the ruby gems that need to be installed)
+(especially the section about the ruby gems that need to be installed)
 
 === Create the initial database schema:
 
@@ -9,4 +9,19 @@ Before you go on, please read instructions at http://hieraki.lavalamp.ca/
 
 === Start DamageControl with built-in web server:
 
-  ruby script/damagecontrol
+  ruby init.rb
+
+=== Take a look
+Point your browser to
+
+  http://localhost:3000
+
+=== Create a sample project
+
+  rake create_demo_project
+
+(Please consult demo/README for the details.)
+
+=== Run DamageControl's own test suite
+
+  rake
