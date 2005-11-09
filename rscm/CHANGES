@@ -1,5 +1,11 @@
 = RSCM Changelog
 
+== Version 0.3.12
+
+Bugfix release
+
+* Made Mockit setup/teardown work with other setup/teardown extensions
+
 == Version 0.3.11
 
 Cleanup release
