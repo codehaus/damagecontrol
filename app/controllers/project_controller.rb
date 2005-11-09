@@ -185,12 +185,17 @@ private
 
   def publishers
     @project.publishers ||= []
-    DamageControl::Publisher::Base.classes.collect{|cls| cls.new}.collect do |publisher|
-      already = @project.publishers.find do |p| 
-        p.class.name == publisher.class.name
+    result = []
+    DamageControl::Publisher::Base.classes.each do |cls|
+      if(cls.supported?)
+        publisher = cls.new
+        already = @project.publishers.find do |p| 
+          p.class.name == publisher.class.name
+        end
+        result << (already ? already : publisher)
       end
-      already ? already : publisher
-    end.sort
+    end
+    result.sort
   end
 
   def trackers
