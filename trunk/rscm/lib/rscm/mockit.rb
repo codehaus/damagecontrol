@@ -1,26 +1,53 @@
 require 'test/unit/assertions'
 
-module MockIt
-    
-  def setup
-    @to_verify = []
-  end
-  module_function :setup
-    
-  def teardown
-    super
-    if(@test_passed && @to_verify)
-      @to_verify.each{|m| m.__verify}
+module Test #:nodoc:
+  module Unit #:nodoc:
+    class TestCase #:nodoc:
+      def setup_with_mocks
+        @to_verify = []
+      end
+      alias_method :setup, :setup_with_mocks 
+         
+      def teardown_with_mocks
+        if(@test_passed && @to_verify)
+          @to_verify.each{|m| m.__verify}
+        end
+      end
+      alias_method :teardown, :teardown_with_mocks 
+
+      def self.method_added(method)
+        case method.to_s
+        when 'setup'
+          unless method_defined?(:setup_without_mocks)
+            alias_method :setup_without_mocks, :setup
+            define_method(:setup) do
+              setup_with_mocks
+              setup_without_mocks
+            end
+          end
+        when 'teardown'
+          unless method_defined?(:teardown_without_mocks)
+            alias_method :teardown_without_mocks, :teardown
+            define_method(:teardown) do
+              teardown_without_mocks
+              teardown_with_mocks
+            end
+          end
+        end
+      end
+  
+      def new_mock
+        mock = MockIt::Mock.new
+        @to_verify = [] unless @to_verify
+        @to_verify << mock
+        mock
+      end
+
     end
   end
+end
 
-  def new_mock
-    mock = MockIt::Mock.new
-    @to_verify = [] unless @to_verify
-    @to_verify << mock
-    mock
-  end
-
+module MockIt
   class Mock
     include Test::Unit::Assertions
     
