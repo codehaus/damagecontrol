@@ -7,6 +7,7 @@ module DamageControl
     # and build and delete them after the test.
     class Base
       cattr_accessor :logger
+      attr_accessor :enabling_states
       include Dom
 
       def self.classes
@@ -25,8 +26,11 @@ module DamageControl
           #Yahoo
         ]
       end
-
-      attr_accessor :enabling_states
+      
+      # +true+ if supported on this platform.
+      def self.supported?
+        true
+      end
       
       def initialize
         @enabling_states = []

@@ -1,15 +1,19 @@
-# Load platform-specific sound player
-require File.expand_path(File.dirname(__FILE__) + "/sound/" + DamageControl::Platform.family + "/sound_player")
-
 module DamageControl
   module Publisher
     class Sound < Base
 
       attr_accessor :executing_sound, :successful_sound, :fixed_sound, :broken_sound, :repeatedly_broken_sound
 
-      # Finds all sound files matching +glob+.
+      # Load platform-specific sound player
+      @@sound_player = File.expand_path(File.dirname(__FILE__) + "/sound/" + DamageControl::Platform.family + "/sound_player.rb")
+      def self.supported?
+        File.exist? @@sound_player
+      end
+      require @@sound_player if supported?
+
+      # Finds all sound files.
       def self.files
-        Dir["#{DC_DATA_DIR}/sound/*"].collect{|f| File.basename(f)}
+        Dir["#{RAILS_ROOT}/sound/*"].collect{|f| File.basename(f)}
       end
 
       def initialize
