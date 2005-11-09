@@ -8,11 +8,13 @@ module DamageControl
     # and other ignoreable files. Relative +exclude_patterns+ can
     # be used to narrow down what's zipped.
     #
-    def zip(dirname, zipfile_name, exclude_patterns=[])
+    def zip(dirname, zipfile_name, include_patterns=[])
       dirname = File.expand_path(dirname)
       files = Rake::FileList.new
-      files.include(dirname + "/**/*")
-      exclude_patterns.each { |p| files.exclude(dirname + "/" + p) }
+      include_patterns.each do |p| 
+        inc = dirname + "/" + p
+        files.include(inc)
+      end
 
       Zip::ZipFile.open(zipfile_name, Zip::ZipFile::CREATE) do |zipfile|
         files.to_a.each do |file_name|

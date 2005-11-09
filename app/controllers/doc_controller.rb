@@ -5,7 +5,7 @@ class DocController < ApplicationController
     send_file(File.dirname(__FILE__) + '/../../damagecontrol.yml', :type => "text/plain", :disposition => "inline")
   end
  
- private
+private
 
   def sidebar
     @template_for_left_column = "doc/sidebar"

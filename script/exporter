@@ -14,10 +14,6 @@ begin
             "Specifies the environment (test/development/production).",
             "Default: #{ENV['RAILS_ENV']}") { |ENV['RAILS_ENV']|}
 
-    opts.on("--data-dir=dir", String, 
-            "DamageControl data directory", 
-            "Default: current dir = #{File.expand_path(Dir.pwd)}") {|dir| DC_DATA_DIR = File.expand_path(dir)}
-
     opts.on("--project-id=id", Integer, 
             "Project id") {|project_id|}
   

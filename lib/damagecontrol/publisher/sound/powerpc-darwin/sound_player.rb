@@ -3,7 +3,7 @@ module DamageControl
     # OS X - See bin/powerpc-darwin
     class SoundPlayer
       def self.play(track)
-        `playsound #{File.expand_path(track)}`
+        `playsound #{track}`
       end
     end
   end

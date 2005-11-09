@@ -1,5 +1,4 @@
-# Read about fixtures at http://ar.rubyonrails.org/classes/Fixtures.html
-first_promotion_level:
+promotion_level_1:
   id: 1
-another_promotion_level:
+promotion_level_2:
   id: 2

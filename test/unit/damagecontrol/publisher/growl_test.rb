@@ -6,8 +6,8 @@ module DamageControl
       fixtures :builds, :projects, :revisions
 
       def test_should_send_message_on_publish
-        Growl.new.publish(@build_1)
-        # hard to assert success. verify manually.
+        Growl.new.publish(builds(:build_1))
+        # hard to assert success. verify visually.
       end
     end
   end

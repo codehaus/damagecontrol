@@ -48,6 +48,7 @@ FileList.new("demo/**/*").each do |src|
     if(File.directory?(src))
       mkdir_p target unless File.exist?(target)
     else
+      mkdir_p File.dirname(target) unless File.exist?(File.dirname(target))
       cp src, target
     end
   end

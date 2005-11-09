@@ -1,13 +1,11 @@
-require 'test/unit'
-require 'fileutils'
-require 'rubygems'
-require 'rscm'
+require File.dirname(__FILE__) + '/../../../test_helper'
 require 'damagecontrol/diff/diff_parser'
 require 'damagecontrol/diff/diff_htmlizer'
 
 module DamageControl
   class DiffHtmlizerTest < Test::Unit::TestCase
     include RSCM::Difftool
+    self.use_transactional_fixtures = false
     
     def test_should_parse_diff_to_object_model
       p = DiffParser.new

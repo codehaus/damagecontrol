@@ -83,7 +83,7 @@ class ProjectControllerTest < Test::Unit::TestCase
   def test_should_create_revisions_rss
     setup_project_for_rss
 
-    post :revisions_rss, :id => @project_1.id
+    post :revisions_rss, :id => projects(:project_1).id
     # TODO assert something with a trac path here!
     assert @response.body.index("<pubDate>Sun, 28 Feb 1971 23:45:02 -0000</pubDate>")
   end
@@ -91,7 +91,7 @@ class ProjectControllerTest < Test::Unit::TestCase
   def test_should_create_builds_rss
     setup_project_for_rss
 
-    post :builds_rss, :id => @project_1.id
+    post :builds_rss, :id => projects(:project_1).id
     assert @response.body.index("<enclosure url=\"http://test.host/artifacts/hoppe/sa/gaasa.gem\"") != -1
     assert @response.body.index("length=\"9\"") != 0
     assert @response.body.index("<pubDate>Sun, 28 Feb 1971 23:45:01 -0000</pubDate>")
@@ -100,7 +100,7 @@ class ProjectControllerTest < Test::Unit::TestCase
   def test_should_create_mixed_rss
     setup_project_for_rss
 
-    post :rss, :id => @project_1.id
+    post :rss, :id => projects(:project_1).id
     assert @response.body.index("<enclosure url=\"http://test.host/artifacts/hoppe/sa/gaasa.gem\"") != -1
     assert @response.body.index("length=\"9\"") != 0
     assert @response.body.index("<pubDate>Sun, 28 Feb 1971 23:45:02 -0000</pubDate>")
@@ -112,12 +112,12 @@ private
     trac = MetaProject::Tracker::Trac::TracTracker.new
     trac.trac_base_url = "http://dev.rubyonrails.com/"
     trac.enabled = true
-    @project_1.tracker = trac
-    @project_1.save
+    projects(:project_1).tracker = trac
+    projects(:project_1).save
 
-    @artifact_1.file.parent.mkpath
-    @artifact_1.file.open("w") {|io| io.puts "a one" }
-    @artifact_2.file.parent.mkpath
-    @artifact_2.file.open("w") {|io| io.puts "a twoooo" }
+    artifacts(:artifact_1).file.parent.mkpath
+    artifacts(:artifact_1).file.open("w") {|io| io.puts "a one" }
+    artifacts(:artifact_2).file.parent.mkpath
+    artifacts(:artifact_2).file.open("w") {|io| io.puts "a twoooo" }
   end
 end

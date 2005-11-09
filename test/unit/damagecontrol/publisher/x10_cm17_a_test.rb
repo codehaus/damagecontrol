@@ -5,7 +5,7 @@ module DamageControl
   module Publisher
     class X10Cm17ATest < Test::Unit::TestCase
       fixtures :builds, :projects, :revisions
-      include MockIt
+      self.use_transactional_fixtures = false
 
       if(ENV['DC_TEST_X10CM17A_ENABLE'])
         def broken_x10

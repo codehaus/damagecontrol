@@ -4,56 +4,56 @@ class ProjectTest < Test::Unit::TestCase
   fixtures :projects, :revisions, :builds, :build_executors, :build_executors_projects
 
   def test_should_have_revisions
-    assert_equal(3, @project_1.revisions.length)
+    assert_equal(3, projects(:project_1).revisions.length)
   end
   
   def test_should_find_latest_revision
-    assert_equal(@revision_3, @project_1.latest_revision)
+    assert_equal(revisions(:revision_3), projects(:project_1).latest_revision)
   end
 
   def test_should_find_latest_build_based_on_create_time
-    assert_equal(@build_2, @project_1.latest_build)
+    assert_equal(builds(:build_2), projects(:project_1).latest_build)
   end
 
   def test_should_find_latest_build_before
-    assert_equal(@build_2, @project_1.builds(:before => Time.utc(1971,02,28,23,41,02))[0])
-    assert_equal(@build_1, @project_1.builds(:before => Time.utc(1971,02,28,23,41,01))[0])
+    assert_equal(builds(:build_2), projects(:project_1).builds(:before => Time.utc(1971,02,28,23,41,02))[0])
+    assert_equal(builds(:build_1), projects(:project_1).builds(:before => Time.utc(1971,02,28,23,41,01))[0])
   end
 
   def test_should_find_latest_successful_build
-    assert_equal(@build_1, @project_1.latest_successful_build)
+    assert_equal(builds(:build_1), projects(:project_1).latest_successful_build)
   end
   
   def test_should_have_build_executors
-    assert_equal([@slave_1, @slave_2], @slave_project.build_executors)
+    assert_equal([build_executors(:slave_1), build_executors(:slave_2)], projects(:slave_project).build_executors)
   end
 
   def test_should_persist_scm
     cvs = RSCM::Cvs.new("a_root", "a_mod", "a_branch", "a_password")
 
-    @project_1.scm = cvs
-    @project_1.save
-    @project_1.reload
+    projects(:project_1).scm = cvs
+    projects(:project_1).save
+    projects(:project_1).reload
 
-    assert_equal(cvs, @project_1.scm)
+    assert_equal(cvs, projects(:project_1).scm)
 
-    @project_1.scm.root = "jalla"
-    @project_1.save
-    @project_1.reload
-    assert_equal("jalla", @project_1.scm.root)
-    assert_equal(true, @project_1.scm.enabled)
+    projects(:project_1).scm.root = "jalla"
+    projects(:project_1).save
+    projects(:project_1).reload
+    assert_equal("jalla", projects(:project_1).scm.root)
+    assert_equal(true, projects(:project_1).scm.enabled)
   end
 
   def test_should_persist_tracker
     # TODO: fix this nil!
     rf = MetaProject::Tracker::XForge::RubyForgeTracker.new("http://rubyforge.org/tracker/?group_id=801", nil)
 
-    @project_1.tracker = rf
-    @project_1.save
-    @project_1.reload
+    projects(:project_1).tracker = rf
+    projects(:project_1).save
+    projects(:project_1).reload
 
-    assert_equal("http://rubyforge.org/tracker/?group_id=801", @project_1.tracker.overview)
-    assert_equal(true, @project_1.tracker.enabled)
+    assert_equal("http://rubyforge.org/tracker/?group_id=801", projects(:project_1).tracker.overview)
+    assert_equal(true, projects(:project_1).tracker.enabled)
   end
 
   def test_should_persist_scm_web
@@ -67,26 +67,26 @@ class ProjectTest < Test::Unit::TestCase
       "g"
     )
 
-    @project_1.scm_web = scm_web
-    @project_1.save
-    @project_1.reload
+    projects(:project_1).scm_web = scm_web
+    projects(:project_1).save
+    projects(:project_1).reload
 
-    assert_equal("dir/foo", @project_1.scm_web.dir("foo"))
-    assert_equal(true, @project_1.scm_web.enabled)
+    assert_equal("dir/foo", projects(:project_1).scm_web.dir("foo"))
+    assert_equal(true, projects(:project_1).scm_web.enabled)
   end
 
   def test_should_persist_publishers
     publishers = DamageControl::Publisher::Base.classes.collect{|cls| cls.new}
-    @project_1.publishers = publishers
-    @project_1.save
-    @project_1_found = Project.find(@project_1.id)
-    assert_not_same(@project_1, @project_1_found)
+    projects(:project_1).publishers = publishers
+    projects(:project_1).save
+    project_1_found = Project.find(projects(:project_1).id)
+    assert_not_same(projects(:project_1), project_1_found)
 
-    assert_equal(DamageControl::Publisher::Base.classes, @project_1_found.publishers.collect{|pub| pub.class})
+    assert_equal(DamageControl::Publisher::Base.classes, project_1_found.publishers.collect{|pub| pub.class})
   end
 
   def test_should_create_basedir_after_load
-    expected_base_dir = "#{DC_DATA_DIR}/projects/#{@project_1.id}"
+    expected_base_dir = "#{DC_DATA_DIR}/projects/#{projects(:project_1).id}"
     assert(File.exist?(expected_base_dir), "Should exist: #{expected_base_dir}")
   end
 
@@ -165,9 +165,9 @@ class ProjectTest < Test::Unit::TestCase
   end
   
   def test_should_have_latest_pending_builds
-    assert_equal([], @project_1.pending_builds)
-    pending = @revision_3.request_builds(Build::SCM_POLLED)
-    assert_equal(pending, @project_1.pending_builds)
+    assert_equal([], projects(:project_1).pending_builds)
+    pending = revisions(:revision_3).request_builds(Build::SCM_POLLED)
+    assert_equal(pending, projects(:project_1).pending_builds)
   end
   
   def FIXMEtest_should_import_and_export_as_yaml
