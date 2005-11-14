@@ -2,7 +2,6 @@ require File.dirname(__FILE__) + '/../test_helper'
 require 'rscm/mockit'
 
 class RevisionTest < Test::Unit::TestCase
-  fixtures :projects, :revisions, :revision_files, :builds, :build_executors, :build_executors_projects
 
   def test_should_have_builds
     assert_equal([builds(:build_1)], revisions(:revision_1).builds)

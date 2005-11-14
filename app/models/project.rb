@@ -1,10 +1,3 @@
-#require 'rgl/adjacency'
-#require 'rgl/connected_components'
-require 'set'
-require 'rss/maker'
-require 'rss/parser'
-#require 'damagecontrol'
-
 # A Project record contains information about a project to be continuously
 # built by DamageControl.
 class Project < ActiveRecord::Base
@@ -12,6 +5,7 @@ class Project < ActiveRecord::Base
   include DamageControl::Dom
   attr_reader :basedir
 
+  has_many :poll_requests, :order => "scm_time", :dependent => true
   has_many :revisions, :order => "timepoint DESC", :dependent => true
   has_and_belongs_to_many :dependencies, 
     :class_name => "Project", 
@@ -170,9 +164,26 @@ LIMIT #{options[:count]}
   
   # Requests builds for the latest revision and returns those builds
   def request_builds_for_latest_revision(reason, triggering_build)
-    lr = latest_revision
-    if(lr)
+    if(lr = latest_revision)
       lr.request_builds(reason, triggering_build)
+    end
+  end
+  
+  # Yields if the scm uses polling or if there is a poll request (pr) that is after or at the 
+  # same time as the latest revision.
+  # Deletes pr and all prior poll requests.
+  def poll!
+    req = nil
+    lr = nil
+    if(lr = latest_revision)
+      req = PollRequest.find(:first, :conditions => ["project_id = ? AND scm_time >= ?", id, lr.timepoint], :order => "scm_time")
+    end
+
+    always_poll = self.scm && self.scm.uses_polling?    
+    if(req || always_poll)
+      yield
+      req.destroy if req
+      PollRequest.destroy_all(["project_id = ? AND scm_time <= ?", id, lr.timepoint]) if lr
     end
   end
 

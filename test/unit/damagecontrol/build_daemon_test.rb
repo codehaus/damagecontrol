@@ -3,10 +3,8 @@ require 'stringio'
 
 module DamageControl  
   class BuildDaemonTest < Test::Unit::TestCase
-    include Platform
-    self.use_transactional_fixtures = false
 
-    def setup
+    def cleanup
       Project.delete_all
       Revision.delete_all
       Build.delete_all
@@ -36,6 +34,7 @@ module DamageControl
     end
 
     def test_should_execute_build_when_change_committed
+      cleanup
       log = StringIO.new
       
       BuildDaemon.logger = Logger.new(log)
@@ -50,7 +49,7 @@ module DamageControl
       
       scm = RSCM::Subversion.new
       scm.url = RSCM::PathConverter.filepath_to_nativeurl(central_repo)
-      copy_command = family == "mswin32" ? "copy" : "cp"
+      copy_command = Platform.family == "mswin32" ? "copy" : "cp"
       project = Project.create(
         :name => "Test", 
         :scm => scm, 

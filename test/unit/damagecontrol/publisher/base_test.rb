@@ -3,7 +3,6 @@ require File.dirname(__FILE__) + '/../../../test_helper'
 module DamageControl
   module Publisher
     class BaseTest < Test::Unit::TestCase
-      self.use_transactional_fixtures = false
 
       def test_should_load_all_publisher_classes
         expected = [
@@ -25,7 +24,7 @@ module DamageControl
           Base.classes.collect{|c| c.new.class})
       end
 
-      class MockPublisher < Base
+      class StubPublisher < Base
         attr_reader :published
         
         def publish(build)
@@ -36,7 +35,7 @@ module DamageControl
       def test_should_publish_if_successful_enabled
         build = Build.create(:reason => Build::SCM_POLLED, :state => Build::Fixed.new)
         
-        pub = MockPublisher.new
+        pub = StubPublisher.new
         pub.publish_maybe(build)
         assert(pub.published.nil?)
 

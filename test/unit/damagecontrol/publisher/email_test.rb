@@ -3,7 +3,6 @@ require File.dirname(__FILE__) + '/../../../test_helper'
 module DamageControl
   module Publisher
     class EmailTest < Test::Unit::TestCase
-      fixtures :builds, :projects, :revisions, :revision_files
 
       def test_should_send_email_with_sendmail_on_publish
         if (ENV['DC_TEST_SENDMAIL_ENABLE'])

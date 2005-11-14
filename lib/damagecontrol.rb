@@ -2,6 +2,7 @@
 # This must be done here so that rubyscript2exe can
 # discover what it needs to bundle up!
 require 'damagecontrol/platform'
+require 'rubygems'
 
 ##### START: ALL OF THIS MUST BE INSTALLED MANUALLY
 require_gem 'ambient'
@@ -25,6 +26,9 @@ else
 end
 ##### END: ALL OF THIS MUST BE INSTALLED MANUALLY
 
+require 'set'
+require 'rss/maker'
+require 'rss/parser'
 require 'optparse'
 require 'webrick'
 require 'logger'
@@ -58,4 +62,3 @@ require 'revision'
 require 'revision_file'
 
 exit if defined?(REQUIRE2LIB) # rubyscript2exe packaging mode
-

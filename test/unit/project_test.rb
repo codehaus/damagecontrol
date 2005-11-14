@@ -1,7 +1,6 @@
 require File.dirname(__FILE__) + '/../test_helper'
 
 class ProjectTest < Test::Unit::TestCase
-  fixtures :projects, :revisions, :builds, :build_executors, :build_executors_projects
 
   def test_should_have_revisions
     assert_equal(3, projects(:project_1).revisions.length)
@@ -157,13 +156,6 @@ class ProjectTest < Test::Unit::TestCase
     # TODO: how the heck do we get the 2 sub graphs?
   end
   
-  def test_should_lock_project
-    p = Project.create(:name => "lock me")
-    assert !p.lock_time
-    p.lock_time = Time.now.utc
-    assert p.lock_time
-  end
-  
   def test_should_have_latest_pending_builds
     assert_equal([], projects(:project_1).pending_builds)
     pending = revisions(:revision_3).request_builds(Build::SCM_POLLED)
@@ -177,6 +169,42 @@ class ProjectTest < Test::Unit::TestCase
     assert_equal("http://damagecontrol.codehaus.org/", p.home_page)
     export = p.export_to_hash
     assert_equal(import, export)
+  end
+
+  def FIXMEtest_should_lock_project
+    p = Project.create(:name => "lock me")
+    assert !p.lock_time
+    p.lock_time = Time.now.utc
+    assert p.lock_time
+  end
+  
+  # If a commit is done to the scm of a project that
+  # uses scm triggering (and not polling), we have
+  # to enqueue all the requests in a persistent manner.
+  # This is to avoid that requests get lost and not taken into account.
+  def test_should_enqueue_revision_poll_requests
+    # revisions: 00, 01, 02
+    t = Time.utc(1971,02,28,23,45,00)
+    pr0 = projects(:project_1).poll_requests.create(:scm_time => t)
+    pr1 = projects(:project_1).poll_requests.create(:scm_time => t+1)
+    pr2 = projects(:project_1).poll_requests.create(:scm_time => t+2)
+    pr3 = projects(:project_1).poll_requests.create(:scm_time => t+3)
+    pr4 = projects(:project_1).poll_requests.create(:scm_time => t+4)
+    assert_equal [pr0, pr1, pr2, pr3, pr4], projects(:project_1).poll_requests
+    
+    found2 = false
+    projects(:project_1).poll! do
+      found2 = true
+    end
+    assert found2
+    assert_equal [pr3, pr4], projects(:project_1).poll_requests(true)
+
+    found3 = false
+    projects(:project_1).poll! do
+      found3 = true
+    end
+    assert found3
+    assert_equal [pr4], projects(:project_1).poll_requests(true)
   end
   
 end
