@@ -27,7 +27,7 @@ begin
       STDOUT.write "Creating new project "
       project = Project.create(project_hash[:id])
     end
-    project.populate_from_hash(project_hash)
+    project.populate_from_hash(project_hash, nil)
     puts "'#{project.name}'"
     project.save
   end

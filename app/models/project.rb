@@ -5,7 +5,7 @@ class Project < ActiveRecord::Base
   include DamageControl::Dom
   attr_reader :basedir
 
-  has_many :poll_requests, :order => "scm_time", :dependent => true
+  has_many :poll_requests, :dependent => true
   has_many :revisions, :order => "timepoint DESC", :dependent => true
   has_and_belongs_to_many :dependencies, 
     :class_name => "Project", 
@@ -169,26 +169,24 @@ LIMIT #{options[:count]}
     end
   end
   
-  # Yields if the scm uses polling or if there is a poll request (pr) that is after or at the 
-  # same time as the latest revision.
-  # Deletes pr and all prior poll requests.
+  # Yields if the scm uses polling or if there is a poll request for this project and then
+  # deletes all poll requests. If there are no requests, no yield.
   def poll!
-    req = nil
-    lr = nil
-    if(lr = latest_revision)
-      req = PollRequest.find(:first, :conditions => ["project_id = ? AND scm_time >= ?", id, lr.timepoint], :order => "scm_time")
-    end
+    req = PollRequest.find(:first, :conditions => ["project_id = ?", id])
+    always_poll = self.scm && self.scm.uses_polling    
 
-    always_poll = self.scm && self.scm.uses_polling?    
     if(req || always_poll)
       yield
-      req.destroy if req
-      PollRequest.destroy_all(["project_id = ? AND scm_time <= ?", id, lr.timepoint]) if lr
+      PollRequest.destroy_all(["project_id = ?", id])
     end
   end
 
   def working_copy_dir
      File.expand_path("#{@basedir}/working_copy")
+  end
+
+  def scm_trigger_dir
+     File.expand_path("#{@basedir}/scm_trigger")
   end
 
   def zip_dir
@@ -340,7 +338,7 @@ LIMIT #{options[:count]}
   
   # Populates from fields in a hash. The hash typically
   # comes from a HTTP request or a YAML file.
-  def populate_from_hash(hash)
+  def populate_from_hash(hash, controller)
     hash = HashWithIndifferentAccess.new(hash)
     
     attrs = hash.dup.delete_if do |k,v|
@@ -373,6 +371,8 @@ LIMIT #{options[:count]}
         end
       end
     end
+    
+    update_scm_triggering(controller)
   end
   
   def export_to_hash
@@ -380,6 +380,42 @@ LIMIT #{options[:count]}
   end
 
 private
+
+  #  uses_polling trigger_enabled? action
+  #  Y            Y                uninstall
+  #  Y            N                nothing
+  #  N            Y                nothing
+  #  N            N                install
+  #
+  def update_scm_triggering(controller)
+    if(scm.supports_trigger?)
+      # TODO: take base url from a persistent table (globals) and make it work on windows
+      trigger_command = "curl http://localhost:3000/project/request_scm_poll/#{self.id}"
+
+      begin
+        enabled = scm.trigger_installed?(trigger_command, scm_trigger_dir)
+        should_be_enabled = scm.uses_polling == false # can be true, false or nil
+      
+        if(enabled && !should_be_enabled)
+          scm.uninstall_trigger(trigger_command, scm_trigger_dir)
+          notice controller, "Successfully uninstalled trigger"
+        elsif(!enabled && should_be_enabled)
+          scm.install_trigger(trigger_command, scm_trigger_dir)
+          notice controller, "Successfully installed trigger"
+        end
+      rescue => e
+        notice controller, "Failed to modify trigger: #{e.message}"
+      end
+    end
+  end
+  
+  def notice(controller, msg)
+    if(controller)
+      controller.notice msg
+    else
+      raise msg
+    end
+  end
 
   def set_defaults
     @basedir = File.expand_path("#{DC_DATA_DIR}/projects/#{id}")

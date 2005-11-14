@@ -2,11 +2,19 @@
 <% if(object.supports_trigger?) %>
   <table>
     <tr>
-      <td>Change detection</td>
-      <td>
-        Polling: <%= radio_button_tag("scm[#{object.class.name}][uses_polling]", "1", object.uses_polling?, :id=>nil) %>
-        Trigger: <%= radio_button_tag("scm[#{object.class.name}][uses_polling]", "0", !object.uses_polling?, :id=>nil) %>
-      </td>
+      <td>Revision detection</td>
+    </tr>
+    <tr>
+      <td>Polling:</td>
+      <td><%= radio_button_tag("scm[#{object.class.name}][uses_polling]", "true", object.uses_polling == true, :id=>nil) %></td>
+    </tr>
+    <tr>
+      <td>Triggering (<%= object.trigger_mechanism %>):</td>
+      <td><%= radio_button_tag("scm[#{object.class.name}][uses_polling]", "false", object.uses_polling == false, :id=>nil) %></td>
+    </tr>
+    <tr>
+      <td>None:</td>
+      <td><%= radio_button_tag("scm[#{object.class.name}][uses_polling]", "nil", object.uses_polling.nil?, :id=>nil) %></td>
     </tr>
   </table>
 <% end %>

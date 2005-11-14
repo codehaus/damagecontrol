@@ -12,6 +12,7 @@ private
   # Deserialises an object from a Hash holding attribute values. 
   # Special rules:
   # * "true" and "false" strings are turned into booleans.
+  # * "nil" is turned into nil.
   # * Array values are eval'ed to classes and new'ed.
   # * Hash values are turned into a new Hash by combining its
   #   :keys and :values entries (This is handier to POST from forms).
@@ -25,6 +26,8 @@ private
         attr_value = true
       elsif(attr_value == "false")
         attr_value = false
+      elsif(attr_value == "nil")
+        attr_value = nil
       elsif(attr_name =~ /(.*)_yaml/)
         attr_value = YAML::load(attr_value)
         attr_name = $1

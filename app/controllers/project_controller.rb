@@ -103,23 +103,31 @@ class ProjectController < ApplicationController
     find
   end
   
+  # Requests the polling of the SCM. Intended to be used for projects with scm polling off
+  # (triggering on) and can be called with 
+  # curl http://localhost:3000/project/request_scm_poll/1?time=`date -u +%Y%m%d%H%M%S`
+  def request_scm_poll
+    @project.poll_requests.create
+    render :text => "DamageControl received SCM poll request for #{@project.name}\n", :layout => false
+  end
+
   def timeline
     @revisions = @project.revisions
   end
 
   def rss
     find
-    render :text => @project.rss(self)
+    render :text => @project.rss(self), :layout => false
   end
   
   def revisions_rss
     find
-    render :text => @project.revisions_rss(self)
+    render :text => @project.revisions_rss(self), :layout => false
   end
 
   def builds_rss
     find
-    render :text => @project.builds_rss(self)
+    render :text => @project.builds_rss(self), :layout => false
   end
   
   # Java WebStart
@@ -164,7 +172,7 @@ private
     # the POSTed hash (@params) aren't exactly how we want things
     hash = params.dup
     hash.merge!(params[:project])
-    project.populate_from_hash(hash)
+    project.populate_from_hash(hash, self)
   end
   
   def define_plugin_rows
@@ -179,6 +187,7 @@ private
   # will also be among these, and will have the persisted attribute values.
   def scms
     RSCM::Base.classes.collect{|cls| cls.new}.collect do |scm|
+      scm.uses_polling = true
       scm.class == @project.scm.class ? @project.scm : scm
     end.sort
   end

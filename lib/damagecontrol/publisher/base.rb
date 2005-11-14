@@ -57,7 +57,11 @@ module DamageControl
         end
         should_publish = state_classes.index(build.state.class)
         if(should_publish)
-          publish(build)
+          begin
+            publish(build)
+          rescue => e
+            logger.error "Failed to publish via #{self.class.name}: #{e.message}"
+          end
         end
       end
       
