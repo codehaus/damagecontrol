@@ -116,6 +116,10 @@ module RSCM
     def apply_label(label)
       cvs(@checkout_dir, "tag -c #{label}")
     end
+
+    def trigger_mechanism
+      "CVSROOT/loginfo"
+    end
     
     def install_trigger(trigger_command, trigger_files_checkout_dir)
       raise "mod can't be null or empty" if (mod.nil? || mod == "")

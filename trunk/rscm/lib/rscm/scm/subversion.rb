@@ -25,10 +25,6 @@ module RSCM
       @password = ""
     end
     
-    def to_yaml_properties
-      ["@url", "@path", "@username", "@password"]
-    end
-
     def add(relative_filename)
       svn(@checkout_dir, "add #{relative_filename}")
     end
@@ -143,6 +139,10 @@ module RSCM
       # local?
     end
 
+    def trigger_mechanism
+      "hooks/post-commit"
+    end
+    
     def create_central
       native_path = PathConverter.filepath_to_nativepath(svnrootdir, true)
       mkdir_p(PathConverter.nativepath_to_filepath(native_path))
@@ -158,11 +158,11 @@ module RSCM
       end
     end
 
-    def install_trigger(trigger_command, damagecontrol_install_dir)
+    def install_trigger(trigger_command, trigger_files_checkout_dir)
       if (WINDOWS)
-        install_win_trigger(trigger_command, damagecontrol_install_dir)
+        install_win_trigger(trigger_command, trigger_files_checkout_dir)
       else
-        install_unix_trigger(trigger_command, damagecontrol_install_dir)
+        install_unix_trigger(trigger_command, trigger_files_checkout_dir)
       end
     end
     
