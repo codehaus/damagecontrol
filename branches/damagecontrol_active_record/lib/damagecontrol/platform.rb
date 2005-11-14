@@ -8,7 +8,7 @@ module DamageControl
       return "powerpc-darwin" if target_os.downcase =~ /darwin/
       return "mswin32"  if target_os.downcase =~ /32/
       return "cygwin" if target_os.downcase =~ /cyg/
-      # TODO: distinguish between ELF and, err, what's the other one?
+      # TODO: distinguish between different kinds...
       return "linux"
     end
     module_function :family

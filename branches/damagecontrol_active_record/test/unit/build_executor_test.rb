@@ -1,7 +1,6 @@
 require File.dirname(__FILE__) + '/../test_helper'
 
 class BuildExecutorTest < Test::Unit::TestCase
-  fixtures :build_executors, :revisions, :builds, :build_executors
 
   def test_should_have_builds
     assert_equal([builds(:build_2)], build_executors(:slave_2).builds)

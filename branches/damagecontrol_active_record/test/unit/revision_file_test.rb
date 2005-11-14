@@ -1,7 +1,6 @@
 require File.dirname(__FILE__) + '/../test_helper'
 
 class RevisionFileTest < Test::Unit::TestCase
-  fixtures :revisions, :revision_files
 
   def test_should_have_properties
     assert_equal("MODIFIED", revision_files(:revision_file_1_1).status)

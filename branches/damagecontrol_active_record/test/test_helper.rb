@@ -3,6 +3,8 @@ require File.expand_path(File.dirname(__FILE__) + "/../config/environment")
 require 'test_help'
 
 class Test::Unit::TestCase
+  fixtures :artifacts, :build_executors, :build_executors_projects, :builds, :projects, :promotion_levels, :revision_files, :revisions, :poll_requests
+  
   # Turn off transactional fixtures if you're working with MyISAM tables in MySQL
   self.use_transactional_fixtures = true
   

@@ -59,8 +59,8 @@ module DamageControl
       # We'll put all pending and new builds in here...
       builds = []
       builds.concat(project.pending_builds)
-      if(project.scm && project.scm.uses_polling?)
-
+      
+      project.poll! do
         latest_new_revision = @scm_poller.poll_and_persist_new_revisions(project)
         if(latest_new_revision)
           builds.concat(latest_new_revision.request_builds(Build::SCM_POLLED))

@@ -3,7 +3,6 @@ require File.dirname(__FILE__) + '/../../../test_helper'
 module DamageControl
   module Publisher
     class ArtifactArchiverTest < Test::Unit::TestCase
-      fixtures :builds, :projects, :revisions, :artifacts
 
       def test_should_archive_in_project_directory_and_create_artifact_record
         artifact_dir = "#{projects(:project_1).working_copy_dir}/pkg"

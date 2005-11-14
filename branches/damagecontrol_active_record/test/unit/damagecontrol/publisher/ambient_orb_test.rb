@@ -4,8 +4,6 @@ require 'rscm/mockit'
 module DamageControl
   module Publisher
     class AmbientOrbTest < Test::Unit::TestCase
-      fixtures :builds, :projects, :revisions
-      include MockIt
 
       if(ENV['DC_TEST_ORB_ENABLE'])
         def driver
@@ -20,7 +18,7 @@ module DamageControl
         puts "\n"
         
         def driver
-          driver = Mock.new
+          driver = new_mock
           driver.__expect(:id=) {|id| assert_equal("dummy", id)}
           driver.__expect(:color=) {|color| assert_equal(:green, color)}
           driver.__expect(:animation=) {|animation| assert_equal(:none, animation)}

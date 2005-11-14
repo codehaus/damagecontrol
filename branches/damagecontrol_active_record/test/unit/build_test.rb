@@ -3,8 +3,6 @@ require File.dirname(__FILE__) + '/../test_helper'
 class BuildTest < Test::Unit::TestCase
   include DamageControl::Platform
 
-  fixtures :builds, :revisions, :projects, :artifacts, :build_executors, :build_executors_projects
-
   def test_should_create
     br = revisions(:revision_1).builds.create(:reason => Build::SCM_POLLED)
     assert_equal(revisions(:revision_1), br.revision)

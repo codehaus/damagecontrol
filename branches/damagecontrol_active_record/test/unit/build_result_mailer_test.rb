@@ -4,9 +4,6 @@ require 'build_result_mailer'
 class BuildResultMailerTest < Test::Unit::TestCase
   FIXTURES_PATH = File.dirname(__FILE__) + '/../fixtures'
   CHARSET = "utf-8"
-  self.use_transactional_fixtures = false
-  fixtures :builds, :projects, :revisions, :revision_files
-  
 
   include ActionMailer::Quoting
 

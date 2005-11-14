@@ -3,7 +3,6 @@ require File.dirname(__FILE__) + '/../../../test_helper'
 module DamageControl
   module Publisher
     class JabberTest < Test::Unit::TestCase
-      fixtures :builds, :projects, :revisions
 
       def test_should_send_message_on_publish
         build = builds(:build_1)

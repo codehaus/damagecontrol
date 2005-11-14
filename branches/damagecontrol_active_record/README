@@ -3,7 +3,14 @@
 Before you go on, please read instructions at http://hieraki.lavalamp.ca/
 (especially the section about the ruby gems that need to be installed)
 
-=== Create the initial database schema:
+=== Install dependent software
+
+==== RubyGems
+Install all the gems listed in lib/damagecontrol.rb Example:
+
+  gem install rscm
+
+=== Create the initial database schema and tables:
 
   rake migrate
 
@@ -16,12 +23,20 @@ Point your browser to
 
   http://localhost:3000
 
-=== Create a sample project
+=== Create a demo project
 
   rake create_demo_project
 
 (Please consult demo/README for the details.)
 
+=== Set up *your* project
+Just follow the 'New Project' link on the front page. If it isn't intuitive, let us know.
+
 === Run DamageControl's own test suite
 
   rake
+
+=== Feedback to the team
+If you have questions, patches, bugs or just want to get in touch, see 
+
+  

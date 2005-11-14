@@ -52,11 +52,6 @@ PKG_FILES = FileList[
   "vendor/rails/railties/lib/**/*"
 ]
 
-# Extra stuff needed for 'classic' packaging
-PACKAGE_INCLUDES = [
-  "bin/**/*"
-]
-
 DIST_DIR = "dist/#{PKG_FILE_NAME}"
 
 task :verify_production_environment do
@@ -107,11 +102,6 @@ desc "Create a distro"
 Rake::PackageTask.new(PKG_NAME, PKG_VERSION) do |p|
   files = PKG_FILES.dup
   files.include("bin/**/*")
-  files.exclude(
-    "bin/eee*",
-    "bin/*rubyscript*"
-  )
-
   p.need_tar = true
   p.package_files = files
 end
