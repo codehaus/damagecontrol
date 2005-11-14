@@ -4,7 +4,7 @@ module RSCM
     include ::DamageControl::Dom
 
     attr_accessor :enabled
-    attr_accessor :uses_polling # String, posted from web form.
+    attr_accessor :uses_polling
 
     def self.classes
       # Only Subversion and Cvs are known to be stable...
@@ -15,13 +15,6 @@ module RSCM
       "scm"
     end
     
-    def uses_polling?
-      return @uses_polling if (@uses_polling == true || @uses_polling == false)
-      # If not set at all, default to true
-      return true if @uses_polling.nil?
-      @uses_polling.to_i != 0
-    end
-
     def exclusive?
       true
     end

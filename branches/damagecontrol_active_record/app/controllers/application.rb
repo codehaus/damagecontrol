@@ -26,6 +26,10 @@ class ApplicationController < ActionController::Base
   prepend_before_filter :load_projects, :random_tip, :feeds
   append_before_filter :page_title
   
+  def notice(msg)
+    flash[:notice] = msg
+  end
+  
 protected
   
   def feeds
