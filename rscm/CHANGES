@@ -1,5 +1,12 @@
 = RSCM Changelog
 
+== Version 0.3.13
+
+Improved trigger support
+
+* Added Base.trigger_mechanism and implementation for subclasses that support triggering.
+* Removed Subversion.to_yaml_properties, which prevented additional attributes.
+
 == Version 0.3.12
 
 Bugfix release

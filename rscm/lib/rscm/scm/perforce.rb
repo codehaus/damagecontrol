@@ -112,6 +112,10 @@ module RSCM
       p4admin.uninstall_trigger(trigger_command)
     end
 
+    def trigger_mechanism
+      "p4 triggers -i"
+    end
+
     def diff(revfile, &proc)
       p4client.diff(revfile, &proc)
     end

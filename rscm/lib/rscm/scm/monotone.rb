@@ -146,6 +146,10 @@ module RSCM
       true
     end
 
+    def trigger_mechanism
+      "MT/monotonerc"
+    end
+
     # http://www.venge.net/monotone/monotone.html#Hook-Reference
     def install_trigger(trigger_command, install_dir)
       stop_serve

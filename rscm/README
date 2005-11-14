@@ -1,4 +1,4 @@
-= RSCM - Ruby Source Control Management (0.3.12)
+= RSCM - Ruby Source Control Management (0.3.13)
 
 RSCM is to SCM what DBI/JDBC/ODBC are to databases - an SCM-independent API for accessing different SCMs. The high level features are roughly:
 

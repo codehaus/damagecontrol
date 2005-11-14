@@ -30,8 +30,9 @@ module RSCM
   # * can_create_central?
   # * import_central
   # * install_trigger
-  # * supports_trigger? # TODO: rename to can_install_trigger?
+  # * supports_trigger? / can_install_trigger?
   # * trigger_installed?
+  # * trigger_mechanism
   # * uninstall_trigger
   #
   # Some methods are a bit fuzzy with respect to their relevance to the working copy or
@@ -41,7 +42,7 @@ module RSCM
   # * checkout_command_line
   # * label
   # * name
-  # * transactional?
+  # * transactional? / atomic?
   # * update_command_line
   #
   # Some of the methods in this API use +from_identifier+ and +to_identifier+.
@@ -237,6 +238,12 @@ module RSCM
       # The default implementation assumes no - override if it can be
       # determined programmatically.
       false
+    end
+    alias :can_install_trigger? :supports_trigger?
+
+    # Descriptive name of the trigger mechanism
+    def trigger_mechanism
+      "Unknown"
     end
 
     # Installs +trigger_command+ in the SCM.
