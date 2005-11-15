@@ -30,13 +30,19 @@ class Build < ActiveRecord::Base
 
   #validates_inclusion_of :reason, :in => [SCM_POLLED, SCM_TRIGGERED, MANUALLY_TRIGGERED, SUCCESSFUL_DEPENDENCY]
 
-  def before_save
-    self.create_time = Time.now.utc unless self.create_time
+  def before_create
+    self.create_time ||= Time.now.utc
+    self.state = Requested.new
   end
   
-  def before_destroy
+  def state=(state)
+    write_attribute("state", state)
+    unless new_record?
+      save
+      project.build_state_changed(self) if project
+    end
   end
-  
+
   def stdout_file
     log_file("stdout")
   end
@@ -77,14 +83,6 @@ class Build < ActiveRecord::Base
     end
   end
   
-  def state=(state)
-    write_attribute("state", state)
-    unless new_record?
-      save
-      project.build_state_changed(self) if project
-    end
-  end
-
   # The estimated duration of this build, or nil if it cannot be determined.
   def estimated_duration
     lb = project.builds(:exitstatus => 0)[0]
@@ -152,68 +150,60 @@ class Build < ActiveRecord::Base
       else "red-pulse-32.gif"
     end
   end
+
+  class State
+    def name
+      self.class.name.demodulize.underscore
+    end
+
+    def attr_sym(prefix, suffix)
+      "#{prefix}#{name}_#{suffix}".to_sym
+    end
+  end
+
+  class Unfinished < State
+    def fail
+      Broken.new
+    end
+    def succeed
+      Successful.new
+    end
+  end
   
-  class SynchingWorkingCopy
-    def description
-      "Synching working copy"
-    end
-    def fail
-      Broken.new
-    end
-    def succeed
-      Successful.new
-    end
+  class Requested < Unfinished
   end
 
-  class Executing
-    def description
-      "Executing"
-    end
-    def fail
-      Broken.new
-    end
-    def succeed
-      Successful.new
-    end
+  class SynchingWorkingCopy < Unfinished
   end
 
-  class Successful
+  class Executing < Unfinished
+  end
+
+  class Successful < State
     def succeed
       Successful.new
     end
     def fail
       Broken.new
-    end
-    def description
-      "Successful"
     end
   end
 
   class Fixed < Successful
-    def description
-      "Fixed"
-    end
   end
 
-  class Broken
+  class Broken < State
     def succeed
       Fixed.new
     end
     def fail
       RepeatedlyBroken.new
     end
-    def description
-      "Broken"
-    end
   end
 
   class RepeatedlyBroken < Broken
-    def description
-      "Repeatedly broken"
-    end
   end 
   
-  STATES = [SynchingWorkingCopy.new, Executing.new, Successful.new, Fixed.new, Broken.new, RepeatedlyBroken.new] unless defined? STATES
+  STATES = [Requested.new, SynchingWorkingCopy.new, Executing.new, Successful.new, Fixed.new, Broken.new, RepeatedlyBroken.new] unless defined? STATES
   COMPLETE_STATES = [Successful.new, Fixed.new, Broken.new, RepeatedlyBroken.new] unless defined? COMPLETE_STATES
 
 end

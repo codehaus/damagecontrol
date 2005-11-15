@@ -60,9 +60,9 @@ class BuildTest < Test::Unit::TestCase
     assert_match(/[Uu]nknown command: 'wtf'\nType 'svn help' for usage.\n/, File.open(build.stderr_file).read)
   end
   
-  def test_should_not_have_status_after_request
+  def test_should_have_requested_status_after_create
     build = revisions(:revision_1).request_builds(:reason => Build::SCM_POLLED)[0]
-    assert_nil(build.state)
+    assert_equal(Build::Requested, build.state.class)
   end
   
   def test_should_have_artifacts
@@ -104,30 +104,6 @@ class BuildTest < Test::Unit::TestCase
     b6.determine_state
     b6.save
     assert_equal(Build::Successful, b6.state.class)
-  end
-  
-  def test_should_have_proper_successful_description
-    b = revisions(:revision_1).builds.create(:state => Build::Successful.new, :reason => Build::SCM_POLLED)
-    b.reload
-    assert_equal("Successful", b.state.description)
-  end
-
-  def test_should_have_proper_fixed_description
-    b = revisions(:revision_1).builds.create(:state => Build::Fixed.new, :reason => Build::SCM_POLLED)
-    b.reload
-    assert_equal("Fixed", b.state.description)
-  end
-
-  def test_should_have_proper_broken_description
-    b = revisions(:revision_1).builds.create(:state => Build::Broken.new, :reason => Build::SCM_POLLED)
-    b.reload
-    assert_equal("Broken", b.state.description)
-  end
-
-  def test_should_have_proper_repeatedly_description
-    b = revisions(:revision_1).builds.create(:state => Build::RepeatedlyBroken.new, :reason => Build::SCM_POLLED)
-    b.reload
-    assert_equal("Repeatedly broken", b.state.description)
   end
   
   def test_should_report_committer_when_reason_is_polled

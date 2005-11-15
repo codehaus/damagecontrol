@@ -17,7 +17,7 @@ class BuildResultMailerTest < Test::Unit::TestCase
   end
   
   def test_should_render_email_with_changed_files
-    @expected.subject = "project_1: Fixed build (commit by aslak)"
+    @expected.subject = "project_1: fixed build (commit by aslak)"
 
     mail = BuildResultMailer.create_build_result("nah@not.real", "dcontrol@codehaus.org", builds(:build_1))
     assert_equal(@expected.subject, mail.subject)

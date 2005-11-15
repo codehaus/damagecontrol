@@ -93,7 +93,7 @@ class Project < ActiveRecord::Base
 
     exitstatus_criterion = options[:exitstatus] ? "AND b.exitstatus=0" : ""
     before_criterion = options[:before] ? "AND b.create_time<#{quote(options[:before])}" : ""
-    pending_criterion = options[:pending] ? "AND b.state IS NULL" : ""
+    pending_criterion = options[:pending] ? "AND b.state = '#{Build::Requested.new.to_yaml}'" : ""
     
     sql = <<-EOS
 SELECT DISTINCT b.* 
@@ -129,12 +129,7 @@ LIMIT #{options[:count]}
   # Indicates that a build's state has changed.
   def build_state_changed(build)
     publishers.each do |publisher| 
-      begin
-        publisher.publish_maybe(build)
-      rescue => e
-        logger.error(e.message)
-        logger.error(e.backtrace.join("\n"))
-      end
+      publisher.publish_maybe(build)
     end
   end
   
@@ -236,10 +231,10 @@ LIMIT #{options[:count]}
 
         item.pubDate = build.begin_time
         item.author = build.owner
-        item.title = "#{build.state.description} build (#{build.reason_description}, revision #{build.revision.identifier})"
+        item.title = "#{build.state.name} build (#{build.reason_description}, revision #{build.revision.identifier})"
         item.link = controller.url_for(:controller => "build", :action => "show", :id => build.id)
         
-        headline = "#{build.revision.project.name}: #{build.state.description} build (#{build.reason_description})"
+        headline = "#{build.revision.project.name}: #{build.state.name} build (#{build.reason_description})"
         item.description = "<b>#{headline}</b><br/>\n"
 
         # We have to use detect and not find. find seems to collide with AR.

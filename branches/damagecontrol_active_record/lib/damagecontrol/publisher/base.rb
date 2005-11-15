@@ -53,9 +53,9 @@ module DamageControl
       def publish_maybe(build)
         es = @enabling_states || []
         state_classes = es.collect do |state| 
-          state.class
+          state.class.name
         end
-        should_publish = state_classes.index(build.state.class)
+        should_publish = state_classes.index(build.state.class.name)
         if(should_publish)
           begin
             publish(build)
@@ -67,8 +67,8 @@ module DamageControl
       
     protected
     
-      def build_status_attr(build, kind)
-        __send__ "#{build.state.class.name.demodulize.underscore}_#{kind}".to_sym
+      def build_state_attr(state, suffix)
+        instance_variable_get(state.attr_sym("@", suffix))
       end
 
     end

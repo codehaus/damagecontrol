@@ -25,39 +25,46 @@ tracker:
     enabled: true
 publisher: 
   DamageControl::Publisher::Sound: 
+    requested_sound: hal_nothing.wav
+    synching_working_copy_sound: hal_moment.wav
+    executing_sound: hal_decision.wav
     successful_sound: hal_well.wav
     broken_sound: hal_fault.wav
-    executing_sound: hal_decision.wav
     repeatedly_broken_sound: hal_error.wav
     fixed_sound: hal_better.wav
-    synching_working_copy_sound: hal_moment.wav
     enabling_states:
+      - Build::Requested
+      - Build::SynchingWorkingCopy
       - Build::Executing
       - Build::Successful
       - Build::Fixed
       - Build::Broken
       - Build::RepeatedlyBroken
-      - Build::SynchingWorkingCopy
   DamageControl::Publisher::Growl: 
     hosts: localhost
     enabling_states:
-    - Build::Executing
-    - Build::Successful
-    - Build::Fixed
-    - Build::Broken
-    - Build::RepeatedlyBroken
-    - Build::SynchingWorkingCopy
+      - Build::Requested
+      - Build::SynchingWorkingCopy
+      - Build::Executing
+      - Build::Successful
+      - Build::Fixed
+      - Build::Broken
+      - Build::RepeatedlyBroken
   DamageControl::Publisher::Jabber: 
     id_resource: dcontrol
     friends: ''
     password: dcontrol
   DamageControl::Publisher::X10Cm17A: 
-    successful: a1
-    fixed: a1
-    repeatedly_broken: a2
-    broken: a2
-    executing: a3
+    requested_socket: a3
+    synching_working_copy_socket: a3
+    executing_socket: a3
+    successful_socket: a1
+    fixed_socket: a1
+    repeatedly_broken_socket: a2
+    broken_socket: a2
     enabling_states:
+      - Build::Requested
+      - Build::SynchingWorkingCopy
       - Build::Executing
       - Build::Successful
       - Build::Fixed
