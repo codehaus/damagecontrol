@@ -27,7 +27,7 @@ class ApplicationController < ActionController::Base
   append_before_filter :page_title
   
   def notice(msg)
-    flash[:notice] = msg
+    flash["notice"] = msg
   end
   
 protected

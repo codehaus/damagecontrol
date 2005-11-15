@@ -3,8 +3,9 @@
     "Test #{object.visual_name} with a sample successful build",
     {
       :submit => "project_settings",
+      :url => {:controller => "project", :action => "test_publisher", :params => {:publisher_class_name => object.class.name}},
       :update => "#{object.dom_id}_publisher_test_result",
-      :url => {:controller => "project", :action => "test_publisher", :params => {:publisher_class_name => object.class.name}}
+      :complete => "Effect.Pulsate('#{object.dom_id}_publisher_test_result')"
     }
   ) 
 %>

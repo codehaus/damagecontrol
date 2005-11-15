@@ -13,6 +13,7 @@ class BuildTest < Test::Unit::TestCase
     File.delete build_proof if File.exist?(build_proof)
     
     build = revisions(:revision_1).request_builds(:reason => Build::SCM_POLLED)[0]
+    assert build.id
     assert(!File.exist?(build_proof), "Should not exist: #{build_proof}")
     build.execute!
     assert_equal(Build::Fixed, build.state.class)

@@ -45,28 +45,6 @@
 
     <tr>
       <% if(@project.scm_web.nil?) %>
-        <td><%= file.native_revision_identifier %></td>
-      <% else %>
-        <td>
-          <%= 
-            content_tag(
-              "a", 
-              file.native_revision_identifier, 
-              {
-                :href=> revision_url,
-                :title => case(file.status)
-                  when "ADDED" then added_rev_tip
-                  when "MODIFIED" then modified_rev_tip
-                  when "MOVED" then moved_rev_tip
-                  when "DELETED" then deleted_rev_tip
-                end
-              }
-            )
-          %>
-        </td>
-      <% end %>
-
-      <% if(@project.scm_web.nil?) %>
         <td><%= image_tag(file.icon, :size => "16x16", :title => file.status_description) %></td>
       <% else %>
         <td>
@@ -100,6 +78,28 @@
       <% end %>
 
       <% if(@project.scm_web.nil?) %>
+        <td><%= file.native_revision_identifier %></td>
+      <% else %>
+        <td>
+          <%= 
+            content_tag(
+              "a", 
+              file.native_revision_identifier, 
+              {
+                :href=> revision_url,
+                :title => case(file.status)
+                  when "ADDED" then added_rev_tip
+                  when "MODIFIED" then modified_rev_tip
+                  when "MOVED" then moved_rev_tip
+                  when "DELETED" then deleted_rev_tip
+                end
+              }
+            )
+          %>
+        </td>
+      <% end %>
+
+      <% if(@project.scm_web.nil?) %>
         <td><%= file.path %></td>
       <% else %>
         <td>
@@ -120,10 +120,11 @@
   <% end %>
   <tbody>
 </table>
-<div id="request-build">
+<div id="request-build-<%= @revision.id %>">
   <%= link_to_remote(
   	"Request build(s) for this revision",
   	:url => {:controller => "revision", :action => "request_build", :id => @revision.id},
-  	:update => "request-build"
+  	:update => "request-build-#{@revision.id}",
+    :complete => "Effect.Pulsate('request-build-#{@revision.id}')"
   ) %>
 </div>

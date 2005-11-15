@@ -28,7 +28,7 @@ class Build < ActiveRecord::Base
   serialize :env
   serialize :state
 
-  validates_inclusion_of :reason, :in => [SCM_POLLED, SCM_TRIGGERED, MANUALLY_TRIGGERED, SUCCESSFUL_DEPENDENCY]
+  #validates_inclusion_of :reason, :in => [SCM_POLLED, SCM_TRIGGERED, MANUALLY_TRIGGERED, SUCCESSFUL_DEPENDENCY]
 
   def before_save
     self.create_time = Time.now.utc unless self.create_time
@@ -38,11 +38,18 @@ class Build < ActiveRecord::Base
   end
   
   def stdout_file
-    "#{revision.basedir}/builds/#{id}/stdout.log"
+    log_file("stdout")
   end
 
   def stderr_file
-    "#{revision.basedir}/builds/#{id}/stderr.log"
+    log_file("stderr")
+  end
+  
+  def log_file(name)
+    raise 'id not set' unless id
+    log_dir = "#{revision.basedir}/builds/#{id}"
+    FileUtils.mkdir_p log_dir unless File.exist? log_dir
+    "#{log_dir}/#{name}.log"
   end
   
   # The 'owner' of this build depends on the +reason+ for the build:

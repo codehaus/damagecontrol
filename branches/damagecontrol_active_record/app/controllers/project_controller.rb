@@ -1,6 +1,6 @@
 class ProjectController < ApplicationController
   include MetaProject::ProjectAnalyzer
-  verify :method => :post, :only => %w( import create update destroy test_publisher )
+  verify :method => :post, :only => %w( import create update destroy test_publisher request_scm_poll)
 
   layout "application", :except => [:jnlp]
   before_filter :define_feeds
@@ -46,6 +46,7 @@ class ProjectController < ApplicationController
       import_settings
     )
 
+    project.scm.uses_polling = true
     # Set up some default publishers
     if(DamageControl::Platform.family == 'powerpc-darwin')
       project.add_growl
@@ -74,6 +75,7 @@ class ProjectController < ApplicationController
     redirect_to :action => "edit", :id => project.id
   end
   
+  # Tests a publisher with a dummy build object
   def test_publisher
     project = Project.new(@params[:project])
     populate_from_hash(project, @params)
@@ -81,22 +83,27 @@ class ProjectController < ApplicationController
     publisher_class_name = @params[:publisher_class_name]
     publisher = project.publishers.find{|p| p.class.name == publisher_class_name}
     
+    dummy_revision = Revision.new
+    dummy_revision.project = project
+
     build = Build.new(:state => Build::Successful.new)
+    build.revision = dummy_revision
     
     # TODO: render nothing and figure text with javascript on client (yellow appear effect)
     begin
-      publisher.publish_maybe(build)
+      publisher.publish(build)
       render :text => "Tested #{publisher.visual_name}"
-    rescue
-      render :text => "Failed to test"
+    rescue => e
+      trace = e.backtrace.join("\n")
+      render :text => "Failed to test: #{e.message}<br/><pre>#{trace}</pre>"
     end
   end
 
   def destroy
     project = find
     project.destroy
-    flash["notice"] = "Successfully deleted #{project.name}"
-    redirect_to :action => "index"
+    notice "Successfully deleted #{project.name}"
+    redirect_to :action => "list"
   end
   
   def show

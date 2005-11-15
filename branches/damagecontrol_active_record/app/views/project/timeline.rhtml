@@ -1,4 +1,11 @@
-<div id="timeline">
+<h1><%= @project.name %></h1>
+
+<div class="project-menu">
+  <%= link_to "Edit settings", :action => "edit", :id => @project.id %>
+| <%= link_to "RSS", :controller => "project", :action => "rss", :id => @project.id %>
+</div>
+
+<div class="overview-header">
   <% last_date = nil %>
   <% @revisions.each do |revision| %>
     <% date = revision.timepoint.strftime("%e %b"); if(date != last_date) %>

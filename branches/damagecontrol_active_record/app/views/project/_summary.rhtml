@@ -1,9 +1,8 @@
-<%= link_to project.name, :controller => "project", :action => "show", :id => project.id %>
+<h2><%= link_to project.name, :controller => "project", :action => "timeline", :id => project.id %></h2>
 
 <% if project.latest_build %>
   <%= build_inline_link(project.latest_build) %>
 <% end %>
-<br/>
 <% if(project.latest_revision) %>
   <%= revision_inline_link(project.latest_revision) %>
 <% end %>

@@ -1,4 +1,4 @@
-<div id="projects">
+<div class="overview-header">
   <% @projects.each do |project| %>
     <%= render :partial => "project/summary", :locals => {:project => project} %>
   <% end %>

@@ -60,7 +60,7 @@ module DamageControl
           begin
             publish(build)
           rescue => e
-            logger.error "Failed to publish via #{self.class.name}: #{e.message}"
+            logger.error "Failed to publish via #{self.class.name}: #{e.message}" if logger
           end
         end
       end
