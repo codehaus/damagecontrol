@@ -1,6 +1,6 @@
 class BuildResultMailer < ActionMailer::Base
   def build_result(recipients, from, build)
-    headline = "#{build.revision.project.name}: #{build.state.description} build (#{build.reason_description})"
+    headline = "#{build.revision.project.name}: #{build.state.name} build (#{build.reason_description})"
     
     self.recipients = recipients
     self.from = from

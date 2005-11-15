@@ -28,19 +28,20 @@ module DamageControl
         attr_reader :published
         
         def publish(build)
+
           @published = true
         end
       end
 
       def test_should_publish_if_successful_enabled
-        build = Build.create(:reason => Build::SCM_POLLED, :state => Build::Fixed.new)
+        fixed_build = builds(:build_1)
         
         pub = StubPublisher.new
-        pub.publish_maybe(build)
+        pub.publish_maybe(fixed_build)
         assert(pub.published.nil?)
 
         pub.enabling_states = [Build::Fixed.new]
-        pub.publish_maybe(build)
+        pub.publish_maybe(fixed_build)
         assert(pub.published)
       end
     end

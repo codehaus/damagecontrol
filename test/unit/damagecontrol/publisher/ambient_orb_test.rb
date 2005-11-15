@@ -21,7 +21,7 @@ module DamageControl
           driver = new_mock
           driver.__expect(:id=) {|id| assert_equal("dummy", id)}
           driver.__expect(:color=) {|color| assert_equal(:green, color)}
-          driver.__expect(:animation=) {|animation| assert_equal(:none, animation)}
+          driver.__expect(:animation=) {|animation| assert_equal(:medium, animation)}
           driver.__expect(:update)
           driver
         end

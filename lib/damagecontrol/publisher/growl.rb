@@ -16,12 +16,11 @@ module DamageControl
           g = ::Growl.new(
             host, 
             app, 
-            ::Build::STATES.collect{|state| state.description}
+            ::Build::STATES.collect{|state| state.name}
           )
 
-          message = "#{build.state.description} build\n(#{build.reason_description})"
-          # A bug in Ruby-Growl (or Growl) prevents the message from being sticky (last parameter).
-          g.notify(build.state.description, build.revision.project.name, message, 0, true)
+          message = "#{build.state.name} build\n(#{build.reason_description})"
+          g.notify(build.state.name, build.revision.project.name, message, 0, false)
         end
       end
     end
