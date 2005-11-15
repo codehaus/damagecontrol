@@ -27,15 +27,17 @@ publisher:
   DamageControl::Publisher::Sound: 
     successful_sound: hal_well.wav
     broken_sound: hal_fault.wav
-    executing_sound: hal_moment.wav
+    executing_sound: hal_decision.wav
     repeatedly_broken_sound: hal_error.wav
     fixed_sound: hal_better.wav
+    updating_working_copy_sound: hal_moment.wav
     enabling_states:
       - Build::Executing
       - Build::Successful
       - Build::Fixed
       - Build::Broken
       - Build::RepeatedlyBroken
+      - Build::UpdatingWorkingCopy
   DamageControl::Publisher::Growl: 
     hosts: localhost
     enabling_states:
