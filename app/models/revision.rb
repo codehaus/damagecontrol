@@ -43,12 +43,11 @@ class Revision < ActiveRecord::Base
   end
 
   # Syncs the working copy of the project with this revision.
-  # If +needs_zip+ is true, also creates a zip file.
   def sync_working_copy(needs_zip, zipper = DamageControl::Zipper.new)
     logger.info "Syncing working copy for #{project.name} with revision #{identifier} ..." if logger
     project.scm.checkout(identifier) if project.scm
     logger.info "Done Syncing working copy for #{project.name} with revision #{identifier}" if logger
-    zip(zipper) if needs_zip
+    #zip(zipper) if needs_zip
 
     # Now update the project settings if this revision has a damagecontrol.yml file
     update_project_settings    
@@ -121,7 +120,7 @@ private
     if(File.exist?(damagecontrol_yml_file))
       logger.info "Importing project settings from #{damagecontrol_yml_file}" if logger
       begin
-        project.populate_from_hash(YAML.load_file(damagecontrol_yml_file))
+        project.populate_from_hash(YAML.load_file(damagecontrol_yml_file), nil)
         project.save
       rescue => e
         logger.error e.message if logger

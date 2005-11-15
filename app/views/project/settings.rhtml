@@ -4,6 +4,11 @@ var settings = new Settings("setting-icons");
 
 <% if(@submit_action != "create")  %>
   <h1><%= @project.name %> settings</h1>
+
+  <div class="project-menu">
+    <%= link_to "Timeline", :action => "timeline", :id => @project.id %>
+  </div>
+
   <%= form_tag(:controller => "project", :action => "destroy", :id => @project.id) %>
     <%= submit_tag("Delete #{@project.name}") %>
   </form>

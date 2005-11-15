@@ -33,17 +33,13 @@ class Project < ActiveRecord::Base
       scm.destroy_working_copy if scm
     rescue
     end
-    FileUtils.rm_rf(@basedir) if File.exist?(@basedir)
+    FileUtils.rm_rf(basedir) if File.exist?(basedir)
   end
 
   def after_find
     set_defaults
   end
 
-  def before_save
-    set_defaults    
-  end
-  
   def after_save
     master = BuildExecutor.master_instance
     if(local_build)
@@ -182,15 +178,15 @@ LIMIT #{options[:count]}
   end
 
   def working_copy_dir
-     File.expand_path("#{@basedir}/working_copy")
+     File.expand_path("#{basedir}/working_copy")
   end
 
   def scm_trigger_dir
-     File.expand_path("#{@basedir}/scm_trigger")
+     File.expand_path("#{basedir}/scm_trigger")
   end
 
   def zip_dir
-     mkdir "#{@basedir}/zips"
+     mkdir "#{basedir}/zips"
   end
 
   def build_dir
@@ -349,7 +345,7 @@ LIMIT #{options[:count]}
       k.to_s == "scm_web"
     end
 
-    self.update_attributes(attrs)
+    self.attributes = attrs
 
     self.scm        = hash[:scm].deserialize_to_array.find{|scm| scm.enabled}
     self.tracker    = hash[:tracker].deserialize_to_array.find{|tracker| tracker.enabled}
@@ -372,7 +368,7 @@ LIMIT #{options[:count]}
       end
     end
     
-    update_scm_triggering(controller)
+    update_scm_triggering(controller) if scm
   end
   
   def export_to_hash
@@ -418,11 +414,15 @@ private
   end
 
   def set_defaults
-    @basedir = File.expand_path("#{DC_DATA_DIR}/projects/#{id}")
-    FileUtils.mkdir_p @basedir unless File.exist?(@basedir)
+    FileUtils.mkdir_p basedir unless File.exist?(basedir)
     self.scm.checkout_dir = working_copy_dir if self.scm
     self.scm.enabled = true if self.scm
     self.tracker.enabled = true if self.tracker
+  end
+  
+  def basedir
+    raise "id not set for #{name}" unless id
+    File.expand_path("#{DC_DATA_DIR}/projects/#{id}")
   end
 
   # creates dir if it doesn't exist and returns path to it

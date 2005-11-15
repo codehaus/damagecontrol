@@ -7,8 +7,7 @@ module DamageControl
       attr_accessor :to
       attr_accessor :from # will use gmailer if this is a gmail address
 
-      # SMTP only settings
-      attr_accessor :server # setting this will use smtp
+      attr_accessor :server # setting this will use smtp unless we're using gmail
       attr_accessor :port
       attr_accessor :domain
       attr_accessor :user_name
@@ -21,8 +20,12 @@ module DamageControl
         @from = "\"DamageControl\" <dcontrol@codehaus.org>"
 
         # SMTP only
+        @server = ""
         @port = 25
         @domain = "localhost.localdomain"
+        @user_name = ""
+        @password = ""
+        @authentication = ""
       end
 
       def publish(build)

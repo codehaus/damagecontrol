@@ -38,7 +38,6 @@ class BuildExecutor < ActiveRecord::Base
     build.revision.sync_working_copy(needs_zip)
     build.command = build.revision.project.build_command
     build.env = build.revision.build_environment
-
     if(is_master)
       execute_local(build)
     end
@@ -53,7 +52,6 @@ private
 
     Dir.chdir(build.revision.project.build_dir) do
       begin
-        FileUtils.mkdir_p(File.dirname(build.stdout_file)) unless File.exist?(File.dirname(build.stdout_file))
         redirected_cmd = "#{build.command} > #{build.stdout_file} 2> #{build.stderr_file}"
         logger.info "Executing build for #{build.revision.project.name}'s revision #{build.revision.identifier}: #{redirected_cmd}" if logger
         build.env.each{|k,v| ENV[k]=v}

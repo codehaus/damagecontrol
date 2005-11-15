@@ -30,7 +30,7 @@ Rails::Initializer.run do |config|
   # config.active_record.observers = :cacher, :garbage_collector
 
   raise "The environment variable DC_DATA_DIR must be defined and point to the directory where DamageControl will store data." unless ENV['DC_DATA_DIR']
-  DC_DATA_DIR = ENV['DC_DATA_DIR'] unless defined? DC_DATA_DIR
+  DC_DATA_DIR = File.expand_path(ENV['DC_DATA_DIR']) unless defined? DC_DATA_DIR
   FileUtils.mkdir_p "#{DC_DATA_DIR}/db" unless File.exist?("#{DC_DATA_DIR}/db")
   # config.database_configuration_file = File.join(DC_DATA_DIR, 'config', 'database.yml')
 
