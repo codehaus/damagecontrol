@@ -126,20 +126,8 @@ LIMIT #{options[:count]}
     latest_revision.builds.empty?
   end
   
-  # Indicates that a build has started
-  def build_executing(build)
-    publishers.each do |publisher| 
-      publisher.publish_maybe(build)
-    end
-  end
-  
-  # Indicates that a build is complete (regardless of its successfulness)
-  # Tells each enabled publisher to publish the build
-  # and creates a build request for each dependant project
-  def build_complete(build)
-    logger.info "Build complete for #{name}'s revision #{build.revision.identifier}" if logger
-    logger.info "Successful build: #{build.successful?}" if logger
-
+  # Indicates that a build's state has changed.
+  def build_state_changed(build)
     publishers.each do |publisher| 
       begin
         publisher.publish_maybe(build)
@@ -148,7 +136,14 @@ LIMIT #{options[:count]}
         logger.error(e.backtrace.join("\n"))
       end
     end
-    
+  end
+  
+  # Indicates that a build is complete (regardless of its successfulness)
+  # Requests builds for each dependant project if the build was successful.
+  def build_complete(build)
+    logger.info "Build complete for #{name}'s revision #{build.revision.identifier}" if logger
+    logger.info "Successful build: #{build.successful?}" if logger
+
     # TODO: Make this a post-build task
     if(build.successful?)
       logger.info "Requesting build of dependant projects of #{name}: #{dependants.collect{|p| p.name}.join(',')}" if logger

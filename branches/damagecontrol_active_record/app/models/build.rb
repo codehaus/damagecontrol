@@ -77,6 +77,14 @@ class Build < ActiveRecord::Base
     end
   end
   
+  def state=(state)
+    write_attribute("state", state)
+    unless new_record?
+      save
+      project.build_state_changed(self) if project
+    end
+  end
+
   # The estimated duration of this build, or nil if it cannot be determined.
   def estimated_duration
     lb = project.builds(:exitstatus => 0)[0]

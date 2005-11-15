@@ -70,7 +70,7 @@ class BuildTest < Test::Unit::TestCase
   end
   
   def test_should_save_status_based_on_previous
-    p = Project.create
+    p = Project.create(:publishers => [])
     r = p.revisions.create
     
     now = Time.utc(2000, 1, 1, 1, 1, 1)

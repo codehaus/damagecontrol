@@ -46,16 +46,14 @@ class BuildExecutor < ActiveRecord::Base
 private
 
   def execute_local(build)
-    build.state = ::Build::Executing.new
-    build.begin_time = Time.now.utc
-    build.save
-
     Dir.chdir(build.revision.project.build_dir) do
       begin
         redirected_cmd = "#{build.command} > #{build.stdout_file} 2> #{build.stderr_file}"
         logger.info "Executing build for #{build.revision.project.name}'s revision #{build.revision.identifier}: #{redirected_cmd}" if logger
         build.env.each{|k,v| ENV[k]=v}
-        build.project.build_executing(build)
+        build.state = ::Build::Executing.new
+        build.begin_time = Time.now.utc
+        build.save
 
         `#{redirected_cmd}`
       rescue Errno::ENOENT => e
@@ -67,8 +65,6 @@ private
     build.end_time = Time.now.utc
     build.determine_state
 
-    build.save
-    
     build.project.build_complete(build)
     logger.info "Build of #{build.project.name}'s revision #{build.revision.identifier} complete. Exitstatus: #{build.exitstatus}" if logger
 
