@@ -1,6 +1,6 @@
 name: DamageControl
 home_page: 'http://damagecontrol.codehaus.org/'
-build_command: 'rake'
+build_command: 'rake migrate test_units test_functional'
 relative_build_path: ''
 generated_files:
   - target/*
