@@ -407,6 +407,7 @@ private
   
   def notice(controller, msg)
     if(controller)
+      msg = msg.kind_of?(Array) ? msg.join("<br/>") : msg
       controller.notice msg
     else
       raise msg
