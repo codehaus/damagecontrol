@@ -1,4 +1,4 @@
-#!/usr/local/bin/ruby
+#!/usr/bin/ruby
 
 # This script slurps a Project configuration in YAML from a file or a URL and sets up a new 
 # (or, modifies an existing) DamageControl project. Useful for setting up projects in an 

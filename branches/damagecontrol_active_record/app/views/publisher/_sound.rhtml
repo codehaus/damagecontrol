@@ -8,6 +8,33 @@
   </thead>
   <tbody>
     <tr>
+      <td>Requested</td>
+      <td>
+        <select name="publisher[DamageControl::Publisher::Sound][requested_sound]">
+          <%= options_for_select(DamageControl::Publisher::Sound.files, object.requested_sound) %>
+        </select>
+      </td>
+    </tr>
+
+    <tr>
+      <td>Synching Working Copy</td>
+      <td>
+        <select name="publisher[DamageControl::Publisher::Sound][synching_working_copy_sound]">
+          <%= options_for_select(DamageControl::Publisher::Sound.files, object.synching_working_copy_sound) %>
+        </select>
+      </td>
+    </tr>
+
+    <tr>
+      <td>Executing</td>
+      <td>
+        <select name="publisher[DamageControl::Publisher::Sound][executing_sound]">
+          <%= options_for_select(DamageControl::Publisher::Sound.files, object.executing_sound) %>
+        </select>
+      </td>
+    </tr>
+
+    <tr>
       <td>Successful</td>
       <td>
         <select name="publisher[DamageControl::Publisher::Sound][successful_sound]">
@@ -43,22 +70,5 @@
       </td>
     </tr>
 
-    <tr>
-      <td>Executing</td>
-      <td>
-        <select name="publisher[DamageControl::Publisher::Sound][executing_sound]">
-          <%= options_for_select(DamageControl::Publisher::Sound.files, object.executing_sound) %>
-        </select>
-      </td>
-    </tr>
-
-    <tr>
-      <td>Synching Working Copy</td>
-      <td>
-        <select name="publisher[DamageControl::Publisher::Sound][synching_working_copy_sound]">
-          <%= options_for_select(DamageControl::Publisher::Sound.files, object.synching_working_copy_sound) %>
-        </select>
-      </td>
-    </tr>
   </tbody>
 </table>
