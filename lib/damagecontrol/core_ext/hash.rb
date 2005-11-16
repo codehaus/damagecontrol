@@ -43,7 +43,7 @@ private
       end
 
       setter = "#{attr_name}=".to_sym
-      object.__send__(setter, attr_value)
+      object.__send__(setter, attr_value) rescue nil
     end
     object
   end

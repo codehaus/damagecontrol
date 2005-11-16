@@ -115,11 +115,6 @@ class Build < ActiveRecord::Base
     build_executor.execute(self)
   end
   
-  # The description of the state
-  def state_description
-    state ? state.description : "Unknown"
-  end
-  
   # Number of seconds since the build ended, or nil if it hasn't ended yet
   def seconds_since_end
     end_time ? (Time.now.utc - end_time).to_i : nil

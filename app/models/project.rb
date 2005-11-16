@@ -28,6 +28,8 @@ class Project < ActiveRecord::Base
   serialize :publishers
   serialize :generated_files
 
+  validates_uniqueness_of :name
+
   def before_destroy
     begin
       scm.destroy_working_copy if scm
@@ -378,9 +380,9 @@ private
       # TODO: take base url from a persistent table (globals) and make it work on windows
       trigger_command = "curl http://localhost:3000/project/request_scm_poll/#{self.id}"
 
+      should_be_enabled = scm.uses_polling == false # can be true, false or nil
       begin
         enabled = scm.trigger_installed?(trigger_command, scm_trigger_dir)
-        should_be_enabled = scm.uses_polling == false # can be true, false or nil
       
         if(enabled && !should_be_enabled)
           scm.uninstall_trigger(trigger_command, scm_trigger_dir)
@@ -390,7 +392,7 @@ private
           notice controller, "Successfully installed trigger"
         end
       rescue => e
-        notice controller, "Failed to modify trigger: #{e.message}"
+        notice controller, e.message if should_be_enabled
       end
     end
   end

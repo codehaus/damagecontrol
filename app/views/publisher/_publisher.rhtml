@@ -17,6 +17,18 @@
       <td colspan="2">Build states that will activate <%= object.visual_name %></td>
     </tr>
     <tr>
+      <td>Requested</td>
+      <td><%= enabling_state_tag(object, "Build::Requested") %></td>
+    </tr>
+    <tr>
+      <td>Synching Working Copy</td>
+      <td><%= enabling_state_tag(object, "Build::SynchingWorkingCopy") %></td>
+    </tr>
+    <tr>
+      <td>Executing</td>
+      <td><%= enabling_state_tag(object, "Build::Executing") %></td>
+    </tr>
+    <tr>
       <td>Successful</td>
       <td><%= enabling_state_tag(object, "Build::Successful") %></td>
     </tr>
@@ -31,14 +43,6 @@
     <tr>
       <td>Repeatedly Broken</td>
       <td><%= enabling_state_tag(object, "Build::RepeatedlyBroken") %></td>
-    </tr>
-    <tr>
-      <td>Executing</td>
-      <td><%= enabling_state_tag(object, "Build::Executing") %></td>
-    </tr>
-    <tr>
-      <td>Synching Working Copy</td>
-      <td><%= enabling_state_tag(object, "Build::SynchingWorkingCopy") %></td>
     </tr>
   </table>
 </div>
