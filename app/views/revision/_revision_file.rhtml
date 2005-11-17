@@ -1,0 +1,108 @@
+<%
+  project = revision_file.revision.project
+  full_path = project.scm.scm_web_path(revision_file)
+
+  overview_url = project.scm_web.history(
+    full_path
+  )
+
+  revision_url = project.scm_web.html(
+    full_path, 
+    revision_file.native_revision_identifier
+  )
+
+  diff_url = project.scm_web.diff(
+    full_path, 
+    revision_file.native_revision_identifier,
+    revision_file.previous_native_revision_identifier
+  )
+  
+  # status         revision id            icon                path
+  # ----------------------------------------------------------------------
+  # added          Show new file          Show added rev X    Show history
+  # modified       Show modified file     Show diff           Show history
+  # moved          Show moved file        Show diff           Show history
+  # deleted        Show deleted file      Show deleted rev X  Show history
+
+  added_rev_tip = "Show new file"
+  modified_rev_tip = "Show revision #{revision_file.native_revision_identifier} (modified file)"
+  moved_rev_tip = "Show revision #{revision_file.native_revision_identifier} (moved file)"
+  deleted_rev_tip = "Show revision #{revision_file.native_revision_identifier} (removed file)"
+  diff_tip = "Show diff"
+  history_tip = "Show history"
+%>
+
+  <tr>
+    <% if(project.scm_web.nil?) %>
+      <td><%= image_tag(revision_file.icon, :size => "16x16", :title => revision_file.status_description) %></td>
+    <% else %>
+      <td>
+        <%= 
+          content_tag(
+            "a", 
+            image_tag(
+              revision_file.icon, 
+              {
+                :size => "16x16", 
+                :title => case(revision_file.status)
+                  when "ADDED" then added_rev_tip
+                  when "MODIFIED" then diff_tip
+                  when "MOVED" then diff_tip
+                  when "DELETED" then deleted_rev_tip
+                end,
+                :border=>"0"
+              }
+            ), 
+            {
+              :href => case(revision_file.status)
+                when "ADDED" then revision_url
+                when "MODIFIED" then diff_url
+                when "MOVED" then diff_url
+                when "DELETED" then revision_url
+              end
+            }
+          ) 
+        %>
+      </td>
+    <% end %>
+
+    <% if(project.scm_web.nil?) %>
+      <td><%= revision_file.native_revision_identifier %></td>
+    <% else %>
+      <td>
+        <%= 
+          content_tag(
+            "a", 
+            revision_file.native_revision_identifier, 
+            {
+              :href=> revision_url,
+              :title => case(revision_file.status)
+                when "ADDED" then added_rev_tip
+                when "MODIFIED" then modified_rev_tip
+                when "MOVED" then moved_rev_tip
+                when "DELETED" then deleted_rev_tip
+              end
+            }
+          )
+        %>
+      </td>
+    <% end %>
+
+    <% if(project.scm_web.nil?) %>
+      <td><%= revision_file.path %></td>
+    <% else %>
+      <td>
+        <%= 
+          content_tag(
+            "a", 
+            revision_file.path, 
+            {
+              :href => overview_url,
+              :title => history_tip
+            }
+          ) 
+        %>
+      </td>
+    <% end %>
+
+  </tr>

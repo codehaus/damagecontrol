@@ -1,5 +1,7 @@
 module DamageControl
   
+  # Polls SCMs for new revisions and persists them in the database. Also updates the Ferret
+  # index, which is the backbone for searching.
   class ScmPoller
     include Ferret::Document
 
