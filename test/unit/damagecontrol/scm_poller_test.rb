@@ -36,9 +36,10 @@ module DamageControl
 
       poller = ScmPoller.new
       threads = []
+      n = Project.find(:all).size
       (1..rsc).each do |i|
         threads << Thread.new do
-          p = Project.create(:name => "concurrent_project_#{i}")
+          p = Project.create(:name => "concurrent_project_#{n+i}")
           poller.persist_revisions(p, rscm_revisions)
         end
       end
@@ -48,7 +49,7 @@ module DamageControl
     end
 
     def test_should_use_custom_revision_label_if_specified_for_project
-      p = Project.create(:initial_revision_label => 234)
+      p = Project.create(:name => "toto", :initial_revision_label => 234)
 
       rscm_revision_1 = RSCM::Revision.new
       rscm_revision_2 = RSCM::Revision.new

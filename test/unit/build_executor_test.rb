@@ -10,7 +10,8 @@ class BuildExecutorTest < Test::Unit::TestCase
   end
   
   def test_should_request_builds
-    p = Project.create
+    n = Project.find(:all).size
+    p = Project.create(:name => "p#{n}")
     be = BuildExecutor.create
     r = Revision.create(RSCM::Revision.new)
     p.revisions << r
