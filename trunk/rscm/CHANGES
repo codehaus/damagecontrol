@@ -1,5 +1,11 @@
 = RSCM Changelog
 
+== Version 0.3.14
+
+Improved error messages
+
+* Subversion and CVS now raise detailed instructions on how to install triggers in case of failure.
+
 == Version 0.3.13
 
 Improved trigger support
