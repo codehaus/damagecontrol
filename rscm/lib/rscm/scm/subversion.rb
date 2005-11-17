@@ -11,6 +11,7 @@ module RSCM
   #
   # NOTE: On Cygwin these have to be the win32 builds of svn/svnadmin and not the Cygwin ones.
   class Subversion < Base
+    
     include FileUtils
     include PathConverter
     
@@ -97,7 +98,8 @@ module RSCM
     end
     
     def open(revision_file, &block)
-      Better.popen("svn cat --revision #{revision_file.native_revision_identifier} #{url}/#{revision_file.path}") do |io|
+      cmd = "svn cat #{url}/#{revision_file.path}@#{revision_file.native_revision_identifier}"
+      Better.popen(cmd) do |io|
         return(yield(io))
       end
     end
@@ -242,17 +244,24 @@ module RSCM
         end
         File.chmod(0744, post_commit_file)
       rescue
-        raise "Didn't have permission to write to #{post_commit_file}. " +
-              "Try to manually add the following line:\n\n#{trigger_command}\n\n" +
-              "Finally make it executable with chmod g+x #{post_commit_file}\n\n"
+        raise ["Didn't have permission to write to #{post_commit_file}.",
+              "Try to manually add the following line:",
+              trigger_command,
+              "Finally make it executable with chmod g+x #{post_commit_file}"]
       end
     end
     
     def install_win_trigger(trigger_command, damagecontrol_install_dir)
       post_commit_exists = File.exists?(post_commit_file)
       mode = post_commit_exists ? File::APPEND|File::WRONLY : File::CREAT|File::WRONLY
-      File.open(post_commit_file, mode) do |file|
-        file.puts("#{trigger_command}\n" )
+      begin
+        File.open(post_commit_file, mode) do |file|
+          file.puts("#{trigger_command}\n" )
+        end
+      rescue
+        raise ["Didn't have permission to write to #{post_commit_file}.",
+              "Try to manually add the following line:",
+              trigger_command]
       end
     end
     
@@ -366,7 +375,11 @@ module RSCM
     def post_commit_file
       # We actualy need to use the .cmd when on cygwin. The cygwin svn post-commit
       # hook is hosed. We'll be relying on native windows
-      WINDOWS ? "#{svnrootdir}/hooks/post-commit.cmd" : "#{svnrootdir}/hooks/post-commit"
+      if(local?)
+        WINDOWS ? "#{svnrootdir}/hooks/post-commit.cmd" : "#{svnrootdir}/hooks/post-commit"
+      else
+        raise "The repository is not local. Cannot install or uninstall trigger."
+      end
     end
     
   end

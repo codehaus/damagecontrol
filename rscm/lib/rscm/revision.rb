@@ -142,10 +142,11 @@ module RSCM
       self.message = file.message if file.message
     end
 
-    def [] (file)
-      @files[file]
+    def [] (index)
+      @files[index]
     end
 
+    # Iterates over all the RevisionFile objects
     def each(&block)
       @files.each(&block)
     end
@@ -157,6 +158,7 @@ module RSCM
     def length
       @files.length
     end
+    alias :size :length
 
     def time=(t)
       raise "time must be a Time object - it was a #{t.class.name} with the string value #{t}" unless t.is_a?(Time)
@@ -188,12 +190,6 @@ module RSCM
         result << " " << file.to_s << "\n"
       end
       result
-    end
-    
-    # Returns the identifier of the revision. This is the revision 
-    # (if defined) or an UTC time if it is not natively supported by the scm.
-    def identifierAA
-      @identifier || @time
     end
     
   end

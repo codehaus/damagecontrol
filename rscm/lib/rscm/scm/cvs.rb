@@ -121,25 +121,6 @@ module RSCM
       "CVSROOT/loginfo"
     end
     
-    def install_trigger(trigger_command, trigger_files_checkout_dir)
-      raise "mod can't be null or empty" if (mod.nil? || mod == "")
-
-      root_cvs = create_root_cvs(trigger_files_checkout_dir)
-      root_cvs.checkout
-      with_working_dir(trigger_files_checkout_dir) do
-        trigger_line = "#{mod} #{trigger_command}\n"
-        File.open("loginfo", File::WRONLY | File::APPEND) do |file|
-          file.puts(trigger_line)
-        end
-        begin
-          root_cvs.commit("Installed trigger for CVS module '#{mod}'")
-        rescue
-          raise "Couldn't commit the trigger back to CVS. Try to manually check out CVSROOT/loginfo, " +
-          "add the following line and commit it back:\n\n#{trigger_line}"
-        end
-      end
-    end
-    
     def trigger_installed?(trigger_command, trigger_files_checkout_dir)
       loginfo_line = "#{mod} #{trigger_command}"
       regex = Regexp.new(Regexp.escape(loginfo_line))
@@ -164,6 +145,27 @@ module RSCM
       end
     end
 
+    def install_trigger(trigger_command, trigger_files_checkout_dir)
+      raise "mod can't be null or empty" if (mod.nil? || mod == "")
+
+      root_cvs = create_root_cvs(trigger_files_checkout_dir)
+      root_cvs.checkout
+      with_working_dir(trigger_files_checkout_dir) do
+        trigger_line = "#{mod} #{trigger_command}\n"
+        File.open("loginfo", File::WRONLY | File::APPEND) do |file|
+          file.puts(trigger_line)
+        end
+        begin
+          root_cvs.commit("Installed trigger for CVS module '#{mod}'")
+        rescue
+          raise ["Didn't have permission to commit CVSROOT/loginfo.",
+                "Try to manually add the following line:",
+                trigger_command,
+                "Finally make commit the file to the repository"]
+        end
+      end
+    end
+    
     def uninstall_trigger(trigger_command, trigger_files_checkout_dir)
       loginfo_line = "#{mod} #{trigger_command}"
       regex = Regexp.new(Regexp.escape(loginfo_line))
