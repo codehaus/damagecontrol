@@ -7,12 +7,8 @@ class RevisionController < ApplicationController
 
   def show
     @revision = Revision.find(@params[:id])
+    @revision_files = @revision.revision_files
 
-    # first rendering of revision list
-    @project = @revision.project
-    @revisions = @revision.project.revisions
-    @template_for_left_column = "revision/list"
-    
     @revision_message = @revision.message
   end
 
