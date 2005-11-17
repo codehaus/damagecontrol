@@ -1,0 +1,10 @@
+<%= start_form_tag({:controller => 'search',  :action => 'query'}, {:method => 'get', :id => 'sform'}) %>
+ <label for="q">Search:</label><input type="text" id="q" name="q" value="" size="15" />
+<%= image_tag "spinner.gif", :id => 'search_spinner', :style => 'display:none;' %>
+<%= end_form_tag %>
+<%= observe_field "q", :frequency => 1, 
+    :url => { :controller => "search", :action => "query" }, 
+    :loading => "Element.show('search_spinner')",
+    :complete => "Element.hide('search_spinner')",
+    :update => "search-results",
+    :with => "'q=' + escape($F('q'))" -%>

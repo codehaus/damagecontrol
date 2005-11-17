@@ -6,6 +6,9 @@ module DamageControl
 
     cattr_accessor :logger
     
+    # Create the index
+    FerretConfig::get_index(:create_if_missing => true)
+    
     def initialize(scm_poller)
       @scm_poller = scm_poller
     end

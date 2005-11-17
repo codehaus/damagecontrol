@@ -52,8 +52,9 @@ module DamageControl
       scm.uses_polling = true
 
       copy_command = Platform.family == "mswin32" ? "copy" : "cp"
+      n = Project.find(:all).size
       project = Project.create(
-        :name => "Test", 
+        :name => "Test#{n}", 
         :scm => scm, 
         :publishers => [archiver], 
         :build_command => "#{copy_command} input.txt result.txt",

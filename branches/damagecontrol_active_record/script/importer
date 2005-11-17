@@ -26,6 +26,7 @@ begin
     else
       STDOUT.write "Creating new project "
       project = Project.create(project_hash[:id])
+      raise "There is already a project named #{project.name}" unless project.id
     end
     project.populate_from_hash(project_hash, nil)
     puts "'#{project.name}'"

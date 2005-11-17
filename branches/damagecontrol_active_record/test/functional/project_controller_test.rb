@@ -15,7 +15,8 @@ class ProjectControllerTest < Test::Unit::TestCase
   end
 
   def test_should_save_plugins_on_update
-    project = Project.create
+    n = Project.find(:all).size
+    project = Project.create(:name => "p#{n}")
     post :update, 
       :id => project.id,
       :project => {

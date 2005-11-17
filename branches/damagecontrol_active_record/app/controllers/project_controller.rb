@@ -63,8 +63,12 @@ class ProjectController < ApplicationController
 
   def create
     project = Project.create(@params[:project])
-    populate_from_hash(project, @params)
-    project.save
+    if(project.id)
+      populate_from_hash(project, @params)
+      project.save
+    else
+      notice "There is already a project named #{project.name}"
+    end
     redirect_to :action => "edit", :id => project.id
   end
 

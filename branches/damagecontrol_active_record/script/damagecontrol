@@ -2,7 +2,7 @@
 
 # This is the main bootstrapping script for DamageControl. It forks off zero or more builders
 # (builders are headless daemons that get code from scm and build code) and zero or one server
-# (server is the standard Rails script to start the webapp in WEBrick)
+# (server is the standard Rails script to start the webapp in web server)
 
 require 'optparse'
 require 'webrick'
@@ -16,7 +16,7 @@ DC_OPTIONS = {
   :data_dir        => SHELL_DIR,
   :builders        => 1,
   :no_webrick      => false,
-  # Rails/WEBrick
+  # Rails/web server
   :port            => 3000,
   :ip              => "0.0.0.0",
   :environment     => defined?(RUBYSCRIPT2EXE_APPEXE) ? "production" : "development",
@@ -60,7 +60,7 @@ ARGV.options do |opts|
     # since it unpacks to an arbitrary temp dir and can't be server from
     # a "real" webserver.
     opts.on("--no-webrick",
-            "Don't start the webapp with WEBrick (specify this parameter for Apache/Lighttpd deployments)",
+            "Don't start the webapp with web server (specify this parameter for Apache/Lighttpd deployments)",
             "Default: #{DC_OPTIONS[:no_webrick]}") { |DC_OPTIONS[:no_webrick]| }
   end
 
@@ -72,13 +72,13 @@ ARGV.options do |opts|
     exit
   end
 
-  ################## Rails/WEBrick options (subset of opts in server script) ##################
+  ################## Rails/web server options (subset of opts in server script) ##################
 
   opts.on("-p", "--port=port", Integer,
-          "Runs WEBrick on the specified port.",
+          "Runs web server on the specified port.",
           "Default: 3000") { |DC_OPTIONS[:port]| }
   opts.on("-b", "--binding=ip", String,
-          "Binds WEBrick to the specified ip.",
+          "Binds web server to the specified ip.",
           "Default: 0.0.0.0") { |DC_OPTIONS[:ip]| }
   opts.on("-e", "--environment=name", String,
           "Specifies the environment to run this server under (test/development/production).",
@@ -148,7 +148,7 @@ else
       load(File.dirname(__FILE__) + '/server')
     end
     at_exit do 
-      puts "Killing WEBrick [#{server_pid}]"
+      puts "Killing web server [#{server_pid}]"
       Process.kill("HUP", server_pid)
     end
     Process.wait(server_pid)

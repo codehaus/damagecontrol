@@ -35,8 +35,9 @@ class Revision < ActiveRecord::Base
   def self.create(rscm_revision)
     revision = super(rscm_revision)
 
-    rscm_revision.each do |rscm_file|
-      revision.revision_files.create(rscm_file)
+    rscm_revision.each do |rscm_revision_file|
+      revision_file = revision.revision_files.create(rscm_revision_file)
+      rscm_revision_file.id = revision_file.id
     end
     
     revision
@@ -133,6 +134,8 @@ end
 # Adaptation to make it possible to create an AR Revision
 # from an RSCM one
 class RSCM::Revision
+  # Temporary attributes used while persisting and indexing
+  attr_accessor :id
   attr_accessor :project_id
   attr_accessor :position
   

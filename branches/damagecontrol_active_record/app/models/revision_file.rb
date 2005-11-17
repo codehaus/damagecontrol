@@ -33,13 +33,14 @@ end
 # Adaptation to make it possible to create an AR RevisionFile
 # from an RSCM one
 class RSCM::RevisionFile
+  # Temporary attributes used while persisting and indexing
+  attr_accessor :id
   attr_accessor :revision_id
   
   def stringify_keys!
   end
   
   def reject
-    # we could have used reflection, but this is just as easy!
     {
       "revision_id" => revision_id,
       "status" => status,
