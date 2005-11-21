@@ -77,7 +77,7 @@ class RevisionTest < Test::Unit::TestCase
 #      assert_equal [], exclude_patterns
 #    end
     
-    revisions(:revision_1).sync_working_copy(true, zipper)
+    revisions(:revision_1).sync_working_copy!(true, zipper)
   end
   
   def test_should_persist_identifier_as_time

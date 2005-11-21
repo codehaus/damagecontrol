@@ -1,12 +1,3 @@
-desc "Delete files generated during test"
-task :clean_target_unless_production do
-  FileUtils.rm_rf 'target' unless RAILS_ENV == 'production'
-end
-
-task :clone_structure_to_test => [:clean_target_unless_production]
-task :migrate => [:clean_target_unless_production]
-task :db_structure_dump => [:migrate, :environment]
-
 # Support Tasks ------------------------------------------------------
 
 def egrep(pattern)

@@ -26,6 +26,16 @@ class ProjectTest < Test::Unit::TestCase
   def test_should_have_build_executors
     assert_equal([build_executors(:slave_1), build_executors(:slave_2)], projects(:slave_project).build_executors)
   end
+  
+  def test_should_destroy_revisions_and_files
+    assert_equal 6, Revision.find(:all, true).size
+    assert_equal 6, RevisionFile.find(:all, true).size
+
+    projects(:project_1).destroy
+
+    assert_equal 3, Revision.find(:all, true).size
+    assert_equal 4, RevisionFile.find(:all, true).size
+  end
 
   def test_should_persist_scm
     cvs = RSCM::Cvs.new("a_root", "a_mod", "a_branch", "a_password")

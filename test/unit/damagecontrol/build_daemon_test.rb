@@ -4,12 +4,6 @@ require 'stringio'
 module DamageControl  
   class BuildDaemonTest < Test::Unit::TestCase
 
-    def cleanup
-      Project.delete_all
-      Revision.delete_all
-      Build.delete_all
-    end
-    
     def new_dir(dir)
       dir = File.expand_path(dir)
       FileUtils.rm_r(dir) if File.exist?(dir)
@@ -18,12 +12,12 @@ module DamageControl
     end
     
     def central_repo
-      @repo_dir = new_dir(RAILS_ROOT + "/target/integration/daemon/central") unless @repo_dir
+      @repo_dir = new_dir("#{DC_DATA_DIR}/integration/daemon/central") unless @repo_dir
       @repo_dir
     end
 
     def checkout_dir
-      @checkout_dir = new_dir(RAILS_ROOT + "/target/integration/daemon/local") unless @checkout_dir
+      @checkout_dir = new_dir("#{DC_DATA_DIR}/target/integration/daemon/local") unless @checkout_dir
       @checkout_dir
     end
     
@@ -34,7 +28,8 @@ module DamageControl
     end
 
     def test_should_execute_build_when_change_committed
-      cleanup
+      Project.destroy_all
+      
       log = StringIO.new
       
       BuildDaemon.logger = Logger.new(log)
@@ -83,7 +78,6 @@ module DamageControl
       
       # this should execute a build
       daemon.handle_all_projects_once
-
       log.rewind
       #puts log.read
 
