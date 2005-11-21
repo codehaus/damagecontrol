@@ -125,8 +125,7 @@ class Build < ActiveRecord::Base
     project.builds(:before => create_time)[0]
   end
 
-  # :nodoc:
-  def determine_state
+  def determine_state #:nodoc:
     prev = previous
     prev_state = prev ? (prev.state ? prev.state : Successful.new) : Successful.new
     self.state = prev_state.send(successful? ? :succeed : :fail)

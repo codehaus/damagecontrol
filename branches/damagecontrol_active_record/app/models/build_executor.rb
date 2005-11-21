@@ -5,9 +5,9 @@ class BuildExecutor < ActiveRecord::Base
   # The sole master instance
   def self.master_instance
     begin
-      @local ||= find(1) 
+      @@local ||= find(1) 
     rescue ActiveRecord::RecordNotFound => e
-      @local = create(:id => 1, :is_master => true, :description => "Master build executor")
+      @@local = create(:id => 1, :is_master => true, :description => "Master build executor")
     end
   end
   
@@ -35,7 +35,7 @@ class BuildExecutor < ActiveRecord::Base
     build.save
     
     needs_zip = is_master
-    build.revision.sync_working_copy(needs_zip)
+    build.revision.sync_working_copy!(needs_zip)
     build.command = build.revision.project.build_command
     build.env = build.revision.build_environment
     if(is_master)

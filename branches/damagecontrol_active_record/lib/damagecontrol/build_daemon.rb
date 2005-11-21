@@ -6,9 +6,6 @@ module DamageControl
 
     cattr_accessor :logger
     
-    # Create the index
-    FerretConfig::get_index(:create_if_missing => true)
-    
     def initialize(scm_poller)
       @scm_poller = scm_poller
     end
@@ -35,7 +32,7 @@ module DamageControl
         logger.info "No projects in the database" if logger
         return
       end
-      
+
       projects.each do |project|
         begin
           project.reload

@@ -3,16 +3,56 @@ class Revision < ActiveRecord::Base
   has_many :revision_files, :dependent => true
   has_many :builds, :order => "create_time", :dependent => true
 
-  # identifier can be String, Numeric or Time (depending on the SCM), so we YAML it to the database to preserve type info.
-  # We have to fool AR to do this by wrapping it in an array - serialize doesn't seem to work when the types differ.
+  # Creates a new persistent Revision from a RSCM::Revision
+  def self.create(rscm_revision)
+    revision = super(rscm_revision)
+
+    rscm_revision.each do |rscm_revision_file|
+      revision.revision_files.create(rscm_revision_file)
+    end
+    
+    revision
+  end
+
+  # Updates the Ferret index with file contents
+  def self.index!(revisions)
+    FileUtils.mkdir_p RevisionFile::INDEX_DIR unless File.exist? RevisionFile::INDEX_DIR
+    persistent_index = Ferret::Index::Index.new(:path => RevisionFile::INDEX_DIR, :create_if_missing => true)
+
+    revisions.each do |revision|
+      persistent_index.add_indexes(revision.index)
+    end
+    persistent_index.close
+
+    logger.info "Indexing done" if logger
+  end
+  
+  # Returns an array of Ferret indexes, indexed with the contents of
+  # all our revision_files (except the ones that are DELETED).
+  def index
+    puts "Indexing revision #{id} with #{revision_files.length} files"
+    memory_indexes = []
+    revision_files.each do |revision_file|
+      unless revision_file.status == RSCM::RevisionFile::DELETED
+        memory_indexes << revision_file.index
+      end
+    end
+    memory_indexes
+  end
+
+  # Sets the identifier
   def identifier=(i)
+    # identifier can be String, Numeric or Time (depending on the SCM), so we YAML it to the database to preserve type info.
+    # We have to fool AR to do this by wrapping it in an array - serialize doesn't seem to work when the types differ.
     self[:identifier] = YAML::dump([i])
   end
 
+  # Gets the identifier
   def identifier
      (YAML::load(self[:identifier]))[0]
   end
   
+  # Base directory for filesystem data
   def basedir
     "#{project.basedir}/revision/#{id}"
   end
@@ -32,19 +72,8 @@ class Revision < ActiveRecord::Base
     end
   end
   
-  def self.create(rscm_revision)
-    revision = super(rscm_revision)
-
-    rscm_revision.each do |rscm_revision_file|
-      revision_file = revision.revision_files.create(rscm_revision_file)
-      rscm_revision_file.id = revision_file.id
-    end
-    
-    revision
-  end
-
   # Syncs the working copy of the project with this revision.
-  def sync_working_copy(needs_zip, zipper = DamageControl::Zipper.new)
+  def sync_working_copy!(needs_zip, zipper = DamageControl::Zipper.new)
     logger.info "Syncing working copy for #{project.name} with revision #{identifier} ..." if logger
     project.scm.checkout(identifier) if project.scm
     logger.info "Done Syncing working copy for #{project.name} with revision #{identifier}" if logger
@@ -134,8 +163,6 @@ end
 # Adaptation to make it possible to create an AR Revision
 # from an RSCM one
 class RSCM::Revision
-  # Temporary attributes used while persisting and indexing
-  attr_accessor :id
   attr_accessor :project_id
   attr_accessor :position
   
