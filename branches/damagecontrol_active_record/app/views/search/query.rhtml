@@ -1,5 +1,5 @@
 <% if !@search.to_s.blank? -%>
-  <h3>Searched for <em>"<%=h @search %>"</em></h3>
+  <h3>Searched for <em>"<%=h @query %>"</em></h3>
   <ul>
   <% @results.each do |result| %>
     <li><a href="#"><%= result["path"] %></a></li>

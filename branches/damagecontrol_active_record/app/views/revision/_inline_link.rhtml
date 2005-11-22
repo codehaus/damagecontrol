@@ -1,7 +1,7 @@
 <div>
   <% revision_detail_id = "revision_#{revision.id}_detail" %>
   <%= revision.timepoint.strftime("%H:%M") %>
-  <%= toggle_link_to_remote(image_tag("document_edit", :size=>"16x16") + " #{revision.label}", revision_detail_id, "revision", "show", revision.id) %>
+  <%= toggle_link_to_remote(image_tag("documents", :size=>"16x16") + " #{revision.label}", revision_detail_id, "revision", "show", revision.id) %>
   (<%= revision.developer %>)
 </div>
 <div id="revision_<%= revision.id %>_detail"></div>

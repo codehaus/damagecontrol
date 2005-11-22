@@ -8,6 +8,8 @@ desc "Creates a demo project in DamageControl"
 task :create_demo_project => [:migrate, :create_demo_cvs, :import_demo] do
   p = Project.find_by_name("demo")
   p.destroy if p
+
+  cvs.uses_polling = true
   Project.create(
     :name => "demo",
     :build_command => "rake",
