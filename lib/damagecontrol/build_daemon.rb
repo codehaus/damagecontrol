@@ -12,16 +12,16 @@ module DamageControl
     
     def run
       at_exit do
-        logger.info "=> DamageControl builder exiting"
+        logger.info "=> DamageControl builder exiting" if logger
       end
       begin
-        logger.info "=> DamageControl builder started"
+        logger.info "=> DamageControl builder started" if logger
         loop do
           handle_all_projects_once
           sleep CYCLE_PAUSE
         end
       rescue SignalException => e
-        logger.info "=> DamageControl builder received signal to shut down"
+        logger.info "=> DamageControl builder received signal to shut down" if logger
         exit!(1)
       end
     end

@@ -30,7 +30,6 @@ class Revision < ActiveRecord::Base
   # Returns an array of Ferret indexes, indexed with the contents of
   # all our revision_files (except the ones that are DELETED).
   def index
-    puts "Indexing revision #{id} with #{revision_files.length} files"
     memory_indexes = []
     revision_files.each do |revision_file|
       unless revision_file.status == RSCM::RevisionFile::DELETED

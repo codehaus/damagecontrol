@@ -3,7 +3,6 @@
 class Project < ActiveRecord::Base
   
   include DamageControl::Dom
-  attr_reader :basedir
 
   has_many :poll_requests, :dependent => true
   has_many :revisions, :order => "timepoint DESC", :dependent => true

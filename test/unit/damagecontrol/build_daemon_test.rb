@@ -4,29 +4,6 @@ require 'stringio'
 module DamageControl  
   class BuildDaemonTest < Test::Unit::TestCase
 
-    def new_dir(dir)
-      dir = File.expand_path(dir)
-      FileUtils.rm_r(dir) if File.exist?(dir)
-      FileUtils.mkdir_p(dir)
-      dir
-    end
-    
-    def central_repo
-      @repo_dir = new_dir("#{DC_DATA_DIR}/integration/daemon/central") unless @repo_dir
-      @repo_dir
-    end
-
-    def checkout_dir
-      @checkout_dir = new_dir("#{DC_DATA_DIR}/target/integration/daemon/local") unless @checkout_dir
-      @checkout_dir
-    end
-    
-    def create_file(file, content)
-      File.open(file, "w") do |io|
-        io.write(content)
-      end
-    end
-
     def test_should_execute_build_when_change_committed
       Project.destroy_all
       
@@ -92,5 +69,28 @@ module DamageControl
       assert_equal("This is a test", File.open(Artifact::ARTIFACT_DIR + "/results/result.txt").read)
     end
 
+  private
+
+    def new_dir(dir)
+      FileUtils.rm_r(dir) if File.exist?(dir)
+      FileUtils.mkdir_p(dir)
+      dir
+    end
+  
+    def central_repo
+      @repo_dir = new_dir("#{DC_DATA_DIR}/integration/daemon/central") unless @repo_dir
+      @repo_dir
+    end
+
+    def checkout_dir
+      @checkout_dir = new_dir("#{DC_DATA_DIR}/target/integration/daemon/local") unless @checkout_dir
+      @checkout_dir
+    end
+  
+    def create_file(file, content)
+      File.open(file, "w") do |io|
+        io.write(content)
+      end
+    end
   end
 end

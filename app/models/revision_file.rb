@@ -1,4 +1,9 @@
+require 'set'
+
 class RevisionFile < ActiveRecord::Base
+  INDEX_DIR = "#{DC_DATA_DIR}/index/revision_files" unless defined? INDEX_DIR
+  DATA_INDEX_FIELD = "data" unless defined? DATA_INDEX_FIELD
+
   include Ferret::Document
 
   belongs_to :revision
@@ -31,10 +36,20 @@ class RevisionFile < ActiveRecord::Base
     result
   end
   
+  def self.find_by_path_or_contents(query)
+    by_path = self.find(:all, :conditions => ["path LIKE ?", "%#{query}"])
+    by_contents = self.find_by_contents(query)
+    result = Set.new
+    result += by_path
+    result += by_contents
+    result.to_a
+  end
+  
   # Returns a Ferret index indexed with the contents of this file.
   # Invoking this method will open a connection to the SCM and may
   # be somewhat time consuming.
   def index
+    raise "Already indexed" if self.indexed
     logger.info "#{revision.project.name}: Indexing #{path}@#{native_revision_identifier}" if logger
     # extension = File.extname(revision_file.path)
     # memory_index = Ferret::Index::Index.new(:analyzer => SourceCodeAnalyzer.new(extension))
@@ -49,6 +64,8 @@ class RevisionFile < ActiveRecord::Base
       file_doc << Field.new("project_id", revision.project.id, Field::Store::YES, Field::Index::UNTOKENIZED)
     end
     memory_index << file_doc
+    self.indexed = true
+    save
     memory_index
   end
 
@@ -72,9 +89,6 @@ class RevisionFile < ActiveRecord::Base
     RSCM::RevisionFile::MODIFIED => "Modified file",
     RSCM::RevisionFile::MOVED => "Moved file"
   } unless defined? DESCRIPTIONS
-
-  INDEX_DIR = "#{DC_DATA_DIR}/index/revision_files"
-  DATA_INDEX_FIELD = "data"
 
   def icon
     ICONS[status]

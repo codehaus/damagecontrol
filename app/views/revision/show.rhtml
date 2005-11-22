@@ -11,11 +11,5 @@
   ) %>
 </div>
 
-<table>
-  <thead>
-    <%= render :partial => "revision_file_header" %>
-  </thead>
-  <tbody>
-    <%= render :partial => "revision_file", :collection => @revision_files %>
-  <tbody>
-</table>
+<%= render :partial => "revision_file/header" %>
+<%= render :partial => "revision_file/overview", :collection => @revision_files %>

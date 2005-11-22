@@ -5,8 +5,8 @@ module Test #:nodoc:
   module Unit #:nodoc:
     class TestCase #:nodoc:
       def setup_with_file_wiper
-        FileUtils.rm_rf '#{DC_DATA_DIR}/projects'
-        FileUtils.rm_rf '#{DC_DATA_DIR}/index'
+        FileUtils.rm_rf "#{DC_DATA_DIR}/projects"
+        FileUtils.rm_rf "#{DC_DATA_DIR}/index"
       end
       alias_method :setup, :setup_with_file_wiper 
          
