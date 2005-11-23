@@ -212,6 +212,11 @@ module RSCM
     def ls(relative_path)
       raise NotImplementedError
     end
+    
+    # Opens a revision_file
+    def open(revision_file, &block) #:yield: io
+      raise NotImplementedError
+    end
 
     # Whether the working copy is in synch with the central
     # repository's revision/time identified by +identifier+. 

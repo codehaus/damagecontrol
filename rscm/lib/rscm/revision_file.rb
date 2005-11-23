@@ -37,7 +37,7 @@ module RSCM
     
     # Returns/yields an IO containing the contents of this file, using the +scm+ this
     # file lives in.
-    def open(scm, &block)
+    def open(scm, &block) #:yield: io
       scm.open(self, &block)
     end
     

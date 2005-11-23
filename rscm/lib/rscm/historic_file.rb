@@ -4,6 +4,7 @@ module RSCM
     attr_reader :relative_path
     
     def initialize(relative_path, directory, scm)
+      raise "Not a String: '#{relative_path}' (#{relative_path.class.name})" unless relative_path.is_a? String
       @relative_path, @directory, @scm = relative_path, directory, scm
     end
     
@@ -18,8 +19,8 @@ module RSCM
           files_s = revision.files.collect{|f| f.to_s}.join("\n")
           raise "The file-specific revision didn't have exactly one file, but #{revision.files.length}:\n#{files_s}"
         end
-        if(revision.files[0].path != @relative_path)
-          raise "The file-specific revision didn't have expected path #{@relative_path}, but #{revision.files[0].path}"
+        if(!revision.files[0].path.eql?(@relative_path))
+          raise "The file-specific revision didn't have expected path '#{@relative_path}', but '#{revision.files[0].path}'"
         end
         revision.files[0]
       end
