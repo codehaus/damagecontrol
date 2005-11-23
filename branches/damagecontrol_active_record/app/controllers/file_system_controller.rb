@@ -1,5 +1,7 @@
 require 'mime/types' # http://rubyforge.org/projects/mime-types/
 
+# DEPRECATED. Will be superceded by RSCM controller
+
 class FileSystemController < ApplicationController
 
   def browse
