@@ -40,6 +40,7 @@ module RSCM
     # 16) Verify that OtherWorkingCopy is now uptodate
     # 17) Add and commit a file in WorkingCopy
     # 18) Verify that the revision (since last revision) for CheckoutHereToo contains only one file
+    # 19) Get directory listings
     def test_basics
       work_dir = RSCM.new_temp_dir("basics")
       checkout_dir = "#{work_dir}/WorkingCopy"
@@ -152,8 +153,17 @@ module RSCM
       assert_equal("src/java/com/thoughtworks/damagecontrolled/Hello.txt", revisions[0][0].path)
       
       # 19
-      #root_children = scm.file("").children
-      #assert_equal "build.xml", root_children[0].relative_path
+      root_children = scm.rootdir.children
+      assert_equal "build.xml", root_children[0].relative_path
+      assert !root_children[0].directory?
+      assert_equal "project.xml", root_children[1].relative_path
+      assert !root_children[1].directory?
+      assert_equal "src", root_children[2].relative_path
+      assert root_children[2].directory?
+
+      src_children = root_children[2].children
+      assert_equal "src/java", src_children[0].relative_path
+      assert src_children[0].directory?
     end
 
     def test_create_destroy
@@ -317,7 +327,7 @@ EOF
       assert(got_diff)
       
       # TODO: make separate test. Make helper method for the cumbersome setup!
-      historic_afile = scm.file("afile.txt")
+      historic_afile = scm.file("afile.txt", false)
       revision_files = historic_afile.revision_files
       assert_equal(Array, revision_files.class)
       assert(revision_files.length >= 2)

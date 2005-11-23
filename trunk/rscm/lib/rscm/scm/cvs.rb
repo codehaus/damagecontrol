@@ -114,10 +114,25 @@ module RSCM
     end
     
     def ls(relative_path)
+      prefix = relative_path == "" ? relative_path : "#{relative_path}/"
       with_working_dir(@checkout_dir) do
-        cmd = "cvs -Q ls #{relative_path}"
+        cmd = "cvs -Q ls -l #{relative_path}"
         Better.popen(cmd) do |io|
-          puts io.read
+          parse_ls_log(io, prefix)
+        end
+      end
+    end
+    
+    def parse_ls_log(io, prefix) #:nodoc:
+      io.collect do |line|
+        line.strip!
+        if(
+          (line =~ /(d)... \d\d\d\d\-\d\d\-\d\d \d\d:\d\d:\d\d \-\d\d\d\d (.*)/) ||
+          (line =~ /(.)... \d\d\d\d\-\d\d\-\d\d \d\d:\d\d:\d\d \-\d\d\d\d \d[\.\d]+ (.*)/) 
+        )
+          directory = $1 == "d"
+          name = $2.strip
+          HistoricFile.new("#{prefix}#{name}", directory, self)
         end
       end
     end

@@ -104,6 +104,22 @@ module RSCM
       end
     end
 
+    def ls(relative_path)
+      prefix = relative_path == "" ? relative_path : "#{relative_path}/"
+      cmd = "svn ls #{url}/#{relative_path}"
+      Better.popen(cmd) do |io|
+        io.collect do |line|
+          name = line.strip
+          dir = false
+          if(name =~ /(.*)\/$/)
+            name = $1
+            dir = true
+          end
+          HistoricFile.new("#{prefix}#{name}", dir, self)
+        end
+      end
+    end
+
     def can_create_central?
       local?
     end
