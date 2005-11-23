@@ -46,6 +46,7 @@ Rails::Initializer.run do |config|
   config.active_record.schema_format = :ruby
 
   # See Rails::Configuration for more options
+  config.controller_paths << File.join(RAILS_ROOT, 'vendor', 'plugins', 'rscm_browser', 'controllers')
 end
 
 # Add new inflection rules using the following format 

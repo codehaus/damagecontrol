@@ -1,0 +1,7 @@
+<% @history_files.each do |history_file| %>
+  <% if(history_file) 
+      url = url_for(:action => (history_file.directory? ? "browse" : "view_file"), :id => @id, :trailing_slash => true) + history_file.relative_path
+  %>
+  <a href="<%= url %>"><%= history_file.relative_path %></a><br/>
+  <% end %>
+<% end %>

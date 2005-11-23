@@ -1,0 +1,14 @@
+== RSCM Browser ==
+
+RSCM Browser is a Ruby on Rails plugin that adds a browser interface to your rails app.
+
+=== Installation ===
+
+First, you must put the rscm_browser directory under your app's vendor/plugin directory.
+If your project is under Subversion, you can use svn:externals to do this (TODO: describe how)
+Otherwise, you can just copy the file structure manually.
+
+Second, you must add the following line to your config/environment.rb file so that Rails can
+find the RSCM Browser controller:
+
+  config.controller_paths << File.join(RAILS_ROOT, 'vendor', 'plugins', 'rscm_browser', 'controllers')
