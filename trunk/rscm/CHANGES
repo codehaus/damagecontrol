@@ -1,5 +1,12 @@
 = RSCM Changelog
 
+== Version 0.3.16
+
+Bugfix release
+
+* Added some minor checks for file history
+* Documented Base.open
+
 == Version 0.3.15
 
 This release adds support for directory listings and fixes some incompatibilities with CVS 1.12.x
