@@ -1,10 +1,14 @@
 module RSCM
-  # Represents the full history of a single file
+  # Represents the full history of a single file or directory.
   class HistoricFile
     attr_reader :relative_path
     
-    def initialize(relative_path, scm)
-      @relative_path, @scm = relative_path, scm
+    def initialize(relative_path, directory, scm)
+      @relative_path, @directory, @scm = relative_path, directory, scm
+    end
+    
+    def directory?
+      @directory
     end
     
     # Returns an Array of RevisionFile - from Time.epoch until Time.infinity (now)
@@ -21,8 +25,8 @@ module RSCM
       end
     end
     
-    # TODO: Pathname - like interface for finding BOTH sub dirs and files (hard)
     def children
+      raise "Not a directory" unless directory?
       @scm.ls(@relative_path)
     end
   end

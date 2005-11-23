@@ -2,6 +2,9 @@
 
 == Version 0.3.15
 
+This release adds support for directory listings and fixes some incompatibilities with CVS 1.12.x
+
+* Added support for directory listings.
 * Added support for parsing of revisions for CVS 1.12.x, which uses a slightly different time format.
 
 == Version 0.3.14

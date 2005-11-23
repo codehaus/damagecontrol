@@ -198,9 +198,14 @@ module RSCM
       raise NotImplementedError
     end
     
+    # Returns the HistoricFile representing the root of the repo
+    def rootdir
+      file("", true)
+    end
+    
     # Returns a HistoricFile for +relative_path+
-    def file(relative_path)
-      HistoricFile.new(relative_path, self)
+    def file(relative_path, dir)
+      HistoricFile.new(relative_path, dir, self)
     end
     
     # Returns an Array of the children under +relative_path+
