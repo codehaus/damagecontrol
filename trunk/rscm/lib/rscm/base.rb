@@ -16,6 +16,7 @@ module RSCM
   # * checked_out?
   # * diff
   # * edit
+  # * ls
   # * move
   # * revisions
   # * uptodate?
@@ -108,13 +109,14 @@ module RSCM
     # example if the repository is 'remote' or if it already exists).
     #
     def create_central
-      raise "Not implemented"
+      raise NotImplementedError
     end
     
     # Destroys the central repository. Shuts down any server processes and deletes the repository.
     # WARNING: calling this may result in loss of data. Only call this if you really want to wipe 
     # it out for good!
     def destroy_central
+      raise NotImplementedError
     end
 
     # Whether a repository can be created.
@@ -124,12 +126,14 @@ module RSCM
 
     # Adds +relative_filename+ to the working copy.
     def add(relative_filename)
+      raise NotImplementedError
     end
 
     # Schedules a move of +relative_src+ to +relative_dest+
     # Should not take effect in the central repository until
     # +commit+ is invoked.
     def move(relative_src, relative_dest)
+      raise NotImplementedError
     end
 
     # Recursively imports files from a +dir+ into the central scm
@@ -143,6 +147,7 @@ module RSCM
     
     # Commit (check in) modified files.
     def commit(message)
+      raise NotImplementedError
     end
     
     # Checks out or updates contents from a central SCM to +checkout_dir+ - a local working copy.
@@ -190,27 +195,17 @@ module RSCM
     # revisions pertaining to that path.
     #
     def revisions(from_identifier, to_identifier=Time.infinity, relative_path=nil)
-      # Should be overridden by subclasses
-      revisions = Revisions.new
-      revisions.add(
-        Revision.new(
-          "up/the/chimney",
-          Revision::DELETED,
-          "DamageControl",
-          "The #{name} class doesn't\n" +
-            "correctly implement the revisions method. This is\n" +
-            "not a real revision, but a hint to the developer to go and implement it.\n\n" +
-            "Do It Now!",
-          "999",
-          Time.now.utc
-        )
-      )
-      revisions
+      raise NotImplementedError
     end
     
     # Returns a HistoricFile for +relative_path+
     def file(relative_path)
       HistoricFile.new(relative_path, self)
+    end
+    
+    # Returns an Array of the children under +relative_path+
+    def ls(relative_path)
+      raise NotImplementedError
     end
 
     # Whether the working copy is in synch with the central
@@ -243,7 +238,7 @@ module RSCM
 
     # Descriptive name of the trigger mechanism
     def trigger_mechanism
-      "Unknown"
+      raise NotImplementedError
     end
 
     # Installs +trigger_command+ in the SCM.
@@ -253,37 +248,37 @@ module RSCM
     # Most implementations will ignore this parameter.
     #
     def install_trigger(trigger_command, install_dir)
-      raise "Not implemented"
+      raise NotImplementedError
     end
 
     # Uninstalls +trigger_command+ from the SCM.
     #
     def uninstall_trigger(trigger_command, install_dir)
-      raise "Not implemented"
+      raise NotImplementedError
     end
 
     # Whether the command denoted by +trigger_command+ is installed in the SCM.
     #
     def trigger_installed?(trigger_command, install_dir)
-      raise "Not implemented"
+      raise NotImplementedError
     end
 
     # The command line to run in order to check out a fresh working copy.
     #
     def checkout_commandline(to_identifier=Time.infinity)
-      raise "Not implemented"
+      raise NotImplementedError
     end
 
     # The command line to run in order to update a working copy.
     #
     def update_commandline(to_identifier=Time.infinity)
-      raise "Not implemented"
+      raise NotImplementedError
     end
 
     # Returns/yields an IO containing the unified diff of the change.
     # Also see RevisionFile#diff
     def diff(change, &block)
-      return(yield("Not implemented"))
+      raise NotImplementedError
     end
 
     def ==(other_scm)

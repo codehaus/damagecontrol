@@ -1,5 +1,9 @@
 = RSCM Changelog
 
+== Version 0.3.15
+
+* Added support for parsing of revisions for CVS 1.12.x, which uses a slightly different time format.
+
 == Version 0.3.14
 
 Improved error messages

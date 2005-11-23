@@ -2,7 +2,6 @@ module RSCM
   # Represents a file within a Revision, and also information about how this file
   # was modified compared with the previous revision.
   class RevisionFile
-    include XMLRPC::Marshallable
 
     MODIFIED = "MODIFIED"
     DELETED = "DELETED"

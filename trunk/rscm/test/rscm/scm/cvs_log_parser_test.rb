@@ -14,10 +14,6 @@ module RSCM
       @parser.cvsmodule = "damagecontrol"
     end
     
-    def teardown
-      assert(!@parser.had_error?, "parser had errors") unless @parser.nil?
-    end
-    
     def test_read_log_entry
       assert_equal(nil, CvsLogParser.new(StringIO.new("")).next_log_entry)
     end
@@ -330,8 +326,6 @@ EOF
       assert_equal("website/templates/logo.gif", @parser.parse_path(LOG_ENTRY_FROM_06_07_2004_19_25_2))
     end
 
-# stand in picocontainer's java folder
-# cvs log -d"2003/07/25 12:38:41<=2004/07/08 12:38:41" build.xml
 LOG_WITH_DELETIONS= <<EOF
 RCS file: /home/projects/picocontainer/scm/java/Attic/build.xml,v
 Working file: build.xml
@@ -348,7 +342,7 @@ total revisions: 11;    selected revisions: 2
 description:
 ----------------------------
 revision 1.11
-date: 2003/10/13 00:04:54;  author: rinkrank;  state: dead;  lines: +0 -0
+date: 2003/10/13 00:04:54 -0500;  author: rinkrank;  state: dead;  lines: +0 -0
 Obsolete
 ----------------------------
 revision 1.10
@@ -363,8 +357,7 @@ EOF
       assert_equal(2, revisions.length)
 
       revision_delete = revisions[1]
-#      assert_equal("MAIN:rinkrank:20031013000454", revision_delete.revision)
-      assert_equal(Time.utc(2003,10,13,00,04,54,0), revision_delete.time)
+      assert_equal(Time.utc(2003,10,13,05,04,54,0), revision_delete.time)
       assert_equal("Obsolete", revision_delete.message)
       assert_equal("rinkrank", revision_delete.developer)
       assert_equal(1, revision_delete.length)
@@ -374,7 +367,6 @@ EOF
       assert(RevisionFile::DELETED, revision_delete[0].status)
 
       revision_fix_url = revisions[0]
-#      assert_equal("MAIN:rinkrank:20030725163239", revision_fix_url.revision)
       assert_equal(Time.utc(2003,07,25,16,32,39,0), revision_fix_url.time)
       assert_equal("fixed broken url (NANO-8)", revision_fix_url.message)
       assert_equal("rinkrank", revision_fix_url.developer)
@@ -472,8 +464,8 @@ EOF
 # https://sitemesh.dev.java.net/source/browse/sitemesh/.cvsignore
 # The default commit message probably showed up in vi, and the committer
 # probably just left it there. Not sure why CVS kept it this way
-# (lines starting with CVS: should be ignored in commit message afik).
-# Anyway, the parser nw knows how to deal with this. (AH)
+# (lines starting with CVS: should be ignored in commit message afaik).
+# Anyway, the parser now knows how to deal with this. (AH)
 LOG_WITH_WEIRD_CVS_AND_MANY_DASHES = <<EOF
 ? log.txt
 

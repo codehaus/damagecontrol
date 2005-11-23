@@ -11,8 +11,8 @@ module RSCM
     def teardown
       if @scm
         begin
-          @scm.destroy_working_copy
-          @scm.destroy_central
+#          @scm.destroy_working_copy
+#          @scm.destroy_central
         rescue => e
           # Fails on windows with TortoiseCVS' cvs because of resident cvslock.exe
           STDERR.puts "Couldn't destroy central #{@scm.class.name}: #{e.message}"
@@ -140,13 +140,20 @@ module RSCM
 
       # 16
       assert(other_scm.uptodate?(nil))
+
+      # 17
       add_or_edit_and_commit_file(scm, checkout_dir, "src/java/com/thoughtworks/damagecontrolled/Hello.txt", "Bla bla")
       assert(!other_scm.uptodate?(nil))
       revisions = other_scm.revisions(revisions.latest.identifier)
+
+      # 18
       assert_equal(1, revisions.length)
       assert_equal(1, revisions[0].length)
-      assert("src/java/com/thoughtworks/damagecontrolled/Hello.txt", revisions[0][0].path)
-      assert("src/java/com/thoughtworks/damagecontrolled/Hello.txt", other_scm.checkout.sort[0])
+      assert_equal("src/java/com/thoughtworks/damagecontrolled/Hello.txt", revisions[0][0].path)
+      
+      # 19
+      #root_children = scm.file("").children
+      #assert_equal "build.xml", root_children[0].relative_path
     end
 
     def test_create_destroy
