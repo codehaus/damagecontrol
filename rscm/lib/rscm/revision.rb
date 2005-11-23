@@ -1,4 +1,3 @@
-require 'xmlrpc/utils'
 require 'rscm/time_ext'
 require 'rscm/revision_file'
 
@@ -7,7 +6,6 @@ module RSCM
   # A collection of Revision.
   class Revisions
     include Enumerable
-    include XMLRPC::Marshallable
 
     attr_accessor :revisions
 
@@ -115,7 +113,6 @@ module RSCM
   # same commit message, and within a "reasonably" small timespan.
   class Revision
     include Enumerable
-    include XMLRPC::Marshallable
 
     attr_reader :files
     attr_accessor :identifier
@@ -167,8 +164,7 @@ module RSCM
     end
     
     def ==(other)
-      return false if !other.is_a?(self.class)
-      @files == other.files
+      other.is_a?(self.class) && @files == other.files
     end
 
     def <=>(other)
@@ -177,7 +173,7 @@ module RSCM
 
     # Whether this instance can contain a File. Used
     # by non-transactional SCMs.
-    def can_contain?(file)
+    def can_contain?(file) #:nodoc:
       self.developer == file.developer &&
       self.message == file.message &&
       (self.time - file.time).abs < 60

@@ -106,9 +106,18 @@ module RSCM
     
     def open(revision_file, &block)
       with_working_dir(@checkout_dir) do
-        diff_cmd = "cvs -Q update -p -r #{revision_file.native_revision_identifier} #{revision_file.path}"
-        Better.popen(diff_cmd) do |io|
+        cmd = "cvs -Q update -p -r #{revision_file.native_revision_identifier} #{revision_file.path}"
+        Better.popen(cmd) do |io|
           block.call io
+        end
+      end
+    end
+    
+    def ls(relative_path)
+      with_working_dir(@checkout_dir) do
+        cmd = "cvs -Q ls #{relative_path}"
+        Better.popen(cmd) do |io|
+          puts io.read
         end
       end
     end
@@ -236,9 +245,6 @@ module RSCM
     end
 
     def parse_log(cmd, &proc)
-      logged_command_line = command_line(cmd, hidden_password)
-      yield logged_command_line if block_given?
-
       execed_command_line = command_line(cmd, password)
       revisions = nil
       with_working_dir(@checkout_dir) do
@@ -274,14 +280,6 @@ module RSCM
       "checkout #{branch_option} -d #{target_dir} #{revision_option(to_identifier)} #{mod}"
     end
     
-    def hidden_password
-      if(password && password != "")
-        "********"
-      else
-        ""
-      end
-    end
-  
     def period_option(from_identifier, to_identifier)
       if(from_identifier.nil? && to_identifier.nil?)
         ""

@@ -1,7 +1,7 @@
 require 'rscm/revision'
 require 'rscm/abstract_log_parser'
-
 require 'ftools'
+require 'time'
 
 module RSCM
 
@@ -14,14 +14,11 @@ module RSCM
     
     def initialize(io)
       super(io)
-      @log = ""
     end
   
     def parse_revisions
       revisions = Revisions.new
       while(log_entry = next_log_entry)
-        @log<<log_entry
-        @log<<""
         begin
           parse_files(log_entry, revisions)
         rescue Exception => e
@@ -91,7 +88,13 @@ module RSCM
       file.native_revision_identifier =  extract_match(file_entry_lines[0], /revision (.*)$/)
       
       file.previous_native_revision_identifier = determine_previous_native_revision_identifier(file.native_revision_identifier)
-      file.time = parse_cvs_time(extract_required_match(file_entry_lines[1], /date: (.*?)(;|$)/))
+
+      time = extract_required_match(file_entry_lines[1], /date: (.*?)(;|$)/)
+      if(time.strip.length == 19)
+        # CVS 1.11.x doesn't specify timezone (but assumes UTC), so we'll add it here.
+        time += " +0000"
+      end
+      file.time = Time.parse(time).utc
       file.developer = extract_match(file_entry_lines[1], /author: (.*?);/)
       
       state = extract_match(file_entry_lines[1], /state: (.*?);/)
@@ -128,13 +131,8 @@ module RSCM
       end
     end
     
-    def parse_cvs_time(time)
-      # 2003/11/09 15:39:25
-      Time.utc(time[0..3], time[5..6], time[8..9], time[11..12], time[14..15], time[17..18])
-    end
-    
     def extract_required_match(string, regexp)
-      if string=~regexp
+      if(string =~ regexp)
         return($1)
       else
         $stderr.puts("can't parse: '#{string}'\nexpected to match regexp: #{regexp.to_s}")
