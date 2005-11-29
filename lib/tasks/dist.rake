@@ -45,6 +45,7 @@ PKG_FILES = FileList[
   "lib/**/*",
   "log/**/*",
   "public/**/*",
+  "sound/**/*",
   "script/**/*",
   "vendor/rails/actionmailer/lib/**/*",
   "vendor/rails/actionpack/lib/**/*",
