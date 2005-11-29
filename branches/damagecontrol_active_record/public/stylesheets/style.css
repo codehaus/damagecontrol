@@ -117,3 +117,14 @@ h2 {
   background: #FFFFFF;
   border: 1px solid #CCCCCC;
 }
+
+.build_state_name {
+  background-color: red;
+  width: 100px;
+  float: left;
+}
+
+.build_state_checkbox {
+  background-color: green;
+  float: left;
+}

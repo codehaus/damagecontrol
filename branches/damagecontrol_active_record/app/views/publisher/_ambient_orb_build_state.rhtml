@@ -1,0 +1,6 @@
+<select name="publisher[DamageControl::Publisher::AmbientOrb][color][<%= build_state.name %>]">
+  <%= options_for_select(Ambient::Orb.colors, object.color ? object.color[build_state.name] : nil) %>
+</select>
+<select name="publisher[DamageControl::Publisher::AmbientOrb][animation][<%= build_state.name %>]">
+  <%= options_for_select(Ambient::Orb.animations, object.animation ? object.animation[build_state.name] : nil) %>
+</select>

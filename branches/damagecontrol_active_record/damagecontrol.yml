@@ -1,72 +1,114 @@
+--- 
 name: DamageControl
-home_page: 'http://damagecontrol.codehaus.org/'
-build_command: 'rake migrate test_units test_functional'
-relative_build_path: ''
-generated_files:
+generated_files: 
   - target/*
   - projects/*
   - artifacts/*
-scm: 
-  RSCM::Subversion: 
-    url: svn://beaver.codehaus.org/damagecontrol/scm/branches/damagecontrol_active_record
-    path: branches/damagecontrol_active_record
-    uses_polling: true
-    enabled: true
-scm_web: 
+quiet_period: 
+lock_time: 
+initial_revision_label: 1
+home_page: http://damagecontrol.buildpatterns.org/
+publishers: 
+  - !ruby/object:DamageControl::Publisher::Sound 
+    enabling_states: 
+      - !ruby/object:Build::Requested {}
+      - !ruby/object:Build::SynchingWorkingCopy {}
+      - !ruby/object:Build::Executing {}
+      - !ruby/object:Build::Successful {}
+      - !ruby/object:Build::Fixed {}
+      - !ruby/object:Build::Broken {}
+      - !ruby/object:Build::RepeatedlyBroken {}
+    sound: !ruby/hash:HashWithIndifferentAccess 
+      successful: hal_well.wav
+      repeatedly_broken: hal_error.wav
+      synching_working_copy: hal_moment.wav
+      executing: hal_decision.wav
+      requested: hal_nothing.wav
+      fixed: hal_better.wav
+      broken: hal_fault.wav
+  - !ruby/object:DamageControl::Publisher::Email 
+    authentication: ''
+    content_type: text/html
+    domain: localhost.localdomain
+    from: "\"DamageControl\" <dcontrol@codehaus.org>"
+    password: ''
+    port: "25"
+    server: ''
+    to: ''
+    user_name: ''
+  - !ruby/object:DamageControl::Publisher::AmbientOrb 
+    animation: !ruby/hash:HashWithIndifferentAccess 
+      successful: none
+      synching_working_copy: fast
+      repeatedly_broken: medium
+      requested: slow
+      executing: cresendo
+      fixed: medium
+      broken: none
+    color: !ruby/hash:HashWithIndifferentAccess 
+      successful: green
+      repeatedly_broken: red
+      synching_working_copy: yellow
+      executing: yellow
+      requested: yellow
+      fixed: green
+      broken: red
+    enabling_states: 
+      - !ruby/object:Build::Successful {}
+      - !ruby/object:Build::Fixed {}
+      - !ruby/object:Build::Broken {}
+      - !ruby/object:Build::RepeatedlyBroken {}
+  - !ruby/object:DamageControl::Publisher::Growl 
+    enabling_states: 
+      - !ruby/object:Build::Requested {}
+      - !ruby/object:Build::SynchingWorkingCopy {}
+      - !ruby/object:Build::Executing {}
+      - !ruby/object:Build::Successful {}
+      - !ruby/object:Build::Fixed {}
+      - !ruby/object:Build::Broken {}
+      - !ruby/object:Build::RepeatedlyBroken {}
+    hosts: localhost
+  - !ruby/object:DamageControl::Publisher::Jabber 
+    friends: ''
+    id_resource: dcontrol
+    password: dcontrol
+  - !ruby/object:DamageControl::Publisher::X10Cm17A 
+    device: 
+      successful: a4
+      synching_working_copy: a2
+      repeatedly_broken: a7
+      requested: a1
+      executing: a3
+      fixed: a5
+      broken: a6
+    enabling_states: 
+      - !ruby/object:Build::Requested {}
+      - !ruby/object:Build::SynchingWorkingCopy {}
+      - !ruby/object:Build::Executing {}
+      - !ruby/object:Build::Successful {}
+      - !ruby/object:Build::Fixed {}
+      - !ruby/object:Build::Broken {}
+      - !ruby/object:Build::RepeatedlyBroken {}
+id: 1
+tracker: !ruby/object:MetaProject::Tracker::Jira::JiraTracker 
+  enabled: true
+  jira_base_url: http://jira.codehaus.org/
+  jira_project_id: DC
+scm_web: !ruby/object:MetaProject::ScmWeb::Browser 
+  child_dirs_pattern: 
+  child_files_pattern: 
   diff_spec: http://svn.damagecontrol.codehaus.org/branches/damagecontrol_active_record/#{path}?r1=#{previous_revision}&r2=#{revision}&p1=branches/damagecontrol_active_record/#{path}&p2=branches/damagecontrol_active_record/#{path}
   dir_spec: http://svn.damagecontrol.codehaus.org/branches/damagecontrol_active_record/#{path}
-  raw_spec: http://svn.damagecontrol.codehaus.org/branches/damagecontrol_active_record/#{path}?rev=#{revision}
-  html_spec: http://svn.damagecontrol.codehaus.org/branches/damagecontrol_active_record/#{path}?rev=#{revision}&view=auto
   history_spec: http://svn.damagecontrol.codehaus.org/branches/damagecontrol_active_record/#{path}
-tracker: 
-  MetaProject::Tracker::Jira::JiraTracker: 
-    jira_base_url: http://jira.codehaus.org/
-    jira_project_id: DC
-    enabled: true
-publisher: 
-  DamageControl::Publisher::Sound: 
-    requested_sound: hal_nothing.wav
-    synching_working_copy_sound: hal_moment.wav
-    executing_sound: hal_decision.wav
-    successful_sound: hal_well.wav
-    broken_sound: hal_fault.wav
-    repeatedly_broken_sound: hal_error.wav
-    fixed_sound: hal_better.wav
-    enabling_states:
-      - Build::Requested
-      - Build::SynchingWorkingCopy
-      - Build::Executing
-      - Build::Successful
-      - Build::Fixed
-      - Build::Broken
-      - Build::RepeatedlyBroken
-  DamageControl::Publisher::Growl: 
-    hosts: localhost
-    enabling_states:
-      - Build::Requested
-      - Build::SynchingWorkingCopy
-      - Build::Executing
-      - Build::Successful
-      - Build::Fixed
-      - Build::Broken
-      - Build::RepeatedlyBroken
-  DamageControl::Publisher::Jabber: 
-    id_resource: dcontrol
-    friends: ''
-    password: dcontrol
-  DamageControl::Publisher::X10Cm17A: 
-    requested_socket: a3
-    synching_working_copy_socket: a3
-    executing_socket: a3
-    successful_socket: a1
-    fixed_socket: a1
-    repeatedly_broken_socket: a2
-    broken_socket: a2
-    enabling_states:
-      - Build::Requested
-      - Build::SynchingWorkingCopy
-      - Build::Executing
-      - Build::Successful
-      - Build::Fixed
-      - Build::Broken
-      - Build::RepeatedlyBroken
+  html_spec: http://svn.damagecontrol.codehaus.org/branches/damagecontrol_active_record/#{path}?rev=#{revision}&view=auto
+  raw_spec: http://svn.damagecontrol.codehaus.org/branches/damagecontrol_active_record/#{path}?rev=#{revision}
+scm: !ruby/object:RSCM::Subversion 
+  enabled: true
+  password: ''
+  path: branches/damagecontrol_active_record
+  url: svn://beaver.codehaus.org/damagecontrol/scm/branches/damagecontrol_active_record
+  username: ''
+  uses_polling: true
+local_build: true
+build_command: rake migrate test_units test_functional
+relative_build_path: ''

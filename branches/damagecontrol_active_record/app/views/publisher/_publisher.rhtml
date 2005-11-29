@@ -12,37 +12,16 @@
 <div id="<%= object.dom_id %>_publisher_test_result"></div>
 
 <div id="<%= object.dom_id %>">
-  <table>
-    <tr>
-      <td colspan="2">Build states that will activate <%= object.visual_name %></td>
-    </tr>
-    <tr>
-      <td>Requested</td>
-      <td><%= enabling_state_tag(object, "Build::Requested") %></td>
-    </tr>
-    <tr>
-      <td>Synching Working Copy</td>
-      <td><%= enabling_state_tag(object, "Build::SynchingWorkingCopy") %></td>
-    </tr>
-    <tr>
-      <td>Executing</td>
-      <td><%= enabling_state_tag(object, "Build::Executing") %></td>
-    </tr>
-    <tr>
-      <td>Successful</td>
-      <td><%= enabling_state_tag(object, "Build::Successful") %></td>
-    </tr>
-    <tr>
-      <td>Fixed</td>
-      <td><%= enabling_state_tag(object, "Build::Fixed") %></td>
-    </tr>
-    <tr>
-      <td>Broken</td>
-      <td><%= enabling_state_tag(object, "Build::Broken") %></td>
-    </tr>
-    <tr>
-      <td>Repeatedly Broken</td>
-      <td><%= enabling_state_tag(object, "Build::RepeatedlyBroken") %></td>
-    </tr>
-  </table>
+  Build states that will activate <%= object.visual_name %>
+  
+  <% Build::STATES.each do |build_state| %>
+    <div>
+      <div class="build_state_name"><%= build_state.name %></div>
+      <div class="build_state_checkbox"><%= enabling_state_tag(object, build_state.class.name) %></div>
+      <% if(has_template(object.category, object.class.name.demodulize.underscore+"_build_state")) %>
+        <%= render :partial => template_for(object.category, object.class.name.demodulize.underscore+"_build_state"), 
+            :locals => {:object => object, :build_state => build_state} %>
+      <% end %>
+    </div>
+  <% end %>
 </div>
