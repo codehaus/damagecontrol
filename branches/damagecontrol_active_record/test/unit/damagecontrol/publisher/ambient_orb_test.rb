@@ -10,12 +10,12 @@ module DamageControl
           Ambient::Orb.new
         end
       else
-        puts "\n"
-        puts "Using mocks in #{self.class.name} (#{__FILE__})"
-        puts "If you have an Ambient Orb device and a primary account for it you can test against real Orb devices by defining"
-        puts "DC_TEST_ORB_ENABLE=your_orb_id in your shell"
-        puts "You should see it switching to flashing green"
-        puts "\n"
+        STDERR.puts "\n"
+        STDERR.puts "Using mocks in #{self.class.name} (#{__FILE__})"
+        STDERR.puts "If you have an Ambient Orb device and a primary account for it you can test against real Orb devices by defining"
+        STDERR.puts "DC_TEST_ORB_ENABLE=your_orb_id in your shell"
+        STDERR.puts "You should see it switching to flashing green"
+        STDERR.puts "\n"
         
         def driver
           driver = new_mock

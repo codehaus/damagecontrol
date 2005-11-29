@@ -158,20 +158,20 @@ else
     s.rubyforge_project = "damagecontrol"
     
     # Dependencies
-    require_gem 'ambient',      '=0.1.0'
-    require_gem 'cmdparse',     '=2.0.0'
-    require_gem 'ferret',       '=0.2.1'
-    require_gem 'gmailer',      '=0.1.0'
-    require_gem 'jabber4r',     '=0.8.0'
-    require_gem 'meta_project', '=0.4.13'
-    require_gem 'mime-types',   '=1.13.1'
-    require_gem 'rake',         '=0.6.2'
-    require_gem 'RedCloth',     '=3.0.4'
-    require_gem 'rscm',         '=0.3.16'
-    require_gem 'ruby-growl',   '=1.0.1'
-    require_gem 'rubyzip',      '=0.5.12'
-    require_gem 'sqlite3-ruby', '=1.1.0'
-    require_gem 'x10-cm17a',    '=1.0.1'
+    s.add_dependency 'ambient',      '=0.1.0'
+    s.add_dependency 'cmdparse',     '=2.0.0'
+    s.add_dependency 'ferret',       '=0.2.2'
+    s.add_dependency 'gmailer',      '=0.1.0'
+    s.add_dependency 'jabber4r',     '=0.8.0'
+    s.add_dependency 'meta_project', '=0.4.13'
+    s.add_dependency 'mime-types',   '=1.13.1'
+    s.add_dependency 'rake',         '=0.6.2'
+    s.add_dependency 'RedCloth',     '=3.0.4'
+    s.add_dependency 'rscm',         '=0.3.16'
+    s.add_dependency 'ruby-growl',   '=1.0.1'
+    s.add_dependency 'rubyzip',      '=0.5.12'
+    s.add_dependency 'sqlite3-ruby', '=1.1.0'
+    s.add_dependency 'x10-cm17a',    '=1.0.1'
   end
 
   Rake::GemPackageTask.new(spec) do |pkg|
