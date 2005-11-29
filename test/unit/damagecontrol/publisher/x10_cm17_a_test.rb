@@ -14,12 +14,12 @@ module DamageControl
           X10
         end
       else
-        puts "\n"
-        puts "Using mocks in #{self.class.name} (#{__FILE__})"
-        puts "If you have X10Cm17a device connected you can test against real X10Cm17A devices by defining"
-        puts "DC_TEST_X10CM17A_ENABLE=true in your shell"
-        puts "If you have lamps connected to a5 and a6 you should see them go on and off"
-        puts "\n"
+        STDERR.puts "\n"
+        STDERR.puts "Using mocks in #{self.class.name} (#{__FILE__})"
+        STDERR.puts "If you have X10Cm17a device connected you can test against real X10Cm17A devices by defining"
+        STDERR.puts "DC_TEST_X10CM17A_ENABLE=true in your shell"
+        STDERR.puts "If you have lamps connected to a5 and a6 you should see them go on and off"
+        STDERR.puts "\n"
         
         def fixed_x10
           x10 = new_mock

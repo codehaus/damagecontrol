@@ -12,11 +12,11 @@ module DamageControl
           email.publish(@build_1)
           # hard to assert success. verify manually.
         else
-          puts "\n"
-          puts "Skipping #{self.class.name} (#{__FILE__})"
-          puts "If you have Internet access and sendmail running you can enable this test by defining"
-          puts "DC_TEST_SENDMAIL_ENABLE=your@email in your shell"
-          puts "\n"
+          STDERR.puts "\n"
+          STDERR.puts "Skipping #{self.class.name} (#{__FILE__})"
+          STDERR.puts "If you have Internet access and sendmail running you can enable this test by defining"
+          STDERR.puts "DC_TEST_SENDMAIL_ENABLE=your@email in your shell"
+          STDERR.puts "\n"
         end
       end
 
