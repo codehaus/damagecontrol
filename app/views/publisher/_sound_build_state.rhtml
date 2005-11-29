@@ -1,0 +1,3 @@
+<select name="publisher[DamageControl::Publisher::Sound][sound][<%= build_state.name %>]">
+  <%= options_for_select(DamageControl::Publisher::Sound.sounds, object.sound ? object.sound[build_state.name] : nil) %>
+</select>

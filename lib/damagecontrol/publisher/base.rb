@@ -65,12 +65,6 @@ module DamageControl
         end
       end
       
-    protected
-    
-      def build_state_attr(state, suffix)
-        instance_variable_get(state.attr_sym("@", suffix))
-      end
-
     end
   end
 end

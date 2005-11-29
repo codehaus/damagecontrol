@@ -18,10 +18,12 @@
 # 
 # 
 require 'meta_project'
+require 'damagecontrol/version'
+require 'damagecontrol/platform'
+require 'rake/gempackagetask'
 require 'rake/packagetask'
 require 'rake/contrib/sshpublisher'
 require 'rake/contrib/rubyforgepublisher'
-require 'damagecontrol/platform'
 
 PKG_BUILD     = ENV['PKG_BUILD'] ? '.' + ENV['PKG_BUILD'] : ''
 PKG_NAME      = 'damagecontrol'
@@ -37,7 +39,7 @@ PKG_FILES = FileList[
   "app/**/*",
   "components/**/*",
   "config/**/*",
-  "db/production.db",
+  "db/productio*.db",
   "db/migrate/*",
 #  "doc/**/*",
   "lib/**/*",
@@ -115,4 +117,64 @@ end
 desc "Upload to aslakhellesoy.com"
 task :upload do
   `pscp dist\\#{PKG_FILE_NAME}.exe aslak.hellesoy@chilco.textdrive.com:/users/home/aslak.hellesoy/web/public/damagecontrol/downloads`
+end
+
+if ! defined?(Gem)
+  puts "gem target requires RubyGEMs"
+else
+  spec = Gem::Specification.new do |s|
+    
+    #### Basic information.
+
+    s.name    = PKG_NAME
+    s.version = PKG_VERSION
+    s.summary = DamageControl::VERSION::NAME
+    s.description = DamageControl::VERSION::FULLNAME
+
+    #### Which files are to be included in this gem?  Everything!  (Except CVS directories.)
+
+    s.files = PKG_FILES.to_a
+
+    #### Load-time details: library and application (you will need one or both).
+
+    s.require_path = 'lib'
+
+    #### Documentation and testing.
+
+    #s.has_rdoc = true
+    #s.extra_rdoc_files = rd.rdoc_files.reject { |fn| fn =~ /\.rb$/ }.to_a
+    #rd.options.each do |op|
+    #  s.rdoc_options << op
+    #end
+    
+    #s.executables = 
+
+    #### Author and project details.
+
+    s.author = "Aslak Hellesoy"
+    #s.email = ""
+    s.homepage = "http://damagecontrol.buildpatterns.com/"
+    s.rubyforge_project = "damagecontrol"
+    
+    # Dependencies
+    require_gem 'ambient',      '=0.1.0'
+    require_gem 'cmdparse',     '=2.0.0'
+    require_gem 'ferret',       '=0.2.1'
+    require_gem 'gmailer',      '=0.1.0'
+    require_gem 'jabber4r',     '=0.8.0'
+    require_gem 'meta_project', '=0.4.13'
+    require_gem 'mime-types',   '=1.13.1'
+    require_gem 'rake',         '=0.6.2'
+    require_gem 'RedCloth',     '=3.0.4'
+    require_gem 'rscm',         '=0.3.16'
+    require_gem 'ruby-growl',   '=1.0.1'
+    require_gem 'rubyzip',      '=0.5.12'
+    require_gem 'sqlite3-ruby', '=1.1.0'
+    require_gem 'x10-cm17a',    '=1.0.1'
+  end
+
+  Rake::GemPackageTask.new(spec) do |pkg|
+    pkg.need_zip = true
+    pkg.need_tar = true
+  end
 end

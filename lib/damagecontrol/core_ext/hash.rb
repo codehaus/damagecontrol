@@ -33,7 +33,7 @@ private
         attr_name = $1
       elsif(attr_value.is_a?(Array))
         attr_value = instantiate_array(attr_value)
-      elsif(attr_value.is_a?(Hash))
+      elsif(attr_value.is_a?(Hash) && attr_value[:values].is_a?(Array))
         keys = attr_value[:keys]
         values = attr_value[:values]
         attr_value = {}
