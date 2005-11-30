@@ -1,0 +1,17 @@
+login: &login
+  adapter: mysql
+  host: localhost
+  username: aslak.hellesoy
+  password: xxx
+
+development:
+  database: damagecontrol_dev
+  <<: *login
+
+test:
+  database: damagecontrol_test
+  <<: *login
+
+production:
+  database: damagecontrol
+  <<: *login
