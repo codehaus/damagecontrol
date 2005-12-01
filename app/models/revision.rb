@@ -73,6 +73,7 @@ class Revision < ActiveRecord::Base
   
   # Syncs the working copy of the project with this revision.
   def sync_working_copy!(needs_zip, zipper = DamageControl::Zipper.new)
+    project.prepare_scm
     logger.info "Syncing working copy for #{project.name} with revision #{identifier} ..." if logger
     project.scm.checkout(identifier) if project.scm
     logger.info "Done Syncing working copy for #{project.name} with revision #{identifier}" if logger

@@ -168,6 +168,15 @@ LIMIT #{options[:count]}
     end
   end
 
+  def prepare_scm
+    if(scm.is_a?(RSCM::Cvs))
+      # Override the location of the .cvspass file and make sure it exists
+      cvspass = "#{basedir}/.cvspass"
+      `touch #{cvspass}`
+      ENV['CVS_PASSFILE'] = cvspass
+    end
+  end
+
   def working_copy_dir
      File.expand_path("#{basedir}/working_copy")
   end

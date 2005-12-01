@@ -10,6 +10,7 @@ module DamageControl
     # The latest revision is returned.
     def poll_and_persist_new_revisions(project)
       if(project.scm)
+        project.prepare_scm
         rscm_revisions = project.scm.poll_new_revisions(project.latest_revision)
         revisions = nil
         unless rscm_revisions.length == 0
