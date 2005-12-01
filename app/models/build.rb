@@ -51,10 +51,14 @@ class Build < ActiveRecord::Base
     log_file("stderr")
   end
   
-  def log_file(name)
-    raise 'id not set' unless id
+  def log_dir
     log_dir = "#{revision.basedir}/builds/#{id}"
     FileUtils.mkdir_p log_dir unless File.exist? log_dir
+    log_dir
+  end
+  
+  def log_file(name)
+    raise 'id not set' unless id
     "#{log_dir}/#{name}.log"
   end
   
