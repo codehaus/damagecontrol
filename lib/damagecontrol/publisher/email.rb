@@ -29,13 +29,24 @@ module DamageControl
       end
 
       def publish(build)
+        @stdout_tail = tail(build.stdout_file, 30)
+        @stderr_tail = tail(build.stderr_file, 30)
+        
         if(@from =~ /(.*)@gmail.com/)
           GMailer.connect($1, @password) do |g|
+            # Use the same templare as ActionMailer
+            template = ERB.new(File.read(RAILS_ROOT + '/app/views/build_result_mailer/build_result.rhtml'))
+            @headline = BuildResultMailer.headline(build)
+            @build = build
+            b = binding
+            body = template.result(b)
+
             # 'From' default gmail.com account
             g.send(
               :to => to.split(%r{,\s*}).join(","),
-              :subject => "#{build.project.name}: #{build.state.class.name}",
-              :body => "Hello"
+              :subject => @headline,
+              :body => body,
+              :html => true # Relies on my patch: http://rubyforge.org/tracker/index.php?group_id=869&atid=3435
             )
           end
         else
@@ -46,6 +57,14 @@ module DamageControl
       end
 
     private
+    
+      def tail(file, n)
+        result = ""
+        file = File::Tail::Logfile.new(file).rewind(n)
+        file.return_if_eof = true
+        file.tail{|line| result << line}
+        result
+      end
     
       def delivery_method
         (@server && @server.strip != "") ? "smtp" : "sendmail"

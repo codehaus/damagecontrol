@@ -161,6 +161,7 @@ else
     s.add_dependency 'ambient',      '=0.1.0'
     s.add_dependency 'cmdparse',     '=2.0.0'
     s.add_dependency 'ferret',       '=0.2.2'
+    s.add_dependency 'file-tail',    '=0.1.3'
     s.add_dependency 'gmailer',      '=0.1.0'
     s.add_dependency 'jabber4r',     '=0.8.0'
     s.add_dependency 'meta_project', '=0.4.13'
