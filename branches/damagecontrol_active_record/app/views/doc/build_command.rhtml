@@ -11,4 +11,17 @@ If you need several commands to execute the build, separate them with && charact
 autoconf && ./configure && make
 }}}
 
-Do not use any stream redirect operators such as > or 2> - DamageControl will add these automatically to capture the output.
+In the stdout log of the build (available from the build page) you will see:
+
+{{{
+damagecontrol> autoconf
+[output from autoconf]
+damagecontrol> ./configure
+[output from ./configure]
+damagecontrol> make
+[output from make]
+}}}
+
+You'll see similar entries for the stderr log.
+
+Do not use any stream redirect operators such as > or 2> in the build commands - DamageControl will add these automatically to capture the output.

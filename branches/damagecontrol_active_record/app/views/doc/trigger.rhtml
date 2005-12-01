@@ -3,6 +3,13 @@
 There are several different events that can trigger a build for a project.
 </p>
 <ul>
-  <li>DamageControl detected a new <%= link_to("revision", :action=>"revision") %> in the SCM (someone committed files to the SCM).</li>
+  <li>DamageControl detected a new <%= link_to("revision", :action=>"revision") %> in the SCM (someone committed files to the SCM). The detection is done either by:
+      <ul>
+          <li>Polling the SCM at regular intervals</li>
+          <li>The SCM notifies DamageControl that a new revision has been committed (only for certain SCMs)</li>
+      </ul>
+  </li>
+  
   <li>DamageControl just successfully built an other project.</li>
+  <li>A build of a particular revision was requested manually.</li>
 </ul>
