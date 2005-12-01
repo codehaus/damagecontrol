@@ -1,0 +1,37 @@
+
+
+simian (rev/file)
+coverage (rev/file/build)
+loc (rev/file)
+test result (build/file) 
+change activity (file,person)
+build time (build)
+test time (file)
+comments (file)
+build freq (build)
+revision file size 
+changed lines per file/revision (use diff)
+
+calculate aggregate values in db!!
+
+  revision_file
+  |
+file --------+---------revision------*build
++path    file_presence
+             |
+             *
+ -----0..1 file_metric 0..1----
+
+
+after checkout, collect files (exclude generated files) and insert new +file+ entries if they don't exist. then, create +entry+ rows. now, collect file metrics (simian,loc,comments,other static file analysis). store results in
+a) entry children - one per metric type. example:
+    file_metric
+    ________________________________
+    id  entry_id  value  type
+    22  678       99     'ssloccount'
+    23  678       5      'simian'
+b) similar for revision_metric (unless it can be calculated by db as an aggregate of file_metric)
+c) after build, update each file_metric
+d) after build, also update build_metric (similar to file_metric/revision_metric)
+
+We must use a plugin system for this to make it easy to add new metrics

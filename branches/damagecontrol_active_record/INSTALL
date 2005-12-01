@@ -1,0 +1,12 @@
+== Installing on TextDrive
+1) Install all required gems in your own location
+  * gem install xxx -i <your_gem_dir>
+2) Tell RubyGems about your own gems (required if you want to run tests/migration only)
+  * export GEM_PATH=/users/home/aslak.hellesoy/gems:/usr/local/lib/ruby/gems/1.8
+  * export DC_DATA_DIR=/users/home/aslak.hellesoy/domains/damagecontrol.buildpatterns.com/data
+3) Configure Rails via lighttpd to use the same GEM_PATH and also tell DamageControl where to store data
+  "bin-environment" => ( 
+    "RAILS_ENV" => "production", 
+    "GEM_PATH" => "/users/home/aslak.hellesoy/gems:/usr/local/lib/ruby/gems/1.8", 
+    "DC_DATA_DIR" => "/users/home/aslak.hellesoy/domains/damagecontrol.buildpatterns.com/data"
+  )

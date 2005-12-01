@@ -1,4 +1,5 @@
 require File.dirname(__FILE__) + '/../../../test_helper'
+require 'file/tail'
 
 module DamageControl
   module Publisher
@@ -9,7 +10,7 @@ module DamageControl
           email = Email.new
           email.to = ENV['DC_TEST_SENDMAIL_ENABLE']
           email.from = "dcontrol@codehaus.org"
-          email.publish(@build_1)
+          email.publish(build_1)
           # hard to assert success. verify manually.
         else
           STDERR.puts "\n"
@@ -26,7 +27,7 @@ module DamageControl
           email.to = ENV['DC_TEST_SMTP_ENABLE']
           email.from = "dcontrol@codehaus.org"
           email.server = "localhost"
-          email.publish(@build_1)
+          email.publish(build_1)
           # hard to assert success. verify manually.
         else
           puts "\n"
@@ -43,7 +44,7 @@ module DamageControl
           email.to = ENV['GMAIL_ADDRESS']
           email.from = ENV['GMAIL_ADDRESS']
           email.password = ENV['GMAIL_PASSWORD']
-          email.publish(@build_1)
+          email.publish(build_1)
           # hard to assert success. verify manually.
         else
           puts "\n"
@@ -52,6 +53,17 @@ module DamageControl
           puts "GMAIL_ADDRESS=your_gmail_address and GMAIL_PASSWORD=your_gmail_password in your shell"
           puts "\n"
         end
+      end
+      
+      def build_1
+        b = builds(:build_1).clone
+        def b.stdout_file
+          __FILE__
+        end
+        def b.stderr_file
+          __FILE__
+        end
+        b
       end
     end
   end
