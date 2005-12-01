@@ -5,24 +5,24 @@ module DamageControl
     # Uses sendmail, smtp or gmail to send email. Which one to use depends on attributes.
     class Email < Base
       attr_accessor :to
-      attr_accessor :from # will use gmailer if this is a gmail address
+      attr_accessor :from           # will use gmailer if this is a gmail address
 
-      attr_accessor :server # setting this will use smtp unless we're using gmail
-      attr_accessor :port
-      attr_accessor :domain
-      attr_accessor :user_name
-      attr_accessor :password
-      attr_accessor :authentication
+      attr_accessor :server         # setting this will use smtp unless we're using gmail
+      attr_accessor :port           # will default to 25 if empty
+      attr_accessor :domain         # will default to "localhost.localdomain" if empty
+      attr_accessor :user_name      # if all of these are empty strings,
+      attr_accessor :password       # no authentication will be used
+      attr_accessor :authentication # (all fields will be set to nil)
 
       def initialize
         @content_type = "text/html"
         @to = ""
-        @from = "\"DamageControl\" <dcontrol@codehaus.org>"
+        @from = "\"DamageControl\" <dcontrol@damagecontrol.buildpatterns.org>"
 
         # SMTP only
         @server = ""
-        @port = 25
-        @domain = "localhost.localdomain"
+        @port = ""
+        @domain = ""
         @user_name = ""
         @password = ""
         @authentication = ""
@@ -53,13 +53,14 @@ module DamageControl
 
       def server_settings
         if(delivery_method == "smtp")
+          non_authenticated = @user_name == "" && @password == "" && @authentication == ""
           {
-            :server => @server,
-            :port => @port.to_i,
-            :domain => @domain,
-            :user_name => @user_name,
-            :password => @password,
-            :authentication => @authentication
+            :server         => @server,
+            :port           => @port   == "" ? 25 : @port.to_i,
+            :domain         => @domain == "" ? "localhost.localdomain" : @domain,
+            :user_name      => non_authenticated ? nil : @user_name,
+            :password       => non_authenticated ? nil : @password,
+            :authentication => non_authenticated ? nil : @authentication
           }
         else
           {}

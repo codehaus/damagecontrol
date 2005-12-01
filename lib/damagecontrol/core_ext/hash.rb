@@ -22,6 +22,7 @@ private
   def deserialize(class_name, attributes)
     object = eval(class_name).new
     attributes.each do |attr_name, attr_value|
+      attr_value = attr_value.strip
       if(attr_value == "true")
         attr_value = true
       elsif(attr_value == "false")

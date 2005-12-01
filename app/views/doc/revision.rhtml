@@ -1,15 +1,16 @@
 <h1>Revisions</h1>
 <p>
-A revision is a "snapshot" of the state of an <%= link_to("scm", :action=>"scm") %> at a 
+A revision is a "snapshot" of the state of an <%= link_to("SCM", :action=>"scm") %> at a 
 particular time (and possibly associated with a particular branch). Every time a developer 
 commits (checks in) files to the <%= link_to("scm", :action=>"scm") %>, a new revision is created. 
 </p>
 <p>
-Transactional <%= link_to("scm", :action=>"scm") %>s associate each revision with a set of files (typically the ones that went into the same commit), while non-transactional ones manage revisions on a per-file basis.
+Transactional <%= link_to("scm", :action=>"scm") %>s associate each revision with a set of files (typically the ones that went into the same commit), while non-transactional ones (such as CVS) manage revisions on a per-file basis.
 </p>
 <p>
-It is often 
+If your project uses a non-transactional SCM, DamageControl will emulate revisions by grouping changes that occur at a similar time and have an identical commit message and developer. The revision numbers you see will either be the native revision numbers
+(if natively supported by the SCM) or emulated revision numbers, which are simply a counter that is incremented for each emulated revision.
 </p>
 <p>
-DamageControl knows how to detect new revivions via its <%= link_to("trigger", :action=>"trigger") %> mechanism.
+DamageControl will detect new revisions in the SCM either by polling the SCM at regular intervals, or via a <%= link_to("trigger", :action=>"trigger") %> mechanism (if supported by the SCM).
 </p>
