@@ -50,7 +50,12 @@ private
     commands = build.command.split("&&").collect{|c| c.strip}
     Dir.chdir(build.revision.project.build_dir) do
       i = -1
-      redirected_cmd = commands.collect{|c| i+=1 ; "#{c} > #{build.stdout_file}.#{i} 2> #{build.stderr_file}.#{i}"}.join(" && ")
+      redirected_cmd = commands.collect do |c| 
+        i+=1
+        "echo \"damagecontrol> #{commands[i]}\" >> #{build.stdout_file} && " +
+        "echo \"damagecontrol> #{commands[i]}\" >> #{build.stderr_file} && " +
+        "#{c} >> #{build.stdout_file} 2>> #{build.stderr_file}"
+      end.join(" && ")
 
       build.env.each{|k,v| ENV[k]=v}
       build.state = ::Build::Executing.new
@@ -63,15 +68,6 @@ private
         exitstatus = $?.exitstatus
       rescue Errno::ENOENT => e
         File.open(build.stderr_file, "a") {|io| io.write(e.message)}
-      end
-      
-      # Concatenate the individual log files into one and get rid of them
-      Dir["#{build.log_dir}/*"].each do |f| 
-        if(f =~ /(.*\/std[a-z][a-z][a-z]\.log)\.([\d]+)$/)
-          `echo "damagecontrol> #{commands[$2.to_s.to_i]}" >> #{$1}`
-          `cat #{f} >> #{$1}`
-          FileUtils.rm(f)
-        end
       end
     end
     
