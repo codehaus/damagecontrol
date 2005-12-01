@@ -10,3 +10,5 @@ If you need several commands to execute the build, separate them with && charact
 {{{
 autoconf && ./configure && make
 }}}
+
+Do not use any stream redirect operators such as > or 2> - DamageControl will add these automatically to capture the output.
