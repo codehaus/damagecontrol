@@ -46,22 +46,36 @@ class BuildExecutor < ActiveRecord::Base
 private
 
   def execute_local(build)
+    exitstatus = -1
+    commands = build.command.split("&&").collect{|c| c.strip}
     Dir.chdir(build.revision.project.build_dir) do
-      begin
-        redirected_cmd = "#{build.command} > #{build.stdout_file} 2> #{build.stderr_file}"
-        logger.info "Executing build for #{build.revision.project.name}'s revision #{build.revision.identifier}: #{redirected_cmd}" if logger
-        build.env.each{|k,v| ENV[k]=v}
-        build.state = ::Build::Executing.new
-        build.begin_time = Time.now.utc
-        build.save
+      i = -1
+      redirected_cmd = commands.collect{|c| i+=1 ; "#{c} > #{build.stdout_file}.#{i} 2> #{build.stderr_file}.#{i}"}.join(" && ")
 
+      build.env.each{|k,v| ENV[k]=v}
+      build.state = ::Build::Executing.new
+      build.begin_time = Time.now.utc
+      build.save
+
+      begin
+        # Redirect each subcommand (separated with &&) to a separate file. We'll concatenate them at the end.
         `#{redirected_cmd}`
+        exitstatus = $?.exitstatus
       rescue Errno::ENOENT => e
-        File.open(build.stderr_file, "w") {|io| io.write(e.message)}
+        File.open(build.stderr_file, "a") {|io| io.write(e.message)}
+      end
+      
+      # Concatenate the individual log files into one and get rid of them
+      Dir["#{build.log_dir}/*"].each do |f| 
+        if(f =~ /(.*\/std[a-z][a-z][a-z]\.log)\.([\d]+)$/)
+          `echo "damagecontrol> #{commands[$2.to_s.to_i]}" >> #{$1}`
+          `cat #{f} >> #{$1}`
+          FileUtils.rm(f)
+        end
       end
     end
     
-    build.exitstatus = $?.exitstatus
+    build.exitstatus = exitstatus
     build.end_time = Time.now.utc
     build.determine_state
 
