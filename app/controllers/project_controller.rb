@@ -51,7 +51,7 @@ class ProjectController < ApplicationController
     if(DamageControl::Platform.family == 'powerpc-darwin')
       project.add_growl
     end
-    if(DamageControl::Platform.family == 'powerpc-darwin' || family == 'win32')
+    if(DamageControl::Platform.family == 'powerpc-darwin' || DamageControl::Platform.family == 'win32')
       project.add_sound
     end
 
