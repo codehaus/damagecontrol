@@ -1,7 +1,7 @@
 login: &login
   adapter: mysql
   host: localhost
-  username: aslak.hellesoy
+  username: damagecontrol
   password: xxx
 
 development:
