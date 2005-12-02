@@ -33,6 +33,7 @@ module DamageControl
         sound_path = File.expand_path("#{RAILS_ROOT}/sound/#{sound}")
         raise "File not found: #{sound_path}" unless File.exist?(sound_path)
         SoundPlayer.play(sound_path)
+        "#{sound} was played on the DamageControl server."
       end
       
     end

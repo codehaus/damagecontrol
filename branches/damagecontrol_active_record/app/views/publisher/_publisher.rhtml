@@ -1,27 +1,28 @@
-<%= 
-  link_to_remote(
-    "Test #{object.visual_name} with a sample successful build",
-    {
-      :submit => "project_settings",
-      :url => {:controller => "project", :action => "test_publisher", :params => {:publisher_class_name => object.class.name}},
-      :update => "#{object.dom_id}_publisher_test_result",
-      :complete => "Effect.Pulsate('#{object.dom_id}_publisher_test_result')"
-    }
-  ) 
-%>
-<div id="<%= object.dom_id %>_publisher_test_result"></div>
-
 <div id="<%= object.dom_id %>">
-  Build states that will activate <%= object.visual_name %>
+  <span>Build states that will activate <%= object.visual_name %></span>
   
-  <% Build::STATES.each do |build_state| %>
-    <div>
+  <div class="build_state_header">
+    <div class="build_state_name_header">Build state</div>
+    <div class="build_state_checkbox_header">Active</div>
+    <% if(has_template(object.category, object.class.name.demodulize.underscore+"_build_state_header")) %>
+      <%= render :partial => template_for(object.category, object.class.name.demodulize.underscore + "_build_state_header") %>
+    <% end %>
+  </div>
+
+  <% Build::STATES.each do |build_state| update_id = "#{object.dom_id}_publisher_test_result_#{build_state.name}" %>
+    <div class="build_state">
       <div class="build_state_name"><%= build_state.name %></div>
       <div class="build_state_checkbox"><%= enabling_state_tag(object, build_state.class.name) %></div>
       <% if(has_template(object.category, object.class.name.demodulize.underscore+"_build_state")) %>
-        <%= render :partial => template_for(object.category, object.class.name.demodulize.underscore+"_build_state"), 
-            :locals => {:object => object, :build_state => build_state} %>
+        <%= render :partial => template_for(object.category, object.class.name.demodulize.underscore + "_build_state"), 
+          :locals => {
+            :object => object, 
+            :build_state => build_state
+          } 
+        %>
       <% end %>
+      <div class="publisher_test"><%= test_publisher_link("Try it!", object, build_state, update_id) %></div>
+      <div class="publisher_test_result" id="<%= update_id %>"></div>
     </div>
   <% end %>
 </div>

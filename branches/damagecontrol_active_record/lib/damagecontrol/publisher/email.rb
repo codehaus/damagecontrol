@@ -1,4 +1,5 @@
 require 'gmailer'
+require 'file/tail'
 
 module DamageControl
   module Publisher
@@ -17,9 +18,8 @@ module DamageControl
       def initialize
         @content_type = "text/html"
         @to = ""
-        @from = "\"DamageControl\" <dcontrol@damagecontrol.buildpatterns.org>"
+        @from = "dcontrol@damagecontrol.buildpatterns.org"
 
-        # SMTP only
         @server = ""
         @port = ""
         @domain = ""
@@ -31,21 +31,19 @@ module DamageControl
       def publish(build)
         @stdout_tail = tail(build.stdout_file, 30)
         @stderr_tail = tail(build.stderr_file, 30)
+        template = ERB.new(File.read(RAILS_ROOT + '/app/views/build_result_mailer/build_result.rhtml'))
+        @headline = BuildResultMailer.headline(build)
+        @build = build
+        b = binding
+        @body = template.result(b)        
         
-        if(@from =~ /(.*)@gmail.com/)
-          GMailer.connect($1, @password) do |g|
-            # Use the same templare as ActionMailer
-            template = ERB.new(File.read(RAILS_ROOT + '/app/views/build_result_mailer/build_result.rhtml'))
-            @headline = BuildResultMailer.headline(build)
-            @build = build
-            b = binding
-            body = template.result(b)
-
+        if(delivery_method == "GMail")
+          GMailer.connect(@gmail_user, @password) do |g|
             # 'From' default gmail.com account
             g.send(
               :to => to.split(%r{,\s*}).join(","),
               :subject => @headline,
-              :body => body,
+              :body => @body,
               :html => true # Relies on my patch: http://rubyforge.org/tracker/index.php?group_id=869&atid=3435
             )
           end
@@ -54,6 +52,9 @@ module DamageControl
           BuildResultMailer.server_settings = server_settings
           BuildResultMailer.deliver_build_result(to.split(%r{,\s*}), from, build)
         end
+        # The only reason to return something here is to display some info to the user if called
+        # via the controller.
+        return "Sent email (via #{delivery_details}) to [#{@to}] with subject '#{@headline}' and body:<br/>#{@body}"
       end
 
     private
@@ -65,9 +66,18 @@ module DamageControl
         file.tail{|line| result << line}
         result
       end
+      
+      def delivery_details
+        "#{delivery_method}, #{server_settings.inspect}"
+      end
     
       def delivery_method
-        (@server && @server.strip != "") ? "smtp" : "sendmail"
+        if(@from =~ /(.*)@gmail.com/)
+          @gmail_user = $1
+          "GMail"
+        else
+          @server != "" ? "smtp" : "sendmail"
+        end
       end
 
       def server_settings
