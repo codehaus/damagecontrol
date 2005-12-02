@@ -87,16 +87,39 @@ class ProjectController < ApplicationController
     publisher_class_name = @params[:publisher_class_name]
     publisher = project.publishers.find{|p| p.class.name == publisher_class_name}
     
-    dummy_revision = Revision.new
-    dummy_revision.project = project
+    build_state_class_name = @params[:build_state_class_name]
+    build_state = eval(build_state_class_name).new
 
-    build = Build.new(:state => Build::Successful.new)
-    build.revision = dummy_revision
+    dummy_revision = Revision.new
+    dummy_revision.developer = "_why"
+    dummy_revision.identifier = 1971
+    dummy_revision.project = project
     
-    # TODO: render nothing and figure text with javascript on client (yellow appear effect)
+    dummy_file = RevisionFile.new(
+      :path => "nah/not/real.rb",
+      :status => RSCM::RevisionFile::MODIFIED,
+      :previous_native_revision_identifier => 1970,
+      :native_revision_identifier => 1971,
+      :timepoint => Time.now.utc
+    )
+    dummy_file.revision = dummy_revision
+    dummy_revision.revision_files << dummy_file
+
+    build = Build.new(:state => build_state)
+    build.revision = dummy_revision
+    def build.reason_description
+      "it's not a real build"
+    end
+    def build.stdout_file
+      File.dirname(__FILE__) + '/test_stdout.log'
+    end
+    def build.stderr_file
+      File.dirname(__FILE__) + '/test_stderr.log'
+    end
+
     begin
-      publisher.publish(build)
-      render :text => "Tested #{publisher.visual_name}"
+      status = publisher.publish(build)
+      render :text => (status.is_a?(String) && status.strip != "") ? status : "Tested #{publisher.visual_name}"
     rescue => e
       trace = e.backtrace.join("\n")
       render :text => "Failed to test: #{e.message}<br/><pre>#{trace}</pre>"

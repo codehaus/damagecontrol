@@ -14,16 +14,16 @@ module ActionView
         "."
       ]
       if use_full_path
+        e = nil
         search_path.each do |prefix|
           theme_path = prefix+'/'+template_path
           begin
-            template_extension = pick_template_extension(theme_path)
-          rescue ActionViewError => err
+            return __render_file(theme_path, use_full_path, local_assigns)
+          rescue ActionViewError => e
             next
           end
-          return __render_file(theme_path, use_full_path, local_assigns)
         end
-        raise ActionViewError.new("No template for #{template_path}")
+        raise e
       else
         __render_file(template_path, use_full_path, local_assigns)
       end
@@ -40,14 +40,19 @@ module ActionController
         "../../vendor/plugins/rscm_browser/views",
         "."
       ]
-      search_path.each do |prefix|
-        theme_path = prefix+'/'+template_path
-        begin
-          assert_existance_of_template_file(theme_path)
-        rescue ActionControllerError => err
-          next
+      if use_full_path
+        e = nil
+        search_path.each do |prefix|
+          theme_path = prefix+'/'+template_path
+          begin
+            return __render_file(theme_path, status, use_full_path)
+          rescue MissingTemplate => e
+            next
+          end
         end
-        return __render_file(theme_path, status, use_full_path)
+        raise e
+      else
+        return __render_file(template_path, status, use_full_path)
       end
     end
   end

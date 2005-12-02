@@ -14,13 +14,16 @@ changed lines per file/revision (use diff)
 
 calculate aggregate values in db!!
 
-  revision_file
-  |
+revision_file
+  *
+  |         M:N
 file --------+---------revision------*build
-+path    file_presence
++path    file_revision
              |
              *
  -----0..1 file_metric 0..1----
+
+hmmmm - use acts_as_tree for files?? yay!
 
 
 after checkout, collect files (exclude generated files) and insert new +file+ entries if they don't exist. then, create +entry+ rows. now, collect file metrics (simian,loc,comments,other static file analysis). store results in
