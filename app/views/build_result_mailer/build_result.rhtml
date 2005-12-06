@@ -6,7 +6,7 @@
   <pre><%= @stderr_tail %></pre>
   <h2>Changed files:</h2>
   <ul>
-    <% @build.revision.revision_files.each do |file| %>
+    <% @build.revision.scm_files.each do |file| %>
       <li><%= file.path %></li>
     <% end %>
   </ul>

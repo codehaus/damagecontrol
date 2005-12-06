@@ -21,8 +21,8 @@ class BuildResultMailerTest < Test::Unit::TestCase
 
     mail = BuildResultMailer.create_build_result("nah@not.real", "dcontrol@codehaus.org", builds(:build_1))
     assert_equal(@expected.subject, mail.subject)
-    assert_match(/three\/blind\/mice\.rb/, mail.body)
-    #assert_equal @expected.encoded, mail.encoded
+    assert_match(/README/, mail.body)
+    assert_match(/config\/boot\.rb/, mail.body)
   end
 
   private

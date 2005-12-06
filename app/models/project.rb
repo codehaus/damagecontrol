@@ -6,6 +6,9 @@ class Project < ActiveRecord::Base
 
   has_many :poll_requests, :dependent => true
   has_many :revisions, :order => "timepoint DESC", :dependent => true
+  # Exists only for the purpose of automatic deletion
+  has_many :scm_files, :dependent => true
+
   has_and_belongs_to_many :dependencies, 
     :class_name => "Project", 
     :join_table => "project_dependencies",
@@ -215,7 +218,7 @@ LIMIT #{options[:count]}
         item.description = "<b>#{revision.developer}</b><br/>\n"
         item.description << revision.message.gsub(/\n/, "<br/>\n") << "<p/>\n"
         
-        revision.revision_files.each do |file|
+        revision.scm_files.each do |file|
           # TODO: make internal(expandable) or external links to file diffs
           item.description << "#{file.path}<br/>\n"
         end
@@ -223,6 +226,11 @@ LIMIT #{options[:count]}
     end
     rss.to_s
   end
+  
+  # TODO: make an act
+  # acts_as_feed :title, :link, :description
+  # Needs columns timestamp, author, title, link, description, enclosure
+  # These can be symbols or procs
   
   def builds_rss(controller, rss_version="2.0")
     rss = RSS::Maker.make(rss_version) do |maker|

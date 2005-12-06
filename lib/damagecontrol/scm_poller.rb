@@ -29,8 +29,6 @@ module DamageControl
       # There may be a lot of inserts. Doing it in one txn will speed it up
       Revision.transaction do
         rscm_revisions.collect do |rscm_revision|
-          rscm_revision.project_id = project.id
-          rscm_revision.position = position
           position += 1
 
           # This will go on the web and scrape issue summaries. Might take a little while....
@@ -44,7 +42,7 @@ module DamageControl
           # We're not doing:
           #   project.revisions.create(revision)
           # because of the way Revision.create is implemented (overridden).
-          Revision.create(rscm_revision)
+          Revision.create_from_rscm_revision(project, rscm_revision, position)
         end
       end
     end

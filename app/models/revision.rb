@@ -1,14 +1,30 @@
 class Revision < ActiveRecord::Base
   belongs_to :project
-  has_many :revision_files, :dependent => true
+  has_and_belongs_to_many :scm_files
   has_many :builds, :order => "create_time", :dependent => true
 
-  # Creates a new persistent Revision from a RSCM::Revision
-  def self.create(rscm_revision)
-    revision = super(rscm_revision)
+  # Creates a new persistent Revision from a RSCM::Revision. Also
+  # creates necessary ScmFile records and sets up associations.
+  def self.create_from_rscm_revision(project, rscm_revision, position)
+    revision = project.revisions.create(
+      :position   => position,
+      :identifier => rscm_revision.identifier,
+      :developer  => rscm_revision.developer,
+      :message    => rscm_revision.message,
+      :timepoint  => rscm_revision.time
+    )
 
     rscm_revision.each do |rscm_revision_file|
-      revision.revision_files.create(rscm_revision_file)
+      # RSCM::RevisionFile is always a file, not a dir
+      scm_file = ScmFile.find_or_create_by_path_and_directory_and_project_id(rscm_revision_file.path, false, project.id)
+      revision.scm_files.push_with_attributes(
+        scm_file, 
+        :status                              => rscm_revision_file.status,
+        :previous_native_revision_identifier => rscm_revision_file.previous_native_revision_identifier,
+        :native_revision_identifier          => rscm_revision_file.native_revision_identifier,
+        :timepoint                           => rscm_revision_file.time,
+        :indexed                             => false
+      )
     end
     
     revision
@@ -16,6 +32,7 @@ class Revision < ActiveRecord::Base
 
   # Updates the Ferret index with file contents
   def self.index!(revisions)
+    return # TODO: reimplement this after fine reading thread from acts_as_ferret
     FileUtils.mkdir_p RevisionFile::INDEX_DIR unless File.exist? RevisionFile::INDEX_DIR
     persistent_index = Ferret::Index::Index.new(:path => RevisionFile::INDEX_DIR, :create_if_missing => true)
 
@@ -98,7 +115,7 @@ class Revision < ActiveRecord::Base
     {
       "DAMAGECONTROL_BUILD_LABEL" => label.to_s,
       "PKG_BUILD" => label.to_s,
-      "DAMAGECONTROL_CHANGED_FILES" => revision_files.collect{|f| f.path}.join(',')
+      "DAMAGECONTROL_CHANGED_FILES" => scm_files.collect{|f| f.path}.join(',')
     }
   end
 
@@ -158,25 +175,4 @@ private
     end
   end
     
-end
-
-# Adaptation to make it possible to create an AR Revision
-# from an RSCM one
-class RSCM::Revision
-  attr_accessor :project_id
-  attr_accessor :position
-  
-  def stringify_keys!
-  end
-  
-  def reject
-    {
-      "project_id" => project_id,
-      "position" => position,
-      "identifier" => identifier,
-      "developer" => developer,
-      "message" => message,
-      "timepoint" => time
-    }
-  end
 end

@@ -13,7 +13,7 @@ class BuildExecutorTest < Test::Unit::TestCase
     n = Project.find(:all).size
     p = Project.create(:name => "p#{n}")
     be = BuildExecutor.create
-    r = Revision.create(RSCM::Revision.new)
+    r = Revision.create
     p.revisions << r
     b = be.request_build_for(r, Build::SCM_POLLED, nil)
     

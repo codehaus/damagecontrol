@@ -1,8 +1,8 @@
 <%
-  revision_file = overview # The rendered object carries the name of this file - which is awkward here.
+  scm_file = overview # The rendered object carries the name of this file - which is awkward here.
 
-  project = revision_file.revision.project
-  full_path = project.scm.scm_web_path(revision_file)
+  project = scm_file.project
+  full_path = project.scm.scm_web_path(scm_file)
 
   overview_url = project.scm_web.history(
     full_path
@@ -10,13 +10,13 @@
 
   revision_url = project.scm_web.html(
     full_path, 
-    revision_file.native_revision_identifier
+    scm_file.native_revision_identifier
   )
 
   diff_url = project.scm_web.diff(
     full_path, 
-    revision_file.native_revision_identifier,
-    revision_file.previous_native_revision_identifier
+    scm_file.native_revision_identifier,
+    scm_file.previous_native_revision_identifier
   )
   
   # status         revision id            icon                path
@@ -27,26 +27,26 @@
   # deleted        Show deleted file      Show deleted rev X  Show history
 
   added_rev_tip = "Show new file"
-  modified_rev_tip = "Show revision #{revision_file.native_revision_identifier} (modified file)"
-  moved_rev_tip = "Show revision #{revision_file.native_revision_identifier} (moved file)"
-  deleted_rev_tip = "Show revision #{revision_file.native_revision_identifier} (removed file)"
+  modified_rev_tip = "Show revision #{scm_file.native_revision_identifier} (modified file)"
+  moved_rev_tip = "Show revision #{scm_file.native_revision_identifier} (moved file)"
+  deleted_rev_tip = "Show revision #{scm_file.native_revision_identifier} (removed file)"
   diff_tip = "Show diff"
   history_tip = "Show history"
 %>
 
   <div>
     <% if(project.scm_web.nil?) %>
-      <td><%= image_tag(revision_file.icon, :size => "16x16", :title => revision_file.status_description) %></span>
+      <td><%= image_tag(scm_file.icon, :size => "16x16", :title => scm_file.status_description) %></span>
     <% else %>
       <td>
         <%= 
           content_tag(
             "a", 
             image_tag(
-              revision_file.icon, 
+              scm_file.icon, 
               {
                 :size => "16x16", 
-                :title => case(revision_file.status)
+                :title => case(scm_file.status)
                   when "ADDED" then added_rev_tip
                   when "MODIFIED" then diff_tip
                   when "MOVED" then diff_tip
@@ -56,7 +56,7 @@
               }
             ), 
             {
-              :href => case(revision_file.status)
+              :href => case(scm_file.status)
                 when "ADDED" then revision_url
                 when "MODIFIED" then diff_url
                 when "MOVED" then diff_url
@@ -69,16 +69,16 @@
     <% end %>
 
     <% if(project.scm_web.nil?) %>
-      <td><%= revision_file.native_revision_identifier %></span>
+      <td><%= scm_file.native_revision_identifier %></span>
     <% else %>
       <td>
         <%= 
           content_tag(
             "a", 
-            revision_file.native_revision_identifier, 
+            scm_file.native_revision_identifier, 
             {
               :href=> revision_url,
-              :title => case(revision_file.status)
+              :title => case(scm_file.status)
                 when "ADDED" then added_rev_tip
                 when "MODIFIED" then modified_rev_tip
                 when "MOVED" then moved_rev_tip
@@ -91,13 +91,13 @@
     <% end %>
 
     <% if(project.scm_web.nil?) %>
-      <td><%= revision_file.path %></span>
+      <td><%= scm_file.path %></span>
     <% else %>
       <td>
         <%= 
           content_tag(
             "a", 
-            revision_file.path, 
+            scm_file.path, 
             {
               :href => overview_url,
               :title => history_tip

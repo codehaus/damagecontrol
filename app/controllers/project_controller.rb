@@ -94,16 +94,6 @@ class ProjectController < ApplicationController
     dummy_revision.developer = "_why"
     dummy_revision.identifier = 1971
     dummy_revision.project = project
-    
-    dummy_file = RevisionFile.new(
-      :path => "nah/not/real.rb",
-      :status => RSCM::RevisionFile::MODIFIED,
-      :previous_native_revision_identifier => 1970,
-      :native_revision_identifier => 1971,
-      :timepoint => Time.now.utc
-    )
-    dummy_file.revision = dummy_revision
-    dummy_revision.revision_files << dummy_file
 
     build = Build.new(:state => build_state)
     build.revision = dummy_revision
