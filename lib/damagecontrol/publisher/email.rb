@@ -18,7 +18,7 @@ module DamageControl
       def initialize
         @content_type = "text/html"
         @to = ""
-        @from = "dcontrol@damagecontrol.buildpatterns.org"
+        @from = "dcontrol@damagecontrol.buildpatterns.com"
 
         @server = ""
         @port = ""
@@ -50,7 +50,7 @@ module DamageControl
         else
           BuildResultMailer.delivery_method = delivery_method
           BuildResultMailer.server_settings = server_settings
-          BuildResultMailer.deliver_build_result(to.split(%r{,\s*}), from, build)
+          BuildResultMailer.deliver_build_result(to.split(%r{,\s*}), from, build, @stdout_tail, @stderr_tail)
         end
         # The only reason to return something here is to display some info to the user if called
         # via the controller.

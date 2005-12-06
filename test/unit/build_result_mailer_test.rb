@@ -19,10 +19,18 @@ class BuildResultMailerTest < Test::Unit::TestCase
   def test_should_render_email_with_changed_files
     @expected.subject = "project_1: fixed build (commit by aslak)"
 
-    mail = BuildResultMailer.create_build_result("nah@not.real", "dcontrol@codehaus.org", builds(:build_1))
+    mail = BuildResultMailer.create_build_result(
+      "nah@not.real", 
+      "dcontrol@damagecontrol.buildpatterns.com", 
+      builds(:build_1), 
+      "dummy stdout tail",
+      "dummy stderr tail"
+    )
     assert_equal(@expected.subject, mail.subject)
     assert_match(/README/, mail.body)
     assert_match(/config\/boot\.rb/, mail.body)
+    assert_match(/dummy stdout tail/, mail.body)
+    assert_match(/dummy stderr tail/, mail.body)
   end
 
   private

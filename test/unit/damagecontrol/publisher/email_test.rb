@@ -30,11 +30,11 @@ module DamageControl
           email.publish(build_1)
           # hard to assert success. verify manually.
         else
-          puts "\n"
-          puts "Skipping #{self.class.name} (#{__FILE__})"
-          puts "If you have Internet access and an smtp server running you can enable this test by defining"
-          puts "DC_TEST_SMTP_ENABLE=your@email in your shell"
-          puts "\n"
+          STDERR.puts "\n"
+          STDERR.puts "Skipping #{self.class.name} (#{__FILE__})"
+          STDERR.puts "If you have Internet access and an smtp server running you can enable this test by defining"
+          STDERR.puts "DC_TEST_SMTP_ENABLE=your@email in your shell"
+          STDERR.puts "\n"
         end
       end
 
@@ -47,11 +47,11 @@ module DamageControl
           email.publish(build_1)
           # hard to assert success. verify manually.
         else
-          puts "\n"
-          puts "Skipping #{self.class.name} (#{__FILE__})"
-          puts "If you have Internet access and a GMail account you can enable this test by defining"
-          puts "GMAIL_ADDRESS=your_gmail_address and GMAIL_PASSWORD=your_gmail_password in your shell"
-          puts "\n"
+          STDERR.puts "\n"
+          STDERR.puts "Skipping #{self.class.name} (#{__FILE__})"
+          STDERR.puts "If you have Internet access and a GMail account you can enable this test by defining"
+          STDERR.puts "GMAIL_ADDRESS=your_gmail_address and GMAIL_PASSWORD=your_gmail_password in your shell"
+          STDERR.puts "\n"
         end
       end
       
