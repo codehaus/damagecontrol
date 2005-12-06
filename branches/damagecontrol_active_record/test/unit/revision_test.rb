@@ -7,8 +7,11 @@ class RevisionTest < Test::Unit::TestCase
     assert_equal([builds(:build_1)], revisions(:revision_1).builds)
   end
 
-  def test_should_have_files
-    assert_equal([revision_files(:revision_file_1_1), revision_files(:revision_file_1_2)], revisions(:revision_1).revision_files)
+  def test_should_have_scm_files
+    files = revisions(:revision_1).scm_files
+    assert_equal 2, files.size
+    assert_equal "config/boot.rb", files[0].path
+    assert_equal "1.2.4", files[0].native_revision_identifier
   end
 
   def test_should_have_properties
@@ -23,7 +26,6 @@ class RevisionTest < Test::Unit::TestCase
     assert_equal([revisions(:revision_4)], projects(:project_2).revisions)
 
     rscm_revision = RSCM::Revision.new
-    rscm_revision.project_id = 2
     rscm_revision.identifier = "qwerty"
     rscm_revision.developer = "hellesoy"
     rscm_revision.message = "yippee"
@@ -36,7 +38,7 @@ class RevisionTest < Test::Unit::TestCase
     rscm_file_2.path = "here/i/go"
     rscm_revision << rscm_file_2
 
-    Revision.create(rscm_revision)
+    Revision.create_from_rscm_revision(projects(:project_2), rscm_revision, 1)
     
     ar_revision = projects(:project_2).revisions(true)[0]
     assert_equal(projects(:project_2), ar_revision.project)
@@ -45,8 +47,8 @@ class RevisionTest < Test::Unit::TestCase
     assert_equal("yippee", ar_revision.message)
     assert_equal(Time.utc(1971, 2, 28, 23, 45, 3), ar_revision.timepoint)
     
-    assert_equal("here/i/am", ar_revision.revision_files[0].path)
-    assert_equal("here/i/go", ar_revision.revision_files[1].path)
+    assert_equal("here/i/am", ar_revision.scm_files[0].path)
+    assert_equal("here/i/go", ar_revision.scm_files[1].path)
   end
 
   def test_should_request_build_for_each_build_executor_and_persist_build_number
@@ -84,7 +86,7 @@ class RevisionTest < Test::Unit::TestCase
     now = Time.now.utc
     rscm_revision = RSCM::Revision.new
     rscm_revision.identifier = now
-    revision = Revision.create(rscm_revision)
+    revision = Revision.create_from_rscm_revision(projects(:project_1), rscm_revision, 1)
     revision.reload
     assert_equal(now, revision.identifier)
   end
@@ -92,7 +94,7 @@ class RevisionTest < Test::Unit::TestCase
   def test_should_persist_identifier_as_string
     rscm_revision = RSCM::Revision.new
     rscm_revision.identifier = "koko"
-    revision = Revision.create(rscm_revision)
+    revision = Revision.create_from_rscm_revision(projects(:project_1), rscm_revision, 1)
     revision.reload
     assert_equal("koko", revision.identifier)
   end
@@ -100,7 +102,7 @@ class RevisionTest < Test::Unit::TestCase
   def test_should_persist_identifier_as_int
     rscm_revision = RSCM::Revision.new
     rscm_revision.identifier = 999
-    revision = Revision.create(rscm_revision)
+    revision = Revision.create_from_rscm_revision(projects(:project_1), rscm_revision, 1)
     revision.reload
     assert_equal(999, revision.identifier)
   end

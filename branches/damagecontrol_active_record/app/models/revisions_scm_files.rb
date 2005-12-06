@@ -1,12 +1,13 @@
 require 'set'
 
-class RevisionFile < ActiveRecord::Base
+class RevisionsScmFiles < ActiveRecord::Base
   INDEX_DIR = "#{DC_DATA_DIR}/index/revision_files" unless defined? INDEX_DIR
   DATA_INDEX_FIELD = "data" unless defined? DATA_INDEX_FIELD
 
   include Ferret::Document
 
   belongs_to :revision
+  belongs_to :scm_file
   
   def timepoint
     self[:timepoint] || revision.timepoint
@@ -69,54 +70,4 @@ class RevisionFile < ActiveRecord::Base
     memory_index
   end
 
-  # Returns/yields an IO containing the contents of this file, using the +scm+ this
-  # file lives in.
-  def open(&block)
-    revision.project.scm.open(self, &block)
-  end
-
-  # TODO It's a bit hackish to embed view info in the model :-(
-  ICONS = {
-    RSCM::RevisionFile::ADDED => "document_new",
-    RSCM::RevisionFile::DELETED => "document_delete",
-    RSCM::RevisionFile::MODIFIED => "document_edit",
-    RSCM::RevisionFile::MOVED => "document_exchange"
-  } unless defined? ICONS
-
-  DESCRIPTIONS = {
-    RSCM::RevisionFile::ADDED => "New file",
-    RSCM::RevisionFile::DELETED => "Deleted file",
-    RSCM::RevisionFile::MODIFIED => "Modified file",
-    RSCM::RevisionFile::MOVED => "Moved file"
-  } unless defined? DESCRIPTIONS
-
-  def icon
-    ICONS[status]
-  end
-
-  def status_description
-    DESCRIPTIONS[status]
-  end
-
-
-end
-
-# Adaptation to make it possible to create an AR RevisionFile
-# from an RSCM one
-class RSCM::RevisionFile
-  attr_accessor :revision_id
-  
-  def stringify_keys!
-  end
-  
-  def reject
-    {
-      "revision_id" => revision_id,
-      "status" => status,
-      "path" => path,
-      "previous_native_revision_identifier" => previous_native_revision_identifier,
-      "native_revision_identifier" => native_revision_identifier,
-      "timepoint" => time
-    }
-  end
 end

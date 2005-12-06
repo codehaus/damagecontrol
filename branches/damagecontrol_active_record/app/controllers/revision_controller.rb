@@ -7,7 +7,7 @@ class RevisionController < ApplicationController
 
   def show
     @revision = Revision.find(@params[:id])
-    @revision_files = @revision.revision_files
+    @scm_files = @revision.scm_files
 
     @revision_message = @revision.message
   end

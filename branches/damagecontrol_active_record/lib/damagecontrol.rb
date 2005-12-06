@@ -63,6 +63,6 @@ require 'build'
 require 'build_result_mailer'
 require 'project'
 require 'revision'
-require 'revision_file'
+require 'scm_file'
 
 exit if defined?(REQUIRE2LIB) # rubyscript2exe packaging mode

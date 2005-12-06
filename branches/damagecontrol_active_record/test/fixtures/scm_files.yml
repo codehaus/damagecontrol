@@ -1,0 +1,33 @@
+usr:
+  id: 1
+  directory: true
+  path: "usr"
+  project_id: 3
+usr_bin:
+  id: 2
+  path: "usr/bin"
+  directory: true
+  parent_id: 1
+  project_id: 3
+usr_bin_ruby:
+  id: 3
+  path: "usr/bin/ruby"
+  directory: false
+  parent_id: 2
+  project_id: 3
+config:
+  id: 4
+  path: "config"
+  directory: true
+  project_id: 1
+config_boot_rb:
+  id: 5
+  path: "config/boot.rb"
+  directory: false
+  parent_id: 4
+  project_id: 1
+readme:
+  id: 6
+  path: "README"
+  directory: false
+  project_id: 1

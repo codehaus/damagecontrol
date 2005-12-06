@@ -29,12 +29,12 @@ class ProjectTest < Test::Unit::TestCase
   
   def test_should_destroy_revisions_and_files
     assert_equal 6, Revision.find(:all, true).size
-    assert_equal 6, RevisionFile.find(:all, true).size
+    assert_equal 6, ScmFile.find(:all, true).size
 
     projects(:project_1).destroy
 
     assert_equal 3, Revision.find(:all, true).size
-    assert_equal 4, RevisionFile.find(:all, true).size
+    assert_equal 3, ScmFile.find(:all, true).size
   end
 
   def test_should_persist_scm
