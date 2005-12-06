@@ -30,7 +30,7 @@ publishers:
     authentication: ''
     content_type: text/html
     domain: localhost.localdomain
-    from: "\"DamageControl\" <dcontrol@codehaus.org>"
+    from: "dcontrol@damagecontrol.buildpatterns.com"
     password: ''
     port: "25"
     server: ''
