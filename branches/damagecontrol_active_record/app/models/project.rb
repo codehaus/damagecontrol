@@ -1,10 +1,7 @@
-# A Project record contains information about a project to be continuously
-# built by DamageControl.
 class Project < ActiveRecord::Base
   
   include DamageControl::Dom
 
-  has_many :poll_requests, :dependent => true
   has_many :revisions, :order => "timepoint DESC", :dependent => true
   # Exists only for the purpose of automatic deletion
   has_many :scm_files, :dependent => true
@@ -32,19 +29,23 @@ class Project < ActiveRecord::Base
 
   validates_uniqueness_of :name
 
-  def before_destroy
+  def before_destroy #:nodoc:
     begin
       scm.destroy_working_copy if scm
     rescue
     end
     FileUtils.rm_rf(basedir) if File.exist?(basedir)
   end
-
-  def after_find
-    set_defaults
+  
+  def after_find #:nodoc:
+    FileUtils.mkdir_p basedir unless File.exist?(basedir)
+    self.scm.checkout_dir = working_copy_dir if self.scm
+    self.scm.enabled = true if self.scm
+    self.scm.revision_detection ||= "ALWAYS_POLL" if self.scm
+    self.tracker.enabled = true if self.tracker
   end
 
-  def after_save
+  def after_save #:nodoc:
     master = BuildExecutor.master_instance
     if(local_build)
       build_executors << master unless build_executors.index(master)
@@ -158,19 +159,16 @@ LIMIT #{options[:count]}
       lr.request_builds(reason, triggering_build)
     end
   end
-  
-  # Yields if the scm uses polling or if there is a poll request for this project and then
-  # deletes all poll requests. If there are no requests, no yield.
-  def poll!
-    req = PollRequest.find(:first, :conditions => ["project_id = ?", id])
-    always_poll = self.scm && self.scm.uses_polling    
 
-    if(req || always_poll)
-      yield
-      PollRequest.destroy_all(["project_id = ?", id])
+  # Callback method which is invoked after new revisions are detected
+  def new_revisions_detected(new_revisions)
+    if(!new_revisions[-1].nil? && build_on_new_revisions?)
+      new_revisions[-1].request_builds(Build::SCM_POLLED)
     end
   end
+  
 
+  # Prepares the SCM for use.
   def prepare_scm
     if(scm.is_a?(RSCM::Cvs))
       # Override the location of the .cvspass file and make sure it exists
@@ -385,34 +383,34 @@ LIMIT #{options[:count]}
 
 private
 
-  #  uses_polling trigger_enabled? action
-  #  Y            Y                uninstall
-  #  Y            N                nothing
-  #  N            Y                nothing
-  #  N            N                install
+  #  requires_scm_triggering? trigger_enabled? action
+  #  Y                        Y                uninstall
+  #  Y                        N                nothing
+  #  N                        Y                nothing
+  #  N                        N                install
   #
   def update_scm_triggering(controller)
     if(scm.supports_trigger?)
       # TODO: take base url from a persistent table (globals) and make it work on windows
       trigger_command = "curl http://localhost:3000/project/request_scm_poll/#{self.id}"
 
-      should_be_enabled = scm.uses_polling == false # can be true, false or nil
+      needs_scm_triggering = scm.revision_detection == "POLL_IF_REQUESTED"
       begin
         enabled = scm.trigger_installed?(trigger_command, scm_trigger_dir)
       
-        if(enabled && !should_be_enabled)
+        if(enabled && !needs_scm_triggering)
           scm.uninstall_trigger(trigger_command, scm_trigger_dir)
-          notice controller, "Successfully uninstalled trigger"
-        elsif(!enabled && should_be_enabled)
+          notice controller, "Successfully uninstalled trigger from #{scm.visual_name}"
+        elsif(!enabled && needs_scm_triggering)
           scm.install_trigger(trigger_command, scm_trigger_dir)
-          notice controller, "Successfully installed trigger"
+          notice controller, "Successfully installed trigger from #{scm.visual_name}"
         end
       rescue => e
-        notice controller, e.message if should_be_enabled
+        notice controller, e.message if needs_scm_triggering
       end
     end
   end
-  
+
   def notice(controller, msg)
     if(controller)
       msg = msg.kind_of?(Array) ? msg.join("<br/>") : msg
@@ -422,13 +420,6 @@ private
     end
   end
 
-  def set_defaults
-    FileUtils.mkdir_p basedir unless File.exist?(basedir)
-    self.scm.checkout_dir = working_copy_dir if self.scm
-    self.scm.enabled = true if self.scm
-    self.tracker.enabled = true if self.tracker
-  end
-  
   def basedir
     raise "id not set for #{name}" unless id
     File.expand_path("#{DC_DATA_DIR}/projects/#{id}")

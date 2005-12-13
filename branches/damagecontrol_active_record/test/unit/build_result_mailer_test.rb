@@ -28,7 +28,7 @@ class BuildResultMailerTest < Test::Unit::TestCase
     )
     assert_equal(@expected.subject, mail.subject)
     assert_match(/README/, mail.body)
-    assert_match(/config\/boot\.rb/, mail.body)
+    assert_nil(mail.body =~ /config\/boot\.rb/)
     assert_match(/dummy stdout tail/, mail.body)
     assert_match(/dummy stderr tail/, mail.body)
   end

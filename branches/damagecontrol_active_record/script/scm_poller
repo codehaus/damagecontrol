@@ -11,37 +11,24 @@ ARGV.options do |opts|
           "Specifies the environment (test/development/production).",
           "Default: #{ENV['RAILS_ENV']}") { |ENV['RAILS_ENV']|}
 
-  opts.on("--id=id", Integer, 
-          "Builder id") {|id| BUILDER_ID = id}
-
   opts.separator ""
   opts.on("-h", "--help",
           "Show this help message.") { puts opts; exit }
 
   opts.parse!
-  
-  unless defined? BUILDER_ID
-    STDERR.puts "id must be specified"
-    puts
-    puts opts
-    exit 20
-  end
 end
 require File.dirname(__FILE__) + "/../config/environment"
 
 # set up logging
 FileUtils.mkdir_p("#{DC_DATA_DIR}/log") unless File.exist?("#{DC_DATA_DIR}/log")
-logfile = "#{DC_DATA_DIR}/log/builder_#{BUILDER_ID}.log"
+logfile = "#{DC_DATA_DIR}/log/scm_poller.log"
 logger = Logger.new(logfile, 10, 1.megabyte)
 logger.datetime_format = "%Y-%m-%d %H:%M:%S"
 logger.level = Logger::DEBUG
 [
-  DamageControl::Process::Builder, 
-  DamageControl::Publisher::Base, 
-  Build, 
-  BuildExecutor, 
+  DamageControl::Process::ScmPoller,
   Project, 
   Revision
 ].each { |cls| cls.logger = logger }
-puts "DamageControl builder log: #{logfile}"
-DamageControl::Process::Builder.new.run
+puts "DamageControl scm_poller log: #{logfile}"
+DamageControl::Process::ScmPoller.new.run

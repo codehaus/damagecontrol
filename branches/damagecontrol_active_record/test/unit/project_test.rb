@@ -188,19 +188,4 @@ class ProjectTest < Test::Unit::TestCase
     assert p.lock_time
   end
   
-  def test_should_delete_poll_requests_on_poll
-    # revisions: 00, 01, 02
-    t = Time.utc(1971,02,28,23,45,00)
-    projects(:project_1).poll_requests.create
-    projects(:project_1).poll_requests.create
-    assert_equal 2, projects(:project_1).poll_requests.size
-    
-    found2 = false
-    projects(:project_1).poll! do
-      found2 = true
-    end
-    assert found2
-    assert_equal 0, projects(:project_1).poll_requests(true).size
-  end
-  
 end

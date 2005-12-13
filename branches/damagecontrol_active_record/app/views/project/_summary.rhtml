@@ -1,4 +1,7 @@
-<h2><%= link_to project.name, :controller => "project", :action => "timeline", :id => project.id %></h2>
+<h2>
+  <%= link_to project.name, :controller => "project", :action => "timeline", :id => project.id %> |
+  <%= link_to "browse", :controller => "rscm", :action => "browse", :id => project.id %>
+</h2>
 
 <% if project.latest_build %>
   <%= build_inline_link(project.latest_build) %>

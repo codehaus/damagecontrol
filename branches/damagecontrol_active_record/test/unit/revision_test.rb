@@ -9,13 +9,13 @@ class RevisionTest < Test::Unit::TestCase
 
   def test_should_have_scm_files
     files = revisions(:revision_1).scm_files
-    assert_equal 2, files.size
-    assert_equal "config/boot.rb", files[0].path
-    assert_equal "1.2.4", files[0].native_revision_identifier
+    assert_equal 1, files.size
+    assert_equal "README", files[0].path
+    assert_equal "1.4.5", files[0].native_revision_identifier
   end
 
   def test_should_have_properties
-    assert_equal(789, revisions(:revision_1).identifier)
+    assert_equal(1, revisions(:revision_1).identifier)
     assert_equal("aslak", revisions(:revision_1).developer)
     assert_equal("fixed a bug", revisions(:revision_1).message)
     assert_equal(Time.utc(1971, 2, 28, 23, 45, 0), revisions(:revision_1).timepoint)
@@ -60,11 +60,11 @@ class RevisionTest < Test::Unit::TestCase
     assert_equal(1, builds[0].number)
     assert_equal(2, builds[1].number)
   end
-  
+
   def test_should_sync_projects_working_copy_and_zip_it
     scm = new_mock
     scm.__expect(:checkout) do |identifier|
-      assert_equal(789, identifier)
+      assert_equal(1, identifier)
     end
     scm.__setup(:checkout_dir) do
       "checkout_dir"
@@ -74,7 +74,7 @@ class RevisionTest < Test::Unit::TestCase
     zipper = new_mock
 #    zipper.__expect :zip do |dirname, zipfile_name, exclude_patterns|
 #      assert_equal "checkout_dir", dirname
-#      assert_equal File.expand_path(revisions(:revision_1).project.zip_dir + "/789.zip"), File.expand_path(zipfile_name)
+#      assert_equal File.expand_path(revisions(:revision_1).project.zip_dir + "/1.zip"), File.expand_path(zipfile_name)
 #      # TODO assert_equal ["build/*", "*.log"], exclude_patterns
 #      assert_equal [], exclude_patterns
 #    end

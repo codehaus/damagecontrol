@@ -8,7 +8,7 @@ module DamageControl
       return "powerpc-darwin" if target_os.downcase =~ /darwin/
       return "mswin32"  if target_os.downcase =~ /32/
       return "cygwin" if target_os.downcase =~ /cyg/
-      # TODO: distinguish between different kinds...
+      # TODO: distinguish between different binary formats like ELF and a.out (or whatever it's called)
       return "linux"
     end
     module_function :family

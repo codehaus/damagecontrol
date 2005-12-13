@@ -1,4 +1,5 @@
 <%= enabled_field(object) %>
+
 <% if(object.supports_trigger?) %>
   <table>
     <tr>
@@ -6,15 +7,25 @@
     </tr>
     <tr>
       <td>Polling:</td>
-      <td><%= radio_button_tag("scm[#{object.class.name}][uses_polling]", "true", object.uses_polling == true, :id=>nil) %></td>
+      <td>
+         <%= radio_button_tag(
+           "scm[#{object.class.name}][revision_detection]", 
+           "ALWAYS_POLL",
+           object.revision_detection == "ALWAYS_POLL", 
+           :id => nil) 
+         %>
+      </td>
     </tr>
     <tr>
-      <td>Triggering (<%= object.trigger_mechanism %>):</td>
-      <td><%= radio_button_tag("scm[#{object.class.name}][uses_polling]", "false", object.uses_polling == false, :id=>nil) %></td>
-    </tr>
-    <tr>
-      <td>None:</td>
-      <td><%= radio_button_tag("scm[#{object.class.name}][uses_polling]", "nil", object.uses_polling.nil?, :id=>nil) %></td>
+      <td>SCM Triggering (<%= object.trigger_mechanism %>):</td>
+      <td>
+         <%= radio_button_tag(
+           "scm[#{object.class.name}][revision_detection]", 
+           "POLL_IF_REQUESTED", 
+           object.revision_detection == "POLL_IF_REQUESTED", 
+           :id => nil) 
+         %>
+      </td>
     </tr>
   </table>
 <% end %>

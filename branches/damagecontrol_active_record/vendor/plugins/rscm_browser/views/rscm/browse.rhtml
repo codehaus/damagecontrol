@@ -1,7 +1,78 @@
-<% @history_files.each do |history_file| %>
-  <% if(history_file) 
-      url = url_for(:action => (history_file.directory? ? "browse" : "view_file"), :id => @id, :trailing_slash => true) + history_file.relative_path
-  %>
-  <a href="<%= url %>"><%= history_file.relative_path %></a><br/>
+<% @page_title = 'Browsing repository' %>
+
+<h2>Warning - this is not a live view of the SCM, but an indexed view.
+    If you don't see the full history, make sure the SCM has been fully indexed.</h2>
+
+<div id="content">
+
+<div class="breadcrumbs"><%= @path %></div>
+
+<% #TODO:  styyyyyle me: %>
+<div id="filter-selector">
+  <dl>
+    <dt>Revision:</dt>
+    <dd><%= "@current_entry.revision" -%></dd>
+  </dl>
+  <dl>
+    <dt>Log:</dt> 
+    <dd><%= "format_and_make_links(h(@current_entry.log))" -%></dd>
+  </dl>
+  <dl>
+    <dt>Author:</dt>
+    <dd><%= "@current_entry.author" -%></dd>
+  </dl>
+  <dl>
+    <dt>Date:</dt> 
+    <dd><%= "@current_entry.date" -%></dd>
+  </dl>
+  <% unless "@current_entry.proplist.empty?" -%>
+  <dl>
+    <dt>Properties:</dt> 
+  <% @current_entry.proplist.each do |name, value| %>
+    <dd>Property <%= name -%> is set <%= value.empty? ? '' : "to #{value}" -%></dd>
   <% end %>
-<% end %>
+  </dl>
+  <% end -%>
+</div>
+
+<table id="browser" class="listing">
+ <thead>
+  <tr>
+    <th class="name">Name</th>
+    <th class="age">Age</th>
+    <th class="rev">Rev.</th>
+    <th class="msg">Last commit message</th>
+  </tr>
+ </thead>
+ <tbody>
+  <% unless params[:path].empty? %>
+  <tr class="parent">
+  <% paths = params[:path]; paths.pop %>
+    <td class="name parent"><%= link_to '..', :path => paths, :params => {"rev" => @revision_identifier} %></td>
+    <td class="age"></td>
+    <td class="rev"></td>
+    <td class="msg"></td>
+  </tr>
+  <% end %>
+  <% @files.each do |file| revision = file.revisions.latest(@revision_identifier) %>
+    <% unless revision.nil? %>
+      <tr class="<%= "css" -%>">
+        <td class="name <%= "history_file_type" -%>">
+          <%= link_to file.basename, url_for_file(file, revision) %>
+        </td>
+        <td class="age"><%= "time_ago_in_words(#{revision.timepoint})" %></td>
+        <td class="rev"><%= revision.identifier -%></td>
+        <td class="msg">[<%= revision.developer -%>] <%= truncate(h(revision.message), 50) %> </td>
+      </tr>
+    <% end %>
+  <% end %>
+ </tbody>
+</table>
+
+<!--<div class="rev-chooser">
+  <%= start_form_tag({:action => 'browse', :path => params[:path]}, :method => 'get') %>
+    <p>Revision: <input id="rev" name="rev" type="text" value="<%= @rev -%>" /></p>
+  <% end_form_tag %>
+</div>-->
+
+</div>

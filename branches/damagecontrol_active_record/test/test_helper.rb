@@ -14,7 +14,6 @@ class Test::Unit::TestCase
     :promotion_levels, 
     :revisions_scm_files, 
     :revisions, 
-    :poll_requests,
     :scm_files
   )
   
