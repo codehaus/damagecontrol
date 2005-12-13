@@ -13,7 +13,7 @@ class AddScmFile < ActiveRecord::Migration
 
     # Migrate the contents
     rsfs = RevisionsScmFiles.find(:all)
-    puts "Migrating #{rsfs.length} revision files to new database structure. Please be patient."
+    puts "Migrating #{rsfs.length} revision files to new database structure. Please be patient." unless rsfs.empty?
     rsfs.each do |rsf|
       STDOUT.write(".")
       STDOUT.flush
@@ -21,7 +21,7 @@ class AddScmFile < ActiveRecord::Migration
       rsf.scm_file_id = scm_file.id
       rsf.save
     end
-    puts "Done"
+    puts "Done" unless rsfs.empty?
 
     remove_column :revisions_scm_files, :path
     remove_column :revisions_scm_files, :id

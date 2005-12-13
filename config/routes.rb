@@ -17,7 +17,6 @@ ActionController::Routing::Routes.draw do |map|
 
   map.connect 'artifacts/*path', :controller => 'file_system', :action => 'browse'
   map.connect 'rscm/browse/:id/*path', :controller => 'rscm', :action => 'browse'
-  map.connect 'rscm/cbrowse/:id/*path', :controller => 'rscm', :action => 'cbrowse'
   map.connect 'rscm/view_file/:id/*path', :controller => 'rscm', :action => 'view_file'
 
   # Install the default route as the lowest priority.

@@ -46,7 +46,6 @@ class ProjectController < ApplicationController
       import_settings
     )
 
-    project.scm.uses_polling = true
     # Set up some default publishers
     if(DamageControl::Platform.family == 'powerpc-darwin')
       project.add_growl
@@ -211,7 +210,6 @@ private
   # will also be among these, and will have the persisted attribute values.
   def scms
     RSCM::Base.classes.collect{|cls| cls.new}.collect do |scm|
-      scm.uses_polling = true
       scm.class == @project.scm.class ? @project.scm : scm
     end.sort
   end

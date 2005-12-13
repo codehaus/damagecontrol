@@ -3,24 +3,18 @@ require 'mime/types' # http://rubyforge.org/projects/mime-types/
 # This Controller can show contents of an SCM or File system.
 class RscmController < ActionController::Base
   
-  # TODO: we really have to use RDBMS objects here since we want to display (for each file)
-  #  * latest revision
-  #  * latest timestamp
-  #  * latest author
-  #  * latest message
-  #
-  # The scm.ls methods won't give us that info (it's not in the cvs logs afaik)
-  # It's probably too hard to do all of this in RSCM, so we might have to do it in DC/RDBMS
-  # Therefore, we should use RDBMS persisted revisions where this is probably easier.
-  # We have to look at how it fits in with the metrics stuff too.
   def browse
+    project = Project.find(@params[:id])
     @path = @params[:path].to_s
-    @history_files = scm.ls(@path)
-  end
-  
-  def cbrowse
-    @path = @params[:path].to_s
-    @history_files = scm.ls(@path)
+    @revision_identifier = @params[:rev].nil? ? nil : project.scm.to_identifier(@params[:rev].to_s)
+    
+    parent_file = ScmFile.find_by_path_and_project_id(@path, project.id)
+    parent_file_rev = parent_file.revisions.latest(@revision_identifier)
+    if(parent_file_rev)
+      render :text => "#{@path} did not yet exist at revision #{@revision_identifier}"
+    else
+      @files = parent_file.children
+    end
   end
   
   def view_file
@@ -33,6 +27,18 @@ class RscmController < ActionController::Base
       send_data io.read, :type => mime_type, :disposition => "inline"
     end
   end
+
+  def url_for_file(file, revision=nil)
+    path_parts = file.path.split('/').reject {|fp| fp.empty?}
+    path_url = {:action => 'browse', :path => path_parts}
+    if revision
+      url = path_url.merge({:rev => file.directory? ? revision.identifier : revision.native_revision_identifier})
+    else
+      url = path_url
+    end
+    url_for(url)
+  end
+  helper_method :url_for_file
 
 protected
 

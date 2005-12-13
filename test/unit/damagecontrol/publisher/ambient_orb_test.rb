@@ -5,19 +5,17 @@ module DamageControl
   module Publisher
     class AmbientOrbTest < Test::Unit::TestCase
 
-      if(ENV['DC_TEST_ORB_ENABLE'])
-        def driver
+      def driver
+        if(ENV['DC_TEST_ORB_ENABLE'])
           Ambient::Orb.new
-        end
-      else
-        STDERR.puts "\n"
-        STDERR.puts "Using mocks in #{self.class.name} (#{__FILE__})"
-        STDERR.puts "If you have an Ambient Orb device and a primary account for it you can test against real Orb devices by defining"
-        STDERR.puts "DC_TEST_ORB_ENABLE=your_orb_id in your shell"
-        STDERR.puts "You should see it switching to flashing green"
-        STDERR.puts "\n"
-        
-        def driver
+        else
+          STDERR.puts "\n"
+          STDERR.puts "Using mocks in #{self.class.name} (#{__FILE__})"
+          STDERR.puts "If you have an Ambient Orb device and a primary account for it you can test against real Orb devices by defining"
+          STDERR.puts "DC_TEST_ORB_ENABLE=your_orb_id in your shell"
+          STDERR.puts "You should see it switching to flashing green"
+          STDERR.puts "\n"
+
           driver = new_mock
           driver.__expect(:id=) {|id| assert_equal("dummy", id)}
           driver.__expect(:color=) {|color| assert_equal(:green, color)}

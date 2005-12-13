@@ -27,8 +27,8 @@ class BuildTest < Test::Unit::TestCase
     now = Time.now.utc
     build.execute!
     
-    assert_match(/damagecontrol> echo hello 789.*hello 789/m, File.open(build.stdout_file).read)
-    assert_match(/damagecontrol> echo hello 789/, File.open(build.stderr_file).read)
+    assert_match(/damagecontrol> echo hello 1.*hello 1/m, File.open(build.stdout_file).read)
+    assert_match(/damagecontrol> echo hello 1/, File.open(build.stderr_file).read)
     assert_equal(0, build.exitstatus)
     assert_equal(Build::Fixed, build.state.class)
     assert_equal(Time, build.begin_time.class)

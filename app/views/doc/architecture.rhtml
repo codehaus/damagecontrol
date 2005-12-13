@@ -1,2 +1,34 @@
-<h1>Doc#architecture</h1>
-<p>Find me in app/views/doc/architecture.rhtml</p>
+<h1>DamageControl architecture</h1>
+<p>
+  DamageControl consists of several sub systems, each running in a different ruby process:
+</p>
+<ul>    
+    <li>
+        The SCMPoller polls SCMs for new revisions and persists
+        them to DamageControl's internal database. Whenever an SCMPoller detects 
+        a new revision, it will create a new build request for the associated project.
+        <br/>
+        The scm_poller daemon process periodically invokes the SCMPoller for projects
+        that have SCM polling enabled. 
+        
+        Each project can be configured with different SCM polling strategies:
+        * Always (default)
+        * One-off (used with scm triggering)
+        * Never (used for disabled projects)
+        * Time based (nightly builds)
+        
+        These strategies can be combined...
+    </li>
+    <li>
+        Builder. BuildExecutors look in the database for new build requests.
+        Build requests are created by SCMPollers, but may also be created via the
+        web interface.
+    </li>
+    <li>
+        SCMIndexer. This process updates a search index with the contents of each
+        project's SCM. The index is used by DamageControl's integrated search engine.
+    </li>
+    <li>
+        The webapp.
+    </li>
+</ul>

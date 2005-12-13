@@ -4,11 +4,11 @@ module RSCM
     include ::DamageControl::Dom
 
     attr_accessor :enabled
-    attr_accessor :uses_polling
+    attr_accessor :revision_detection
 
     def self.classes
       # Only Subversion and Cvs are known to be stable...
-      [RSCM::Subversion, RSCM::Cvs, RSCM::ClearCase, RSCM::Perforce, RSCM::Monotone]
+      [RSCM::Subversion, RSCM::Cvs]
     end
 
     def category

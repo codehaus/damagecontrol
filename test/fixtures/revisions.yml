@@ -1,14 +1,14 @@
 revision_1:
   id: 1
   project_id: 1
-  identifier: [789]
+  identifier: [1]
   developer: aslak
   message: fixed a bug
   timepoint: 1971-02-28 23:45:00 Z
 revision_2:
   id: 2
   project_id: 1
-  identifier: [1]
+  identifier: [2]
   developer: tirsen
   message: ibsen
   timepoint: 1971-02-28 23:45:01 Z

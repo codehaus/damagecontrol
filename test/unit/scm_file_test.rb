@@ -6,7 +6,7 @@ class ScmFileTest < Test::Unit::TestCase
     assert scm_files(:usr_bin).directory?
     assert !scm_files(:usr_bin_ruby).directory?
   end
-  
+
   def test_should_find_file_by_path
     assert_equal scm_files(:usr_bin_ruby), ScmFile.find_by_path("usr/bin/ruby")
   end
@@ -23,7 +23,17 @@ class ScmFileTest < Test::Unit::TestCase
   def test_should_have_revision_info
     revisions = scm_files(:readme).revisions
     assert_equal 1, revisions.size
-    assert_equal 789, revisions[0].identifier
+    assert_equal 1, revisions[0].identifier
     assert_equal "1.4.5", revisions[0].native_revision_identifier
+  end
+  
+  def test_should_find_latest_revision_for_identifier
+    assert_equal [revisions(:revision_2), revisions(:revision_3)], scm_files(:config_boot_rb).revisions
+
+    assert_nil scm_files(:config_boot_rb).revisions.latest(1)
+    assert_equal revisions(:revision_2), scm_files(:config_boot_rb).revisions.latest(2)
+    assert_equal revisions(:revision_3), scm_files(:config_boot_rb).revisions.latest(3)
+    assert_equal revisions(:revision_3), scm_files(:config_boot_rb).revisions.latest(4)
+    assert_equal revisions(:revision_3), scm_files(:config_boot_rb).revisions.latest
   end
 end
