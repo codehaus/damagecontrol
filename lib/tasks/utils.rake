@@ -19,12 +19,12 @@ task :todo do
   egrep /#.*(FIXME|TODO|TBD)/
 end
 
-desc "Make greyscale (sepia) images"
+desc "Make greyscale (sepia) images for plugins"
 task :greyscale do
   require 'RMagick'
 
-  colour_pngs = FileList.new('public/images/**/*.png')
-  colour_pngs.exclude('public/images/**/*_grey.png')
+  colour_pngs = FileList.new('public/images/plugin/**/*.png')
+  colour_pngs.exclude('public/images/plugin/**/*_grey.png')
   colour_pngs.to_a.each do |png|
     img = Magick::ImageList.new(png)
     # img = img.sepiatone

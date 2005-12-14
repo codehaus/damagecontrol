@@ -33,7 +33,7 @@ module DamageControl
     end
 
     def icon_base
-      "/images/#{category}/#{underscored_name}"
+      "/images/plugin/#{category}/#{underscored_name}"
     end
 
     def default_render_excludes

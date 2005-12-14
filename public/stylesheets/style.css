@@ -170,17 +170,16 @@ dd {
 }
 
 /* Apply icon background-image twice to avoid hover-flicker in IE/Win */
-dt.revision, dt.revision a { background-image: url(/images/documents.png) !important }
-dt.newticket, dt.newticket a { background-image: url(../newticket.png) !important }
-dt.editedticket, dt.editedticket a { background-image: url(../editedticket.png) !important }
-dt.closedticket, dt.closedticket a { background-image: url(../closedticket.png) !important }
-dt.wiki, dt.wiki a { background-image: url(../wiki.png) !important }
-dt.milestone, dt.milestone a { background-image: url(../milestone.png) !important }
+dt.requested_build, dt.requested_build a { background-image: url(/images/build/grey-16.gif) !important }
+dt.synching_working_copy_build, dt.synching_working_copy_build a { background-image: url(/images/build/grey-16.gif) !important }
+dt.executing_build, dt.executing_build a { background-image: url(/images/build/grey-16.gif) !important }
+dt.successful_build, dt.successful_build a { background-image: url(/images/build/grey-16.gif) !important }
+dt.fixed_build, dt.fixed_build a { background-image: url(/images/build/grey-16.gif) !important }
+dt.broken_build, dt.broken_build a { background-image: url(/images/build/grey-16.gif) !important }
+dt.repeatedly_broken_build, dt.repeatedly_broken_build a { background-image: url(/images/build/grey-16.gif) !important }
 
-/* Styles for the 'revision_show_files' option */
-dd.revision .changes .add { color: #2e2 }
-dd.revision .changes .delete { color: #e00 }
-dd.revision .changes .edit, dd.revision .changes .copy,
-dd.revision .changes .move {
- color: #e84;
-}
+dt.revision, dt.revision a { background-image: url(/images/revision/documents.png) !important }
+dt.added_file, dt.added_file a { background-image: url(/images/revision/document_add.png) !important }
+dt.modified_file, dt.modified_file a { background-image: url(/images/revision/document_edit.png) !important }
+dt.deleted_file, dt.deleted_file a { background-image: url(/images/revision/document_delete.png) !important }
+dt.moved_file, dt.moved_file a { background-image: url(/images/revision/document_exchange.png) !important }
