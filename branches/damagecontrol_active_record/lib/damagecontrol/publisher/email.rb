@@ -1,5 +1,4 @@
 require 'gmailer'
-require 'file/tail'
 
 module DamageControl
   module Publisher
@@ -29,8 +28,8 @@ module DamageControl
       end
 
       def publish(build)
-        @stdout_tail = tail(build.stdout_file, 30)
-        @stderr_tail = tail(build.stderr_file, 30)
+        @stdout_tail = build.tail(build.stdout_file)
+        @stderr_tail = build.tail(build.stderr_file)
         template = ERB.new(File.read(RAILS_ROOT + '/app/views/build_result_mailer/build_result.rhtml'))
         @headline = BuildResultMailer.headline(build)
         @build = build
@@ -59,14 +58,6 @@ module DamageControl
 
     private
     
-      def tail(file, n)
-        result = ""
-        file = File::Tail::Logfile.new(file).rewind(n)
-        file.return_if_eof = true
-        file.tail{|line| result << line}
-        result
-      end
-      
       def delivery_details
         "#{delivery_method}, #{server_settings.inspect}"
       end
