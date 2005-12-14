@@ -1,12 +1,11 @@
 <div class="revision-summary">
   <%= textilize(@revision_message).strip %>
 </div>
-
 <div id="request-build-<%= @revision.id %>">
   <%= link_to_remote(
-  	"Request build(s) for this revision",
-  	:url => {:controller => "revision", :action => "request_build", :id => @revision.id},
-  	:update => "request-build-#{@revision.id}",
+    "Request build(s) for this revision",
+    :url => {:controller => "revision", :action => "request_build", :id => @revision.id},
+    :update => "request-build-#{@revision.id}",
     :complete => "Effect.Pulsate('request-build-#{@revision.id}')"
   ) %>
 </div>
