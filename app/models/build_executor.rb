@@ -15,8 +15,11 @@ class BuildExecutor < ActiveRecord::Base
   # It will not be executed until +execute+ is called.
   def request_build_for(revision, reason, triggering_build)
     build_number = revision.project.build_count + 1
-    build = revision.builds.create(:number => build_number, :reason => reason, :triggering_build => triggering_build)
-    self.builds << build
+    build = nil
+    transaction do
+      build = revision.builds.create(:number => build_number, :reason => reason, :triggering_build => triggering_build)
+      self.builds << build
+    end
     build
   end
 

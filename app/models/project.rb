@@ -5,6 +5,7 @@ class Project < ActiveRecord::Base
   has_many :revisions, :order => "timepoint DESC", :dependent => true
   # Exists only for the purpose of automatic deletion
   has_many :scm_files, :dependent => true
+
   has_and_belongs_to_many :dependencies, 
     :class_name => "Project", 
     :join_table => "project_dependencies",
@@ -27,6 +28,11 @@ class Project < ActiveRecord::Base
   serialize :generated_files
 
   validates_uniqueness_of :name
+  
+  def stderr_failure_patterns
+    [/BUILD FAILED/]
+  end
+  alias :stdout_failure_patterns :stderr_failure_patterns
 
   def before_destroy #:nodoc:
     begin

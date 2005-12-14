@@ -1,3 +1,5 @@
+require 'file/tail'
+
 # Represents the execution and status of a build for a particular Revision. Has the following attributes:
 #
 # * +command+ - The command that was executed (taken from Project)
@@ -106,7 +108,21 @@ class Build < ActiveRecord::Base
 
   # Whether this build was successful. Also see +state+ for a more detailed description.
   def successful?
-    exitstatus == 0
+    exited_ok = exitstatus == 0
+
+    bad_stdout = matches?(tail(stdout_file), project.stdout_failure_patterns)
+    bad_stderr = matches?(tail(stderr_file), project.stderr_failure_patterns)
+
+    # BLAH
+#    ok_stdout = matches?(tail(stdout_file), project.stdout_success_patterns)
+#    ok_stderr = matches?(tail(stderr_file), project.stderr_success_patterns)
+    
+    exited_ok && !bad_stderr && !bad_stdout
+  end
+  
+  def matches?(string, regexps)
+    regexps.each {|regexp| return true if string =~ regexp}
+    false
   end
   
   # Whether this build has completed or not.
@@ -134,6 +150,15 @@ class Build < ActiveRecord::Base
     prev_state = prev ? (prev.state ? prev.state : Successful.new) : Successful.new
     self.state = prev_state.send(successful? ? :succeed : :fail)
   end
+
+  def tail(file, n=30)
+    result = ""
+    file = File::Tail::Logfile.new(file).rewind(n)
+    file.return_if_eof = true
+    file.tail{|line| result << line}
+    result
+  end
+      
 
   def icon
     # Don't ask me why we have to case on the class name and not the class itself
