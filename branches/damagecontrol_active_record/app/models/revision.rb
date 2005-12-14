@@ -30,32 +30,6 @@ class Revision < ActiveRecord::Base
     revision
   end
 
-  # Updates the Ferret index with file contents
-  def self.index!(revisions)
-    return # TODO: reimplement this after fine reading thread from acts_as_ferret
-    FileUtils.mkdir_p RevisionFile::INDEX_DIR unless File.exist? RevisionFile::INDEX_DIR
-    persistent_index = Ferret::Index::Index.new(:path => RevisionFile::INDEX_DIR, :create_if_missing => true)
-
-    revisions.each do |revision|
-      persistent_index.add_indexes(revision.index)
-    end
-    persistent_index.close
-
-    logger.info "Indexing done" if logger
-  end
-  
-  # Returns an array of Ferret indexes, indexed with the contents of
-  # all our revision_files (except the ones that are DELETED).
-  def index
-    memory_indexes = []
-    revision_files.each do |revision_file|
-      unless revision_file.status == RSCM::RevisionFile::DELETED
-        memory_indexes << revision_file.index
-      end
-    end
-    memory_indexes
-  end
-
   # Sets the identifier
   def identifier=(i)
     # identifier can be String, Numeric or Time (depending on the SCM), so we YAML it to the database to preserve type info.

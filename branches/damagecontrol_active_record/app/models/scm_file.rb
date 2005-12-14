@@ -35,13 +35,6 @@ class ScmFile < ActiveRecord::Base
     File.basename(path)
   end
 
-  # Returns/yields an IO containing the contents of this file, using the +scm+ this
-  # file lives in. Important: This will only work if this instance was retrieved via
-  # Revision#scm_files
-  def open(&block)
-    project.scm.open(self, &block)
-  end
-
   # TODO: Move to view - It's a bit hackish to embed view info in the model :-(
   ICONS = {
     RSCM::RevisionFile::ADDED => "document_new",

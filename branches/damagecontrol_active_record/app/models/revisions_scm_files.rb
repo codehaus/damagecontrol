@@ -1,7 +1,6 @@
 require 'set'
 
 class RevisionsScmFiles < ActiveRecord::Base
-  INDEX_DIR = "#{DC_DATA_DIR}/index/revision_files" unless defined? INDEX_DIR
   DATA_INDEX_FIELD = "data" unless defined? DATA_INDEX_FIELD
 
   include Ferret::Document
@@ -9,6 +8,51 @@ class RevisionsScmFiles < ActiveRecord::Base
   belongs_to :revision
   belongs_to :scm_file
   
+  def after_destroy
+    DamageControl::Settings.index.delete(ferret_id)
+  end
+  
+  # Indexes +limit+ unindexed files and marks them as indexed (to avoid reindexing)
+  def self.index_unindexed_files!(limit = 20)
+    unindexed_files = find(
+      :all, 
+      :limit => limit, 
+      :conditions => ["ferret_id IS NULL AND AND directory = ? AND status != ?", true, false, RSCM::RevisionFile::DELETED]
+    )
+    
+    unindexed_files.each_with_index do |rsm, i|
+      rsm.ferret_id = true
+      rsm.save
+    end
+  end
+
+  def index
+    return if status == RSCM::RevisionFile::DELETED
+    return unless ferret_id.nil?
+    
+    logger.info "#{revision.project.name}: Indexing #{path}@#{native_revision_identifier}" if logger
+    # extension = File.extname(revision_file.path)
+    # memory_index = Ferret::Index::Index.new(:analyzer => SourceCodeAnalyzer.new(extension))
+
+    file_doc = Document.new
+    # Open a stream to the contents of the file for the particular revision and index it
+    self.open do |io|
+      data = io.read
+      file_doc << Field.new(DATA_INDEX_FIELD, data, Field::Store::NO,  Field::Index::TOKENIZED)
+      file_doc << Field.new("id", id, Field::Store::YES, Field::Index::UNTOKENIZED)
+      file_doc << Field.new("project_id", revision.project.id, Field::Store::YES, Field::Index::UNTOKENIZED)
+    end
+    DamageControl::Settings.index << file_doc
+    memory_index
+  end
+
+  # Returns/yields an IO containing the contents of this file, using the +scm+ this
+  # file lives in. Important: This will only work if this instance was retrieved via
+  # Revision#scm_files
+  def open(&block)
+    project.scm.open(self, &block)
+  end
+
   def timepoint
     self[:timepoint] || revision.timepoint
   end
@@ -21,7 +65,7 @@ class RevisionsScmFiles < ActiveRecord::Base
   # the search is using a Ferret index. This index can be updated
   # with index!
   def self.find_by_contents(query) #:yield: revision_file
-    @@index_searcher ||= Ferret::Search::IndexSearcher.new(INDEX_DIR)
+    @@index_searcher ||= Ferret::Search::IndexSearcher.new(DamageControl::Settings.index_dir)
     @@query_parser   ||= Ferret::QueryParser.new(DATA_INDEX_FIELD, {})
 
     query = @@query_parser.parse(query)
@@ -46,28 +90,4 @@ class RevisionsScmFiles < ActiveRecord::Base
     result.to_a
   end
   
-  # Returns a Ferret index indexed with the contents of this file.
-  # Invoking this method will open a connection to the SCM and may
-  # be somewhat time consuming.
-  def index
-    raise "Already indexed" if self.indexed
-    logger.info "#{revision.project.name}: Indexing #{path}@#{native_revision_identifier}" if logger
-    # extension = File.extname(revision_file.path)
-    # memory_index = Ferret::Index::Index.new(:analyzer => SourceCodeAnalyzer.new(extension))
-
-    memory_index = Ferret::Index::Index.new
-    file_doc = Document.new
-    # Open a stream to the contents of the file for the particular revision and index it
-    self.open do |io|
-      data = io.read
-      file_doc << Field.new(DATA_INDEX_FIELD, data, Field::Store::NO,  Field::Index::TOKENIZED)
-      file_doc << Field.new("id", id, Field::Store::YES, Field::Index::UNTOKENIZED)
-      file_doc << Field.new("project_id", revision.project.id, Field::Store::YES, Field::Index::UNTOKENIZED)
-    end
-    memory_index << file_doc
-    self.indexed = true
-    save
-    memory_index
-  end
-
 end

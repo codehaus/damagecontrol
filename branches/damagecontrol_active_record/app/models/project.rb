@@ -5,7 +5,6 @@ class Project < ActiveRecord::Base
   has_many :revisions, :order => "timepoint DESC", :dependent => true
   # Exists only for the purpose of automatic deletion
   has_many :scm_files, :dependent => true
-
   has_and_belongs_to_many :dependencies, 
     :class_name => "Project", 
     :join_table => "project_dependencies",
