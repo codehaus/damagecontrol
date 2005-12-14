@@ -15,8 +15,9 @@ class RevisionController < ApplicationController
   # Requests build(s). Should be called via an AJAX POST.
   def request_build
     @revision = Revision.find(@params[:id])
-    @revision.request_builds(Build::MANUALLY_TRIGGERED)
-    render :text => "Build requested"
+    builds = @revision.request_builds(Build::MANUALLY_TRIGGERED)
+    message = builds.nil? ? "Request ignored - there are currently unfinished builds for this revision" : "Build requested"
+    render :text => message
   end
 
   # Returns a zipped revision

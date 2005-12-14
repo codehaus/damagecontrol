@@ -1,7 +1,11 @@
 class Revision < ActiveRecord::Base
   belongs_to :project
   has_and_belongs_to_many :scm_files
-  has_many :builds, :order => "create_time", :dependent => true
+  has_many :builds, :order => "create_time", :dependent => true do
+    def in_progress
+      find(:all, :conditions => "exitstatus IS NULL")
+    end
+  end
 
   # Creates a new persistent Revision from a RSCM::Revision. Also
   # creates necessary ScmFile records and sets up associations.
@@ -74,11 +78,14 @@ class Revision < ActiveRecord::Base
     update_project_settings    
   end
 
-  # Requests build(s) for this revision. How many builds are requested depends on
+  # Requests and returns build(s) for this revision. How many builds are requested depends on
   # how many BuildExecutors (slave and/or local) are registered for the associated project.
   # A +triggering_build+ can be specified if the build is requested as a result of another
   # successful build (this is only used for reporting).
+  #
+  # If there are already unfinished build(s) for this revision, this method returns nil
   def request_builds(reason, triggering_build=nil)
+    return nil unless builds.in_progress.empty?
     project.build_executors.collect do |build_executor|
       build_executor.request_build_for(self, reason, triggering_build)
     end

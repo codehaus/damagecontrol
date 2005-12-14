@@ -158,29 +158,14 @@ class Build < ActiveRecord::Base
     file.tail{|line| result << line}
     result
   end
-      
-
-  def icon
-    # Don't ask me why we have to case on the class name and not the class itself
-    case state.class.name
-      when Successful.name          then "green-32.gif"
-      when Fixed.name               then "green-32.gif"
-      when Broken.name              then "red-32.gif"
-      when RepeatedlyBroken.name    then "red-32.gif"
-      when Executing.name           then "spinner.gif"
-      when SynchingWorkingCopy.name then "blue-32.gif"
-      when NilClass.name            then "grey-32.gif"
-      else "red-pulse-32.gif"
-    end
-  end
 
   class State
     def name
-      self.class.name.demodulize.underscore
+      @@name ||= self.class.name.demodulize.underscore
     end
 
-    def attr_sym(prefix, suffix)
-      "#{prefix}#{name}_#{suffix}".to_sym
+    def verb
+      "was"
     end
   end
 
@@ -190,6 +175,9 @@ class Build < ActiveRecord::Base
     end
     def succeed
       Successful.new
+    end
+    def verb
+      "is"
     end
   end
   
