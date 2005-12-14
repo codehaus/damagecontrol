@@ -5,11 +5,8 @@
 <ul>    
     <li>
         The SCMPoller polls SCMs for new revisions and persists
-        them to DamageControl's internal database. Whenever an SCMPoller detects 
+        them to DamageControl's internal database. Whenever the SCMPoller detects 
         a new revision, it will create a new build request for the associated project.
-        <br/>
-        The scm_poller daemon process periodically invokes the SCMPoller for projects
-        that have SCM polling enabled. 
         
         Each project can be configured with different SCM polling strategies:
         * Always (default)
