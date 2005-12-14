@@ -3,4 +3,4 @@
   build_state = build.state ? build.state.class.name.demodulize.underscore.gsub(/_/, ' ') : 'pending'
   time = (build.begin_time ? build.begin_time : build.create_time).strftime("%H:%M")
 %>
-<dl><dt class="successfulbuild"><a href="#"><span class="time"><%=time%></span> Build <em>(<%=build.number%>)</em> of revision [<%=build.revision.identifier%>] was <%=build_state%></a></dt><dd class="revision"><%=truncate(build.tail(build.stdout_file))%></dd></dl>
+<dl><dt class="<%=build_state%>_build"><a href="#"><span class="time"><%=time%></span> Build <em>(<%=build.number%>)</em> of revision [<%=build.revision.identifier%>] was <%=build_state%></a></dt><dd class="revision"><%=File.exist?(build.stdout_file) ? truncate(build.tail(build.stdout_file)) : "Build not started" %></dd></dl>
