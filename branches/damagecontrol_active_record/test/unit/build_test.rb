@@ -27,8 +27,8 @@ class BuildTest < Test::Unit::TestCase
     now = Time.now.utc
     build.execute!
     
-    assert_match(/damagecontrol\$ echo hello 1.*hello 1/m, File.open(build.stdout_file).read)
-    assert_match(/damagecontrol\$ echo hello 1/, File.open(build.stderr_file).read)
+    assert_match(/.* echo hello 1.*hello 1/m, File.open(build.stdout_file).read)
+    assert_match(/.* echo hello 1/, File.open(build.stderr_file).read)
     assert_equal(0, build.exitstatus)
     assert_equal(Build::Fixed, build.state.class)
     assert_equal(Time, build.begin_time.class)
@@ -64,7 +64,7 @@ class BuildTest < Test::Unit::TestCase
     projects(:project_1).save
     build = revisions(:revision_1).request_builds(:reason => Build::SCM_POLLED)[0]
     build.execute!
-    assert_match(/damagecontrol\$ echo hello\s*\nhello\s*\ndamagecontrol\$ echo world\s*\nworld\s*\n/m, File.open(build.stdout_file).read)
+    assert_match(/.* echo hello\s*\nhello\s*\n.* echo world\s*\nworld\s*\n/m, File.open(build.stdout_file).read)
   end
   
   def test_should_have_requested_status_after_create
