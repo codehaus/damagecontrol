@@ -28,11 +28,12 @@ class Project < ActiveRecord::Base
   serialize :generated_files
 
   validates_uniqueness_of :name
-  
-  def stderr_failure_patterns
-    [/BUILD FAILED/]
-  end
-  alias :stdout_failure_patterns :stderr_failure_patterns
+
+  # TODO: make these persistent and configurable
+  def stdout_failure_patterns; [/BUILD FAILED/m]; end
+  def stderr_failure_patterns; [/BUILD FAILED/m]; end
+  def stdout_success_patterns; []; end
+  def stderr_success_patterns; []; end
 
   def before_destroy #:nodoc:
     begin
