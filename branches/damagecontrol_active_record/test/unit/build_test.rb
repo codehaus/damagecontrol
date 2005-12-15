@@ -64,7 +64,7 @@ class BuildTest < Test::Unit::TestCase
     projects(:project_1).save
     build = revisions(:revision_1).request_builds(:reason => Build::SCM_POLLED)[0]
     build.execute!
-    assert_equal("damagecontrol> echo hello\nhello\ndamagecontrol> echo world\nworld\n", File.open(build.stdout_file).read)
+    assert_match(/damagecontrol\$ echo hello\s*\nhello\s*\ndamagecontrol\$ echo world\s*\nworld\s*\n/m, File.open(build.stdout_file).read)
   end
   
   def test_should_have_requested_status_after_create
