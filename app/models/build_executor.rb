@@ -55,8 +55,8 @@ private
       i = -1
       redirected_cmd = commands.collect do |c| 
         i+=1
-        "echo damagecontrol$ #{commands[i]} >> #{build.stdout_file} && " +
-        "echo damagecontrol$ #{commands[i]} >> #{build.stderr_file} && " +
+        "echo #{DamageControl::Platform.prompt} #{commands[i]} >> #{build.stdout_file} && " +
+        "echo #{DamageControl::Platform.prompt} #{commands[i]} >> #{build.stderr_file} && " +
         "#{c} >> #{build.stdout_file} 2>> #{build.stderr_file}"
       end.join(" && ")
 

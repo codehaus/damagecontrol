@@ -12,6 +12,16 @@ module DamageControl
       return "linux"
     end
     module_function :family
+    
+    def user
+      family == "mswin32" ? ENV['USERNAME'] : ENV['USER']
+    end
+    module_function :user
+    
+    def prompt(dir=Dir.pwd)
+      prompt = "#{dir.gsub(/\//, File::SEPARATOR)} #{user}$"
+    end
+    module_function :prompt
   end
 end
 
