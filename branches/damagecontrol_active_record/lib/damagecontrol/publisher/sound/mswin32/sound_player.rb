@@ -1,4 +1,4 @@
-require 'win32/sound'
+require File.dirname(__FILE__) + '/sound'
 
 module DamageControl
   module Publisher

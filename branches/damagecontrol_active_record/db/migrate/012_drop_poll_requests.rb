@@ -7,5 +7,6 @@ class DropPollRequests < ActiveRecord::Migration
   end
 
   def self.down
+    raise IrreversibleMigration.new("Cannot invert migration #{self}")
   end
 end

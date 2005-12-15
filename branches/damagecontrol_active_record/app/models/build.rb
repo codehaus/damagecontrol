@@ -161,7 +161,7 @@ class Build < ActiveRecord::Base
 
   class State
     def name
-      @@name ||= self.class.name.demodulize.underscore
+      self.class.name.demodulize.underscore
     end
 
     def verb
