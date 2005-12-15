@@ -21,9 +21,7 @@ require_gem 'ruby-growl'
 require_gem 'rubyzip'
 require_gem 'sqlite3-ruby'
 require_gem 'x10-cm17a'
-if(DamageControl::Platform.family == "mswin32")
-  require 'win32/sound'
-else
+if(DamageControl::Platform.family != "mswin32")
   require_gem 'fcgi'
   require 'fcgi'
 end
