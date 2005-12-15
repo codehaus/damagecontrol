@@ -106,23 +106,33 @@ class Build < ActiveRecord::Base
     self.revision.project
   end
 
-  # Whether this build was successful. Also see +state+ for a more detailed description.
+  # Whether this build was successful. Looks at exit code and patterns
+  # in the tails of stdout and stderr files.
+  # Also see +state+ for a more detailed description.
   def successful?
     exited_ok = exitstatus == 0
-
-    bad_stdout = matches?(tail(stdout_file), project.stdout_failure_patterns)
-    bad_stderr = matches?(tail(stderr_file), project.stderr_failure_patterns)
-
-    # BLAH
-#    ok_stdout = matches?(tail(stdout_file), project.stdout_success_patterns)
-#    ok_stderr = matches?(tail(stderr_file), project.stderr_success_patterns)
+    ok_stdout = true
+    ok_stderr = true
+    bad_stdout = false
+    bad_stderr = false
     
-    exited_ok && !bad_stderr && !bad_stdout
+    if File.exist?(stdout_file)
+      stdout_tail = tail(stdout_file)
+      bad_stdout = matches?(stdout_tail, project.stdout_failure_patterns, false)
+      ok_stdout  = matches?(stdout_tail, project.stdout_success_patterns, true)
+    end
+    if File.exist?(stderr_file)
+      stderr_tail = tail(stderr_file)
+      bad_stderr = matches?(stderr_tail, project.stdout_failure_patterns, false)
+      ok_stderr  = matches?(stderr_tail, project.stdout_success_patterns, true)
+    end
+
+    exited_ok && ok_stdout && ok_stderr && !bad_stdout && !bad_stderr
   end
   
-  def matches?(string, regexps)
+  def matches?(string, regexps, default)
     regexps.each {|regexp| return true if string =~ regexp}
-    false
+    default
   end
   
   # Whether this build has completed or not.
