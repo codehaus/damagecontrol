@@ -1,0 +1,12 @@
+<% fields_for(:plugin, plugins[0]) do |p| %>
+  <span class="plugin_group_header"><%= p.group_name %></span><br/>
+<% end %>
+<% plugins.each do |plugin| %>
+  <% fields_for(:plugin, plugin) do |p| %>
+    <%= javascript_tag("damageControlPlugins.add('#{p.group_name}', '#{plugin.class.name}', #{p.exclusive?})") %>
+    <%= link_to_function(
+      image_tag(p.icon, :size=>"24x24", :id=>p.img_id) + "&nbsp;" + content_tag("span", p.visual_name) + "<br/>",
+      "javascript:damageControlPlugins.show('#{plugin.class.name}');"
+    )%>
+  <% end %>  
+<% end %>

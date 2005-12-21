@@ -12,16 +12,18 @@
 	
   <%= stylesheet_link_tag("style.css", "undohtml.css") %>
   <%= javascript_include_tag(
+    "behaviour",
     "prototype",
     "effects",
     "controls",
-    "damagecontrol"
+    "application"
   ) %>
 </head>
 <body>
   <div class="general-menu">
     <%= link_to "All projects", :controller => "project", :action => "list" %>
   | <%= link_to "New project", :controller => "project", :action => "new" %>
+  | <%= link_to "Import project", :controller => "project", :action => "show_import" %>
   </div>
 
   <div>

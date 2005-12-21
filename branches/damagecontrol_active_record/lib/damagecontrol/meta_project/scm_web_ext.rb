@@ -1,8 +1,7 @@
 module MetaProject
   module ScmWeb
+    # TODO: delete this file?
     class Browser
-      include ::DamageControl::Dom
-    
       def enabled
         true
       end

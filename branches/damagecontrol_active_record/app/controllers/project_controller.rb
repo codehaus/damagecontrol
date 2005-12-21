@@ -9,7 +9,7 @@ class ProjectController < ApplicationController
     @project = Project.new(:name => "Project #{@projects.length}")
     @project.publishers = []
 
-    define_plugin_rows
+    define_plugin_groups
 
     @submit_action = "create"
     @submit_text = "Create project"
@@ -20,13 +20,13 @@ class ProjectController < ApplicationController
   def edit    
     find
     
-    define_plugin_rows
+    define_plugin_groups
 
     @submit_action = "update"
     @submit_text = "Update #{@project.name}"
     render :action => "settings"
   end
-
+  
   def show_import
     find
   end
@@ -198,12 +198,11 @@ private
     project.populate_from_hash(hash, self)
   end
   
-  def define_plugin_rows
+  def define_plugin_groups
     # Workaround for AR bug
     @project.publishers = YAML::load(@project.publishers) if @project.publishers.class == String
 
-    top_row = [@project, @project.scm_web]
-    @rows = [top_row, scms, publishers, trackers]
+    @plugin_groups = [[@project, @project.scm_web], scms, publishers, trackers]
   end
 
   # Instantiates all known SCMs. The project's persisted scm
@@ -211,7 +210,7 @@ private
   def scms
     RSCM::Base.classes.collect{|cls| cls.new}.collect do |scm|
       scm.class == @project.scm.class ? @project.scm : scm
-    end.sort
+    end.sort{|a,b| a.class.name <=> b.class.name}
   end
 
   def publishers
@@ -226,13 +225,13 @@ private
         result << (already ? already : publisher)
       end
     end
-    result.sort
+    result.sort{|a,b| a.class.name <=> b.class.name}
   end
 
   def trackers
     MetaProject::Tracker::Base.classes.collect{|cls| cls.new}.collect do |tracker|
       tracker.class == @project.tracker.class ? @project.tracker : tracker
-    end.sort
+    end.sort{|a,b| a.class.name <=> b.class.name}
   end
 
 end

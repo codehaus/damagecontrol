@@ -1,0 +1,32 @@
+<% fields_for(:plugin, plugin) do |p| %>
+  <%= p.enabled_field %>
+<% end %>
+<% if(plugin.supports_trigger?) %>
+  <table>
+    <tr>
+      <td>Revision detection</td>
+    </tr>
+    <tr>
+      <td>Polling:</td>
+      <td>
+         <%= radio_button_tag(
+           "scm[#{plugin.class.name}][revision_detection]", 
+           "ALWAYS_POLL",
+           plugin.revision_detection == "ALWAYS_POLL", 
+           :id => nil) 
+         %>
+      </td>
+    </tr>
+    <tr>
+      <td>SCM Triggering (<%= plugin.trigger_mechanism %>):</td>
+      <td>
+         <%= radio_button_tag(
+           "scm[#{plugin.class.name}][revision_detection]", 
+           "POLL_IF_REQUESTED", 
+           plugin.revision_detection == "POLL_IF_REQUESTED", 
+           :id => nil) 
+         %>
+      </td>
+    </tr>
+  </table>
+<% end %>
