@@ -6,7 +6,7 @@
 </table>
 
 <script type="text/javascript">
-artifact_archiver_files_counter = <%= object.files.size %>;
+artifact_archiver_files_counter = <%= plugin.files.size %>;
 function addArchiverFiles(glob, dest) {
   var key = "<input name='publisher[DamageControl::Publisher::ArtifactArchiver][files][keys][]' value=\"" + glob + "\"/>";
   var value = "<input name='publisher[DamageControl::Publisher::ArtifactArchiver][files][values][]' value=\"" + dest + "\"/>";
@@ -17,8 +17,8 @@ function addArchiverFiles(glob, dest) {
   artifact_archiver_files_counter++;
 }
 
-<% object.files.keys.sort.each_with_index do |glob, i| %>
-addArchiverFiles("<%= glob %>", "<%= object.files[glob] %>");
+<% plugin.files.keys.sort.each_with_index do |glob, i| %>
+addArchiverFiles("<%= glob %>", "<%= plugin.files[glob] %>");
 <% end %>
 </script>
 

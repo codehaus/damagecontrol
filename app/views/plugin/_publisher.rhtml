@@ -1,0 +1,27 @@
+<% fields_for(:plugin, plugin) do |p| %>
+<span>Build states that will activate <%= p.visual_name %></span>
+  
+<div class="build_state_header">
+  <div class="build_state_name_header">Build state</div>
+  <div class="build_state_checkbox_header">Active</div>
+  <% if(has_template(p.plugin_path, 'build_state_header')) %>
+    <%= render :partial => template_for(p.plugin_path, 'build_state_header') %>
+  <% end %>
+</div>
+
+<% Build::STATES.each do |build_state| update_id = "#{p.domify}_publisher_test_result_#{build_state.name}" %>
+  <div class="build_state">
+    <div class="build_state_name"><%= build_state.name %></div>
+    <div class="build_state_checkbox"><%= p.enabling_state_tag(build_state.class.name) %></div>
+    <% if(has_template(p.plugin_path, 'build_state')) %>
+      <%= render :partial => template_for(p.plugin_path, 'build_state'), 
+        :locals => {
+        :plugin => plugin, 
+        :build_state => build_state
+      }%>
+    <% end %>
+    <div class="publisher_test"><%= test_publisher_link("Try it!", plugin, build_state, update_id) %></div>
+    <div class="publisher_test_result" id="<%= update_id %>"></div>
+  </div>
+<% end %>
+<% end %>

@@ -1,0 +1,50 @@
+<table>
+  <tr>
+    <td>CVSROOT</td>
+    <td><%= tag("input", :name => "scm[RSCM::Cvs][root]", :value => plugin.root, :id => "cvs_root", :class => "cvs_root") %></td>
+  </tr>
+<% if(true) %>
+  <tr>
+    <td>Protocol</td>
+    <td>
+      <select class="cvs_select" id="cvs_protocol">
+        <option value=""></option>
+        <option value="ext" selected="selected">Secure shell (:ext:)</option>
+        <option value="pserver">Password server (:pserver:)</option>
+        <option value="local">Locally mounted directory (:local:)</option>
+      </select>
+    </td>
+  </tr>
+  <tr>
+    <td>User name</td>
+    <td><%= tag("input", :id => "cvs_user", :class => "cvs_input") %></td>
+  </tr>
+  <tr>
+    <td>Password</td>
+    <td><%= tag("input", :type => "password", :name => "scm[RSCM::Cvs][password]", :value => plugin.password, :id => "cvs_password", :class => "cvs_input") %></td>
+  </tr>
+  <tr>
+    <td>Server</td>
+    <td><%= tag("input", :id => "cvs_server", :class => "cvs_input") %></td>
+  </tr>
+  <tr>
+    <td>Port</td>
+    <td><%= tag("input", :id => "cvs_port", :class => "cvs_input") %></td>
+  </tr>
+  <tr>
+    <td>Repository directory</td>
+    <td><%= tag("input", :id => "cvs_repodir", :class => "cvs_input") %></td>
+  </tr>
+<% end %>
+  <tr>
+    <td>Module</td>
+    <td><%= tag("input", :name => "scm[RSCM::Cvs][mod]", :value => plugin.mod, :id => "cvs_module") %></td>
+  </tr>
+  <tr>
+    <td>Branch</td>
+    <td><%= tag("input", :name => "scm[RSCM::Cvs][branch]", :value => plugin.branch, :id => "cvs_branch") %></td>
+  </tr>
+</table>
+
+<script type="text/javascript" src="/javascripts/scm/cvs.js"></script>
+</body>

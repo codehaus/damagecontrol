@@ -1,4 +1,4 @@
-body {  
+body {
   color: #333333;
 
   background-color: #FFFFFF;
@@ -11,6 +11,22 @@ body {
   padding:0px;
 }
 
+#plugin-details {
+  margin:0px 50px 50px 200px;
+  padding:10px;
+}
+
+#plugin-overview {
+  position:absolute;
+  top:100px;
+  left:20px;
+  width:172px;
+  padding:10px;
+  border:1px dashed #999;
+  line-height:17px;
+  width:150px;
+}
+
 h1 {
   font-size: 2em;
   font-weight: normal;
@@ -21,50 +37,6 @@ h2 {
   font-size: 1.5em;
   font-weight: normal;
   letter-spacing: -0.04em;
-}
-
-/* Styles for project settings panel */
-#settings-group {
-}
-
-.settings-container {
-  position: relative;
-  top: 0px;
-  left: 0px;
-  height: 500px;
-}
-
-.setting-icon-row {
-  position: relative;
-  height: 48px;
-}
-
-.setting-icon-column {
-  padding-left: 12px;
-  float: left;
-  width: 48px;
-}
-
-.setting-names-row {
-  position: relative;
-  height: 20px;
-  text-align:center;margin:0 auto;
-}
-
-.setting-name-column {
-  padding-left: 12px;
-  float: left;
-  width: 48px;
-  height: 20px;
-}
-
-.setting-category-row {
-  position: relative;
-  height: 20px;
-}
-
-.project-summary {
-  
 }
 
 .overview-header h2 {
@@ -119,13 +91,11 @@ h2 {
 }
 
 .build_state_name {
-  background-color: red;
   width: 100px;
   float: left;
 }
 
 .build_state_checkbox {
-  background-color: green;
   float: left;
 }
 

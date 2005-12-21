@@ -1,7 +1,5 @@
 class Project < ActiveRecord::Base
   
-  include DamageControl::Dom
-
   has_many :revisions, :order => "timepoint DESC", :dependent => true
   # Exists only for the purpose of automatic deletion
   has_many :scm_files, :dependent => true

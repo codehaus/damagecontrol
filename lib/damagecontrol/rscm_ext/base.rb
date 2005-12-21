@@ -1,8 +1,6 @@
 module RSCM
 
   class Base
-    include ::DamageControl::Dom
-
     attr_accessor :enabled
     attr_accessor :revision_detection
 

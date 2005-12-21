@@ -1,7 +1,3 @@
-<script type="text/javascript">
-var settings = new Settings("setting-icons");
-</script>
-
 <% if(@submit_action != "create")  %>
   <h1><%= @project.name %> settings</h1>
 
@@ -13,143 +9,25 @@ var settings = new Settings("setting-icons");
     <%= submit_tag("Delete #{@project.name}") %>
   </form>
 <% end %>
-<%= form_tag({:controller => "project", :action => @submit_action, :id => @project.id}, {:id => "project_settings"}) %>
-<%= submit_tag(@submit_text) %>
 
-<div id="build-executors">
-Build executors: <%= @project.build_executors.collect{|be| be.description}.join(",") %>
-</div>
+<a href="#" id="show-plugin-overview">Show plugin overview</a>
+<%= form_tag({
+    :controller => "project", 
+    :action => @submit_action, 
+    :id => @project.id}, 
+    {:id => "project_settings"}) %>
+    <%= submit_tag(@submit_text) %>
 
-<div id="settings-group">
-  <!-- The top 'fixed' settings row -->
-  <div class="setting-category-row">
-    General settings
-  </div>
-
-  <div class="setting-icon-row">
-    <div class="setting-icon-column">
-      <%= link_to_function(image_tag("wrench.gif", :size=>"48x48", :border=>0), "settings.show('setting-icons')") %>
-    </div>
-    <% @rows[0].each do |object| %>
-      <div class="setting-icon-column">
-        <%= 
-          link_to_function(
-            image_tag(
-              object.icon, 
-              :size=>"48x48", :border => 0, :id => object.dom_id + "_img_menu"
-            ), 
-            "settings.show('#{object.class.name}', '#{object.category}', '#{object.dom_id}', #{object.exclusive?})"
-          ) 
-        %>
-      </div>
-    <% end %>
-    <div class="setting-icon-column">
-      <% show_import_url = @project ? 
-        url_for(:controller => "project", :action => "show_import", :id => @project.id) :
-        url_for(:controller => "project", :action => "show_import")
-      %>
-      <%= 
-        link_to(
-          image_tag(
-            "/images/project/import.gif", 
-            :size=>"48x48", :border => 0
-          ), 
-          show_import_url
-        ) 
-      %>
-    </div>
-    <div class="setting-icon-column">
-      <% if(@project.id) %>
-        <%=
-          link_to(
-            image_tag(
-              "/images/project/export.gif", 
-              :size=>"48x48", :border => 0
-            ), 
-            url_for(:controller => "project", :action => "export", :id => @project.id)
-          ) 
-        %>
-      <% end %>
-    </div>
-  </div>
-  <div class="setting-names-row">
-    <div class="setting-name-column">Show All</div>
-    <% @rows[0].each do |object| %>
-      <div class="setting-name-column"><%= object.visual_name %></div>
-    <% end %>
-    <div class="setting-name-column">Import</div>
-    <% if(@project.id) %>
-      <div class="setting-name-column">Export</div>
-    <% end %>
-  </div>
-
-  <div id="setting-icons" style="display:block">
-    <%
-      @rows[1..-1].each do |row| 
-    %>
-      <div class="setting-category-row">
-        <%= row[0].category.pluralize.capitalize %>
-      </div>
-      <div class="setting-icon-row">
-        <% row.each do |object| %>
-          <div class="setting-icon-column">
-            <%= link_to_function(
-                  image_tag(
-                    object.icon, 
-                    :size=>"48x48", :border => 0, :id => object.dom_id + "_img_menu"
-                  ), 
-                  "settings.show('#{object.class.name}', '#{object.category}', '#{object.dom_id}', #{object.exclusive?})"
-                ) %>
-          </div>
-        <% end %>
-      </div>
-      <div class="setting-names-row">
-        <% row.each do |object| %>
-          <div class="setting-name-column"><%= object.visual_name %></div>
-        <% end %>
-      </div>
+  <div id="plugin-overview">
+    <%= javascript_tag("var damageControlPlugins = new DamageControl.Plugins('/images');") %>
+    <% @plugin_groups.each do |plugins| %>
+      <%= render :partial => "plugin_group", :locals => {:plugins => plugins} %>
     <% end %>
   </div>
   
-  <!-- Now, render a hidden form for each plugin -->
-  <% @rows.flatten.each do |object| %>
-    <script type="text/javascript">
-      if(categories['<%= object.category %>'] == undefined) {
-        categories['<%= object.category %>'] = new Array();
-      }
-      categories['<%= object.category %>'].push('<%= object.dom_id %>');
-      var <%= object.dom_id %>_img_disabled = new Image();
-      <%= object.dom_id %>_img_disabled.src = '<%= object.disabled_icon %>';
-      var <%= object.dom_id %>_img_enabled = new Image();
-      <%= object.dom_id %>_img_enabled.src = '<%= object.enabled_icon %>';
-    </script>
-    <div class="settings-container" id="<%= object.class.name %>" style="display:none;">
-      <div>
-        <p>
-          <%= image_tag(object.icon, :size=>"48x48", :border => 0, :id => object.dom_id + "_img") %>
-        </p>
-        <p>
-          <%= object.visual_name %>
-        </p>
-      </div>
-      <div>
-        <!-- Family-common part of form -->
-        <% unless(object.category == "project") %>
-          <%= render :partial => template_for(object.category, object.category), 
-              :locals => {:object => object} %>
-        <% end %>
-      
-        <!-- Render the object itself -->
-        <% if(has_template(object.category, object.class.name.demodulize.underscore)) %>
-          <!-- Custom template -->
-          <%= render :partial => template_for(object.category, object.class.name.demodulize.underscore), 
-              :locals => {:object => object} %>
-        <% else %>
-          <!-- Use generic template -->
-          <%= render_object(object, "#{object.category}[#{object.class.name}]") %>
-        <% end %>
-      </div>
-    </div>
-  <% end %>
-</div>
+  <div id="plugin-details">
+    <% @plugin_groups.flatten.each do |plugin| %>
+      <%= render :partial => "plugin", :locals => {:plugin => plugin} %>
+    <% end %>
+  </div>
 </form>

@@ -8,7 +8,6 @@ module DamageControl
     class Base
       cattr_accessor :logger
       attr_accessor :enabling_states
-      include Dom
 
       def self.classes
         [
@@ -40,14 +39,6 @@ module DamageControl
         @enabling_states && !@enabling_states.empty?
       end
       
-      def category
-        "publisher"
-      end
-
-      def exclusive?
-        false
-      end
-
       # Publishes +build+ if its state is
       # among our +enabling_states+.
       def publish_maybe(build)

@@ -1,9 +1,6 @@
 module MetaProject
   module Tracker
-  
     class Base
-      include ::DamageControl::Dom
-
       attr_accessor :enabled
 
       def category
