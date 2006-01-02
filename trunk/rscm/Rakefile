@@ -7,10 +7,11 @@ require 'rake/gempackagetask'
 require 'rake/contrib/sshpublisher'
 require 'rake/contrib/rubyforgepublisher'
 require 'meta_project'
+require 'lib/rscm/version'
 
 PKG_BUILD     = ENV['PKG_BUILD'] ? '.' + ENV['PKG_BUILD'] : ''
 PKG_NAME      = 'rscm'
-PKG_VERSION   = '0.3.16' + PKG_BUILD
+PKG_VERSION   = RSCM::VERSION::STRING + PKG_BUILD
 PKG_FILE_NAME = "#{PKG_NAME}-#{PKG_VERSION}"
 
 desc "Default Task"
@@ -32,6 +33,9 @@ Rake::TestTask.new { |t|
   t.libs << "test"
   t.test_files = fl
   t.verbose = true
+  
+  # turn on code coverage
+  #t.ruby_opts << "-rcoverage/coverage"
 }
 
 rd = Rake::RDocTask.new { |rdoc|

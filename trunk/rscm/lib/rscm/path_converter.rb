@@ -4,21 +4,6 @@ WINDOWS = WIN32 || CYGWIN
 
 require 'fileutils'
 
-def with_working_dir(dir)
-  # Can't use Dir.chdir{ block } - will fail with multithreaded code.
-  # http://www.ruby-doc.org/core/classes/Dir.html#M000790
-  #
-  prev = Dir.pwd
-  begin
-    dir = File.expand_path(dir)
-    FileUtils.mkdir_p(dir)
-    Dir.chdir(dir)
-    yield
-  ensure
-    Dir.chdir(prev)
-  end
-end
-
 # Utility for converting between win32 and cygwin paths. Does nothing on *nix.
 module RSCM
   module PathConverter
@@ -50,6 +35,7 @@ module RSCM
 
     def nativepath_to_filepath(path)
       return nil if path.nil?
+      path = File.expand_path(path)
       if(WIN32)
         path.gsub(/\//, "\\")
       elsif(CYGWIN)

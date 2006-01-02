@@ -1,4 +1,4 @@
-= RSCM - Ruby Source Control Management (0.3.16)
+= RSCM - Ruby Source Control Management (0.4.0)
 
 RSCM is to SCM what DBI/JDBC/ODBC are to databases - an SCM-independent API for accessing different SCMs. The high level features are roughly:
 
@@ -8,8 +8,9 @@ RSCM is to SCM what DBI/JDBC/ODBC are to databases - an SCM-independent API for 
 * Add and commit files
 * Manipluate triggers
 
-Although RSCM's main focus is operations on a working copy of an SCM repository, the API also allows some level of interaction
-with the SCM repository itself, like creating new repositories.
+Although RSCM's main focus is operations on a working copy of an SCM repository, 
+the API also allows some level of interaction with the SCM repository itself, 
+like creating new repositories.
 
 == Download
 
@@ -17,10 +18,14 @@ RSCM is available as a RubyGem, and can be installed like this:
 
   gem install rscm
 
-(You may need administer access to do this on a POSIX system).
-If you want the latest and greatest, you can get the sources, which live alongside DamageControl's sources:
+(You may need administrator access to do this on a POSIX system).
+If you want the latest and greatest, you can get the sources:
 
-* See the DamageControl Developer Guide at http://hieraki.lavalamp.ca/
+Anonymous:
+  svn co svn://svn.damagecontrol.codehaus.org/damagecontrol/scm/trunk/rscm
+
+Developers:
+  svn co svn+ssh://developer@beaver.codehaus.org/home/projects/damagecontrol/scm/trunk/rscm
 
 == Contributors
 
@@ -33,10 +38,10 @@ If you want the latest and greatest, you can get the sources, which live alongsi
 
 * CVS - http://www.nongnu.org/cvs (stable)
 * Subversion - http://subversion.tigris.org (stable)
-* ClearCase - http://www-306.ibm.com/software/awdtools/clearcase (not thoroughly tested)
 
 In progress:
 
+* ClearCase - http://www-306.ibm.com/software/awdtools/clearcase (not thoroughly tested)
 * Darcs - http://www.abridgegame.org/darcs (very incomplete)
 * Monotone - http://www.venge.net/monotone (half complete)
 * Perforce - http://www.perforce.com (nearly complete - a little out of date with recent API)
@@ -48,7 +53,8 @@ Loads! All of them! How to add support for a new one is described further down i
 
 == Related projects
 
-* DamageControl - http://damagecontrol.codehaus.org. DamageControl adds a web interface to RSCM and tons of other features for continuous integration.
+* DamageControl - http://damagecontrol.buildpatterns.com. DamageControl is a Continuous Integration system
+built around RSCM and Ruby on Rails.
 
 == Sample usage
 
@@ -57,6 +63,7 @@ Here is an example of how to use RSCM to get a list of revisions (aka changesets
   require 'rscm'
   
   scm = RSCM::Subversion.new("svn://some.server/some/path/trunk")
+  scm.default_options = {:stdout => "stdout.log", :stderr => "stderr.log"}
   # What follows would look the same for any supported SCM
   revisions = scm.revisions(Time.utc(2004, 11, 10, 12, 34, 22)) # For Subversion, you can also pass a revision number (int)
   revisions.each do |revision|

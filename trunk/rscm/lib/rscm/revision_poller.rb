@@ -9,25 +9,26 @@ module RSCM
     
 
     # Polls new revisions for since +last_revision+,
-    # or if +last_revision+ is nil, polls since 'now' - +seconds_before_now+.
-    # If no revisions are found AND the poll was using +seconds_before_now+
+    # or if +last_revision+ is nil, polls since 'now' - +options[:seconds_before_now]+.
+    # If no revisions are found AND the poll was using +options[:seconds_before_now]+
     # (i.e. it's the first poll, and no revisions were found),
-    # calls itself recursively with twice the +seconds_before_now+.
-    # This happens until revisions are found, ot until the +seconds_before_now+
+    # calls itself recursively with twice the +options[:seconds_before_now]+.
+    # This happens until revisions are found, ot until the +options[:seconds_before_now]+
     # Exceeds 32 weeks, which means it's probably not worth looking further in
     # the past, the scm is either completely idle or not yet active.
-    def poll_new_revisions(latest_revision=nil, quiet_period=DEFAULT_QUIET_PERIOD, seconds_before_now=TWO_WEEKS_AGO, max_time_before_now=THIRTY_TWO_WEEKS_AGO)
-      max_past = Time.new.utc - max_time_before_now
+    def poll_new_revisions(options)
+      options = {
+        :latest_revision => nil, 
+        :quiet_period => DEFAULT_QUIET_PERIOD, 
+        :seconds_before_now => TWO_WEEKS_AGO, 
+        :max_time_before_now => THIRTY_TWO_WEEKS_AGO,
+      }.merge(options)
+      max_past = Time.new.utc - options[:max_time_before_now]
   
-      if(!central_exists?)
-        logger.info "Not polling for revisions - central scm repo doesn't seem to exist" if logger
-        return []
-      end
-      
       # Default value for start time (in case there are no detected revisions yet)
-      from = Time.new.utc - seconds_before_now
-      if(latest_revision)
-        from = latest_revision.identifier
+      from = Time.new.utc - options[:seconds_before_now]
+      if(options[:latest_revision])
+        from = options[:latest_revision].identifier
       else
         if(from < max_past)
           logger.info "Checked for revisions as far back as #{max_past}. There were none, so we give up." if logger
@@ -39,13 +40,15 @@ module RSCM
 
       logger.info "Polling revisions after #{from} (#{from.class.name})" if logger
       
-      revisions = revisions(from)
+      revisions = revisions(from, options)
       if(revisions.empty?)
         logger.info "No new revisions after #{from}" if logger
-        unless(latest_revision)
-          double_seconds_before_now = 2*seconds_before_now
+        unless(options[:latest_revision])
+          double_seconds_before_now = 2*options[:seconds_before_now]
           logger.info "Last revision still not found, checking since #{double_seconds_before_now.ago}" if logger
-          return poll_new_revisions(project, double_seconds_before_now, max_time_before_now)
+          new_opts = options.dup
+          new_opts[:seconds_before_now] = double_seconds_before_now
+          return poll_new_revisions(new_opts)
         end
       else
         logger.info "There were #{revisions.length} new revision(s) after #{from}" if logger
@@ -61,9 +64,9 @@ module RSCM
         # revision (on next poll).
         commit_in_progress = true
         while(commit_in_progress)
-          logger.info "Sleeping for #{quiet_period} seconds because #{visual_name} is not transactional." if logger
+          logger.info "Sleeping for #{options[:quiet_period]} seconds because #{visual_name} is not transactional." if logger
           
-          sleep(quiet_period)
+          sleep(options[:quiet_period])
           previous_revisions = revisions
           revisions = revisions(from)
           commit_in_progress = revisions != previous_revisions

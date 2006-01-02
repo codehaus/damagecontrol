@@ -4,8 +4,10 @@ require 'rscm/path_converter'
 require 'rscm/difftool_test'
 
 module RSCM
+  DEFAULT_OPTIONS = {:stdout => 'target/stdout.log', :stderr => 'target/stderr.log'}.freeze
 
   module GenericSCMTests
+    
     include FileUtils
 
     def teardown
@@ -47,15 +49,17 @@ module RSCM
       other_checkout_dir = "#{work_dir}/OtherWorkingCopy"
       repository_dir = "#{work_dir}/repository"
       scm = create_scm(repository_dir, "damagecontrolled")
+      scm.default_options = DEFAULT_OPTIONS
       scm.checkout_dir = checkout_dir
 
       other_scm = create_scm(repository_dir, "damagecontrolled")
+      other_scm.default_options = DEFAULT_OPTIONS
       other_scm.checkout_dir = other_checkout_dir
 
       raise "This scm (#{scm.name}) can't create 'central' repositories." unless scm.can_create_central?
 
       # 1
-      scm.create_central
+      scm.create_central 
       @scm = scm
 
       # 2
@@ -66,25 +70,18 @@ module RSCM
       assert(!scm.uptodate?(nil))
       
       # 4
-      yielded_files = []
-      files = scm.checkout do |file_name|
-        yielded_files << file_name
-      end
-      
-      # 5
-      assert_equal(4, files.length)
-      assert_equal(files, yielded_files)
-      files.sort!
-      yielded_files.sort!
-      assert_equal(files, yielded_files)
+      files = scm.checkout nil
 
+      # 5
+      assert_equal(4, files.length, files.join("\n"))
+      files.sort!
       assert_equal("build.xml", files[0])
       assert_equal("project.xml", files[1])
       assert_equal("src/java/com/thoughtworks/damagecontrolled/Thingy.java", files[2])
       assert_equal("src/test/com/thoughtworks/damagecontrolled/ThingyTestCase.java", files[3])
 
       # 6
-      initial_revisions = scm.revisions(nil, nil)
+      initial_revisions = scm.revisions(nil)
       assert_equal("imported\nsources", initial_revisions[0].message)
       # Subversion seems to add a revision with message "Added directories"
       #assert_equal(1, initial_revisions.length)
@@ -97,21 +94,20 @@ module RSCM
       change_file(scm, "#{checkout_dir}/build.xml")
       change_file(scm, "#{checkout_dir}/src/java/com/thoughtworks/damagecontrolled/Thingy.java")
 
-      # 9
-      other_scm.checkout
-      # 10
-      assert(other_scm.uptodate?(nil))
-      # 11
-      assert(scm.uptodate?(nil))
-      # 12
+      assert(!other_scm.uptodate?(initial_revisions.latest.identifier))
+      other_scm.checkout nil
+      assert(other_scm.uptodate?(initial_revisions.latest.identifier))
+
+      sleep(1)
       scm.commit("changed\nsomething") 
 
       # 13
       revisions = scm.revisions(initial_revisions.latest.identifier)
+      assert_equal(1, revisions.length, "Actual revisions:\n" + revisions.collect{|cs| cs.to_s}.join("\n"))
+
       assert(revisions[0].identifier)
-      assert_equal(1, revisions.length, revisions.collect{|cs| cs.to_s})
       revision = revisions[0]
-      assert_equal(2, revision.length)
+      assert_equal(2, revision.length, "Actual files:\n" + revision.collect{|file| file.path}.join("\n"))
 
       assert_equal("changed\nsomething", revision.message)
 
@@ -134,7 +130,7 @@ module RSCM
       assert(scm.uptodate?(revisions.latest.identifier))
 
       # 15
-      files = other_scm.checkout.sort
+      files = other_scm.checkout(nil).sort
       assert_equal(2, files.length)
       assert_equal("build.xml", files[0])
       assert_equal("src/java/com/thoughtworks/damagecontrolled/Thingy.java", files[1])
@@ -151,19 +147,6 @@ module RSCM
       assert_equal(1, revisions.length)
       assert_equal(1, revisions[0].length)
       assert_equal("src/java/com/thoughtworks/damagecontrolled/Hello.txt", revisions[0][0].path)
-      
-      # 19
-      root_children = scm.rootdir.children
-      assert_equal "build.xml", root_children[0].relative_path
-      assert !root_children[0].directory?
-      assert_equal "project.xml", root_children[1].relative_path
-      assert !root_children[1].directory?
-      assert_equal "src", root_children[2].relative_path
-      assert root_children[2].directory?
-
-      src_children = root_children[2].children
-      assert_equal "src/java", src_children[0].relative_path
-      assert src_children[0].directory?
     end
 
     def test_create_destroy
@@ -171,11 +154,12 @@ module RSCM
       checkout_dir = "#{work_dir}/checkout"
       repository_dir = "#{work_dir}/repository"
       scm = create_scm(repository_dir, "killme")
+      scm.default_options = DEFAULT_OPTIONS
       scm.checkout_dir = checkout_dir
 
       (1..3).each do
         assert(!scm.central_exists?)
-        scm.create_central
+        scm.create_central 
         assert(scm.central_exists?)
         scm.destroy_central
       end
@@ -189,6 +173,7 @@ module RSCM
       repository_dir = "#{work_dir}/repository"
       trigger_proof = "#{work_dir}/trigger_proof"
       scm = create_scm(repository_dir, "damagecontrolled")
+      scm.default_options = DEFAULT_OPTIONS
       scm.checkout_dir = checkout_dir
       scm.create_central 
       @scm = scm
@@ -206,7 +191,7 @@ module RSCM
 
       # Verify that the trigger works
       import_damagecontrolled(scm, "#{work_dir}/damagecontrolled")
-      scm.checkout
+      scm.checkout nil
       scm.install_trigger(trigger_command, trigger_files_checkout_dir)
       assert(!File.exist?(trigger_proof))
 
@@ -219,12 +204,13 @@ module RSCM
       checkout_dir = "#{work_dir}/checkout"
       repository_dir = "#{work_dir}/repository"
       scm = create_scm(repository_dir, "damagecontrolled")
+      scm.default_options = DEFAULT_OPTIONS
       scm.checkout_dir = checkout_dir
-      scm.create_central
+      scm.create_central 
       @scm = scm
 
       import_damagecontrolled(scm, "#{work_dir}/damagecontrolled")
-      scm.checkout
+      scm.checkout nil
       add_or_edit_and_commit_file(scm, checkout_dir, "before.txt", "Before label")
       before_cs = scm.revisions(Time.epoch)
 
@@ -244,12 +230,13 @@ module RSCM
       checkout_dir = "#{work_dir}/checkout"
       repository_dir = "#{work_dir}/repository"
       scm = create_scm(repository_dir, "damagecontrolled")
+      scm.default_options = DEFAULT_OPTIONS
       scm.checkout_dir = checkout_dir
       scm.create_central 
       @scm = scm
 
       import_damagecontrolled(scm, "#{work_dir}/damagecontrolled")
-      scm.checkout
+      scm.checkout nil
       
       from = "src/java/com/thoughtworks/damagecontrolled/Thingy.java"
       to = "src/java/com/thoughtworks/damagecontrolled/Mooky.java"
@@ -258,7 +245,7 @@ module RSCM
       assert(File.exist?(scm.checkout_dir + "/" + to))
       rm_rf(scm.checkout_dir + "/" + to)
       assert(!File.exist?(scm.checkout_dir + "/" + to))
-      scm.checkout
+      scm.checkout nil
       assert(File.exist?(scm.checkout_dir + "/" + to))
     end
 
@@ -281,8 +268,9 @@ EOF
       repository_dir = "#{work_dir}/repository"
       import_dir = "#{work_dir}/import/diffing"
       scm = create_scm(repository_dir, "diffing")
+      scm.default_options = DEFAULT_OPTIONS
       scm.checkout_dir = checkout_dir
-      scm.create_central
+      scm.create_central 
       @scm = scm
       
       mkdir_p(import_dir)
@@ -290,8 +278,8 @@ EOF
         io.puts("just some")
         io.puts("initial content")
       end      
-      scm.import_central(import_dir, "Initial revision")
-      scm.checkout
+      scm.import_central :dir=>import_dir, :message=>"Importing"
+      scm.checkout nil
       initial_revision = scm.revisions(nil).latest
       sleep(1)
 
@@ -328,7 +316,7 @@ EOF
       
       # TODO: make separate test. Make helper method for the cumbersome setup!
       historic_afile = scm.file("afile.txt", false)
-      revision_files = historic_afile.revision_files
+      revision_files = historic_afile.revision_files 
       assert_equal(Array, revision_files.class)
       assert(revision_files.length >= 2)
       assert(revision_files.length <= 3)
@@ -345,7 +333,7 @@ EOF
       cp_r(path, dirname)
       todelete = Dir.glob("#{import_copy_dir}/**/.svn")
       rm_rf(todelete)
-      scm.import_central(import_copy_dir, "imported\nsources")
+      scm.import_central :dir => import_copy_dir, :message => "imported\nsources"
     end
     
     def change_file(scm, file)
@@ -379,13 +367,14 @@ EOF
       checkout_dir = "#{work_dir}/LabelTest"
       repository_dir = "#{work_dir}/repository"
       scm = create_scm(repository_dir, "damagecontrolled")
+      scm.default_options = DEFAULT_OPTIONS
       scm.checkout_dir = checkout_dir
-      scm.create_central
+      scm.create_central 
       @scm = scm
 
       import_damagecontrolled(scm, "#{work_dir}/damagecontrolled")
 
-      scm.checkout
+      scm.checkout nil
 
       # TODO: introduce a Revision class which implements comparator methods
       return
@@ -395,7 +384,7 @@ EOF
       )
       change_file(scm, "#{checkout_dir}/build.xml")
       scm.commit("changed something")
-      scm.checkout 
+      scm.checkout nil
       assert_equal(
         "2",
         scm.label 

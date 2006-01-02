@@ -3,48 +3,20 @@ require 'rscm/revision'
 require 'rscm/path_converter'
 
 module RSCM
-  # This class defines the RSCM API. The documentation of the various methods
-  # uses CVS and Subversion's terminology. (For example, checkout means 'get working copy',
-  # not 'lock for private edit' as in ClearCase or VSS terminology).
+  # This class defines the RSCM API, which offers access to an SCM working copy
+  # as well as a 'central' repository.
   #
-  # Concrete subclasses of this class provide an API to manage a local working copy
-  # as well as an associated 'central' repository. The main responsibility is working
-  # copy operations:
+  # Concrete subclasses of this class (concrete adapters) implement the integration
+  # with the respective SCMs.
   #
-  # * add
-  # * checkout
-  # * checked_out?
-  # * diff
-  # * edit
-  # * ls
-  # * move
-  # * revisions
-  # * uptodate?
-  # * file
-  # * destroy_working_copy
+  # Most of the methods take an optional +options+ Hash (named parameters), allowing
+  # the following options:
   #
-  # In addition to operations related to working copies, the same instance should provide
-  # methods to administer the working copy's associated 'central' repository. These are:
+  # * <tt>:stdout</tt>: Path to file name where stdout of SCM operations are written.
+  # * <tt>:stdout</tt>: Path to file name where stderr of SCM operations are written.
   #
-  # * central_exists?
-  # * create_central
-  # * can_create_central?
-  # * import_central
-  # * install_trigger
-  # * supports_trigger? / can_install_trigger?
-  # * trigger_installed?
-  # * trigger_mechanism
-  # * uninstall_trigger
-  #
-  # Some methods are a bit fuzzy with respect to their relevance to the working copy or
-  # the associated central repository, as it depends on the nature of the individual underlying 
-  # SCMs. These methods are:
-  #
-  # * checkout_command_line
-  # * label
-  # * name
-  # * transactional? / atomic?
-  # * update_command_line
+  # In stead of specifying the +options+ parameters for every API method, it's possible
+  # to assign default options via the +default_options+ attribute.
   #
   # Some of the methods in this API use +from_identifier+ and +to_identifier+.
   # These identifiers can be either a UTC Time (according to the SCM's clock)
@@ -54,29 +26,30 @@ module RSCM
   # If +from_identifier+ or +to_identifier+ are +nil+ they should respectively default to
   # Time.epoch or Time.infinite.
   #
-  # TODO: rename this superclass to 'Base'
-  #
   class Base
 
-# TODO: Make revisions yield revisions as they are determined, to avoid
-# having to load them all into memory before the method exits. Careful not to
-# use yielded revisions to do another scm hit - like get diffs. Some SCMs
-# might dead lock on this. Implement a guard for that.
-# TODO: Add some visitor support here too?
-
-  public
+    attr_accessor :default_options
   
+    # Transforms +raw_identifier+ into the native rype used for revisions.
+    def to_identifier(raw_identifier)
+      raw_identifier.to_s
+    end
+  
+    # Sets the checkout dir (working copy). Should be set prior to most other method
+    # invocations (depending on the implementation).
     def checkout_dir=(dir)
       @checkout_dir = PathConverter.filepath_to_nativepath(dir, false)
     end
   
+    # Gets the working copy directory.
     def checkout_dir
       @checkout_dir
     end
 
-    def to_yaml_properties
+    def to_yaml_properties #:nodoc:
       props = instance_variables
       props.delete("@checkout_dir")
+      props.delete("@default_options")
       props.sort!
     end
 
@@ -85,8 +58,7 @@ module RSCM
       FileUtils.rm_rf(checkout_dir) unless checkout_dir.nil?
     end
 
-    # Whether the physical SCM represented by this instance exists.
-    #
+    # Whether or not the SCM represented by this instance exists.
     def central_exists?
       # The default implementation assumes yes - override if it can be
       # determined programmatically.
@@ -94,7 +66,6 @@ module RSCM
     end
     
     # Whether or not this SCM is transactional (atomic).
-    #
     def transactional?
       false
     end
@@ -103,12 +74,12 @@ module RSCM
     # Creates a new 'central' repository. This is intended only for creation of 'central'
     # repositories (not for working copies). You shouldn't have to call this method if a central repository
     # already exists. This method is used primarily for testing of RSCM, but can also
-    # be used if you *really* want to create a central repository. 
+    # be used if you *really* want to use RSCM to create a central repository. 
     # 
     # This method should throw an exception if the repository cannot be created (for
     # example if the repository is 'remote' or if it already exists).
     #
-    def create_central
+    def create_central(options={})
       raise NotImplementedError
     end
     
@@ -125,28 +96,29 @@ module RSCM
     end
 
     # Adds +relative_filename+ to the working copy.
-    def add(relative_filename)
+    def add(relative_filename, options={})
       raise NotImplementedError
     end
 
     # Schedules a move of +relative_src+ to +relative_dest+
     # Should not take effect in the central repository until
     # +commit+ is invoked.
-    def move(relative_src, relative_dest)
+    def move(relative_src, relative_dest, options={})
       raise NotImplementedError
     end
 
-    # Recursively imports files from a +dir+ into the central scm
-    def import_central(dir, message)
-      raise "Not implemented"
+    # Recursively imports files from <tt>:dir</tt> into the central scm,
+    # using commit message <tt>:message</tt>
+    def import_central(options)
+      raise NotImplementedError
     end
 
     # Open a file for edit - required by scms that check out files in read-only mode e.g. perforce
-    def edit(file)
+    def edit(file, options={})
     end
     
     # Commit (check in) modified files.
-    def commit(message)
+    def commit(message, options={})
       raise NotImplementedError
     end
     
@@ -166,12 +138,14 @@ module RSCM
     # For some SCMs this is not possible, or at least very hard. In that case, just override
     # the checkout_silent method instead of this method (should be protected).
     #
-    def checkout(to_identifier=Time.infinity) # :yield: file
+    def checkout(to_identifier=Time.infinity, options={}) # :yield: file
+      to_identifier=Time.infinity if to_identifier.nil?
+
       # the OS doesn't store file timestamps with fractions.
       before_checkout_time = Time.now.utc - 1
 
       # We expect subclasses to implement this as a protected method (unless this whole method is overridden).
-      checkout_silent(to_identifier)
+      checkout_silent(to_identifier, options)
       files = Dir["#{@checkout_dir}/**/*"]
       added = []
       files.each do |file|
@@ -184,9 +158,6 @@ module RSCM
         File.file?(path)
       end
       relative_added_file_paths = to_relative(checkout_dir, added_file_paths)
-      relative_added_file_paths.each do |path|
-        yield path if block_given?
-      end
       relative_added_file_paths
     end
   
@@ -194,7 +165,7 @@ module RSCM
     # and +to_identifier+ (inclusive). If +relative_path+ is specified, the result will only contain
     # revisions pertaining to that path.
     #
-    def revisions(from_identifier, to_identifier=Time.infinity, relative_path=nil)
+    def revisions(from_identifier, options={})
       raise NotImplementedError
     end
     
@@ -208,11 +179,6 @@ module RSCM
       HistoricFile.new(relative_path, dir, self)
     end
     
-    # Returns an Array of the children under +relative_path+
-    def ls(relative_path)
-      raise NotImplementedError
-    end
-    
     # Opens a revision_file
     def open(revision_file, &block) #:yield: io
       raise NotImplementedError
@@ -222,12 +188,8 @@ module RSCM
     # repository's revision/time identified by +identifier+. 
     # If +identifier+ is nil, 'HEAD' of repository should be assumed.
     #
-    # TODO: rename to in_synch?
     def uptodate?(identifier)
-      # Suboptimal algorithm that works for all SCMs.
-      # Subclasses can override this to improve efficiency.
-      
-      revisions(identifier).empty?
+      raise NotImplementedError
     end
 
     # Whether the project is checked out from the central repository or not.
@@ -300,6 +262,19 @@ module RSCM
     end
 
   protected
+  
+    # Wrapper for CommandLine.execute that provides default values for 
+    # dir plus any options set in default_options (typically stdout and stderr).
+    def execute(cmd, options={}, &proc)
+      default_dir = @checkout_dir.nil? ? Dir.pwd : @checkout_dir
+      options = {:dir => default_dir}.merge(default_options).merge(options)
+      begin
+        CommandLine.execute(cmd, options, &proc)
+      rescue CommandLine::OptionError => e
+        e.message += "\nEither specify default_options on the scm object, or pass the required options to the method"
+        raise e
+      end
+    end
 
     # Takes an array of +absolute_paths+ and turns it into an array
     # of paths relative to +dir+

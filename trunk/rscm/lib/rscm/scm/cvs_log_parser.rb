@@ -52,13 +52,8 @@ module RSCM
         file = parse_file(entry)
         next if file.nil?
         file.path = parse_path(entries[0])
-
         file.status = RevisionFile::ADDED if file.native_revision_identifier =~ /1\.1$/
-
-        revision = revisions.add(file)
-        # CVS doesn't have revision for revisions, use
-        # Fisheye-style revision
-#        revision.native_revision_identifier =  "MAIN:#{file.developer}:#{file.time.utc.strftime('%Y%m%d%H%M%S')}" if revision
+        revisions.add(file)
       end
       nil
     end
@@ -83,10 +78,9 @@ module RSCM
       raise "can't parse: #{file_entry}" if file_entry =~ REVISION_SEPARATOR
          
       file_entry_lines = file_entry.split(/\r?\n/)
-      file = RevisionFile.new
 
+      file = RevisionFile.new
       file.native_revision_identifier =  extract_match(file_entry_lines[0], /revision (.*)$/)
-      
       file.previous_native_revision_identifier = determine_previous_native_revision_identifier(file.native_revision_identifier)
 
       time = extract_required_match(file_entry_lines[1], /date: (.*?)(;|$)/)

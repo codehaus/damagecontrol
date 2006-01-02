@@ -203,7 +203,7 @@ module RSCM
 
     # Administrative files that should be ignored when counting files.
     def ignore_paths
-      return [/MT/, /\.mt-attrs/]
+      [/MT/, /\.mt-attrs/]
     end
 
   private
