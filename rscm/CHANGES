@@ -1,5 +1,19 @@
 = RSCM Changelog
 
+== Version 0.4.0
+
+This release of RSCM modifies mosts API methods to take an options Hash (or alternatively, setting
+the default_options attribute), allowing better capturing of the underlying SCM's IO (stdout/stderr)
+
+* Introduced named parameters for several API methods.
+* Added RSCM::VERSION
+* Fixed incorrect arguments to poll_new_revisions in revision_poller.rb
+* Added Base.to_identifier(raw_identifier) for type conversion to the native revision type.
+* Removed support for directory listings (No use case for it anymore, keep things simpler)
+* checkout no longer yields new files, only returns an array (primarily used for testing)
+* Better.popen removed in favour of RSCM::CommandLine.
+* Stdout and stderr logs are now written to disk.
+
 == Version 0.3.16
 
 Bugfix release

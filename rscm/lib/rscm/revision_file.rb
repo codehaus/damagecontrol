@@ -37,13 +37,13 @@ module RSCM
     
     # Returns/yields an IO containing the contents of this file, using the +scm+ this
     # file lives in.
-    def open(scm, &block) #:yield: io
-      scm.open(self, &block)
+    def open(scm, options={}, &block) #:yield: io
+      scm.open(self, options, &block)
     end
     
     # Yields the diff as an IO for this file
-    def diff(scm, &block)
-      scm.diff(self, &block)
+    def diff(scm, options={}, &block)
+      scm.diff(self, options, &block)
     end
   
     # Accepts a visitor that must respond to +visit_file(revision_file)+ 

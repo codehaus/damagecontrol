@@ -7,5 +7,6 @@ class Time
     def infinity
       Time.utc(2036)
     end
+    
   end
 end

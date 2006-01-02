@@ -1,6 +1,7 @@
 require 'rscm/path_converter'
 require 'rscm/difftool'
-require 'rscm/better'
+require 'rscm/platform'
+require 'rscm/command_line'
 require 'rscm/base'
 require 'rscm/revision'
 require 'rscm/revision_poller'

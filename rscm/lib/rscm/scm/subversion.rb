@@ -25,98 +25,53 @@ module RSCM
       @username = ""
       @password = ""
     end
+
+    def to_identifier(raw_identifier)
+      raw_identifier.to_i
+    end
     
-    def add(relative_filename)
-      svn(@checkout_dir, "add #{relative_filename}")
+    def add(relative_filename, options={})
+      svn("add #{relative_filename}", options)
     end
 
-    def move(relative_src, relative_dest)
-      svn(@checkout_dir, "mv #{relative_src} #{relative_dest}")
+    def move(relative_src, relative_dest, options={})
+      svn("mv #{relative_src} #{relative_dest}", options)
     end
 
     def transactional?
       true
     end
 
-    def checkout(to_identifier=nil)
-      checkout_dir = PathConverter.filepath_to_nativepath(@checkout_dir, false)
-      mkdir_p(@checkout_dir)
-      checked_out_files = []
-      path_regex = /^[A|D|U]\s+(.*)/
-      if(checked_out?)
-        svn(@checkout_dir, update_command(to_identifier)) do |line|
-          if(line =~ path_regex)
-            absolute_path = "#{checkout_dir}/#{$1}"
-            relative_path = $1.chomp
-            relative_path = relative_path.gsub(/\\/, "/") if WINDOWS
-            checked_out_files << relative_path
-            yield relative_path if block_given?
-          end
-        end
-      else
-        svn(@checkout_dir, checkout_command(to_identifier)) do |line|
-          if(line =~ path_regex)
-            native_absolute_path = $1
-            absolute_path = PathConverter.nativepath_to_filepath(native_absolute_path)
-            if(File.exist?(absolute_path) && !File.directory?(absolute_path))
-              native_checkout_dir = PathConverter.filepath_to_nativepath(@checkout_dir, false)
-              relative_path = native_absolute_path[native_checkout_dir.length+1..-1].chomp
-              relative_path = relative_path.gsub(/\\/, "/")
-              checked_out_files << relative_path
-              yield relative_path if block_given?
-            end
-          end
-        end
-      end
-      checked_out_files
-    end
-
-    def uptodate?(identifier)
+    def uptodate?(identifier, options={})
       if(!checked_out?)
         false
       else
-        rev = identifier ? identifier : head_revision_identifier
-        local_revision_identifier == rev
+        rev = identifier.nil? ? head_revision_identifier(options) : identifier 
+        local_revision_identifier(options) == rev
       end
     end
 
-    def commit(message)
-      svn(@checkout_dir, commit_command(message))
+    def commit(message, options={})
+      svn(commit_command(message), options)
       # We have to do an update to get the local revision right
-      svn(@checkout_dir, "update")
+      svn("update", options)
     end
 
     def label
       local_revision_identifier.to_s
     end
 
-    def diff(file, &block)
+    def diff(file, options={}, &block)
       cmd = "svn diff --revision #{file.previous_native_revision_identifier}:#{file.native_revision_identifier} \"#{url}/#{file.path}\""
-      Better.popen(cmd) do |io|
+      execute(cmd, options) do |io|
         return(yield(io))
       end
     end
     
-    def open(revision_file, &block)
+    def open(revision_file, options, &block)
       cmd = "svn cat #{url}/#{revision_file.path}@#{revision_file.native_revision_identifier}"
-      Better.popen(cmd) do |io|
+      execute(cmd, options) do |io|
         return(yield(io))
-      end
-    end
-
-    def ls(relative_path)
-      prefix = relative_path == "" ? relative_path : "#{relative_path}/"
-      cmd = "svn ls #{url}/#{relative_path}"
-      Better.popen(cmd) do |io|
-        io.collect do |line|
-          name = line.strip
-          dir = false
-          if(name =~ /(.*)\/$/)
-            name = $1
-            dir = true
-          end
-          HistoricFile.new("#{prefix}#{name}", dir, self)
-        end
       end
     end
 
@@ -141,7 +96,7 @@ module RSCM
         # on stdout (and an error msg on std err).
         exists = false
         cmd = "svn log #{url} -r HEAD"
-        Better.popen(cmd) do |stdout|
+        execute(cmd) do |stdout|
           stdout.each_line do |line|
             exists = true
           end
@@ -161,53 +116,58 @@ module RSCM
       "hooks/post-commit"
     end
     
-    def create_central
+    def create_central(options={})
+      options = options.dup.merge({:dir => svnrootdir})
       native_path = PathConverter.filepath_to_nativepath(svnrootdir, true)
       mkdir_p(PathConverter.nativepath_to_filepath(native_path))
-      svnadmin(svnrootdir, "create #{native_path}")
+      svnadmin("create #{native_path}", options)
       if(@path && @path != "")
+        options = options.dup.merge({:dir => "."})
         # create the directories
         paths = @path.split("/")
         paths.each_with_index do |p,i|
           p = paths[0..i]
           u = "#{repourl}/#{p.join('/')}"
-          svn(".", "mkdir #{u} -m \"Adding directories\"")
+          svn("mkdir #{u} -m \"Adding directories\"", options)
         end
       end
     end
 
-    def install_trigger(trigger_command, trigger_files_checkout_dir)
+    def install_trigger(trigger_command, trigger_files_checkout_dir, options={})
       if (WINDOWS)
-        install_win_trigger(trigger_command, trigger_files_checkout_dir)
+        install_win_trigger(trigger_command, trigger_files_checkout_dir, options)
       else
-        install_unix_trigger(trigger_command, trigger_files_checkout_dir)
+        install_unix_trigger(trigger_command, trigger_files_checkout_dir, options)
       end
     end
     
-    def uninstall_trigger(trigger_command, trigger_files_checkout_dir)
+    def uninstall_trigger(trigger_command, trigger_files_checkout_dir, options={})
       File.comment_out(post_commit_file, /#{Regexp.escape(trigger_command)}/, nil)
     end
     
-    def trigger_installed?(trigger_command, trigger_files_checkout_dir)
+    def trigger_installed?(trigger_command, trigger_files_checkout_dir, options={})
       return false unless File.exist?(post_commit_file)
       not_already_commented = LineEditor.comment_out(File.new(post_commit_file), /#{Regexp.escape(trigger_command)}/, "# ", "")
       not_already_commented
     end
     
-    def import_central(dir, message)
-      import_cmd = "import #{url} -m \"#{message}\""
-      svn(dir, import_cmd)
+    def import_central(options)
+      import_cmd = "import #{url} -m \"#{options[:message]}\""
+      svn(import_cmd, options)
     end
 
-    def revisions(from_identifier, to_identifier=Time.infinity, relative_path="")
-      # Return empty revision if the requested revision doesn't exist yet.
-      return Revisions.new if(from_identifier.is_a?(Integer) && head_revision_identifier <= from_identifier)
-
+    def revisions(from_identifier, options={})
+      options = {
+        :from_identifier => from_identifier,
+        :to_identifier => Time.infinity, 
+        :relative_path => "",
+        :dir => Dir.pwd
+      }.merge(options)
+      
       checkout_dir = PathConverter.filepath_to_nativepath(@checkout_dir, false)
       revisions = nil
-      command = "svn #{changes_command(from_identifier, to_identifier, relative_path)}"
-
-      Better.popen(command) do |stdout|
+      command = "svn #{changes_command(options[:from_identifier], options[:to_identifier], options[:relative_path])}"
+      execute(command, options) do |stdout|
         parser = SubversionLogParser.new(stdout, @url)
         revisions = parser.parse_revisions
       end
@@ -226,31 +186,47 @@ module RSCM
       result
     end
 
+  protected
+
+    def checkout_silent(to_identifier, options)
+      checkout_dir = PathConverter.filepath_to_nativepath(@checkout_dir, false)
+      mkdir_p(@checkout_dir)
+      if(checked_out?)
+        svn(update_command(to_identifier), options)
+      else
+        svn(checkout_command(to_identifier), options)
+      end
+    end
+
+    def ignore_paths
+      [/\.svn\/.*/]
+    end
+
   private
 
-    def local_revision_identifier
+    def local_revision_identifier(options)
       local_revision_identifier = nil
-      svn(@checkout_dir, "info") do |line|
+      svn("info", options) do |line|
         if(line =~ /Revision: ([0-9]*)/)
           return $1.to_i
         end
       end
     end
 
-    def head_revision_identifier
+    def head_revision_identifier(options)
       # This command only seems to yield any changesets if the url is the root of
       # the repo, which we don't know in the case where path is not specified (likely)
       # We therefore don't specify it and get the latest revision from the full url instead.
       # cmd = "svn log #{login_options} #{repourl} -r HEAD"
       cmd = "svn log #{login_options} #{url}"
-      Better.popen(cmd) do |stdout|
+      execute(cmd, options) do |stdout|
         parser = SubversionLogParser.new(stdout, @url)
         revisions = parser.parse_revisions
-        revisions[0].identifier.to_i
+        revisions[0].identifier
       end
     end
 
-    def install_unix_trigger(trigger_command, damagecontrol_install_dir)
+    def install_unix_trigger(trigger_command, damagecontrol_install_dir, options)
       post_commit_exists = File.exists?(post_commit_file)
       mode = post_commit_exists ? File::APPEND|File::WRONLY : File::CREAT|File::WRONLY
       begin
@@ -267,7 +243,7 @@ module RSCM
       end
     end
     
-    def install_win_trigger(trigger_command, damagecontrol_install_dir)
+    def install_win_trigger(trigger_command, damagecontrol_install_dir, options)
       post_commit_exists = File.exists?(post_commit_file)
       mode = post_commit_exists ? File::APPEND|File::WRONLY : File::CREAT|File::WRONLY
       begin
@@ -291,22 +267,19 @@ module RSCM
       result
     end
 
-    def svnadmin(dir, cmd, &proc)
-      svncommand("svnadmin", dir, cmd, &proc)
+    def svnadmin(cmd, options={}, &proc)
+      svncommand("svnadmin", cmd, options, &proc)
     end
 
-    def svn(dir, cmd, &proc)
-      svncommand("svn", dir, cmd, &proc)
+    def svn(cmd, options={}, &proc)
+      svncommand("svn", cmd, options, &proc)
     end
 
-    def svncommand(executable, dir, cmd, &proc)
+    def svncommand(executable, cmd, options, &proc)
       command_line = "#{executable} #{cmd}"
-      dir = File.expand_path(dir)
-      with_working_dir(dir) do
-        Better.popen(command_line) do |stdout|
-          stdout.each_line do |line|
-            yield line if block_given?
-          end
+      execute(command_line, options) do |stdout|
+        stdout.each_line do |line|
+          yield line if block_given?
         end
       end
     end
