@@ -23,6 +23,7 @@ module DamageControl
       attr_accessor :animation
       
       def initialize
+        @orb_id = nil
         @color = {}
         @animation = {}
 

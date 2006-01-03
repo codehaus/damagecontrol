@@ -1,4 +1,4 @@
-// similar to Rails' Inflector
+// Similar to Rails' Inflector
 String.prototype.underscore = function() {
   return this.replace(/::/g, '/').replace(/([A-Z]+)([A-Z][a-z])/g,'$1_$2').replace(/([a-z,0-9])([A-Z])/g,'$1_$2').toLowerCase();
 }
@@ -53,16 +53,16 @@ DamageControl.Plugins.prototype = {
   },
 
   /**
-   * Called for plugins that have checkboxes.
+   * Called for plugins that have checkboxes, i.e. non-exclusive ones.
    */
   enable: function(className, e) {
-   var checked = false;
-   $A($(className.contentElement()).getElementsByTagName("input")).each(function(element) {
+    var checked = false;
+    $A($(className.contentElement()).getElementsByTagName("input")).each(function(element) {
       if(element.checked) {
-       checked = true;
+        checked = true;
       }
     });
-    damageControlPlugins.plugins[className].setEnabled(checked);
+    damageControlPlugins.plugins[className].setEnabled(checked, false);
   }
 }
 
@@ -88,9 +88,9 @@ DamageControl.PluginGroup.prototype = {
   shown: function(plugin) {
     if(this.exclusive) {
       if(this.enabledPlugin != undefined) {
-        this.enabledPlugin.setEnabled(false);
+        this.enabledPlugin.setEnabled(false, true);
       }
-      plugin.setEnabled(true);
+      plugin.setEnabled(true, true);
       this.enabledPlugin = plugin;
     }
   }  
@@ -113,8 +113,10 @@ DamageControl.Plugin.prototype = {
     this.pluginGroup.shown(this);
   },
 
-  setEnabled: function(enabled) {
+  setEnabled: function(enabled, updateEnabledElement) {
     $(this.className.imgElement()).src = enabled ? this.enabledImg.src : this.disabledImg.src;
-    $(this.className.enabledElement()).value = enabled;
+    if(updateEnabledElement) {
+      $(this.className.enabledElement()).value = enabled;
+    }
   }
 }

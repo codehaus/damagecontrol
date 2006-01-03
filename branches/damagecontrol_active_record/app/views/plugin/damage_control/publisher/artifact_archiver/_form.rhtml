@@ -10,7 +10,7 @@ artifact_archiver_files_counter = <%= plugin.files.size %>;
 function addArchiverFiles(glob, dest) {
   var key = "<input name='publisher[DamageControl::Publisher::ArtifactArchiver][files][keys][]' value=\"" + glob + "\"/>";
   var value = "<input name='publisher[DamageControl::Publisher::ArtifactArchiver][files][values][]' value=\"" + dest + "\"/>";
-  var delete_icon = "<a href=\"#\" onclick=\"Element.remove('artifact_archiver_files_" + artifact_archiver_files_counter + "'); return false;\"><img src=\"/images/document_delete.png\" width=\"16\" height=\"16\" border=\"0\"/></a>";
+  var delete_icon = "<a href=\"#\" onclick=\"Element.remove('artifact_archiver_files_" + artifact_archiver_files_counter + "'); return false;\"><img src=\"/images/revision/document_delete.png\" width=\"16\" height=\"16\" border=\"0\"/></a>";
   var row = "<tr id='artifact_archiver_files_" + artifact_archiver_files_counter + "'><td>" + key + "</td><td>" + value + "</td><td>" + delete_icon + "</td></tr>";
   new Insertion.Bottom("artifact_archiver_files", row);
 

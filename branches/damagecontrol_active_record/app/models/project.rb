@@ -365,16 +365,18 @@ LIMIT #{options[:count]}
 
     self.attributes = attrs
 
-    self.scm        = hash[:scm].deserialize_to_array.find{|scm| scm.enabled}
-    self.tracker    = hash[:tracker].deserialize_to_array.find{|tracker| tracker.enabled}
-    self.publishers = hash[:publisher].deserialize_to_array
+    self.scm        = hash[:scm].deserialize_to_array.find{|scm| scm.enabled} if hash[:scm].is_a?(Hash)
+    self.tracker    = hash[:tracker].deserialize_to_array.find{|tracker| tracker.enabled} if hash[:tracker].is_a?(Hash)
+    self.publishers = hash[:publisher].deserialize_to_array if hash[:publisher].is_a?(Hash)
 
-    self.scm_web = MetaProject::ScmWeb::Browser.new
-    self.scm_web.dir_spec      = hash[:scm_web][:dir_spec]
-    self.scm_web.history_spec  = hash[:scm_web][:history_spec]
-    self.scm_web.raw_spec      = hash[:scm_web][:raw_spec]
-    self.scm_web.html_spec     = hash[:scm_web][:html_spec]
-    self.scm_web.diff_spec     = hash[:scm_web][:diff_spec]
+    if hash[:scm_web].is_a?(Hash)
+      self.scm_web = MetaProject::ScmWeb::Browser.new
+      self.scm_web.dir_spec      = hash[:scm_web][:dir_spec]
+      self.scm_web.history_spec  = hash[:scm_web][:history_spec]
+      self.scm_web.raw_spec      = hash[:scm_web][:raw_spec]
+      self.scm_web.html_spec     = hash[:scm_web][:html_spec]
+      self.scm_web.diff_spec     = hash[:scm_web][:diff_spec]
+    end
 
     self.dependencies.clear
     if(hash[:project_dependencies])

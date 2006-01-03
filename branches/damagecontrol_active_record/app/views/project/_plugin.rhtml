@@ -1,6 +1,5 @@
 <% fields_for(:plugin, plugin) do |p| %>
 <div id="<%= p.content_id %>" style="display:none">
-  <h1><%= p.visual_name %></h1>
   <% if(has_template('plugin', p.group_name)) %>
     <%= render :partial => template_for('plugin', p.group_name), :locals => {:plugin => plugin} %>
   <% end %>

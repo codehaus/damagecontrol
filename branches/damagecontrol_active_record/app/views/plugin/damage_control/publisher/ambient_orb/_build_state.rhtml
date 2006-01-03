@@ -1,6 +1,10 @@
-<select name="publisher[DamageControl::Publisher::AmbientOrb][color][<%= build_state.name %>]">
-  <%= options_for_select(Ambient::Orb.colors, plugin.color ? plugin.color[build_state.name] : nil) %>
-</select>
-<select name="publisher[DamageControl::Publisher::AmbientOrb][animation][<%= build_state.name %>]">
-  <%= options_for_select(Ambient::Orb.animations, plugin.animation ? plugin.animation[build_state.name] : nil) %>
-</select>
+<td>
+  <select name="publisher[DamageControl::Publisher::AmbientOrb][color][<%= build_state.name %>]">
+    <%= options_for_select(Ambient::Orb.colors, plugin.color ? plugin.color[build_state.name] : nil) %>
+  </select>
+</td>
+<td>
+  <select name="publisher[DamageControl::Publisher::AmbientOrb][animation][<%= build_state.name %>]">
+    <%= options_for_select(Ambient::Orb.animations, plugin.animation ? plugin.animation[build_state.name] : nil) %>
+  </select>
+</td>

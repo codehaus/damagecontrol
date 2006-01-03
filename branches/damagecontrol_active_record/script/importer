@@ -19,17 +19,14 @@ begin
   opener.open(ARGV[0]) do |io|
     project_hash = YAML.load(io)
 
-    project = nil
-    if(project_hash[:id])
-      project = Project.find(project_hash[:id])
-      STDOUT.write "Updating existing project "
+    project = Project.find_by_name(project_hash['name'])
+    if(project)
+      STDOUT.puts "Updating existing project #{project_hash['name']}"
     else
-      STDOUT.write "Creating new project "
-      project = Project.create(project_hash[:id])
-      raise "There is already a project named #{project.name}" unless project.id
+      STDOUT.puts "Creating new project #{project_hash['name']}"
+      project = Project.create
     end
     project.populate_from_hash(project_hash, nil)
-    puts "'#{project.name}'"
     project.save
   end
 rescue => e
