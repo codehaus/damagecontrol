@@ -1,7 +1,7 @@
 require File.dirname(__FILE__) + '/../test_helper'
 
 class BuildTest < Test::Unit::TestCase
-  include DamageControl::Platform
+  include DamageControl::RSCM::Platform
 
   def test_should_create
     br = revisions(:revision_1).builds.create(:reason => Build::SCM_POLLED)

@@ -55,6 +55,10 @@ protected
   def page_title
     @page_title = "DamageControl"
   end
+  
+  def send_log(file)
+    send_file(file, :type => "text/plain", :disposition => "inline")
+  end
 
 private
 

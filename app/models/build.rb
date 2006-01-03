@@ -168,6 +168,19 @@ class Build < ActiveRecord::Base
     file.tail{|line| result << line}
     result
   end
+  
+  # Returns a short status of the build, and a 'type' of the status ('log' or 'text')
+  def short_status
+    if completed? && !successful?
+      if(File.exist?(stdout_file))
+        return tail(stdout_file, 2), "log"
+      else
+        return "#{stdout_file} doesn't exist", "text"
+      end
+    else
+      return "", "text"
+    end
+  end
 
   class State
     def name

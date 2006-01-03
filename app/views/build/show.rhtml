@@ -14,6 +14,15 @@
   </tr>
   <% end %>
   <tr>
+    <td>Status:</td>
+    <td><%= @build.state.name %><div class="<%=@build.state.name%>_build" style="width:16px;height:16px;"></div></td>
+  </tr>
+  <tr>
+    <td>Request time:</td>
+    <td><%= @build.create_time %></td>
+  </tr>
+  <% unless @build.begin_time.nil? %>
+  <tr>
     <td>Command:</td>
     <td><%= @build.command %></td>
   </tr>
@@ -22,20 +31,14 @@
     <td><%= @build.env.inspect %></td>
   </tr>
   <tr>
-    <td>Status:</td>
-    <td><%= @build.state.name %></td>
+    <td>Begin time:</td>
+    <td><%= @build.begin_time %></td>
   </tr>
+  <% end %>
+  <% unless @build.end_time.nil? %>
   <tr>
     <td>Exit status:</td>
     <td><%= @build.exitstatus %></td>
-  </tr>
-  <tr>
-    <td>Request time:</td>
-    <td><%= @build.create_time %></td>
-  </tr>
-  <tr>
-    <td>Begin time:</td>
-    <td><%= @build.begin_time %></td>
   </tr>
   <tr>
     <td>End time:</td>
@@ -43,16 +46,17 @@
   </tr>
   <tr>
     <td>Duration:</td>
-    <td><%= @build.duration %> seconds</td>
+    <td><%= distance_of_time_in_words(@build.begin_time, @build.end_time, true) %></td>
   </tr>
   <tr>
-    <td>When:</td>
-    <td><%= @build.seconds_since_end %> seconds ago</td>
+    <td>Finished:</td>
+    <td><%= time_ago_in_words(@build.end_time) %> ago</td>
   </tr>
   <tr>
     <td>Artifacts:</td>
     <td><%= @build.artifacts.collect{ |artifact| file_system_link(artifact) }.join("<br>\n") %></td>
   </tr>
+  <% end %>
 </table>
 
 <%= link_to("Standard out", :action => "stdout", :id => @build.id) %> |

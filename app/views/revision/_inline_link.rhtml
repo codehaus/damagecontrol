@@ -1,1 +1,0 @@
-<dl><dt class="revision"><a href="#"><span class="time"><%=revision.timepoint.strftime("%H:%M")%></span> Revision <em>[<%=revision.label%>]</em> by <%=revision.developer%></a></dt><dd class="revision"><%=revision.message%></dd><dd><%=render(:partial => "revision/request_builds", :locals=>{:revision => revision})%></dd></dl>

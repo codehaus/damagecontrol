@@ -3,13 +3,13 @@ require 'rscm'
 cvsroot = "target/demo/cvsroot"
 path = RSCM::PathConverter.filepath_to_nativepath(cvsroot, true)
 cvs = RSCM::Cvs.new(":local:#{path}", "demo")
+cvs.default_options = {:stdout => File.expand_path("target/demo/cvs_stdout.log"), :stderr => File.expand_path("target/demo/cvs_stderr.log")}
 
 desc "Creates a demo project in DamageControl"
 task :create_demo_project => [:migrate, :create_demo_cvs, :import_demo] do
   p = Project.find_by_name("demo")
   p.destroy if p
 
-  cvs.uses_polling = true
   Project.create(
     :name => "demo",
     :build_command => "rake",
@@ -58,5 +58,5 @@ FileList.new("demo/**/*").each do |src|
 end
 
 task :import_demo => :copy_demo do
-  cvs.import_central("#{import_dir}/demo", "import sources")
+  cvs.import_central(:dir => "#{import_dir}/demo", :message => "import sources")
 end

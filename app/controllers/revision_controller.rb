@@ -3,8 +3,6 @@ require 'zip/zip'
 class RevisionController < ApplicationController
   verify :method => :post, :only => %w( request_build result_zip )
 
-  layout nil
-
   def show
     @revision = Revision.find(@params[:id])
     @scm_files = @revision.scm_files

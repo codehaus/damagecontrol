@@ -1,3 +1,5 @@
+# THIS CODE IS NOT ACTIVE YET
+
 require 'open-uri'
 require 'time'
 

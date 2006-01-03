@@ -17,9 +17,6 @@ body {
 }
 
 #plugin-overview {
-  position:absolute;
-  top:100px;
-  left:20px;
   width:172px;
   padding:10px;
   border:1px dashed #999;
@@ -140,16 +137,16 @@ dd {
 }
 
 /* Apply icon background-image twice to avoid hover-flicker in IE/Win */
-dt.requested_build, dt.requested_build a { background-image: url(/images/build/grey-16.gif) !important }
-dt.synching_working_copy_build, dt.synching_working_copy_build a { background-image: url(/images/build/blue-16.gif) !important }
-dt.executing_build, dt.executing_build a { background-image: url(/images/build/spinner.gif) !important }
-dt.successful_build, dt.successful_build a { background-image: url(/images/build/green-16.gif) !important }
-dt.fixed_build, dt.fixed_build a { background-image: url(/images/build/green-16.gif) !important }
-dt.broken_build, dt.broken_build a { background-image: url(/images/build/red-16.gif) !important }
-dt.repeatedly_broken_build, dt.repeatedly_broken_build a { background-image: url(/images/build/red-pulse-16.gif) !important }
+.requested_build, .requested_build a { background-image: url(/images/build/grey-16.gif) !important }
+.synching_working_copy_build, .synching_working_copy_build a { background-image: url(/images/build/blue-16.gif) !important }
+.executing_build, .executing_build a { background-image: url(/images/build/spinner.gif) !important }
+.successful_build, .successful_build a { background-image: url(/images/build/green-16.gif) !important }
+.fixed_build, .fixed_build a { background-image: url(/images/build/green-16.gif) !important }
+.broken_build, .broken_build a { background-image: url(/images/build/red-16.gif) !important }
+.repeatedly_broken_build, .repeatedly_broken_build a { background-image: url(/images/build/red-pulse-16.gif) !important }
 
-dt.revision, dt.revision a { background-image: url(/images/revision/documents.png) !important }
-dt.added_file, dt.added_file a { background-image: url(/images/revision/document_add.png) !important }
-dt.modified_file, dt.modified_file a { background-image: url(/images/revision/document_edit.png) !important }
-dt.deleted_file, dt.deleted_file a { background-image: url(/images/revision/document_delete.png) !important }
-dt.moved_file, dt.moved_file a { background-image: url(/images/revision/document_exchange.png) !important }
+.revision, .revision a { background-image: url(/images/revision/documents.png) !important }
+.added_file, .added_file a { background-image: url(/images/revision/document_add.png) !important }
+.modified_file, .modified_file a { background-image: url(/images/revision/document_edit.png) !important }
+.deleted_file, .deleted_file a { background-image: url(/images/revision/document_delete.png) !important }
+.moved_file, .moved_file a { background-image: url(/images/revision/document_exchange.png) !important }

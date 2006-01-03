@@ -4,7 +4,7 @@ module ActionView
   module Helpers
     class FormBuilder
       def exclusive?
-        @object.is_a?(RSCM::Base)
+        @object.is_a?(RSCM::Base) || @object.is_a?(MetaProject::Tracker::Base)
       end
 
       def render(binding)
@@ -170,12 +170,12 @@ module ApplicationHelper
     EOT
   end
   
-  def build_inline_link(build)
-    render :partial => "build/inline_link", :locals => {:build => build}
+  def build_link(build)
+    render :partial => "build/link", :locals => {:build => build}
   end
 
-  def revision_inline_link(revision)
-    render :partial => "revision/inline_link", :locals => {:revision => revision}
+  def revision_link(revision)
+    render :partial => "revision/link", :locals => {:revision => revision}
   end
   
 end

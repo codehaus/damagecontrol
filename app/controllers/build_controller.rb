@@ -1,7 +1,5 @@
 class BuildController < ApplicationController
   
-  layout nil
-
   def show
     find
     @project = @build.project
@@ -19,14 +17,6 @@ private
 
   def find
     @build = Build.find(@params[:id])
-  end
-
-  def send_log(file)
-    if(File.exist?(file))
-      send_file(file, :type => "text/plain", :disposition => "inline")
-    else
-      render :text => @build.completed? ? "File #{file} not found. It has probably been deleted" : "Build not started"
-    end
   end
 
 end

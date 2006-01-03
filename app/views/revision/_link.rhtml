@@ -1,0 +1,1 @@
+<dl><dt class="revision"><a href="<%= url_for :controller=>'revision', :action=>'show', :id=>revision.id %>"><span class="time"><%=revision.timepoint.strftime("%H:%M")%></span> Revision <em>[<%=revision.label%>]</em> by <%=revision.developer%></a></dt><dd><%=revision.message%></dd><dd></dl>

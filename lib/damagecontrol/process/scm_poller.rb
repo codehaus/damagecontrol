@@ -1,5 +1,8 @@
+require File.dirname(__FILE__) + '/base'
+
 module DamageControl
   module Process
+    
     # Polls projects' SCMs for new revisions and persists them in the database.
     class ScmPoller < Base
 
@@ -22,7 +25,9 @@ module DamageControl
         end
         if(should_poll)
           project.prepare_scm # Create .cvspass file or do other preparation
-          rscm_revisions = project.scm.poll_new_revisions(project.latest_revision)
+          rscm_revisions = project.scm.poll_new_revisions(
+            :latest_revision => project.latest_revision
+          )
           new_revisions = persist_revisions(project, rscm_revisions)
           project.new_revisions_detected(new_revisions)
         end

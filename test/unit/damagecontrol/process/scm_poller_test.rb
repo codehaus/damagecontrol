@@ -66,13 +66,11 @@ module DamageControl
       end
 
       def test_should_request_build_when_change_committed
-        log = StringIO.new
-
-        ScmPoller.logger = Logger.new(log)
         scm_poller = ScmPoller.new
 
         # create svn repository
         scm = RSCM::Subversion.new
+        scm.default_options = {:stdout => stdout, :stderr => stderr}
         scm.url = RSCM::PathConverter.filepath_to_nativeurl(central_repo)
         scm.create_central
 
@@ -92,8 +90,6 @@ module DamageControl
 
         # this should detect a new revision and request a build
         scm_poller.poll_if_needed(project)
-        log.rewind
-        #puts log.read
         project.reload
         assert_equal(1, project.revisions.length)
         assert_equal(1, project.latest_revision.builds.length)
@@ -107,6 +103,14 @@ module DamageControl
         FileUtils.rm_r(dir) if File.exist?(dir)
         FileUtils.mkdir_p(dir)
         dir
+      end
+      
+      def stdout
+        "#{DC_DATA_DIR}/scm_poller_test/stdout.log"
+      end
+
+      def stderr
+        "#{DC_DATA_DIR}/scm_poller_test/stderr.log"
       end
 
       def central_repo

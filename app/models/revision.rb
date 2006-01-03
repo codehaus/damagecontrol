@@ -67,12 +67,11 @@ class Revision < ActiveRecord::Base
   end
   
   # Syncs the working copy of the project with this revision.
-  def sync_working_copy!(needs_zip, zipper = DamageControl::Zipper.new)
+  def sync_working_copy!(stdout, stderr)
     project.prepare_scm
     logger.info "Syncing working copy for #{project.name} with revision #{identifier} ..." if logger
-    project.scm.checkout(identifier) if project.scm
+    project.scm.checkout(identifier, :stdout => stdout, :stderr => stderr) if project.scm
     logger.info "Done Syncing working copy for #{project.name} with revision #{identifier}" if logger
-    #zip(zipper) if needs_zip
 
     # Now update the project settings if this revision has a damagecontrol.yml file
     update_project_settings    

@@ -10,8 +10,8 @@
 # correspond to. The deploy_to path must be the path on each machine that will
 # form the root of the application path.
 
-set :application, "."
-set :repository, "svn://beaver.codehaus.org/damagecontrol/scm/branches/damagecontrol_active_record"
+set :application, "damage_control"
+set :repository, "http://svn.yourhost.com/#{application}/trunk"
 
 # =============================================================================
 # ROLES
@@ -22,18 +22,20 @@ set :repository, "svn://beaver.codehaus.org/damagecontrol/scm/branches/damagecon
 # be used to single out a specific subset of boxes in a particular role, like
 # :primary => true.
 
-role :web, "cheddar.codehaus.org"
-role :app, "cheddar.codehaus.org"
-role :db,  "cheddar.codehaus.org"
+role :web, "www01.example.com", "www02.example.com"
+role :app, "app01.example.com", "app02.example.com", "app03.example.com"
+role :db,  "db01.example.com", :primary => true
+role :db,  "db02.example.com", "db03.example.com"
 
 # =============================================================================
 # OPTIONAL VARIABLES
 # =============================================================================
-set :deploy_to, "/home/dcontrol/apps/#{application}" # defaults to "/u/apps/#{application}"
+# set :deploy_to, "/path/to/app" # defaults to "/u/apps/#{application}"
 # set :user, "flippy"            # defaults to the currently logged in user
 # set :scm, :darcs               # defaults to :subversion
 # set :svn, "/path/to/svn"       # defaults to searching the PATH
 # set :darcs, "/path/to/darcs"   # defaults to searching the PATH
+# set :cvs, "/path/to/cvs"       # defaults to searching the PATH
 # set :gateway, "gate.host.com"  # default to no gateway
 
 # =============================================================================

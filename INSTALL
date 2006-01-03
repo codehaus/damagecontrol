@@ -1,4 +1,77 @@
-== Installing on TextDrive
+== Introduction
+There are several installation options for DamageControl. They all have slightly different installation routines.
+Decide what installation option is best for you, and follow the instructions in the mentioned sub-sections.
+
+* Installing from Subversion    : Prerequisites + Ruby + Subversion + Environment + Source Run
+* Installing from Ruby Gem      : Prerequisites + Ruby + Environment
+* Installing from Source distro : Prerequisites + Ruby + Gems + Environment + Source Run
+* Installing from Executable    : Prerequisites + Environment + Executable
+* Creating distros              : Prerequisites + Ruby + Subversion + Environment + Packaging
+
+* Using DamageControl
+
+== Prerequisites
+* Install the database you want to use with DamageControl (SQLite3, MySQL or PostgreSQL recommended)
+* Install SCM clients (Subversion or CVS are currently the only supported ones)
+* Install the build tools needed to build your projects (Ant, Nant, Maven, etc.)
+* Install compilers and other build tools you may need (JDK, GCC, etc.)
+
+== Ruby
+* Install Ruby 1.8.3 (DamageControl has not been tested with older or newer versions!)
+* Install RubyGems 0.8.10 or later (Run 'gem update --system' or install RubyGems from scratch)
+
+== Subversion
+* Check out the sources. Use one of the following commands, depending on whether you have developer access or not:
+    svn co svn+ssh://developers@beaver.codehaus.org/home/projects/damagecontrol/scm/branches/damagecontrol_active_record
+    svn co svn://svn.damagecontrol.codehaus.org/damagecontrol/scm/branches/damagecontrol_active_record
+
+== Gems
+* Install the gem dependencies:
+    rake install_gems
+
+== Packaging
+* Creating the DamageControl Source distros and Gem:
+  rake package
+* Creating a self-contained Executable (for your platform only!)
+  rake rubyscript2exe
+
+== Environment
+Define the DC_DATA_DIR environment variable. This is where DamageControl will store files.
+
+=== Windows
+==== Using a DOS shell
+  set DC_DATA_DIR=C:\damagecontrol_data
+  damagecontrol.exe
+
+==== Clicking on damagecontrol.exe
+Set the DC_DATA_DIR as a permanent environment variable:
+  Right-click My Computer -> Properties -> Advanced -> Environment variables
+Double-click on damagecontrol.exe
+
+=== POSIX (Linux, OS-X and other)
+  export DC_DATA_DIR=~/damagecontrol_data
+
+== Source Run
+Open a shell.
+
+Before you run DamageControl for the first time you must initialize the database (create all the tables):
+  rake migrate RAILS_ENV=production
+
+Start DamageControl with the following command (standing in DamageControl's root directory):
+  ruby init.rb
+
+== Executable
+The executable contains everything needed to run DamageControl. The windows executable also includes the SQLite3 binaries. OS-X Tiger should have SQLite3 installed already. Make sure you follow all the steps in Prerequisites 
+(except maybe SQLite3, depending on your platform).
+
+On Windows, just double-click on the executable (provided the DC_DATA_DIR has been set permanently).
+On other platforms (or if you have only set the DC_DATA_DIR in the current shell), just run the damagecontrol executable.
+
+== Using DamageControl
+Once you have DamageControl up and running, you should be able to access it via the web interface:
+  http://localhost:3000
+
+== Installing on TextDrive (OBSOLETE!)
 1) Install all required gems in your own location
   * gem install xxx -i <your_gem_dir>
 2) Tell RubyGems about your own gems (required if you want to run tests/migration only)

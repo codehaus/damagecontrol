@@ -37,8 +37,7 @@ class BuildExecutor < ActiveRecord::Base
     build.state = ::Build::SynchingWorkingCopy.new
     build.save
     
-    needs_zip = is_master
-    build.revision.sync_working_copy!(needs_zip)
+    build.revision.sync_working_copy!(build.stdout_file, build.stderr_file)
     build.command = build.revision.project.build_command
     build.env = build.revision.build_environment
     if(is_master)
@@ -49,38 +48,25 @@ class BuildExecutor < ActiveRecord::Base
 private
 
   def execute_local(build)
-    exitstatus = -1
-    commands = build.command.split("&&").collect{|c| c.strip}
-    Dir.chdir(build.revision.project.build_dir) do
-      i = -1
-      redirected_cmd = commands.collect do |c|
-        i+=1
-        "echo #{DamageControl::Platform.prompt} #{commands[i]} >> #{build.stdout_file} && " +
-        "echo #{DamageControl::Platform.prompt} #{commands[i]} >> #{build.stderr_file} && " +
-        "#{c} >> #{build.stdout_file} 2>> #{build.stderr_file}"
-      end.join(" && ")
-
-      build.env.each{|k,v| ENV[k]=v}
+    begin
       build.state = ::Build::Executing.new
       build.begin_time = Time.now.utc
       build.save
-
-      begin
-        # Redirect each subcommand (separated with &&) to a separate file. We'll concatenate them at the end.
-        `#{redirected_cmd}`
-        exitstatus = $?.exitstatus
-      rescue Errno::ENOENT => e
-        File.open(build.stderr_file, "a") {|io| io.write(e.message)}
-      end
+      exitstatus = RSCM::CommandLine.execute(build.command,
+        :dir => build.revision.project.build_dir,
+        :stdout => build.stdout_file, 
+        :stderr => build.stderr_file, 
+        :env => build.env
+      )
+    rescue RSCM::CommandLine::ExecutionError => e
+      exitstatus = e.exitstatus
+    ensure
+      build.exitstatus = exitstatus
+      build.end_time = Time.now.utc
+      build.determine_state
+      build.project.build_complete(build)
+      logger.info "Build of #{build.project.name}'s revision #{build.revision.identifier} complete. Exitstatus: #{build.exitstatus}" if logger
     end
-    
-    build.exitstatus = exitstatus
-    build.end_time = Time.now.utc
-    build.determine_state
-
-    build.project.build_complete(build)
-    logger.info "Build of #{build.project.name}'s revision #{build.revision.identifier} complete. Exitstatus: #{build.exitstatus}" if logger
-
     nil
   end
 
