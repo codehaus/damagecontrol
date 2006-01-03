@@ -39,7 +39,7 @@ class BuildExecutor < ActiveRecord::Base
     
     build.revision.sync_working_copy!(build.stdout_file, build.stderr_file)
     build.command = build.revision.project.build_command
-    build.env = build.revision.build_environment
+    build.env = {}.merge(ENV).merge(build.revision.build_environment)
     if(is_master)
       execute_local(build)
     end

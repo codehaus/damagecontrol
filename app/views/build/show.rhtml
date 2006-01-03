@@ -4,56 +4,71 @@
     <td><%= select("build", "promotion_level_id", PromotionLevel.find(:all).collect {|p| [ p.name, p.id ] }, { :include_blank => true }) %></td>
   </tr-->
   <tr>
-    <td>Reason:</td>
+    <td>Reason</td>
     <td><%= @build.reason %></td>
   </tr>
   <% if(@build.triggering_build) %>
   <tr>
-    <td>Triggered by:</td>
+    <td>Triggered by</td>
     <td><%= link_to(@build.triggering_build.project.name, :id => @build.triggering_build.id) %></td>
   </tr>
   <% end %>
   <tr>
-    <td>Status:</td>
+    <td>Status</td>
     <td><%= @build.state.name %><div class="<%=@build.state.name%>_build" style="width:16px;height:16px;"></div></td>
   </tr>
   <tr>
-    <td>Request time:</td>
+    <td>Request time</td>
     <td><%= @build.create_time %></td>
   </tr>
   <% unless @build.begin_time.nil? %>
   <tr>
-    <td>Command:</td>
+    <td>Command</td>
     <td><%= @build.command %></td>
   </tr>
   <tr>
-    <td>Environment variables set by DamageControl:</td>
-    <td><%= @build.env.inspect %></td>
+    <td>Environment</td>
+    <td>
+	  <table>
+		<thead>
+		  <tr>
+		    <th>Varible</th><th>Value</th>
+		  </tr>
+		</thead>
+		<tbody>
+		  <% @build.env.keys.sort.each do |k| %>
+		  <tr>
+		    <td><%= h(k) %></td><td><%= h(@build.env[k]) %></td>
+		  </tr>
+		  <% end %>
+		</tbody>
+	  </table>
+    </td>
   </tr>
   <tr>
-    <td>Begin time:</td>
+    <td>Begin time</td>
     <td><%= @build.begin_time %></td>
   </tr>
   <% end %>
   <% unless @build.end_time.nil? %>
   <tr>
-    <td>Exit status:</td>
+    <td>Exit status</td>
     <td><%= @build.exitstatus %></td>
   </tr>
   <tr>
-    <td>End time:</td>
+    <td>End time</td>
     <td><%= @build.end_time %></td>
   </tr>
   <tr>
-    <td>Duration:</td>
+    <td>Duration</td>
     <td><%= distance_of_time_in_words(@build.begin_time, @build.end_time, true) %></td>
   </tr>
   <tr>
-    <td>Finished:</td>
+    <td>Finished</td>
     <td><%= time_ago_in_words(@build.end_time) %> ago</td>
   </tr>
   <tr>
-    <td>Artifacts:</td>
+    <td>Artifacts</td>
     <td><%= @build.artifacts.collect{ |artifact| file_system_link(artifact) }.join("<br>\n") %></td>
   </tr>
   <% end %>
