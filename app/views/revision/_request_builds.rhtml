@@ -1,6 +1,6 @@
 <div id="request-build-<%= revision.id %>">
   <%= link_to_remote(
-    "Request build(s) for this revision",
+    "Request build for this revision",
     :url => {:controller => "revision", :action => "request_build", :id => revision.id},
     :update => "request-build-#{revision.id}",
     :complete => "Effect.Pulsate('request-build-#{revision.id}')"

@@ -2,32 +2,47 @@
 # A set of rake tasks for invoking the SwitchTower automation utility.
 # =============================================================================
 
-desc "Push the latest revision into production using the release manager"
+# Invoke the given actions via SwitchTower
+def switchtower_invoke(*actions)
+  begin
+    require 'rubygems'
+  rescue LoadError
+    # no rubygems to load, so we fail silently
+  end
+
+  require 'switchtower/cli'
+
+  args = %w[-vvvvv -r config/deploy]
+  args.concat(actions.map { |act| ["-a", act.to_s] }.flatten)
+  SwitchTower::CLI.new(args).execute!
+end
+
+desc "Push the latest revision into production"
 task :deploy do
-  system "switchtower -vvvv -r config/deploy -a deploy"
+  switchtower_invoke :deploy
 end
 
 desc "Rollback to the release before the current release in production"
 task :rollback do
-  system "switchtower -vvvv -r config/deploy -a rollback"
+  switchtower_invoke :rollback
 end
 
 desc "Describe the differences between HEAD and the last production release"
 task :diff_from_last_deploy do
-  system "switchtower -vvvv -r config/deploy -a diff_from_last_deploy"
+  switchtower_invoke :diff_from_last_deploy
 end
 
 desc "Enumerate all available deployment tasks"
 task :show_deploy_tasks do
-  system "switchtower -r config/deploy -a show_tasks"
+  switchtower_invoke :show_tasks
 end
 
-desc "Execute a specific action using the release manager"
+desc "Execute a specific action using switchtower"
 task :remote_exec do
   unless ENV['ACTION']
     raise "Please specify an action (or comma separated list of actions) via the ACTION environment variable"
   end
 
-  actions = ENV['ACTION'].split(",").map { |a| "-a #{a}" }.join(" ")
-  system "switchtower -vvvv -r config/deploy #{actions}"
+  actions = ENV['ACTION'].split(",")
+  switchtower_invoke(*actions)
 end

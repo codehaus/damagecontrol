@@ -34,9 +34,9 @@
   history_tip = "Show history"
 %>
 
-  <div>
+  <tr>
     <% if(project.scm_web.nil?) %>
-      <td><%= image_tag(scm_file.icon, :size => "16x16", :title => scm_file.status_description) %></span>
+      <td><%= image_tag(scm_file.icon, :size => "16x16", :title => scm_file.status_description) %></td>
     <% else %>
       <td>
         <%= 
@@ -53,11 +53,11 @@
             }
           ) 
         %>
-      </span>
+      </td>
     <% end %>
 
     <% if(project.scm_web.nil?) %>
-      <td><%= scm_file.native_revision_identifier %></span>
+      <td><%= scm_file.native_revision_identifier %></td>
     <% else %>
       <td>
         <%= 
@@ -75,11 +75,11 @@
             }
           )
         %>
-      </span>
+      </td>
     <% end %>
 
     <% if(project.scm_web.nil?) %>
-      <td><%= scm_file.path %></span>
+      <td><%= scm_file.path %></td>
     <% else %>
       <td>
         <%= 
@@ -92,7 +92,6 @@
             }
           ) 
         %>
-      </span>
+      </td>
     <% end %>
-
-  </div>
+  </tr>

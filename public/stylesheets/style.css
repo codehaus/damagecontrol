@@ -11,17 +11,18 @@ body {
   padding:0px;
 }
 
-#plugin-details {
-  margin:0px 50px 50px 200px;
-  padding:10px;
-}
-
 #plugin-overview {
-  width:172px;
+  position: relative;
+  float:left;
+  top: 0px;
+  left: 0px;
+  width:150px;
   padding:10px;
   border:1px dashed #999;
   line-height:17px;
-  width:150px;
+}
+
+#plugin-details {
 }
 
 h1 {

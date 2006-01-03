@@ -10,24 +10,25 @@
   </form>
 <% end %>
 
-<a href="#" id="show-plugin-overview">Show plugin overview</a>
 <%= form_tag({
-    :controller => "project", 
-    :action => @submit_action, 
-    :id => @project.id}, 
-    {:id => "project_settings"}) %>
-    <%= submit_tag(@submit_text) %>
+  :controller => "project", 
+  :action => @submit_action, 
+  :id => @project.id}, 
+  {:id => "project_settings"}) %>
+<%= submit_tag(@submit_text) %>
 
-  <div id="plugin-overview">
-    <%= javascript_tag("var damageControlPlugins = new DamageControl.Plugins('/images');") %>
-    <% @plugin_groups.each do |plugins| %>
-      <%= render :partial => "plugin_group", :locals => {:plugins => plugins} %>
-    <% end %>
-  </div>
-  
-  <div id="plugin-details">
-    <% @plugin_groups.flatten.each do |plugin| %>
-      <%= render :partial => "plugin", :locals => {:plugin => plugin} %>
-    <% end %>
+  <div id="plugins">
+    <div id="plugin-overview">
+      <%= javascript_tag("var damageControlPlugins = new DamageControl.Plugins('/images');") %>
+      <% @plugin_groups.each do |plugins| %>
+        <%= render :partial => "plugin_group", :locals => {:plugins => plugins} %>
+      <% end %>
+    </div>
+
+    <div id="plugin-details">
+      <% @plugin_groups.flatten.each do |plugin| %>
+        <%= render :partial => "plugin", :locals => {:plugin => plugin} %>
+      <% end %>
+    </div>
   </div>
 </form>
