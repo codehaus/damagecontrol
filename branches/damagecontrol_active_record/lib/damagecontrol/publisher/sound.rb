@@ -1,5 +1,5 @@
 # Load platform-specific sound player
-@@sound_player = File.expand_path(File.dirname(__FILE__) + "/sound/" + DamageControl::Platform.family + "/sound_player.rb")
+@@sound_player = File.expand_path(File.dirname(__FILE__) + "/sound/" + DamageControl::RSCM::Platform.family + "/sound_player.rb")
 def self.supported?
   File.exist? @@sound_player
 end

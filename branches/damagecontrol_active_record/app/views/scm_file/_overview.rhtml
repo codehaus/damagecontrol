@@ -1,5 +1,5 @@
 <%
-  scm_file = overview # The rendered object carries the name of this file - which is awkward here.
+  scm_file = overview
 
   project = scm_file.project
   full_path = project.scm.scm_web_path(scm_file)
@@ -42,19 +42,7 @@
         <%= 
           content_tag(
             "a", 
-            image_tag(
-              scm_file.icon, 
-              {
-                :size => "16x16", 
-                :title => case(scm_file.status)
-                  when "ADDED" then added_rev_tip
-                  when "MODIFIED" then diff_tip
-                  when "MOVED" then diff_tip
-                  when "DELETED" then deleted_rev_tip
-                end,
-                :border=>"0"
-              }
-            ), 
+            content_tag("div", "", :class=>"#{scm_file.status.downcase}_file", :style=>"width:16px; height:16px;"), 
             {
               :href => case(scm_file.status)
                 when "ADDED" then revision_url

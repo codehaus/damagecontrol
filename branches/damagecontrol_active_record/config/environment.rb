@@ -17,6 +17,7 @@ Rails::Initializer.run do |config|
   # Force all environments to use the same logger level 
   # (by default production uses :info, the others :debug)
   # config.log_level = :debug
+  #config.log_path
 
   # Use the database for sessions instead of the file system
   # (create the session table with 'rake create_sessions_table')
@@ -28,15 +29,9 @@ Rails::Initializer.run do |config|
 
   # Activate observers that should always be running
   # config.active_record.observers = :cacher, :garbage_collector
-  if(RAILS_ENV == "production")
-    raise "The environment variable DC_DATA_DIR must be defined and point to the directory where DamageControl will store data." unless ENV['DC_DATA_DIR']
-    DC_DATA_DIR = File.expand_path(ENV['DC_DATA_DIR']) unless defined? DC_DATA_DIR
-  else
-    DC_DATA_DIR = File.expand_path("target/data") unless defined? DC_DATA_DIR
-  end
-  require 'fileutils'
-  FileUtils.mkdir_p "#{DC_DATA_DIR}/db" unless File.exist?("#{DC_DATA_DIR}/db")
+
   # config.database_configuration_file = File.join(DC_DATA_DIR, 'config', 'database.yml')
+  require File.dirname(__FILE__) + '/dc_environment'
 
   # Make Active Record use UTC-base instead of local time
   config.active_record.default_timezone = :utc

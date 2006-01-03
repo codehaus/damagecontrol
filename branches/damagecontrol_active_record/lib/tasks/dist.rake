@@ -17,9 +17,8 @@
 # require cygwin on windows since lighttpd doesn't run on win32 (AFAIK)
 # 
 # 
-require 'meta_project'
-require 'damagecontrol/version'
-require 'damagecontrol/platform'
+#require 'meta_project'
+require 'lib/damagecontrol/version'
 require 'rake/gempackagetask'
 require 'rake/packagetask'
 require 'rake/contrib/sshpublisher'
@@ -47,12 +46,7 @@ PKG_FILES = FileList[
   "public/**/*",
   "sound/**/*",
   "script/**/*",
-  "vendor/rails/actionmailer/lib/**/*",
-  "vendor/rails/actionpack/lib/**/*",
-  "vendor/rails/actionwebservice/lib/**/*",
-  "vendor/rails/activerecord/lib/**/*",
-  "vendor/rails/activesupport/lib/**/*",
-  "vendor/rails/railties/lib/**/*"
+  "vendor/**/lib/**/*",
 ]
 
 DIST_DIR = "dist/#{PKG_FILE_NAME}"
@@ -70,7 +64,7 @@ task :copy_dist => [:prepare_dist] do
 
   files = PKG_FILES.dup
   files.include(
-    "bin/#{DamageControl::Platform.family}/sqlite3*",
+    "bin/#{RSCM::Platform.family}/sqlite3*",
     "bin/eee*",
     "bin/*rubyscript*"
   )

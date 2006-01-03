@@ -1,3 +1,5 @@
+# THIS CODE IS NOT ACTIVE YET
+
 RAILS_STATS_LOC_TOTAL     = /\|\s+Total\s+\|\s+\d+\s+\|\s+(\d+)\s+\|/
 RAILS_STATS_CLASSES_TOTAL = /\|\s+Total\s+\|\s+\d+\s+\|\s+\d+\s+\|\s+(\d+)\s+\|/
 RAILS_STATS_METHODS_TOTAL = /\|\s+Total\s+\|\s+\d+\s+\|\s+\d+\s+\|\s+\d+\s+\|\s+(\d+)\s+\|/

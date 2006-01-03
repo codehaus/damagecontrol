@@ -1,5 +1,5 @@
+# THIS CODE IS NOT ACTIVE YET
 # http://ostermiller.org/findcomment.html
-
 # metric: ration of commented out code
 module DamageControl
   module Task

@@ -1,6 +1,7 @@
 class Project < ActiveRecord::Base
   
   has_many :revisions, :order => "timepoint DESC", :dependent => true
+
   # Exists only for the purpose of automatic deletion
   has_many :scm_files, :dependent => true
 
@@ -43,9 +44,12 @@ class Project < ActiveRecord::Base
   
   def after_find #:nodoc:
     FileUtils.mkdir_p basedir unless File.exist?(basedir)
-    self.scm.checkout_dir = working_copy_dir if self.scm
-    self.scm.enabled = true if self.scm
-    self.scm.revision_detection ||= "ALWAYS_POLL" if self.scm
+    if self.scm
+      self.scm.checkout_dir = working_copy_dir
+      self.scm.default_options = {:stdout => scm_log('stdout'), :stderr => scm_log('stderr')}
+      self.scm.enabled = true
+      self.scm.revision_detection ||= "ALWAYS_POLL"
+    end
     self.tracker.enabled = true if self.tracker
   end
 
@@ -183,19 +187,23 @@ LIMIT #{options[:count]}
   end
 
   def working_copy_dir
-     File.expand_path("#{basedir}/working_copy")
+    "#{basedir}/working_copy"
   end
 
   def scm_trigger_dir
-     File.expand_path("#{basedir}/scm_trigger")
+    "#{basedir}/scm_trigger"
   end
 
   def zip_dir
-     mkdir "#{basedir}/zips"
+    mkdir "#{basedir}/zips"
   end
 
   def build_dir
     mkdir "#{working_copy_dir}/#{relative_build_path}"
+  end
+  
+  def scm_log(name)
+    "#{basedir}/#{scm.class.name.demodulize.underscore}_#{name}.log"
   end
 
   def revisions_rss(controller, rss_version="2.0")

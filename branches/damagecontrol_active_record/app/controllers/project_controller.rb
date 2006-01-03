@@ -47,10 +47,10 @@ class ProjectController < ApplicationController
     )
 
     # Set up some default publishers
-    if(DamageControl::Platform.family == 'powerpc-darwin')
+    if(DamageControl::RSCM::Platform.family == 'powerpc-darwin')
       project.add_growl
     end
-    if(DamageControl::Platform.family == 'powerpc-darwin' || DamageControl::Platform.family == 'win32')
+    if(DamageControl::RSCM::Platform.family == 'powerpc-darwin' || DamageControl::RSCM::Platform.family == 'win32')
       project.add_sound
     end
 
@@ -108,7 +108,7 @@ class ProjectController < ApplicationController
 
     begin
       status = publisher.publish(build)
-      render :text => (status.is_a?(String) && status.strip != "") ? status : "Tested #{publisher.visual_name}"
+      render :text => (status.is_a?(String) && status.strip != "") ? status : "Tested #{publisher.class.name}"
     rescue => e
       trace = e.backtrace.join("\n")
       render :text => "Failed to test: #{e.message}<br/><pre>#{trace}</pre>"
@@ -153,6 +153,14 @@ class ProjectController < ApplicationController
     render :text => @project.builds_rss(self), :layout => false
   end
   
+  def scm_stdout
+    send_log(find.scm_log("stdout"))
+  end
+
+  def scm_stderr
+    send_log(find.scm_log("stderr"))
+  end
+
   # Java WebStart
   def jnlp
     response.headers["Content-Type"] = "application/x-java-jnlp-file"

@@ -171,6 +171,12 @@ class ProjectTest < Test::Unit::TestCase
     pending = revisions(:revision_3).request_builds(Build::SCM_POLLED)
     assert_equal(pending, projects(:project_1).pending_builds)
   end
+
+  def TODOtest_should_have_latest_pending_builds_through_revisions
+    assert_equal([], projects(:project_1).revisions.pending_builds)
+    pending = revisions(:revision_3).request_builds(Build::SCM_POLLED)
+    assert_equal(pending, projects(:project_1).revisions.pending_builds)
+  end
   
   def FIXMEtest_should_import_and_export_as_yaml
     import = YAML.load_file(File.dirname(__FILE__) + '/../../damagecontrol.yml')
