@@ -1,3 +1,6 @@
+<%= link_to("Standard out", :action => "stdout", :id => @build.id) %> |
+<%= link_to("Standard error", :action => "stderr", :id => @build.id) %>
+
 <table>
   <!--tr>
     <td>Promotion level</td>
@@ -21,7 +24,33 @@
     <td>Request time</td>
     <td><%= @build.create_time %></td>
   </tr>
+  <% unless @build.end_time.nil? %>
+  <tr>
+    <td>Exit status</td>
+    <td><%= @build.exitstatus %></td>
+  </tr>
+  <tr>
+    <td>End time</td>
+    <td><%= @build.end_time %></td>
+  </tr>
+  <tr>
+    <td>Duration</td>
+    <td><%= distance_of_time_in_words(@build.begin_time, @build.end_time, true) %></td>
+  </tr>
+  <tr>
+    <td>Finished</td>
+    <td><%= time_ago_in_words(@build.end_time) %> ago</td>
+  </tr>
+  <tr>
+    <td>Artifacts</td>
+    <td><%= @build.artifacts.collect{ |artifact| file_system_link(artifact) }.join("<br>\n") %></td>
+  </tr>
+  <% end %>
   <% unless @build.begin_time.nil? %>
+  <tr>
+    <td>Begin time</td>
+    <td><%= @build.begin_time %></td>
+  </tr>
   <tr>
     <td>Command</td>
     <td><%= @build.command %></td>
@@ -45,34 +74,5 @@
 	  </table>
     </td>
   </tr>
-  <tr>
-    <td>Begin time</td>
-    <td><%= @build.begin_time %></td>
-  </tr>
-  <% end %>
-  <% unless @build.end_time.nil? %>
-  <tr>
-    <td>Exit status</td>
-    <td><%= @build.exitstatus %></td>
-  </tr>
-  <tr>
-    <td>End time</td>
-    <td><%= @build.end_time %></td>
-  </tr>
-  <tr>
-    <td>Duration</td>
-    <td><%= distance_of_time_in_words(@build.begin_time, @build.end_time, true) %></td>
-  </tr>
-  <tr>
-    <td>Finished</td>
-    <td><%= time_ago_in_words(@build.end_time) %> ago</td>
-  </tr>
-  <tr>
-    <td>Artifacts</td>
-    <td><%= @build.artifacts.collect{ |artifact| file_system_link(artifact) }.join("<br>\n") %></td>
-  </tr>
   <% end %>
 </table>
-
-<%= link_to("Standard out", :action => "stdout", :id => @build.id) %> |
-<%= link_to("Standard error", :action => "stderr", :id => @build.id) %>

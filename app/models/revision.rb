@@ -95,7 +95,8 @@ class Revision < ActiveRecord::Base
     {
       "DAMAGECONTROL_BUILD_LABEL" => label.to_s,
       "PKG_BUILD" => label.to_s,
-      "DAMAGECONTROL_CHANGED_FILES" => scm_files.collect{|f| f.path}.join(',')
+      "DAMAGECONTROL_CHANGED_FILES" => scm_files.collect{|f| f.path}.join(','),
+      "RAILS_ENV" => "development"
     }
   end
 
